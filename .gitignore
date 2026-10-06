@@ -1,0 +1,25 @@
+# Ambiente e arquivos temporários do Python
+_geradores/.venv/
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Arquivos de bloqueio do Excel e do LibreOffice
+~$*
+.~lock.*#
+
+# Vercel e variáveis de ambiente locais
+.vercel/
+.env*
+!.env.example
+
+# Arquivos transitórios do Superpowers SDD
+.superpowers/sdd/
+.superpowers/cache/
+
+# Sistema operacional e logs
+*.log
+.DS_Store
+Thumbs.db
