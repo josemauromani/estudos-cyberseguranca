@@ -1,0 +1,966 @@
+/* ==========================================================================
+   ESTUDOS DE CIBERSEGURANÇA — DESIGN SYSTEM BASE (base.css)
+   Compatível com temas Claro / Escuro, responsivo e 100% offline-ready.
+   Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0. Importação de Fontes Web (Google Fonts com Fallbacks Locais Nativos)
+   -------------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+/* --------------------------------------------------------------------------
+   1. Design Tokens & Variáveis CSS (Tema Claro - Padrão)
+   -------------------------------------------------------------------------- */
+:root {
+  /* Paleta Base */
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+
+  /* Cores Temáticas das 6 Trilhas */
+  --t1-blue: #2563EB;     /* Trilha 1: Fundamentos & Princípios */
+  --t2-green: #059669;    /* Trilha 2: Defesa & Operações Blue Team */
+  --t3-red: #DC2626;      /* Trilha 3: Segurança Ofensiva & Red Team */
+  --t4-purple: #7C3AED;   /* Trilha 4: Engenharia, Cloud & AppSec */
+  --t5-cyan: #0891B2;     /* Trilha 5: Criptografia & Identidade */
+  --t6-amber: #D97706;    /* Trilha 6: Governança, Risco & Regulação */
+
+  /* Cores de Alerta / Callouts */
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+
+  --warning-color: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #F59E0B;
+
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+
+  --law-color: #7C3AED;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+
+  /* Tipografia */
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+
+  /* Espaçamento e Bordas */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 28, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 28, 0.08), 0 2px 4px -2px rgba(15, 23, 28, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 28, 0.1), 0 4px 6px -4px rgba(15, 23, 28, 0.05);
+
+  /* Transição */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.25s ease-in-out;
+}
+
+/* --------------------------------------------------------------------------
+   2. Suporte a Tema Escuro (Modo Noturno / Dark Mode)
+   -------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0F171C;
+    --surface: #172229;
+    --sunk: #1E2B33;
+    --ink: #E4EAED;
+    --muted: #9BABB6;
+    --rule: #2B3A44;
+
+    /* Trilhas no Dark Mode (ajuste de saturação e contraste) */
+    --t1-blue: #60A5FA;
+    --t2-green: #34D399;
+    --t3-red: #F87171;
+    --t4-purple: #A78BFA;
+    --t5-cyan: #22D3EE;
+    --t6-amber: #FBBF24;
+
+    /* Alertas no Dark Mode */
+    --tip-color: #34D399;
+    --tip-bg: rgba(5, 150, 105, 0.18);
+    --tip-border: #059669;
+
+    --warning-color: #FBBF24;
+    --warning-bg: rgba(217, 119, 6, 0.18);
+    --warning-border: #D97706;
+
+    --danger-color: #F87171;
+    --danger-bg: rgba(220, 38, 38, 0.20);
+    --danger-border: #DC2626;
+
+    --law-color: #A78BFA;
+    --law-bg: rgba(124, 58, 237, 0.18);
+    --law-border: #7C3AED;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #0F171C;
+  --surface: #172229;
+  --sunk: #1E2B33;
+  --ink: #E4EAED;
+  --muted: #9BABB6;
+  --rule: #2B3A44;
+
+  --t1-blue: #60A5FA;
+  --t2-green: #34D399;
+  --t3-red: #F87171;
+  --t4-purple: #A78BFA;
+  --t5-cyan: #22D3EE;
+  --t6-amber: #FBBF24;
+
+  --tip-color: #34D399;
+  --tip-bg: rgba(5, 150, 105, 0.18);
+  --tip-border: #059669;
+
+  --warning-color: #FBBF24;
+  --warning-bg: rgba(217, 119, 6, 0.18);
+  --warning-border: #D97706;
+
+  --danger-color: #F87171;
+  --danger-bg: rgba(220, 38, 38, 0.20);
+  --danger-border: #DC2626;
+
+  --law-color: #A78BFA;
+  --law-bg: rgba(124, 58, 237, 0.18);
+  --law-border: #7C3AED;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="light"] {
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+
+  --t1-blue: #2563EB;
+  --t2-green: #059669;
+  --t3-red: #DC2626;
+  --t4-purple: #7C3AED;
+  --t5-cyan: #0891B2;
+  --t6-amber: #D97706;
+
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+
+  --warning-color: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #F59E0B;
+
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+
+  --law-color: #7C3AED;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+}
+
+/* --------------------------------------------------------------------------
+   3. Reset e Estilos Globais
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  color-scheme: light dark;
+}
+
+body {
+  background-color: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  margin: 0;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* Tipografia Estrutural */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.75rem; margin-top: 2rem; border-bottom: 2px solid var(--rule); padding-bottom: 0.5rem; }
+h3 { font-size: 1.35rem; margin-top: 1.5rem; }
+h4 { font-size: 1.15rem; }
+
+p {
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--t1-blue);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity var(--transition-fast);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code, kbd, samp {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background-color: var(--sunk);
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--rule);
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  background-color: #0D1418;
+  color: #E2E8F0;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  border: none;
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   4. Layout do Documento & Barra de Navegação Superior
+   -------------------------------------------------------------------------- */
+.top-nav {
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.top-nav-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.nav-back:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.theme-toggle-btn {
+  background: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+  background: var(--surface);
+  border-color: var(--muted);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 4rem 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   5. Cabeçalho de Destaque (.hero-header) e Metadados
+   -------------------------------------------------------------------------- */
+.hero-header {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-color: var(--track-color, var(--t1-blue));
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  background-color: var(--sunk);
+  color: var(--ink);
+}
+
+.badge-t1 { background-color: rgba(37, 99, 235, 0.15); color: var(--t1-blue); }
+.badge-t2 { background-color: rgba(5, 150, 105, 0.15); color: var(--t2-green); }
+.badge-t3 { background-color: rgba(220, 38, 38, 0.15); color: var(--t3-red); }
+.badge-t4 { background-color: rgba(124, 58, 237, 0.15); color: var(--t4-purple); }
+.badge-t5 { background-color: rgba(8, 145, 178, 0.15); color: var(--t5-cyan); }
+.badge-t6 { background-color: rgba(217, 119, 6, 0.15); color: var(--t6-amber); }
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+}
+
+.meta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.meta-item strong {
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   6. Caixas de Destaque (.callout)
+   -------------------------------------------------------------------------- */
+.callout {
+  padding: 1.1rem 1.35rem;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  border-left: 5px solid var(--muted);
+  background-color: var(--sunk);
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+}
+
+.callout strong {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+}
+
+.callout-tip, .callout.tip {
+  border-left-color: var(--tip-color);
+  background-color: var(--tip-bg);
+}
+
+.callout-warning, .callout.warning {
+  border-left-color: var(--warning-color);
+  background-color: var(--warning-bg);
+}
+
+.callout-danger, .callout.danger {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg);
+}
+
+.callout-law, .callout.law {
+  border-left-color: var(--law-color);
+  background-color: var(--law-bg);
+}
+
+/* --------------------------------------------------------------------------
+   7. Bloco Terminal / Comandos (.terminal-box)
+   -------------------------------------------------------------------------- */
+.terminal-box {
+  background-color: #0A0F13;
+  color: #E2E8F0;
+  border: 1px solid #1E293B;
+  border-radius: var(--radius-md);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.terminal-header {
+  background-color: #151E27;
+  padding: 0.5rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1E2B37;
+}
+
+.terminal-title {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #94A3B8;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.terminal-title::before {
+  content: "● ● ●";
+  letter-spacing: 0.15rem;
+  color: #475569;
+  font-size: 0.65rem;
+}
+
+.btn-copy {
+  background-color: #243242;
+  color: #CBD5E1;
+  border: 1px solid #334155;
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-copy:hover {
+  background-color: #334155;
+  color: #FFFFFF;
+}
+
+.terminal-box pre {
+  margin: 0;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 1rem;
+  color: #E2E8F0;
+}
+
+/* --------------------------------------------------------------------------
+   8. Simulador / Painel de Laboratório (.lab-box)
+   -------------------------------------------------------------------------- */
+.lab-box {
+  background-color: var(--surface);
+  border: 2px solid var(--rule);
+  border-radius: var(--radius-lg);
+  margin: 2rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.lab-header {
+  background-color: var(--sunk);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.lab-header h3 {
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+  font-size: 1.3rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lab-header p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+.lab-body {
+  padding: 1.5rem;
+}
+
+.lab-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  background-color: var(--ground);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+}
+
+.lab-controls label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.lab-controls input[type="text"],
+.lab-controls input[type="number"],
+.lab-controls select,
+.lab-controls textarea {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.lab-controls input:focus,
+.lab-controls select:focus,
+.lab-controls textarea:focus {
+  outline: none;
+  border-color: var(--t1-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.lab-output {
+  background-color: #0B1116;
+  color: #38BDF8;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid #1E293B;
+  min-height: 100px;
+  max-height: 400px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.55;
+}
+
+/* --------------------------------------------------------------------------
+   9. Botões e Controles Padrão
+   -------------------------------------------------------------------------- */
+.btn-primary {
+  background-color: var(--t1-blue);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface);
+  border-color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   10. Lista de Verificação Interativa (.checklist)
+   -------------------------------------------------------------------------- */
+.checklist {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin: 1.75rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.checklist h4 {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.checklist-progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: var(--sunk);
+  border-radius: var(--radius-pill);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.checklist-progress-fill {
+  height: 100%;
+  background-color: var(--t2-green);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  margin: 0.25rem 0;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast);
+}
+
+.check-item:hover {
+  background-color: var(--sunk);
+}
+
+.check-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--muted);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.check-item input[type="checkbox"]:checked {
+  background-color: var(--t2-green);
+  border-color: var(--t2-green);
+}
+
+.check-item input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.check-item span {
+  font-size: 0.95rem;
+  color: var(--ink);
+  line-height: 1.45;
+  transition: color var(--transition-fast);
+}
+
+.check-item.completed span {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   11. Quiz de Fixação (.quiz, .quiz-item, .quiz-section)
+   -------------------------------------------------------------------------- */
+.quiz-section {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  margin: 2rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.quiz-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.quiz-item {
+  background-color: var(--sunk);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.quiz-question {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 0.85rem;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.quiz-btn {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1.4;
+}
+
+.quiz-btn:hover:not(:disabled) {
+  border-color: var(--t1-blue);
+  background-color: var(--ground);
+}
+
+.quiz-btn.correct {
+  background-color: var(--tip-bg) !important;
+  border-color: var(--t2-green) !important;
+  color: var(--t2-green) !important;
+  font-weight: 600;
+}
+
+.quiz-btn.incorrect {
+  background-color: var(--danger-bg) !important;
+  border-color: var(--danger-color) !important;
+  color: var(--danger-color) !important;
+}
+
+.quiz-feedback {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-top: 0.75rem;
+  border-left: 4px solid var(--rule);
+  background-color: var(--surface);
+}
+
+.quiz-feedback.correct {
+  border-left-color: var(--t2-green);
+  background-color: var(--tip-bg);
+  color: var(--ink);
+}
+
+.quiz-feedback.incorrect {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg);
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   12. Grade de Fatos / Cards Comparativos (.facts-grid, .facts-card)
+   -------------------------------------------------------------------------- */
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.facts-card {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.facts-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.facts-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+}
+
+.facts-card p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   13. Tabelas Técnicas Comparativas
+   -------------------------------------------------------------------------- */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  background-color: var(--surface);
+  text-align: left;
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+th {
+  background-color: var(--sunk);
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: var(--ground);
+}
+
+/* --------------------------------------------------------------------------
+   14. Rodapé e Referências
+   -------------------------------------------------------------------------- */
+.study-footer {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   15. Responsividade & Impressão (@media)
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  h1 { font-size: 1.85rem; }
+  h2 { font-size: 1.45rem; }
+  .hero-header { padding: 1.25rem; }
+  .lab-body { padding: 1rem; }
+  .lab-controls { flex-direction: column; align-items: stretch; }
+  .top-nav-inner { padding: 0.5rem 1rem; }
+}
+
+@media print {
+  body {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  .top-nav, .theme-toggle-btn, .btn-copy, .lab-controls button {
+    display: none !important;
+  }
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+  .hero-header, .lab-box, .checklist, .quiz-section {
+    border: 1px solid #CCC !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+}
