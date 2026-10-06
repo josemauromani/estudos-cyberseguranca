@@ -1,0 +1,39 @@
+# Catálogo Canônico de Estudos em Cibersegurança (28 Módulos)
+# Formato: slug|titulo_curto|pasta|arquivo_html|trilha_num|cor_tema|nist_fn
+#
+# Trilhas:
+# 1 = Fundamentos & Redes (#2563EB)
+# 2 = Segurança Defensiva (#059669)
+# 3 = Segurança Ofensiva (#DC2626)
+# 4 = Operações & SOC (#7C3AED)
+# 5 = Especialidades (#0891B2)
+# 6 = Governança & Riscos (#D97706)
+
+Fundamentos-Ciber|Tríade CIA, Ameaças e Modelagem STRIDE|Fundamentos-Ciber|treinamento-fundamentos-ciber.html|1|#2563EB|Identify
+Redes-e-Protocolos|TCP/IP, DNS, Roteamento e Inspeção de Tráfego|Redes-e-Protocolos|treinamento-redes-e-protocolos.html|1|#2563EB|Protect / Detect
+Criptografia-Pratica|Criptografia Simétrica, Assimétrica, Hashes e PKI|Criptografia-Pratica|treinamento-criptografia-pratica.html|1|#2563EB|Protect
+Autenticacao-e-IAM|Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC|Autenticacao-e-IAM|treinamento-autenticacao-e-iam.html|1|#2563EB|Protect
+Segmentacao-e-Firewall|DMZ, VLANs, Regras de Firewall e Filtragem|Segmentacao-e-Firewall|treinamento-segmentacao-e-firewall.html|1|#2563EB|Protect
+Hardening-Sistemas|Bastionamento Linux e Windows (CIS Benchmarks)|Hardening-Sistemas|treinamento-hardening-sistemas.html|2|#059669|Protect
+Seguranca-de-Redes-Defesa|IDS/IPS, WAF, VPNs e Proxies Reversos|Seguranca-de-Redes-Defesa|treinamento-seguranca-de-redes-defesa.html|2|#059669|Protect / Detect
+Arquitetura-Zero-Trust|Princípios Zero Trust e Microsegmentação|Arquitetura-Zero-Trust|treinamento-arquitetura-zero-trust.html|2|#059669|Protect
+Gestao-de-Vulnerabilidades|CVE, CVSS v3.1/v4.0 e Priorização de Patches|Gestao-de-Vulnerabilidades|treinamento-gestao-de-vulnerabilidades.html|2|#059669|Identify / Protect
+Seguranca-em-Endpoints-EDR|Antivírus, EDR/XDR e Proteção de Host|Seguranca-em-Endpoints-EDR|treinamento-seguranca-em-endpoints-edr.html|2|#059669|Protect / Detect
+Reconhecimento-e-OSINT|Superfície de Ataque, DNS, WHOIS e Shodan|Reconhecimento-e-OSINT|treinamento-reconhecimento-e-osint.html|3|#DC2626|Identify
+OWASP-Top-10-Web|Falhas Web (SQLi, XSS, CSRF, Broken Auth)|OWASP-Top-10-Web|treinamento-owasp-top-10-web.html|3|#DC2626|Protect
+Seguranca-em-APIs|OWASP API Security, Rate Limiting e Tokens|Seguranca-em-APIs|treinamento-seguranca-em-apis.html|3|#DC2626|Protect
+Pentest-Metodologias|Fases do Pentest (PTES), Escopo e Relatório|Pentest-Metodologias|treinamento-pentest-metodologias.html|3|#DC2626|Identify
+Engenharia-Social-e-Phishing|Pretexting, Spear Phishing e Defesas Humanas|Engenharia-Social-e-Phishing|treinamento-engenharia-social-e-phishing.html|3|#DC2626|Protect
+Operacoes-SOC-e-SIEM|Rotina de SOC L1/L2, Logs e Regras Sigma|Operacoes-SOC-e-SIEM|treinamento-operacoes-soc-e-siem.html|4|#7C3AED|Detect
+Threat-Intelligence|IoCs, TTPs, MITRE ATT&CK e STIX/TAXII|Threat-Intelligence|treinamento-threat-intelligence.html|4|#7C3AED|Identify / Detect
+Resposta-a-Incidentes|Ciclo NIST SP 800-61 (Contenção e Erradicação)|Resposta-a-Incidentes|treinamento-resposta-a-incidentes.html|4|#7C3AED|Respond
+Forense-Digital|Cadeia de Custódia, Coleta de RAM e Artefatos|Forense-Digital|treinamento-forense-digital.html|4|#7C3AED|Respond
+Analise-Basica-de-Malware|Análise Estática vs Dinâmica e Sandboxes|Analise-Basica-de-Malware|treinamento-analise-basica-de-malware.html|4|#7C3AED|Detect / Respond
+Seguranca-em-Nuvem|Responsabilidade Compartilhada e CSPM|Seguranca-em-Nuvem|treinamento-seguranca-em-nuvem.html|5|#0891B2|Protect
+DevSecOps-e-CI-CD|Shift-Left, SAST, DAST, SCA e Containers|DevSecOps-e-CI-CD|treinamento-devsecops-e-ci-cd.html|5|#0891B2|Protect
+Seguranca-em-IoT-e-OT|Redes Industriais (SCADA/Modbus) e IoT|Seguranca-em-IoT-e-OT|treinamento-seguranca-em-iot-e-ot.html|5|#0891B2|Protect
+IA-e-Ciberseguranca|Ameaças a LLMs (OWASP LLM), Deepfakes e Defesa|IA-e-Ciberseguranca|treinamento-ia-e-ciberseguranca.html|5|#0891B2|Protect / Detect
+Gestao-de-Riscos-TI|Avaliação Qualitativa vs Quantitativa (ALE/SLE)|Gestao-de-Riscos-TI|treinamento-gestao-de-riscos-ti.html|6|#D97706|Govern / Identify
+ISO-27001-e-27002|SGSI e Controles do Anexo A (Edição 2022)|ISO-27001-e-27002|treinamento-iso-27001-e-27002.html|6|#D97706|Govern
+LGPD-e-Privacidade|Bases Legais, Direitos do Titular e RIPD/DPIA|LGPD-e-Privacidade|treinamento-lgpd-e-privacidade.html|6|#D97706|Govern / Protect
+Continuidade-e-Disaster-Recovery|BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1|Continuidade-e-Disaster-Recovery|treinamento-continuidade-e-disaster-recovery.html|6|#D97706|Recover
