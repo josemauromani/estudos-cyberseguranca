@@ -1,0 +1,757 @@
+<!-- ==========================================================================
+     Estudo 07: Segurança de Redes Defensiva
+     Corpo do Treinamento: IDS/IPS, WAF, VPNs e Proxies Reversos
+     ========================================================================== -->
+
+<header class="study-header">
+  <span class="study-track-kicker">Trilha 2: Segurança Defensiva &bull; Estudo 07</span>
+  <h1 class="study-title">Segurança de Redes Defensiva: IDS/IPS, WAF, VPNs e Proxies Reversos</h1>
+  <p class="study-lead">
+    Enquanto firewalls tradicionais de rede decidem se um fluxo de tráfego é permitido com base apenas em IPs e portas,
+    ameaças modernas operam escondidas no interior de conexões legítimas (portas 80 e 443).
+    Compreender a atuação e os trade-offs entre sistemas de detecção passiva (IDS) e prevenção inline (IPS),
+    a formulação de regras em motores de alta performance (Snort 3 e Suricata), a proteção profunda de Camada 7 via
+    Web Application Firewalls (WAF) com o OWASP Core Rule Set, a blindagem de serviços com Proxies Reversos e mTLS,
+    e a arquitetura de túneis criptográficos seguros (WireGuard e IPsec IKEv2) é essencial para interceptar adversários
+    antes que alcancem seus objetivos.
+  </p>
+  <div class="study-meta-bar">
+    <span class="badge green">NIST CSF 2.0: Protect / Detect (PR.DS / DE.CM)</span>
+    <span class="badge slate">MITRE ATT&amp;CK: TA0011, TA0005, T1071, T1573, T1048</span>
+    <span class="badge slate">Tempo Estimado: ~50 minutos</span>
+    <span class="badge slate">Carreiras: Blue Team &bull; SOC &bull; Engenharia de Redes</span>
+  </div>
+</header>
+
+<!-- SEÇÃO 1: IDS VS IPS E MOTORES SNORT/SURICATA -->
+<section class="study-section" id="ids-vs-ips">
+  <div class="section-title-wrap">
+    <span class="section-num">01</span>
+    <h2>Sistemas de Detecção e Prevenção de Intrusão (IDS vs IPS)</h2>
+  </div>
+
+  <p>
+    Sistemas de detecção e prevenção de intrusão inspecionam o conteúdo detalhado (cabeçalhos e carga útil / payload)
+    dos pacotes de dados que trafegam pela rede, procurando por anomalias, explorações de vulnerabilidades conhecidas,
+    atividades de malwares ou desvios de protocolos. A distinção arquitetural primária reside em seu modo de posicionamento:
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>IDS (Intrusion Detection System) &bull; Modo Passivo</h4>
+      <p>
+        Posicionado <strong>fora do caminho direto do tráfego (Out-of-Band)</strong>. Recebe uma cópia dos pacotes através
+        de uma porta espelhada em switch (<strong>SPAN - Switch Port Analyzer</strong>) ou um <strong>Network TAP</strong> físico.
+        <br><strong>Vantagem:</strong> Impacto nulo na latência da rede e sem risco de derrubar conexões legítimas se travar.
+        <br><strong>Limitação:</strong> Não impede o ataque em tempo real. Quando o IDS gera o alerta no SIEM, o pacote malicioso já atingiu a vítima.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>IPS (Intrusion Prevention System) &bull; Modo Inline Ativo</h4>
+      <p>
+        Posicionado <strong>diretamente no fluxo do tráfego (In-Line)</strong>, entre os roteadores/firewalls e a rede protegida.
+        Todo pacote precisa atravessar a CPU do IPS antes de ser encaminhado.
+        <br><strong>Vantagem:</strong> Bloqueia ativamente ataques em tempo real (ação <code>DROP</code>, injeção de <code>TCP RST</code> ou reconfiguração de firewall).
+        <br><strong>Risco:</strong> Pode introduzir latência de rede e, em caso de falsos positivos, interromper serviços comerciais críticos.
+      </p>
+    </div>
+  </div>
+
+  <h3>Motores de Inspeção: Snort vs Suricata</h3>
+  <p>
+    Os dois motores de código aberto mais consagrados mundialmente compartilham sintaxes de regras compatíveis,
+    porém possuem diferenças arquiteturais marcantes:
+  </p>
+  <ul>
+    <li>
+      <strong>Snort 3:</strong> Desenvolvido pela Cisco Talos. O Snort 3 introduziu arquitetura multi-threaded moderna,
+      melhor manipulação de conexões paralelas, inspeção inteligente de protocolos com buffers dedicados (como <code>http_uri</code>,
+      <code>http_header</code> e <code>http_client_body</code>) e configuração flexível em scripts Lua.
+    </li>
+    <li>
+      <strong>Suricata:</strong> Mantido pela Open Information Security Foundation (OISF). Projetado desde a sua concepção
+      com suporte nativo a multi-threading massivo e aceleração por hardware (GPU/DPDK). Destaca-se pela geração nativa de telemetria
+      estruturada rica em formato <strong>EVE JSON</strong>, que integra diretamente com SIEMs (Splunk, Elastic, Graylog) registrando
+      metadados de sessões DNS, TLS, HTTP e fluxos de rede sem necessidade de parsers complexos.
+    </li>
+  </ul>
+
+  <h3>Anatomia de uma Regra de Assinatura (Snort / Suricata)</h3>
+  <div class="terminal-box">
+    <div class="terminal-header">
+      <span class="terminal-title">Estrutura de Regra de Assinatura de Intrusão</span>
+      <button class="terminal-copy-btn" onclick="copyCode(this, 'snort-rule-sample')">Copiar</button>
+    </div>
+    <pre id="snort-rule-sample"><code>alert tcp $EXTERNAL_NET any -&gt; $HTTP_SERVERS $HTTP_PORTS (
+  msg:"ET EXPLOIT Possível SQL Injection em Parâmetro HTTP (UNION SELECT)";
+  flow:established,to_server;
+  content:"UNION",nocase;
+  content:"SELECT",nocase,distance 1;
+  pcre:"/UNION\s+ALL\s+SELECT/i";
+  classtype:web-application-attack;
+  sid:2001001;
+  rev:1;
+)</code></pre>
+  </div>
+
+  <p>
+    A regra divide-se em <strong>Cabeçalho da Regra</strong> (Ação <code>alert</code>, Protocolo <code>tcp</code>, Redes de Origem e Destino, Portas)
+    e <strong>Opções da Regra</strong> entre parênteses:
+  </p>
+  <ul>
+    <li><code>msg:</code> Texto descritivo do alerta exibido no console do SOC.</li>
+    <li><code>flow:established,to_server:</code> Otimização crítica. Avalia o tráfego apenas em conexões TCP já estabelecidas na direção do cliente para o servidor, descartando pacotes soltos ou forjados.</li>
+    <li><code>content:"...",nocase:</code> Busca rápida de correspondência de strings (case-insensitive) no payload.</li>
+    <li><code>pcre:</code> Expressão regular Perl-Compatible para validação refinada de padrões complexos.</li>
+    <li><code>sid:</code> <em>Signature ID</em> único da regra (regras personalizadas utilizam IDs acima de <code>1000000</code>).</li>
+  </ul>
+</section>
+
+<!-- SEÇÃO 2: WEB APPLICATION FIREWALLS (WAF) -->
+<section class="study-section" id="waf-camada-7">
+  <div class="section-title-wrap">
+    <span class="section-num">02</span>
+    <h2>Web Application Firewalls (WAF) e Proteção em Camada 7</h2>
+  </div>
+
+  <p>
+    Um firewall de rede convencional permite tráfego na porta 443 porque sabe que é HTTPS. No entanto, ele não possui
+    entendimento semântico sobre a lógica da aplicação web. Um ataque de <strong>SQL Injection (SQLi)</strong>,
+    <strong>Cross-Site Scripting (XSS)</strong> ou <strong>Remote Code Execution (RCE)</strong> chega codificado perfeitamente
+    dentro de uma requisição HTTP válida. É aqui que entra o <strong>Web Application Firewall (WAF)</strong>.
+  </p>
+
+  <div class="callout tip">
+    <h4>O Padrão da Indústria: OWASP Core Rule Set (CRS)</h4>
+    <p>
+      O <strong>OWASP Core Rule Set (CRS)</strong> é um conjunto padronizado e mantido pela comunidade de regras de detecção
+      para motores WAF (como ModSecurity, Coraza, AWS WAF, Cloudflare e Azure Application Gateway). Ele protege aplicações web
+      contra o <strong>OWASP Top 10</strong> sem exigir conhecimento prévio do código-fonte da aplicação.
+    </p>
+  </div>
+
+  <h3>O Modelo de Pontuação de Anomalias (Anomaly Scoring Mode)</h3>
+  <p>
+    Diferente de firewalls que bloqueiam na primeira regra que der match, os WAFs modernos operam preferencialmente no
+    <strong>Modo de Pontuação de Anomalias (<em>Anomaly Scoring</em>)</strong>:
+  </p>
+  <ul>
+    <li>
+      Cada regra do CRS que detecta um padrão suspeito (ex: caracteres especiais em parâmetros, palavras reservadas de SQL,
+      tags HTML não codificadas) não bloqueia a requisição imediatamente, mas adiciona pontos ao <strong>Score de Anomalia</strong>
+      daquela requisição com base na severidade (Crítico = 5 pontos, Alto = 4, Médio = 3, Baixo = 2).
+    </li>
+    <li>
+      No final da inspeção, se o somatório de pontos ultrapassar o <strong>Limiar Crítico (Inbound Anomaly Score Threshold)</strong>
+      configurado (tipicamente 5 pontos), a requisição é bloqueada com <strong>HTTP 403 Forbidden</strong> e registrada nos logs.
+    </li>
+    <li>
+      <em>Vantagem:</em> Reduz drasticamente a taxa de <strong>Falsos Positivos</strong>, pois uma única anomalia leve não interrompe
+      a navegação de um usuário legítimo, enquanto um ataque verdadeiro acumula dezenas de pontos e é barrado com precisão.
+    </li>
+  </ul>
+</section>
+
+<!-- SEÇÃO 3: PROXIES REVERSOS E MTLS -->
+<section class="study-section" id="proxies-e-mtls">
+  <div class="section-title-wrap">
+    <span class="section-num">03</span>
+    <h2>Proxies Reversos e Autenticação Mútua TLS (mTLS)</h2>
+  </div>
+
+  <p>
+    Um <strong>Reverse Proxy (Proxy Reverso)</strong> é um servidor intermediário posicionado na borda da infraestrutura
+    que recebe requisições de clientes externos e as despacha para os servidores de aplicação internos adequados.
+    Exemplos dominantes incluem NGINX, HAProxy, Envoy e Traefik.
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>Ocultação de Topologia e Isolamento</h4>
+      <p>
+        O cliente externo conhece apenas o endereço IP público do Proxy Reverso.
+        Os servidores de backend de banco de dados e microsserviços residem em sub-redes privadas inacessíveis diretamente da Internet.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>Terminação TLS e Descarga (SSL Offloading)</h4>
+      <p>
+        O proxy centraliza o gerenciamento dos certificados SSL/TLS, negociando cifras criptográficas robustas na borda
+        e descarregando o processamento computacional intensivo dos servidores de aplicação.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>Injeção de Cabeçalhos de Segurança HTTP</h4>
+      <p>
+        Aplica cabeçalhos defensivos globais em todas as respostas: <code>Strict-Transport-Security (HSTS)</code>,
+        <code>Content-Security-Policy (CSP)</code>, <code>X-Frame-Options: DENY</code> e <code>X-Content-Type-Options: nosniff</code>.
+      </p>
+    </div>
+  </div>
+
+  <h3>Autenticação Mútua TLS (mTLS - Mutual TLS)</h3>
+  <p>
+    No TLS convencional da web, apenas o servidor apresenta um certificado digital para comprovar sua identidade ao navegador do cliente.
+    Em arquiteturas de alta segurança, comunicação interbancária e malhas de microsserviços (<em>Service Meshes</em> como Istio e Linkerd),
+    adota-se a <strong>Autenticação Mútua TLS (mTLS)</strong>:
+  </p>
+  <ul>
+    <li>O servidor valida o certificado do cliente contra uma Autoridade Certificadora (CA) interna confiável.</li>
+    <li>O cliente valida o certificado do servidor.</li>
+    <li>Ambas as partes autenticam-se mutuamente através de chaves criptográficas assimétricas antes de qualquer byte de tráfego transitar.</li>
+    <li>Mesmo que um invasor consiga penetrar na rede interna, ele é incapaz de emitir chamadas de API contra microsserviços sem possuir o certificado cliente privado e válido.</li>
+  </ul>
+</section>
+
+<!-- SEÇÃO 4: TÚNEIS VPN SEGUROS (WIREGUARD VS IPSEC) -->
+<section class="study-section" id="vpns-seguras">
+  <div class="section-title-wrap">
+    <span class="section-num">04</span>
+    <h2>Túneis VPN Seguros: IPsec IKEv2 vs WireGuard vs OpenVPN</h2>
+  </div>
+
+  <p>
+    Uma <strong>Rede Virtual Privada (VPN - Virtual Private Network)</strong> estende uma rede corporativa privada através
+    de uma rede pública não confiável (como a Internet), criando um túnel criptografado que assegura confidencialidade,
+    integridade e autenticação de origem dos pacotes.
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>IPsec IKEv2 (Padrão Corporativo L3)</h4>
+      <p>
+        Opera na Camada de Rede (Camada 3). Utiliza o protocolo <strong>ESP (Encapsulating Security Payload)</strong> para cifragem
+        e autenticação em modo Túnel.
+        <br><strong>IKEv2 (Internet Key Exchange v2):</strong> Protocolo maduro que negocia Associações de Segurança (SAs)
+        com suporte a mobilidade (MOBIKE - troca rápida entre Wi-Fi e 5G sem queda de túnel) e PFS (Perfect Forward Secrecy) via Diffie-Hellman.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>WireGuard (A Revolução Moderna)</h4>
+      <p>
+        Protocolo moderno executado diretamente dentro do kernel Linux com apenas <strong>~4.000 linhas de código</strong>
+        (contra centenas de milhares do IPsec/OpenVPN), facilitando auditorias completas de segurança.
+        <br>Utiliza o framework criptográfico <em>Noise Protocol</em> com primitivas de ponta fixas:
+        <strong>ChaCha20-Poly1305</strong> (cifra autenticada), <strong>Curve25519</strong> (troca de chaves ECDH),
+        <strong>BLAKE2s</strong> (hashing) e <strong>SipHash24</strong>. Sem negociação de cifras obsoletas.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>OpenVPN (Alta Flexibilidade)</h4>
+      <p>
+        Executado em espaço de usuário (Userspace) através da interface virtual <code>tun/tap</code> e da biblioteca OpenSSL.
+        Altamente flexível, capaz de encapsular tráfego sobre TCP ou UDP em qualquer porta (inclusive TCP 443 para burlar proxies restritivos),
+        porém apresenta maior sobrecarga de processamento e latência comparado ao WireGuard.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (ANALISADOR SNORT/SURICATA) -->
+<section class="study-section" id="laboratorio-pratico">
+  <div class="section-title-wrap">
+    <span class="section-num">05</span>
+    <h2>Laboratório Interativo: Analisador de Regras Snort/Suricata vs Tráfego</h2>
+  </div>
+
+  <p>
+    Experimente na prática a mecânica interna de avaliação de regras de sistemas de detecção e prevenção de intrusão.
+    Neste laboratório em Vanilla JavaScript, você pode inspecionar regras no padrão canônico Snort/Suricata,
+    injetar payloads de rede e ataques reais (SQL Injection, Path Traversal, Malware Beacons), alternar entre o
+    <strong>Modo IDS (Apenas Alerta)</strong> e o <strong>Modo IPS (Bloqueio Drop &amp; Alert)</strong> e analisar
+    a correspondência exata de assinaturas no tráfego.
+  </p>
+
+  <div class="lab-box" id="ids-lab">
+    <div class="lab-header">
+      <span class="lab-badge">LAB PRÁTICO INTERATIVO</span>
+      <h3>Motor de Inspeção Profunda de Tráfego (DPI) &bull; Snort / Suricata</h3>
+      <p>Avalie payloads contra assinaturas de rede, visualize o byte-match e teste a diferença entre IDS passivo e IPS inline.</p>
+    </div>
+
+    <!-- Alternador de Modo Operacional IDS vs IPS -->
+    <div style="background:var(--ground); border:1px solid var(--rule); border-radius:8px; padding:1rem; margin-bottom: 1.25rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <span style="font-weight:700; font-size:0.9rem; color:var(--ink);">Modo de Operação do Mecanismo:</span>
+        <div style="font-size:0.8rem; color:var(--muted);" id="modo-operacao-desc">
+          Modo IDS: O sistema apenas gera alertas de telemetria no SIEM e deixa o tráfego passar intacto.
+        </div>
+      </div>
+      <div style="display:flex; gap:0.5rem;">
+        <button class="lab-btn selected" id="btn-modo-ids" onclick="alternarModoIdsIps('IDS')" style="outline:2px solid #2563eb;">📡 Modo IDS (Monitoramento Passivo)</button>
+        <button class="lab-btn" id="btn-modo-ips" onclick="alternarModoIdsIps('IPS')">🛡️ Modo IPS (Prevenção In-Line Ativa)</button>
+      </div>
+    </div>
+
+    <!-- Cenários de Tráfego Rápido -->
+    <div style="margin-bottom: 1.25rem;">
+      <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:0.5rem;">Disparar Cenários Práticos de Tráfego de Rede:</div>
+      <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+        <button class="lab-btn" onclick="injetarCenarioTrafego('benigno')">🌐 Tráfego Web Legítimo (GET /index.html)</button>
+        <button class="lab-btn lab-btn-danger" onclick="injetarCenarioTrafego('sqli')">💉 SQL Injection (UNION SELECT)</button>
+        <button class="lab-btn lab-btn-danger" onclick="injetarCenarioTrafego('traversal')">📂 Path Traversal (/etc/passwd)</button>
+        <button class="lab-btn lab-btn-warning" onclick="injetarCenarioTrafego('beacon')">☣️ Sinalização C2 (Cobalt Strike Beacon)</button>
+        <button class="lab-btn lab-btn-warning" onclick="injetarCenarioTrafego('sqlmap')">🔍 Scanner de Vulnerabilidade (SQLMap)</button>
+      </div>
+    </div>
+
+    <!-- Editor de Payload Injetado -->
+    <div style="margin-bottom: 1.25rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+        <label style="font-weight:700; font-size:0.875rem; color:var(--ink);">Payload do Pacote / Requisição HTTP em Trânsito:</label>
+        <span style="font-size:0.75rem; color:var(--muted);">(Você pode editar o payload livremente)</span>
+      </div>
+      <textarea id="payload-input-text" rows="5" style="width:100%; font-family:var(--font-mono); font-size:0.825rem; padding:0.75rem; border-radius:6px; border:1px solid var(--rule); background:var(--ground); color:var(--ink); resize:vertical;"></textarea>
+      <div style="margin-top:0.5rem; text-align:right;">
+        <button class="lab-btn" style="background:#2563eb; color:#fff;" onclick="dispararInspecaoManual()">🚀 Inspecionar Payload no Motor</button>
+      </div>
+    </div>
+
+    <!-- Regras Ativas do Motor Snort/Suricata -->
+    <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1.25rem; margin-bottom: 1.25rem;">
+      <h4 style="margin:0 0 0.5rem 0; font-size:0.95rem; color:var(--ink);">Assinaturas Ativas Carregadas no Motor (Snort/Suricata Syntax)</h4>
+      <div id="regras-ids-container" style="display:flex; flex-direction:column; gap:0.5rem; font-family:var(--font-mono); font-size:0.75rem;">
+        <!-- Renderizado dinamicamente via JS -->
+      </div>
+    </div>
+
+    <!-- Painel de Decisão do Mecanismo -->
+    <div style="background:var(--ground); border:1px solid var(--rule); border-radius:8px; padding:1.25rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem;">
+        <h4 style="margin:0; font-size:1rem; color:var(--ink);">Resultado da Inspeção Profunda de Pacote (DPI)</h4>
+        <span id="resultado-ids-badge" class="badge slate" style="font-size:0.8rem;">Aguardando inspeção...</span>
+      </div>
+      <div id="resultado-ids-corpo" style="font-size:0.85rem; line-height:1.6; color:var(--muted);"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 6: CHECKLIST PRÁTICO -->
+<section class="study-section" id="checklist-defesa-redes">
+  <div class="section-title-wrap">
+    <span class="section-num">06</span>
+    <h2>Checklist de Aplicação Prática: Defesa de Perímetro e Inspeção de Tráfego</h2>
+  </div>
+
+  <p>
+    Utilize este checklist técnico durante implantações de soluções de perímetro, auditorias de segurança
+    de rede ou revisões de arquitetura de tráfego corporativo:
+  </p>
+
+  <div class="checklist" id="checklist-seguranca-redes-defesa">
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Atualização Automatizada de Regras de IDS/IPS (ET / Talos):</strong>
+        O motor de IDS/IPS possui rotina diária automatizada de atualização de regras (Emerging Threats / Cisco Talos)
+        com testes de sintaxe pré-compilação para evitar paradas do serviço.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>WAF com OWASP Core Rule Set em Modo Anomaly Scoring:</strong>
+        Todas as aplicações web expostas para a Internet são protegidas por WAF operando com regras CRS afinadas (tuning),
+        com supressão de regras ruidosas específicas para evitar falsos positivos.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Terminação TLS com Cifras Fortes e HSTS Habilitado:</strong>
+        Proxies reversos rejeitam protocolos legados (SSLv3, TLS 1.0, TLS 1.1) e cifras CBC, exigindo exclusivamente
+        TLS 1.2/TLS 1.3 com Perfect Forward Secrecy (ECDHE) e cabeçalho <code>Strict-Transport-Security</code>.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Adoção de mTLS para Comunicações Críticas M2M:</strong>
+        Microsserviços internos, APIs de alta sensibilidade financeira e canais de ingestão de dados exigem autenticação
+        mútua com certificados X.509 de cliente emitidos por uma autoridade certificadora corporativa.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Túneis VPN com Criptografia Moderna (WireGuard / IKEv2):</strong>
+        Conexões VPN ponto a ponto e acesso remoto utilizam WireGuard ou IPsec IKEv2 com algoritmos resistentes a ataques,
+        descartando protocolos obsoletos como PPTP e L2TP desprotegido.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Exportação Estruturada de Telemetria (EVE JSON / CEF):</strong>
+        Logs de alertas de IDS/IPS e eventos de bloqueio de WAF são exportados em tempo real em formato estruturado
+        para o SIEM corporativo, disparando correlações automáticas de resposta a incidentes.
+      </span>
+    </label>
+  </div>
+</section>
+
+<!-- SEÇÃO 7: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
+<section class="study-section" id="questoes-fixacao">
+  <div class="section-title-wrap">
+    <span class="section-num">07</span>
+    <h2>Questões de Fixação e Concursos Públicos</h2>
+  </div>
+
+  <p>
+    Valide sua compreensão técnica resolvendo questões baseadas em provas de concursos públicos e certificações
+    (CompTIA Security+, Cisco CyberOps, Certified Ethical Hacker):
+  </p>
+
+  <div class="quiz" id="quiz-seguranca-redes-defesa">
+    <!-- Questão 1 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 1 &bull; Posicionamento Arquitetural de IDS vs IPS</span>
+        <p>
+          Uma instituição governamental contratou um especialista em segurança para posicionar uma solução de detecção
+          e combate a ameaças de rede. A diretoria exige que a ferramenta seja capaz de impedir imediatamente em tempo real
+          qualquer pacote contendo código de exploração (exploit) de atingir os servidores de bancos de dados internos,
+          mesmo que isso signifique que o tráfego passe obrigatoriamente por essa ferramenta.
+          Qual tipo de sistema e modo de posicionamento de rede deve ser adotado para atender a essa exigência?
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: Um IPS (Intrusion Prevention System) posicionado em modo Inline (no caminho direto do tráfego).</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> Um IDS tradicional opera em modo passivo (out-of-band), recebendo apenas uma cópia espelhada do tráfego (via porta SPAN ou TAP). Quando o IDS processa a cópia e gera o alerta, o pacote original já chegou ao destino e executou a ação. Somente um **IPS posicionado in-line** (diretamente no fluxo) é capaz de inspecionar o pacote antes de encaminhá-lo e aplicar a ação de descarte imediato (DROP), impedindo que o exploit alcance o servidor interno.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Questão 2 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 2 &bull; Modos Operacionais do OWASP Core Rule Set</span>
+        <p>
+          Ao configurar o Web Application Firewall (WAF) ModSecurity com o OWASP Core Rule Set (CRS) em uma loja virtual,
+          o arquiteto optou por utilizar o modo <em>Anomaly Scoring</em> em vez do modo tradicional <em>Traditional / Self-Contained</em>.
+          Qual é a principal vantagem prática dessa escolha para as operações do comércio eletrônico?
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: Redução drástica da taxa de falsos positivos, bloqueando requisições apenas quando o somatório acumulado de severidades de regras acionadas ultrapassar um limiar configurado.</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> No modo tradicional, qualquer regra que der match (mesmo uma anomalia menor e inofensiva na URL) gera um bloqueio HTTP 403 imediato, resultando em altos índices de falsos positivos que frustram clientes reais. No modo **Anomaly Scoring**, as regras somam pontos de anomalia baseados na severidade. Uma requisição maliciosa real costuma violar múltiplas regras (ex: caracteres especiais, palavras de SQL e ausência de headers comuns), ultrapassando o limiar crítico (threshold) e sendo bloqueada com alta precisão técnica.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Questão 3 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 3 &bull; VPNs Modernas e Criptografia do WireGuard</span>
+        <p>
+          Ao comparar o protocolo de VPN contemporâneo WireGuard com soluções históricas baseadas em IPsec IKEv2 e OpenVPN,
+          engenheiros de segurança destacam a extrema simplicidade de sua base de código e a redução de riscos de implementação.
+          Entre as características técnicas do WireGuard, qual contribui diretamente para essa redução da superfície de ataque?
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: Utilização de um conjunto fixo de primitivas criptográficas modernas de alta performance (ChaCha20-Poly1305, Curve25519), eliminando a negociação complexa de algoritmos obsoletos e vulneráveis.</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> Protocolos legados como IPsec e OpenVPN possuem milhares de opções de negociação de cifras (incluindo algoritmos obsoletos como DES, 3DES, MD5 e SHA-1), o que infla a base de código para centenas de milhares de linhas e introduz vulnerabilidades de negociação e downgrade. O WireGuard adota uma filosofia "opiniada" (sem negociação de cifras) baseada no *Noise Protocol*, com cerca de 4.000 linhas de código no kernel do Linux e algoritmos criptográficos imutáveis de última geração.
+          </p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 8: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
+<section class="study-section" id="fatos-essenciais">
+  <div class="section-title-wrap">
+    <span class="section-num">08</span>
+    <h2>Fatos Essenciais &bull; Trilha 2: Segurança Defensiva</h2>
+  </div>
+
+  <div class="facts-grid">
+    <div class="facts-card">
+      <h4>IDS Alerta, IPS Bloqueia</h4>
+      <p>O IDS passivo via SPAN gera alertas após o fato; o IPS inline ativo inspeciona o pacote antes de encaminhar e descarta ameaças em tempo real.</p>
+    </div>
+    <div class="facts-card">
+      <h4>WAF Protege a Camada 7</h4>
+      <p>Firewalls de rede não enxergam payloads HTTP/HTTPS. O WAF analisa injeções SQL, XSS e exploits web através de conjuntos como o OWASP CRS.</p>
+    </div>
+    <div class="facts-card">
+      <h4>Anomaly Scoring Evita Falsos Positivos</h4>
+      <p>Em vez de bloquear na primeira suspeita, o WAF acumula pontuações de gravidade e descarta apenas tráfego que ultrapassa o limiar configurado.</p>
+    </div>
+    <div class="facts-card">
+      <h4>mTLS Estabelece Confiança Mútua</h4>
+      <p>Tanto o cliente quanto o servidor apresentam certificados digitais X.509, blindando microsserviços e canais corporativos críticos.</p>
+    </div>
+    <div class="facts-card">
+      <h4>WireGuard é Simples e Rápido</h4>
+      <p>Com cerca de 4.000 linhas de código e criptografia moderna fixa (ChaCha20-Poly1305, Curve25519), supera IPsec e OpenVPN em performance e auditabilidade.</p>
+    </div>
+    <div class="facts-card">
+      <h4>Próximo Módulo da Trilha 2</h4>
+      <p>No <strong>Estudo 08 (Arquitetura-Zero-Trust)</strong>, você explorará a eliminação da confiança implícita de perímetro segundo o NIST SP 800-207 e motores de decisão PDP/PEP.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SCRIPT EMBUTIDO: SIMULADOR DE REGRAS SNORT/SURICATA -->
+<script>
+/**
+ * Simulador Interativo: Motor DPI de Regras Snort/Suricata
+ * Estudos de Cibersegurança - José Mauro da Silva Brandão
+ */
+
+// Estado interno do simulador
+let modoOperacionalAtual = "IDS"; // "IDS" (Alert Only) ou "IPS" (Drop & Alert)
+
+// Banco de Regras do Motor
+const regrasIdsBanco = [
+  {
+    sid: 2001001,
+    msg: "ET EXPLOIT Possível SQL Injection em Requisição HTTP (UNION SELECT)",
+    proto: "TCP",
+    porta: 80,
+    flow: "established,to_server",
+    content: "UNION",
+    content2: "SELECT",
+    nocase: true,
+    severidade: "Crítica",
+    classtype: "web-application-attack",
+    regraRaw: 'alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS 80 (msg:"ET EXPLOIT SQLi Union"; flow:established,to_server; content:"UNION",nocase; content:"SELECT",nocase; classtype:web-application-attack; sid:2001001; rev:1;)'
+  },
+  {
+    sid: 2001002,
+    msg: "ET WEB_SERVER Possível Ataque de Path Traversal (/etc/passwd)",
+    proto: "TCP",
+    porta: 80,
+    flow: "established,to_server",
+    content: "/etc/passwd",
+    nocase: false,
+    severidade: "Alta",
+    classtype: "attempted-admin",
+    regraRaw: 'alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS 80 (msg:"ET WEB_SERVER Path Traversal /etc/passwd"; flow:established,to_server; content:"/etc/passwd"; classtype:attempted-admin; sid:2001002; rev:1;)'
+  },
+  {
+    sid: 2001003,
+    msg: "ET MALWARE Atividade de Beaconing Cobalt Strike (User-Agent Suspeito)",
+    proto: "TCP",
+    porta: 80,
+    flow: "established,to_server",
+    content: "CobaltStrike",
+    nocase: true,
+    severidade: "Crítica",
+    classtype: "trojan-activity",
+    regraRaw: 'alert tcp $HOME_NET any -> $EXTERNAL_NET 80 (msg:"ET MALWARE Cobalt Strike User-Agent"; flow:established,to_server; content:"CobaltStrike",nocase; classtype:trojan-activity; sid:2001003; rev:1;)'
+  },
+  {
+    sid: 2001004,
+    msg: "ET SCAN Varredura Automatizada de Vulnerabilidade (SQLMap Web Scanner)",
+    proto: "TCP",
+    porta: 80,
+    flow: "established,to_server",
+    content: "sqlmap",
+    nocase: true,
+    severidade: "Média",
+    classtype: "attempted-recon",
+    regraRaw: 'alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS 80 (msg:"ET SCAN SQLMap Detected"; flow:established,to_server; content:"sqlmap",nocase; classtype:attempted-recon; sid:2001004; rev:1;)'
+  }
+];
+
+// Alterna entre modo IDS e IPS
+function alternarModoIdsIps(novoModo) {
+  modoOperacionalAtual = novoModo;
+  const btnIds = document.getElementById("btn-modo-ids");
+  const btnIps = document.getElementById("btn-modo-ips");
+  const descEl = document.getElementById("modo-operacao-desc");
+
+  if (novoModo === "IDS") {
+    btnIds.classList.add("selected");
+    btnIds.style.outline = "2px solid #2563eb";
+    btnIps.classList.remove("selected");
+    btnIps.style.outline = "none";
+    if (descEl) descEl.textContent = "Modo IDS: O sistema apenas gera alertas de telemetria no SIEM e deixa o tráfego passar intacto para a vítima.";
+  } else {
+    btnIps.classList.add("selected");
+    btnIps.style.outline = "2px solid #ef4444";
+    btnIds.classList.remove("selected");
+    btnIds.style.outline = "none";
+    if (descEl) descEl.textContent = "Modo IPS: O sistema opera in-line ativo. Pacotes maliciosos são imediatamente descartados (DROP) e a conexão TCP é encerrada com RST.";
+  }
+
+  dispararInspecaoManual();
+}
+
+// Injeção de cenários de tráfego
+function injetarCenarioTrafego(tipo) {
+  const textarea = document.getElementById("payload-input-text");
+  if (!textarea) return;
+
+  if (tipo === "benigno") {
+    textarea.value = `GET /index.html HTTP/1.1\nHost: portal.empresa.com.br\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/122.0\nAccept: text/html,application/xhtml+xml\nConnection: keep-alive`;
+  } else if (tipo === "sqli") {
+    textarea.value = `GET /api/produtos?id=10 UNION SELECT id, username, password_hash FROM usuarios-- HTTP/1.1\nHost: portal.empresa.com.br\nUser-Agent: Mozilla/5.0 (X11; Linux x86_64)\nAccept: application/json`;
+  } else if (tipo === "traversal") {
+    textarea.value = `GET /download?arquivo=../../../../etc/passwd HTTP/1.1\nHost: portal.empresa.com.br\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)\nAccept: */*`;
+  } else if (tipo === "beacon") {
+    textarea.value = `POST /submit.php?id=88491 HTTP/1.1\nHost: c2-controller.attacker-server.net\nUser-Agent: CobaltStrike/4.0 (Windows NT 6.1; Trident/7.0)\nContent-Length: 128\n\n[DADOS_CIFRADOS_DO_BEACON_MALICIOSO]`;
+  } else if (tipo === "sqlmap") {
+    textarea.value = `GET /busca.php?termo=teste' AND 1=1-- HTTP/1.1\nHost: portal.empresa.com.br\nUser-Agent: sqlmap/1.6.12#stable (https://sqlmap.org)\nAccept: */*`;
+  }
+
+  dispararInspecaoManual();
+}
+
+function dispararInspecaoManual() {
+  const textarea = document.getElementById("payload-input-text");
+  if (!textarea) return;
+  avaliarPayloadRegrasIds(textarea.value);
+}
+
+// Avalia o payload contra todas as regras do banco
+function avaliarPayloadRegrasIds(payloadTexto) {
+  const regrasAcionadas = [];
+
+  regrasIdsBanco.forEach(regra => {
+    let match1 = false;
+    let match2 = true;
+
+    if (regra.nocase) {
+      match1 = payloadTexto.toLowerCase().includes(regra.content.toLowerCase());
+      if (regra.content2) {
+        match2 = payloadTexto.toLowerCase().includes(regra.content2.toLowerCase());
+      }
+    } else {
+      match1 = payloadTexto.includes(regra.content);
+      if (regra.content2) {
+        match2 = payloadTexto.includes(regra.content2);
+      }
+    }
+
+    if (match1 && match2) {
+      regrasAcionadas.push(regra);
+    }
+  });
+
+  renderizarListaRegrasVisual(regrasAcionadas);
+  renderizarResultadoDpi(payloadTexto, regrasAcionadas);
+  return regrasAcionadas;
+}
+
+// Renderiza a lista de regras destacando as acionadas
+function renderizarListaRegrasVisual(regrasAcionadas) {
+  const container = document.getElementById("regras-ids-container");
+  if (!container) return;
+
+  container.innerHTML = "";
+  const sidsAcionados = regrasAcionadas.map(r => r.sid);
+
+  regrasIdsBanco.forEach(r => {
+    const isMatched = sidsAcionados.includes(r.sid);
+    const div = document.createElement("div");
+    div.style.padding = "0.5rem 0.75rem";
+    div.style.borderRadius = "4px";
+    div.style.border = "1px solid var(--rule)";
+    div.style.background = isMatched
+      ? (modoOperacionalAtual === "IPS" ? "rgba(220, 38, 38, 0.15)" : "rgba(245, 158, 11, 0.15)")
+      : "var(--ground)";
+    div.style.borderLeft = isMatched
+      ? (modoOperacionalAtual === "IPS" ? "4px solid #ef4444" : "4px solid #f59e0b")
+      : "4px solid var(--rule)";
+
+    div.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
+        <strong>SID: ${r.sid} &bull; ${escapeHtml(r.msg)}</strong>
+        <span class="badge ${isMatched ? (modoOperacionalAtual === 'IPS' ? 'red' : 'amber') : 'slate'}">
+          ${isMatched ? (modoOperacionalAtual === 'IPS' ? 'TRIGGERED (DROP)' : 'TRIGGERED (ALERT)') : 'MONITORING'}
+        </span>
+      </div>
+      <div style="color:var(--muted); word-break:break-all;">${escapeHtml(r.regraRaw)}</div>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+// Renderiza o veredicto da inspeção no painel de decisão
+function renderizarResultadoDpi(payload, acionadas) {
+  const badgeEl = document.getElementById("resultado-ids-badge");
+  const corpoEl = document.getElementById("resultado-ids-corpo");
+  if (!badgeEl || !corpoEl) return;
+
+  if (acionadas.length === 0) {
+    badgeEl.className = "badge green";
+    badgeEl.textContent = "TRÁFEGO LIMPO / BENIGNO";
+    corpoEl.innerHTML = `
+      <div style="color:#10b981; font-weight:700; margin-bottom:0.4rem;">✓ Nenhuma correspondência de assinatura hostil encontrada no payload.</div>
+      <p style="margin:0;">O motor de Deep Packet Inspection (DPI) inspecionou todos os cabeçalhos e o corpo da mensagem. Nenhum padrão malicioso conhecido foi detectado. Tráfego liberado normalmente com código <code>HTTP 200 OK</code>.</p>
+    `;
+    return;
+  }
+
+  const primeira = acionadas[0];
+
+  if (modoOperacionalAtual === "IPS") {
+    badgeEl.className = "badge red";
+    badgeEl.textContent = `BLOQUEADO (IPS DROP & RESET)`;
+    corpoEl.innerHTML = `
+      <div style="color:#ef4444; font-weight:700; margin-bottom:0.4rem;">🚨 Ameaça Bloqueada Ativamente pelo IPS In-Line!</div>
+      <p style="margin:0 0 0.5rem 0;">
+        <strong>Regra Acionada:</strong> SID ${primeira.sid} &bull; <em>${escapeHtml(primeira.msg)}</em><br>
+        <strong>Ação Executada:</strong> O pacote foi descartado no buffer do kernel do IPS (ação <code>DROP</code>) e um pacote forjado com flag <code>TCP RST</code> foi injetado para encerrar a conexão imediatamente.
+      </p>
+      <div style="background:rgba(220, 38, 38, 0.1); padding:0.5rem; border-radius:4px; font-family:var(--font-mono); font-size:0.8rem; color:#ef4444;">
+        [SURICATA DROP EVENT] Timestamp: ${new Date().toISOString()} | Alvo Protegido: 10.0.1.10:80 | Ação: INLINE_DROP
+      </div>
+    `;
+  } else {
+    badgeEl.className = "badge amber";
+    badgeEl.textContent = `ALERTA GERADO (IDS PASSIVO)`;
+    corpoEl.innerHTML = `
+      <div style="color:#f59e0b; font-weight:700; margin-bottom:0.4rem;">⚠️ Ameaça Detectada mas NÃO Bloqueada (Modo IDS Passivo)!</div>
+      <p style="margin:0 0 0.5rem 0;">
+        <strong>Regra Acionada:</strong> SID ${primeira.sid} &bull; <em>${escapeHtml(primeira.msg)}</em><br>
+        <strong>Impacto Arquitetural:</strong> Por estar posicionado em uma porta espelhada (SPAN), o IDS gerou o alerta de telemetria abaixo no SIEM, porém <strong>o pacote malicioso seguiu viagem e atingiu a aplicação de destino</strong>.
+      </p>
+      <div style="background:rgba(245, 158, 11, 0.1); padding:0.5rem; border-radius:4px; font-family:var(--font-mono); font-size:0.8rem; color:#f59e0b;">
+        [EVE.JSON ALERT] {"event_type":"alert","src_ip":"203.0.113.88","alert":{"action":"allowed","sid":${primeira.sid},"signature":"${primeira.msg}"}}
+      </div>
+    `;
+  }
+}
+
+// Inicialização automática do checklist e do laboratório no carregamento da página
+document.addEventListener("DOMContentLoaded", function() {
+  if (typeof initChecklist === "function") {
+    initChecklist("seguranca-redes-defesa");
+  }
+  injetarCenarioTrafego("benigno");
+});
+</script>
