@@ -1,0 +1,945 @@
+<!-- ==========================================================================
+     Estudo 05: Segmentação de Redes, DMZ e Filtragem de Firewall
+     Corpo do Treinamento: DMZ, VLANs, Regras de Firewall e Filtragem
+     ========================================================================== -->
+
+<header class="study-header">
+  <span class="study-track-kicker">Trilha 1: Fundamentos &amp; Redes Seguras &bull; Estudo 05</span>
+  <h1 class="study-title">Segmentação de Redes, DMZ e Filtragem de Firewall</h1>
+  <p class="study-lead">
+    Em um cenário contemporâneo onde o comprometimento inicial de um endpoint ou servidor web é uma possibilidade
+    estatística real, a ausência de segmentação interna transforma qualquer invasão local em um desastre corporativo generalizado.
+    Compreender a divisão em zonas de confiança, a criação de DMZs resilientes, o particionamento em Camada 2 via VLANs 802.1Q,
+    o funcionamento da tabela de estados <em>conntrack</em> (Stateful Inspection) e a formulação estrita de regras com ordem
+    First-Match e Default Drop é indispensável para conter ameaças e impedir o movimento lateral (Lateral Movement).
+  </p>
+  <div class="study-meta-bar">
+    <span class="badge blue">NIST CSF 2.0: Protect (PR.AC / PR.DS)</span>
+    <span class="badge slate">MITRE ATT&amp;CK: TA0008, TA0011, T1190, T1021</span>
+    <span class="badge slate">Tempo Estimado: ~40 minutos</span>
+    <span class="badge slate">Carreiras: Blue Team &bull; Infraestrutura &bull; SOC</span>
+  </div>
+</header>
+
+<!-- SEÇÃO 1: SEGMENTAÇÃO DE REDES E DMZ -->
+<section class="study-section" id="zonas-confianca-dmz">
+  <div class="section-title-wrap">
+    <span class="section-num">01</span>
+    <h2>Zonas de Confiança, Redes Planas e Arquitetura de DMZ</h2>
+  </div>
+
+  <p>
+    Por décadas, muitas redes corporativas foram projetadas como uma "casca de ovo": uma borda externa fortificada
+    com firewall e roteador de borda, porém com um interior completamente oco e desprotegido conhecido como
+    <strong>Rede Plana (<em>Flat Network</em>)</strong>. Em uma rede plana, todos os dispositivos (estações de trabalho,
+    servidores de arquivos, impressoras, câmeras IP e bancos de dados transacionais) compartilham a mesma sub-rede e o mesmo
+    domínio de broadcast.
+  </p>
+
+  <div class="callout danger">
+    <h4>O Perigo Mortal das Redes Planas: Movimento Lateral (MITRE ATT&amp;CK TA0008)</h4>
+    <p>
+      Se um colaborador inadvertidamente executar um malware em sua máquina de trabalho (via phishing ou pendrive infectado),
+      o atacante obtém visibilidade imediata de toda a infraestrutura. Sem barreiras internas de segmentação, ele pode realizar
+      varreduras ARP/IP locais, explorar vulnerabilidades SMB (como EternalBlue/MS17-010), roubar credenciais em memória
+      (Pass-the-Hash) e comprometer diretamente o Controlador de Domínio (Active Directory) ou o banco de dados de produção
+      em poucos minutos, sem que o firewall de borda sequer tome conhecimento do tráfego.
+    </p>
+  </div>
+
+  <h3>O Conceito de Zonas de Segurança Lógicas</h3>
+  <p>
+    A segmentação moderna substitui a confiança implícita por <strong>Zonas de Confiança Hierárquicas</strong>,
+    onde o tráfego que cruza as fronteiras entre zonas é obrigatoriamente filtrado, inspecionado e registrado:
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>1. Zona Externa (Untrusted / Internet)</h4>
+      <p>Rede pública aberta, totalmente fora do controle administrativo corporativo. Fonte primária de tráfego hostil, botnets e scanners automatizados.</p>
+    </div>
+    <div class="info-card">
+      <h4>2. Zona Desmilitarizada (DMZ / Semi-trusted)</h4>
+      <p>Sub-rede intermediária projetada para hospedar servidores com serviços públicos voltados para a Internet (Web Servers, Proxies Reversos, DNS Autoritativo, VPN Gateways). Mesmo se um servidor na DMZ for comprometido, ele não possui livre acesso à rede interna.</p>
+    </div>
+    <div class="info-card">
+      <h4>3. Zona Interna (LAN Corporativa / Trusted)</h4>
+      <p>Ambiente onde residem as estações de trabalho de colaboradores, notebooks corporativos e dispositivos de usuário final.</p>
+    </div>
+    <div class="info-card">
+      <h4>4. Zona Restrita / Dados (Strictly Confidential)</h4>
+      <p>Zona altamente isolada abrigando os ativos mais sensíveis da empresa: Bancos de Dados SQL, ERPs financeiros, Controladores de Domínio e clusters de processamento confidencial.</p>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <h4>Arquitetura de DMZ em Dois Estágios (Dual-Firewall Architecture)</h4>
+    <p>
+      Em arquiteturas corporativas de alta segurança, a DMZ é implementada entre <strong>dois firewalls físicos distintos de fabricantes diferentes</strong>
+      (ex: Firewall de Borda do Fornecedor A e Firewall Interno do Fornecedor B).
+    </p>
+    <p>
+      Essa abordagem de <em>Defesa em Profundidade</em> garante que, caso uma vulnerabilidade de dia zero (Zero-Day) ou falha de configuração
+      seja descoberta e explorada no firewall de borda, o atacante ainda enfrentará uma barreira tecnológica completamente diferente
+      antes de conseguir atingir os servidores internos e bases de dados restritas.
+    </p>
+  </div>
+</section>
+
+<!-- SEÇÃO 2: SEGREGAÇÃO EM CAMADA 2 (VLANS & 802.1Q) -->
+<section class="study-section" id="vlans-e-8021q">
+  <div class="section-title-wrap">
+    <span class="section-num">02</span>
+    <h2>Segregação em Camada 2: VLANs e Trunking IEEE 802.1Q</h2>
+  </div>
+
+  <p>
+    Implementar segmentação física comprando switches e cabos separados para cada departamento corporativo seria
+    economicamente inviável e inflexível. Para resolver isso, switches gerenciáveis utilizam
+    <strong>VLANs (Virtual Local Area Networks)</strong>, que criam partições lógicas independentes dentro do mesmo hardware de comutação.
+  </p>
+
+  <p>
+    Cada VLAN constitui um <strong>domínio de broadcast isolado</strong>. O tráfego de broadcast (como requisições ARP) gerado
+    em uma VLAN não se propaga para outras VLANs, impedindo que dispositivos em departamentos diferentes interceptem
+    comunicações de rede locais (ataques de ARP Spoofing e sniffing de rede).
+  </p>
+
+  <h3>O Cabeçalho IEEE 802.1Q e a Diferença entre Access e Trunk</h3>
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>Porta de Acesso (Access Port)</h4>
+      <p>
+        Conectada a dispositivos finais (computadores, impressoras, servidores). Pertence a <strong>apenas uma única VLAN</strong>.
+        Os quadros Ethernet trafegam normais (sem tag 802.1Q). O switch insere a identificação de VLAN internamente e remove antes de enviar ao host.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>Porta de Enlace (Trunk Port)</h4>
+      <p>
+        Conecta switches entre si ou um switch a um firewall/roteador. Transporta tráfego de <strong>múltiplas VLANs simultaneamente</strong>.
+        Para diferenciar os pacotes, o switch insere uma tag de 4 bytes no quadro Ethernet seguindo o padrão <strong>IEEE 802.1Q</strong>.
+      </p>
+    </div>
+  </div>
+
+  <div class="terminal-box">
+    <div class="terminal-header">
+      <span class="terminal-title">Estrutura da Tag IEEE 802.1Q (4 Bytes inseridos no quadro Ethernet)</span>
+      <button class="terminal-copy-btn" onclick="copyCode(this, 'vlan-tag-struct')">Copiar</button>
+    </div>
+    <pre id="vlan-tag-struct"><code>[ Preâmbulo ] [ MAC Destino ] [ MAC Origem ] [ 802.1Q Tag: 4 Bytes ] [ EtherType ] [ Dados ] [ FCS ]
+                                                │
+                 ┌──────────────────────────────┴──────────────────────────────┐
+                 ▼                                                             ▼
+           TPID (2 Bytes)                                                TCI (2 Bytes)
+         Valor: 0x8100 (Indica presença da tag)   ┌─────────────────┬───────────┴───────────┐
+                                                  ▼                 ▼                       ▼
+                                            PCP (3 bits)       DEI (1 bit)             VID (12 bits)
+                                            (Prioridade QoS)  (Drop Elegible)       <strong>VLAN ID (1 a 4094)</strong></code></pre>
+  </div>
+
+  <div class="callout warning">
+    <h4>Ataques de Salto de VLAN (VLAN Hopping) e Mitigações de Hardening</h4>
+    <p>
+      Atacantes em uma VLAN de menor privilégio (ex: rede de visitantes) tentam injetar tráfego em VLANs restritas através de duas técnicas clássicas:
+    </p>
+    <ul>
+      <li>
+        <strong>Switch Spoofing:</strong> O computador do atacante se passa por um switch emitindo mensagens de protocolo de negociação
+        (como o DTP - <em>Dynamic Trunking Protocol</em> da Cisco). Se o switch tiver negociação automática ativada, a porta vira um Trunk,
+        permitindo ao invasor acessar todas as VLANs.
+        <br><em>Mitigação:</em> Desativar negociação dinâmica em todas as portas de acesso (<code>switchport mode access</code> e <code>switchport nonegotiate</code>).
+      </li>
+      <li>
+        <strong>Double Tagging (Marcação Dupla 802.1Q):</strong> O atacante envia um quadro com duas tags 802.1Q (a externa com a VLAN nativa do switch,
+        e a interna com a VLAN vítima). O primeiro switch retira a tag nativa externa e reencaminha o pacote via Trunk; o segundo switch lê a tag interna
+        e entrega o pacote na VLAN de destino.
+        <br><em>Mitigação:</em> Nunca utilizar a VLAN 1 (padrão) para tráfego operacional e alterar explicitamente a VLAN Nativa dos trunks para uma VLAN não utilizada.
+      </li>
+    </ul>
+  </div>
+
+  <h3>Roteamento Inter-VLAN: Router-on-a-Stick vs Firewall Inline</h3>
+  <p>
+    Como dispositivos em VLANs diferentes não se comunicam diretamente na Camada 2, todo tráfego entre elas precisa ser roteado
+    na Camada 3. Em ambientes seguros, o gateway desse roteamento inter-VLAN não é um roteador cego, mas sim um
+    <strong>Firewall Corporativo</strong> (ou subinterfaces virtuais em modo <em>Router-on-a-Stick</em> conectadas a um firewall),
+    garantindo que qualquer pacote que tente transitar de uma VLAN para outra seja inspecionado contra a política de segurança.
+  </p>
+</section>
+
+<!-- SEÇÃO 3: ARQUITETURA DE FIREWALLS (STATELESS vs STATEFUL vs NGFW) -->
+<section class="study-section" id="arquiteturas-firewall">
+  <div class="section-title-wrap">
+    <span class="section-num">03</span>
+    <h2>Arquitetura de Firewalls: Stateless, Stateful e NGFW</h2>
+  </div>
+
+  <p>
+    Um firewall é um dispositivo ou software que monitora e controla o tráfego de rede de entrada e saída com base em
+    regras de segurança pré-determinadas. A evolução da tecnologia de filtragem divide os firewalls em três gerações fundamentais:
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>1. Stateless (Filtragem Estática de Pacotes)</h4>
+      <p>
+        Avalia cada pacote isoladamente com base apenas no cabeçalho (IPs e Portas de origem/destino e protocolo).
+        <strong>Não tem memória de conexões passadas</strong>.
+        <br><em>Grave limitação:</em> Para permitir que usuários internos naveguem na web, o administrador precisava abrir
+        todas as portas altas de entrada (1024-65535), pois o firewall não conseguia correlacionar uma resposta com a requisição inicial.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>2. Stateful Inspection (Inspeção com Estado)</h4>
+      <p>
+        Rastreia o ciclo de vida completo de cada conexão na memória operacional através da <strong>Tabela de Estados (conntrack)</strong>.
+        Reconhece o handshake TCP de 3 vias (SYN, SYN-ACK, ACK) e encerramento (FIN/RST).
+        <br><em>Superpoder:</em> Quando um cliente interno inicia uma conexão para um servidor web na Internet, o firewall registra o estado
+        e <strong>permite automaticamente os pacotes de retorno legítimos</strong> sem precisar de regras manuais permissivas de entrada.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>3. NGFW (Next-Generation Firewall)</h4>
+      <p>
+        Combina a inspeção de estado tradicional com <strong>Deep Packet Inspection (DPI) na Camada 7 (Aplicação)</strong>.
+        Identifica a aplicação real independentemente da porta utilizada (ex: detecta tráfego BitTorrent ou DNS tunneling rodando na porta 443),
+        executa descriptografia TLS/SSL, integra antivírus de fluxo, IPS e controle de identidade de usuários (User-ID).
+      </p>
+    </div>
+  </div>
+
+  <h3>O Coração do Stateful Firewall: A Tabela de Estados (conntrack)</h3>
+  <p>
+    No kernel do Linux (mecanismo Netfilter/iptables/nftables) e em appliances de mercado (Fortinet, Palo Alto, Check Point),
+    cada conexão rastreada recebe uma classificação de estado precisa:
+  </p>
+  <ul>
+    <li><strong>NEW:</strong> Primeiro pacote que tenta estabelecer uma nova sessão legítima (por exemplo, um pacote TCP com a flag <code>SYN</code> ativa).</li>
+    <li><strong>ESTABLISHED:</strong> Pacotes que pertencem a uma conexão que já completou o handshake bidirecional e está ativa na tabela de estados.</li>
+    <li><strong>RELATED:</strong> Pacotes que iniciam uma nova conexão, porém associada diretamente a uma conexão já existente (ex: a conexão de dados da porta 20 em transferências FTP ou canais de controle VoIP/SIP).</li>
+    <li><strong>INVALID:</strong> Pacotes que não correspondem a nenhuma conexão conhecida ou violam a máquina de estados do TCP (ex: receber um pacote com flag <code>ACK</code> ou <code>FIN</code> do nada, sem histórico de <code>SYN</code> prévio). Devem ser sempre descartados imediatamente.</li>
+  </ul>
+</section>
+
+<!-- SEÇÃO 4: FORMULAÇÃO DE REGRAS E ORDEM DE PRECEDÊNCIA -->
+<section class="study-section" id="regras-e-precedencia">
+  <div class="section-title-wrap">
+    <span class="section-num">04</span>
+    <h2>Formulação de Políticas e Ordem de Precedência de Regras</h2>
+  </div>
+
+  <p>
+    Configurar regras de firewall exige precisão matemática. Ao contrário de uma linguagem declarativa genérica,
+    os mecanismos de firewall processam suas listas de controle de acesso (ACLs) seguindo um princípio estrito de
+    <strong>Avaliação Sequencial First-Match</strong>.
+  </p>
+
+  <div class="callout tip">
+    <h4>A Regra de Ouro: Default Drop / Default Deny</h4>
+    <p>
+      O alicerce inegociável de qualquer firewall seguro é a <strong>Política de Bloqueio Padrão (Default Drop)</strong>.
+      A última regra de qualquer conjunto de filtragem (ou a política implícita da tabela) determina que:
+      <em>"Se um pacote de dados não coincidiu explicitamente com nenhuma regra de permissão anterior, ele deve ser sumariamente descartado e registrado em log"</em>.
+      Sistemas que utilizam "Default Allow" (permitir tudo exceto o que for explicitamente proibido) são categoricamente considerados inseguros.
+    </p>
+  </div>
+
+  <h3>Anatomia de uma Regra de Firewall (Tupla de 5 Elementos)</h3>
+  <p>
+    Toda regra de firewall é composta por critérios de correspondência (Matching Criteria) e uma ação decisória (Action):
+  </p>
+  <ul>
+    <li><strong>IP de Origem (Source IP / Subnet):</strong> Endereço ou máscara de quem envia o pacote.</li>
+    <li><strong>Porta de Origem (Source Port):</strong> Geralmente aleatória/alta do cliente (geralmente indicada como <code>Any</code> ou <code>1024-65535</code>).</li>
+    <li><strong>Protocolo de Transporte:</strong> <code>TCP</code>, <code>UDP</code>, <code>ICMP</code> ou <code>Any</code>.</li>
+    <li><strong>IP de Destino (Destination IP / Subnet):</strong> Endereço do servidor ou serviço de destino.</li>
+    <li><strong>Porta de Destino (Destination Port):</strong> Porta do serviço requerido (ex: <code>80</code>, <code>443</code>, <code>22</code>, <code>5432</code>).</li>
+    <li>
+      <strong>Ação (Target Action):</strong>
+      <br>&bull; <code>ACCEPT / PERMIT:</code> O pacote é aprovado e segue viagem.
+      <br>&bull; <code>DROP:</code> O pacote é silenciosamente descartado sem retorno (ideal contra scanners externos para economizar banda e não confirmar presença).
+      <br>&bull; <code>REJECT:</code> O pacote é descartado, mas o firewall envia ativamente uma resposta informativa (um pacote <code>TCP RST</code> ou uma mensagem <code>ICMP Port Unreachable</code>).
+    </li>
+  </ul>
+
+  <div class="callout danger">
+    <h4>A Falha Crítica do Sombreamento de Regras (Rule Shadowing)</h4>
+    <p>
+      Como as regras são avaliadas de <strong>cima para baixo (First-Match)</strong>, a ordem das linhas é determinante.
+      Se uma regra genérica for colocada antes de uma regra específica, ocorre o <strong>Sombreamento de Regras (Rule Shadowing)</strong>.
+    </p>
+    <p>
+      <em>Cenário de Desastre:</em> Um administrador deseja bloquear tráfego SSH da Internet para a rede, exceto para o IP do seu escritório.
+      Se ele colocar primeiro a regra <code>PERMIT Any -> Any porta 22</code> e abaixo colocar a regra <code>DROP Any -> Any porta 22</code>,
+      a regra de bloqueio <strong>nunca será executada</strong>, deixando a rede completamente vulnerável!
+      <strong>Regras específicas e restritivas devem sempre anteceder regras gerais e permissivas</strong>.
+    </p>
+  </div>
+</section>
+
+<!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (FIREWALL SIMULATOR & CONNTRACK) -->
+<section class="study-section" id="laboratorio-pratico">
+  <div class="section-title-wrap">
+    <span class="section-num">05</span>
+    <h2>Laboratório Interativo: Simulador de Regras de Firewall e Tabela conntrack</h2>
+  </div>
+
+  <p>
+    Experimente na prática a mecânica de avaliação sequencial <em>First-Match</em> de um firewall corporativo.
+    Neste laboratório em Vanilla JavaScript, você pode injetar pacotes de rede realistas, acompanhar passo a passo
+    qual regra realizou o match, verificar a atuação da tabela de conexões ativas (<em>conntrack</em>) e reordenar
+    regras para entender ao vivo o impacto devastador do <em>Rule Shadowing</em>.
+  </p>
+
+  <div class="lab-box" id="firewall-lab">
+    <div class="lab-header">
+      <span class="lab-badge">LAB PRÁTICO INTERATIVO</span>
+      <h3>Simulador de Filtragem Stateful e Inspeção de Regras</h3>
+      <p>InjAudite políticas de perímetro, dispare pacotes simulados e visualize a resolução do motor de firewall.</p>
+    </div>
+
+    <!-- Cenários rápidos de injeção de pacotes -->
+    <div style="margin-bottom: 1.5rem;">
+      <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:0.5rem;">Disparar Cenários Práticos de Tráfego:</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+        <button class="lab-btn" onclick="injetarPacoteCenario('web_legitimo')">🌐 Internet &rarr; DMZ Web (HTTPS 443)</button>
+        <button class="lab-btn" onclick="injetarPacoteCenario('dmz_para_banco')">💾 DMZ Web &rarr; Banco SQL (Porta 5432)</button>
+        <button class="lab-btn lab-btn-danger" onclick="injetarPacoteCenario('invasao_ssh_direto')">🚨 Internet &rarr; Banco SQL (SSH 22)</button>
+        <button class="lab-btn lab-btn-danger" onclick="injetarPacoteCenario('c2_conexao_reversa')">⚠️ DMZ Web &rarr; Internet (C2 Porta 4444)</button>
+        <button class="lab-btn lab-btn-warning" onclick="injetarPacoteCenario('scan_rdp')">🔍 Varredura Externa (RDP 3389)</button>
+      </div>
+    </div>
+
+    <!-- Painel de entrada manual do pacote -->
+    <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1.25rem; margin-bottom: 1.5rem;">
+      <div style="font-weight:700; font-size:0.9rem; color:var(--ink); margin-bottom:0.75rem;">Detalhes do Pacote Injetado:</div>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:0.75rem; font-size:0.85rem;">
+        <div>
+          <label style="display:block; color:var(--muted); margin-bottom:0.2rem;">IP Origem:</label>
+          <input type="text" id="pkt-src-ip" value="203.0.113.50" style="width:100%; font-family:var(--font-mono); padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);">
+        </div>
+        <div>
+          <label style="display:block; color:var(--muted); margin-bottom:0.2rem;">IP Destino:</label>
+          <input type="text" id="pkt-dst-ip" value="192.168.10.10" style="width:100%; font-family:var(--font-mono); padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);">
+        </div>
+        <div>
+          <label style="display:block; color:var(--muted); margin-bottom:0.2rem;">Protocolo:</label>
+          <select id="pkt-proto" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);">
+            <option value="TCP">TCP</option>
+            <option value="UDP">UDP</option>
+            <option value="ICMP">ICMP</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block; color:var(--muted); margin-bottom:0.2rem;">Porta Destino:</label>
+          <input type="number" id="pkt-dst-port" value="443" style="width:100%; font-family:var(--font-mono); padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);">
+        </div>
+      </div>
+      <div style="margin-top:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+        <span style="font-size:0.8rem; color:var(--muted);">Simula o primeiro pacote (TCP SYN) tentando estabelecer sessão.</span>
+        <button class="lab-btn" style="background:#2563eb; color:#fff;" onclick="dispararInjecaoManual()">🚀 Inspecionar Pacote no Firewall</button>
+      </div>
+    </div>
+
+    <!-- Tabela Ordenada de Regras de Firewall (First-Match) -->
+    <div style="background:var(--ground); border:1px solid var(--rule); border-radius:8px; padding:1.25rem; margin-bottom: 1.5rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+        <div>
+          <h4 style="margin:0; font-size:1rem; color:var(--ink);">Conjunto de Regras do Firewall (Ordem de Avaliação First-Match)</h4>
+          <p style="margin:0.2rem 0 0 0; font-size:0.8rem; color:var(--muted);">As regras são avaliadas sequencialmente de cima para baixo. Clique nas setas para reordenar e testar Rule Shadowing.</p>
+        </div>
+        <button class="lab-btn" style="font-size:0.75rem;" onclick="restaurarRegrasOriginais()">↺ Restaurar Ordem Recomendada</button>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.825rem;" id="tabela-regras-firewall">
+          <thead>
+            <tr style="border-bottom:2px solid var(--rule); text-align:left;">
+              <th style="padding:0.5rem; color:var(--muted); width:40px;">#</th>
+              <th style="padding:0.5rem; color:var(--muted); width:70px;">Ordem</th>
+              <th style="padding:0.5rem; color:var(--muted); width:90px;">Ação</th>
+              <th style="padding:0.5rem; color:var(--muted);">Origem (Src)</th>
+              <th style="padding:0.5rem; color:var(--muted);">Destino (Dst)</th>
+              <th style="padding:0.5rem; color:var(--muted);">Proto/Porta</th>
+              <th style="padding:0.5rem; color:var(--muted);">Descrição / Zona</th>
+            </tr>
+          </thead>
+          <tbody id="firewall-rules-tbody">
+            <!-- Renderizado via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Painel de Decisão do Pacote e Tabela de Estados conntrack -->
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:1rem;">
+      <!-- Resultado da Inspeção -->
+      <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1rem;">
+        <h4 style="margin:0 0 0.75rem 0; font-size:0.95rem; color:var(--ink);">Decisão Final da Filtragem</h4>
+        <div id="veredicto-banner" style="padding:0.75rem; border-radius:6px; font-size:0.9rem; font-weight:700; margin-bottom:0.75rem;">
+          Aguardando disparo de pacote...
+        </div>
+        <div id="veredicto-detalhe" style="font-size:0.85rem; color:var(--muted); line-height:1.5;"></div>
+      </div>
+
+      <!-- Tabela de Estados Conntrack -->
+      <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <h4 style="margin:0; font-size:0.95rem; color:var(--ink);">Tabela de Conexões Ativas (conntrack)</h4>
+          <span id="conntrack-count" class="badge slate" style="font-size:0.7rem;">0 conexões ativas</span>
+        </div>
+        <div id="conntrack-table-container" style="max-height:160px; overflow-y:auto; font-family:var(--font-mono); font-size:0.75rem;">
+          <div style="color:var(--muted); padding:0.5rem 0;">Nenhuma sessão ativa registrada no estado ESTABLISHED.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 6: CHECKLIST PRÁTICO -->
+<section class="study-section" id="checklist-segmentacao">
+  <div class="section-title-wrap">
+    <span class="section-num">06</span>
+    <h2>Checklist de Aplicação Prática: Auditoria de Segmentação e Firewalls</h2>
+  </div>
+
+  <p>
+    Utilize este checklist técnico durante auditorias de rede, implementação de novos perímetros
+    ou compliance com normas como ISO 27001 (controles de rede) e PCI DSS (requisito de segmentação de ambiente de dados de cartão - CDE):
+  </p>
+
+  <div class="checklist" id="checklist-segmentacao-firewall">
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Política Padrão Default Drop Habilitada:</strong>
+        Todas as interfaces e zonas de segurança possuem a regra final implícita de descarte sumário (DROP) de qualquer pacote não autorizado, com geração de alertas e logs de auditoria.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Isolamento Rigoroso da DMZ (Sem Tráfego Inbound para LAN):</strong>
+        Servidores posicionados na DMZ são impedidos de iniciar novas conexões para a rede corporativa interna ou servidores de banco de dados, exceto em portas estritamente documentadas originadas da LAN para a DMZ.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Prevenção Ativa Contra VLAN Hopping em Switches:</strong>
+        Todas as portas de acesso possuem negociação DTP desativada (<code>nonegotiate</code>), a VLAN 1 padrão está desabilitada para tráfego operacional e a VLAN nativa dos trunks foi alterada para um ID dedicado não utilizado.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Auditoria Periódica de Sombreamento de Regras (Rule Shadowing):</strong>
+        A ordem das regras no firewall é revisada semestralmente com ferramentas automatizadas para identificar regras obsoletas, duplicadas ou mascaradas por regras mais permissivas acima.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Filtragem Egress (Tráfego de Saída Restrito):</strong>
+        Servidores internos e da DMZ possuem regras estritas de saída, impedindo que conexões em portas não autorizadas (como IRC, canais de C2 ou consultas DNS externas para servidores não autorizados) saiam da organização.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Inspeção com Estado (Stateful) com Drop de Pacotes Inválidos:</strong>
+        O kernel do firewall descarta explicitamente pacotes com estado <code>INVALID</code> (violação da sequência TCP) antes de qualquer avaliação de regras de permissão.
+      </span>
+    </label>
+  </div>
+</section>
+
+<!-- SEÇÃO 7: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
+<section class="study-section" id="questoes-fixacao">
+  <div class="section-title-wrap">
+    <span class="section-num">07</span>
+    <h2>Questões de Fixação e Concursos Públicos</h2>
+  </div>
+
+  <p>
+    Teste sua preparação respondendo a questões focadas em concursos públicos de alto nível para Perito Criminal da PF,
+    Analista de Infraestrutura do SERPRO e certificações como Cisco CCNA/CCNP Security e Check Point CCSA:
+  </p>
+
+  <div class="quiz" id="quiz-segmentacao-firewall">
+    <!-- Questão 1 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 1 &bull; Stateful vs Stateless</span>
+        <p>
+          Em uma infraestrutura de rede corporativa, um analista de segurança precisa configurar um firewall para permitir
+          que as estações de trabalho da LAN interna naveguem na web (HTTP porta 80 e HTTPS porta 443 na Internet),
+          mas nenhuma conexão originada na Internet deve penetrar na rede interna. Se for utilizado um firewall estático
+          sem estado (Stateless Packet Filter), qual configuração seria tecnicamente necessária para viabilizar essa navegação,
+          e qual risco direto ela introduz?
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: Seria necessário abrir todas as portas altas (1024 a 65535) na direção de entrada da Internet para a LAN, permitindo que atacantes externos acessem qualquer serviço em portas altas sem inspeção.</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> Firewalls Stateless não possuem tabela de estados (conntrack) e não sabem se um pacote vindo da Internet é uma resposta legítima a uma navegação iniciada internamente ou uma tentativa de ataque. Como clientes TCP utilizam portas de origem efêmeras aleatórias (geralmente entre 1024 e 65535), um firewall sem estado precisa ter uma regra genérica de entrada permitindo portas altas. Em contrapartida, um <strong>firewall Stateful</strong> rastreia a conexão iniciada internamente no estado <code>ESTABLISHED</code> e permite automaticamente o tráfego de retorno sem abrir portas fixas de entrada.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Questão 2 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 2 &bull; Ordem de Avaliação e Rule Shadowing</span>
+        <p>
+          Considere o seguinte trecho simplificado de uma tabela de regras de um firewall que processa políticas de cima para baixo (First-Match):
+          <br><strong>Regra 1:</strong> Ação: <code>DROP</code> | Origem: <code>Qualquer</code> | Destino: <code>Rede_Servidores_DMZ</code> | Porta: <code>Qualquer</code>
+          <br><strong>Regra 2:</strong> Ação: <code>ACCEPT</code> | Origem: <code>Qualquer</code> | Destino: <code>Servidor_Web_DMZ (10.0.1.5)</code> | Porta: <code>443 (HTTPS)</code>
+          <br><strong>Regra 3:</strong> Ação: <code>DROP</code> | Origem: <code>Qualquer</code> | Destino: <code>Qualquer</code> | Porta: <code>Qualquer</code> (Default Drop)
+          <br>Ao tentar acessar o site HTTPS hospedado no <code>Servidor_Web_DMZ</code>, os usuários da Internet recebem erro de conexão recusada / timeout. Qual a causa desse comportamento?
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: Ocorrência de Rule Shadowing (Sombreamento de Regra), onde a Regra 1 ampla descarta o tráfego antes que a Regra 2 específica seja avaliada.</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> Como o algoritmo First-Match interrompe a verificação na primeira correspondência, um pacote com destino ao IP <code>10.0.1.5</code> na porta 443 casa perfeitamente com a Regra 1 (pois <code>10.0.1.5</code> pertence a <code>Rede_Servidores_DMZ</code>). O firewall aplica imediatamente a ação <code>DROP</code> e encerra o processamento. A Regra 2 está "sombreada" e nunca será executada. Para corrigir, a regra permissiva específica (Regra 2) deve ser movida para cima da Regra 1.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Questão 3 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 3 &bull; Arquitetura de DMZ e Mitigação de Pivot</span>
+        <p>
+          Um servidor web corporativo hospedado na DMZ foi comprometido por meio de uma vulnerabilidade de execução remota de código (RCE).
+          Qual diretriz fundamental de arquitetura de rede impede que o atacante utilize esse servidor web como pivô (<em>pivot host</em>)
+          para invadir o banco de dados principal de produção localizado na rede interna restrita?
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: Proibição estrita de conexões iniciadas na DMZ com destino à rede interna, associada a regras de firewall específicas permitindo apenas portas estritas do serviço (ex: SQL 5432) com controle de origem.</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> O princípio de isolamento de DMZ dita que servidores semi-confiáveis nunca devem ter permissão de iniciar conexões arbitrárias com a rede interna. A comunicação necessária entre a aplicação web e o banco de dados deve ser restrita via firewall estritamente ao IP do banco na porta específica (ex: TCP 5432), bloqueando terminantemente qualquer tráfego administrativo (SSH, RDP, SMB, ICMP) ou conexões reversas para a Internet, frustrando tentativas de movimentação lateral.
+          </p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 8: FATOS ESSENCIAIS E CONCLUSÃO DA TRILHA 1 -->
+<section class="study-section" id="fatos-essenciais">
+  <div class="section-title-wrap">
+    <span class="section-num">08</span>
+    <h2>Fatos Essenciais &bull; Conclusão da Trilha 1: Fundamentos &amp; Redes Seguras</h2>
+  </div>
+
+  <div class="facts-grid">
+    <div class="facts-card">
+      <h4>Redes Planas São Indefensáveis</h4>
+      <p>Sem segmentação interna, o comprometimento de uma única máquina corporativa concede acesso irrestrito ao Active Directory e aos bancos de dados da empresa.</p>
+    </div>
+    <div class="facts-card">
+      <h4>802.1Q Isola Domínios de Broadcast</h4>
+      <p>VLANs separam o tráfego de Camada 2 via tags de 4 bytes (VID de 12 bits). Desative DTP e restrinja trunks para evitar ataques de VLAN Hopping.</p>
+    </div>
+    <div class="facts-card">
+      <h4>Stateful Rastreia o Handshake</h4>
+      <p>A tabela de estados (conntrack) permite pacotes de retorno legítimos no estado ESTABLISHED sem a necessidade perigosa de abrir portas altas estáticas.</p>
+    </div>
+    <div class="facts-card">
+      <h4>Default Drop é Inegociável</h4>
+      <p>Todo tráfego que não coincidir explicitamente com uma regra permissiva deve ser bloqueado na última linha do firewall.</p>
+    </div>
+    <div class="facts-card">
+      <h4>First-Match Exige Cuidado com a Ordem</h4>
+      <p>Regras são avaliadas de cima para baixo. Regras específicas devem sempre preceder regras gerais para evitar Rule Shadowing.</p>
+    </div>
+    <div class="facts-card" style="border: 2px solid #059669;">
+      <h4 style="color: #059669;">Parabéns! Trilha 1 Concluída</h4>
+      <p>Você dominou Fundamentos, Redes, Criptografia, IAM e Segmentação. O próximo passo é o <strong>Estudo 06 (Hardening-Sistemas)</strong>, iniciando a <strong>Trilha 2: Segurança Defensiva</strong>!</p>
+    </div>
+  </div>
+</section>
+
+<!-- SCRIPT EMBUTIDO: SIMULADOR DE FIREWALL COM FIRST-MATCH E CONNTRACK -->
+<script>
+/**
+ * Simulador Interativo: Filtragem de Firewall (First-Match) & Tabela Conntrack
+ * Estudos de Cibersegurança - José Mauro da Silva Brandão
+ */
+
+// Estado das regras ativas do simulador
+let regrasFirewall = [
+  {
+    id: 1,
+    acao: "ACCEPT",
+    src: "203.0.113.0/24",
+    dst: "192.168.10.10",
+    proto: "TCP",
+    port: 443,
+    desc: "Permitir HTTPS da Internet para Servidor Web (DMZ)"
+  },
+  {
+    id: 2,
+    acao: "ACCEPT",
+    src: "192.168.10.10",
+    dst: "10.0.2.50",
+    proto: "TCP",
+    port: 5432,
+    desc: "Permitir queries SQL do Web Server (DMZ) para Banco de Dados"
+  },
+  {
+    id: 3,
+    acao: "ACCEPT",
+    src: "10.0.1.100",
+    dst: "10.0.2.0/24",
+    proto: "TCP",
+    port: 22,
+    desc: "Permitir SSH exclusivamente da Estação do Administrador (LAN)"
+  },
+  {
+    id: 4,
+    acao: "DROP",
+    src: "192.168.10.0/24",
+    dst: "0.0.0.0/0",
+    proto: "TCP",
+    port: 4444,
+    desc: "Bloquear tentativas de C2 / Shell Reversa originadas da DMZ"
+  },
+  {
+    id: 5,
+    acao: "DROP",
+    src: "0.0.0.0/0",
+    dst: "0.0.0.0/0",
+    proto: "ANY",
+    port: 0,
+    desc: "Política Padrão: Default Drop (Descarte Implícito de Borda)"
+  }
+];
+
+// Tabela simulada de estados de conexão (conntrack)
+const tabelaConntrack = [];
+
+// Funções de correspondência de IP e sub-redes simplificada para o simulador
+function ipMatches(ipRegra, ipPacote) {
+  if (ipRegra === "0.0.0.0/0" || ipRegra === "Qualquer" || ipRegra === "ANY") return true;
+  if (ipRegra === ipPacote) return true;
+  if (ipRegra.endsWith("/24")) {
+    const prefixoRegra = ipRegra.split("/")[0].split(".").slice(0, 3).join(".");
+    const prefixoPacote = ipPacote.split(".").slice(0, 3).join(".");
+    return prefixoRegra === prefixoPacote;
+  }
+  return false;
+}
+
+function portMatches(portRegra, portPacote) {
+  if (portRegra === 0 || portRegra === "ANY" || portRegra === "Qualquer") return true;
+  return Number(portRegra) === Number(portPacote);
+}
+
+function protoMatches(protoRegra, protoPacote) {
+  if (protoRegra === "ANY" || protoRegra === "Qualquer") return true;
+  return protoRegra.toUpperCase() === protoPacote.toUpperCase();
+}
+
+// Renderiza a tabela de regras na interface
+function renderizarTabelaRegras(idRegraVencedora = null) {
+  const tbody = document.getElementById("firewall-rules-tbody");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  regrasFirewall.forEach((regra, index) => {
+    const isDefaultDrop = (index === regrasFirewall.length - 1 && regra.desc.includes("Default Drop"));
+    const tr = document.createElement("tr");
+    tr.style.borderBottom = "1px solid var(--rule)";
+
+    if (idRegraVencedora === regra.id) {
+      tr.style.background = regra.acao === "ACCEPT" ? "rgba(16, 185, 129, 0.18)" : "rgba(220, 38, 38, 0.18)";
+      tr.style.outline = regra.acao === "ACCEPT" ? "2px solid #10b981" : "2px solid #ef4444";
+    }
+
+    const badgeAcao = regra.acao === "ACCEPT"
+      ? '<span class="badge green">ACCEPT</span>'
+      : '<span class="badge red">DROP</span>';
+
+    const botoesOrdem = isDefaultDrop
+      ? '<span style="color:var(--muted); font-size:0.75rem;">(Fixa)</span>'
+      : `
+        <button class="lab-btn" style="padding:0.15rem 0.35rem; font-size:0.7rem;" onclick="reordenarRegra(${regra.id}, -1)" ${index === 0 ? "disabled" : ""}>▲</button>
+        <button class="lab-btn" style="padding:0.15rem 0.35rem; font-size:0.7rem;" onclick="reordenarRegra(${regra.id}, 1)" ${index >= regrasFirewall.length - 2 ? "disabled" : ""}>▼</button>
+      `;
+
+    tr.innerHTML = `
+      <td style="padding:0.5rem; font-family:var(--font-mono); font-weight:700;">${index + 1}</td>
+      <td style="padding:0.5rem;">${botoesOrdem}</td>
+      <td style="padding:0.5rem;">${badgeAcao}</td>
+      <td style="padding:0.5rem; font-family:var(--font-mono);">${escapeHtml(regra.src)}</td>
+      <td style="padding:0.5rem; font-family:var(--font-mono);">${escapeHtml(regra.dst)}</td>
+      <td style="padding:0.5rem; font-family:var(--font-mono);">${regra.proto}/${regra.port === 0 ? "ANY" : regra.port}</td>
+      <td style="padding:0.5rem; font-size:0.8rem; color:var(--muted);">${escapeHtml(regra.desc)}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+// Avaliação do pacote de acordo com a política sequencial First-Match
+function avaliarPacoteFirewall(pacote) {
+  let regraMatch = null;
+  let indexMatch = -1;
+
+  for (let i = 0; i < regrasFirewall.length; i++) {
+    const r = regrasFirewall[i];
+    if (
+      ipMatches(r.src, pacote.src) &&
+      ipMatches(r.dst, pacote.dst) &&
+      protoMatches(r.proto, pacote.proto) &&
+      portMatches(r.port, pacote.port)
+    ) {
+      regraMatch = r;
+      indexMatch = i;
+      break; // Interrupção First-Match obrigatória
+    }
+  }
+
+  // Atualização da tabela de conexões ativas se aceito
+  if (regraMatch && regraMatch.acao === "ACCEPT") {
+    tabelaConntrack.unshift({
+      timestamp: new Date().toLocaleTimeString(),
+      proto: pacote.proto,
+      src: `${pacote.src}:${Math.floor(Math.random() * 40000) + 1024}`,
+      dst: `${pacote.dst}:${pacote.port}`,
+      state: "ESTABLISHED"
+    });
+    if (tabelaConntrack.length > 5) tabelaConntrack.pop();
+  }
+
+  // Atualiza a visualização
+  renderizarTabelaRegras(regraMatch ? regraMatch.id : null);
+  renderizarVeredicto(pacote, regraMatch, indexMatch);
+  renderizarConntrack();
+
+  return { pacote, regraMatch, indexMatch };
+}
+
+// Renderiza a explicação técnica no painel de decisão
+function renderizarVeredicto(pacote, regra, index) {
+  const banner = document.getElementById("veredicto-banner");
+  const detalhe = document.getElementById("veredicto-detalhe");
+  if (!banner || !detalhe) return;
+
+  if (!regra) {
+    banner.style.background = "rgba(220, 38, 38, 0.2)";
+    banner.style.color = "#ef4444";
+    banner.textContent = "🔴 PACOTE DESCARTADO (Sem correspondência)";
+    detalhe.textContent = "O pacote não deu match em nenhuma regra configurada.";
+    return;
+  }
+
+  if (regra.acao === "ACCEPT") {
+    banner.style.background = "rgba(16, 185, 129, 0.2)";
+    banner.style.color = "#10b981";
+    banner.innerHTML = `🟢 PERMITIDO (ACCEPT) na Regra #${index + 1}`;
+    detalhe.innerHTML = `
+      <strong>Correspondência:</strong> Regra #${index + 1} &bull; <em>"${escapeHtml(regra.desc)}"</em>.<br>
+      <strong>Ação de Estado:</strong> O pacote TCP SYN estabeleceu uma nova sessão válida no kernel. A conexão foi registrada na tabela <code>conntrack</code> no estado <strong>ESTABLISHED</strong>, permitindo respostas automáticas.
+    `;
+  } else {
+    banner.style.background = "rgba(220, 38, 38, 0.2)";
+    banner.style.color = "#ef4444";
+    banner.innerHTML = `🔴 BLOQUEADO (DROP) na Regra #${index + 1}`;
+    detalhe.innerHTML = `
+      <strong>Correspondência:</strong> Regra #${index + 1} &bull; <em>"${escapeHtml(regra.desc)}"</em>.<br>
+      <strong>Segurança:</strong> O pacote foi sumariamente descartado sem resposta (DROP silencioso). Nenhuma entrada de estado foi criada na tabela <code>conntrack</code>.
+    `;
+  }
+}
+
+// Renderiza as conexões ativas da tabela conntrack
+function renderizarConntrack() {
+  const container = document.getElementById("conntrack-table-container");
+  const badgeCount = document.getElementById("conntrack-count");
+  if (!container) return;
+
+  if (badgeCount) {
+    badgeCount.textContent = `${tabelaConntrack.length} sessões ativas`;
+  }
+
+  if (tabelaConntrack.length === 0) {
+    container.innerHTML = '<div style="color:var(--muted); padding:0.5rem 0;">Nenhuma sessão ativa registrada no estado ESTABLISHED.</div>';
+    return;
+  }
+
+  let html = '<table style="width:100%; border-collapse:collapse;">';
+  html += '<tr style="color:var(--muted); border-bottom:1px solid var(--rule); text-align:left;"><th>Hora</th><th>Proto</th><th>Origem</th><th>Destino</th><th>Estado</th></tr>';
+
+  tabelaConntrack.forEach(sessao => {
+    html += `
+      <tr style="border-bottom:1px solid var(--rule);">
+        <td style="padding:0.25rem 0; color:var(--muted);">${sessao.timestamp}</td>
+        <td style="padding:0.25rem 0;">${sessao.proto}</td>
+        <td style="padding:0.25rem 0;">${escapeHtml(sessao.src)}</td>
+        <td style="padding:0.25rem 0;">${escapeHtml(sessao.dst)}</td>
+        <td style="padding:0.25rem 0; color:#10b981; font-weight:700;">${sessao.state}</td>
+      </tr>
+    `;
+  });
+  html += '</table>';
+  container.innerHTML = html;
+}
+
+// Reordena regras para demonstrar Rule Shadowing
+function reordenarRegra(idRegra, direcao) {
+  const idx = regrasFirewall.findIndex(r => r.id === idRegra);
+  if (idx < 0) return;
+
+  const novoIdx = idx + direcao;
+  // A última regra (Default Drop) não pode sair do final
+  if (novoIdx < 0 || novoIdx >= regrasFirewall.length - 1) return;
+
+  const temp = regrasFirewall[idx];
+  regrasFirewall[idx] = regrasFirewall[novoIdx];
+  regrasFirewall[novoIdx] = temp;
+
+  renderizarTabelaRegras();
+  dispararInjecaoManual();
+}
+
+// Restaura ordem padrão recomendada
+function restaurarRegrasOriginais() {
+  regrasFirewall = [
+    {
+      id: 1,
+      acao: "ACCEPT",
+      src: "203.0.113.0/24",
+      dst: "192.168.10.10",
+      proto: "TCP",
+      port: 443,
+      desc: "Permitir HTTPS da Internet para Servidor Web (DMZ)"
+    },
+    {
+      id: 2,
+      acao: "ACCEPT",
+      src: "192.168.10.10",
+      dst: "10.0.2.50",
+      proto: "TCP",
+      port: 5432,
+      desc: "Permitir queries SQL do Web Server (DMZ) para Banco de Dados"
+    },
+    {
+      id: 3,
+      acao: "ACCEPT",
+      src: "10.0.1.100",
+      dst: "10.0.2.0/24",
+      proto: "TCP",
+      port: 22,
+      desc: "Permitir SSH exclusivamente da Estação do Administrador (LAN)"
+    },
+    {
+      id: 4,
+      acao: "DROP",
+      src: "192.168.10.0/24",
+      dst: "0.0.0.0/0",
+      proto: "TCP",
+      port: 4444,
+      desc: "Bloquear tentativas de C2 / Shell Reversa originadas da DMZ"
+    },
+    {
+      id: 5,
+      acao: "DROP",
+      src: "0.0.0.0/0",
+      dst: "0.0.0.0/0",
+      proto: "ANY",
+      port: 0,
+      desc: "Política Padrão: Default Drop (Descarte Implícito de Borda)"
+    }
+  ];
+  renderizarTabelaRegras();
+  dispararInjecaoManual();
+}
+
+// Injeção de cenários prontos
+function injetarPacoteCenario(tipo) {
+  const srcEl = document.getElementById("pkt-src-ip");
+  const dstEl = document.getElementById("pkt-dst-ip");
+  const protoEl = document.getElementById("pkt-proto");
+  const portEl = document.getElementById("pkt-dst-port");
+
+  if (tipo === "web_legitimo") {
+    srcEl.value = "203.0.113.50";
+    dstEl.value = "192.168.10.10";
+    protoEl.value = "TCP";
+    portEl.value = "443";
+  } else if (tipo === "dmz_para_banco") {
+    srcEl.value = "192.168.10.10";
+    dstEl.value = "10.0.2.50";
+    protoEl.value = "TCP";
+    portEl.value = "5432";
+  } else if (tipo === "invasao_ssh_direto") {
+    srcEl.value = "198.51.100.88";
+    dstEl.value = "10.0.2.50";
+    protoEl.value = "TCP";
+    portEl.value = "22";
+  } else if (tipo === "c2_conexao_reversa") {
+    srcEl.value = "192.168.10.10";
+    dstEl.value = "203.0.113.99";
+    protoEl.value = "TCP";
+    portEl.value = "4444";
+  } else if (tipo === "scan_rdp") {
+    srcEl.value = "198.51.100.12";
+    dstEl.value = "192.168.10.10";
+    protoEl.value = "TCP";
+    portEl.value = "3389";
+  }
+
+  dispararInjecaoManual();
+}
+
+function dispararInjecaoManual() {
+  const src = document.getElementById("pkt-src-ip").value.trim();
+  const dst = document.getElementById("pkt-dst-ip").value.trim();
+  const proto = document.getElementById("pkt-proto").value;
+  const port = parseInt(document.getElementById("pkt-dst-port").value, 10) || 0;
+
+  avaliarPacoteFirewall({ src, dst, proto, port });
+}
+
+// Inicialização automática do checklist e do laboratório no carregamento da página
+document.addEventListener("DOMContentLoaded", function() {
+  if (typeof initChecklist === "function") {
+    initChecklist("segmentacao-firewall");
+  }
+  renderizarTabelaRegras();
+  injetarPacoteCenario("web_legitimo");
+});
+</script>
