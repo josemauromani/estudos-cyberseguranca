@@ -1,0 +1,2749 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="study-slug" content="Autenticacao-e-IAM">
+  <title>Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC — Estudos de Cibersegurança</title>
+
+  <!-- Google Fonts: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+/* ==========================================================================
+   ESTUDOS DE CIBERSEGURANÇA — DESIGN SYSTEM BASE (base.css)
+   Compatível com temas Claro / Escuro, responsivo e 100% offline-ready.
+   Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0. Importação de Fontes Web (Google Fonts com Fallbacks Locais Nativos)
+   -------------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+/* --------------------------------------------------------------------------
+   1. Design Tokens & Variáveis CSS (Tema Claro - Padrão)
+   -------------------------------------------------------------------------- */
+:root {
+  /* Paleta Base */
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+
+  /* Cores Temáticas das 6 Trilhas */
+  --t1-blue: #2563EB;     /* Trilha 1: Fundamentos & Princípios */
+  --t2-green: #059669;    /* Trilha 2: Defesa & Operações Blue Team */
+  --t3-red: #DC2626;      /* Trilha 3: Segurança Ofensiva & Red Team */
+  --t4-purple: #7C3AED;   /* Trilha 4: Engenharia, Cloud & AppSec */
+  --t5-cyan: #0891B2;     /* Trilha 5: Criptografia & Identidade */
+  --t6-amber: #D97706;    /* Trilha 6: Governança, Risco & Regulação */
+
+  /* Cores de Alerta / Callouts */
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+
+  --warning-color: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #F59E0B;
+
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+
+  --law-color: #7C3AED;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+
+  /* Tipografia */
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+
+  /* Espaçamento e Bordas */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 28, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 28, 0.08), 0 2px 4px -2px rgba(15, 23, 28, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 28, 0.1), 0 4px 6px -4px rgba(15, 23, 28, 0.05);
+
+  /* Transição */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.25s ease-in-out;
+}
+
+/* --------------------------------------------------------------------------
+   2. Suporte a Tema Escuro (Modo Noturno / Dark Mode)
+   -------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0F171C;
+    --surface: #172229;
+    --sunk: #1E2B33;
+    --ink: #E4EAED;
+    --muted: #9BABB6;
+    --rule: #2B3A44;
+
+    /* Trilhas no Dark Mode (ajuste de saturação e contraste) */
+    --t1-blue: #60A5FA;
+    --t2-green: #34D399;
+    --t3-red: #F87171;
+    --t4-purple: #A78BFA;
+    --t5-cyan: #22D3EE;
+    --t6-amber: #FBBF24;
+
+    /* Alertas no Dark Mode */
+    --tip-color: #34D399;
+    --tip-bg: rgba(5, 150, 105, 0.18);
+    --tip-border: #059669;
+
+    --warning-color: #FBBF24;
+    --warning-bg: rgba(217, 119, 6, 0.18);
+    --warning-border: #D97706;
+
+    --danger-color: #F87171;
+    --danger-bg: rgba(220, 38, 38, 0.20);
+    --danger-border: #DC2626;
+
+    --law-color: #A78BFA;
+    --law-bg: rgba(124, 58, 237, 0.18);
+    --law-border: #7C3AED;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #0F171C;
+  --surface: #172229;
+  --sunk: #1E2B33;
+  --ink: #E4EAED;
+  --muted: #9BABB6;
+  --rule: #2B3A44;
+
+  --t1-blue: #60A5FA;
+  --t2-green: #34D399;
+  --t3-red: #F87171;
+  --t4-purple: #A78BFA;
+  --t5-cyan: #22D3EE;
+  --t6-amber: #FBBF24;
+
+  --tip-color: #34D399;
+  --tip-bg: rgba(5, 150, 105, 0.18);
+  --tip-border: #059669;
+
+  --warning-color: #FBBF24;
+  --warning-bg: rgba(217, 119, 6, 0.18);
+  --warning-border: #D97706;
+
+  --danger-color: #F87171;
+  --danger-bg: rgba(220, 38, 38, 0.20);
+  --danger-border: #DC2626;
+
+  --law-color: #A78BFA;
+  --law-bg: rgba(124, 58, 237, 0.18);
+  --law-border: #7C3AED;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="light"] {
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+
+  --t1-blue: #2563EB;
+  --t2-green: #059669;
+  --t3-red: #DC2626;
+  --t4-purple: #7C3AED;
+  --t5-cyan: #0891B2;
+  --t6-amber: #D97706;
+
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+
+  --warning-color: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #F59E0B;
+
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+
+  --law-color: #7C3AED;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+}
+
+/* --------------------------------------------------------------------------
+   3. Reset e Estilos Globais
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  color-scheme: light dark;
+}
+
+body {
+  background-color: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  margin: 0;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* Tipografia Estrutural */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.75rem; margin-top: 2rem; border-bottom: 2px solid var(--rule); padding-bottom: 0.5rem; }
+h3 { font-size: 1.35rem; margin-top: 1.5rem; }
+h4 { font-size: 1.15rem; }
+
+p {
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--t1-blue);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity var(--transition-fast);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code, kbd, samp {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background-color: var(--sunk);
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--rule);
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  background-color: #0D1418;
+  color: #E2E8F0;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  border: none;
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   4. Layout do Documento & Barra de Navegação Superior
+   -------------------------------------------------------------------------- */
+.top-nav {
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.top-nav-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.nav-back:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.theme-toggle-btn {
+  background: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+  background: var(--surface);
+  border-color: var(--muted);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 4rem 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   5. Cabeçalho de Destaque (.hero-header) e Metadados
+   -------------------------------------------------------------------------- */
+.hero-header {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-color: var(--track-color, var(--t1-blue));
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  background-color: var(--sunk);
+  color: var(--ink);
+}
+
+.badge-t1 { background-color: rgba(37, 99, 235, 0.15); color: var(--t1-blue); }
+.badge-t2 { background-color: rgba(5, 150, 105, 0.15); color: var(--t2-green); }
+.badge-t3 { background-color: rgba(220, 38, 38, 0.15); color: var(--t3-red); }
+.badge-t4 { background-color: rgba(124, 58, 237, 0.15); color: var(--t4-purple); }
+.badge-t5 { background-color: rgba(8, 145, 178, 0.15); color: var(--t5-cyan); }
+.badge-t6 { background-color: rgba(217, 119, 6, 0.15); color: var(--t6-amber); }
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+}
+
+.meta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.meta-item strong {
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   6. Caixas de Destaque (.callout)
+   -------------------------------------------------------------------------- */
+.callout {
+  padding: 1.1rem 1.35rem;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  border-left: 5px solid var(--muted);
+  background-color: var(--sunk);
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+}
+
+.callout strong {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+}
+
+.callout-tip, .callout.tip {
+  border-left-color: var(--tip-color);
+  background-color: var(--tip-bg);
+}
+
+.callout-warning, .callout.warning {
+  border-left-color: var(--warning-color);
+  background-color: var(--warning-bg);
+}
+
+.callout-danger, .callout.danger {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg);
+}
+
+.callout-law, .callout.law {
+  border-left-color: var(--law-color);
+  background-color: var(--law-bg);
+}
+
+/* --------------------------------------------------------------------------
+   7. Bloco Terminal / Comandos (.terminal-box)
+   -------------------------------------------------------------------------- */
+.terminal-box {
+  background-color: #0A0F13;
+  color: #E2E8F0;
+  border: 1px solid #1E293B;
+  border-radius: var(--radius-md);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.terminal-header {
+  background-color: #151E27;
+  padding: 0.5rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1E2B37;
+}
+
+.terminal-title {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #94A3B8;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.terminal-title::before {
+  content: "● ● ●";
+  letter-spacing: 0.15rem;
+  color: #475569;
+  font-size: 0.65rem;
+}
+
+.btn-copy {
+  background-color: #243242;
+  color: #CBD5E1;
+  border: 1px solid #334155;
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-copy:hover {
+  background-color: #334155;
+  color: #FFFFFF;
+}
+
+.terminal-box pre {
+  margin: 0;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 1rem;
+  color: #E2E8F0;
+}
+
+/* --------------------------------------------------------------------------
+   8. Simulador / Painel de Laboratório (.lab-box)
+   -------------------------------------------------------------------------- */
+.lab-box {
+  background-color: var(--surface);
+  border: 2px solid var(--rule);
+  border-radius: var(--radius-lg);
+  margin: 2rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.lab-header {
+  background-color: var(--sunk);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.lab-header h3 {
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+  font-size: 1.3rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lab-header p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+.lab-body {
+  padding: 1.5rem;
+}
+
+.lab-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  background-color: var(--ground);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+}
+
+.lab-controls label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.lab-controls input[type="text"],
+.lab-controls input[type="number"],
+.lab-controls select,
+.lab-controls textarea {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.lab-controls input:focus,
+.lab-controls select:focus,
+.lab-controls textarea:focus {
+  outline: none;
+  border-color: var(--t1-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.lab-output {
+  background-color: #0B1116;
+  color: #38BDF8;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid #1E293B;
+  min-height: 100px;
+  max-height: 400px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.55;
+}
+
+/* Controles e Grid do Laboratório Interativo */
+.lab-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background-color: var(--ground);
+  border-bottom: 1px solid var(--rule);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.form-control {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--t1-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.form-range {
+  width: 100%;
+  accent-color: var(--t1-blue);
+  cursor: pointer;
+}
+
+.flags-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.flag-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.flag-toggle:hover {
+  border-color: var(--t1-blue);
+}
+
+.flag-toggle input[type="checkbox"] {
+  accent-color: var(--t1-blue);
+  cursor: pointer;
+}
+
+.lab-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--rule);
+}
+
+.packet-display-wrap {
+  padding: 1.5rem;
+  background-color: var(--surface);
+}
+
+.packet-display-wrap h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.packet-header-grid {
+  display: grid;
+  grid-template-columns: repeat(32, 1fr);
+  gap: 4px;
+  background-color: var(--ground);
+  padding: 0.75rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.header-field-cell {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-width: 75px;
+}
+
+.header-field-cell.span-8 {
+  grid-column: span 8;
+}
+
+.header-field-cell.span-16 {
+  grid-column: span 16;
+}
+
+.header-field-cell.span-32 {
+  grid-column: span 32;
+}
+
+.header-field-cell .field-title {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.2rem;
+}
+
+.header-field-cell .field-val {
+  font-size: 0.88rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.header-field-cell .field-val.highlight {
+  color: var(--t1-blue);
+}
+
+.header-field-cell .field-val.flag-badge {
+  background-color: var(--sunk);
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+  .packet-header-grid {
+    grid-template-columns: repeat(16, 1fr);
+  }
+  .header-field-cell.span-8 {
+    grid-column: span 16;
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   9. Botões e Controles Padrão
+   -------------------------------------------------------------------------- */
+.btn-primary {
+  background-color: var(--t1-blue);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface);
+  border-color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   10. Lista de Verificação Interativa (.checklist)
+   -------------------------------------------------------------------------- */
+.checklist {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin: 1.75rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.checklist h4 {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.checklist-progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: var(--sunk);
+  border-radius: var(--radius-pill);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.checklist-progress-fill {
+  height: 100%;
+  background-color: var(--t2-green);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  margin: 0.25rem 0;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast);
+}
+
+.check-item:hover {
+  background-color: var(--sunk);
+}
+
+.check-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--muted);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.check-item input[type="checkbox"]:checked {
+  background-color: var(--t2-green);
+  border-color: var(--t2-green);
+}
+
+.check-item input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.check-item span {
+  font-size: 0.95rem;
+  color: var(--ink);
+  line-height: 1.45;
+  transition: color var(--transition-fast);
+}
+
+.check-item.completed span {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   11. Quiz de Fixação (.quiz, .quiz-item, .quiz-section)
+   -------------------------------------------------------------------------- */
+.quiz-section {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  margin: 2rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.quiz-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.quiz-item {
+  background-color: var(--sunk);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.quiz-question {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 0.85rem;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.quiz-btn {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1.4;
+}
+
+.quiz-btn:hover:not(:disabled) {
+  border-color: var(--t1-blue);
+  background-color: var(--ground);
+}
+
+.quiz-btn.correct {
+  background-color: var(--tip-bg) !important;
+  border-color: var(--t2-green) !important;
+  color: var(--t2-green) !important;
+  font-weight: 600;
+}
+
+.quiz-btn.incorrect {
+  background-color: var(--danger-bg) !important;
+  border-color: var(--danger-color) !important;
+  color: var(--danger-color) !important;
+}
+
+.quiz-feedback {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-top: 0.75rem;
+  border-left: 4px solid var(--rule);
+  background-color: var(--surface);
+}
+
+.quiz-feedback.correct {
+  border-left-color: var(--t2-green);
+  background-color: var(--tip-bg);
+  color: var(--ink);
+}
+
+.quiz-feedback.incorrect {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg);
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   12. Grade de Fatos / Cards Comparativos (.facts-grid, .facts-card)
+   -------------------------------------------------------------------------- */
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.facts-card {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.facts-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.facts-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+}
+
+.facts-card p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   13. Tabelas Técnicas Comparativas
+   -------------------------------------------------------------------------- */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  background-color: var(--surface);
+  text-align: left;
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+th {
+  background-color: var(--sunk);
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: var(--ground);
+}
+
+/* --------------------------------------------------------------------------
+   14. Rodapé e Referências
+   -------------------------------------------------------------------------- */
+.study-footer {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   15. Responsividade & Impressão (@media)
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  h1 { font-size: 1.85rem; }
+  h2 { font-size: 1.45rem; }
+  .hero-header { padding: 1.25rem; }
+  .lab-body { padding: 1rem; }
+  .lab-controls { flex-direction: column; align-items: stretch; }
+  .top-nav-inner { padding: 0.5rem 1rem; }
+}
+
+@media print {
+  body {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  .top-nav, .theme-toggle-btn, .btn-copy, .lab-controls button {
+    display: none !important;
+  }
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+  .hero-header, .lab-box, .checklist, .quiz-section {
+    border: 1px solid #CCC !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+}
+
+  </style>
+</head>
+<body data-slug="Autenticacao-e-IAM">
+
+  <!-- Barra de Navegação Superior e Breadcrumbs -->
+  <header class="top-nav">
+    <div class="top-nav-inner">
+      <a href="../index.html" class="nav-back">← Painel de Estudos</a>
+      <span class="nav-title">Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</span>
+      <div class="nav-actions">
+        <span class="badge badge-t1">Trilha 1</span>
+        <button class="theme-toggle-btn" aria-label="Alternar tema" onclick="toggleTheme()">
+          <span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal do Treinamento -->
+  <main class="container">
+<!-- ==========================================================================
+     Estudo 04: Autenticação e Gestão de Identidades (IAM)
+     Corpo do Treinamento: Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC
+     ========================================================================== -->
+
+<header class="study-header">
+  <span class="study-track-kicker">Trilha 1: Fundamentos &amp; Redes Seguras &bull; Estudo 04</span>
+  <h1 class="study-title">Autenticação e Gestão de Identidades (IAM)</h1>
+  <p class="study-lead">
+    A identidade é o novo perímetro da segurança cibernética. Em um cenário corporativo híbrido e descentralizado,
+    compreender os fundamentos do ciclo IAAA, a robustez dos hashes lentos de senha, a proteção irredutível do MFA
+    com FIDO2/WebAuthn, os fluxos modernos de federação com OAuth 2.0/OIDC, a segurança profunda de tokens JWT e os
+    modelos de controle de acesso (RBAC e ABAC) é a primeira e mais crítica linha de defesa contra violações e movimentos laterais.
+  </p>
+  <div class="study-meta-bar">
+    <span class="badge blue">NIST CSF 2.0: Protect (PR.AA)</span>
+    <span class="badge slate">MITRE ATT&amp;CK: TA0006, TA0004, T1556, T1078</span>
+    <span class="badge slate">Tempo Estimado: ~45 minutos</span>
+    <span class="badge slate">Carreiras: AppSec &bull; Blue Team &bull; DevSecOps &bull; GRC</span>
+  </div>
+</header>
+
+<!-- SEÇÃO 1: PILARES DE IAM E O CICLO IAAA -->
+<section class="study-section" id="pilares-iam">
+  <div class="section-title-wrap">
+    <span class="section-num">01</span>
+    <h2>Fundamentos de IAM, Governança e o Ciclo IAAA</h2>
+  </div>
+
+  <p>
+    A disciplina de <strong>Gestão de Identidade e Acesso (IAM - <em>Identity and Access Management</em>)</strong>
+    estabelece os processos, diretrizes e tecnologias que asseguram que os indivíduos e sistemas corretos tenham
+    o acesso adequado aos recursos corporativos adequados, pelos motivos corretos e no tempo estritamente necessário.
+    Toda a arquitetura de IAM repousa sobre quatro pilares sequenciais e interdependentes conhecidos como o <strong>Ciclo IAAA</strong>:
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>1. Identificação (Identification)</h4>
+      <p>
+        O ato de uma entidade declarar quem afirma ser perante o sistema. Não envolve prova imediata de veracidade.
+        <br><strong>Exemplos:</strong> Nome de usuário (username), endereço de e-mail, matrícula funcional, identificador de dispositivo (UUID).
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>2. Autenticação (Authentication)</h4>
+      <p>
+        O processo criptográfico ou lógico de verificar e comprovar a identidade alegada. O sistema desafia o usuário
+        a apresentar evidências de autenticidade irrefutáveis.
+        <br><strong>Exemplos:</strong> Senha cifrada, código TOTP de 6 dígitos, biometria facial, assinatura com chave privada WebAuthn.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>3. Autorização (Authorization)</h4>
+      <p>
+        A determinação das permissões e privilégios concedidos à identidade previamente autenticada sobre recursos específicos.
+        <br><strong>Exemplos:</strong> Verificação de permissão RBAC (leitura de faturamento), escopos OAuth 2.0 (<code>read:reports</code>), políticas ABAC.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>4. Auditoria / Rastreabilidade (Accountability)</h4>
+      <p>
+        O registro imutável de eventos (logs) associando cada ação executada à identidade responsável, assegurando não-repúdio.
+        <br><strong>Exemplos:</strong> Logs SIEM de login, emissão de queries com ID do usuário, trilhas de auditoria protegidas contra exclusão.
+      </p>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <h4>Princípio do Menor Privilégio e Segregação de Funções (SoD)</h4>
+    <p>
+      O <strong>Princípio do Menor Privilégio (Principle of Least Privilege)</strong> determina que qualquer usuário,
+      serviço ou aplicação deve possuir apenas os privilégios estritamente indispensáveis para o cumprimento imediato
+      de sua função operacional. Em conjunto, a <strong>Segregação de Funções (SoD - <em>Separation of Duties</em>)</strong>
+      impede que uma única pessoa detenha controle total sobre processos críticos (por exemplo, quem cadastra uma conta
+      bancária fornecedora não pode ser a mesma pessoa com privilégio para autorizar o pagamento).
+    </p>
+  </div>
+
+  <div class="callout law">
+    <h4>O Ciclo de Vida da Identidade: O Processo JML (Joiner, Mover, Leaver)</h4>
+    <p>
+      A governança de identidades deve monitorar todo o ciclo de vida dos colaboradores na organização:
+    </p>
+    <ul>
+      <li><strong>Joiner (Admissão):</strong> Criação da identidade com provisionamento automatizado de acessos baseados na função inicial (evitando concessão manual indiscriminada).</li>
+      <li><strong>Mover (Movimentação/Promoção):</strong> Revisão obrigatória de acessos. A grande falha corporativa é o <em>Privilege Creep</em> (acumulação histórica de privilégios de departamentos anteriores). Os privilégios antigos devem ser revogados ao assumir novas atribuições.</li>
+      <li><strong>Leaver (Desligamento):</strong> Desprovisionamento imediato e sistemático (bloqueio de credenciais no IdP, revogação de tokens de sessão ativos e recolhimento de dispositivos) para evitar contas órfãs exploráveis.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- SEÇÃO 2: ARMAZENAMENTO SEGURO DE SENHAS E MFA -->
+<section class="study-section" id="senhas-e-mfa">
+  <div class="section-title-wrap">
+    <span class="section-num">02</span>
+    <h2>Armazenamento Seguro de Senhas &amp; Autenticação Multifator (MFA)</h2>
+  </div>
+
+  <p>
+    Senhas continuam sendo o mecanismo de autenticação primária mais difundido, porém o mais suscetível a erros de implementação.
+    O armazenamento de senhas em bancos de dados corporativos nunca deve ser em texto claro nem através de cifras reversíveis.
+    Mais importante ainda: <strong>funções de hash criptográfico tradicionais rápidas (como MD5, SHA-1 e SHA-256) são totalmente inadequadas para armazenamento de senhas</strong>.
+  </p>
+
+  <div class="callout danger">
+    <h4>Por que SHA-256 e MD5 Falham no Armazenamento de Senhas?</h4>
+    <p>
+      Funções de hash de uso geral foram projetadas para serem extremamente rápidas (capazes de validar gigabytes de arquivos em frações de segundo).
+      Um invasor utilizando um rig moderno com 8 placas de vídeo (GPUs RTX 4090) é capaz de computar mais de <strong>100 bilhões de hashes SHA-256 por segundo</strong>,
+      permitindo quebrar qualquer senha humana alfanumérica de 8 caracteres em poucos minutos por força bruta ou ataque de dicionário com tabelas pré-computadas (<em>Rainbow Tables</em>).
+    </p>
+  </div>
+
+  <p>
+    Para armazenar senhas com resiliência, a indústria de segurança utiliza <strong>Funções Adaptativas de Derivação de Chaves (KDFs lentas)</strong>,
+    que exigem um custo computacional configurável e impõem uso massivo de memória RAM para inviabilizar ataques paralelos em hardware dedicado:
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>Argon2id (Recomendação Atual)</h4>
+      <p>
+        Vencedor oficial da <em>Password Hashing Competition (PHC)</em>. Sua variante <strong>Argon2id</strong> combina resistência
+        a ataques de canal lateral (<em>side-channel</em>) na CPU e inviabilidade de paralelização massiva em GPUs e circuitos ASIC
+        através de alto consumo forçado de memória RAM (<em>memory-hard function</em>).
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>bcrypt (Padrão de Mercado)</h4>
+      <p>
+        Baseado na cifra de bloco Blowfish. Utiliza um parâmetro de custo exponencial (<em>work factor</em> de 10 a 14) e um salt
+        criptográfico de 128 bits gerado aleatoriamente por senha. Cada incremento no fator de custo dobra o tempo de cálculo necessário.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>PBKDF2 e scrypt</h4>
+      <p>
+        <strong>PBKDF2:</strong> Padrão NIST com milhares de iterações HMAC (recomendado mínimo 600.000 iterações com HMAC-SHA256).
+        <br><strong>scrypt:</strong> Criado para combater ASICs ao exigir parâmetros de memória estritos (N, r, p).
+      </p>
+    </div>
+  </div>
+
+  <h3>Os Três Fatores Canônicos de Autenticação</h3>
+  <p>
+    A <strong>Autenticação Multifator (MFA)</strong> exige que o usuário apresente com sucesso evidências pertencentes a
+    <strong>duas ou mais categorias distintas</strong> de fatores. Requisitar uma senha e uma pergunta de segurança não é MFA,
+    pois ambas pertencem à mesma categoria de conhecimento.
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>1. Algo que Você Sabe (Knowledge)</h4>
+      <p>Informação que o usuário retém mentalmente: senhas, códigos PIN alfanuméricos, frases secretas (passphrases).</p>
+    </div>
+    <div class="info-card">
+      <h4>2. Algo que Você Tem (Possession)</h4>
+      <p>Dispositivo físico ou virtual sob controle do usuário: chaves de segurança USB/NFC (YubiKey), smartphone com aplicativo autenticador, smartcard.</p>
+    </div>
+    <div class="info-card">
+      <h4>3. Algo que Você É (Inherence)</h4>
+      <p>Características biométricas físicas ou comportamentais: leitor de impressão digital, reconhecimento facial 3D, varredura de íris, padrão de digitação.</p>
+    </div>
+  </div>
+
+  <div class="callout warning">
+    <h4>A Fragilidade Crítica do MFA por SMS e Chamada Telefônica</h4>
+    <p>
+      O envio de códigos OTP via SMS ou ligação telefônica sofre com ataques de <strong>SIM Swapping</strong> (clonagem da linha telefônica
+      junto à operadora de telecomunicação por engenharia social) e interceptação de sinalização na rede móvel (vulnerabilidades SS7).
+      O NIST SP 800-63B classifica SMS como um método restrito e desaconselhado para sistemas de alto risco.
+    </p>
+  </div>
+
+  <h3>TOTP (RFC 6238) vs FIDO2 / WebAuthn</h3>
+  <p>
+    Para superar a fragilidade do SMS, adotam-se geradores criptográficos em aplicativo ou tokens de hardware:
+  </p>
+  <ul>
+    <li>
+      <strong>TOTP (Time-Based One-Time Password - RFC 6238):</strong> Gera um código temporal (geralmente 6 dígitos) derivado de um
+      segredo compartilhado previamente trocado via QR Code e da contagem de épocas Unix dividida em passos de 30 segundos:
+      <br><code>TOTP = Truncate(HMAC-SHA1(SegredoCompartilhado, floor(UnixTime / 30)))</code>.
+      <br><em>Limitação:</em> Embora excelente contra interceptação de rede, o TOTP ainda é vulnerável a ataques modernos de
+      <strong>Phishing com Adversary-in-the-Middle (AiTM)</strong> (como ferramentas Evilginx), onde o proxy reverso do invasor
+      repassa o código TOTP digitado pela vítima em tempo real para o serviço legítimo.
+    </li>
+    <li>
+      <strong>FIDO2 e WebAuthn (Passkeys):</strong> O padrão ouro da indústria. Utiliza <strong>criptografia assimétrica vinculada à origem web (Origin Binding)</strong>.
+      O navegador e a chave de segurança física (ou enclave seguro do dispositivo) assinam o desafio criptográfico do servidor vinculando
+      o domínio exato (ex: <code>banco.com.br</code>). Se a vítima estiver em um site clonado de phishing (ex: <code>banco-falso.com.br</code>),
+      a chave se recusa a assinar ou assina com credencial inválida para o domínio falso, tornando o phishing tecnicamente inviável.
+    </li>
+  </ul>
+</section>
+
+<!-- SEÇÃO 3: FEDERAÇÃO, OAUTH 2.0 E OPENID CONNECT -->
+<section class="study-section" id="federacao-oauth-oidc">
+  <div class="section-title-wrap">
+    <span class="section-num">03</span>
+    <h2>Federação de Identidades, OAuth 2.0 e OpenID Connect (OIDC)</h2>
+  </div>
+
+  <p>
+    Em ecossistemas modernos com dezenas de aplicações e microsserviços, exigir que cada software armazene suas próprias senhas
+    é uma anti-prática perigosa. A <strong>Federação de Identidades</strong> centraliza o gerenciamento de credenciais em um
+    <strong>Provedor de Identidade (IdP - <em>Identity Provider</em>)</strong> confiável (como Okta, Microsoft Entra ID, Keycloak ou Google Workspace).
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>OAuth 2.0 (RFC 6749)</h4>
+      <p>
+        <strong>Protocolo de Autorização Delegada.</strong> Permite que uma aplicação de terceiros acerte acesso a recursos de um usuário
+        sem que o usuário precise fornecer sua senha à aplicação.
+        <br><strong>Exemplo:</strong> Permitir que uma ferramenta de calendário acesse sua lista de contatos do Google.
+        <br><strong>Artefato emitido:</strong> <code>Access Token</code>.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>OpenID Connect (OIDC)</h4>
+      <p>
+        <strong>Camada de Autenticação construída sobre o OAuth 2.0.</strong> Fornece a identidade do usuário final para a aplicação cliente.
+        Responde à pergunta: <em>"Quem é este usuário logado?"</em>.
+        <br><strong>Exemplo:</strong> Botão "Entrar com Conta Gov.br" ou "Entrar com Google".
+        <br><strong>Artefato emitido:</strong> <code>ID Token</code> (em formato JWT legível).
+      </p>
+    </div>
+  </div>
+
+  <h3>Os Quatro Papéis Fundamentais do OAuth 2.0</h3>
+  <ol>
+    <li><strong>Resource Owner (Proprietário do Recurso):</strong> A entidade capaz de conceder acesso a um recurso protegido (tipicamente o usuário final).</li>
+    <li><strong>Client (Aplicação Cliente):</strong> A aplicação que faz solicitações de recursos protegidos em nome do Resource Owner (pode ser uma aplicação web, mobile ou Single Page App).</li>
+    <li><strong>Authorization Server (Servidor de Autorização):</strong> O servidor que autentica o Resource Owner e emite tokens após receber autorização (o IdP).</li>
+    <li><strong>Resource Server (Servidor de Recursos / API):</strong> A API backend que hospeda os recursos protegidos e aceita requisições acompanhadas de um <em>Access Token</em> válido.</li>
+  </ol>
+
+  <div class="callout tip">
+    <h4>Authorization Code Flow com PKCE (RFC 7636)</h4>
+    <p>
+      Historicamente, o fluxo <em>Implicit Flow</em> era utilizado em aplicações frontend (SPAs e Apps Mobile), mas foi
+      <strong>depreciado pelo consórcio OAuth devido a riscos de vazamento de tokens em fragmentos de URL</strong>.
+      A recomendação obrigatória atual é o <strong>Authorization Code Flow com PKCE (<em>Proof Key for Code Exchange</em>)</strong>.
+    </p>
+    <p>
+      O cliente gera aleatoriamente um segredo temporário (<code>code_verifier</code>), calcula seu hash SHA-256 (<code>code_challenge</code>)
+      e o envia ao iniciar o fluxo. Ao receber o código de autorização, o cliente envia o <code>code_verifier</code> original via canal seguro.
+      O servidor confere o hash e emite o token. Isso impede que malwares em dispositivos móveis que interceptem o código de autorização consigam trocá-lo pelo token de acesso.
+    </p>
+  </div>
+</section>
+
+<!-- SEÇÃO 4: ANATOMIA E ATAQUES A TOKENS JWT -->
+<section class="study-section" id="anatomia-jwt">
+  <div class="section-title-wrap">
+    <span class="section-num">04</span>
+    <h2>Anatomia, Ciclo de Vida e Vetores de Ataque em Tokens JWT</h2>
+  </div>
+
+  <p>
+    O <strong>JSON Web Token (JWT - RFC 7519)</strong> é o padrão aberto dominante para transmissão compacta e autossuficiente
+    de declarações (<em>claims</em>) de segurança entre duas partes em formato JSON. Ele é composto por três partes distintas
+    separadas por pontos (<code>.</code>), codificadas no formato <strong>Base64URL</strong>:
+  </p>
+
+  <div class="terminal-box">
+    <div class="terminal-header">
+      <span class="terminal-title">Formato Canônico de um Token JWT</span>
+      <button class="terminal-copy-btn" onclick="copyCode(this, 'jwt-anatomy-code')">Copiar</button>
+    </div>
+    <pre id="jwt-anatomy-code"><code><span style="color:#f43f5e;font-weight:700;">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</span>.<span style="color:#818cf8;font-weight:700;">eyJzdWIiOiIxMjM0NTYiLCJ1c2VyIjoiYWxpY2UiLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3NzAyODgwMDB9</span>.<span style="color:#06b6d4;font-weight:700;">TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ</span></code></pre>
+  </div>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4 style="color:#f43f5e;">1. Header (Cabeçalho)</h4>
+      <p>
+        Define o algoritmo criptográfico utilizado para assinar o token e o tipo do token:
+        <br><code>{"alg": "HS256", "typ": "JWT"}</code>
+        <br><em>Algoritmos comuns:</em> <code>HS256</code> (HMAC com SHA-256 simétrico), <code>RS256</code> (RSA com SHA-256 assimétrico), <code>ES256</code> (ECDSA com curvas elípticas).
+      </p>
+    </div>
+    <div class="info-card">
+      <h4 style="color:#818cf8;">2. Payload (Corpo de Declarações / Claims)</h4>
+      <p>
+        Contém as declarações sobre a entidade (usuário ou serviço) e metadados contextuais:
+        <br><strong>Claims Registradas (RFC 7519):</strong>
+        <br>&bull; <code>sub</code> (Subject): identificador único do usuário.
+        <br>&bull; <code>iss</code> (Issuer): entidade emissora do token.
+        <br>&bull; <code>aud</code> (Audience): destinatários pretendidos do token.
+        <br>&bull; <code>exp</code> (Expiration Time): timestamp Unix de validade limite.
+        <br>&bull; <code>iat</code> (Issued At): timestamp Unix de momento de emissão.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4 style="color:#06b6d4;">3. Signature (Assinatura Criptográfica)</h4>
+      <p>
+        Calculada a partir da concatenação do Header codificado e Payload codificado com a chave de segredo:
+        <br><code>HMACSHA256(base64UrlEncode(header) + "." + base64UrlEncode(payload), segredo)</code>
+        <br>Garante que o payload não foi adulterado em trânsito (integridade e autenticidade).
+      </p>
+    </div>
+  </div>
+
+  <div class="callout danger">
+    <h4>Atenção Crítica: O JWT Não Criptografa Dados por Padrão!</h4>
+    <p>
+      Uma confusão comum entre desenvolvedores iniciantes é acreditar que o JWT esconde dados confidenciais.
+      A assinatura garante <strong>integridade</strong>, mas <strong>NÃO confidencialidade</strong>.
+      Qualquer pessoa com acesso ao token pode decodificar a string Base64URL em texto claro e visualizar todas as claims.
+      <strong>Nunca inclua senhas, chaves de API ou dados de cartão de crédito no payload de um JWT assinado comum (JWS)</strong>.
+      Para confidencialidade, deve ser utilizado o padrão JWE (<em>JSON Web Encryption</em>).
+    </p>
+  </div>
+
+  <h3>Vulnerabilidades Críticas de Implementação em JWT</h3>
+  <ul>
+    <li>
+      <strong>Ataque do Algoritmo "none" (Bypass de Assinatura):</strong>
+      A especificação RFC 7519 previa o algoritmo <code>"alg": "none"</code> para tokens desprotegidos. Muitas bibliotecas
+      iniciais de backend continham a falha grave de aceitar tokens com <code>"alg": "none"</code> sem assinatura,
+      permitindo que atacantes adulterassem o payload para <code>{"role": "admin"}</code> e obtivessem acesso irrestrito.
+    </li>
+    <li>
+      <strong>Confusão de Algoritmo (Key Confusion / HMAC vs RSA - CVE-2015-9235):</strong>
+      Ocorre quando a API espera um token assinado assimetricamente com RSA (RS256), possuindo a chave pública RSA disponível publicamente.
+      Se o atacante trocar o header para HS256 e assinar o token usando a chave pública RSA do servidor como se fosse a chave simétrica secreta,
+      bibliotecas vulneráveis usam a mesma chave para validar HMAC e aceitam a assinatura forjada!
+    </li>
+    <li>
+      <strong>Chaves Secretas Fracas (Brute-Force Offline):</strong>
+      Como o invasor possui o Header, Payload e Signature válidos capturados, ele pode testar bilhões de senhas por segundo
+      offline em ferramentas como <em>Hashcat</em> ou <em>jwtcat</em> para descobrir o segredo HMAC simétrico e assinar novos tokens arbitrários.
+    </li>
+    <li>
+      <strong>O Desafio da Revogação de Tokens (Stateful vs Stateless):</strong>
+      Por ser autossuficiente e sem estado (*stateless*), um JWT permanece válido até atingir a data de expiração (<code>exp</code>),
+      mesmo que o usuário troque de senha ou seja demitido. Para mitigar isso, arquiteturas seguras utilizam
+      <strong>Access Tokens com tempo de vida ultra-curto (ex: 5 a 15 minutos)</strong> combinados com <strong>Refresh Tokens opacos</strong>
+      armazenados em banco de dados e sujeitos a revogação instantânea e rotação automática.
+    </li>
+  </ul>
+</section>
+
+<!-- SEÇÃO 5: MODELOS DE CONTROLE DE ACESSO (RBAC vs ABAC) -->
+<section class="study-section" id="modelos-controle-acesso">
+  <div class="section-title-wrap">
+    <span class="section-num">05</span>
+    <h2>Modelos de Controle de Acesso: DAC, MAC, RBAC e ABAC</h2>
+  </div>
+
+  <p>
+    Após a identidade do usuário ser comprovada pela autenticação, o subsistema de autorização deve decidir
+    se uma requisição para ler, criar, alterar ou excluir um recurso deve ser concedida ou negada.
+    Existem quatro modelos formais consagrados de controle de acesso:
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>DAC (Discretionary Access Control)</h4>
+      <p>
+        O proprietário do recurso (<em>owner</em>) possui total discricionariedade para conceder ou revogar permissões a outros usuários.
+        <br><strong>Exemplo:</strong> Permissões de arquivos em sistemas operacionais tradicionais (POSIX/Linux: <code>chmod 755 arquivo</code>)
+        ou compartilhamento de documentos no Google Drive.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>MAC (Mandatory Access Control)</h4>
+      <p>
+        Controle centralizado imposto pelo sistema operacional baseado em níveis estritos de sensibilidade e autorização de segurança (<em>clearance</em>).
+        Os usuários comuns não podem repassar permissões discricionariamente.
+        <br><strong>Exemplo:</strong> SELinux, AppArmor, modelos militares Bell-LaPadula (Top Secret, Secret, Confidential).
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>RBAC (Role-Based Access Control)</h4>
+      <p>
+        Permissões são atribuídas a <strong>papéis / funções corporativas (Roles)</strong>, e os usuários recebem papéis.
+        Simplifica drasticamente o gerenciamento de permissões em empresas de médio e grande porte.
+        <br><strong>Exemplo:</strong> Perfil <code>Auditor</code> tem acesso de leitura a relatórios; perfil <code>Financeiro</code> tem permissão de emissão de notas.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>ABAC (Attribute-Based Access Control)</h4>
+      <p>
+        Modelo dinâmico que avalia políticas baseadas em <strong>atributos múltiplos em tempo de execução</strong>:
+        atributos do sujeito (cargo, setor), do recurso (classificação confidencial), da ação solicitada (leitura, escrita)
+        e do contexto ambiental (IP de origem, horário comercial, nível de risco de conformidade do dispositivo).
+        <br><strong>Exemplo:</strong> <em>"Permitir leitura de prontuários médicos apenas se o médico pertencer ao mesmo hospital e a requisição ocorrer durante o plantão ativo via rede interna"</em>.
+      </p>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <h4>Comparativo Estratégico: RBAC vs ABAC</h4>
+    <p>
+      O RBAC é excelente e amplamente suficiente para a vasta maioria das aplicações de pequeno e médio porte.
+      No entanto, conforme a complexidade da organização cresce, o RBAC sofre com o fenômeno da <strong>"Explosão de Papéis" (<em>Role Explosion</em>)</strong>,
+      onde surgem centenas de papéis micro-específicos (ex: <code>Vendedor_Filial_Sul_Turno_Noite</code>).
+      Nesses cenários hipercomplexos e em arquiteturas modernas de Nuvem e Zero Trust, a transição para <strong>ABAC</strong>
+      (utilizando motores de política como Open Policy Agent / OPA ou padrões XACML) viabiliza decisões granulares e contextuais de alta precisão.
+    </p>
+  </div>
+</section>
+
+<!-- SEÇÃO 6: LABORATÓRIO INTERATIVO (JWT & RBAC MATRIX) -->
+<section class="study-section" id="laboratorio-pratico">
+  <div class="section-title-wrap">
+    <span class="section-num">06</span>
+    <h2>Laboratório Interativo: Decodificador JWT e Avaliador de Matriz RBAC</h2>
+  </div>
+
+  <p>
+    Experimente na prática o ciclo de inspeção, manipulação e avaliação de segurança de tokens JWT.
+    Neste laboratório interativo desenvolvido em Vanilla JavaScript, você pode inspecionar tokens legítimos,
+    editar claims em tempo real, simular ataques reais (como a injeção do algoritmo <code>none</code> ou forja de assinatura)
+    e avaliar em tempo de execução como um motor de autorização RBAC processa requisições corporativas.
+  </p>
+
+  <div class="lab-box" id="jwt-rbac-lab">
+    <div class="lab-header">
+      <span class="lab-badge">LAB PRÁTICO INTERATIVO</span>
+      <h3>Simulador de Segurança de Tokens JWT e Controle RBAC</h3>
+      <p>Decodifique o token, altere declarações críticas e teste o impacto em permissões corporativas.</p>
+    </div>
+
+    <!-- Controles rápidos de cenário -->
+    <div style="margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+      <button class="lab-btn" onclick="carregarCenarioJwt('viewer')">👤 Carregar Token Legítimo (Viewer)</button>
+      <button class="lab-btn" onclick="carregarCenarioJwt('admin')">👑 Carregar Token Legítimo (Admin)</button>
+      <button class="lab-btn" onclick="carregarCenarioJwt('expirado')">⏳ Carregar Token Expirado</button>
+      <button class="lab-btn lab-btn-danger" onclick="injetarAtaqueNone()">⚠️ Injetar Ataque 'alg': 'none'</button>
+      <button class="lab-btn lab-btn-warning" onclick="forjarAssinaturaInvalida()">❌ Forjar Assinatura Inválida</button>
+    </div>
+
+    <!-- Campo de entrada do token codificado -->
+    <div style="margin-bottom: 1.5rem;">
+      <label style="display:block; font-weight:700; font-size:0.875rem; margin-bottom:0.4rem; color:var(--ink);">Token JWT Codificado (Compact JWS):</label>
+      <textarea id="jwt-raw-input" rows="3" style="width:100%; font-family:var(--font-mono); font-size:0.85rem; padding:0.75rem; border-radius:6px; border:1px solid var(--rule); background:var(--ground); color:var(--ink); resize:vertical;" oninput="processarEntradaTokenManual()"></textarea>
+    </div>
+
+    <!-- Visualizador colorido das 3 partes -->
+    <div style="margin-bottom: 1.5rem; background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1rem;">
+      <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:0.5rem;">Visualização Estrutural do Token</div>
+      <div id="jwt-colored-view" style="font-family:var(--font-mono); font-size:0.9rem; word-break:break-all; line-height:1.6;"></div>
+    </div>
+
+    <!-- Inspeção e Edição de Claims JSON -->
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1rem; margin-bottom: 1.5rem;">
+      <!-- Header Box -->
+      <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1rem; border-top:3px solid #f43f5e;">
+        <h4 style="color:#f43f5e; margin:0 0 0.5rem 0; font-size:0.95rem;">Header (JSON Decodificado)</h4>
+        <pre id="jwt-header-display" style="background:var(--ground); padding:0.75rem; border-radius:6px; font-size:0.8rem; font-family:var(--font-mono); overflow-x:auto; margin:0;"></pre>
+      </div>
+
+      <!-- Payload Box -->
+      <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1rem; border-top:3px solid #818cf8;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+          <h4 style="color:#818cf8; margin:0; font-size:0.95rem;">Payload (Declarações / Claims)</h4>
+          <span id="jwt-exp-status-badge" class="badge" style="font-size:0.7rem;"></span>
+        </div>
+        <pre id="jwt-payload-display" style="background:var(--ground); padding:0.75rem; border-radius:6px; font-size:0.8rem; font-family:var(--font-mono); overflow-x:auto; margin:0 0 0.75rem 0;"></pre>
+        
+        <!-- Formulário rápido de edição de claims -->
+        <div style="font-size:0.8rem; display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+          <div>
+            <label style="display:block; font-weight:600; color:var(--muted); margin-bottom:0.2rem;">Papel (role):</label>
+            <select id="jwt-claim-role" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="atualizarClaimRole(this.value)">
+              <option value="viewer">viewer (Visualizador)</option>
+              <option value="operator">operator (Operador)</option>
+              <option value="admin">admin (Administrador)</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-weight:600; color:var(--muted); margin-bottom:0.2rem;">Validade (exp):</label>
+            <select id="jwt-claim-exp" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="atualizarClaimExp(this.value)">
+              <option value="valido">Válido (+1 hora)</option>
+              <option value="expirado">Expirado (-1 hora)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signature Box -->
+      <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1rem; border-top:3px solid #06b6d4;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+          <h4 style="color:#06b6d4; margin:0; font-size:0.95rem;">Assinatura Criptográfica</h4>
+          <span id="jwt-sig-status-badge" class="badge" style="font-size:0.7rem;"></span>
+        </div>
+        <div style="margin-bottom:0.5rem;">
+          <label style="font-size:0.75rem; color:var(--muted); display:block; margin-bottom:0.2rem;">Segredo Simétrico HMAC do Backend:</label>
+          <div style="display:flex; gap:0.5rem;">
+            <input type="text" id="jwt-secret-input" value="minha-chave-secreta-corporativa-2026" style="flex:1; font-family:var(--font-mono); font-size:0.8rem; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);">
+            <button class="lab-btn" style="padding:0.35rem 0.6rem; font-size:0.75rem;" onclick="reassinarComSegredoAtual()">Reassinar</button>
+          </div>
+        </div>
+        <div id="jwt-signature-display" style="font-family:var(--font-mono); font-size:0.8rem; word-break:break-all; background:var(--ground); padding:0.5rem; border-radius:4px; color:var(--muted);"></div>
+      </div>
+    </div>
+
+    <!-- Avaliador de Matriz RBAC em Tempo Real -->
+    <div style="background:var(--ground); border:1px solid var(--rule); border-radius:8px; padding:1.25rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+        <div>
+          <h4 style="margin:0; font-size:1rem; color:var(--ink);">Motor de Decisão de Controle de Acesso (RBAC)</h4>
+          <p style="margin:0.2rem 0 0 0; font-size:0.85rem; color:var(--muted);">Avaliação imediata dos privilégios de acesso às operações corporativas com base no token atual:</p>
+        </div>
+        <div id="jwt-overall-status-banner" style="font-size:0.85rem; font-weight:700; padding:0.4rem 0.8rem; border-radius:6px;"></div>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.875rem;">
+          <thead>
+            <tr style="border-bottom:2px solid var(--rule); text-align:left;">
+              <th style="padding:0.6rem; color:var(--muted);">Operação / Endpoint</th>
+              <th style="padding:0.6rem; color:var(--muted);">Papel Exigido</th>
+              <th style="padding:0.6rem; color:var(--muted);">Decisão do Backend</th>
+              <th style="padding:0.6rem; color:var(--muted);">Justificativa Técnica</th>
+            </tr>
+          </thead>
+          <tbody id="rbac-matrix-rows">
+            <!-- Linhas geradas dinamicamente via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 7: CHECKLIST PRÁTICO -->
+<section class="study-section" id="checklist-iam">
+  <div class="section-title-wrap">
+    <span class="section-num">07</span>
+    <h2>Checklist de Aplicação Prática: Auditoria e Implementação de IAM</h2>
+  </div>
+
+  <p>
+    Utilize este checklist técnico durante revisões de arquitetura, auditorias de conformidade (ISO 27001 / LGPD / SOC 2)
+    ou desenvolvimentos de novas aplicações para assegurar que controles fundamentais de identidade foram implementados:
+  </p>
+
+  <div class="checklist" id="checklist-autenticacao-iam">
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Armazenamento com KDF Lenta e Salt Único:</strong>
+        Todas as senhas são armazenadas utilizando exclusivamente Argon2id ou bcrypt com fator de custo verificado,
+        rejeitando terminantemente qualquer uso de hashes simples (MD5, SHA-1, SHA-256) ou reversíveis.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Obrigatoriedade de MFA Resistente a Phishing:</strong>
+        Contas administrativas, acessos remotos (VPN/ZTNA) e sistemas corporativos críticos exigem MFA, priorizando
+        chaves FIDO2/WebAuthn ou TOTP corporativo, abolindo SMS como fator exclusivo para sistemas confidenciais.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Adoção de PKCE em Clientes Públicos (OAuth 2.0):</strong>
+        Aplicações Single Page (SPAs) e aplicativos mobile utilizam estritamente Authorization Code Flow com PKCE (RFC 7636),
+        com verificação estrita do <code>code_challenge</code> e descontinuação do fluxo <em>Implicit Flow</em>.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Bloqueio Rigoroso do Algoritmo 'none' e Validação de Algoritmos em JWT:</strong>
+        O backend impõe uma lista estrita de algoritmos permitidos (<em>whitelisting</em>), rejeita incondicionalmente
+        tokens com <code>"alg": "none"</code> e previne ataques de confusão de chave (HMAC vs RSA).
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Tokens de Acesso de Curta Duração e Rotação de Refresh Tokens:</strong>
+        Access Tokens JWT possuem tempo de expiração curto (5 a 15 minutos), e Refresh Tokens são armazenados com
+        atributos de segurança (HttpOnly, Secure, SameSite) e sofrem rotação a cada uso, com revogação imediata em anomalias.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Revisão Periódica de Acessos e Desprovisionamento Automatizado:</strong>
+        O processo JML (Joiner, Mover, Leaver) é integrado com sistemas de RH para revogação imediata de contas no desligamento,
+        com auditorias semestrais para erradicação de acúmulo indevido de privilégios (<em>Privilege Creep</em>).
+      </span>
+    </label>
+  </div>
+</section>
+
+<!-- SEÇÃO 8: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
+<section class="study-section" id="questoes-fixacao">
+  <div class="section-title-wrap">
+    <span class="section-num">08</span>
+    <h2>Questões de Fixação e Concursos Públicos</h2>
+  </div>
+
+  <p>
+    Avalie seu entendimento técnico resolvendo questões baseadas em bancas de concursos públicos de alto nível (Cespe/Cebraspe, FGV)
+    e certificações internacionais de segurança (CompTIA Security+, CISSP, CCSP):
+  </p>
+
+  <div class="quiz" id="quiz-autenticacao-iam">
+    <!-- Questão 1 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 1 &bull; Autenticação Multifator</span>
+        <p>
+          Em uma auditoria de segurança da informação, um especialista em segurança avalia o mecanismo de autenticação
+          adotado pelos administradores de servidores de banco de dados. Os administradores utilizam uma senha complexa
+          de 16 caracteres e, logo em seguida, respondem a uma pergunta de segurança ("Qual a cidade de nascimento da sua mãe?")
+          cadastrada na criação da conta. Considerando os conceitos normativos de Autenticação Multifator (MFA) do NIST SP 800-63B,
+          é correto afirmar que:
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: O procedimento NÃO constitui autenticação multifator (MFA), configurando apenas autenticação de fator único duplo (Two-Step).</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> Para constituir autenticação multifator (MFA), as credenciais exigidas devem pertencer a <strong>categorias distintas</strong>
+            de fatores (conhecimento, posse e inerência). Tanto a senha quanto a pergunta de segurança baseiam-se em informações memorizadas, pertencendo
+            exclusivamente à categoria <em>"algo que você sabe"</em> (fator de conhecimento). Para configurar MFA legítimo, o segundo fator deveria pertencer
+            à posse (ex: token físico FIDO2, aplicativo TOTP) ou à inerência (ex: biometria).
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Questão 2 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 2 &bull; Vulnerabilidades em JWT</span>
+        <p>
+          Uma equipe de desenvolvimento web implementou autenticação baseada em JSON Web Tokens (JWT). Durante um teste de invasão (pentest),
+          o analista capturou o token de um usuário comum (<code>{"sub":"42", "role":"editor"}</code>), alterou a claim de papel para
+          <code>{"role":"admin"}</code>, modificou o cabeçalho para <code>{"alg":"none", "typ":"JWT"}</code>, removeu completamente a assinatura
+          criptográfica (mantendo o ponto final) e reenviou a requisição para o endpoint de administração da API. O backend processou a requisição
+          com sucesso e concedeu privilégios administrativos. Qual falha estrutural possibilitou essa vulnerabilidade?
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: Aceitação incondicional do algoritmo 'none' na verificação do token, permitindo bypass completo da validação de assinatura.</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> O algoritmo <code>"none"</code> indica tokens não assinados. Bibliotecas ou implementações que não exigem estritamente
+            um algoritmo criptográfico seguro configurado no servidor (<em>algorithm whitelisting</em>) confiam cegamente no valor do cabeçalho enviado
+            pelo cliente. Ao receber <code>"alg": "none"</code>, a biblioteca pula a rotina de validação de assinatura e confia nos dados adulterados do payload.
+            A correção definitiva exige rejeitar explicitamente o algoritmo <code>none</code> e forçar a validação com o algoritmo simétrico ou assimétrico esperado pelo servidor.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Questão 3 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 3 &bull; Modelos de Autorização (RBAC vs ABAC)</span>
+        <p>
+          Uma instituição hospitalar necessita implementar uma política de acesso aos prontuários eletrônicos de pacientes com a seguinte regra:
+          <em>"Médicos podem visualizar prontuários de pacientes apenas se estiverem presencialmente no hospital durante seu horário de plantão ativo
+          e se houver vínculo assistencial direto com a ala de internação do paciente."</em> Entre os modelos clássicos de controle de acesso,
+          qual deles é o mais indicado para implementar nativamente essa política sem gerar sobrecarga ou proliferação caótica de perfis estáticos?
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: ABAC (Attribute-Based Access Control).</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> A política descrita depende de variáveis contextuais dinâmicas em tempo real: atributos do usuário (cargo de médico, escala de plantão),
+            atributos ambientais (localização física / IP da rede interna hospitalar, horário da requisição) e atributos do recurso/relacionamento (ala de internação do paciente).
+            Modelos RBAC baseiam-se em papéis estáticos e, para atender a essa regra, causariam uma <em>explosão de papéis</em> (ex: <code>Medico_Plantao_AlaNorte_Dia</code>).
+            O ABAC avalia expressões booleanas sobre múltiplos atributos no momento da requisição, sendo a arquitetura ideal para controle contextual granular.
+          </p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 9: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
+<section class="study-section" id="fatos-essenciais">
+  <div class="section-title-wrap">
+    <span class="section-num">09</span>
+    <h2>Fatos Essenciais e Próximos Passos</h2>
+  </div>
+
+  <div class="facts-grid">
+    <div class="facts-card">
+      <h4>O Ciclo IAAA é Sequencial</h4>
+      <p>Identificação declara quem é; Autenticação prova a declaração; Autorização concede privilégios; Auditoria registra os atos para não-repúdio.</p>
+    </div>
+    <div class="facts-card">
+      <h4>Hashes Rápidos São Proibidos em Senhas</h4>
+      <p>MD5, SHA-1 e SHA-256 sucumbem a ataques de força bruta em GPUs. Utilize Argon2id ou bcrypt com salts aleatórios e alto fator de custo.</p>
+    </div>
+    <div class="facts-card">
+      <h4>FIDO2/WebAuthn Vence o Phishing</h4>
+      <p>Ao vincular criptograficamente o domínio web da origem (Origin Binding) na assinatura, chaves de segurança físicas anulam ataques AiTM.</p>
+    </div>
+    <div class="facts-card">
+      <h4>OAuth 2.0 Não Autentica, Autoriza</h4>
+      <p>OAuth 2.0 fornece Access Tokens para autorização de APIs. Para autenticação federada de usuários, adota-se a camada OpenID Connect (OIDC).</p>
+    </div>
+    <div class="facts-card">
+      <h4>JWT É Assinado, Não Cifrado</h4>
+      <p>Tokens JWS garantem integridade, mas o payload é Base64URL aberto. Nunca insira credenciais sensíveis no payload de um token comum.</p>
+    </div>
+    <div class="facts-card">
+      <h4>Próximo Módulo da Trilha 1</h4>
+      <p>No <strong>Estudo 05 (Segmentacao-e-Firewall)</strong>, você dominará o isolamento de redes, zonas desmilitarizadas (DMZ), tabelas de estado e filtragem de pacotes.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SCRIPT EMBUTIDO: SIMULADOR DE SEGURANÇA JWT & MATRIZ RBAC -->
+<script>
+/**
+ * Simulador Interativo: Laboratório de Tokens JWT & Matriz RBAC
+ * Estudos de Cibersegurança - José Mauro da Silva Brandão
+ */
+
+// Estado interno do simulador
+const estadoSimulador = {
+  header: { alg: "HS256", typ: "JWT" },
+  payload: {
+    sub: "usr_99812",
+    name: "Ana Silva",
+    role: "viewer",
+    exp: Math.floor(Date.now() / 1000) + 3600, // +1h
+    iat: Math.floor(Date.now() / 1000) - 60
+  },
+  signatureStatus: "valida", // "valida", "invalida", "none"
+  secret: "minha-chave-secreta-corporativa-2026",
+  rawToken: ""
+};
+
+// Funções auxiliares para codificação/decodificação Base64URL segura
+function base64UrlEncodeStr(str) {
+  const bytes = new TextEncoder().encode(str);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary)
+    .replace(/=/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
+}
+
+function base64UrlDecodeStr(b64url) {
+  let b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
+  while (b64.length % 4 !== 0) {
+    b64 += "=";
+  }
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return new TextDecoder().decode(bytes);
+}
+
+// Gera hash simulado determinístico para assinatura HMAC de demonstração
+function calcularAssinaturaSimulada(headerB64, payloadB64, secret) {
+  const input = headerB64 + "." + payloadB64 + "." + secret;
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+    hash = ((hash << 5) - hash) + input.charCodeAt(i);
+    hash |= 0;
+  }
+  // Retorna string estilizada similar a base64url de 43 caracteres
+  const hex = Math.abs(hash).toString(16).padStart(8, "0") + "fa7e9b2c4d018a356ef128472910ab38c7d19";
+  return base64UrlEncodeStr(hex).slice(0, 43);
+}
+
+// Reconstrói e exibe o token codificado com base no estado atual
+function sincronizarTokenComEstado() {
+  const headerB64 = base64UrlEncodeStr(JSON.stringify(estadoSimulador.header));
+  const payloadB64 = base64UrlEncodeStr(JSON.stringify(estadoSimulador.payload));
+
+  let sigB64 = "";
+  if (estadoSimulador.header.alg === "none") {
+    sigB64 = "";
+  } else if (estadoSimulador.signatureStatus === "invalida") {
+    sigB64 = "ASSINATURA_FORJADA_INVALIDA_XYZ1234567890ABC";
+  } else {
+    sigB64 = calcularAssinaturaSimulada(headerB64, payloadB64, estadoSimulador.secret);
+  }
+
+  estadoSimulador.rawToken = headerB64 + "." + payloadB64 + (sigB64 ? "." + sigB64 : ".");
+  atualizarInterfaceCompleta();
+}
+
+// Atualiza a interface gráfica, renderização colorida e tabela RBAC
+function atualizarInterfaceCompleta() {
+  const rawInput = document.getElementById("jwt-raw-input");
+  if (rawInput) rawInput.value = estadoSimulador.rawToken;
+
+  const partes = estadoSimulador.rawToken.split(".");
+  const hB64 = partes[0] || "";
+  const pB64 = partes[1] || "";
+  const sB64 = partes[2] || "";
+
+  // Visualização colorida
+  const coloredView = document.getElementById("jwt-colored-view");
+  if (coloredView) {
+    coloredView.innerHTML = `
+      <span style="color:#f43f5e; font-weight:700;" title="Header (Cabeçalho)">${escapeHtml(hB64)}</span><span style="color:var(--muted); font-weight:700;">.</span><span style="color:#818cf8; font-weight:700;" title="Payload (Claims)">${escapeHtml(pB64)}</span><span style="color:var(--muted); font-weight:700;">.</span><span style="color:#06b6d4; font-weight:700;" title="Signature (Assinatura)">${escapeHtml(sB64 || (estadoSimulador.header.alg === 'none' ? '[Assinatura Omitida - none]' : ''))}</span>
+    `;
+  }
+
+  // Bloco Header
+  const headerDisplay = document.getElementById("jwt-header-display");
+  if (headerDisplay) {
+    headerDisplay.textContent = JSON.stringify(estadoSimulador.header, null, 2);
+  }
+
+  // Bloco Payload
+  const payloadDisplay = document.getElementById("jwt-payload-display");
+  if (payloadDisplay) {
+    payloadDisplay.textContent = JSON.stringify(estadoSimulador.payload, null, 2);
+  }
+
+  // Status de Expiração
+  const expStatusBadge = document.getElementById("jwt-exp-status-badge");
+  const agoraUnix = Math.floor(Date.now() / 1000);
+  const estaExpirado = (estadoSimulador.payload.exp && estadoSimulador.payload.exp < agoraUnix);
+  if (expStatusBadge) {
+    if (estaExpirado) {
+      expStatusBadge.className = "badge red";
+      expStatusBadge.textContent = "EXPIRADO";
+    } else {
+      expStatusBadge.className = "badge green";
+      expStatusBadge.textContent = "DENTRO DO PRAZO";
+    }
+  }
+
+  // Bloco Signature e Status
+  const sigStatusBadge = document.getElementById("jwt-sig-status-badge");
+  const sigDisplay = document.getElementById("jwt-signature-display");
+  if (sigStatusBadge) {
+    if (estadoSimulador.header.alg === "none") {
+      sigStatusBadge.className = "badge red";
+      sigStatusBadge.textContent = "ALG: NONE (SEM ASSINATURA)";
+    } else if (estadoSimulador.signatureStatus === "invalida") {
+      sigStatusBadge.className = "badge red";
+      sigStatusBadge.textContent = "ASSINATURA FORJADA";
+    } else {
+      sigStatusBadge.className = "badge green";
+      sigStatusBadge.textContent = "ASSINATURA ÍNTEGRA";
+    }
+  }
+
+  if (sigDisplay) {
+    if (estadoSimulador.header.alg === "none") {
+      sigDisplay.textContent = "(Nenhuma assinatura incluída devido a 'alg': 'none')";
+    } else {
+      sigDisplay.textContent = sB64 || "(Vazia)";
+    }
+  }
+
+  // Sincroniza selects de formulário rápido
+  const roleSelect = document.getElementById("jwt-claim-role");
+  if (roleSelect && estadoSimulador.payload.role) {
+    roleSelect.value = estadoSimulador.payload.role;
+  }
+  const expSelect = document.getElementById("jwt-claim-exp");
+  if (expSelect) {
+    expSelect.value = estaExpirado ? "expirado" : "valido";
+  }
+
+  // Avaliação da Matriz RBAC
+  avaliarPermissoesRbac();
+}
+
+// Avalia a matriz RBAC contra o estado do token e renderiza a tabela
+function avaliarPermissoesRbac() {
+  const agoraUnix = Math.floor(Date.now() / 1000);
+  const estaExpirado = (estadoSimulador.payload.exp && estadoSimulador.payload.exp < agoraUnix);
+  const temAssinaturaValida = (estadoSimulador.header.alg !== "none" && estadoSimulador.signatureStatus === "valida");
+  const papelAtual = estadoSimulador.payload.role || "nenhum";
+
+  const banner = document.getElementById("jwt-overall-status-banner");
+  if (banner) {
+    if (estadoSimulador.header.alg === "none") {
+      banner.style.background = "rgba(220, 38, 38, 0.15)";
+      banner.style.color = "#ef4444";
+      banner.style.border = "1px solid #ef4444";
+      banner.textContent = "🔴 REJEIÇÃO GLOBAL: Algoritmo 'none' Detectado (Ataque Barrado)";
+    } else if (estadoSimulador.signatureStatus === "invalida") {
+      banner.style.background = "rgba(220, 38, 38, 0.15)";
+      banner.style.color = "#ef4444";
+      banner.style.border = "1px solid #ef4444";
+      banner.textContent = "🔴 REJEIÇÃO GLOBAL: HTTP 401 Unauthorized (Assinatura Inválida)";
+    } else if (estaExpirado) {
+      banner.style.background = "rgba(245, 158, 11, 0.15)";
+      banner.style.color = "#f59e0b";
+      banner.style.border = "1px solid #f59e0b";
+      banner.textContent = "🟡 REJEIÇÃO GLOBAL: HTTP 401 Unauthorized (Token Expirado)";
+    } else {
+      banner.style.background = "rgba(16, 185, 129, 0.15)";
+      banner.style.color = "#10b981";
+      banner.style.border = "1px solid #10b981";
+      banner.textContent = `🟢 TOKEN VÁLIDO: Autenticado como '${escapeHtml(papelAtual.toUpperCase())}'`;
+    }
+  }
+
+  // Tabela de permissões operacionais
+  const operacoes = [
+    {
+      nome: "GET /api/v1/relatorios",
+      desc: "Visualizar Relatórios Operacionais",
+      papeisPermitidos: ["viewer", "operator", "admin"],
+      minRole: "viewer"
+    },
+    {
+      nome: "POST /api/v1/exportar-financeiro",
+      desc: "Exportar Balanço Financeiro",
+      papeisPermitidos: ["operator", "admin"],
+      minRole: "operator"
+    },
+    {
+      nome: "PUT /api/v1/configuracoes-seguranca",
+      desc: "Modificar Parâmetros Globais de Segurança",
+      papeisPermitidos: ["admin"],
+      minRole: "admin"
+    },
+    {
+      nome: "DELETE /api/v1/usuarios/:id",
+      desc: "Excluir Definitivamente Contas de Usuários",
+      papeisPermitidos: ["admin"],
+      minRole: "admin"
+    }
+  ];
+
+  const tbody = document.getElementById("rbac-matrix-rows");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  operacoes.forEach(op => {
+    let decisaoStatus = "";
+    let decisaoBadge = "";
+    let justificativa = "";
+
+    if (estadoSimulador.header.alg === "none") {
+      decisaoBadge = '<span class="badge red">403 FORBIDDEN</span>';
+      justificativa = "Servidor rejeitou requisição por cabeçalho 'alg: none' não confiável.";
+    } else if (estadoSimulador.signatureStatus === "invalida") {
+      decisaoBadge = '<span class="badge red">401 UNAUTHORIZED</span>';
+      justificativa = "Assinatura criptográfica não corresponde ao segredo do backend.";
+    } else if (estaExpirado) {
+      decisaoBadge = '<span class="badge amber">401 TOKEN EXPIRADO</span>';
+      justificativa = "A data atual ultrapassou o timestamp registrado na claim 'exp'.";
+    } else if (!op.papeisPermitidos.includes(papelAtual)) {
+      decisaoBadge = '<span class="badge red">403 ACESSO NEGADO</span>';
+      justificativa = `Papel '${papelAtual}' não possui o privilégio exigido (exige: ${op.minRole}).`;
+    } else {
+      decisaoBadge = '<span class="badge green">200 AUTORIZADO</span>';
+      justificativa = `Permissão concedida com sucesso para o papel corporativo '${papelAtual}'.`;
+    }
+
+    const tr = document.createElement("tr");
+    tr.style.borderBottom = "1px solid var(--rule)";
+    tr.innerHTML = `
+      <td style="padding:0.6rem;">
+        <strong style="font-family:var(--font-mono); font-size:0.8rem; color:var(--ink);">${escapeHtml(op.nome)}</strong>
+        <div style="font-size:0.75rem; color:var(--muted);">${escapeHtml(op.desc)}</div>
+      </td>
+      <td style="padding:0.6rem; font-family:var(--font-mono); font-size:0.8rem; color:var(--ink);">
+        ${op.papeisPermitidos.join(", ")}
+      </td>
+      <td style="padding:0.6rem;">${decisaoBadge}</td>
+      <td style="padding:0.6rem; font-size:0.8rem; color:var(--muted);">${escapeHtml(justificativa)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Carregadores rápidos de cenários
+function carregarCenarioJwt(cenario) {
+  const agoraUnix = Math.floor(Date.now() / 1000);
+  estadoSimulador.header = { alg: "HS256", typ: "JWT" };
+  estadoSimulador.signatureStatus = "valida";
+
+  if (cenario === "viewer") {
+    estadoSimulador.payload = {
+      sub: "usr_10024",
+      name: "Carlos Mendes",
+      role: "viewer",
+      exp: agoraUnix + 3600,
+      iat: agoraUnix
+    };
+  } else if (cenario === "admin") {
+    estadoSimulador.payload = {
+      sub: "usr_00001",
+      name: "Mariana Costa",
+      role: "admin",
+      exp: agoraUnix + 7200,
+      iat: agoraUnix
+    };
+  } else if (cenario === "expirado") {
+    estadoSimulador.payload = {
+      sub: "usr_10024",
+      name: "Carlos Mendes",
+      role: "viewer",
+      exp: agoraUnix - 3600, // 1h no passado
+      iat: agoraUnix - 7200
+    };
+  }
+  sincronizarTokenComEstado();
+}
+
+// Injeção do ataque alg: none
+function injetarAtaqueNone() {
+  estadoSimulador.header = { alg: "none", typ: "JWT" };
+  estadoSimulador.signatureStatus = "none";
+  // O atacante tipicamente se auto-promove para admin junto
+  estadoSimulador.payload.role = "admin";
+  sincronizarTokenComEstado();
+}
+
+// Simulação de assinatura forjada
+function forjarAssinaturaInvalida() {
+  estadoSimulador.header = { alg: "HS256", typ: "JWT" };
+  estadoSimulador.signatureStatus = "invalida";
+  estadoSimulador.payload.role = "admin";
+  sincronizarTokenComEstado();
+}
+
+// Atualização de claims via selects
+function atualizarClaimRole(novoRole) {
+  estadoSimulador.payload.role = novoRole;
+  if (estadoSimulador.signatureStatus === "valida") {
+    // Reassina para manter íntegro
+    sincronizarTokenComEstado();
+  } else {
+    atualizarInterfaceCompleta();
+  }
+}
+
+function atualizarClaimExp(opcao) {
+  const agoraUnix = Math.floor(Date.now() / 1000);
+  if (opcao === "expirado") {
+    estadoSimulador.payload.exp = agoraUnix - 1800;
+  } else {
+    estadoSimulador.payload.exp = agoraUnix + 3600;
+  }
+  sincronizarTokenComEstado();
+}
+
+function reassinarComSegredoAtual() {
+  const inputSecret = document.getElementById("jwt-secret-input");
+  if (inputSecret) {
+    estadoSimulador.secret = inputSecret.value || "segredo";
+  }
+  estadoSimulador.header.alg = "HS256";
+  estadoSimulador.signatureStatus = "valida";
+  sincronizarTokenComEstado();
+}
+
+// Função para quando o usuário cola um token manualmente no textarea
+function processarEntradaTokenManual() {
+  const input = document.getElementById("jwt-raw-input");
+  if (!input) return;
+  const token = input.value.trim();
+  decodificarTokenJwt(token);
+}
+
+// Decodificador de string compacta JWS
+function decodificarTokenJwt(tokenCompacto) {
+  try {
+    const partes = tokenCompacto.split(".");
+    if (partes.length < 2) return;
+
+    const headerObj = JSON.parse(base64UrlDecodeStr(partes[0]));
+    const payloadObj = JSON.parse(base64UrlDecodeStr(partes[1]));
+
+    estadoSimulador.header = headerObj;
+    estadoSimulador.payload = payloadObj;
+    estadoSimulador.rawToken = tokenCompacto;
+
+    const sigPart = partes[2] || "";
+    if (headerObj.alg === "none") {
+      estadoSimulador.signatureStatus = "none";
+    } else {
+      // Verifica se bate com a assinatura esperada
+      const esperada = calcularAssinaturaSimulada(partes[0], partes[1], estadoSimulador.secret);
+      if (sigPart && sigPart === esperada) {
+        estadoSimulador.signatureStatus = "valida";
+      } else {
+        estadoSimulador.signatureStatus = "invalida";
+      }
+    }
+    atualizarInterfaceCompleta();
+  } catch (err) {
+    console.warn("Erro ao decodificar token digitado manualmente:", err);
+  }
+}
+
+// Assinador de token utilitário (compatibilidade com teste)
+function assinarTokenSimulado(header, payload, secret) {
+  const hB64 = base64UrlEncodeStr(JSON.stringify(header));
+  const pB64 = base64UrlEncodeStr(JSON.stringify(payload));
+  const sigB64 = calcularAssinaturaSimulada(hB64, pB64, secret);
+  return hB64 + "." + pB64 + "." + sigB64;
+}
+
+// Inicialização automática do checklist e do laboratório no carregamento da página
+document.addEventListener("DOMContentLoaded", function() {
+  if (typeof initChecklist === "function") {
+    initChecklist("autenticacao-iam");
+  }
+  carregarCenarioJwt("viewer");
+});
+</script>
+    <footer class="study-footer">
+      <p>&copy; 2026 Estudos em Cibersegurança &bull; Material Autoinstrucional e Prático 100% Offline</p>
+      <p><a href="../index.html">← Painel de Estudos</a> &bull; Curadoria e Desenvolvimento por José Mauro da Silva Brandão</p>
+    </footer>
+  </main>
+
+  <!-- Scripts Interativos Embutidos -->
+  <script>
+/**
+ * ============================================================================
+ * ESTUDOS DE CIBERSEGURANÇA — BIBLIOTECA BASE COMPARTILHADA (base.js)
+ * Utilitários reativos, persistência local segura, acessibilidade e interatividade.
+ * Vanilla JavaScript (Zero dependências externas, 100% offline-ready).
+ * ============================================================================
+ */
+
+(function (window, document) {
+  'use strict';
+
+  // --------------------------------------------------------------------------
+  // 0. Utilitários Seguros de Armazenamento Local (localStorage)
+  // --------------------------------------------------------------------------
+  function safeStorageGet(key) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.localStorage.getItem(key);
+      }
+    } catch (e) {
+      console.warn(`[CS] Falha ao ler localStorage chave "${key}":`, e);
+    }
+    return null;
+  }
+
+  function safeStorageSet(key, value) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, String(value));
+        return true;
+      }
+    } catch (e) {
+      console.warn(`[CS] Falha ao gravar localStorage chave "${key}":`, e);
+    }
+    return false;
+  }
+
+  // --------------------------------------------------------------------------
+  // 1. Gerenciamento de Tema (Claro / Escuro)
+  // --------------------------------------------------------------------------
+  const THEME_STORAGE_KEY = 'cs_theme';
+
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    updateThemeButtons(theme);
+  }
+
+  function getSystemTheme() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  }
+
+  function getCurrentTheme() {
+    const saved = safeStorageGet(THEME_STORAGE_KEY);
+    return saved || getSystemTheme();
+  }
+
+  function updateThemeButtons(currentTheme) {
+    const effectiveTheme = currentTheme === 'dark' || (!currentTheme && getSystemTheme() === 'dark') ? 'dark' : 'light';
+    const buttons = document.querySelectorAll('.theme-toggle-btn, [data-theme-toggle]');
+    buttons.forEach((btn) => {
+      btn.setAttribute('aria-label', effectiveTheme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro');
+      btn.innerHTML = effectiveTheme === 'dark'
+        ? '<span class="theme-icon">☀️</span> <span class="theme-label">Claro</span>'
+        : '<span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>';
+    });
+  }
+
+  function toggleTheme() {
+    const current = getCurrentTheme();
+    const next = current === 'dark' ? 'light' : 'dark';
+    safeStorageSet(THEME_STORAGE_KEY, next);
+    applyTheme(next);
+    return next;
+  }
+
+  function initTheme() {
+    const saved = safeStorageGet(THEME_STORAGE_KEY);
+    if (saved) {
+      applyTheme(saved);
+    } else {
+      updateThemeButtons(getSystemTheme());
+    }
+
+    // Monitora preferência do sistema operacional caso usuário não tenha fixado
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!safeStorageGet(THEME_STORAGE_KEY)) {
+          updateThemeButtons(e.matches ? 'dark' : 'light');
+        }
+      });
+    }
+
+    // Vincula cliques em botões de tema
+    document.querySelectorAll('.theme-toggle-btn, [data-theme-toggle]').forEach((btn) => {
+      btn.onclick = toggleTheme;
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 2. Checklist Operacional Interativo & Status de Conclusão de Estudo
+  // --------------------------------------------------------------------------
+  function extractSlug() {
+    if (document.body && document.body.dataset && document.body.dataset.slug) {
+      return document.body.dataset.slug;
+    }
+    const metaSlug = document.querySelector('meta[name="study-slug"]');
+    if (metaSlug && metaSlug.content) {
+      return metaSlug.content;
+    }
+    // Fallback: tenta obter do pathname
+    const match = window.location.pathname.match(/treinamento-([^.]+)\.html/);
+    if (match) {
+      return match[1];
+    }
+    return 'default';
+  }
+
+  function updateChecklistProgress(checklistEl) {
+    const checkboxes = checklistEl.querySelectorAll('input[type="checkbox"]');
+    if (!checkboxes.length) return;
+
+    let checkedCount = 0;
+    checkboxes.forEach((cb) => {
+      if (cb.checked) checkedCount++;
+    });
+
+    const progressFill = checklistEl.querySelector('.checklist-progress-fill');
+    if (progressFill) {
+      const pct = Math.round((checkedCount / checkboxes.length) * 100);
+      progressFill.style.width = `${pct}%`;
+    }
+
+    const counterEl = checklistEl.querySelector('.checklist-counter');
+    if (counterEl) {
+      counterEl.textContent = `${checkedCount} de ${checkboxes.length} itens auditados`;
+    }
+  }
+
+  function initChecklist(slug) {
+    const activeSlug = slug || extractSlug();
+    const checklists = document.querySelectorAll('.checklist');
+
+    checklists.forEach((checklist, listIdx) => {
+      const listId = checklist.dataset.checklistId || `list_${listIdx}`;
+      const items = checklist.querySelectorAll('.check-item');
+
+      items.forEach((item, itemIdx) => {
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        if (!checkbox) return;
+
+        const itemId = checkbox.id || checkbox.getAttribute('data-id') || `${listId}_${itemIdx}`;
+        const storageKey = `cs_check_${activeSlug}_${itemId}`;
+
+        // Restaura estado
+        const savedState = safeStorageGet(storageKey);
+        if (savedState === 'true') {
+          checkbox.checked = true;
+          item.classList.add('completed');
+        } else {
+          checkbox.checked = false;
+          item.classList.remove('completed');
+        }
+
+        // Event listener
+        checkbox.onchange = function () {
+          safeStorageSet(storageKey, checkbox.checked ? 'true' : 'false');
+          if (checkbox.checked) {
+            item.classList.add('completed');
+          } else {
+            item.classList.remove('completed');
+          }
+          updateChecklistProgress(checklist);
+        };
+      });
+
+      updateChecklistProgress(checklist);
+    });
+  }
+
+  function isStudyDone(slug) {
+    const activeSlug = slug || extractSlug();
+    return safeStorageGet(`cs_done_${activeSlug}`) === 'true';
+  }
+
+  function setStudyDone(slug, isDone) {
+    const activeSlug = slug || extractSlug();
+    const doneValue = isDone !== false;
+    return safeStorageSet(`cs_done_${activeSlug}`, doneValue ? 'true' : 'false');
+  }
+
+  // --------------------------------------------------------------------------
+  // 3. Sistema de Quiz com Feedback Explicativo
+  // --------------------------------------------------------------------------
+  function checkQuiz(btn, isCorrect, explanation) {
+    const quizItem = btn.closest('.quiz-item');
+    if (!quizItem) return;
+
+    // Desabilita botões para registrar a tentativa
+    const buttons = quizItem.querySelectorAll('.quiz-btn');
+    buttons.forEach((b) => {
+      b.disabled = true;
+      b.classList.remove('selected');
+    });
+
+    // Destaca o botão clicado
+    btn.classList.add('selected');
+    if (isCorrect) {
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('incorrect');
+    }
+
+    // Exibe ou atualiza o painel de feedback
+    let feedbackEl = quizItem.querySelector('.quiz-feedback');
+    if (!feedbackEl) {
+      feedbackEl = document.createElement('div');
+      feedbackEl.className = 'quiz-feedback';
+      quizItem.appendChild(feedbackEl);
+    }
+
+    feedbackEl.className = `quiz-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+    const icon = isCorrect ? '✅' : '❌';
+    const statusText = isCorrect ? 'Correto!' : 'Incorreto.';
+    feedbackEl.innerHTML = `<strong>${icon} ${statusText}</strong> ${escapeHtml(explanation || '')}`;
+    feedbackEl.style.display = 'block';
+  }
+
+  function initQuiz() {
+    const quizItems = document.querySelectorAll('.quiz-item');
+    quizItems.forEach((quiz, idx) => {
+      const qId = quiz.dataset.quizId || `quiz_${idx}`;
+      quiz.setAttribute('data-initialized', 'true');
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 4. Copiar Código para Área de Transferência
+  // --------------------------------------------------------------------------
+  function copyCode(button, targetId) {
+    let textToCopy = '';
+
+    if (targetId) {
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        textToCopy = targetEl.innerText || targetEl.textContent;
+      }
+    } else if (button) {
+      const terminalBox = button.closest('.terminal-box') || button.parentElement;
+      const codeEl = terminalBox ? terminalBox.querySelector('pre code, pre, code') : null;
+      if (codeEl) {
+        textToCopy = codeEl.innerText || codeEl.textContent;
+      }
+    }
+
+    if (!textToCopy) return;
+
+    const originalText = button ? button.innerText : 'Copiar';
+
+    function setSuccess() {
+      if (button) {
+        button.innerText = '✓ Copiado!';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.innerText = originalText;
+          button.classList.remove('copied');
+        }, 2000);
+      }
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textToCopy.trim()).then(setSuccess).catch(() => {
+        fallbackCopy(textToCopy.trim(), setSuccess);
+      });
+    } else {
+      fallbackCopy(textToCopy.trim(), setSuccess);
+    }
+  }
+
+  function fallbackCopy(text, callback) {
+    if (!document.body) {
+      console.warn('document.body não está pronto para cópia via textarea.');
+      return;
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const successful = document.execCommand('copy');
+      if (successful && callback) {
+        callback();
+      }
+    } catch (e) {
+      console.warn('Falha ao copiar texto:', e);
+    } finally {
+      if (textarea.parentNode) {
+        textarea.parentNode.removeChild(textarea);
+      }
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 5. Utilitários Reutilizáveis para Simuladores e Laboratórios
+  // --------------------------------------------------------------------------
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function formatBytes(bytes, decimals = 2) {
+    if (!+bytes || bytes < 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  }
+
+  function formatNumber(num) {
+    if (isNaN(num)) return '0';
+    return new Intl.NumberFormat('pt-BR').format(num);
+  }
+
+  function bytesToHex(uint8Array) {
+    return Array.from(uint8Array)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  function hexToBytes(hexString) {
+    let cleaned = String(hexString || '').replace(/\s+/g, '');
+    if (cleaned.length % 2 !== 0) {
+      cleaned = '0' + cleaned;
+    }
+    const bytes = new Uint8Array(cleaned.length / 2);
+    for (let i = 0; i < cleaned.length; i += 2) {
+      bytes[i / 2] = parseInt(cleaned.substring(i, i + 2), 16);
+    }
+    return bytes;
+  }
+
+  async function sha256Hex(message) {
+    if (!window.crypto || !window.crypto.subtle) {
+      throw new Error('Web Cryptography API não suportada neste ambiente.');
+    }
+    const msgUint8 = new TextEncoder().encode(message);
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // --------------------------------------------------------------------------
+  // 6. Exposição Global de Funções & Inicialização Automática
+  // --------------------------------------------------------------------------
+  window.safeStorageGet = safeStorageGet;
+  window.safeStorageSet = safeStorageSet;
+  window.initTheme = initTheme;
+  window.toggleTheme = toggleTheme;
+  window.initChecklist = initChecklist;
+  window.isStudyDone = isStudyDone;
+  window.setStudyDone = setStudyDone;
+  window.initQuiz = initQuiz;
+  window.checkQuiz = checkQuiz;
+  window.copyCode = copyCode;
+  window.escapeHtml = escapeHtml;
+  window.formatBytes = formatBytes;
+  window.formatNumber = formatNumber;
+  window.bytesToHex = bytesToHex;
+  window.hexToBytes = hexToBytes;
+  window.sha256Hex = sha256Hex;
+
+  // Namespace unificado
+  window.CS = {
+    safeStorageGet,
+    safeStorageSet,
+    initTheme,
+    toggleTheme,
+    initChecklist,
+    isStudyDone,
+    setStudyDone,
+    initQuiz,
+    checkQuiz,
+    copyCode,
+    escapeHtml,
+    formatBytes,
+    formatNumber,
+    bytesToHex,
+    hexToBytes,
+    sha256Hex,
+  };
+
+  // Auto-inicialização na carga do DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      initChecklist();
+      initQuiz();
+    });
+  } else {
+    initTheme();
+    initChecklist();
+    initQuiz();
+  }
+})(window, document);
+
+  </script>
+</body>
+</html>
