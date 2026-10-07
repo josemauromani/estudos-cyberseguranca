@@ -1,13 +1,39 @@
 /**
  * ============================================================================
  * ESTUDOS DE CIBERSEGURANÇA — BIBLIOTECA BASE COMPARTILHADA (base.js)
- * Utilitários reativos, persistência local, acessibilidade e interatividade.
+ * Utilitários reativos, persistência local segura, acessibilidade e interatividade.
  * Vanilla JavaScript (Zero dependências externas, 100% offline-ready).
  * ============================================================================
  */
 
 (function (window, document) {
   'use strict';
+
+  // --------------------------------------------------------------------------
+  // 0. Utilitários Seguros de Armazenamento Local (localStorage)
+  // --------------------------------------------------------------------------
+  function safeStorageGet(key) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.localStorage.getItem(key);
+      }
+    } catch (e) {
+      console.warn(`[CS] Falha ao ler localStorage chave "${key}":`, e);
+    }
+    return null;
+  }
+
+  function safeStorageSet(key, value) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, String(value));
+        return true;
+      }
+    } catch (e) {
+      console.warn(`[CS] Falha ao gravar localStorage chave "${key}":`, e);
+    }
+    return false;
+  }
 
   // --------------------------------------------------------------------------
   // 1. Gerenciamento de Tema (Claro / Escuro)
@@ -32,7 +58,7 @@
   }
 
   function getCurrentTheme() {
-    const saved = localStorage.getItem(THEME_STORAGE_KEY);
+    const saved = safeStorageGet(THEME_STORAGE_KEY);
     return saved || getSystemTheme();
   }
 
@@ -50,13 +76,13 @@
   function toggleTheme() {
     const current = getCurrentTheme();
     const next = current === 'dark' ? 'light' : 'dark';
-    localStorage.setItem(THEME_STORAGE_KEY, next);
+    safeStorageSet(THEME_STORAGE_KEY, next);
     applyTheme(next);
     return next;
   }
 
   function initTheme() {
-    const saved = localStorage.getItem(THEME_STORAGE_KEY);
+    const saved = safeStorageGet(THEME_STORAGE_KEY);
     if (saved) {
       applyTheme(saved);
     } else {
@@ -66,7 +92,7 @@
     // Monitora preferência do sistema operacional caso usuário não tenha fixado
     if (window.matchMedia) {
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (!localStorage.getItem(THEME_STORAGE_KEY)) {
+        if (!safeStorageGet(THEME_STORAGE_KEY)) {
           updateThemeButtons(e.matches ? 'dark' : 'light');
         }
       });
@@ -79,10 +105,10 @@
   }
 
   // --------------------------------------------------------------------------
-  // 2. Checklist Operacional Interativo com Persistência
+  // 2. Checklist Operacional Interativo & Status de Conclusão de Estudo
   // --------------------------------------------------------------------------
   function extractSlug() {
-    if (document.body.dataset && document.body.dataset.slug) {
+    if (document.body && document.body.dataset && document.body.dataset.slug) {
       return document.body.dataset.slug;
     }
     const metaSlug = document.querySelector('meta[name="study-slug"]');
@@ -134,7 +160,7 @@
         const storageKey = `cs_check_${activeSlug}_${itemId}`;
 
         // Restaura estado
-        const savedState = localStorage.getItem(storageKey);
+        const savedState = safeStorageGet(storageKey);
         if (savedState === 'true') {
           checkbox.checked = true;
           item.classList.add('completed');
@@ -145,7 +171,7 @@
 
         // Event listener
         checkbox.onchange = function () {
-          localStorage.setItem(storageKey, checkbox.checked ? 'true' : 'false');
+          safeStorageSet(storageKey, checkbox.checked ? 'true' : 'false');
           if (checkbox.checked) {
             item.classList.add('completed');
           } else {
@@ -157,6 +183,17 @@
 
       updateChecklistProgress(checklist);
     });
+  }
+
+  function isStudyDone(slug) {
+    const activeSlug = slug || extractSlug();
+    return safeStorageGet(`cs_done_${activeSlug}`) === 'true';
+  }
+
+  function setStudyDone(slug, isDone) {
+    const activeSlug = slug || extractSlug();
+    const doneValue = isDone !== false;
+    return safeStorageSet(`cs_done_${activeSlug}`, doneValue ? 'true' : 'false');
   }
 
   // --------------------------------------------------------------------------
@@ -248,6 +285,11 @@
   }
 
   function fallbackCopy(text, callback) {
+    if (!document.body) {
+      console.warn('document.body não está pronto para cópia via textarea.');
+      return;
+    }
+
     const textarea = document.createElement('textarea');
     textarea.value = text;
     textarea.style.position = 'fixed';
@@ -255,12 +297,16 @@
     document.body.appendChild(textarea);
     textarea.select();
     try {
-      document.execCommand('copy');
-      if (callback) callback();
+      const successful = document.execCommand('copy');
+      if (successful && callback) {
+        callback();
+      }
     } catch (e) {
       console.warn('Falha ao copiar texto:', e);
     } finally {
-      document.body.removeChild(textarea);
+      if (textarea.parentNode) {
+        textarea.parentNode.removeChild(textarea);
+      }
     }
   }
 
@@ -298,10 +344,13 @@
   }
 
   function hexToBytes(hexString) {
-    const cleaned = hexString.replace(/\s+/g, '');
+    let cleaned = String(hexString || '').replace(/\s+/g, '');
+    if (cleaned.length % 2 !== 0) {
+      cleaned = '0' + cleaned;
+    }
     const bytes = new Uint8Array(cleaned.length / 2);
     for (let i = 0; i < cleaned.length; i += 2) {
-      bytes[i / 2] = parseInt(cleaned.substr(i, 2), 16);
+      bytes[i / 2] = parseInt(cleaned.substring(i, i + 2), 16);
     }
     return bytes;
   }
@@ -319,9 +368,13 @@
   // --------------------------------------------------------------------------
   // 6. Exposição Global de Funções & Inicialização Automática
   // --------------------------------------------------------------------------
+  window.safeStorageGet = safeStorageGet;
+  window.safeStorageSet = safeStorageSet;
   window.initTheme = initTheme;
   window.toggleTheme = toggleTheme;
   window.initChecklist = initChecklist;
+  window.isStudyDone = isStudyDone;
+  window.setStudyDone = setStudyDone;
   window.initQuiz = initQuiz;
   window.checkQuiz = checkQuiz;
   window.copyCode = copyCode;
@@ -334,9 +387,13 @@
 
   // Namespace unificado
   window.CS = {
+    safeStorageGet,
+    safeStorageSet,
     initTheme,
     toggleTheme,
     initChecklist,
+    isStudyDone,
+    setStudyDone,
     initQuiz,
     checkQuiz,
     copyCode,

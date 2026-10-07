@@ -102,8 +102,12 @@ class TestAssets(unittest.TestCase):
         content = self.js_file.read_text(encoding="utf-8")
 
         funcoes = [
+            "safeStorageGet",
+            "safeStorageSet",
             "initTheme",
             "initChecklist",
+            "isStudyDone",
+            "setStudyDone",
             "initQuiz",
             "checkQuiz",
             "copyCode",
@@ -121,6 +125,7 @@ class TestAssets(unittest.TestCase):
 
         self.assertIn("cs_theme", content, "Chave de tema no localStorage deve ser cs_theme")
         self.assertIn("cs_check_", content, "Chave de checklist no localStorage deve conter cs_check_")
+        self.assertIn("cs_done_", content, "Chave de conclusão no localStorage deve conter cs_done_")
 
 
 if __name__ == "__main__":
