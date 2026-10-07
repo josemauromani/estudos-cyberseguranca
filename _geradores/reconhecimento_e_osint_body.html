@@ -1,0 +1,671 @@
+<!-- Estudo 11: Reconhecimento-e-OSINT Body Fragment -->
+<article class="study-container" data-slug="reconhecimento-osint">
+
+    <!-- SEÇÃO 1: INTRODUÇÃO E CONTEXTO PRÁTICO -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução e Contexto Prático: A Visão do Adversário</h2>
+        </div>
+
+        <p class="lead-text">
+            No ciclo de vida de uma operação de segurança ofensiva (Red Team e Testes de Intrusão), o <strong>Reconhecimento</strong> é a fase inicial e mais determinante para o sucesso. Segundo o framework <em>MITRE ATT&CK</em>, a tática de <strong>Reconhecimento (TA0043)</strong> engloba todas as ações que um adversário executa para coletar ativamente ou passivamente informações estratégicas sobre o alvo antes de qualquer tentativa de acesso inicial.
+        </p>
+
+        <p>
+            Mais de 80% do esforço de inteligência em ataques modernos reside na disciplina de <strong>OSINT (Open Source Intelligence)</strong> — a arte de descobrir ativos esquecidos, subdomínios legados, serviços expostos e credenciais vazadas a partir de fontes públicas e acessíveis na internet.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">💡</span>
+                <strong>A Regra de Ouro: O Atacante Precisa de Apenas Uma Brecha</strong>
+            </div>
+            <p>
+                Enquanto o time de defesa (Blue Team) precisa proteger 100% da superfície de ataque, o atacante procura exatamente o ativo desprotegido esquecido pela equipe de TI: um subdomínio de testes criado há dois anos, uma porta RDP aberta em uma filial remota, ou um arquivo de configuração <code>.env</code> indexado inadvertidamente por um robô de busca.
+            </p>
+        </div>
+
+        <h3>Reconhecimento Passivo vs. Reconhecimento Ativo</h3>
+        <p>
+            A distinção entre as modalidades de reconhecimento é o divisor de águas entre discrição absoluta e alerta imediato nas defesas da organização:
+        </p>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Modalidade</th>
+                        <th>Interação com o Alvo</th>
+                        <th>Detecção por IDS / WAF / SOC</th>
+                        <th>Fontes & Ferramentas Típicas</th>
+                        <th>Exemplo Prático</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Reconhecimento Passivo</strong></td>
+                        <td><strong>Nenhuma interação direta</strong> com os servidores do alvo. As consultas são feitas a terceiros.</td>
+                        <td><strong>Zero.</strong> Os sistemas de monitoramento do alvo não recebem um único pacote suspeito.</td>
+                        <td>WHOIS, DNS recursivos públicos, Certificate Transparency (crt.sh), Shodan, Censys, Google Dorks, GitHub.</td>
+                        <td>Pesquisar no Shodan quais servidores pertencem ao ASN da empresa sem enviar pings ou varreduras de porta.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reconhecimento Ativo</strong></td>
+                        <td><strong>Interação direta</strong> com a infraestrutura, enviando pacotes aos endereços IP do alvo.</td>
+                        <td><strong>Alta.</strong> Gera logs abundantes em firewalls, sensores IDS/IPS, WAF e alertas de EDR nos hosts.</td>
+                        <td>Nmap, Masscan, enumeração SNMP, fuzzer de URLs (Gobuster/Feroxbuster), tentativas de AXFR no DNS autoritativo.</td>
+                        <td>Executar varredura de portas TCP SYN (<code>nmap -sS -p-</code>) diretamente no firewall de borda da vítima.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Aspectos Éticos e Legais no Brasil (Art. 154-A e LGPD)</strong>
+            </div>
+            <p>
+                Consultar fontes abertas (OSINT passivo) é uma atividade de pesquisa legalmente lícita. No entanto, passar para o reconhecimento ativo invasivo ou utilizar as informações para acessar dispositivos alheios sem autorização contratual expressa constitui crime tipificado pelo Art. 154-A do Código Penal Brasileiro (Invasão de Dispositivo Informático — Lei 12.737/2012 e Lei 14.155/2021). Em testes de intrusão profissionais, o escopo (<em>Rules of Engagement</em>) deve ser formalizado e assinado previamente.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: TÉCNICAS E FONTES CANÔNICAS DE INTELIGÊNCIA TÉCNICA -->
+    <section class="study-section" id="tecnicas">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Técnicas e Fontes Canônicas de Inteligência Técnica</h2>
+        </div>
+
+        <p class="lead-text">
+            Um analista de segurança defensiva ou ofensiva deve dominar as quatro fontes fundamentais de reconhecimento de infraestrutura externa:
+        </p>
+
+        <h3>1. WHOIS, BGP e Numeração de ASN</h3>
+        <p>
+            O protocolo <strong>WHOIS</strong> e os registros de alocação de blocos (como <em>Registro.br</em> para o Brasil, ARIN na América do Norte e LACNIC na América Latina) permitem identificar a entidade detentora de um domínio, contatos técnicos e, fundamentalmente, o <strong>ASN (Autonomous System Number)</strong> e blocos de rede CIDR alocados à organização (ex: <code>200.140.88.0/24</code>). Conhecer o bloco CIDR revela todo o universo de IPs públicos que pertencem legitimamente ao alvo.
+        </p>
+
+        <h3>2. DNS e Certificate Transparency (CT Logs)</h3>
+        <p>
+            O sistema de nomes (DNS) é o mapa geográfico da presença digital:
+        </p>
+        <ul>
+            <li><strong>Registros A e AAAA:</strong> Mapeiam nomes para endereços IPv4 e IPv6.</li>
+            <li><strong>Registros MX:</strong> Revelam os provedores de correio eletrônico (Microsoft 365, Google Workspace ou gateways on-premises como IronPort).</li>
+            <li><strong>Registros TXT:</strong> Frequentemente contêm regras de SPF (<code>v=spf1 include:...</code>) que expõem parceiros de SaaS e serviços autorizados a enviar e-mails em nome da corporação.</li>
+            <li><strong>Transferência de Zona (AXFR):</strong> Se os servidores DNS autoritativos estiverem mal configurados permitindo AXFR para qualquer solicitante, o atacante obtém instantaneamente a lista completa de todos os hosts internos e externos da zona.</li>
+        </ul>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">🔍</span>
+                <strong>Certificate Transparency: A Janela Pública dos Subdomínios</strong>
+            </div>
+            <p>
+                O padrão <strong>Certificate Transparency</strong> (RFC 6962) exige que toda Autoridade Certificadora pública registre publicamente os certificados TLS emitidos em logs imutáveis e auditáveis. Plataformas como <code>crt.sh</code> permitem pesquisar por <code>%.empresa.com.br</code> e descobrir instantaneamente subdomínios recém-criados (ex: <code>homolog-api.empresa.com.br</code>, <code>vpn-legada.empresa.com.br</code>, <code>dev-gitlab.empresa.com.br</code>) sem fazer uma única consulta direta aos servidores da empresa.
+            </p>
+        </div>
+
+        <h3>3. Google Dorks e Mecanismos de Busca Especializados</h3>
+        <p>
+            O <em>Google Hacking Database (GHDB)</em> cataloga consultas avançadas que forçam robôs de busca a revelar dados sensíveis que foram indexados acidentalmente:
+        </p>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Consultas de Google Dorks Comuns e Perigosas</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-dorks')">Copiar</button>
+            </div>
+            <pre><code id="code-dorks"># Descoberta de arquivos de ambiente com senhas e chaves de API
+site:alvo.com.br filetype:env "DB_PASSWORD"
+
+# Descoberta de diretórios abertos com navegação ativada
+site:alvo.com.br intitle:"Index of /" .git
+
+# Painéis administrativos ou consoles de autenticação expostos
+site:alvo.com.br inurl:admin | inurl:login | inurl:portal
+
+# Documentos internos confidenciais em formato PDF ou planilhas
+site:alvo.com.br filetype:pdf | filetype:xlsx "confidencial" OR "interno"</code></pre>
+        </div>
+
+        <h3>4. Shodan, Censys e o Perigo do Subdomain Takeover</h3>
+        <p>
+            Ao contrário do Google, que indexa páginas web (HTML), o <strong>Shodan</strong> indexa os <em>banners de serviço</em> retornados por portas abertas em qualquer endereço IPv4 na internet:
+        </p>
+        <ul>
+            <li><strong>Filtros do Shodan:</strong> <code>org:"Nome"</code>, <code>net:"200.140.88.0/24"</code>, <code>port:3389</code> (RDP), <code>port:9200</code> (Elasticsearch desprotegido), <code>has_vuln:true</code>.</li>
+            <li><strong>Subdomain Takeover:</strong> Ocorre quando um subdomínio (ex: <code>blog.empresa.com.br</code>) possui um registro DNS CNAME apontando para um serviço de nuvem (como AWS S3, GitHub Pages ou Heroku) que foi cancelado ou excluído. Se o registro DNS não for removido, qualquer atacante pode criar uma conta no provedor de nuvem com aquele mesmo identificador e assumir o controle completo do subdomínio legítimo com certificado válido!</li>
+            <li><strong>Metadados com ExifTool:</strong> Arquivos PDF e imagens disponibilizados publicamente contêm metadados (nomes de usuários do Active Directory, versões de softwares, caminhos de rede UNC). A ferramenta <strong>ExifTool</strong> extrai esses dados sem esforço.</li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 3: LABORATÓRIO / SIMULADOR INTERATIVO -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Terminal Simulado de OSINT e Enumeração</h2>
+        </div>
+
+        <p class="lead-text">
+            Utilize o emulador de terminal abaixo para realizar o reconhecimento técnico sobre a organização fictícia <code>corp-financeira.com.br</code>. Utilize comandos como <code>whois</code>, <code>dig</code>, <code>crtsh</code>, <code>shodan</code> e <code>dork</code> para mapear a superfície de ataque externa sem enviar pacotes invasivos ao alvo.
+        </p>
+
+        <div class="lab-box osint-lab" id="osint-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Laboratório de Reconhecimento</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Terminal Simulado de Reconhecimento OSINT</h3>
+                    <p style="margin: 0; font-size: 0.9rem; color: var(--muted);">Explore comandos de inteligência em fontes abertas e preencha a matriz de superfície de ataque.</p>
+                </div>
+                <div>
+                    <span class="status-indicator-badge" id="osint-score-badge" style="background: rgba(220, 38, 38, 0.15); color: #DC2626; border: 1px solid #DC2626; padding: 0.35rem 0.75rem; border-radius: 4px; font-weight: 700; font-size: 0.85rem;">
+                        SUPERFÍCIE: 0% MAPEADA
+                    </span>
+                </div>
+            </div>
+
+            <!-- Botões de Atalho Rápido para Praticidade -->
+            <div style="margin: 1.25rem 0 0.75rem 0;">
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--muted); margin-bottom: 0.4rem; text-transform: uppercase;">
+                    Comandos Rápidos Recomendados (Clique para Inserir ou Digite Abaixo):
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="preencherComando('help')">help</button>
+                    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="preencherComando('whois corp-financeira.com.br')">whois corp-financeira.com.br</button>
+                    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="preencherComando('dig corp-financeira.com.br any')">dig corp-financeira.com.br any</button>
+                    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="preencherComando('crtsh corp-financeira.com.br')">crtsh corp-financeira.com.br</button>
+                    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="preencherComando('shodan search &quot;org:CorpFinanceira&quot;')">shodan search "org:CorpFinanceira"</button>
+                    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="preencherComando('dork site:corp-financeira.com.br filetype:env')">dork site:corp-financeira.com.br filetype:env</button>
+                    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="preencherComando('mapa')">mapa (Ver Superfície)</button>
+                    <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="preencherComando('clear')">clear</button>
+                </div>
+            </div>
+
+            <!-- Janela do Terminal Shell -->
+            <div style="background: #0f172a; color: #f8fafc; border-radius: 6px; padding: 1.25rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; border: 1px solid #334155; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);">
+                <div id="osint-terminal-output" style="max-height: 420px; overflow-y: auto; white-space: pre-wrap; line-height: 1.45; margin-bottom: 0.75rem;">
+<!-- Boas-vindas do terminal -->
+<span style="color: #38bdf8;">======================================================================</span>
+<span style="color: #38bdf8;">  OSINT RECON SHELL v2.4 — AMBIENTE AUTÔNOMO DE ENUMERAÇÃO PASSIVA</span>
+<span style="color: #38bdf8;">======================================================================</span>
+Alvo de Investigação: <span style="color: #facc15; font-weight: bold;">corp-financeira.com.br</span>
+Modo: Reconhecimento Passivo e Não-Invasivo.
+Digite <span style="color: #4ade80; font-weight: bold;">help</span> ou clique nos comandos rápidos acima para iniciar.
+                </div>
+
+                <!-- Linha de Entrada do Prompt -->
+                <div style="display: flex; align-items: center; border-top: 1px solid #1e293b; padding-top: 0.5rem;">
+                    <span style="color: #4ade80; margin-right: 0.5rem; font-weight: bold;">analista@osint-box:~$</span>
+                    <input type="text" id="osint-cli-input" style="flex: 1; background: transparent; border: none; outline: none; color: #f8fafc; font-family: inherit; font-size: inherit;" placeholder="Digite um comando aqui..." onkeydown="tratarInputTerminal(event)" autofocus>
+                    <button class="btn" style="padding: 0.25rem 0.75rem; font-size: 0.75rem; background: #DC2626; color: white;" onclick="executarComandoOsint()">Executar</button>
+                </div>
+            </div>
+
+            <!-- Tabela Dinâmica de Superfície de Ataque Descoberta -->
+            <div style="margin-top: 1.5rem; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 1.25rem;">
+                <h4 style="margin-top: 0; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <span>Matriz da Superfície de Ataque Descoberta</span>
+                    <span id="osint-progresso-txt" style="font-size: 0.85rem; color: var(--muted); font-weight: normal;">0 de 5 descobertas identificadas</span>
+                </h4>
+                <div class="table-responsive">
+                    <table class="data-table" style="font-size: 0.85rem; margin-top: 0.5rem;">
+                        <thead>
+                            <tr>
+                                <th>Categoria</th>
+                                <th>Ativo / Descoberta</th>
+                                <th>Fonte OSINT</th>
+                                <th>Risco / Impacto Técnico</th>
+                            </tr>
+                        </thead>
+                        <tbody id="osint-matriz-tbody">
+                            <tr id="matriz-vazia-row">
+                                <td colspan="4" style="text-align: center; color: var(--muted); padding: 1.5rem;">
+                                    Nenhum ativo descoberto ainda. Execute comandos no terminal acima para mapear a infraestrutura do alvo.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST DE APLICAÇÃO PRÁTICA -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Auditoria e Redução de Superfície Externa</h2>
+        </div>
+
+        <p class="lead-text">
+            Aplique este checklist defensivo para auditar a pegada digital pública da sua organização e sanar vulnerabilidades expostas antes que sejam descobertas por atores maliciosos.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="reconhecimento-osint">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-osint-1">
+                <label for="chk-osint-1">
+                    <strong>Privacidade de WHOIS e Higienização de Registros:</strong> Validar que informações pessoais de administradores (CPFs, e-mails diretos e telefones móveis) estão ocultadas por serviços de privacidade de WHOIS, utilizando apenas caixas postais corporativas genéricas (ex: <code>security@empresa.com.br</code>).
+                </label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-osint-2">
+                <label for="chk-osint-2">
+                    <strong>Bloqueio Global de Transferência de Zona DNS (AXFR):</strong> Testar todos os servidores autoritativos da organização garantindo que consultas <code>dig domain.com axfr</code> recebam status <code>REFUSED</code> para qualquer IP externo não autorizado.
+                </label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-osint-3">
+                <label for="chk-osint-3">
+                    <strong>Auditoria Contínua de Subdomain Takeover:</strong> Inventariar todos os registros CNAME da zona DNS e certificar-se de que não apontam para buckets S3, instâncias Azure, GitHub Pages ou serviços SaaS que foram excluídos ou desativados.
+                </label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-osint-4">
+                <label for="chk-osint-4">
+                    <strong>Monitoramento Automatizado em Shodan e Censys:</strong> Configurar alertas de monitoramento com a API do Shodan para os blocos de rede e ASN corporativo, detectando portas administrativas abertas (SSH 22, RDP 3389, SMB 445, bancos de dados) em até 24 horas após exposição.
+                </label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-osint-5">
+                <label for="chk-osint-5">
+                    <strong>Sanitização de Metadados em Documentos Públicos:</strong> Implementar rotina de pré-publicação ou pipeline CI/CD que execute ferramentas como ExifTool para remover nomes de usuários, impressoras e caminhos de arquivos em PDFs e planilhas antes de disponibilizá-los em portais públicos.
+                </label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-osint-6">
+                <label for="chk-osint-6">
+                    <strong>Monitoramento Proativo de Google Dorks e GitHub Leaks:</strong> Executar varreduras periódicas com scripts de dorking e scanners de repositórios (TruffleHog / GitGuardian) para detectar vazamentos involuntários de segredos, arquivos <code>.env</code> ou chaves de API.
+                </label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Concursos</h2>
+        </div>
+
+        <p class="lead-text">
+            Consolide seus conhecimentos com questões baseadas em provas de certificação ofensiva (CEH, OSCP) e concursos de segurança cibernética:
+        </p>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Classificação de Reconhecimento):</strong> Durante uma auditoria técnica de segurança em uma instituição bancária, um analista utilizou a ferramenta <code>crt.sh</code> para pesquisar logs de Certificate Transparency e realizou pesquisas com a API do Shodan pelo ASN da entidade. O WAF e o IDS perimetral do banco não registraram nenhum alerta desse analista. Como essa atividade é classificada e qual a justificativa técnica para a ausência de alertas?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta Técnica:</strong></p>
+                    <p>
+                        A atividade é classificada estritamente como <strong>Reconhecimento Passivo</strong>. Ao consultar os logs de Certificate Transparency e a base de dados do Shodan, as requisições HTTP e de rede foram direcionadas aos servidores da infraestrutura do Shodan e aos repositórios de transparência de certificados mantidos por terceiros, e <strong>não aos servidores do banco</strong>. Como nenhum pacote IP ou conexão TCP foi estabelecida com a infraestrutura da organização auditada, seus sensores locais (WAF, IDS, firewall) não tinham qualquer tráfego para inspecionar ou alertar.
+                    </p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (DNS e Subdomain Takeover):</strong> A empresa XPTO possuía um blog de tecnologia cujo registro DNS era <code>tech.xpto.com.br CNAME xpto-blog.github.io</code>. Recentemente, a empresa migrou seu blog para um portal próprio e excluiu o repositório no GitHub, mas a equipe de infraestrutura esqueceu de remover o registro DNS CNAME. Explique detalhadamente como um invasor explora essa condição (*Subdomain Takeover*) e qual o impacto para a organização.
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta Técnica:</strong></p>
+                    <p>
+                        O invasor percebe que o subdomínio <code>tech.xpto.com.br</code> resolve para um CNAME apontando para <code>xpto-blog.github.io</code> que retorna o erro 404 (repositório inexistente). O invasor cria uma conta pessoal no GitHub e registra um repositório chamado <code>xpto-blog.github.io</code> configurando o Custom Domain como <code>tech.xpto.com.br</code>. O GitHub valida que o DNS aponta para sua plataforma e emite um certificado SSL legítimo. A partir deste momento, o atacante controla 100% do conteúdo servido sob o domínio institucional da vítima, permitindo hospedar páginas de phishing convincentes, roubar cookies de sessão (se configurados com escopo de domínio pai <code>.xpto.com.br</code>) e contornar políticas de Content Security Policy (CSP).
+                    </p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (DNS Zone Transfer):</strong> Ao executar o comando <code>dig @ns1.alvo.com alvo.com axfr</code>, o auditor recebeu como resposta uma listagem completa contendo 248 registros DNS, incluindo hosts com nomes como <code>dc01-interno.alvo.com</code>, <code>banco-oracle.alvo.com</code> e <code>dev-ambiente.alvo.com</code> com seus respectivos endereços IP. Qual vulnerabilidade ocorreu e qual controle de configuração deve ser implementado no servidor DNS?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta Técnica:</strong></p>
+                    <p>
+                        Ocorreu uma <strong>Transferência de Zona DNS não autorizada (Zone Transfer AXFR)</strong>. O protocolo DNS utiliza o comando AXFR para replicar toda a base de dados de uma zona entre servidores DNS primários e secundários (usando a porta TCP 53). Se o servidor autoritativo estiver configurado sem restrição de IP, qualquer cliente externo pode solicitar o dump completo de todos os nomes, subdomínios e endereços de rede registrados na zona. A correção obrigatória é restringir a transferência de zona apenas para os endereços IP confiáveis dos servidores DNS secundários autorizados (ex: no BIND DNS, configurando <code>allow-transfer { 192.168.1.2; };</code> dentro da diretiva de zona).
+                    </p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais e Próximos Passos</h2>
+        </div>
+
+        <p class="lead-text">
+            O reconhecimento é o alicerce sobre o qual toda a operação de segurança ofensiva e defensiva é construída. Memorize estes princípios:
+        </p>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Invisibilidade Passiva</h4>
+                <p>Reconhecimento passivo pesquisa terceiros (WHOIS, crt.sh, Shodan, Google) e não envia pacotes ao alvo, sendo indetectável por firewalls e WAFs locais.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Certificate Transparency</h4>
+                <p>Logs públicos de certificados TLS são a fonte mais rica e atualizada para descobrir novos subdomínios, ambientes de teste e portais corporativos.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Shodan vs Google</h4>
+                <p>O Google indexa conteúdo web textual (HTML/PDF); o Shodan indexa portas de rede abertas e banners de serviços de qualquer dispositivo conectado.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Risco de CNAME Órfão</h4>
+                <p>Registros DNS CNAME apontando para serviços em nuvem extintos expõem a corporação ao risco crítico de Subdomain Takeover total.</p>
+            </div>
+        </div>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximo Estudo: Estudo 12 — OWASP-Top-10-Web</strong>
+            </div>
+            <p>
+                Agora que mapeamos a superfície de ataque externa e identificamos aplicações web expostas, o próximo passo na Trilha 3 é auditar a segurança dessas aplicações contra as vulnerabilidades mais perigosas do planeta: injeções SQL, Cross-Site Scripting (XSS), quebra de autenticação e falhas de autorização do <strong>OWASP Top 10</strong>!
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- SCRIPT VANILLA DO TERMINAL SIMULADO OSINT -->
+<script>
+(function() {
+    // Estado de descobertas mapeadas pelo usuário
+    const DESCOBERTAS = {
+        whois: {
+            feita: false,
+            categoria: "Rede / ASN",
+            ativo: "Bloco CIDR: 200.140.88.0/24 (AS264812)",
+            fonte: "whois corp-financeira.com.br",
+            risco: "Mapeia todo o perímetro de IPs públicos alocados à entidade."
+        },
+        dns: {
+            feita: false,
+            categoria: "Serviços DNS",
+            ativo: "Servidores MX e SPF com IPs autorizados",
+            fonte: "dig corp-financeira.com.br any",
+            risco: "Revela provedor de e-mail corporativo e infraestrutura autorizada."
+        },
+        crtsh: {
+            feita: false,
+            categoria: "Subdomínios",
+            ativo: "vpn.corp-financeira.com.br e api-dev.corp-financeira.com.br",
+            fonte: "crtsh (Certificate Transparency)",
+            risco: "Ambientes de homologação e VPN expostos sem documentação."
+        },
+        shodan: {
+            feita: false,
+            categoria: "Portas Abertas",
+            ativo: "200.140.88.15:3389 (RDP) e 200.140.88.42:9200 (Elastic)",
+            fonte: "shodan search \"org:CorpFinanceira\"",
+            risco: "Acesso remoto RDP e banco de dados NoSQL sem autenticação."
+        },
+        dork: {
+            feita: false,
+            categoria: "Credenciais Vazadas",
+            ativo: "Arquivo .env com DB_PASSWORD exposto em subdiretório",
+            fonte: "Google Dorks (filetype:env)",
+            risco: "Vazamento direto de segredos de conexão ao banco de dados."
+        }
+    };
+
+    let historicoComandos = [];
+    let indiceHistorico = -1;
+
+    // Respostas simuladas dos comandos
+    const RESPOSTAS = {
+        help: `Comandos OSINT disponíveis no terminal:
+  whois <dominio>               Consulta registros de propriedade, ASN e blocos CIDR.
+  dig <dominio> [tipo]          Consulta registros DNS (ex: dig corp-financeira.com.br any).
+  crtsh <dominio>               Consulta logs de Certificate Transparency para descobrir subdomínios.
+  shodan search "<filtro>"      Pesquisa serviços e portas indexados no Shodan (ex: org:CorpFinanceira).
+  dork <termo>                  Executa pesquisa avançada no Google Hacking Database.
+  mapa                          Exibe a matriz gráfica da superfície de ataque descoberta.
+  clear                         Limpa a tela do terminal.`,
+
+        whois: `[WHOIS CONSULTA REGISTRO.BR / LACNIC]
+Domínio:          corp-financeira.com.br
+Entidade:         Corporação Financeira Nacional S.A.
+CNPJ:             12.345.678/0001-90
+Titular / País:   Brasil (BR)
+ASN Alocado:      AS264812 (CORP-FINANCEIRA-BGP)
+Blocos IPv4:      200.140.88.0/24 (256 endereços roteáveis)
+Servidores DNS:   ns1.corp-financeira.com.br
+                  ns2.corp-financeira.com.br
+Contato Técnico:  admin-sec@corp-financeira.com.br
+Status:           Publicado / Ativo`,
+
+        dig: `; <<>> DiG 9.18.1-1ubuntu1-Ubuntu <<>> corp-financeira.com.br any
+;; QUESTION SECTION:
+;corp-financeira.com.br.    IN  ANY
+
+;; ANSWER SECTION:
+corp-financeira.com.br. 3600  IN  A      200.140.88.10
+corp-financeira.com.br. 3600  IN  MX     10 mail.corp-financeira.com.br.
+corp-financeira.com.br. 3600  IN  TXT    "v=spf1 ip4:200.140.88.0/24 include:_spf.google.com ~all"
+corp-financeira.com.br. 86400 IN  NS     ns1.corp-financeira.com.br.
+corp-financeira.com.br. 86400 IN  NS     ns2.corp-financeira.com.br.
+
+;; Tentativa de AXFR (Transferência de Zona):
+;; Transferência negada pelo servidor autoritativo (REFUSED). Boa prática ativa!`,
+
+        crtsh: `[CERTIFICATE TRANSPARENCY SEARCH — crt.sh/%.corp-financeira.com.br]
+Id Log       Data Emissão    Identidade (Nome Comum / SAN)
+--------------------------------------------------------------------------------
+10482910     2026-08-10      corp-financeira.com.br
+10482911     2026-08-10      www.corp-financeira.com.br
+10920412     2026-09-01      vpn.corp-financeira.com.br (Gateway GlobalProtect)
+11204918     2026-09-14      api-dev.corp-financeira.com.br (Ambiente Homologação)
+11204919     2026-09-14      painel-admin.corp-financeira.com.br (Portal Interno)
+11481023     2026-10-02      mail.corp-financeira.com.br
+
+=> 4 subdomínios adicionais descobertos através de registros públicos de SSL!`,
+
+        shodan: `[SHODAN RECON — Filtro: org:"CorpFinanceira"]
+Total de resultados encontrados: 3 hosts públicos indexados
+
+Host 1: 200.140.88.10 (Brasil - São Paulo)
+  Porta 80/tcp  (HTTP - Nginx 1.24.0)
+  Porta 443/tcp (HTTPS - Certificado emitido para corp-financeira.com.br)
+
+Host 2: 200.140.88.15 (Brasil - São Paulo)
+  Porta 3389/tcp (Microsoft Terminal Services - RDP HABILITADO EXPOSTO!)
+  Alerta: Porta administrativa de Área de Trabalho Remota aberta na Internet!
+
+Host 3: 200.140.88.42 (Brasil - São Paulo)
+  Porta 9200/tcp (Elasticsearch 7.17.0 - CLUSTER DESPROTEGIDO!)
+  Banner: "cluster_name": "corp-telemetria-elastic", "status": "green"
+  ALERTA CRÍTICO: Banco de dados indexado sem autenticação habilitada!`,
+
+        dork: `[GOOGLE DORK SIMULADO — Busca: site:corp-financeira.com.br filetype:env]
+Resultado 1:
+URL: https://api-dev.corp-financeira.com.br/.env
+Trecho Indexado:
+  APP_ENV=development
+  APP_KEY=base64:3f982c019a...
+  DB_HOST=10.0.1.50
+  DB_DATABASE=finance_db
+  DB_USERNAME=root
+  DB_PASSWORD=SuperSecretFinance2026!
+
+ALERTA DE SEGURANÇA: Chaves de produção/homologação expostas publicamente via .env!`
+    };
+
+    window.preencherComando = function(cmd) {
+        const input = document.getElementById("osint-cli-input");
+        if (input) {
+            input.value = cmd;
+            input.focus();
+        }
+    };
+
+    window.tratarInputTerminal = function(event) {
+        if (event.key === "Enter") {
+            window.executarComandoOsint();
+        } else if (event.key === "ArrowUp") {
+            if (historicoComandos.length > 0 && indiceHistorico > 0) {
+                indiceHistorico--;
+                document.getElementById("osint-cli-input").value = historicoComandos[indiceHistorico];
+            }
+        } else if (event.key === "ArrowDown") {
+            if (indiceHistorico < historicoComandos.length - 1) {
+                indiceHistorico++;
+                document.getElementById("osint-cli-input").value = historicoComandos[indiceHistorico];
+            } else {
+                indiceHistorico = historicoComandos.length;
+                document.getElementById("osint-cli-input").value = "";
+            }
+        }
+    };
+
+    window.executarComandoOsint = function() {
+        const input = document.getElementById("osint-cli-input");
+        const terminal = document.getElementById("osint-terminal-output");
+        if (!input || !terminal) return;
+
+        const cmd = input.value.trim();
+        if (!cmd) return;
+
+        historicoComandos.push(cmd);
+        indiceHistorico = historicoComandos.length;
+        input.value = "";
+
+        // Adiciona linha do usuário
+        terminal.innerHTML += `\n<span style="color: #4ade80;">analista@osint-box:~$</span> <span style="color: #f8fafc;">${escapeHtml(cmd)}</span>\n`;
+
+        const cmdLower = cmd.toLowerCase();
+
+        if (cmdLower === "clear" || cmdLower === "limpar") {
+            terminal.innerHTML = `<span style="color: #38bdf8;">Terminal OSINT reinicializado. Digite 'help' para ver os comandos.</span>\n`;
+            return;
+        }
+
+        if (cmdLower === "help" || cmdLower === "ajuda") {
+            terminal.innerHTML += RESPOSTAS.help + "\n";
+        } else if (cmdLower.startsWith("whois")) {
+            terminal.innerHTML += RESPOSTAS.whois + "\n";
+            marcarDescoberta("whois");
+        } else if (cmdLower.startsWith("dig")) {
+            terminal.innerHTML += RESPOSTAS.dig + "\n";
+            marcarDescoberta("dns");
+        } else if (cmdLower.startsWith("crtsh")) {
+            terminal.innerHTML += RESPOSTAS.crtsh + "\n";
+            marcarDescoberta("crtsh");
+        } else if (cmdLower.startsWith("shodan")) {
+            terminal.innerHTML += RESPOSTAS.shodan + "\n";
+            marcarDescoberta("shodan");
+        } else if (cmdLower.startsWith("dork")) {
+            terminal.innerHTML += RESPOSTAS.dork + "\n";
+            marcarDescoberta("dork");
+        } else if (cmdLower === "mapa") {
+            renderizarMapaNoTerminal();
+        } else {
+            terminal.innerHTML += `<span style="color: #f87171;">Comando desconhecido: "${escapeHtml(cmd)}". Digite 'help' para listar os comandos aceitos.</span>\n`;
+        }
+
+        terminal.scrollTop = terminal.scrollHeight;
+    };
+
+    function marcarDescoberta(chave) {
+        if (!DESCOBERTAS[chave]) return;
+        DESCOBERTAS[chave].feita = true;
+        atualizarMatrizSuperficie();
+    }
+
+    function atualizarMatrizSuperficie() {
+        const tbody = document.getElementById("osint-matriz-tbody");
+        const badge = document.getElementById("osint-score-badge");
+        const progressoTxt = document.getElementById("osint-progresso-txt");
+        if (!tbody) return;
+
+        let total = Object.keys(DESCOBERTAS).length;
+        let feitas = Object.values(DESCOBERTAS).filter(d => d.feita).length;
+        let percent = Math.round((feitas / total) * 100);
+
+        if (badge) {
+            badge.textContent = `SUPERFÍCIE: ${percent}% MAPEADA`;
+            if (percent === 100) {
+                badge.style.background = "rgba(16, 185, 129, 0.2)";
+                badge.style.color = "#10B981";
+                badge.style.borderColor = "#10B981";
+            }
+        }
+
+        if (progressoTxt) {
+            progressoTxt.textContent = `${feitas} de ${total} descobertas identificadas`;
+        }
+
+        if (feitas === 0) {
+            tbody.innerHTML = `
+                <tr id="matriz-vazia-row">
+                    <td colspan="4" style="text-align: center; color: var(--muted); padding: 1.5rem;">
+                        Nenhum ativo descoberto ainda. Execute comandos no terminal acima para mapear a infraestrutura do alvo.
+                    </td>
+                </tr>`;
+            return;
+        }
+
+        let html = "";
+        for (const [k, d] of Object.entries(DESCOBERTAS)) {
+            if (d.feita) {
+                html += `
+                    <tr>
+                        <td><strong>${d.categoria}</strong></td>
+                        <td><code>${d.ativo}</code></td>
+                        <td><span style="font-family: monospace; font-size: 0.8rem; background: var(--surface); padding: 0.15rem 0.4rem; border-radius: 3px; border: 1px solid var(--rule);">${d.fonte}</span></td>
+                        <td style="color: #DC2626; font-size: 0.8rem;">⚠️ ${d.risco}</td>
+                    </tr>
+                `;
+            }
+        }
+        tbody.innerHTML = html;
+    }
+
+    function renderizarMapaNoTerminal() {
+        const terminal = document.getElementById("osint-terminal-output");
+        if (!terminal) return;
+
+        let total = Object.keys(DESCOBERTAS).length;
+        let feitas = Object.values(DESCOBERTAS).filter(d => d.feita).length;
+
+        terminal.innerHTML += `
+[RESUMO DA SUPERFÍCIE DE ATAQUE DESCOBERTA (${feitas}/${total})]
+----------------------------------------------------------------------
+${DESCOBERTAS.whois.feita ? " [X] ASN & Bloco CIDR: 200.140.88.0/24 mapeado via WHOIS" : " [ ] ASN & Bloco CIDR: Pendente (use 'whois')"}
+${DESCOBERTAS.dns.feita ? " [X] DNS & SPF: Registros mapeados via DIG" : " [ ] DNS & SPF: Pendente (use 'dig')"}
+${DESCOBERTAS.crtsh.feita ? " [X] Subdomínios: vpn, api-dev, painel-admin via crt.sh" : " [ ] Subdomínios: Pendente (use 'crtsh')"}
+${DESCOBERTAS.shodan.feita ? " [X] Serviços Expostos: RDP (3389) e Elastic (9200) via Shodan" : " [ ] Serviços Expostos: Pendente (use 'shodan')"}
+${DESCOBERTAS.dork.feita ? " [X] Arquivo Sensível: .env com senha de banco via Google Dork" : " [ ] Arquivo Sensível: Pendente (use 'dork')"}
+----------------------------------------------------------------------
+` + (feitas === total ? "<span style=\"color: #4ade80; font-weight: bold;\">PARABÉNS! Você descobriu 100% da superfície externa do alvo!</span>\n" : "Continue investigando para completar todos os itens da superfície.\n");
+    }
+
+    // Inicialização ao carregar a página
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof initChecklist === "function") {
+            initChecklist("reconhecimento-osint");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
