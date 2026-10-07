@@ -1,0 +1,2310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="study-slug" content="Arquitetura-Zero-Trust">
+  <title>Princípios Zero Trust e Microsegmentação — Estudos de Cibersegurança</title>
+
+  <!-- Google Fonts: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+/* ==========================================================================
+   ESTUDOS DE CIBERSEGURANÇA — DESIGN SYSTEM BASE (base.css)
+   Compatível com temas Claro / Escuro, responsivo e 100% offline-ready.
+   Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0. Importação de Fontes Web (Google Fonts com Fallbacks Locais Nativos)
+   -------------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+/* --------------------------------------------------------------------------
+   1. Design Tokens & Variáveis CSS (Tema Claro - Padrão)
+   -------------------------------------------------------------------------- */
+:root {
+  /* Paleta Base */
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+
+  /* Cores Temáticas das 6 Trilhas */
+  --t1-blue: #2563EB;     /* Trilha 1: Fundamentos & Princípios */
+  --t2-green: #059669;    /* Trilha 2: Defesa & Operações Blue Team */
+  --t3-red: #DC2626;      /* Trilha 3: Segurança Ofensiva & Red Team */
+  --t4-purple: #7C3AED;   /* Trilha 4: Engenharia, Cloud & AppSec */
+  --t5-cyan: #0891B2;     /* Trilha 5: Criptografia & Identidade */
+  --t6-amber: #D97706;    /* Trilha 6: Governança, Risco & Regulação */
+
+  /* Cores de Alerta / Callouts */
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+
+  --warning-color: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #F59E0B;
+
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+
+  --law-color: #7C3AED;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+
+  /* Tipografia */
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+
+  /* Espaçamento e Bordas */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 28, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 28, 0.08), 0 2px 4px -2px rgba(15, 23, 28, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 28, 0.1), 0 4px 6px -4px rgba(15, 23, 28, 0.05);
+
+  /* Transição */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.25s ease-in-out;
+}
+
+/* --------------------------------------------------------------------------
+   2. Suporte a Tema Escuro (Modo Noturno / Dark Mode)
+   -------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0F171C;
+    --surface: #172229;
+    --sunk: #1E2B33;
+    --ink: #E4EAED;
+    --muted: #9BABB6;
+    --rule: #2B3A44;
+
+    /* Trilhas no Dark Mode (ajuste de saturação e contraste) */
+    --t1-blue: #60A5FA;
+    --t2-green: #34D399;
+    --t3-red: #F87171;
+    --t4-purple: #A78BFA;
+    --t5-cyan: #22D3EE;
+    --t6-amber: #FBBF24;
+
+    /* Alertas no Dark Mode */
+    --tip-color: #34D399;
+    --tip-bg: rgba(5, 150, 105, 0.18);
+    --tip-border: #059669;
+
+    --warning-color: #FBBF24;
+    --warning-bg: rgba(217, 119, 6, 0.18);
+    --warning-border: #D97706;
+
+    --danger-color: #F87171;
+    --danger-bg: rgba(220, 38, 38, 0.20);
+    --danger-border: #DC2626;
+
+    --law-color: #A78BFA;
+    --law-bg: rgba(124, 58, 237, 0.18);
+    --law-border: #7C3AED;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #0F171C;
+  --surface: #172229;
+  --sunk: #1E2B33;
+  --ink: #E4EAED;
+  --muted: #9BABB6;
+  --rule: #2B3A44;
+
+  --t1-blue: #60A5FA;
+  --t2-green: #34D399;
+  --t3-red: #F87171;
+  --t4-purple: #A78BFA;
+  --t5-cyan: #22D3EE;
+  --t6-amber: #FBBF24;
+
+  --tip-color: #34D399;
+  --tip-bg: rgba(5, 150, 105, 0.18);
+  --tip-border: #059669;
+
+  --warning-color: #FBBF24;
+  --warning-bg: rgba(217, 119, 6, 0.18);
+  --warning-border: #D97706;
+
+  --danger-color: #F87171;
+  --danger-bg: rgba(220, 38, 38, 0.20);
+  --danger-border: #DC2626;
+
+  --law-color: #A78BFA;
+  --law-bg: rgba(124, 58, 237, 0.18);
+  --law-border: #7C3AED;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="light"] {
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+
+  --t1-blue: #2563EB;
+  --t2-green: #059669;
+  --t3-red: #DC2626;
+  --t4-purple: #7C3AED;
+  --t5-cyan: #0891B2;
+  --t6-amber: #D97706;
+
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+
+  --warning-color: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #F59E0B;
+
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+
+  --law-color: #7C3AED;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+}
+
+/* --------------------------------------------------------------------------
+   3. Reset e Estilos Globais
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  color-scheme: light dark;
+}
+
+body {
+  background-color: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  margin: 0;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* Tipografia Estrutural */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.75rem; margin-top: 2rem; border-bottom: 2px solid var(--rule); padding-bottom: 0.5rem; }
+h3 { font-size: 1.35rem; margin-top: 1.5rem; }
+h4 { font-size: 1.15rem; }
+
+p {
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--t1-blue);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity var(--transition-fast);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code, kbd, samp {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background-color: var(--sunk);
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--rule);
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  background-color: #0D1418;
+  color: #E2E8F0;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  border: none;
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   4. Layout do Documento & Barra de Navegação Superior
+   -------------------------------------------------------------------------- */
+.top-nav {
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.top-nav-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.nav-back:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.theme-toggle-btn {
+  background: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+  background: var(--surface);
+  border-color: var(--muted);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 4rem 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   5. Cabeçalho de Destaque (.hero-header) e Metadados
+   -------------------------------------------------------------------------- */
+.hero-header {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-color: var(--track-color, var(--t1-blue));
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  background-color: var(--sunk);
+  color: var(--ink);
+}
+
+.badge-t1 { background-color: rgba(37, 99, 235, 0.15); color: var(--t1-blue); }
+.badge-t2 { background-color: rgba(5, 150, 105, 0.15); color: var(--t2-green); }
+.badge-t3 { background-color: rgba(220, 38, 38, 0.15); color: var(--t3-red); }
+.badge-t4 { background-color: rgba(124, 58, 237, 0.15); color: var(--t4-purple); }
+.badge-t5 { background-color: rgba(8, 145, 178, 0.15); color: var(--t5-cyan); }
+.badge-t6 { background-color: rgba(217, 119, 6, 0.15); color: var(--t6-amber); }
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+}
+
+.meta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.meta-item strong {
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   6. Caixas de Destaque (.callout)
+   -------------------------------------------------------------------------- */
+.callout {
+  padding: 1.1rem 1.35rem;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  border-left: 5px solid var(--muted);
+  background-color: var(--sunk);
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+}
+
+.callout strong {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+}
+
+.callout-tip, .callout.tip {
+  border-left-color: var(--tip-color);
+  background-color: var(--tip-bg);
+}
+
+.callout-warning, .callout.warning {
+  border-left-color: var(--warning-color);
+  background-color: var(--warning-bg);
+}
+
+.callout-danger, .callout.danger {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg);
+}
+
+.callout-law, .callout.law {
+  border-left-color: var(--law-color);
+  background-color: var(--law-bg);
+}
+
+/* --------------------------------------------------------------------------
+   7. Bloco Terminal / Comandos (.terminal-box)
+   -------------------------------------------------------------------------- */
+.terminal-box {
+  background-color: #0A0F13;
+  color: #E2E8F0;
+  border: 1px solid #1E293B;
+  border-radius: var(--radius-md);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.terminal-header {
+  background-color: #151E27;
+  padding: 0.5rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1E2B37;
+}
+
+.terminal-title {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #94A3B8;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.terminal-title::before {
+  content: "● ● ●";
+  letter-spacing: 0.15rem;
+  color: #475569;
+  font-size: 0.65rem;
+}
+
+.btn-copy {
+  background-color: #243242;
+  color: #CBD5E1;
+  border: 1px solid #334155;
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-copy:hover {
+  background-color: #334155;
+  color: #FFFFFF;
+}
+
+.terminal-box pre {
+  margin: 0;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 1rem;
+  color: #E2E8F0;
+}
+
+/* --------------------------------------------------------------------------
+   8. Simulador / Painel de Laboratório (.lab-box)
+   -------------------------------------------------------------------------- */
+.lab-box {
+  background-color: var(--surface);
+  border: 2px solid var(--rule);
+  border-radius: var(--radius-lg);
+  margin: 2rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.lab-header {
+  background-color: var(--sunk);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.lab-header h3 {
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+  font-size: 1.3rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lab-header p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+.lab-body {
+  padding: 1.5rem;
+}
+
+.lab-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  background-color: var(--ground);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+}
+
+.lab-controls label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.lab-controls input[type="text"],
+.lab-controls input[type="number"],
+.lab-controls select,
+.lab-controls textarea {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.lab-controls input:focus,
+.lab-controls select:focus,
+.lab-controls textarea:focus {
+  outline: none;
+  border-color: var(--t1-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.lab-output {
+  background-color: #0B1116;
+  color: #38BDF8;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid #1E293B;
+  min-height: 100px;
+  max-height: 400px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.55;
+}
+
+/* Controles e Grid do Laboratório Interativo */
+.lab-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background-color: var(--ground);
+  border-bottom: 1px solid var(--rule);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.form-control {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--t1-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.form-range {
+  width: 100%;
+  accent-color: var(--t1-blue);
+  cursor: pointer;
+}
+
+.flags-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.flag-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.flag-toggle:hover {
+  border-color: var(--t1-blue);
+}
+
+.flag-toggle input[type="checkbox"] {
+  accent-color: var(--t1-blue);
+  cursor: pointer;
+}
+
+.lab-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--rule);
+}
+
+.packet-display-wrap {
+  padding: 1.5rem;
+  background-color: var(--surface);
+}
+
+.packet-display-wrap h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.packet-header-grid {
+  display: grid;
+  grid-template-columns: repeat(32, 1fr);
+  gap: 4px;
+  background-color: var(--ground);
+  padding: 0.75rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.header-field-cell {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-width: 75px;
+}
+
+.header-field-cell.span-8 {
+  grid-column: span 8;
+}
+
+.header-field-cell.span-16 {
+  grid-column: span 16;
+}
+
+.header-field-cell.span-32 {
+  grid-column: span 32;
+}
+
+.header-field-cell .field-title {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.2rem;
+}
+
+.header-field-cell .field-val {
+  font-size: 0.88rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.header-field-cell .field-val.highlight {
+  color: var(--t1-blue);
+}
+
+.header-field-cell .field-val.flag-badge {
+  background-color: var(--sunk);
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+  .packet-header-grid {
+    grid-template-columns: repeat(16, 1fr);
+  }
+  .header-field-cell.span-8 {
+    grid-column: span 16;
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   9. Botões e Controles Padrão
+   -------------------------------------------------------------------------- */
+.btn-primary {
+  background-color: var(--t1-blue);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface);
+  border-color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   10. Lista de Verificação Interativa (.checklist)
+   -------------------------------------------------------------------------- */
+.checklist {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin: 1.75rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.checklist h4 {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.checklist-progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: var(--sunk);
+  border-radius: var(--radius-pill);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.checklist-progress-fill {
+  height: 100%;
+  background-color: var(--t2-green);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  margin: 0.25rem 0;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast);
+}
+
+.check-item:hover {
+  background-color: var(--sunk);
+}
+
+.check-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--muted);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.check-item input[type="checkbox"]:checked {
+  background-color: var(--t2-green);
+  border-color: var(--t2-green);
+}
+
+.check-item input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.check-item span {
+  font-size: 0.95rem;
+  color: var(--ink);
+  line-height: 1.45;
+  transition: color var(--transition-fast);
+}
+
+.check-item.completed span {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   11. Quiz de Fixação (.quiz, .quiz-item, .quiz-section)
+   -------------------------------------------------------------------------- */
+.quiz-section {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  margin: 2rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.quiz-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.quiz-item {
+  background-color: var(--sunk);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.quiz-question {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 0.85rem;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.quiz-btn {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1.4;
+}
+
+.quiz-btn:hover:not(:disabled) {
+  border-color: var(--t1-blue);
+  background-color: var(--ground);
+}
+
+.quiz-btn.correct {
+  background-color: var(--tip-bg) !important;
+  border-color: var(--t2-green) !important;
+  color: var(--t2-green) !important;
+  font-weight: 600;
+}
+
+.quiz-btn.incorrect {
+  background-color: var(--danger-bg) !important;
+  border-color: var(--danger-color) !important;
+  color: var(--danger-color) !important;
+}
+
+.quiz-feedback {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-top: 0.75rem;
+  border-left: 4px solid var(--rule);
+  background-color: var(--surface);
+}
+
+.quiz-feedback.correct {
+  border-left-color: var(--t2-green);
+  background-color: var(--tip-bg);
+  color: var(--ink);
+}
+
+.quiz-feedback.incorrect {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg);
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   12. Grade de Fatos / Cards Comparativos (.facts-grid, .facts-card)
+   -------------------------------------------------------------------------- */
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.facts-card {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.facts-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.facts-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+}
+
+.facts-card p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   13. Tabelas Técnicas Comparativas
+   -------------------------------------------------------------------------- */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  background-color: var(--surface);
+  text-align: left;
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+th {
+  background-color: var(--sunk);
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: var(--ground);
+}
+
+/* --------------------------------------------------------------------------
+   14. Rodapé e Referências
+   -------------------------------------------------------------------------- */
+.study-footer {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   15. Responsividade & Impressão (@media)
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  h1 { font-size: 1.85rem; }
+  h2 { font-size: 1.45rem; }
+  .hero-header { padding: 1.25rem; }
+  .lab-body { padding: 1rem; }
+  .lab-controls { flex-direction: column; align-items: stretch; }
+  .top-nav-inner { padding: 0.5rem 1rem; }
+}
+
+@media print {
+  body {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  .top-nav, .theme-toggle-btn, .btn-copy, .lab-controls button {
+    display: none !important;
+  }
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+  .hero-header, .lab-box, .checklist, .quiz-section {
+    border: 1px solid #CCC !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+}
+
+  </style>
+</head>
+<body data-slug="Arquitetura-Zero-Trust">
+
+  <!-- Barra de Navegação Superior e Breadcrumbs -->
+  <header class="top-nav">
+    <div class="top-nav-inner">
+      <a href="../index.html" class="nav-back">← Painel de Estudos</a>
+      <span class="nav-title">Princípios Zero Trust e Microsegmentação</span>
+      <div class="nav-actions">
+        <span class="badge badge-t2">Trilha 2</span>
+        <button class="theme-toggle-btn" aria-label="Alternar tema" onclick="toggleTheme()">
+          <span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal do Treinamento -->
+  <main class="container">
+<!-- ==========================================================================
+     Estudo 08: Arquitetura Zero Trust e Microsegmentação
+     Corpo do Treinamento: Princípios Zero Trust e Microsegmentação
+     ========================================================================== -->
+
+<header class="study-header">
+  <span class="study-track-kicker">Trilha 2: Segurança Defensiva &bull; Estudo 08</span>
+  <h1 class="study-title">Arquitetura Zero Trust e Microsegmentação</h1>
+  <p class="study-lead">
+    O modelo tradicional de segurança perimetral &mdash; baseado na metáfora do "castelo fortificado cercado por um fosso" &mdash;
+    tornou-se obsoleto com a migração massiva para a nuvem, a pulverização de microsserviços e o trabalho remoto descentralizado.
+    A <strong>Arquitetura Zero Trust (ZTA)</strong>, formalizada pelo <strong>NIST SP 800-207</strong>, substitui a confiança implícita
+    baseada na localização de rede por um modelo estrito de verificação contínua, mínimo privilégio e presunção de comprometimento.
+    Compreender a divisão arquitetural entre PDP (Policy Decision Point) e PEP (Policy Enforcement Point), a substituição de VPNs
+    por ZTNA/SDP, o controle granular por microsegmentação e a avaliação contínua da postura do dispositivo é indispensável
+    para desenhar defesas modernas e resilientes.
+  </p>
+  <div class="study-meta-bar">
+    <span class="badge green">NIST CSF 2.0: Protect (PR.AA / PR.AC)</span>
+    <span class="badge slate">MITRE ATT&amp;CK: TA0008, TA0004, T1078, T1021</span>
+    <span class="badge slate">Tempo Estimado: ~40 minutos</span>
+    <span class="badge slate">Carreiras: Blue Team &bull; Arquitetura &bull; GRC</span>
+  </div>
+</header>
+
+<!-- SEÇÃO 1: O COLAPSO DO PERÍMETRO E OS 3 AXIOMAS DO ZERO TRUST -->
+<section class="study-section" id="axiomas-zero-trust">
+  <div class="section-title-wrap">
+    <span class="section-num">01</span>
+    <h2>O Colapso do Perímetro Tradicional e os Três Axiomas do Zero Trust</h2>
+  </div>
+
+  <p>
+    Por mais de duas décadas, a arquitetura de redes corporativas operou sob o dogma da
+    <strong>Confiança Implícita de Perímetro</strong>: qualquer pacote que estivesse fisicamente conectado
+    à rede interna (ou autenticado através de uma VPN tradicional) era tratado como confiável.
+    Contudo, a explosão de aplicações SaaS, ambientes multi-cloud (AWS, Azure, GCP) e colaboradores trabalhando
+    de suas residências pulverizou as bordas físicas da empresa.
+  </p>
+
+  <div class="callout danger">
+    <h4>A Falha Fatal do Modelo "Castelo e Fosso" (Castle-and-Moat)</h4>
+    <p>
+      Se o perímetro externo for violado &mdash; seja por uma credencial roubada via phishing, um dispositivo comprometido
+      ou um insider mal-intencionado &mdash; o modelo tradicional concede ao atacante liberdade quase irrestrita para realizar
+      varreduras internas, farejar tráfego em texto claro e efetuar movimentação lateral profunda (MITRE ATT&CK TA0008).
+      No mundo moderno, <strong>a rede interna deve ser tratada como tão hostil e não-confiável quanto a Internet pública</strong>.
+    </p>
+  </div>
+
+  <h3>Os Três Axiomas Fundamentais do Zero Trust</h3>
+  <p>
+    Popularizado pela Forrester e consagrado pelo NIST e CISA, o Zero Trust não é um produto ou software que se instala,
+    mas uma filosofia estratégica de segurança regida por três princípios universais:
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>1. Never Trust, Always Verify (Nunca Confie, Sempre Verifique)</h4>
+      <p>
+        Toda e qualquer tentativa de acesso a um recurso corporativo &mdash; seja uma planilha no SharePoint, uma query
+        em banco SQL ou uma chamada de API interna &mdash; deve ser explicitamente autenticada, autorizada e criptografada
+        em tempo de execução, independentemente de onde a requisição se originou (seja da sede em São Paulo ou de um café em Lisboa).
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>2. Least Privilege Access (Acesso com Privilégio Mínimo)</h4>
+      <p>
+        O acesso deve ser concedido sob demanda estrita: <strong>Just-In-Time (JIT)</strong> (privilégio temporário que expira
+        automaticamente após a tarefa) e <strong>Just-Enough-Access (JEA)</strong> (conceder acesso apenas àquele micro-recurso
+        específico, e não à sub-rede inteira).
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>3. Assume Breach (Presuma a Violação)</h4>
+      <p>
+        Projete cada componente da infraestrutura partindo da premissa de que o adversário <em>já possui acesso a credenciais
+        válidas e já está presente na rede</em>. Segmente domínios de falha, inspecione tráfego leste-oeste (inter-servidores),
+        cifre dados em trânsito e em repouso e monitore telemetria comportamental continuamente.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 2: ARQUITETURA FORMAL DO NIST SP 800-207 -->
+<section class="study-section" id="nist-sp-800-207">
+  <div class="section-title-wrap">
+    <span class="section-num">02</span>
+    <h2>A Arquitetura Lógica Formal do NIST SP 800-207</h2>
+  </div>
+
+  <p>
+    A publicação especial <strong>NIST SP 800-207 (Zero Trust Architecture)</strong> padronizou o modelo de referência
+    técnico para implementação corporativa. A arquitetura estabelece uma separação rigorosa entre o
+    <strong>Plano de Controle (Control Plane)</strong> e o <strong>Plano de Dados (Data Plane)</strong>:
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>Subject (Sujeito)</h4>
+      <p>A entidade que solicita acesso ao recurso. Pode ser um colaborador humano, uma máquina gerenciada ou um serviço/aplicação autônoma.</p>
+    </div>
+    <div class="info-card">
+      <h4>PEP (Policy Enforcement Point)</h4>
+      <p>
+        O ponto de aplicação de política posicionado diretamente no Plano de Dados. Ele intercepta a requisição,
+        estabelece a comunicação segura e aplica as decisões emanadas do plano de controle.
+        <br><strong>Exemplos:</strong> Gateways ZTNA, proxies reversos (Envoy), agentes locais de endpoint.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>PDP (Policy Decision Point)</h4>
+      <p>
+        O cérebro decisório central residente no Plano de Controle. É responsável por analisar os fatores de contexto
+        e emitir a ordem de permitir ou bloquear o acesso. Divide-se em:
+        <br>&bull; <strong>Policy Engine (PE):</strong> O motor de inferência que calcula o score de risco da requisição.
+        <br>&bull; <strong>Policy Administrator (PA):</strong> O componente que comanda o PEP a abrir ou revogar a conexão.
+      </p>
+    </div>
+  </div>
+
+  <div class="terminal-box">
+    <div class="terminal-header">
+      <span class="terminal-title">Fluxo Lógico de Decisão NIST SP 800-207</span>
+      <button class="terminal-copy-btn" onclick="copyCode(this, 'nist-zta-diagram')">Copiar</button>
+    </div>
+    <pre id="nist-zta-diagram"><code>┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                               PLANO DE CONTROLE (PDP)                                  │
+│   ┌────────────────────────────────┐            ┌──────────────────────────────────┐   │
+│   │    Policy Engine (PE)          │◄──────────►│   Policy Administrator (PA)      │   │
+│   │   (Avaliação e Cálculo Risco)  │            │  (Comando de Abertura/Revogação) │   │
+│   └───────────────▲────────────────┘            └─────────────────┬────────────────┘   │
+└───────────────────┼───────────────────────────────────────────────┼────────────────────┘
+                    │ Telemetria & Contexto                         │ Comando de Acesso
+                    │ (SIEM, EDR, RH, Threat Intel)                 ▼
+┌───────────────────┴───────────────────────────────────────────────┴────────────────────┐
+│                                PLANO DE DADOS (DATA PLANE)                             │
+│   ┌─────────────┐                      ┌───────────────────┐           ┌───────────┐   │
+│   │   Subject   │ ═══════════════════► │        PEP        │ ════════► │  Recurso  │   │
+│   │  (Usuário)  │                      │ (Gateway / Proxy) │           │ Protegido │   │
+│   └─────────────┘                      └───────────────────┘           └───────────┘   │
+└────────────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+  </div>
+</section>
+
+<!-- SEÇÃO 3: MICROSEGMENTAÇÃO E ZTNA VS VPN -->
+<section class="study-section" id="microsegmentacao-ztna">
+  <div class="section-title-wrap">
+    <span class="section-num">03</span>
+    <h2>Microsegmentação e Perímetro Definido por Software (SDP / ZTNA)</h2>
+  </div>
+
+  <p>
+    A segmentação de redes tradicional (VLANs e firewalls de borda) opera no nível macro de sub-redes inteiras.
+    Em uma arquitetura Zero Trust, adota-se a <strong>Microsegmentação Granular</strong>, que isola cargas de trabalho
+    individuais (<em>Workloads</em>, Containers, Pods de Kubernetes ou instâncias de VM), permitindo que apenas fluxos
+    estritamente autorizados transitem entre serviços.
+  </p>
+
+  <h3>O Duelo Tecnológico: VPN Tradicional vs ZTNA / SDP</h3>
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4 style="color:#ef4444;">VPN Corporativa Tradicional (Legada)</h4>
+      <p>
+        <strong>Concede Acesso à Rede (Camada 3):</strong> Ao autenticar com sucesso, a máquina do colaborador recebe um IP
+        da rede interna e rota para a sub-rede inteira.
+        <br><em>Risco Crítico:</em> Se o notebook pessoal do colaborador estiver infectado por ransomware ou cavalo de Troia,
+        o malware pode navegar livremente pela rede corporativa interna, explorando portas vulneráveis de outros servidores.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4 style="color:#10b981;">ZTNA (Zero Trust Network Access / SDP)</h4>
+      <p>
+        <strong>Concede Acesso à Aplicação Específica (Camada 7):</strong> O usuário nunca recebe acesso à rede. O túnel seguro
+        é estabelecido estritamente para a porta daquela aplicação web ou serviço autorizado.
+        <br><em>Superpoder:</em> Todos os outros servidores e portas da empresa permanecem totalmente <strong>invisíveis e não-roteáveis</strong>
+        para o cliente (conceito de <em>Dark Cloud / Black Cloud</em>), impossibilitando varreduras de porta e movimento lateral.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 4: ACESSO BASEADO EM CONTEXTO E POSTURA DO DISPOSITIVO -->
+<section class="study-section" id="contexto-postura">
+  <div class="section-title-wrap">
+    <span class="section-num">04</span>
+    <h2>Acesso Baseado em Contexto e Avaliação Contínua de Risco</h2>
+  </div>
+
+  <p>
+    No Zero Trust, a autenticação primária (nome de usuário e senha) é apenas o primeiro de dezenas de sinais avaliados.
+    O Policy Engine (PE) toma decisões baseando-se no <strong>Contexto em Tempo Real</strong> e na
+    <strong>Postura do Dispositivo (Device Health/Compliance)</strong>:
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>Identidade e Fator de Autenticação</h4>
+      <p>Qual método de autenticação foi utilizado? Senha fraca sem MFA? Código SMS? Ou chave física resistente a phishing (FIDO2/WebAuthn)?</p>
+    </div>
+    <div class="info-card">
+      <h4>Postura do Dispositivo (Device Health)</h4>
+      <p>
+        O disco está criptografado (BitLocker/FileVault)? O agente de EDR está ativo e atualizado?
+        O sistema operacional possui patches de vulnerabilidades críticas aplicados? O dispositivo possui certificado de gerenciamento corporativo (MDM/Intune)?
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>Contexto de Rede e Geolocalização</h4>
+      <p>
+        A requisição vem do IP residencial habitual ou de uma rede anônima (Tor, nós de saída de VPN pública)?
+        Há detecção de anomalia temporal como <strong>Viagem Impossível (Impossible Travel)</strong> (ex: login em São Paulo e 15 minutos depois em Hong Kong)?
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>Sensibilidade do Recurso Alvo</h4>
+      <p>
+        A requisição é para a intranet comum (baixo risco) ou para o banco de dados transacional com dados de cartão de crédito (altíssimo risco)?
+      </p>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <h4>Reavaliação Contínua em Tempo de Execução (Continuous Risk Assessment)</h4>
+    <p>
+      Uma premissa revolucionária do Zero Trust é que a autorização <strong>não é um evento estático que ocorre apenas no login</strong>.
+      Se durante uma sessão de trabalho de 8 horas o colaborador desativar o antivírus corporativo para instalar um jogo,
+      ou se o SIEM detectar um alerta de comprometimento naquela máquina, o PDP revoga imediatamente a sessão ativa no PEP,
+      encerrando a conexão no mesmo segundo.
+    </p>
+  </div>
+</section>
+
+<!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (MOTOR PDP/PEP) -->
+<section class="study-section" id="laboratorio-pratico">
+  <div class="section-title-wrap">
+    <span class="section-num">05</span>
+    <h2>Laboratório Interativo: Motor de Decisão Zero Trust (PDP/PEP)</h2>
+  </div>
+
+  <p>
+    Experimente na prática como um motor de decisão Policy Engine avalia múltiplos sinais de contexto em tempo real.
+    Neste laboratório em Vanilla JavaScript, você pode carregar cenários corporativos realistas ou parametrizar
+    livremente fatores de autenticação, saúde do endpoint, rede e horário, calculando o score de risco contextual
+    e observando a decisão formal do PEP (Permitir, Bloquear ou Exigir Desafio de MFA Adicional / Step-Up).
+  </p>
+
+  <div class="lab-box" id="zero-trust-lab">
+    <div class="lab-header">
+      <span class="lab-badge">LAB PRÁTICO INTERATIVO</span>
+      <h3>Simulador de Decisão Contínua NIST SP 800-207 (PDP/PEP)</h3>
+      <p>Configure atributos contextuais, calcule o score de risco em tempo real e visualize a resposta do gateway de acesso.</p>
+    </div>
+
+    <!-- Cenários Pré-Configurados -->
+    <div style="margin-bottom: 1.25rem;">
+      <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:0.5rem;">Cenários Pré-Configurados para Teste:</div>
+      <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+        <button class="lab-btn" onclick="injetarCenarioZeroTrust('conforme')">💻 Notebook Corporativo Conforme (Segunda-feira 14h)</button>
+        <button class="lab-btn lab-btn-warning" onclick="injetarCenarioZeroTrust('byod')">📱 Dispositivo Pessoal BYOD (Sem Criptografia)</button>
+        <button class="lab-btn lab-btn-danger" onclick="injetarCenarioZeroTrust('viagem_impossivel')">🌍 Viagem Impossível / Rede Tor Anônima</button>
+        <button class="lab-btn lab-btn-danger" onclick="injetarCenarioZeroTrust('madrugada_critica')">🌙 Acesso Noturno a Dados Confidenciais</button>
+      </div>
+    </div>
+
+    <!-- Painel de Parâmetros de Contexto -->
+    <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1.25rem; margin-bottom: 1.25rem;">
+      <div style="font-weight:700; font-size:0.9rem; color:var(--ink); margin-bottom:0.75rem;">Sinais e Atributos de Contexto da Requisição:</div>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; font-size:0.85rem;">
+        <!-- Fator de Autenticação -->
+        <div>
+          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Método de Autenticação:</label>
+          <select id="zt-param-auth" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="dispararAvaliacaoManual()">
+            <option value="fido2">MFA Chave Física FIDO2 / WebAuthn (Risco Mínimo)</option>
+            <option value="totp">MFA Aplicativo TOTP / Push Seguro</option>
+            <option value="sms">MFA por SMS (Vulnerável a SIM Swap)</option>
+            <option value="senha">Apenas Senha (Sem MFA - Alto Risco)</option>
+          </select>
+        </div>
+
+        <!-- Postura do Dispositivo -->
+        <div>
+          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Postura do Dispositivo (Endpoint):</label>
+          <select id="zt-param-device" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="dispararAvaliacaoManual()">
+            <option value="conforme">Conforme (BitLocker Ativo + EDR Saudável)</option>
+            <option value="parcial">Parcial (Antivírus Ativo, Sem Criptografia de Disco)</option>
+            <option value="desconhecido">Não-Conforme (Sem EDR corporativo / BYOD)</option>
+            <option value="infectado">Comprometido (EDR reporta alerta de malware)</option>
+          </select>
+        </div>
+
+        <!-- Rede e Origem -->
+        <div>
+          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Rede e Localização do IP:</label>
+          <select id="zt-param-net" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="dispararAvaliacaoManual()">
+            <option value="corporativa">Rede Conhecida / IP Residencial Habitual</option>
+            <option value="publica">Wi-Fi Público / Hotel / IP Desconhecido</option>
+            <option value="tor">Nó de Saída Tor / Proxy Anônimo / VPN Comercial</option>
+            <option value="impossivel">Alerta de Viagem Impossível (Dois países em minutos)</option>
+          </select>
+        </div>
+
+        <!-- Sensibilidade do Recurso -->
+        <div>
+          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Sensibilidade do Recurso Requisitado:</label>
+          <select id="zt-param-resource" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="dispararAvaliacaoManual()">
+            <option value="baixo">Intranet Comum / Políticas Públicas (Baixo)</option>
+            <option value="medio">CRM / Sistema de Vendas (Médio)</option>
+            <option value="alto">ERP Financeiro / Código-Fonte / Produção (Alto)</option>
+            <option value="critico">Bancos de Dados Transacionais / Chaves Criptográficas (Crítico)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Painel de Decisão do Motor (PDP / Policy Engine) -->
+    <div style="background:var(--ground); border:1px solid var(--rule); border-radius:8px; padding:1.25rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+        <div>
+          <h4 style="margin:0; font-size:1rem; color:var(--ink);">Decisão Formal do Policy Decision Point (PDP)</h4>
+          <span style="font-size:0.8rem; color:var(--muted);" id="zt-status-sub">Avaliando parâmetros de contexto...</span>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; font-weight:700;">Score de Risco Contextual</div>
+          <div id="zt-risk-score-display" style="font-size:1.75rem; font-weight:800; font-family:var(--font-display);">-- / 100</div>
+        </div>
+      </div>
+
+      <!-- Barra Visual de Risco -->
+      <div style="width:100%; height:8px; background:var(--sunk); border-radius:4px; overflow:hidden; margin-bottom:1rem;">
+        <div id="zt-risk-bar" style="width:0%; height:100%; background:#10b981; transition:width 0.4s ease, background 0.4s ease;"></div>
+      </div>
+
+      <!-- Veredicto Final do PEP -->
+      <div id="zt-veredicto-box" style="padding:1rem; border-radius:6px; font-size:0.9rem; line-height:1.6;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 6: CHECKLIST PRÁTICO -->
+<section class="study-section" id="checklist-zero-trust">
+  <div class="section-title-wrap">
+    <span class="section-num">06</span>
+    <h2>Checklist de Aplicação Prática: Implementação e Auditoria Zero Trust</h2>
+  </div>
+
+  <p>
+    Utilize este checklist técnico durante auditorias de conformidade com o NIST SP 800-207
+    ou planejamento de migração de infraestruturas tradicionais para ZTNA:
+  </p>
+
+  <div class="checklist" id="checklist-arquitetura-zero-trust">
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Erradicação da Confiança Implícita em Redes Internas:</strong>
+        Dispositivos conectados à rede local cabeada da empresa não possuem privilégios adicionais sobre dispositivos remotos;
+        todas as conexões exigem autenticação explícita e criptografia mTLS ponta a ponta.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Adoção de ZTNA em Substituição a VPNs de Camada 3:</strong>
+        O acesso remoto para colaboradores e parceiros é baseado em ZTNA/SDP com acesso granular na Camada 7 por aplicação,
+        sem concessão de endereçamento IP interno ou rotas de rede ampla.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Verificação Estrita da Postura do Dispositivo (Device Health):</strong>
+        O Policy Engine valida a criptografia de disco, a presença de agente EDR saudável e o status de patches antes
+        de conceder acesso a sistemas corporativos de média ou alta criticidade.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Reavaliação Contínua de Risco em Tempo Real:</strong>
+        Sessões ativas não possuem autorização vitalícia; alterações no contexto (desativação de antivírus, anomalias de rede)
+        disparam o Policy Administrator para revogar o acesso imediatamente.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Microsegmentação entre Cargas de Trabalho (Leste-Oeste):</strong>
+        Serviços e bancos de dados em nuvem e containers utilizam políticas de rede estritas (Network Policies)
+        que impedem comunicação lateral entre pods e servidores sem necessidade de negócio comprovada.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Obrigatoriedade de MFA Resistente a Phishing (FIDO2):</strong>
+        O acesso ao plano de controle e recursos corporativos críticos exige autenticação multifator FIDO2/WebAuthn,
+        rejeitando métodos obsoletos como SMS em sistemas confidenciais.
+      </span>
+    </label>
+  </div>
+</section>
+
+<!-- SEÇÃO 7: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
+<section class="study-section" id="questoes-fixacao">
+  <div class="section-title-wrap">
+    <span class="section-num">07</span>
+    <h2>Questões de Fixação e Concursos Públicos</h2>
+  </div>
+
+  <p>
+    Valide sua preparação respondendo a questões baseadas em provas de concursos para Analista de Segurança e Tecnologia
+    da Informação (TCU, Bacen, Tribunais) e certificações de liderança (CISSP, CCSP):
+  </p>
+
+  <div class="quiz" id="quiz-arquitetura-zero-trust">
+    <!-- Questão 1 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 1 &bull; Componentes Lógicos do NIST SP 800-207</span>
+        <p>
+          Em conformidade com a arquitetura Zero Trust descrita na norma NIST SP 800-207, qual é a responsabilidade
+          estrita do componente denominado Policy Enforcement Point (PEP), e como ele se relaciona com o Policy Decision Point (PDP)?
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: O PEP atua no Plano de Dados, interceptando requisições e aplicando as decisões de permitir, bloquear ou encerrar conexões determinadas pelo PDP (que reside no Plano de Controle).</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> O NIST SP 800-207 divide a arquitetura entre plano de controle e plano de dados. O **PEP (Policy Enforcement Point)** é o guarda de trânsito em linha (gateway, proxy ou agente de host) que recebe a requisição do usuário, consulta o **PDP (Policy Decision Point)** e executa fisicamente a ordem recebida (abrindo o túnel seguro para o recurso ou descartando o pacote). O PDP contém a inteligência analítica (Policy Engine e Policy Administrator), enquanto o PEP executa a aplicação prática da política.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Questão 2 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 2 &bull; ZTNA vs VPN Tradicional</span>
+        <p>
+          Uma organização financeira substituiu suas conexões de VPN corporativas tradicionais por uma solução de
+          Zero Trust Network Access (ZTNA). Sob a ótica da contenção de movimentação lateral de invasores (MITRE ATT&CK TA0008),
+          qual é o diferencial arquitetural primário do ZTNA que fundamenta essa decisão?
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: O ZTNA concede acesso restrito em nível de aplicação (Camada 7), mantendo todas as demais portas e servidores da rede corporativa invisíveis e inacessíveis para o dispositivo do usuário.</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> A VPN tradicional opera na Camada de Rede (Camada 3), atribuindo um endereço IP interno ao cliente e concedendo roteamento amplo para sub-redes inteiras da empresa. Se a máquina remota for infectada por um malware, o atacante ganha livre acesso para escanear a rede interna. Em contraste, o ZTNA conecta o usuário estritamente àquela aplicação autorizada (Camada 7); todos os demais servidores permanecem em modo *Dark Cloud* (não roteáveis e indetectáveis por varreduras de porta).
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Questão 3 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 3 &bull; Princípio do Assume Breach</span>
+        <p>
+          O princípio <em>"Assume Breach"</em> (Presuma a Violação) é um dos três pilares fundamentais do Zero Trust.
+          Qual decisão de engenharia de segurança reflete diretamente a aplicação desse princípio em um data center moderno?
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: Implementação de microsegmentação estrita e criptografia mTLS obrigatória em todo o tráfego leste-oeste (entre servidores internos), assumindo que um invasor já pode ter comprometido um host na rede local.</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> "Assume Breach" significa não confiar cegamente no tráfego interno apenas porque ele se originou dentro do data center. Ao presumir que um atacante já possui uma máquina comprometida na rede interna, os arquitetos implementam microsegmentação granular para conter o raio de explosão (blast radius), forçam autenticação mútua mTLS entre microsserviços e realizam inspeção contínua em todo o tráfego de comunicação leste-oeste.
+          </p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 8: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
+<section class="study-section" id="fatos-essenciais">
+  <div class="section-title-wrap">
+    <span class="section-num">08</span>
+    <h2>Fatos Essenciais &bull; Trilha 2: Segurança Defensiva</h2>
+  </div>
+
+  <div class="facts-grid">
+    <div class="facts-card">
+      <h4>O Perímetro Físico Morreu</h4>
+      <p>A localização de rede (estar na sede da empresa) não confere confiança. Cada transação deve ser validada e autorizada individualmente.</p>
+    </div>
+    <div class="facts-card">
+      <h4>NIST SP 800-207 é o Padrão</h4>
+      <p>O PDP (Policy Decision Point) decide no plano de controle; o PEP (Policy Enforcement Point) intercepta e aplica no plano de dados.</p>
+    </div>
+    <div class="facts-card">
+      <h4>ZTNA Substitui VPNs</h4>
+      <p>VPN conecta à rede inteira (Camada 3); ZTNA conecta apenas à aplicação autorizada (Camada 7), tornando o restante da rede invisível.</p>
+    </div>
+    <div class="facts-card">
+      <h4>Postura do Dispositivo é Crítica</h4>
+      <p>O Policy Engine valida a integridade do endpoint (BitLocker ativo, EDR saudável, patches em dia) antes de autorizar o acesso.</p>
+    </div>
+    <div class="facts-card">
+      <h4>Reavaliação Contínua em Execução</h4>
+      <p>O Zero Trust reavalia o contexto em tempo real. Se a máquina do usuário for comprometida durante uma sessão aberta, o acesso é revogado imediatamente.</p>
+    </div>
+    <div class="facts-card">
+      <h4>Próximo Estudo da Trilha 2</h4>
+      <p>No <strong>Estudo 09 (Gestao-de-Vulnerabilidades)</strong>, abordaremos a mensuração de vulnerabilidades com CVSS v3.1/v4.0, correlação com EPSS e priorização de patches com CISA KEV.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SCRIPT EMBUTIDO: SIMULADOR DE MOTOR ZERO TRUST PDP/PEP -->
+<script>
+/**
+ * Simulador Interativo: Motor de Decisão Zero Trust (NIST SP 800-207 PDP/PEP)
+ * Estudos de Cibersegurança - José Mauro da Silva Brandão
+ */
+
+// Pesos e pontuações de risco para cálculo contextual
+function calcularScoreRisco(params) {
+  let score = 0;
+
+  // 1. Fator de Autenticação (Peso: até 30 pontos)
+  if (params.auth === "fido2") score += 0;
+  else if (params.auth === "totp") score += 10;
+  else if (params.auth === "sms") score += 20;
+  else if (params.auth === "senha") score += 30;
+
+  // 2. Postura do Dispositivo (Peso: até 35 pontos)
+  if (params.device === "conforme") score += 0;
+  else if (params.device === "parcial") score += 15;
+  else if (params.device === "desconhecido") score += 25;
+  else if (params.device === "infectado") score += 40;
+
+  // 3. Rede e Origem (Peso: até 25 pontos)
+  if (params.net === "corporativa") score += 0;
+  else if (params.net === "publica") score += 10;
+  else if (params.net === "tor") score += 25;
+  else if (params.net === "impossivel") score += 30;
+
+  // 4. Criticidade do Recurso Alvo (Multiplicador de sensibilidade)
+  if (params.resource === "baixo") score -= 5;
+  else if (params.resource === "medio") score += 0;
+  else if (params.resource === "alto") score += 10;
+  else if (params.resource === "critico") score += 20;
+
+  // Normalização entre 0 e 100
+  score = Math.max(0, Math.min(100, score));
+  return score;
+}
+
+// Avaliação completa da decisão Zero Trust
+function avaliarDecisaoZeroTrust(params) {
+  const score = calcularScoreRisco(params);
+  let decisao = "";
+  let acaoPep = "";
+  let cor = "";
+  let justificativas = [];
+
+  // Avaliação de regras de corte estrito (Hard Gates)
+  if (params.device === "infectado") {
+    decisao = "BLOQUEIO IMEDIATO (DISPOSITIVO COMPROMETIDO)";
+    acaoPep = "PEP descarta a conexão e isola o endpoint da rede via EDR.";
+    cor = "#ef4444";
+    justificativas.push("Alerta crítico de malware detectado no endpoint pelo agente EDR.");
+  } else if (params.net === "impossivel") {
+    decisao = "BLOQUEIO IMEDIATO (ANOMALIA DE VIAGEM IMPOSSÍVEL)";
+    acaoPep = "PEP rejeita o túnel e dispara notificação de alerta de alta severidade no SIEM.";
+    cor = "#ef4444";
+    justificativas.push("A mesma credencial foi utilizada em duas localizações geograficamente incompatíveis em curto intervalo de tempo.");
+  } else if (score >= 60) {
+    decisao = "ACESSO NEGADO (SCORE DE RISCO ELEVADO)";
+    acaoPep = "PEP encerra o handshake e fecha o túnel seguro ZTNA.";
+    cor = "#ef4444";
+    justificativas.push(`O score de risco contextual (${score}/100) ultrapassou o limiar máximo de segurança corporativa (60).`);
+  } else if (score >= 25 || params.resource === "critico" || params.device === "desconhecido") {
+    decisao = "EXIGIR DESAFIO DE MFA ADICIONAL (STEP-UP)";
+    acaoPep = "PEP suspende a conexão e redireciona o usuário para reautenticação com FIDO2.";
+    cor = "#f59e0b";
+    justificativas.push(`Score de risco moderado (${score}/100) ou acesso a recurso crítico a partir de contexto sensível.`);
+    justificativas.push("O Policy Administrator ordenou a aplicação de Step-Up Authentication.");
+  } else {
+    decisao = "ACESSO CONCEDIDO (TÚNEL ZTNA ESTABELECIDO)";
+    acaoPep = "PEP estabelece o canal TLS seguro Camada 7 exclusivamente para a porta da aplicação autorizada.";
+    cor = "#10b981";
+    justificativas.push(`Score de risco muito baixo (${score}/100). Dispositivo conforme e contexto compatível.`);
+  }
+
+  renderizarResultadoZeroTrust(score, decisao, acaoPep, cor, justificativas);
+  return { score, decisao, acaoPep, justificativas };
+}
+
+// Renderiza a decisão no painel
+function renderizarResultadoZeroTrust(score, decisao, acaoPep, cor, justificativas) {
+  const scoreDisplay = document.getElementById("zt-risk-score-display");
+  const scoreBar = document.getElementById("zt-risk-bar");
+  const subStatus = document.getElementById("zt-status-sub");
+  const veredictoBox = document.getElementById("zt-veredicto-box");
+
+  if (scoreDisplay) {
+    scoreDisplay.textContent = `${score} / 100`;
+    scoreDisplay.style.color = cor;
+  }
+
+  if (scoreBar) {
+    scoreBar.style.width = `${score}%`;
+    scoreBar.style.background = cor;
+  }
+
+  if (subStatus) {
+    subStatus.textContent = `Avaliação do Policy Engine concluída com sucesso (${justificativas.length} fatores avaliados).`;
+  }
+
+  if (veredictoBox) {
+    veredictoBox.style.background = cor === "#10b981" ? "rgba(16, 185, 129, 0.15)" : (cor === "#f59e0b" ? "rgba(245, 158, 11, 0.15)" : "rgba(220, 38, 38, 0.15)");
+    veredictoBox.style.border = `1px solid ${cor}`;
+    veredictoBox.style.color = "var(--ink)";
+
+    let htmlJust = "<ul>";
+    justificativas.forEach(j => {
+      htmlJust += `<li>${escapeHtml(j)}</li>`;
+    });
+    htmlJust += "</ul>";
+
+    veredictoBox.innerHTML = `
+      <div style="font-size:1.1rem; font-weight:800; color:${cor}; margin-bottom:0.4rem;">${escapeHtml(decisao)}</div>
+      <div style="margin-bottom:0.5rem;"><strong>Comando ao PEP (Plano de Dados):</strong> ${escapeHtml(acaoPep)}</div>
+      <div style="font-size:0.85rem; color:var(--muted);"><strong>Justificativa Técnica do Policy Engine (PDP):</strong></div>
+      ${htmlJust}
+    `;
+  }
+}
+
+// Carregador de cenários rápidos
+function injetarCenarioZeroTrust(cenario) {
+  const authEl = document.getElementById("zt-param-auth");
+  const devEl = document.getElementById("zt-param-device");
+  const netEl = document.getElementById("zt-param-net");
+  const resEl = document.getElementById("zt-param-resource");
+
+  if (cenario === "conforme") {
+    authEl.value = "fido2";
+    devEl.value = "conforme";
+    netEl.value = "corporativa";
+    resEl.value = "medio";
+  } else if (cenario === "byod") {
+    authEl.value = "totp";
+    devEl.value = "desconhecido";
+    netEl.value = "publica";
+    resEl.value = "alto";
+  } else if (cenario === "viagem_impossivel") {
+    authEl.value = "senha";
+    devEl.value = "parcial";
+    netEl.value = "impossivel";
+    resEl.value = "alto";
+  } else if (cenario === "madrugada_critica") {
+    authEl.value = "sms";
+    devEl.value = "desconhecido";
+    netEl.value = "tor";
+    resEl.value = "critico";
+  }
+
+  dispararAvaliacaoManual();
+}
+
+function dispararAvaliacaoManual() {
+  const auth = document.getElementById("zt-param-auth").value;
+  const device = document.getElementById("zt-param-device").value;
+  const net = document.getElementById("zt-param-net").value;
+  const resource = document.getElementById("zt-param-resource").value;
+
+  avaliarDecisaoZeroTrust({ auth, device, net, resource });
+}
+
+// Inicialização automática do checklist e do laboratório no carregamento da página
+document.addEventListener("DOMContentLoaded", function() {
+  if (typeof initChecklist === "function") {
+    initChecklist("arquitetura-zero-trust");
+  }
+  injetarCenarioZeroTrust("conforme");
+});
+</script>
+    <footer class="study-footer">
+      <p>&copy; 2026 Estudos em Cibersegurança &bull; Material Autoinstrucional e Prático 100% Offline</p>
+      <p><a href="../index.html">← Painel de Estudos</a> &bull; Curadoria e Desenvolvimento por José Mauro da Silva Brandão</p>
+    </footer>
+  </main>
+
+  <!-- Scripts Interativos Embutidos -->
+  <script>
+/**
+ * ============================================================================
+ * ESTUDOS DE CIBERSEGURANÇA — BIBLIOTECA BASE COMPARTILHADA (base.js)
+ * Utilitários reativos, persistência local segura, acessibilidade e interatividade.
+ * Vanilla JavaScript (Zero dependências externas, 100% offline-ready).
+ * ============================================================================
+ */
+
+(function (window, document) {
+  'use strict';
+
+  // --------------------------------------------------------------------------
+  // 0. Utilitários Seguros de Armazenamento Local (localStorage)
+  // --------------------------------------------------------------------------
+  function safeStorageGet(key) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.localStorage.getItem(key);
+      }
+    } catch (e) {
+      console.warn(`[CS] Falha ao ler localStorage chave "${key}":`, e);
+    }
+    return null;
+  }
+
+  function safeStorageSet(key, value) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, String(value));
+        return true;
+      }
+    } catch (e) {
+      console.warn(`[CS] Falha ao gravar localStorage chave "${key}":`, e);
+    }
+    return false;
+  }
+
+  // --------------------------------------------------------------------------
+  // 1. Gerenciamento de Tema (Claro / Escuro)
+  // --------------------------------------------------------------------------
+  const THEME_STORAGE_KEY = 'cs_theme';
+
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    updateThemeButtons(theme);
+  }
+
+  function getSystemTheme() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  }
+
+  function getCurrentTheme() {
+    const saved = safeStorageGet(THEME_STORAGE_KEY);
+    return saved || getSystemTheme();
+  }
+
+  function updateThemeButtons(currentTheme) {
+    const effectiveTheme = currentTheme === 'dark' || (!currentTheme && getSystemTheme() === 'dark') ? 'dark' : 'light';
+    const buttons = document.querySelectorAll('.theme-toggle-btn, [data-theme-toggle]');
+    buttons.forEach((btn) => {
+      btn.setAttribute('aria-label', effectiveTheme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro');
+      btn.innerHTML = effectiveTheme === 'dark'
+        ? '<span class="theme-icon">☀️</span> <span class="theme-label">Claro</span>'
+        : '<span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>';
+    });
+  }
+
+  function toggleTheme() {
+    const current = getCurrentTheme();
+    const next = current === 'dark' ? 'light' : 'dark';
+    safeStorageSet(THEME_STORAGE_KEY, next);
+    applyTheme(next);
+    return next;
+  }
+
+  function initTheme() {
+    const saved = safeStorageGet(THEME_STORAGE_KEY);
+    if (saved) {
+      applyTheme(saved);
+    } else {
+      updateThemeButtons(getSystemTheme());
+    }
+
+    // Monitora preferência do sistema operacional caso usuário não tenha fixado
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!safeStorageGet(THEME_STORAGE_KEY)) {
+          updateThemeButtons(e.matches ? 'dark' : 'light');
+        }
+      });
+    }
+
+    // Vincula cliques em botões de tema
+    document.querySelectorAll('.theme-toggle-btn, [data-theme-toggle]').forEach((btn) => {
+      btn.onclick = toggleTheme;
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 2. Checklist Operacional Interativo & Status de Conclusão de Estudo
+  // --------------------------------------------------------------------------
+  function extractSlug() {
+    if (document.body && document.body.dataset && document.body.dataset.slug) {
+      return document.body.dataset.slug;
+    }
+    const metaSlug = document.querySelector('meta[name="study-slug"]');
+    if (metaSlug && metaSlug.content) {
+      return metaSlug.content;
+    }
+    // Fallback: tenta obter do pathname
+    const match = window.location.pathname.match(/treinamento-([^.]+)\.html/);
+    if (match) {
+      return match[1];
+    }
+    return 'default';
+  }
+
+  function updateChecklistProgress(checklistEl) {
+    const checkboxes = checklistEl.querySelectorAll('input[type="checkbox"]');
+    if (!checkboxes.length) return;
+
+    let checkedCount = 0;
+    checkboxes.forEach((cb) => {
+      if (cb.checked) checkedCount++;
+    });
+
+    const progressFill = checklistEl.querySelector('.checklist-progress-fill');
+    if (progressFill) {
+      const pct = Math.round((checkedCount / checkboxes.length) * 100);
+      progressFill.style.width = `${pct}%`;
+    }
+
+    const counterEl = checklistEl.querySelector('.checklist-counter');
+    if (counterEl) {
+      counterEl.textContent = `${checkedCount} de ${checkboxes.length} itens auditados`;
+    }
+  }
+
+  function initChecklist(slug) {
+    const activeSlug = slug || extractSlug();
+    const checklists = document.querySelectorAll('.checklist');
+
+    checklists.forEach((checklist, listIdx) => {
+      const listId = checklist.dataset.checklistId || `list_${listIdx}`;
+      const items = checklist.querySelectorAll('.check-item');
+
+      items.forEach((item, itemIdx) => {
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        if (!checkbox) return;
+
+        const itemId = checkbox.id || checkbox.getAttribute('data-id') || `${listId}_${itemIdx}`;
+        const storageKey = `cs_check_${activeSlug}_${itemId}`;
+
+        // Restaura estado
+        const savedState = safeStorageGet(storageKey);
+        if (savedState === 'true') {
+          checkbox.checked = true;
+          item.classList.add('completed');
+        } else {
+          checkbox.checked = false;
+          item.classList.remove('completed');
+        }
+
+        // Event listener
+        checkbox.onchange = function () {
+          safeStorageSet(storageKey, checkbox.checked ? 'true' : 'false');
+          if (checkbox.checked) {
+            item.classList.add('completed');
+          } else {
+            item.classList.remove('completed');
+          }
+          updateChecklistProgress(checklist);
+        };
+      });
+
+      updateChecklistProgress(checklist);
+    });
+  }
+
+  function isStudyDone(slug) {
+    const activeSlug = slug || extractSlug();
+    return safeStorageGet(`cs_done_${activeSlug}`) === 'true';
+  }
+
+  function setStudyDone(slug, isDone) {
+    const activeSlug = slug || extractSlug();
+    const doneValue = isDone !== false;
+    return safeStorageSet(`cs_done_${activeSlug}`, doneValue ? 'true' : 'false');
+  }
+
+  // --------------------------------------------------------------------------
+  // 3. Sistema de Quiz com Feedback Explicativo
+  // --------------------------------------------------------------------------
+  function checkQuiz(btn, isCorrect, explanation) {
+    const quizItem = btn.closest('.quiz-item');
+    if (!quizItem) return;
+
+    // Desabilita botões para registrar a tentativa
+    const buttons = quizItem.querySelectorAll('.quiz-btn');
+    buttons.forEach((b) => {
+      b.disabled = true;
+      b.classList.remove('selected');
+    });
+
+    // Destaca o botão clicado
+    btn.classList.add('selected');
+    if (isCorrect) {
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('incorrect');
+    }
+
+    // Exibe ou atualiza o painel de feedback
+    let feedbackEl = quizItem.querySelector('.quiz-feedback');
+    if (!feedbackEl) {
+      feedbackEl = document.createElement('div');
+      feedbackEl.className = 'quiz-feedback';
+      quizItem.appendChild(feedbackEl);
+    }
+
+    feedbackEl.className = `quiz-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+    const icon = isCorrect ? '✅' : '❌';
+    const statusText = isCorrect ? 'Correto!' : 'Incorreto.';
+    feedbackEl.innerHTML = `<strong>${icon} ${statusText}</strong> ${escapeHtml(explanation || '')}`;
+    feedbackEl.style.display = 'block';
+  }
+
+  function initQuiz() {
+    const quizItems = document.querySelectorAll('.quiz-item');
+    quizItems.forEach((quiz, idx) => {
+      const qId = quiz.dataset.quizId || `quiz_${idx}`;
+      quiz.setAttribute('data-initialized', 'true');
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 4. Copiar Código para Área de Transferência
+  // --------------------------------------------------------------------------
+  function copyCode(button, targetId) {
+    let textToCopy = '';
+
+    if (targetId) {
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        textToCopy = targetEl.innerText || targetEl.textContent;
+      }
+    } else if (button) {
+      const terminalBox = button.closest('.terminal-box') || button.parentElement;
+      const codeEl = terminalBox ? terminalBox.querySelector('pre code, pre, code') : null;
+      if (codeEl) {
+        textToCopy = codeEl.innerText || codeEl.textContent;
+      }
+    }
+
+    if (!textToCopy) return;
+
+    const originalText = button ? button.innerText : 'Copiar';
+
+    function setSuccess() {
+      if (button) {
+        button.innerText = '✓ Copiado!';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.innerText = originalText;
+          button.classList.remove('copied');
+        }, 2000);
+      }
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textToCopy.trim()).then(setSuccess).catch(() => {
+        fallbackCopy(textToCopy.trim(), setSuccess);
+      });
+    } else {
+      fallbackCopy(textToCopy.trim(), setSuccess);
+    }
+  }
+
+  function fallbackCopy(text, callback) {
+    if (!document.body) {
+      console.warn('document.body não está pronto para cópia via textarea.');
+      return;
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const successful = document.execCommand('copy');
+      if (successful && callback) {
+        callback();
+      }
+    } catch (e) {
+      console.warn('Falha ao copiar texto:', e);
+    } finally {
+      if (textarea.parentNode) {
+        textarea.parentNode.removeChild(textarea);
+      }
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 5. Utilitários Reutilizáveis para Simuladores e Laboratórios
+  // --------------------------------------------------------------------------
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function formatBytes(bytes, decimals = 2) {
+    if (!+bytes || bytes < 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  }
+
+  function formatNumber(num) {
+    if (isNaN(num)) return '0';
+    return new Intl.NumberFormat('pt-BR').format(num);
+  }
+
+  function bytesToHex(uint8Array) {
+    return Array.from(uint8Array)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  function hexToBytes(hexString) {
+    let cleaned = String(hexString || '').replace(/\s+/g, '');
+    if (cleaned.length % 2 !== 0) {
+      cleaned = '0' + cleaned;
+    }
+    const bytes = new Uint8Array(cleaned.length / 2);
+    for (let i = 0; i < cleaned.length; i += 2) {
+      bytes[i / 2] = parseInt(cleaned.substring(i, i + 2), 16);
+    }
+    return bytes;
+  }
+
+  async function sha256Hex(message) {
+    if (!window.crypto || !window.crypto.subtle) {
+      throw new Error('Web Cryptography API não suportada neste ambiente.');
+    }
+    const msgUint8 = new TextEncoder().encode(message);
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // --------------------------------------------------------------------------
+  // 6. Exposição Global de Funções & Inicialização Automática
+  // --------------------------------------------------------------------------
+  window.safeStorageGet = safeStorageGet;
+  window.safeStorageSet = safeStorageSet;
+  window.initTheme = initTheme;
+  window.toggleTheme = toggleTheme;
+  window.initChecklist = initChecklist;
+  window.isStudyDone = isStudyDone;
+  window.setStudyDone = setStudyDone;
+  window.initQuiz = initQuiz;
+  window.checkQuiz = checkQuiz;
+  window.copyCode = copyCode;
+  window.escapeHtml = escapeHtml;
+  window.formatBytes = formatBytes;
+  window.formatNumber = formatNumber;
+  window.bytesToHex = bytesToHex;
+  window.hexToBytes = hexToBytes;
+  window.sha256Hex = sha256Hex;
+
+  // Namespace unificado
+  window.CS = {
+    safeStorageGet,
+    safeStorageSet,
+    initTheme,
+    toggleTheme,
+    initChecklist,
+    isStudyDone,
+    setStudyDone,
+    initQuiz,
+    checkQuiz,
+    copyCode,
+    escapeHtml,
+    formatBytes,
+    formatNumber,
+    bytesToHex,
+    hexToBytes,
+    sha256Hex,
+  };
+
+  // Auto-inicialização na carga do DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      initChecklist();
+      initQuiz();
+    });
+  } else {
+    initTheme();
+    initChecklist();
+    initQuiz();
+  }
+})(window, document);
+
+  </script>
+</body>
+</html>
