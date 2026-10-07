@@ -202,9 +202,57 @@ def gerar_index_html(
 
     # JavaScript do Portal Central
     portal_js = """
-  // Gerenciador de Tema (Claro / Escuro)
+  // --------------------------------------------------------------------------
+  // 0. Utilitários Seguros de Armazenamento Local (localStorage)
+  // --------------------------------------------------------------------------
+  function safeStorageGet(key) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.localStorage.getItem(key);
+      }
+    } catch (e) {
+      console.warn('[CS] Falha ao ler localStorage chave "' + key + '":', e);
+    }
+    return null;
+  }
+
+  function safeStorageSet(key, value) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, String(value));
+        return true;
+      }
+    } catch (e) {
+      console.warn('[CS] Falha ao gravar localStorage chave "' + key + '":', e);
+    }
+    return false;
+  }
+
+  function safeStorageRemove(key) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.removeItem(key);
+        return true;
+      }
+    } catch (e) {
+      console.warn('[CS] Falha ao remover localStorage chave "' + key + '":', e);
+    }
+    return false;
+  }
+
+  // --------------------------------------------------------------------------
+  // 1. Normalização de Texto com Remoção de Acentos (Accent Folding)
+  // --------------------------------------------------------------------------
+  function removerAcentos(str) {
+    if (!str) return '';
+    return str.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();
+  }
+
+  // --------------------------------------------------------------------------
+  // 2. Gerenciador de Tema (Claro / Escuro)
+  // --------------------------------------------------------------------------
   function initTheme() {
-    const savedTheme = localStorage.getItem('cs_theme');
+    const savedTheme = safeStorageGet('cs_theme');
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     const theme = savedTheme || (prefersDark ? 'dark' : 'light');
     applyTheme(theme);
@@ -212,7 +260,7 @@ def gerar_index_html(
 
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('cs_theme', theme);
+    safeStorageSet('cs_theme', theme);
     const icon = document.querySelector('.theme-icon');
     const label = document.querySelector('.theme-label');
     if (icon && label) {
@@ -232,7 +280,9 @@ def gerar_index_html(
     applyTheme(nextTheme);
   }
 
-  // Gerenciador de Progresso Global do Estudante
+  // --------------------------------------------------------------------------
+  // 3. Gerenciador de Progresso Global do Estudante
+  // --------------------------------------------------------------------------
   const TOTAL_ESTUDOS = 28;
 
   function initProgress() {
@@ -241,7 +291,7 @@ def gerar_index_html(
     
     cards.forEach(card => {
       const slug = card.getAttribute('data-slug');
-      const isDone = localStorage.getItem('cs_done_' + slug) === 'true';
+      const isDone = safeStorageGet('cs_done_' + slug) === 'true';
       const checkbox = card.querySelector('input[type="checkbox"]');
       if (checkbox) {
         checkbox.checked = isDone;
@@ -259,9 +309,9 @@ def gerar_index_html(
 
   function toggleDone(slug, isDone) {
     if (isDone) {
-      localStorage.setItem('cs_done_' + slug, 'true');
+      safeStorageSet('cs_done_' + slug, 'true');
     } else {
-      localStorage.removeItem('cs_done_' + slug);
+      safeStorageRemove('cs_done_' + slug);
     }
     const card = document.getElementById('estudo-' + slug);
     if (card) {
@@ -279,7 +329,7 @@ def gerar_index_html(
       const cards = document.querySelectorAll('.study-card');
       cards.forEach(card => {
         const slug = card.getAttribute('data-slug');
-        localStorage.removeItem('cs_done_' + slug);
+        safeStorageRemove('cs_done_' + slug);
       });
       initProgress();
     }
@@ -297,7 +347,9 @@ def gerar_index_html(
     }
   }
 
-  // Filtros Multifacetados e Busca em Tempo Real
+  // --------------------------------------------------------------------------
+  // 4. Filtros Multifacetados e Busca em Tempo Real
+  // --------------------------------------------------------------------------
   let currentFacet = 'todas';
   let currentFilterValue = 'all';
 
@@ -328,17 +380,19 @@ def gerar_index_html(
   }
 
   function filtrarCards() {
-    const query = (document.getElementById('search-input').value || '').trim().toLowerCase();
+    const rawQuery = (document.getElementById('search-input').value || '').trim();
+    const query = removerAcentos(rawQuery);
     const clearBtn = document.querySelector('.clear-search-btn');
     if (clearBtn) {
-      clearBtn.style.display = query.length > 0 ? 'block' : 'none';
+      clearBtn.style.display = rawQuery.length > 0 ? 'block' : 'none';
     }
 
     const cards = document.querySelectorAll('.study-card');
     let visibleCount = 0;
 
     cards.forEach(card => {
-      const cardSearch = card.getAttribute('data-search') || '';
+      const cardSearchRaw = card.getAttribute('data-search') || '';
+      const cardSearch = removerAcentos(cardSearchRaw);
       const cardTrilha = card.getAttribute('data-trilha');
       const cardNist = card.getAttribute('data-nist');
       const cardCarreiras = card.getAttribute('data-carreiras') || '';

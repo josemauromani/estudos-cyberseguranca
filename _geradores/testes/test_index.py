@@ -127,15 +127,20 @@ class TestBuildIndex(unittest.TestCase):
         self.assertIn("STRIDE", conteudo)
         self.assertIn("search-input", conteudo)
 
-        # Suporte a temas e persistência
+        # Suporte a temas e persistência segura
         self.assertIn("data-theme", conteudo)
         self.assertIn("localStorage", conteudo)
+        self.assertIn("safeStorageGet", conteudo)
+        self.assertIn("safeStorageSet", conteudo)
         self.assertIn("cs_done_", conteudo)
         self.assertIn("cs_theme", conteudo)
 
-        # Filtros interativos
+        # Filtros interativos e busca com remoção de acentos
         self.assertIn("filtro", conteudo.lower())
+        self.assertIn("removerAcentos", conteudo)
         self.assertIn("card", conteudo)
+        self.assertIn("highlight-pulse", conteudo)
+        self.assertIn("pulseHighlight", conteudo)
 
 
 if __name__ == "__main__":
