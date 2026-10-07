@@ -1,0 +1,932 @@
+<!-- ==========================================================================
+     Estudo 09: Gestão de Vulnerabilidades
+     Corpo do Treinamento: CVE, CVSS v3.1/v4.0 e Priorização de Patches
+     ========================================================================== -->
+
+<header class="study-header">
+  <span class="study-track-kicker">Trilha 2: Segurança Defensiva &bull; Estudo 09</span>
+  <h1 class="study-title">Gestão de Vulnerabilidades: CVE, CVSS v3.1/v4.0 e Priorização com EPSS e KEV</h1>
+  <p class="study-lead">
+    Em uma grande organização, ferramentas de varredura automatizada frequentemente reportam milhares de vulnerabilidades
+    abertas em servidores, aplicações e ativos em nuvem. Tentar corrigir todas as falhas indiscriminadamente paralisa
+    as equipes de desenvolvimento e infraestrutura. A moderna engenharia de segurança defensiva baseia-se na
+    <strong>Gestão de Vulnerabilidades Baseada em Risco (RBVM)</strong>. Compreender a taxonomia do ecossistema CVE/NVD,
+    a formulação matemática das métricas do <strong>CVSS v3.1</strong> e as inovações do <strong>CVSS v4.0</strong>,
+    e correlacionar esses dados com a probabilidade preditiva de exploração do <strong>EPSS</strong> e a confirmação
+    irrefutável do catálogo <strong>CISA KEV</strong> é indispensável para priorizar patches críticos com precisão cirúrgica.
+  </p>
+  <div class="study-meta-bar">
+    <span class="badge green">NIST CSF 2.0: Identify / Protect (ID.RA / PR.PS)</span>
+    <span class="badge slate">MITRE ATT&amp;CK: TA0001, T1190</span>
+    <span class="badge slate">Tempo Estimado: ~45 minutos</span>
+    <span class="badge slate">Carreiras: Blue Team &bull; GRC &bull; SOC &bull; DevSecOps</span>
+  </div>
+</header>
+
+<!-- SEÇÃO 1: O CICLO DE VIDA DA VULNERABILIDADE E O ECOSSISTEMA CVE -->
+<section class="study-section" id="ecossistema-cve">
+  <div class="section-title-wrap">
+    <span class="section-num">01</span>
+    <h2>O Ciclo de Vida da Vulnerabilidade e o Ecossistema Global (CVE / NVD)</h2>
+  </div>
+
+  <p>
+    Uma <strong>Vulnerabilidade de Segurança</strong> é uma fraqueza ou falha computacional na lógica, arquitetura,
+    implementação ou configuração de um software ou hardware que pode ser explorada por um agente de ameaça para
+    violar uma ou mais propriedades da Tríade CIA (Confidencialidade, Integridade ou Disponibilidade).
+  </p>
+
+  <p>
+    Para evitar que a indústria de tecnologia utilizasse nomes dispersos para a mesma falha, a corporação MITRE
+    criou em 1999 o padrão universal <strong>CVE (Common Vulnerabilities and Exposures)</strong>.
+    O ecossistema global de identificação e análise de vulnerabilidades repousa sobre três pilares interconectados:
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>1. Dicionário CVE (MITRE)</h4>
+      <p>
+        Repositório universal que atribui identificadores exclusivos no formato <code>CVE-AAAA-NNNNN</code>
+        (ex: <code>CVE-2021-44228</code> para o Log4Shell). Cada registro contém uma descrição técnica sucinta,
+        o software afetado e referências para boletins de segurança de fabricantes.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>2. CNAs (CVE Numbering Authorities)</h4>
+      <p>
+        Organizações autorizadas oficialmente pelo MITRE a reservar e emitir IDs CVE para vulnerabilidades
+        descobertas em seus próprios produtos ou ecossistemas (inclui empresas como Microsoft, Google, Red Hat,
+        Apple, bem como equipes de pesquisa e projetos de código aberto como o Apache Software Foundation).
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>3. NVD (National Vulnerability Database / NIST)</h4>
+      <p>
+        Base de dados governamental mantida pelo NIST dos Estados Unidos. A NVD ingere os registros do CVE
+        e enriquece cada vulnerabilidade com análises formais de severidade <strong>CVSS</strong>, identificadores de
+        produtos afetados (<strong>CPE - Common Platform Enumeration</strong>) e mapeamento para categorias de fraqueza
+        (<strong>CWE - Common Weakness Enumeration</strong>).
+      </p>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <h4>Divulgação Responsável e Coordenada (Coordinated Vulnerability Disclosure - CVD)</h4>
+    <p>
+      O processo ético padrão adotado por pesquisadores de segurança consiste em relatar a falha confidencialmente ao fabricante
+      ou projeto afetado, estabelecendo um prazo razoável (tipicamente 90 dias) para que a equipe de engenharia desenvolva,
+      teste e publique um patch de correção antes que os detalhes técnicos da vulnerabilidade se tornem públicos.
+      Isso impede que cibercriminosos tenham acesso a exploits funcionais contra sistemas sem correção disponível (ataques de dia zero / Zero-Day).
+    </p>
+  </div>
+
+  <h3>O Ciclo Contínuo de Gestão de Vulnerabilidades</h3>
+  <ol>
+    <li><strong>Descoberta (Discovery):</strong> Identificação de ativos corporativos e varredura contínua de vulnerabilidades em sistemas internos e externos (usando scanners como Tenable Nessus, Qualys, OpenVAS ou Trivy).</li>
+    <li><strong>Avaliação (Assessment):</strong> Categorização técnica da falha, identificação da versão do software afetado e análise de viabilidade de exploração no ambiente específico.</li>
+    <li><strong>Priorização (Prioritization):</strong> Aplicação de inteligência de ameaças (CVSS + EPSS + CISA KEV) para determinar o grau de urgência real entre as centenas de falhas reportadas.</li>
+    <li><strong>Remediação ou Mitigação (Remediation / Mitigation):</strong> Aplicação do patch oficial do fabricante ou implementação de controles compensatórios de mitigação (regras de WAF, isolamento em DMZ ou desativação de módulos vulneráveis).</li>
+    <li><strong>Verificação (Verification):</strong> Re-varredura imediata para comprovar que o patch foi aplicado com sucesso e que a vulnerabilidade não é mais detectável.</li>
+  </ol>
+</section>
+
+<!-- SEÇÃO 2: O PADRÃO CVSS V3.1 E AS INOVAÇÕES DO CVSS V4.0 -->
+<section class="study-section" id="padroes-cvss">
+  <div class="section-title-wrap">
+    <span class="section-num">02</span>
+    <h2>O Padrão CVSS v3.1 e as Inovações do CVSS v4.0</h2>
+  </div>
+
+  <p>
+    O <strong>Common Vulnerability Scoring System (CVSS)</strong>, mantido pelo consórcio global <strong>FIRST (Forum of Incident Response and Security Teams)</strong>,
+    é o padrão internacional aberto para quantificar a severidade técnica intrínseca de uma vulnerabilidade através
+    de uma escala numérica contínua de <strong>0.0 a 10.0</strong>.
+  </p>
+
+  <h3>O Modelo Estrutural do CVSS v3.1</h3>
+  <p>
+    O CVSS v3.1 organiza suas variáveis em três grupos de métricas:
+    <strong>Grupo Base (Base Metrics)</strong>, <strong>Grupo Temporal (Temporal Metrics)</strong> e <strong>Grupo Ambiental (Environmental Metrics)</strong>.
+    O score mais amplamente citado é o <strong>Base Score</strong>, calculado a partir de dois sub-grupos:
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>Métricas de Exploitability (Facilidade de Exploração)</h4>
+      <p>
+        Medem a facilidade com que o invasor pode atingir o alvo:
+        <br>&bull; <strong>Attack Vector (AV):</strong> Network (N - remoto via Internet), Adjacent (A - mesma sub-rede/Wi-Fi), Local (L - acesso ao console/SSH), Physical (P - acesso físico ao hardware).
+        <br>&bull; <strong>Attack Complexity (AC):</strong> Low (L - condições sempre ideais), High (H - exige condições de contorno especiais como race condition ou MitM).
+        <br>&bull; <strong>Privileges Required (PR):</strong> None (N - qualquer usuário anônimo), Low (L - usuário comum), High (H - requer credencial administrativa).
+        <br>&bull; <strong>User Interaction (UI):</strong> None (N - totalmente autônomo), Required (R - depende da vítima clicar em link ou abrir arquivo).
+        <br>&bull; <strong>Scope (S):</strong> Unchanged (U - afeta apenas a aplicação vulnerável), Changed (C - rompe o limite de autorização e afeta outros sistemas, ex: escape de sandbox ou máquina virtual).
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>Métricas de Impact (Impacto nos Pilares CIA)</h4>
+      <p>
+        Avaliam o dano potencial se a vulnerabilidade for explorada com sucesso:
+        <br>&bull; <strong>Confidentiality (C):</strong> None (N), Low (L), High (H - vazamento completo de dados sensíveis).
+        <br>&bull; <strong>Integrity (I):</strong> None (N), Low (L), High (H - modificação total de arquivos ou comandos executados com privilégio máximo).
+        <br>&bull; <strong>Availability (A):</strong> None (N), Low (L), High (H - indisponibilidade total do serviço ou travamento completo do sistema).
+      </p>
+    </div>
+  </div>
+
+  <div class="terminal-box">
+    <div class="terminal-header">
+      <span class="terminal-title">Formato Canônico da String de Vetor CVSS v3.1</span>
+      <button class="terminal-copy-btn" onclick="copyCode(this, 'cvss-vector-example')">Copiar</button>
+    </div>
+    <pre id="cvss-vector-example"><code>CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H  &bull;  Score: <strong>10.0 (Crítica)</strong>
+  │      │    │    │    │    │   │   │   └─ Disponibilidade: High
+  │      │    │    │    │    │   │   └───── Integridade: High
+  │      │    │    │    │    │   └───────── Confidencialidade: High
+  │      │    │    │    │    └───────────── Escopo: Changed (Impacto expandido)
+  │      │    │    │    └────────────────── Interação do Usuário: None
+  │      │    │    └─────────────────────── Privilégios Exigidos: None
+  │      │    └──────────────────────────── Complexidade de Ataque: Low
+  │      └───────────────────────────────── Vetor de Ataque: Network (Remoto)
+  └──────────────────────────────────────── Versão do Padrão: CVSS v3.1</code></pre>
+  </div>
+
+  <h3>Faixas Oficiais de Severidade Qualitativa</h3>
+  <table style="width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.875rem;">
+    <thead>
+      <tr style="border-bottom:2px solid var(--rule); text-align:left;">
+        <th style="padding:0.6rem; color:var(--muted);">Faixa Numérica</th>
+        <th style="padding:0.6rem; color:var(--muted);">Classificação de Severidade</th>
+        <th style="padding:0.6rem; color:var(--muted);">Exemplo Prático Típico</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid var(--rule);">
+        <td style="padding:0.6rem; font-weight:700; color:#ef4444;">9.0 &ndash; 10.0</td>
+        <td style="padding:0.6rem;"><span class="badge red">CRÍTICA (Critical)</span></td>
+        <td style="padding:0.6rem; color:var(--muted);">RCE não autenticado pela Internet com privilégios de root (ex: Log4Shell).</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--rule);">
+        <td style="padding:0.6rem; font-weight:700; color:#f59e0b;">7.0 &ndash; 8.9</td>
+        <td style="padding:0.6rem;"><span class="badge amber">ALTA (High)</span></td>
+        <td style="padding:0.6rem; color:var(--muted);">Escalação local de privilégios para root ou vazamento de banco de dados restrito.</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--rule);">
+        <td style="padding:0.6rem; font-weight:700; color:#0891b2;">4.0 &ndash; 6.9</td>
+        <td style="padding:0.6rem;"><span class="badge blue">MÉDIA (Medium)</span></td>
+        <td style="padding:0.6rem; color:var(--muted);">Cross-Site Scripting (XSS) refletido ou negação de serviço de componente menor.</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--rule);">
+        <td style="padding:0.6rem; font-weight:700; color:var(--muted);">0.1 &ndash; 3.9</td>
+        <td style="padding:0.6rem;"><span class="badge slate">BAIXA (Low)</span></td>
+        <td style="padding:0.6rem; color:var(--muted);">Vazamento de informações de versão em cabeçalho ou ataque exigindo acesso físico.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>As Principais Inovações do CVSS v4.0</h3>
+  <p>
+    Lançado pelo FIRST no final de 2023, o <strong>CVSS v4.0</strong> refinou métricas históricas confusas:
+  </p>
+  <ul>
+    <li>
+      <strong>Fim da Métrica de Escopo (Scope):</strong> No v3.1, a métrica <em>Scope</em> causava discrepâncias de pontuação entre analistas.
+      O v4.0 substituiu-a pela separação explícita entre <strong>Impacto no Sistema Vulnerável (VC, VI, VA)</strong> e
+      <strong>Impacto nos Sistemas Subsequentes (SC, SI, SA)</strong>.
+    </li>
+    <li>
+      <strong>Nomenclaturas de Avaliação Multidimensional:</strong> O v4.0 desencoraja o uso isolado do Base Score e estabelece nomenclaturas formais:
+      <code>CVSS-B</code> (apenas métricas base), <code>CVSS-BT</code> (Base + Threat Intelligence), <code>CVSS-BE</code> (Base + Ambiente) e <code>CVSS-BTE</code> (completo).
+    </li>
+    <li>
+      <strong>Métricas de Segurança Física (Safety):</strong> Introduziu parâmetros formais para avaliar se a exploração pode causar
+      danos físicos a operadores humanos ou paralisação de instalações ciberfísicas (sistemas industriais SCADA/ICS).
+    </li>
+  </ul>
+</section>
+
+<!-- SEÇÃO 3: A TRÍADE MODERNA DE PRIORIZAÇÃO (CVSS + EPSS + KEV) -->
+<section class="study-section" id="triade-priorizacao">
+  <div class="section-title-wrap">
+    <span class="section-num">03</span>
+    <h2>A Tríade Moderna de Priorização: CVSS + EPSS + CISA KEV</h2>
+  </div>
+
+  <p>
+    O maior erro conceitual em gestão de vulnerabilidades é assumir que <em>Severidade Teórica (CVSS)</em> é igual a <em>Risco Real</em>.
+    Existem hoje mais de 250.000 identificadores CVE catalogados no mundo. Estudos estatísticos da indústria revelam que
+    <strong>menos de 5% de todas as vulnerabilidades chegam a ser exploradas no mundo real por invasores</strong>.
+  </p>
+
+  <div class="callout danger">
+    <h4>A Fadiga de Patches e o Colapso Operacional do "Apenas CVSS"</h4>
+    <p>
+      Se uma equipe de segurança adotar a regra simplista de "corrigir todas as vulnerabilidades CVSS &ge; 9.0 em até 48 horas",
+      ela gastará milhares de horas de engenharia aplicando patches em bibliotecas isoladas sem rota de ataque externa,
+      enquanto deixa desprotegida uma falha de severidade média (CVSS 6.5) que está sendo ativamente explorada por cibercriminosos
+      para roubar credenciais corporativas no mesmo momento.
+    </p>
+  </div>
+
+  <p>
+    Para resolver esse problema, a indústria adota a <strong>Tríade Moderna de Priorização Baseada em Risco</strong>:
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4 style="color:#0891b2;">1. CVSS (O que Pode Acontecer?)</h4>
+      <p>
+        Mede a <strong>severidade técnica teórica</strong> da falha caso ela venha a ser explorada. Responde:
+        <em>"Quão destrutivo seria o impacto nos pilares de confidencialidade, integridade e disponibilidade?"</em>.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4 style="color:#f59e0b;">2. EPSS (Qual a Probabilidade de Acontecer?)</h4>
+      <p>
+        O <strong>Exploit Prediction Scoring System</strong> é um modelo estatístico treinado com aprendizado de máquina
+        que calcula diariamente a <strong>probabilidade percentual (0% a 100%)</strong> de uma CVE específica ser explorada
+        na natureza nos próximos 30 dias.
+        <br><em>Exemplo:</em> Uma falha com EPSS de <code>0.94 (94%)</code> possui probabilidade iminente de ataque automatizado.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4 style="color:#ef4444;">3. CISA KEV (Está Acontecendo Agora?)</h4>
+      <p>
+        O catálogo <strong>Known Exploited Vulnerabilities (KEV)</strong> da CISA é a "lista vermelha" global de falhas
+        com confirmação irrefutável de exploração ativa na natureza por atacantes, malwares ou grupos APT.
+        <br><strong>Regra de Ouro:</strong> Se uma CVE está no CISA KEV, ela deve ser corrigida imediatamente com prioridade máxima,
+        independentemente de seu score CVSS original.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 4: REMEDIAÇÃO, MITIGAÇÃO E SLAS -->
+<section class="study-section" id="remediacao-mitigacao-sla">
+  <div class="section-title-wrap">
+    <span class="section-num">04</span>
+    <h2>Remediação, Mitigação e SLAs de Correção Corporativos</h2>
+  </div>
+
+  <p>
+    Diante de uma vulnerabilidade confirmada, a equipe de segurança e sustentação de TI possui três cursos de ação possíveis:
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>Remediação (Remediation)</h4>
+      <p>
+        A solução definitiva. Aplicação do patch oficial, atualização de versão do pacote ou recompilação do binário
+        disponibilizado pelo fornecedor, eliminando a falha no código-fonte permanentemente.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>Mitigação (Mitigation / Controles Compensatórios)</h4>
+      <p>
+        Ações que reduzem ou anulam a viabilidade do ataque quando o patch oficial ainda não existe ou não pode ser aplicado
+        imediatamente por risco de incompatibilidade.
+        <br><em>Exemplos:</em> Adicionar regra de assinatura no WAF para barrar o payload, isolar o servidor em DMZ restrita,
+        desativar a funcionalidade vulnerável específica ou exigir autenticação mTLS.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>Aceitação Formal de Risco (Risk Acceptance)</h4>
+      <p>
+        Quando o custo ou impacto operacional de corrigir a falha supera o risco do dano potencial (ex: servidor isolado
+        em rede sem acesso externo). Exige documento formal assinado pela diretoria de negócios e revisão periódica obrigatória.
+      </p>
+    </div>
+  </div>
+
+  <h3>Matriz Recomendada de Acordos de Nível de Serviço (SLAs de Patching)</h3>
+  <table style="width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.875rem;">
+    <thead>
+      <tr style="border-bottom:2px solid var(--rule); text-align:left;">
+        <th style="padding:0.6rem; color:var(--muted);">Classificação de Risco Real</th>
+        <th style="padding:0.6rem; color:var(--muted);">Critérios Combinados</th>
+        <th style="padding:0.6rem; color:var(--muted);">SLA de Correção Máximo</th>
+        <th style="padding:0.6rem; color:var(--muted);">Ação Operacional Exigida</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid var(--rule);">
+        <td style="padding:0.6rem; font-weight:700; color:#ef4444;">EMERGÊNCIA MÁXIMA</td>
+        <td style="padding:0.6rem;">Presente no <strong>CISA KEV</strong> ou <strong>EPSS &gt; 50%</strong></td>
+        <td style="padding:0.6rem; font-weight:700;">Até 48 horas</td>
+        <td style="padding:0.6rem; color:var(--muted);">Mobilização imediata em regime de força-tarefa ou isolamento do ativo.</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--rule);">
+        <td style="padding:0.6rem; font-weight:700; color:#f59e0b;">ALTA PRIORIDADE</td>
+        <td style="padding:0.6rem;">CVSS &ge; 9.0 (Crítica) sem KEV ativo</td>
+        <td style="padding:0.6rem; font-weight:700;">Até 7 dias</td>
+        <td style="padding:0.6rem; color:var(--muted);">Testes de regressão acelerados e aplicação na próxima janela de manutenção.</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--rule);">
+        <td style="padding:0.6rem; font-weight:700; color:#0891b2;">MÉDIA PRIORIDADE</td>
+        <td style="padding:0.6rem;">CVSS 7.0 &ndash; 8.9 (Alta) sem exploit ativo</td>
+        <td style="padding:0.6rem; font-weight:700;">Até 30 dias</td>
+        <td style="padding:0.6rem; color:var(--muted);">Ciclo regular mensal de patching de sistemas operacionais e aplicações.</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--rule);">
+        <td style="padding:0.6rem; font-weight:700; color:var(--muted);">BAIXA PRIORIDADE</td>
+        <td style="padding:0.6rem;">CVSS &lt; 7.0 e baixo EPSS</td>
+        <td style="padding:0.6rem; font-weight:700;">Até 90 dias</td>
+        <td style="padding:0.6rem; color:var(--muted);">Correção durante manutenções programadas ou grandes upgrades de versão.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (CALCULADORA CVSS & PRIORIZADOR) -->
+<section class="study-section" id="laboratorio-pratico">
+  <div class="section-title-wrap">
+    <span class="section-num">05</span>
+    <h2>Laboratório Interativo: Calculadora Vetorial CVSS v3.1 e Priorizador de Risco</h2>
+  </div>
+
+  <p>
+    Experimente na prática a mecânica matemática oficial do algoritmo CVSS v3.1 e o cruzamento com dados de ameaças ativas.
+    Neste laboratório em Vanilla JavaScript, você pode carregar casos históricos famosos de vulnerabilidades
+    (como o Log4Shell e o EternalBlue) ou ajustar manualmente cada métrica de Exploitability e Impacto,
+    observando a geração em tempo real do Score Base (0.0 a 10.0), da string de vetor e da recomendação corporativa de SLA.
+  </p>
+
+  <div class="lab-box" id="cvss-lab">
+    <div class="lab-header">
+      <span class="lab-badge">LAB PRÁTICO INTERATIVO</span>
+      <h3>Calculadora Vetorial CVSS v3.1 &bull; Motor Matemático Oficial</h3>
+      <p>Configure os parâmetros de exploração e impacto, gere a string vetorial oficial e avalie o SLA de correção.</p>
+    </div>
+
+    <!-- Cenários de CVEs Reais -->
+    <div style="margin-bottom: 1.25rem;">
+      <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:0.5rem;">Carregar Casos Históricos de Vulnerabilidades Reais:</div>
+      <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+        <button class="lab-btn lab-btn-danger" onclick="carregarCenarioCve('log4shell')">🚨 Log4Shell (CVE-2021-44228) &bull; RCE Crítico</button>
+        <button class="lab-btn lab-btn-danger" onclick="carregarCenarioCve('eternalblue')">☣️ EternalBlue (CVE-2017-0144) &bull; SMBv1 RCE</button>
+        <button class="lab-btn" onclick="carregarCenarioCve('local_escalation')">🔑 Escalação Local de Privilégio (Linux Kernel)</button>
+        <button class="lab-btn" onclick="carregarCenarioCve('xss_refletido')">🌐 XSS Refletido Web (Médio Impacto)</button>
+      </div>
+    </div>
+
+    <!-- Painel de Seleção das Métricas CVSS v3.1 -->
+    <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1.25rem; margin-bottom: 1.25rem;">
+      <h4 style="margin:0 0 0.75rem 0; font-size:0.95rem; color:var(--ink);">Métricas do Grupo Base (Base Metrics):</h4>
+      
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:0.75rem; font-size:0.825rem;">
+        <!-- Attack Vector -->
+        <div>
+          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Attack Vector (AV):</label>
+          <select id="cvss-av" style="width:100%; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
+            <option value="N">Network (N - Remoto Internet)</option>
+            <option value="A">Adjacent (A - Rede Local/Wi-Fi)</option>
+            <option value="L">Local (L - Acesso Local/Console)</option>
+            <option value="P">Physical (P - Acesso Físico)</option>
+          </select>
+        </div>
+
+        <!-- Attack Complexity -->
+        <div>
+          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Attack Complexity (AC):</label>
+          <select id="cvss-ac" style="width:100%; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
+            <option value="L">Low (L - Condições Triviais)</option>
+            <option value="H">High (H - Exige Condições Especiais)</option>
+          </select>
+        </div>
+
+        <!-- Privileges Required -->
+        <div>
+          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Privileges Required (PR):</label>
+          <select id="cvss-pr" style="width:100%; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
+            <option value="N">None (N - Anônimo / Sem Senha)</option>
+            <option value="L">Low (L - Usuário Comum)</option>
+            <option value="H">High (H - Administrador)</option>
+          </select>
+        </div>
+
+        <!-- User Interaction -->
+        <div>
+          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">User Interaction (UI):</label>
+          <select id="cvss-ui" style="width:100%; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
+            <option value="N">None (N - Autônomo / Sem Vítima)</option>
+            <option value="R">Required (R - Depende de Clique da Vítima)</option>
+          </select>
+        </div>
+
+        <!-- Scope -->
+        <div>
+          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Scope (S):</label>
+          <select id="cvss-s" style="width:100%; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
+            <option value="U">Unchanged (U - Apenas o Componente)</option>
+            <option value="C">Changed (C - Afeta Outros Sistemas / Sandbox Escape)</option>
+          </select>
+        </div>
+
+        <!-- Confidentiality Impact -->
+        <div>
+          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Confidentiality (C):</label>
+          <select id="cvss-c" style="width:100%; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
+            <option value="H">High (H - Vazamento Total)</option>
+            <option value="L">Low (L - Vazamento Parcial)</option>
+            <option value="N">None (N - Nenhum)</option>
+          </select>
+        </div>
+
+        <!-- Integrity Impact -->
+        <div>
+          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Integrity (I):</label>
+          <select id="cvss-i" style="width:100%; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
+            <option value="H">High (H - Modificação Total / RCE)</option>
+            <option value="L">Low (L - Modificação Parcial)</option>
+            <option value="N">None (N - Nenhum)</option>
+          </select>
+        </div>
+
+        <!-- Availability Impact -->
+        <div>
+          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Availability (A):</label>
+          <select id="cvss-a" style="width:100%; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
+            <option value="H">High (H - Queda Total / Travamento)</option>
+            <option value="L">Low (L - Degradação Parcial)</option>
+            <option value="N">None (N - Nenhum)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Fatores Complementares de Priorização de Risco -->
+      <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--rule); display:flex; flex-wrap:wrap; gap:1.5rem; align-items:center;">
+        <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; font-weight:600; font-size:0.85rem;">
+          <input type="checkbox" id="cvss-cisa-kev" onchange="calcularScoreCvss()">
+          <span>⚠️ Presente no Catálogo CISA KEV (Explorada Ativamente na Internet)</span>
+        </label>
+        <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem;">
+          <label style="font-weight:600; color:var(--muted);">Score EPSS (Probabilidade de Exploit):</label>
+          <input type="number" id="cvss-epss" value="97.4" min="0" max="100" step="0.1" style="width:70px; padding:0.3rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
+          <span>%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Painel de Resultados: Score Base, Vetor e SLA -->
+    <div style="background:var(--ground); border:1px solid var(--rule); border-radius:8px; padding:1.25rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+        <div>
+          <div style="display:flex; align-items:center; gap:0.6rem;">
+            <h4 style="margin:0; font-size:1.1rem; color:var(--ink);">Resultado do Cálculo CVSS v3.1</h4>
+            <span id="cvss-severity-badge" class="badge red">CRÍTICA</span>
+          </div>
+          <div style="font-size:0.8rem; color:var(--muted); margin-top:0.3rem;">Fórmula oficial de arredondamento ceiling do FIRST.</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; font-weight:700;">Score Base Calculado</div>
+          <div id="cvss-score-num" style="font-size:2rem; font-weight:800; color:#ef4444; font-family:var(--font-display);">10.0</div>
+        </div>
+      </div>
+
+      <!-- String Vetorial Gerada -->
+      <div style="margin-bottom:1rem;">
+        <label style="display:block; font-size:0.75rem; color:var(--muted); text-transform:uppercase; font-weight:700; margin-bottom:0.25rem;">Vetor CVSS v3.1 Oficial Padronizado:</label>
+        <div style="display:flex; gap:0.5rem;">
+          <input type="text" id="cvss-vector-string" readonly style="flex:1; font-family:var(--font-mono); font-size:0.8rem; padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--surface); color:var(--ink);">
+          <button class="lab-btn" style="padding:0.4rem 0.8rem; font-size:0.75rem;" onclick="copiarVetorCvss()">Copiar Vetor</button>
+        </div>
+      </div>
+
+      <!-- Veredicto de Priorização e SLA -->
+      <div id="cvss-sla-box" style="padding:1rem; border-radius:6px; font-size:0.85rem; line-height:1.6; border:1px solid #ef4444; background:rgba(220, 38, 38, 0.15);"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 6: CHECKLIST PRÁTICO -->
+<section class="study-section" id="checklist-gestao-vulns">
+  <div class="section-title-wrap">
+    <span class="section-num">06</span>
+    <h2>Checklist de Aplicação Prática: Gestão de Vulnerabilidades Baseada em Risco</h2>
+  </div>
+
+  <p>
+    Utilize este checklist técnico durante revisões de governança, auditorias de conformidade com o NIST CSF 2.0
+    ou estruturação de programas de gerenciamento de patches corporativos:
+  </p>
+
+  <div class="checklist" id="checklist-gestao-vulnerabilidades">
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Integração Obrigatória com o Catálogo CISA KEV:</strong>
+        O pipeline de priorização de segurança correlaciona diariamente os achados de varredura com o catálogo KEV,
+        disparando fluxo de remediação emergencial de 48 horas para qualquer vulnerabilidade explorada na selva.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Uso do EPSS para Filtrar Falsas Prioridades:</strong>
+        A equipe de segurança avalia a probabilidade preditiva de exploração (EPSS) antes de escalonar alertas para a engenharia,
+        evitando paradas emergenciais de trabalho para falhas de alto CVSS teórico mas com probabilidade quase nula de ataque real.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>SLAs de Correção Formalmente Definidos e Monitorados:</strong>
+        Existem metas contratuais e corporativas claras de tempo máximo para correção (Crítica KEV &le; 48h, Alta &le; 15 dias, Média &le; 30 dias),
+        com acompanhamento contínuo de métricas de MTTR (Mean Time to Remediate).
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Plano Formal de Mitigações e Controles Compensatórios:</strong>
+        Quando um patch do fabricante não puder ser aplicado imediatamente em sistemas legados críticos,
+        aplica-se obrigatoriamente um controle compensatório documentado (regras de WAF, isolamento em VLAN/DMZ ou IPS inline).
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Re-varredura Sistemática Pós-Remediação:</strong>
+        Nenhum ticket de vulnerabilidade é encerrado com base na alegação do administrador; o encerramento exige
+        uma varredura automatizada subsequente confirmando que o software foi atualizado e que o scanner não detecta mais a falha.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Programa de Divulgação Coordenada e Canal de Reporte Seguro:</strong>
+        A organização mantém um canal seguro documentado (ex: arquivo <code>security.txt</code> na raiz do domínio)
+        e uma política clara de Coordinated Vulnerability Disclosure para receber alertas de pesquisadores éticos externos.
+      </span>
+    </label>
+  </div>
+</section>
+
+<!-- SEÇÃO 7: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
+<section class="study-section" id="questoes-fixacao">
+  <div class="section-title-wrap">
+    <span class="section-num">07</span>
+    <h2>Questões de Fixação e Concursos Públicos</h2>
+  </div>
+
+  <p>
+    Valide sua preparação respondendo a questões baseadas em provas de concursos para Analista de Tecnologia e Segurança
+    (Polícia Federal - Perito em Informática, Bancos Públicos) e certificações internacionais (CompTIA Security+, CySA+):
+  </p>
+
+  <div class="quiz" id="quiz-gestao-vulnerabilidades">
+    <!-- Questão 1 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 1 &bull; Cálculo e Métrica de Escopo no CVSS v3.1</span>
+        <p>
+          Em uma avaliação de risco de vulnerabilidade de acordo com a norma CVSS v3.1, um analista analisa uma falha
+          de injeção de comandos descoberta em um container Docker. A exploração permite que o atacante escape da sandbox
+          do container e execute comandos com privilégios de root diretamente no sistema operacional do host físico hospedeiro.
+          Qual métrica do Grupo Base do CVSS v3.1 captura especificamente essa capacidade de ultrapassar a fronteira de autorização original,
+          e qual é o impacto direto no cálculo final do score?
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: Métrica de Escopo (Scope - S), definida como "Scope: Changed (S:C)", o que amplia significativamente o multiplicador de impacto e eleva o score final da vulnerabilidade.</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> No CVSS v3.1, a métrica *Scope* (Escopo) determina se a vulnerabilidade afeta apenas os recursos pertencentes à mesma autoridade de segurança da aplicação vulnerável (*Scope: Unchanged - S:U*) ou se rompe a fronteira de proteção e atinge sistemas ou componentes gerenciados por autoridades de segurança diferentes (*Scope: Changed - S:C*). Escapes de máquinas virtuais, quebras de containers Docker ou vulnerabilidades XSS (onde o navegador da vítima é comprometido por uma falha do servidor) são exemplos clássicos de *Scope: Changed*, resultando em um cálculo matemático de impacto muito mais elevado.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Questão 2 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 2 &bull; Priorização Moderna: CVSS vs EPSS vs CISA KEV</span>
+        <p>
+          Um relatório de varredura de vulnerabilidades aponta duas falhas em servidores voltados para a Internet:
+          <br>&bull; <strong>Vulnerabilidade Alfa:</strong> CVSS 9.8 (Crítica), EPSS de 0.8% (0.008), sem menção no catálogo CISA KEV.
+          <br>&bull; <strong>Vulnerabilidade Beta:</strong> CVSS 7.2 (Alta), EPSS de 89.4% (0.894), catalogada no CISA KEV com exploração ativa confirmada por grupos de ransomware.
+          <br>Considerando as melhores práticas contemporâneas de Gestão de Vulnerabilidades Baseada em Risco (RBVM), qual vulnerabilidade deve ser corrigida primeiro pela equipe de segurança?
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: A Vulnerabilidade Beta deve ser corrigida em caráter de emergência imediata (SLA &le; 48 horas), antes da Vulnerabilidade Alfa.</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> O score CVSS reflete apenas a severidade teórica caso o ataque ocorra. No entanto, o risco real é o produto da severidade pela probabilidade/presença de ameaça ativa. A Vulnerabilidade Beta está confirmada no catálogo **CISA KEV** (está sendo ativamente explorada por cibercriminosos no mundo real) e possui um **EPSS de 89.4%** (probabilidade altíssima de sofrer ataques nos próximos dias). A Vulnerabilidade Alfa, embora com CVSS 9.8 teórico, possui baixíssima probabilidade de exploração prática (EPSS 0.8%) e nenhum exploit ativo conhecido. A priorização moderna dita: *KEV ativo e alto EPSS superam o score CVSS isolado*.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Questão 3 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 3 &bull; Inovações do Padrão CVSS v4.0</span>
+        <p>
+          A organização global FIRST lançou a versão 4.0 do CVSS trazendo refinamentos conceituais relevantes.
+          Qual das alternativas a seguir descreve corretamente uma das principais modificações introduzidas pelo CVSS v4.0
+          em relação ao seu antecessor v3.1?
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: A eliminação da métrica ambígua de "Scope" em prol da divisão explícita do impacto entre o Sistema Vulnerável (VC, VI, VA) e Sistemas Subsequentes (SC, SI, SA), além de novas métricas de segurança física humana (Safety).</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> O CVSS v4.0 corrigiu críticas históricas sobre o "Scope", que era interpretado de maneira inconsistente entre fabricantes. No v4.0, o impacto é medido em seis variáveis claras: Impacto no Sistema Vulnerável (Vulnerable System Impact: VC, VI, VA) e Impacto nos Sistemas Subsequentes (Subsequent System Impact: SC, SI, SA). Além disso, incluiu métricas específicas de segurança humana (*Safety*) para sistemas ciberfísicos (OT/SCADA) e padronizou nomenclaturas como CVSS-B, CVSS-BT e CVSS-BTE.
+          </p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 8: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
+<section class="study-section" id="fatos-essenciais">
+  <div class="section-title-wrap">
+    <span class="section-num">08</span>
+    <h2>Fatos Essenciais &bull; Trilha 2: Segurança Defensiva</h2>
+  </div>
+
+  <div class="facts-grid">
+    <div class="facts-card">
+      <h4>CVE e NVD Padronizam o Mundo</h4>
+      <p>O MITRE gerencia os identificadores CVE, e o NIST enriquece a NVD com análises detalhadas de CVSS, CPE e CWE.</p>
+    </div>
+    <div class="facts-card">
+      <h4>CVSS Mede Severidade Teórica</h4>
+      <p>O Base Score (0.0 a 10.0) avalia a facilidade de exploração e os danos aos pilares CIA, mas não mede probabilidade de ataque real.</p>
+    </div>
+    <div class="facts-card">
+      <h4>EPSS Estima a Probabilidade Real</h4>
+      <p>O modelo estatístico do FIRST prevê a probabilidade percentual (0 a 100%) de uma vulnerabilidade ser explorada na selva nos próximos 30 dias.</p>
+    </div>
+    <div class="facts-card">
+      <h4>CISA KEV é a Lista Vermelha</h4>
+      <p>Se uma CVE está no catálogo KEV, sua exploração por cibercriminosos está confirmada. O patch deve ser aplicado em até 48 horas.</p>
+    </div>
+    <div class="facts-card">
+      <h4>CVSS v4.0 Separa Sistemas Subsequentes</h4>
+      <p>O novo padrão encerra a métrica confusa de Scope e traz avaliação separada para o sistema vulnerável e sistemas posteriores, incluindo métricas de Safety.</p>
+    </div>
+    <div class="facts-card" style="border: 2px solid #059669;">
+      <h4 style="color: #059669;">Rumo à Conclusão da Trilha 2</h4>
+      <p>No <strong>Estudo 10 (Seguranca-em-Endpoints-EDR)</strong>, fecharemos a Trilha 2 com proteção de host, telemetria comportamental e EDR/XDR!</p>
+    </div>
+  </div>
+</section>
+
+<!-- SCRIPT EMBUTIDO: CALCULADORA CVSS V3.1 E PRIORIZADOR EPSS/KEV -->
+<script>
+/**
+ * Calculadora Interativa CVSS v3.1 e Priorizador de Risco
+ * Implementação matemática oficial das fórmulas do FIRST
+ * Estudos de Cibersegurança - José Mauro da Silva Brandão
+ */
+
+// Pesos oficiais das métricas do CVSS v3.1
+const CVSS_WEIGHTS = {
+  AV: { N: 0.85, A: 0.62, L: 0.55, P: 0.20 },
+  AC: { L: 0.77, H: 0.44 },
+  PR_U: { N: 0.85, L: 0.62, H: 0.27 }, // Scope Unchanged
+  PR_C: { N: 0.85, L: 0.68, H: 0.50 }, // Scope Changed
+  UI: { N: 0.85, R: 0.62 },
+  C: { H: 0.56, L: 0.22, N: 0.00 },
+  I: { H: 0.56, L: 0.22, N: 0.00 },
+  A: { H: 0.56, L: 0.22, N: 0.00 }
+};
+
+// Cenários históricos pré-configurados
+const CENARIOS_CVE = {
+  log4shell: {
+    nome: "Log4Shell (CVE-2021-44228)",
+    av: "N", ac: "L", pr: "N", ui: "N", s: "C", c: "H", i: "H", a: "H",
+    kev: true, epss: 97.4
+  },
+  eternalblue: {
+    nome: "EternalBlue (CVE-2017-0144)",
+    av: "N", ac: "L", pr: "N", ui: "N", s: "U", c: "H", i: "H", a: "H",
+    kev: true, epss: 96.1
+  },
+  local_escalation: {
+    nome: "Escalação Local de Privilégio (Linux Kernel)",
+    av: "L", ac: "L", pr: "L", ui: "N", s: "U", c: "H", i: "H", a: "H",
+    kev: false, epss: 1.4
+  },
+  xss_refletido: {
+    nome: "XSS Refletido em Aplicação Web",
+    av: "N", ac: "L", pr: "N", ui: "R", s: "C", c: "L", i: "L", a: "N",
+    kev: false, epss: 4.8
+  }
+};
+
+// Carrega os parâmetros de um cenário específico
+function carregarCenarioCve(chave) {
+  const c = CENARIOS_CVE[chave];
+  if (!c) return;
+
+  document.getElementById("cvss-av").value = c.av;
+  document.getElementById("cvss-ac").value = c.ac;
+  document.getElementById("cvss-pr").value = c.pr;
+  document.getElementById("cvss-ui").value = c.ui;
+  document.getElementById("cvss-s").value = c.s;
+  document.getElementById("cvss-c").value = c.c;
+  document.getElementById("cvss-i").value = c.i;
+  document.getElementById("cvss-a").value = c.a;
+  document.getElementById("cvss-cisa-kev").checked = c.kev;
+  document.getElementById("cvss-epss").value = c.epss;
+
+  calcularScoreCvss();
+}
+
+// Gera a string oficial de vetor CVSS v3.1
+function gerarStringVetorCvss() {
+  const av = document.getElementById("cvss-av").value;
+  const ac = document.getElementById("cvss-ac").value;
+  const pr = document.getElementById("cvss-pr").value;
+  const ui = document.getElementById("cvss-ui").value;
+  const s = document.getElementById("cvss-s").value;
+  const c = document.getElementById("cvss-c").value;
+  const i = document.getElementById("cvss-i").value;
+  const a = document.getElementById("cvss-a").value;
+
+  return `CVSS:3.1/AV:${av}/AC:${ac}/PR:${pr}/UI:${ui}/S:${s}/C:${c}/I:${i}/A:${a}`;
+}
+
+// Função oficial de arredondamento ceiling do CVSS v3.1
+function roundUp(input) {
+  const intInput = Math.round(input * 100000);
+  if (intInput % 10000 === 0) {
+    return intInput / 100000;
+  }
+  return (Math.floor(intInput / 10000) + 1) / 10;
+}
+
+// Cálculo matemático das fórmulas oficiais do CVSS v3.1
+function calcularScoreCvss() {
+  const av = document.getElementById("cvss-av").value;
+  const ac = document.getElementById("cvss-ac").value;
+  const pr = document.getElementById("cvss-pr").value;
+  const ui = document.getElementById("cvss-ui").value;
+  const s = document.getElementById("cvss-s").value;
+  const c = document.getElementById("cvss-c").value;
+  const i = document.getElementById("cvss-i").value;
+  const a = document.getElementById("cvss-a").value;
+
+  const isKev = document.getElementById("cvss-cisa-kev").checked;
+  const epss = parseFloat(document.getElementById("cvss-epss").value) || 0;
+
+  // 1. Cálculo de Impact Sub-Score (ISS)
+  const cWeight = CVSS_WEIGHTS.C[c];
+  const iWeight = CVSS_WEIGHTS.I[i];
+  const aWeight = CVSS_WEIGHTS.A[a];
+  const iss = 1 - ((1 - cWeight) * (1 - iWeight) * (1 - aWeight));
+
+  let impact = 0;
+  if (s === "U") {
+    impact = 6.42 * iss;
+  } else {
+    impact = 7.52 * (iss - 0.029) - 3.25 * Math.pow(iss - 0.02, 15);
+  }
+
+  // 2. Cálculo de Exploitability Sub-Score
+  const prWeight = (s === "U") ? CVSS_WEIGHTS.PR_U[pr] : CVSS_WEIGHTS.PR_C[pr];
+  const exploitability = 8.22 * CVSS_WEIGHTS.AV[av] * CVSS_WEIGHTS.AC[ac] * prWeight * CVSS_WEIGHTS.UI[ui];
+
+  // 3. Cálculo do Base Score
+  let baseScore = 0;
+  if (impact <= 0) {
+    baseScore = 0.0;
+  } else if (s === "U") {
+    baseScore = roundUp(Math.min(impact + exploitability, 10));
+  } else {
+    baseScore = roundUp(Math.min(1.08 * (impact + exploitability), 10));
+  }
+
+  baseScore = Math.max(0.0, Math.min(10.0, baseScore));
+
+  const vectorString = gerarStringVetorCvss();
+  renderizarResultadoCvss(baseScore, vectorString, isKev, epss);
+  return { baseScore, vectorString, isKev, epss };
+}
+
+// Renderiza o resultado nos componentes da interface
+function renderizarResultadoCvss(score, vectorString, isKev, epss) {
+  const scoreNumEl = document.getElementById("cvss-score-num");
+  const sevBadgeEl = document.getElementById("cvss-severity-badge");
+  const vectorInput = document.getElementById("cvss-vector-string");
+  const slaBox = document.getElementById("cvss-sla-box");
+
+  if (vectorInput) vectorInput.value = vectorString;
+  if (scoreNumEl) scoreNumEl.textContent = score.toFixed(1);
+
+  let severidade = "BAIXA";
+  let cor = "#0891b2";
+  let badgeClass = "badge blue";
+
+  if (score >= 9.0) {
+    severidade = "CRÍTICA";
+    cor = "#ef4444";
+    badgeClass = "badge red";
+  } else if (score >= 7.0) {
+    severidade = "ALTA";
+    cor = "#f59e0b";
+    badgeClass = "badge amber";
+  } else if (score >= 4.0) {
+    severidade = "MÉDIA";
+    cor = "#0891b2";
+    badgeClass = "badge blue";
+  } else if (score > 0) {
+    severidade = "BAIXA";
+    cor = "var(--muted)";
+    badgeClass = "badge slate";
+  } else {
+    severidade = "NENHUMA";
+    cor = "var(--muted)";
+    badgeClass = "badge slate";
+  }
+
+  if (scoreNumEl) scoreNumEl.style.color = cor;
+  if (sevBadgeEl) {
+    sevBadgeEl.className = badgeClass;
+    sevBadgeEl.textContent = severidade;
+  }
+
+  // Avaliação de Priorização de Risco Real e SLA
+  if (slaBox) {
+    let slaPrazo = "";
+    let slaStatus = "";
+    let boxCor = "";
+
+    if (isKev) {
+      slaStatus = "🚨 SLA DE EMERGÊNCIA IMEDIATA (EXPLORAÇÃO ATIVA NO CISA KEV)";
+      slaPrazo = "Correção Obrigatória em até 48 HORAS (ou isolamento emergencial do ativo).";
+      boxCor = "#ef4444";
+    } else if (epss >= 50.0) {
+      slaStatus = "⚠️ SLA DE ALTA PRIORIDADE (ALTO RISCO DE ATAQUE IMINENTE - EPSS > 50%)";
+      slaPrazo = "Correção em até 7 DIAS.";
+      boxCor = "#f59e0b";
+    } else if (score >= 9.0) {
+      slaStatus = "🟡 PRIORIDADE ALTA (CVSS CRÍTICO SEM EXPLOIT ATIVO CONFIRMADO)";
+      slaPrazo = "Correção em até 15 DIAS (próxima janela de manutenção programada).";
+      boxCor = "#f59e0b";
+    } else if (score >= 7.0) {
+      slaStatus = "🔵 PRIORIDADE MÉDIA (SEVERIDADE ALTA / BAIXO EPSS)";
+      slaPrazo = "Correção em até 30 DIAS no ciclo mensal de patches.";
+      boxCor = "#0891b2";
+    } else {
+      slaStatus = "⚪ BAIXA PRIORIDADE (SEVERIDADE MODERADA/BAIXA)";
+      slaPrazo = "Correção em até 90 DIAS na manutenção trimestral.";
+      boxCor = "var(--rule)";
+    }
+
+    slaBox.style.borderColor = boxCor;
+    slaBox.style.background = boxCor === "#ef4444" ? "rgba(220, 38, 38, 0.15)" : (boxCor === "#f59e0b" ? "rgba(245, 158, 11, 0.15)" : "rgba(8, 145, 178, 0.15)");
+    slaBox.innerHTML = `
+      <div style="font-weight:800; font-size:0.95rem; color:${boxCor}; margin-bottom:0.3rem;">${escapeHtml(slaStatus)}</div>
+      <div><strong>Prazo SLA Recomendado:</strong> ${escapeHtml(slaPrazo)}</div>
+      <div style="font-size:0.8rem; color:var(--muted); margin-top:0.4rem;">
+        <strong>Diagnóstico de Inteligência:</strong> CVSS Base = <strong>${score.toFixed(1)}</strong> | CISA KEV = <strong>${isKev ? "SIM (ATIVO)" : "NÃO"}</strong> | Probabilidade EPSS = <strong>${epss.toFixed(1)}%</strong>.
+      </div>
+    `;
+  }
+}
+
+function copiarVetorCvss() {
+  const input = document.getElementById("cvss-vector-string");
+  if (!input) return;
+  input.select();
+  navigator.clipboard.writeText(input.value).then(() => {
+    alert("Vetor CVSS copiado com sucesso para a área de transferência!");
+  }).catch(() => {
+    document.execCommand("copy");
+    alert("Vetor CVSS copiado!");
+  });
+}
+
+// Inicialização automática do checklist e do laboratório no carregamento da página
+document.addEventListener("DOMContentLoaded", function() {
+  if (typeof initChecklist === "function") {
+    initChecklist("gestao-vulnerabilidades");
+  }
+  carregarCenarioCve("log4shell");
+});
+</script>
