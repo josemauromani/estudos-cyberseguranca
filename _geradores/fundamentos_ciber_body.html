@@ -1,0 +1,1128 @@
+<!-- ==========================================================================
+     MÓDULO 01: FUNDAMENTOS-CIBER — CORPO DIDÁTICO E SIMULADOR STRIDE
+     Estruturado conforme GUIA-DO-AUTOR.md e CURRICULO.md (100% Offline-ready)
+     ========================================================================== -->
+
+<main class="container">
+
+  <!-- 1. CABEÇALHO HERO & METADADOS -->
+  <header class="hero-header" style="--track-color: var(--t1-blue);">
+    <div class="badge badge-t1">Trilha 1 &bull; Fundamentos &amp; Redes</div>
+    <h1>Tríade CIA, Ameaças e Modelagem STRIDE</h1>
+    <p class="hero-subtitle">Pilares da segurança da informação, vetores de ameaça e metodologia STRIDE para modelagem defensiva de arquiteturas de software e sistemas.</p>
+    <div class="meta-bar">
+      <span class="meta-item">⏱️ <strong>Tempo Estimado:</strong> 40 minutos</span>
+      <span class="meta-item">🛡️ <strong>NIST CSF 2.0:</strong> Identify (ID.AM, ID.RA)</span>
+      <span class="meta-item">🎯 <strong>Carreiras:</strong> Blue Team, Red Team, AppSec, SOC, GRC</span>
+      <span class="meta-item">🔬 <strong>MITRE ATT&amp;CK:</strong> TA0043 (Reconnaissance) &bull; TA0001 (Initial Access)</span>
+    </div>
+  </header>
+
+  <!-- 2. FUNDAMENTAÇÃO TEÓRICA E ARQUITETURA -->
+  <section class="content-section" id="fundamentacao-teorica">
+    <h2>1. Introdução e Contexto Prático da Cibersegurança</h2>
+    <p>
+      Cibersegurança moderna não é um produto de software, uma caixa de firewall ou uma lista estática de regras antivírus; é uma disciplina contínua de gerenciamento de risco e engenharia de resiliência. O objetivo primário de qualquer arquiteto ou analista defensivo é assegurar que a missão do negócio prospere mesmo na presença inevitável de adversários capacitados e falhas estruturais de tecnologia.
+    </p>
+
+    <p>
+      Para estruturar qualquer política, controle ou auditoria, a indústria internacional e normas consagradas — como a <strong>ISO/IEC 27001</strong> e o <strong>NIST SP 800-12</strong> — estabelecem que a segurança da informação sustenta-se sobre três pilares essenciais: a <strong>Tríade CIA</strong> (<em>Confidentiality, Integrity, Availability</em>).
+    </p>
+
+    <div class="callout callout-tip">
+      <strong>💡 Fundamento Profissional:</strong>
+      A segurança não busca eliminar 100% dos riscos — o que é matematicamente impossível —, mas elevar o custo de exploração para o adversário a um patamar tão alto que o ataque se torne inviável econômica e operacionalmente.
+    </div>
+
+    <h3>Os Três Pilares da Tríade CIA</h3>
+
+    <div class="facts-grid">
+      <div class="facts-card" style="border-top: 4px solid var(--t1-blue);">
+        <h4>🔒 Confidencialidade (Confidentiality)</h4>
+        <p>
+          Garante que a informação não seja divulgada ou disponibilizada a indivíduos, entidades ou processos computacionais não autorizados. Trata-se de manter o segredo e a privacidade de dados sensíveis (PII, propriedade intelectual, credenciais, segredos de estado).
+        </p>
+        <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--muted);">
+          <strong>Controles Típicos:</strong> Criptografia forte (AES-256-GCM, TLS 1.3), controle de acesso rigoroso (RBAC/ABAC), Mascaramento de dados e Data Loss Prevention (DLP).
+        </p>
+      </div>
+
+      <div class="facts-card" style="border-top: 4px solid var(--t2-green);">
+        <h4>🛡️ Integridade (Integrity)</h4>
+        <p>
+          Salvaguarda a exatidão, completeza e autenticidade dos dados e métodos de processamento contra modificações não autorizadas, corrupções acidentais ou adulterações maliciosas em repouso ou em trânsito.
+        </p>
+        <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--muted);">
+          <strong>Controles Típicos:</strong> Funções de resumo criptográfico (SHA-256), assinaturas digitais, HMAC, controle de versão auditável e File Integrity Monitoring (FIM).
+        </p>
+      </div>
+
+      <div class="facts-card" style="border-top: 4px solid var(--t6-amber);">
+        <h4>⚡ Disponibilidade (Availability)</h4>
+        <p>
+          Assegura que os usuários, serviços e sistemas autorizados tenham acesso oportuno, ininterrupto e confiável à informação e aos recursos operacionais no exato instante em que requisitados.
+        </p>
+        <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--muted);">
+          <strong>Controles Típicos:</strong> Redundância geográfica, clusters ativo-ativo, mitigação de DDoS, balanceadores de carga com health-checks, backups com teste de restauração (RTO/RPO).
+        </p>
+      </div>
+    </div>
+
+    <h3>A Contrapartida Ofensiva: A Tríade DAD</h3>
+    <p>
+      Enquanto o defensor trabalha para sustentar a Tríade CIA, o adversário cibernético opera com objetivos simétricos e opostos, sistematizados na <strong>Tríade DAD</strong>:
+    </p>
+
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Pilar Defensivo (CIA)</th>
+            <th>Vetor Adversário (DAD)</th>
+            <th>Impacto Real no Negócio</th>
+            <th>Exemplo Prático de Ataque</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Confidencialidade</strong></td>
+            <td><strong style="color: var(--t3-red);">Divulgação (Disclosure)</strong></td>
+            <td>Vazamento de segredos industriais, violação de privacidade (multas LGPD/GDPR), espionagem.</td>
+            <td>Exfiltração de banco de dados via SQL Injection ou bucket S3 com leitura pública não autenticada.</td>
+          </tr>
+          <tr>
+            <td><strong>Integridade</strong></td>
+            <td><strong style="color: var(--t3-red);">Alteração (Alteration)</strong></td>
+            <td>Adulteração de saldos bancários, modificação de prontuários médicos, envenenamento de dados.</td>
+            <td>Ataque Man-in-the-Middle (MitM) manipulando parâmetros de requisição ou modificando hashes de pacotes.</td>
+          </tr>
+          <tr>
+            <td><strong>Disponibilidade</strong></td>
+            <td><strong style="color: var(--t3-red);">Destruição / Negação (Destruction / Denial)</strong></td>
+            <td>Paralisação de operações fabris, desligamento de e-commerce, perda de reputação por SLA rompido.</td>
+            <td>Ataques volumétricos de negação de serviço (DDoS) ou infecção por ransomware criptografando volumes inteiros.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Extensões Fundamentais: Autenticidade e Não-Repúdio</h3>
+    <p>
+      Embora a Tríade CIA seja a referência clássica, arquiteturas de missão crítica exigem duas propriedades complementares indispensáveis:
+    </p>
+    <ul>
+      <li>
+        <strong>Autenticidade (Authenticity):</strong> Propriedade que garante a veracidade da identidade alegada de um sujeito (seja um operador humano, um processo ou um microserviço). A autenticidade assegura que quem está comunicando é genuinamente quem afirma ser.
+      </li>
+      <li>
+        <strong>Não-Repúdio (Non-Repudiation):</strong> Capacidade de provar a autoria e a ocorrência irrevogável de uma transação ou ação digital, impedindo que o emissor ou receptor negue formalmente sua participação. Implementa-se através de assinaturas digitais assimétricas com chaves privadas exclusivas e trilhas de auditoria criptograficamente imutáveis.
+      </li>
+    </ul>
+
+    <div class="callout callout-warning">
+      <strong>⚠️ Atenção Criptográfica:</strong>
+      A integridade sem autenticidade não garante segurança contra atacantes ativos: se um adversário puder interceptar uma mensagem e recalcular um hash simples (ex.: SHA-256 sem chave compartilhada), a integridade parecerá válida para a vítima. Para vincular autenticidade à integridade, deve-se usar <strong>HMAC</strong> ou <strong>assinaturas digitais</strong> baseadas em chaves assimétricas.
+    </div>
+
+    <h3>Princípios Arquiteturais Cardeais: Menor Privilégio e Defesa em Profundidade</h3>
+    <p>
+      Na engenharia de segurança, dois princípios arquiteturais orientam todas as decisões de projeto defensivo:
+    </p>
+
+    <div class="facts-grid">
+      <div class="facts-card">
+        <h4>🔑 Princípio do Menor Privilégio (PoLP)</h4>
+        <p>
+          Qualquer usuário, processo do sistema operacional, conta de serviço ou contêiner deve ser configurado com o <strong>conjunto estritamente mínimo de privilégios e permissões</strong> necessário para cumprir sua tarefa legítima, e apenas durante o tempo exato em que a tarefa é executada.
+        </p>
+        <p style="margin-top: 0.5rem; font-size: 0.85rem;">
+          <em>Exemplo Prático:</em> Aplicações web nunca devem conectar ao banco de dados com usuário <code>sa</code> ou <code>root</code>, nem rodar contêineres Docker com privilégios de root no host.
+        </p>
+      </div>
+
+      <div class="facts-card">
+        <h4>🏰 Defesa em Profundidade (Defense in Depth)</h4>
+        <p>
+          Estruturação de defesas em camadas concêntricas independentes. Nenhuma organização deve apostar a totalidade de sua segurança em uma única barreira (como um firewall de borda). Se a primeira camada falhar, a camada subsequente deve conter o incidente.
+        </p>
+        <p style="margin-top: 0.5rem; font-size: 0.85rem;">
+          <em>Exemplo Prático:</em> Mesmo que um invasor ultrapasse o WAF perimetral, encontrará autenticação mTLS interna, autorização RBAC restritiva, segmentação em micro-redes e dados cifrados em repouso.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout callout-danger">
+      <strong>🚨 Perigo Crítico:</strong>
+      Executar microsserviços em contêineres como usuário <code>root</code> (UID 0) com o Docker socket montado (<code>/var/run/docker.sock</code>) destrói qualquer proteção de isolamento. Em caso de vulnerabilidade de execução remota de código (RCE) na aplicação, o invasor obtém controle total sobre o servidor hospedeiro.
+    </div>
+
+    <!-- Bloco Terminal Prático -->
+    <div class="terminal-box">
+      <div class="terminal-header">
+        <span class="terminal-title">bash &mdash; Verificação de Integridade e Menor Privilégio no Linux</span>
+        <button class="btn-copy" onclick="CS.copyCode(this)">Copiar</button>
+      </div>
+      <pre><code># 1. Gerando e conferindo resumo criptográfico SHA-256 para atestar Integridade
+sha256sum pacote_producao.tar.gz > pacote_producao.tar.gz.sha256
+sha256sum -c pacote_producao.tar.gz.sha256
+
+# 2. Aplicando Menor Privilégio em diretório de configuração sensível
+# Impede leitura/escrita para outros usuários do sistema (chmod 700 / 600)
+chmod 700 /etc/app-secrets/
+chmod 600 /etc/app-secrets/credentials.env
+chown -R appuser:appgroup /etc/app-secrets/</code></pre>
+    </div>
+
+    <div class="callout callout-law">
+      <strong>⚖️ Requisito Normativo (LGPD Art. 46):</strong>
+      A Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018) estipula que os agentes de tratamento devem adotar medidas de segurança, técnicas e administrativas aptas a proteger os dados pessoais de acessos não autorizados e de situações acidentais ou ilícitas de destruição, perda, alteração, comunicação ou qualquer forma de tratamento inadequado.
+    </div>
+  </section>
+
+  <!-- 3. FUNDAMENTOS DA MODELAGEM DE AMEAÇAS STRIDE -->
+  <section class="content-section" id="modelagem-stride">
+    <h2>2. Fundamentos da Modelagem de Ameaças STRIDE</h2>
+    <p>
+      A modelagem de ameaças é uma atividade estruturada que permite identificar, quantificar e mitigar fraquezas de segurança na fase de concepção e desenho de um sistema, muito antes de linhas de código serem escritas ou servidores provisionados. Identificar e mitigar uma falha na fase de arquitetura pode ser até <strong>60 vezes mais barato</strong> do que corrigi-la em produção após um incidente cibernético.
+    </p>
+
+    <p>
+      Desenvolvida pela Microsoft no final da década de 1990 por Praerit Garg e Loren Kohnfelder, a metodologia <strong>STRIDE</strong> decompõe o universo de ameaças em seis categorias mnemônicas fundamentais. Cada letra do acrônimo STRIDE viola diretamente uma propriedade de segurança e exige uma resposta de engenharia específica:
+    </p>
+
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Letra</th>
+            <th>Categoria STRIDE</th>
+            <th>Propriedade Violada</th>
+            <th>Definição e Vetor de Ataque</th>
+            <th>Controle Arquitetural Mitigatório</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color: var(--t1-blue); font-size: 1.1rem;">S</strong></td>
+            <td><strong>Spoofing (Falsificação de Identidade)</strong></td>
+            <td>Autenticidade</td>
+            <td>O invasor se passa por outro usuário, serviço ou dispositivo legítimo (ex.: roubo de token, session hijacking, IP spoofing).</td>
+            <td>Autenticação forte (MFA, Passkeys), certificados mTLS mútuos, tokens assinados criptograficamente, SPF/DKIM/DMARC.</td>
+          </tr>
+          <tr>
+            <td><strong style="color: var(--t2-green); font-size: 1.1rem;">T</strong></td>
+            <td><strong>Tampering (Adulteração de Dados)</strong></td>
+            <td>Integridade</td>
+            <td>Modificação maliciosa de dados em repouso (disco/banco) ou em trânsito (rede) sem permissão legítima.</td>
+            <td>Criptografia em trânsito com TLS 1.3, assinaturas digitais, resumos HMAC, File Integrity Monitoring (FIM).</td>
+          </tr>
+          <tr>
+            <td><strong style="color: var(--t4-purple); font-size: 1.1rem;">R</strong></td>
+            <td><strong>Repudiation (Repúdio)</strong></td>
+            <td>Não-Repúdio</td>
+            <td>Um agente executa uma operação sensível e nega a autoria por ausência de registros ou provas irrefutáveis.</td>
+            <td>Trilhas de auditoria imutáveis (append-only/WORM), logs centralizados em SIEM com NTP sincronizado e assinaturas digitais.</td>
+          </tr>
+          <tr>
+            <td><strong style="color: var(--t5-cyan); font-size: 1.1rem;">I</strong></td>
+            <td><strong>Information Disclosure (Vazamento de Informação)</strong></td>
+            <td>Confidencialidade</td>
+            <td>Exposição de dados sensíveis ou segredos a atores não autorizados (ex.: stack traces expostos, buckets S3 abertos, tráfego HTTP claro).</td>
+            <td>Criptografia de ponta a ponta (AES-256), tokenização, mascaramento de dados (DLP), sanitização de respostas de erro da API.</td>
+          </tr>
+          <tr>
+            <td><strong style="color: var(--t6-amber); font-size: 1.1rem;">D</strong></td>
+            <td><strong>Denial of Service (Negação de Serviço)</strong></td>
+            <td>Disponibilidade</td>
+            <td>Degradação ou exaustão de capacidade operacional (CPU, memória, banda, conexões), tornando o serviço indisponível aos usuários legítimos.</td>
+            <td>Rate limiting, throttling per-client, balanceamento elástico, scrubbing de DDoS (WAF), timeouts curtos e paginação obrigatória.</td>
+          </tr>
+          <tr>
+            <td><strong style="color: var(--t3-red); font-size: 1.1rem;">E</strong></td>
+            <td><strong>Elevation of Privilege (Elevação de Privilégio)</strong></td>
+            <td>Autorização</td>
+            <td>Um usuário com permissões restritas obtém capacidades administrativas ou acesso horizontal/vertical não concedido.</td>
+            <td>Princípio do menor privilégio, autorização robusta verificada no backend (RBAC/ABAC), contêineres sem root, segregação de funções.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 4. LABORATÓRIO / SIMULADOR INTERATIVO STRIDE CANVAS -->
+  <section class="content-section" id="simulador-stride">
+    <h2>3. Laboratório Interativo: STRIDE Canvas</h2>
+    <p>
+      Utilize o <strong>STRIDE Canvas</strong> abaixo para conduzir um exercício realista de modelagem de ameaças. Selecione um ativo da arquitetura do sistema corporativo, analise as ameaças mapeadas para cada categoria STRIDE, simule a ativação de controles mitigatórios e exporte o relatório executivo de risco residual.
+    </p>
+
+    <div class="lab-box">
+      <div class="lab-header">
+        <h3>🧪 Simulador STRIDE Canvas</h3>
+        <p>Selecione um componente arquitetural para inspecionar ameaças e validar controles defensivos.</p>
+      </div>
+
+      <div class="lab-body">
+        <!-- Controles de Seleção de Ativo -->
+        <div class="lab-controls">
+          <label for="stride-asset-select">
+            <strong>Componente Arquitetural sob Escopo:</strong>
+          </label>
+          <select id="stride-asset-select" onchange="selecionarAtivo(this.value)">
+            <option value="usuario-externo">👤 Usuário Externo / Cliente Web (Navegador/Mobile)</option>
+            <option value="api-gateway">🌐 API Gateway / Reverse Proxy (Borda Perimetral)</option>
+            <option value="auth-service">🔑 Serviço de Autenticação / Microserviço IAM</option>
+            <option value="database-sql">🗄️ Banco de Dados SQL de Produção</option>
+            <option value="s3-storage">☁️ Armazenamento em Nuvem (Bucket S3 / Object Storage)</option>
+          </select>
+          <button class="btn-secondary" onclick="mitigarTodas()">🛡️ Mitigar Todas</button>
+          <button class="btn-secondary" onclick="resetarAmeacas()">🔄 Resetar Estado</button>
+        </div>
+
+        <!-- Painel Informativo da Fronteira de Confiança do Ativo -->
+        <div id="stride-asset-info" style="background-color: var(--ground); border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 1.5rem;">
+          <!-- Preenchido via JavaScript -->
+        </div>
+
+        <!-- Grade Dinâmica de Ameaças STRIDE -->
+        <div id="stride-threats-container">
+          <!-- Cards de ameaças injetados dinamicamente via JavaScript -->
+        </div>
+
+        <!-- Painel de Resumo de Risco Residual -->
+        <div id="stride-summary" style="margin-top: 1.5rem; background-color: var(--sunk); border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 1.25rem;">
+          <!-- Preenchido dinamicamente via JavaScript -->
+        </div>
+
+        <!-- Exportação de Relatório Executivo -->
+        <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+          <button class="btn-primary" onclick="gerarRelatorioAmeacas()">📋 Gerar Relatório de Modelagem de Ameaça</button>
+          <button class="btn-secondary" id="btn-copy-report" style="display: none;" onclick="copiarRelatorio()">📄 Copiar Relatório</button>
+        </div>
+
+        <div id="stride-report-wrapper" style="display: none; margin-top: 1rem;">
+          <label style="font-size: 0.85rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 0.35rem;">Relatório Técnico Formatado (Markdown):</label>
+          <div class="lab-output" id="stride-report-output">
+            <!-- Saída de relatório formatado -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. CHECKLIST OPERACIONAL DE BOAS PRÁTICAS -->
+  <section class="content-section" id="checklist-pratico">
+    <h2>4. Checklist de Auditoria: Modelagem de Ameaças em Projetos Reais</h2>
+    <p>
+      Este checklist operacional consolida as etapas mandatórias para a condução de sessões de modelagem de ameaças em squads de desenvolvimento ágil e revisões de arquitetura. O progresso é <strong>salvo automaticamente</strong> no seu navegador (<em>localStorage</em>) para consultas e auditorias futuras.
+    </p>
+
+    <div class="checklist" data-checklist-id="fundamentos-ciber">
+      <h4>
+        <span>Auditoria de Modelagem de Ameaças STRIDE</span>
+        <span class="checklist-counter" style="font-size: 0.85rem; color: var(--muted); font-weight: normal;">0 de 6 itens auditados</span>
+      </h4>
+      <div class="checklist-progress-bar">
+        <div class="checklist-progress-fill"></div>
+      </div>
+
+      <label class="check-item">
+        <input type="checkbox" id="chk-fnd-1">
+        <span><strong>1. Inventário de Ativos e Dados:</strong> Identificar e catalogar formalmente todos os ativos críticos, dados sensíveis sob escopo (PII, credenciais, segredos criptográficos) e seus fluxos operacionais.</span>
+      </label>
+
+      <label class="check-item">
+        <input type="checkbox" id="chk-fnd-2">
+        <span><strong>2. Fronteiras de Confiança (Trust Boundaries):</strong> Mapear visualmente no diagrama arquitetural os pontos onde dados transitam entre zonas de diferentes níveis de privilégio (ex.: internet pública vs DMZ vs rede privada).</span>
+      </label>
+
+      <label class="check-item">
+        <input type="checkbox" id="chk-fnd-3">
+        <span><strong>3. Aplicação Sistemática da Taxonomia STRIDE:</strong> Analisar exaustivamente cada componente, fluxo de dados, armazenamento e processo do diagrama contra as 6 categorias da metodologia STRIDE.</span>
+      </label>
+
+      <label class="check-item">
+        <input type="checkbox" id="chk-fnd-4">
+        <span><strong>4. Classificação de Severidade e Impacto:</strong> Quantificar a severidade das ameaças identificadas com base no impacto ao negócio e na viabilidade técnica de exploração pelo adversário.</span>
+      </label>
+
+      <label class="check-item">
+        <input type="checkbox" id="chk-fnd-5">
+        <span><strong>5. Associação de Controles Mitigatórios:</strong> Definir e especificar formalmente pelo menos um controle de engenharia robusto (MFA, mTLS, WORM logs, RBAC, Rate Limiting) para cada ameaça prioritária.</span>
+      </label>
+
+      <label class="check-item">
+        <input type="checkbox" id="chk-fnd-6">
+        <span><strong>6. Homologação e Security as Code:</strong> Converter os controles mitigatórios em histórias de usuário no backlog dos times de desenvolvimento e em testes automatizados de validação no pipeline CI/CD.</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- 6. QUIZ DE FIXAÇÃO E VALIDAÇÃO -->
+  <section class="content-section" id="quiz-fixacao">
+    <h2>5. Questões de Fixação e Concursos Públicos</h2>
+    <p>
+      Valide sua compreensão com questões analíticas baseadas em casos práticos e provas de alto nível em segurança cibernética e certificações internacionais:
+    </p>
+
+    <div class="quiz-section">
+      <!-- Questão 1 -->
+      <div class="quiz-item" data-quiz-id="q1">
+        <p class="quiz-question">
+          <strong>Questão 1 (Tríade CIA &amp; DAD):</strong> Durante um incidente cibernético contra um centro de saúde, operadores de ransomware utilizaram criptografia simétrica para bloquear todos os discos rígidos dos servidores de prontuário eletrônico dos pacientes, sem efetuar a extração externa prévia dos arquivos. Em termos da Tríade CIA e de sua contrapartida ofensiva (Tríade DAD), qual pilar de segurança foi primariamente violado e qual vetor DAD foi concretizado?
+        </p>
+        <div class="quiz-options">
+          <button class="quiz-btn" onclick="CS.checkQuiz(this, false, 'Incorreto. A confidencialidade não foi o pilar violado, pois os dados não foram vazados ou divulgados a terceiros não autorizados.')">
+            A) Confidencialidade foi violada primariamente pelo vetor Divulgação (Disclosure).
+          </button>
+          <button class="quiz-btn" onclick="CS.checkQuiz(this, true, 'Correto! O ataque tornou os sistemas e dados inacessíveis aos médicos e operadores legítimos (violação da Disponibilidade), concretizando o objetivo de Destruição/Negação (Destruction/Denial) da Tríade DAD.')">
+            B) Disponibilidade foi violada primariamente pelo vetor Destruição / Negação (Destruction / Denial).
+          </button>
+          <button class="quiz-btn" onclick="CS.checkQuiz(this, false, 'Incorreto. Embora a integridade dos blocos de disco tenha sofrido alteração pela cifra, o impacto primário e imediato do ransomware que paralisa a operação é a perda de disponibilidade do serviço.')">
+            C) Apenas a Integridade foi afetada pelo vetor Alteração, mantendo a disponibilidade inalterada.
+          </button>
+          <button class="quiz-btn" onclick="CS.checkQuiz(this, false, 'Incorreto. O não-repúdio e o spoofing de identidade são propriedades de autenticação e auditoria, não o pilar principal paralisado pelo sequestro de dados.')">
+            D) Não-repúdio foi violado primariamente pelo vetor Spoofing de identidade.
+          </button>
+        </div>
+        <div class="quiz-feedback" style="display: none;"></div>
+      </div>
+
+      <!-- Questão 2 -->
+      <div class="quiz-item" data-quiz-id="q2">
+        <p class="quiz-question">
+          <strong>Questão 2 (Taxonomia STRIDE):</strong> Um atacante intercepta a comunicação de rede de uma aplicação financeira desprovida de TLS e altera o campo "valor_transferencia" de um JSON em trânsito antes que o servidor receba a requisição. Simultaneamente, um funcionário desonesto executa um estorno ilegal no sistema e apaga as linhas correspondentes da tabela de log local para evitar que sua ação seja descoberta. Quais categorias STRIDE descrevem com precisão esses dois eventos e quais mitigações são recomendadas?
+        </p>
+        <div class="quiz-options">
+          <button class="quiz-btn" onclick="CS.checkQuiz(this, true, 'Correto! A alteração de dados em trânsito é Tampering (mitigado por TLS 1.3 e assinaturas/HMAC). A destruição de logs para ocultar a autoria de uma ação é Repudiation (mitigado por trilhas de auditoria imutáveis append-only e assinaturas digitais com carimbo de tempo).')">
+            A) Tampering (mitigado por TLS 1.3 / HMAC) e Repudiation (mitigado por trilhas de auditoria append-only imutáveis).
+          </button>
+          <button class="quiz-btn" onclick="CS.checkQuiz(this, false, 'Incorreto. A adulteração da mensagem em trânsito é Tampering, e não Spoofing (que seria a falsificação de quem está enviando).')">
+            B) Spoofing (mitigado por senhas fortes) e Elevation of Privilege (mitigado por firewalls perimetrais).
+          </button>
+          <button class="quiz-btn" onclick="CS.checkQuiz(this, false, 'Incorreto. A alteração de dados não é Information Disclosure (vazamento), e a deleção de registros de log não se classifica como Denial of Service.')">
+            C) Information Disclosure (mitigado por rate limiting) e Denial of Service (mitigado por balanceadores).
+          </button>
+          <button class="quiz-btn" onclick="CS.checkQuiz(this, false, 'Incorreto. Elevation of Privilege trata de obtenção de permissões administrativas; os eventos descritos são adulteração de dados e quebra de não-repúdio.')">
+            D) Elevation of Privilege (mitigado por mTLS) e Tampering (mitigado por antivírus de endpoint).
+          </button>
+        </div>
+        <div class="quiz-feedback" style="display: none;"></div>
+      </div>
+
+      <!-- Questão 3 -->
+      <div class="quiz-item" data-quiz-id="q3">
+        <p class="quiz-question">
+          <strong>Questão 3 (Menor Privilégio &amp; Defesa em Profundidade):</strong> Uma empresa expõe uma API pública com WAF na borda, mas o contêiner interno da aplicação executa como usuário root do Linux e possui o socket <code>/var/run/docker.sock</code> montado em seu volume. Sob os princípios de cibersegurança, qual é o diagnóstico arquitetural dessa infraestrutura?
+        </p>
+        <div class="quiz-options">
+          <button class="quiz-btn" onclick="CS.checkQuiz(this, false, 'Incorreto. O WAF é apenas uma camada perimetral (inspeção HTTP) e não anula falhas críticas de privilégios e permissões nas camadas internas.')">
+            A) A arquitetura é totalmente segura, pois o WAF na borda é suficiente para conter qualquer ataque.
+          </button>
+          <button class="quiz-btn" onclick="CS.checkQuiz(this, true, 'Correto! A configuração viola o Princípio do Menor Privilégio e desfaz a Defesa em Profundidade: caso o WAF seja contornado ou ocorra uma exploração de RCE na aplicação, o atacante com acesso ao socket Docker e privilégios de root assumirá o controle total de todo o nó hospedeiro.')">
+            B) Viola gravemente o Menor Privilégio e compromete a Defesa em Profundidade: uma exploração interna (RCE) confere controle total do host.
+          </button>
+          <button class="quiz-btn" onclick="CS.checkQuiz(this, false, 'Incorreto. Contêineres compartilham o kernel do sistema operacional com o hospedeiro e não oferecem isolamento por hardware como hypervisors tipo 1.')">
+            C) Não há risco, pois contêineres Docker isolam o hardware de forma impermeável independente do usuário.
+          </button>
+          <button class="quiz-btn" onclick="CS.checkQuiz(this, false, 'Incorreto. O usuário root não afeta a vazão de rede; a vulnerabilidade reside na quebra de autorização e segurança operacional.')">
+            D) O problema reside unicamente no desperdício de memória RAM gerado pelo socket de comunicação.
+          </button>
+        </div>
+        <div class="quiz-feedback" style="display: none;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. FATOS ESSENCIAIS, NORMAS E PRÓXIMOS PASSOS -->
+  <section class="content-section" id="fatos-essenciais">
+    <h2>6. Fatos Essenciais, Normas e Próximos Passos</h2>
+    <p>
+      Síntese dos conceitos-chave consolidados neste módulo piloto para consulta rápida e alinhamento normativo:
+    </p>
+
+    <div class="facts-grid">
+      <div class="facts-card">
+        <h4>📚 Tríade CIA &amp; Tríade DAD</h4>
+        <p>
+          A defesa sustenta a <strong>Confidencialidade</strong> (segredo), <strong>Integridade</strong> (exatidão) e <strong>Disponibilidade</strong> (acesso contínuo). O atacante busca a <strong>Divulgação</strong> (Disclosure), <strong>Alteração</strong> (Alteration) e <strong>Destruição/Negação</strong> (Destruction/Denial).
+        </p>
+      </div>
+
+      <div class="facts-card">
+        <h4>🎯 Mapeamento STRIDE &bull; Microsoft SDL</h4>
+        <p>
+          <strong>S</strong>poofing &rarr; Autenticação | <strong>T</strong>ampering &rarr; Integridade | <strong>R</strong>epudiation &rarr; Não-Repúdio | <strong>I</strong>nformation Disclosure &rarr; Confidencialidade | <strong>D</strong>enial of Service &rarr; Disponibilidade | <strong>E</strong>levation of Privilege &rarr; Autorização.
+        </p>
+      </div>
+
+      <div class="facts-card">
+        <h4>⚖️ Normas e Frameworks Governamentais</h4>
+        <p>
+          Mapeado diretamente na função <strong>Identify (ID)</strong> do <strong>NIST CSF 2.0</strong> (Categorias ID.AM e ID.RA), nas táticas <strong>TA0043</strong> e <strong>TA0001</strong> do <strong>MITRE ATT&amp;CK</strong>, na norma <strong>ISO/IEC 27001</strong> e no Art. 46 da <strong>LGPD</strong>.
+        </p>
+      </div>
+
+      <div class="facts-card" style="border: 2px dashed var(--t1-blue); background-color: rgba(37, 99, 235, 0.04);">
+        <h4>🚀 Próximo Estudo Recomendado</h4>
+        <p>
+          <strong>Módulo 02: Redes-e-Protocolos</strong><br>
+          Aprofunde a análise de tráfego, dissecação de cabeçalhos IPv4/IPv6, handshake TCP/IP e inspeção de DNS para consolidar a proteção de perímetros na camada de rede.
+        </p>
+        <p style="margin-top: 0.5rem;">
+          <a href="../Redes-e-Protocolos/treinamento-redes-e-protocolos.html">Ir para Redes-e-Protocolos &rarr;</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- JAVASCRIPT EXCLUSIVO DO SIMULADOR STRIDE CANVAS (VANILLA JS) -->
+<script>
+(function() {
+  'use strict';
+
+  // Base de Conhecimento Estruturada de Modelagem STRIDE
+  const STRIDE_ASSETS = {
+    "usuario-externo": {
+      nome: "Usuário Externo / Cliente Web (Navegador/Mobile)",
+      icone: "👤",
+      fronteira: "Zona Não Confiável (Internet Pública) → Borda Perimetral",
+      descricao: "Clientes finais interagindo via browsers ou aplicativos móveis em redes abertas e não controladas.",
+      ameacas: [
+        {
+          id: "usr-s",
+          categoria: "Spoofing",
+          sigla: "S",
+          cor: "#2563EB",
+          propriedade: "Autenticidade",
+          titulo: "Falsificação de Identidade e Roubo de Sessão (Credential Stuffing / Session Hijacking)",
+          descricao: "Atacante utiliza credenciais vazadas em brechas públicas ou rouba tokens de sessão para se passar pelo cliente legítimo.",
+          severidade: "Crítico",
+          mitigacao: "Implantar Autenticação Multifator (MFA/Passkeys), vincular tokens a impressão digital do cliente e aplicar proteção contra força bruta.",
+          mitigado: false
+        },
+        {
+          id: "usr-t",
+          categoria: "Tampering",
+          sigla: "T",
+          cor: "#059669",
+          propriedade: "Integridade",
+          titulo: "Manipulação de Parâmetros de Requisição no Cliente (Parameter Tampering)",
+          descricao: "Usuário malicioso intercepta o tráfego HTTP localmente e altera IDs, valores ou permissões no payload JSON.",
+          severidade: "Alto",
+          mitigacao: "Nunca confiar em dados do cliente; validar todas as regras de negócio e integridade no servidor.",
+          mitigado: false
+        },
+        {
+          id: "usr-r",
+          categoria: "Repudiation",
+          sigla: "R",
+          cor: "#7C3AED",
+          propriedade: "Não-Repúdio",
+          titulo: "Negação de Transação Financeira ou Operação Sensível",
+          descricao: "O usuário realiza um pagamento ou alteração crítica e alega fraude por falta de comprovação irrefutável.",
+          severidade: "Médio",
+          mitigacao: "Assinatura digital de operações, carimbo de tempo seguro (RFC 3161) e registro de IP, device-id e geolocalização no log.",
+          mitigado: false
+        },
+        {
+          id: "usr-i",
+          categoria: "Information Disclosure",
+          sigla: "I",
+          cor: "#0891B2",
+          propriedade: "Confidencialidade",
+          titulo: "Interceptação de Dados em Redes Wi-Fi Abertas (Eavesdropping)",
+          descricao: "Tráfego inspecionado passivamente por terceiros caso não esteja sob canal criptográfico forte.",
+          severidade: "Alto",
+          mitigacao: "Forçar TLS 1.3 com HSTS estrito e armazenar tokens exclusivamente em cookies HttpOnly e Secure.",
+          mitigado: false
+        },
+        {
+          id: "usr-d",
+          categoria: "Denial of Service",
+          sigla: "D",
+          cor: "#D97706",
+          propriedade: "Disponibilidade",
+          titulo: "Esgotamento de Recursos por Conexões Concorrentes Abusivas",
+          descricao: "Cliente malicioso abre milhares de conexões persistentes para saturar pools de conexões.",
+          severidade: "Médio",
+          mitigacao: "Rate limiting por IP/token e encerramento de conexões TCP ociosas com timeouts curtos.",
+          mitigado: false
+        },
+        {
+          id: "usr-e",
+          categoria: "Elevation of Privilege",
+          sigla: "E",
+          cor: "#DC2626",
+          propriedade: "Autorização",
+          titulo: "Injeção de Claims Administrativas em Tokens JWT do Cliente",
+          descricao: "Tentativa de adulterar claims como 'role: admin' em tokens armazenados no cliente para acessar recursos protegidos.",
+          severidade: "Crítico",
+          mitigacao: "Assinatura assimétrica de tokens com chaves privadas em HSM e validação autoritativa das permissões no backend a cada requisição.",
+          mitigado: false
+        }
+      ]
+    },
+    "api-gateway": {
+      nome: "API Gateway / Reverse Proxy (Borda Perimetral)",
+      icone: "🌐",
+      fronteira: "Borda Perimetral (DMZ) → Rede Interna de Microsserviços",
+      descricao: "Ponto único de entrada para tráfego externo, responsável por terminação TLS, roteamento e rate limiting.",
+      ameacas: [
+        {
+          id: "gw-s",
+          categoria: "Spoofing",
+          sigla: "S",
+          cor: "#2563EB",
+          propriedade: "Autenticidade",
+          titulo: "Falsificação de Certificado SSL/TLS e MitM de Roteamento",
+          descricao: "Atacante com autoridade certificadora comprometida intercepta o tráfego do gateway.",
+          severidade: "Crítico",
+          mitigacao: "Utilizar Certificate Transparency e HTTP Strict Transport Security (HSTS) com preloading.",
+          mitigado: false
+        },
+        {
+          id: "gw-t",
+          categoria: "Tampering",
+          sigla: "T",
+          cor: "#059669",
+          propriedade: "Integridade",
+          titulo: "HTTP Request Smuggling / Adulteração de Cabeçalhos",
+          descricao: "Dessincronia entre o proxy reverso e o backend permite injetar requisições arbitrárias no fluxo.",
+          severidade: "Crítico",
+          mitigacao: "Uniformizar parsers HTTP entre gateway e backends; desabilitar reuso ambíguo de conexões HTTP/1.1 em favor de HTTP/2 ou gRPC.",
+          mitigado: false
+        },
+        {
+          id: "gw-r",
+          categoria: "Repudiation",
+          sigla: "R",
+          cor: "#7C3AED",
+          propriedade: "Não-Repúdio",
+          titulo: "Ausência de Registro de Cabeçalhos de Rastreabilidade",
+          descricao: "Gateway descarta ou falha ao anexar Correlation-IDs e endereços IP de origem nos logs.",
+          severidade: "Médio",
+          mitigacao: "Geração de Trace-ID obrigatório em todas as requisições de borda com encaminhamento imediato para SIEM.",
+          mitigado: false
+        },
+        {
+          id: "gw-i",
+          categoria: "Information Disclosure",
+          sigla: "I",
+          cor: "#0891B2",
+          propriedade: "Confidencialidade",
+          titulo: "Exposição de Metadados e Versões de Software em Cabeçalhos Server",
+          descricao: "Cabeçalhos como 'Server: Apache/2.4.41' ou 'X-Powered-By' auxiliam reconhecimento de vulnerabilidades.",
+          severidade: "Baixo",
+          mitigacao: "Remover todos os cabeçalhos que revelem detalhes internos da infraestrutura.",
+          mitigado: false
+        },
+        {
+          id: "gw-d",
+          categoria: "Denial of Service",
+          sigla: "D",
+          cor: "#D97706",
+          propriedade: "Disponibilidade",
+          titulo: "Ataque Volumétrico de DDoS Saturando Largura de Banda do Gateway",
+          descricao: "Milhões de requisições maliciosas sobrecarregam a capacidade de processamento da borda.",
+          severidade: "Crítico",
+          mitigacao: "Integração com serviço de mitigação DDoS em nuvem (ex.: Cloudflare, AWS Shield) e rate limiting baseado em leaky bucket.",
+          mitigado: false
+        },
+        {
+          id: "gw-e",
+          categoria: "Elevation of Privilege",
+          sigla: "E",
+          cor: "#DC2626",
+          propriedade: "Autorização",
+          titulo: "Bypass de Rotas Administrativas Internas via Falhas no Roteador",
+          descricao: "Rotas internas reservadas (/internal/* ou /admin/*) expostas por erro de regex no roteador.",
+          severidade: "Crítico",
+          mitigacao: "Política padrão de 'bloqueio por padrão' (deny by default) e segregação física de portas administrativas.",
+          mitigado: false
+        }
+      ]
+    },
+    "auth-service": {
+      nome: "Serviço de Autenticação / Microserviço IAM",
+      icone: "🔑",
+      fronteira: "Rede Interna de Microsserviços (Zona Segura)",
+      descricao: "Serviço central de identidade, emissor de tokens OpenID Connect/OAuth 2.0 e validador de credenciais.",
+      ameacas: [
+        {
+          id: "iam-s",
+          categoria: "Spoofing",
+          sigla: "S",
+          cor: "#2563EB",
+          propriedade: "Autenticidade",
+          titulo: "Emissão de Tokens Falsificados por Chave Privada Comprometida",
+          descricao: "Vazamento da chave privada RSA/ECDSA permite que invasores criem tokens válidos para qualquer identidade.",
+          severidade: "Crítico",
+          mitigacao: "Armazenamento exclusivo de chaves de assinatura em Hardware Security Module (HSM) ou KMS gerenciado com rotação automática.",
+          mitigado: false
+        },
+        {
+          id: "iam-t",
+          categoria: "Tampering",
+          sigla: "T",
+          cor: "#059669",
+          propriedade: "Integridade",
+          titulo: "Adulteração de Políticas de Permissão no Repositório de Identidades",
+          descricao: "Invasor com acesso ao backend modifica grupos e roles diretamente no diretório LDAP/banco.",
+          severidade: "Crítico",
+          mitigacao: "Controle estrito de integridade de banco, criptografia de atributos sensíveis e auditoria de alterações cadastrais.",
+          mitigado: false
+        },
+        {
+          id: "iam-r",
+          categoria: "Repudiation",
+          sigla: "R",
+          cor: "#7C3AED",
+          propriedade: "Não-Repúdio",
+          titulo: "Falta de Auditoria de Trocas de Senhas e Concessão de Privilégios",
+          descricao: "Administrador concede privilégios a usuário e nega a ação posteriormente.",
+          severidade: "Alto",
+          mitigacao: "Logs de auditoria de operações IAM assinados e encaminhados para SIEM protegido contra exclusão.",
+          mitigado: false
+        },
+        {
+          id: "iam-i",
+          categoria: "Information Disclosure",
+          sigla: "I",
+          cor: "#0891B2",
+          propriedade: "Confidencialidade",
+          titulo: "Vazamento de Hashes de Senha em Respostas de Falha de Autenticação",
+          descricao: "Diferenças no tempo de resposta (Timing Attacks) revelam se usuário existe no sistema.",
+          severidade: "Médio",
+          mitigacao: "Respostas genéricas de erro com tempo constante de processamento utilizando hashes lentos (Argon2id ou bcrypt).",
+          mitigado: false
+        },
+        {
+          id: "iam-d",
+          categoria: "Denial of Service",
+          sigla: "D",
+          cor: "#D97706",
+          propriedade: "Disponibilidade",
+          titulo: "Esgotamento de CPU por Cálculo Excessivo de Hashes Criptográficos",
+          descricao: "Bombardeio de logins inválidos forçando milhões de iterações de derivação de chave (KDF).",
+          severidade: "Alto",
+          mitigacao: "Filtros de rate limiting e desafios Proof-of-Work (CAPTCHA) acionados após 3 tentativas consecutivas.",
+          mitigado: false
+        },
+        {
+          id: "iam-e",
+          categoria: "Elevation of Privilege",
+          sigla: "E",
+          cor: "#DC2626",
+          propriedade: "Autorização",
+          titulo: "Confiança Cega no Algoritmo 'none' ou Chave Pública como HMAC",
+          descricao: "Ataque clássico JWT onde o cliente força algoritmo 'none' ou troca RS256 por HS256.",
+          severidade: "Crítico",
+          mitigacao: "Biblioteca JWT restrita a algoritmos assimétricos explícitos com validação de emissor (iss) e público (aud).",
+          mitigado: false
+        }
+      ]
+    },
+    "database-sql": {
+      nome: "Banco de Dados SQL de Produção",
+      icone: "🗄️",
+      fronteira: "Rede Privada de Dados (Isolamento Restrito)",
+      descricao: "Repositório relacional com informações cadastrais, financeiras e regras de negócio da organização.",
+      ameacas: [
+        {
+          id: "db-s",
+          categoria: "Spoofing",
+          sigla: "S",
+          cor: "#2563EB",
+          propriedade: "Autenticidade",
+          titulo: "Conexão Não Autorizada Utilizando Credenciais Compartilhadas",
+          descricao: "Múltiplos serviços conectando com a mesma credencial estática sem identificação de instância.",
+          severidade: "Alto",
+          mitigacao: "Credenciais dinâmicas rotacionadas periodicamente (ex.: HashiCorp Vault) e mTLS para autenticação de clientes.",
+          mitigado: false
+        },
+        {
+          id: "db-t",
+          categoria: "Tampering",
+          sigla: "T",
+          cor: "#059669",
+          propriedade: "Integridade",
+          titulo: "Injeção de Código SQL (SQL Injection) Adulterando Registros",
+          descricao: "Entradas não tratadas permitem executar comandos UPDATE ou DROP arbitrários.",
+          severidade: "Crítico",
+          mitigacao: "Uso obrigatório de consultas parametrizadas (Prepared Statements) e ORMs seguros; nunca concatenar strings em queries.",
+          mitigado: false
+        },
+        {
+          id: "db-r",
+          categoria: "Repudiation",
+          sigla: "R",
+          cor: "#7C3AED",
+          propriedade: "Não-Repúdio",
+          titulo: "Execução de Comandos DDL/DML sem Rastreabilidade de DBA",
+          descricao: "DBA altera registros diretamente no console sem log de auditoria.",
+          severidade: "Alto",
+          mitigacao: "Habilitar auditoria nativa no banco (ex.: pgAudit) gravando todos os comandos DDL e DML em storage externo.",
+          mitigado: false
+        },
+        {
+          id: "db-i",
+          categoria: "Information Disclosure",
+          sigla: "I",
+          cor: "#0891B2",
+          propriedade: "Confidencialidade",
+          titulo: "Exfiltração de Dados Sensíveis sem Criptografia em Repouso",
+          descricao: "Acesso físico ou clonagem de snapshots do disco revela dados cadastrais em texto claro.",
+          severidade: "Crítico",
+          mitigacao: "Criptografia de dados em repouso (TDE / Transparent Data Encryption com AES-256) e mascaramento de colunas com PII.",
+          mitigado: false
+        },
+        {
+          id: "db-d",
+          categoria: "Denial of Service",
+          sigla: "D",
+          cor: "#D97706",
+          propriedade: "Disponibilidade",
+          titulo: "Queries Complexas sem Índices Travando o Pool de Conexões",
+          descricao: "Consultas maliciosas com múltiplos FULL TABLE JOINS esgotam CPU e conexões disponíveis.",
+          severidade: "Alto",
+          mitigacao: "Limitação estrita de tempo de query (statement_timeout), réplicas de leitura para relatórios e pooler de conexões (PgBouncer).",
+          mitigado: false
+        },
+        {
+          id: "db-e",
+          categoria: "Elevation of Privilege",
+          sigla: "E",
+          cor: "#DC2626",
+          propriedade: "Autorização",
+          titulo: "Usuário de Aplicação com Privilégios de SUPERUSER/DBA",
+          descricao: "Aplicação conectada com permissões de criar tabelas, ler esquemas do sistema ou executar funções de shell.",
+          severidade: "Crítico",
+          mitigacao: "Princípio do menor privilégio: usuário de aplicação possui apenas SELECT, INSERT e UPDATE nas tabelas estritamente necessárias.",
+          mitigado: false
+        }
+      ]
+    },
+    "s3-storage": {
+      nome: "Armazenamento em Nuvem (Bucket S3 / Object Storage)",
+      icone: "☁️",
+      fronteira: "Serviço Gerenciado em Nuvem (Acesso via IAM Cloud)",
+      descricao: "Armazenamento de objetos para backups, anexos de usuários e relatórios exportados.",
+      ameacas: [
+        {
+          id: "s3-s",
+          categoria: "Spoofing",
+          sigla: "S",
+          cor: "#2563EB",
+          propriedade: "Autenticidade",
+          titulo: "Uso de URLs Pré-Assinadas (Pre-signed URLs) Forjadas ou Reutilizadas",
+          descricao: "URL com credencial temporária capturada e explorada por agente não autorizado antes de sua expiração.",
+          severidade: "Alto",
+          mitigacao: "Definir tempo de expiração curto para URLs pré-assinadas (máximo 5 minutos) e restringir IPs autorizados.",
+          mitigado: false
+        },
+        {
+          id: "s3-t",
+          categoria: "Tampering",
+          sigla: "T",
+          cor: "#059669",
+          propriedade: "Integridade",
+          titulo: "Sobrescrita Não Autorizada de Arquivos e Backups",
+          descricao: "Invasor sobrescreve arquivos legítimos com cargas vazias ou malware.",
+          severidade: "Crítico",
+          mitigacao: "Habilitar Versionamento de Objetos (S3 Versioning) e travas de imutabilidade (Object Lock / WORM).",
+          mitigado: false
+        },
+        {
+          id: "s3-r",
+          categoria: "Repudiation",
+          sigla: "R",
+          cor: "#7C3AED",
+          propriedade: "Não-Repúdio",
+          titulo: "Deleção de Objetos sem Registro de Logs de Acesso a Dados",
+          descricao: "Arquivos excluídos sem identificação de qual credencial efetuou a chamada de API.",
+          severidade: "Médio",
+          mitigacao: "Habilitar logs de acesso a dados (S3 Data Events no AWS CloudTrail) com retenção mínima de 1 ano.",
+          mitigado: false
+        },
+        {
+          id: "s3-i",
+          categoria: "Information Disclosure",
+          sigla: "I",
+          cor: "#0891B2",
+          propriedade: "Confidencialidade",
+          titulo: "Configuração de Bucket Público (Public Read ACL)",
+          descricao: "Erro de configuração expõe milhares de arquivos confidenciais para qualquer visitante da internet.",
+          severidade: "Crítico",
+          mitigacao: "Ativar 'S3 Block Public Access' no nível da conta organizacional e forçar criptografia com chave de cliente (SSE-KMS).",
+          mitigado: false
+        },
+        {
+          id: "s3-d",
+          categoria: "Denial of Service",
+          sigla: "D",
+          cor: "#D97706",
+          propriedade: "Disponibilidade",
+          titulo: "Exclusão em Massa de Backups em Incidente de Ransomware",
+          descricao: "Atacante com credenciais comprometidas purga todos os backups históricos.",
+          severidade: "Crítico",
+          mitigacao: "Habilitar exclusão multifator (MFA Delete) e replicação entre contas de nuvem com isolamento de acesso.",
+          mitigado: false
+        },
+        {
+          id: "s3-e",
+          categoria: "Elevation of Privilege",
+          sigla: "E",
+          cor: "#DC2626",
+          propriedade: "Autorização",
+          titulo: "Políticas de Bucket Excessivamente Permissivas (Wildcards 's3:*')",
+          descricao: "Função IAM com permissões universais permitindo que serviços leiam e apaguem qualquer bucket.",
+          severidade: "Crítico",
+          mitigacao: "Aplicar políticas de IAM com escopo estrito por ARN e auditoria contínua via ferramentas de CSPM.",
+          mitigado: false
+        }
+      ]
+    }
+  };
+
+  let ativoAtual = 'usuario-externo';
+
+  // Renderiza a interface do simulador
+  function renderizarSimulador() {
+    const asset = STRIDE_ASSETS[ativoAtual];
+    if (!asset) return;
+
+    // 1. Atualiza bloco informativo da fronteira de confiança
+    const infoEl = document.getElementById('stride-asset-info');
+    if (infoEl) {
+      infoEl.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <h4 style="margin: 0; display: flex; align-items: center; gap: 0.5rem; color: var(--ink);">
+            <span>${asset.icone}</span> <span>${asset.nome}</span>
+          </h4>
+          <span class="badge" style="background-color: var(--sunk); color: var(--muted); margin: 0;">
+            Fronteira: ${asset.fronteira}
+          </span>
+        </div>
+        <p style="margin: 0; font-size: 0.92rem; color: var(--muted);">${asset.descricao}</p>
+      `;
+    }
+
+    // 2. Renderiza os cards de ameaças
+    const container = document.getElementById('stride-threats-container');
+    if (container) {
+      container.innerHTML = '';
+
+      asset.ameacas.forEach((ameaca) => {
+        const card = document.createElement('div');
+        card.className = 'stride-threat-card';
+        card.style.cssText = `
+          background-color: var(--surface);
+          border: 1px solid ${ameaca.mitigado ? 'var(--t2-green)' : 'var(--rule)'};
+          border-left: 5px solid ${ameaca.mitigado ? 'var(--t2-green)' : ameaca.cor};
+          border-radius: var(--radius-md);
+          padding: 1.25rem;
+          margin-bottom: 1rem;
+          box-shadow: var(--shadow-sm);
+          transition: all 0.2s ease;
+        `;
+
+        const badgeSeveridadeCor = {
+          'Crítico': 'var(--danger-bg); color: var(--danger-color); border: 1px solid var(--danger-color)',
+          'Alto': 'var(--warning-bg); color: var(--warning-color); border: 1px solid var(--warning-border)',
+          'Médio': 'var(--sunk); color: var(--muted); border: 1px solid var(--rule)',
+          'Baixo': 'var(--tip-bg); color: var(--tip-color); border: 1px solid var(--tip-border)'
+        }[ameaca.severidade] || 'var(--sunk); color: var(--muted);';
+
+        card.innerHTML = `
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <span class="badge" style="background-color: ${ameaca.cor}; color: #FFFFFF; font-weight: 700; margin: 0; min-width: 2rem; text-align: center;">
+                ${ameaca.sigla}
+              </span>
+              <strong style="font-size: 0.95rem; color: var(--ink);">${ameaca.categoria} &bull; Violação de ${ameaca.propriedade}</strong>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="badge" style="background-color: ${badgeSeveridadeCor}; font-size: 0.75rem; margin: 0;">
+                Risco: ${ameaca.severidade}
+              </span>
+              <span class="badge" style="background-color: ${ameaca.mitigado ? 'var(--tip-bg)' : 'var(--danger-bg)'}; color: ${ameaca.mitigado ? 'var(--tip-color)' : 'var(--danger-color)'}; margin: 0;">
+                ${ameaca.mitigado ? '✅ Mitigado' : '⚠️ Não Mitigado'}
+              </span>
+            </div>
+          </div>
+
+          <h5 style="margin: 0.5rem 0 0.35rem 0; font-size: 1rem; color: var(--ink); font-family: var(--font-body); font-weight: 600;">
+            ${ameaca.titulo}
+          </h5>
+          <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 0.75rem; line-height: 1.45;">
+            ${ameaca.descricao}
+          </p>
+
+          <div style="background-color: var(--ground); border-radius: var(--radius-sm); padding: 0.75rem 0.9rem; margin-bottom: 0.75rem; border-left: 3px solid var(--tip-border);">
+            <div style="font-size: 0.82rem; font-weight: 700; color: var(--tip-color); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 0.2rem;">
+              🛡️ Controle Mitigatório Recomendado:
+            </div>
+            <div style="font-size: 0.88rem; color: var(--ink); line-height: 1.4;">
+              ${ameaca.mitigacao}
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end;">
+            <button class="${ameaca.mitigado ? 'btn-secondary' : 'btn-primary'}" style="font-size: 0.85rem; padding: 0.35rem 0.85rem;" onclick="toggleMitigacao('${ameaca.id}')">
+              ${ameaca.mitigado ? 'Desativar Mitigação' : 'Ativar Mitigação Defensiva'}
+            </button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // 3. Atualiza painel de resumo de risco residual
+    atualizarResumo();
+  }
+
+  // Atualiza métricas de risco do ativo
+  function atualizarResumo() {
+    const asset = STRIDE_ASSETS[ativoAtual];
+    if (!asset) return;
+
+    const total = asset.ameacas.length;
+    const mitigadas = asset.ameacas.filter(a => a.mitigado).length;
+    const pendentes = total - mitigadas;
+    const pct = Math.round((mitigadas / total) * 100);
+
+    let statusRisco = 'Crítico';
+    let corRisco = 'var(--danger-color)';
+    if (pct === 100) {
+      statusRisco = 'Residual Baixo (Controlado)';
+      corRisco = 'var(--t2-green)';
+    } else if (pct >= 50) {
+      statusRisco = 'Moderado / Em Tratamento';
+      corRisco = 'var(--warning-color)';
+    }
+
+    const summaryEl = document.getElementById('stride-summary');
+    if (summaryEl) {
+      summaryEl.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.75rem;">
+          <div>
+            <strong style="font-size: 1.05rem; color: var(--ink);">Nível de Exposição Residual:</strong>
+            <span style="font-size: 1.05rem; font-weight: 700; color: ${corRisco}; margin-left: 0.5rem;">${statusRisco}</span>
+          </div>
+          <div style="font-size: 0.9rem; color: var(--muted);">
+            Progresso de Tratamento: <strong>${mitigadas}</strong> de <strong>${total}</strong> ameaças mitigadas (${pct}%)
+          </div>
+        </div>
+        <div class="checklist-progress-bar" style="margin-bottom: 0;">
+          <div class="checklist-progress-fill" style="width: ${pct}%; background-color: ${pct === 100 ? 'var(--t2-green)' : 'var(--t1-blue)'};"></div>
+        </div>
+      `;
+    }
+  }
+
+  // Seleciona ativo pelo dropdown
+  window.selecionarAtivo = function(chave) {
+    if (STRIDE_ASSETS[chave]) {
+      ativoAtual = chave;
+      renderizarSimulador();
+    }
+  };
+
+  // Alterna status de mitigação
+  window.toggleMitigacao = function(ameacaId) {
+    const asset = STRIDE_ASSETS[ativoAtual];
+    if (!asset) return;
+
+    const ameaca = asset.ameacas.find(a => a.id === ameacaId);
+    if (ameaca) {
+      ameaca.mitigado = !ameaca.mitigado;
+      renderizarSimulador();
+    }
+  };
+
+  // Mitiga todas as ameaças do ativo atual
+  window.mitigarTodas = function() {
+    const asset = STRIDE_ASSETS[ativoAtual];
+    if (!asset) return;
+    asset.ameacas.forEach(a => a.mitigado = true);
+    renderizarSimulador();
+  };
+
+  // Reseta estado do ativo atual
+  window.resetarAmeacas = function() {
+    const asset = STRIDE_ASSETS[ativoAtual];
+    if (!asset) return;
+    asset.ameacas.forEach(a => a.mitigado = false);
+    renderizarSimulador();
+  };
+
+  // Gera relatório formatado em Markdown
+  window.gerarRelatorioAmeacas = function() {
+    const asset = STRIDE_ASSETS[ativoAtual];
+    if (!asset) return;
+
+    const dataHora = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    const total = asset.ameacas.length;
+    const mitigadas = asset.ameacas.filter(a => a.mitigado).length;
+
+    let relatorio = `# Relatório Executivo de Modelagem de Ameaças (STRIDE)\n`;
+    relatorio += `Data de Emissão: ${dataHora} UTC\n`;
+    relatorio += `Componente Arquitetural: ${asset.nome}\n`;
+    relatorio += `Fronteira de Confiança: ${asset.fronteira}\n`;
+    relatorio += `Status de Mitigação: ${mitigadas}/${total} Controles Ativos (${Math.round((mitigadas/total)*100)}%)\n\n`;
+    relatorio += `## Matriz de Riscos STRIDE\n\n`;
+
+    asset.ameacas.forEach(a => {
+      relatorio += `### [${a.sigla}] ${a.categoria} — ${a.titulo}\n`;
+      relatorio += `- Propriedade Afetada: ${a.propriedade}\n`;
+      relatorio += `- Severidade Intrínseca: ${a.severidade}\n`;
+      relatorio += `- Status: ${a.mitigado ? 'MITIGADO' : 'NÃO MITIGADO (VULNERÁVEL)'}\n`;
+      relatorio += `- Controle Recomendado: ${a.mitigacao}\n\n`;
+    });
+
+    relatorio += `---\nDocumento gerado automaticamente pelo STRIDE Canvas &bull; Estudos de Cibersegurança`;
+
+    const outWrapper = document.getElementById('stride-report-wrapper');
+    const outEl = document.getElementById('stride-report-output');
+    const copyBtn = document.getElementById('btn-copy-report');
+
+    if (outWrapper && outEl) {
+      outEl.textContent = relatorio;
+      outWrapper.style.display = 'block';
+    }
+    if (copyBtn) {
+      copyBtn.style.display = 'inline-flex';
+    }
+  };
+
+  // Copia relatório para a área de transferência
+  window.copiarRelatorio = function() {
+    const outEl = document.getElementById('stride-report-output');
+    if (!outEl) return;
+
+    const texto = outEl.textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(texto).then(() => {
+        alert('Relatório copiado com sucesso para a área de transferência!');
+      }).catch(() => {
+        alert('Não foi possível copiar automaticamente.');
+      });
+    } else {
+      alert('Selecione e copie o texto manualmente.');
+    }
+  };
+
+  // Inicialização na carga
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      renderizarSimulador();
+    });
+  } else {
+    renderizarSimulador();
+  }
+})();
+</script>
