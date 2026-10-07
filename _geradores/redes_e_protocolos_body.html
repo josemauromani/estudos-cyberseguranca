@@ -1,0 +1,882 @@
+<!-- ==========================================================================
+     Estudo 02: Redes e Protocolos
+     Corpo do Treinamento: TCP/IP, DNS, Roteamento e Inspeção de Tráfego
+     ========================================================================== -->
+
+<header class="study-header">
+  <span class="study-track-kicker">Trilha 1: Fundamentos &amp; Redes Seguras &bull; Estudo 02</span>
+  <h1 class="study-title">Redes e Protocolos</h1>
+  <p class="study-lead">
+    A cibersegurança operacional começa na camada de transporte e roteamento. Compreender a anatomia dos
+    cabeçalhos IPv4, o controle de estado do TCP, a leveza do UDP e os mecanismos de resolução do DNS é o
+    alicerce indispensável para dissecar ataques, configurar firewalls e identificar anomalias em capturas de tráfego.
+  </p>
+  <div class="study-meta-bar">
+    <span class="badge blue">NIST CSF 2.0: Protect (PR) &amp; Detect (DE)</span>
+    <span class="badge slate">MITRE ATT&amp;CK: T1046, T1071, T1557</span>
+    <span class="badge slate">Tempo Estimado: ~50 minutos</span>
+    <span class="badge slate">Carreiras: Blue Team &bull; Red Team &bull; SOC L1/L2</span>
+  </div>
+</header>
+
+<!-- SEÇÃO 1: INTRODUÇÃO E MODELOS DE REDE -->
+<section class="study-section" id="modelos-rede">
+  <div class="section-title-wrap">
+    <span class="section-num">01</span>
+    <h2>Modelos de Rede, Camadas e Encapsulamento</h2>
+  </div>
+
+  <p>
+    Para proteger ou investigar uma rede, o profissional de segurança deve visualizar como a informação transita
+    desde a aplicação do usuário até os impulsos elétricos ou ópticos no meio físico. Dois modelos conceituais
+    norteiam essa compreensão: o <strong>Modelo OSI (7 camadas)</strong>, que serve como referência teórica e
+    padronização internacional (ISO/IEC 7498-1), e a <strong>Pilha TCP/IP (4 camadas)</strong>, que representa a
+    arquitetura real implementada na Internet e nas redes corporativas modernas.
+  </p>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Camada OSI</th>
+          <th>Pilha TCP/IP</th>
+          <th>Unidade de Dados (PDU)</th>
+          <th>Protocolos Notáveis</th>
+          <th>Superfície de Ataque &amp; Foco de Segurança</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>7. Aplicação<br>6. Apresentação<br>5. Sessão</strong></td>
+          <td><strong>Aplicação</strong></td>
+          <td>Dados / Mensagem</td>
+          <td>HTTP, HTTPS, DNS, SSH, SMTP, TLS</td>
+          <td>Injeção web (SQLi, XSS), quebra de autenticação, exfiltração em túneis DNS, cabeçalhos inseguros.</td>
+        </tr>
+        <tr>
+          <td><strong>4. Transporte</strong></td>
+          <td><strong>Transporte</strong></td>
+          <td>Segmento (TCP) / Datagrama (UDP)</td>
+          <td>TCP, UDP, SCTP, QUIC</td>
+          <td>Esgotamento de portas (SYN Flood), varredura de portas (Port Scan), hijacking de sessão TCP, amplificação UDP.</td>
+        </tr>
+        <tr>
+          <td><strong>3. Rede</strong></td>
+          <td><strong>Internet</strong></td>
+          <td>Pacote</td>
+          <td>IPv4, IPv6, ICMP, IPsec, BGP, OSPF</td>
+          <td>IP Spoofing, ataques de fragmentação, manipulação de TTL, envenenamento de rotas BGP, ICMP Tunneling.</td>
+        </tr>
+        <tr>
+          <td><strong>2. Enlace de Dados</strong></td>
+          <td rowspan="2"><strong>Acesso à Rede</strong></td>
+          <td>Quadro (Frame)</td>
+          <td>Ethernet (802.3), Wi-Fi (802.11), ARP, VLAN (802.1Q)</td>
+          <td>ARP Spoofing / Poisoning, esgotamento de tabela CAM em switches, salto de VLAN (VLAN Hopping), clones de MAC.</td>
+        </tr>
+        <tr>
+          <td><strong>1. Física</strong></td>
+          <td>Bits / Sinal</td>
+          <td>Cabos UTP/STP, Fibra óptica, Rádio RF</td>
+          <td>Interceptação física de cabos (wiretapping), interferência de sinal (jamming), acesso físico não autorizado a switches.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout tip">
+    <h4>O Mecanismo de Encapsulamento e Desencapsulamento</h4>
+    <p>
+      Quando uma máquina cliente envia uma requisição, cada camada inferior adiciona seu próprio cabeçalho
+      (<strong>encapsulamento</strong>), contendo os metadados necessários para seu funcionamento (ex.: porta de origem/destino
+      no transporte, IP origem/destino na rede, MAC no enlace). No receptor, o processo ocorre de forma inversa
+      (<strong>desencapsulamento</strong>). Em ferramentas de captura como o <em>Wireshark</em> ou <em>tcpdump</em>,
+      a inspeção consiste justamente em desempacotar visualmente cada camada desse envelope digital.
+    </p>
+  </div>
+
+  <h3>MTU e Riscos de Fragmentação IP</h3>
+  <p>
+    A <strong>MTU (Maximum Transmission Unit)</strong> define o tamanho máximo, em bytes, de um pacote que pode trafegar
+    em determinado meio de rede sem sofrer fragmentação. Na Ethernet padrão, a MTU é de <strong>1.500 bytes</strong>.
+    Quando um pacote IPv4 excede a MTU de um salto intermediário e não possui a flag <em>DF (Don't Fragment)</em> ativada,
+    o roteador o divide em fragmentos menores.
+  </p>
+  <p>
+    Historicamente, fragmentos malformados foram explorados em ataques clássicos de negação de serviço, como o
+    <em>Teardrop Attack</em> (sobreposição proposital de offsets para travar pilhas TCP/IP vulneráveis) e técnicas
+    para contornar regras ingênuas de firewalls sem estado (stateless), onde o cabeçalho TCP viaja apenas no primeiro fragmento.
+  </p>
+</section>
+
+<!-- SEÇÃO 2: DISSECAÇÃO DOS PROTOCOLOS -->
+<section class="study-section" id="dissecacao-protocolos">
+  <div class="section-title-wrap">
+    <span class="section-num">02</span>
+    <h2>Dissecação dos Protocolos: IPv4, TCP, UDP, DNS e ARP</h2>
+  </div>
+
+  <h3>1. Anatomia do Cabeçalho IPv4</h3>
+  <p>
+    O cabeçalho IPv4 padrão possui <strong>20 bytes</strong> de tamanho base (podendo expandir até 60 bytes se houver opções).
+    Entre seus campos mais relevantes para investigação de segurança destacam-se:
+  </p>
+  <ul>
+    <li><strong>TTL (Time to Live):</strong> Contador de 8 bits decrescido a cada salto de roteador. Impede que pacotes fiquem em loops infinitos. Valores iniciais comuns revelam o sistema operacional de origem (Linux tipicamente inicia em 64, Windows em 128, roteadores Cisco em 255).</li>
+    <li><strong>Protocol:</strong> Identifica o protocolo da camada superior encapsulado (<code>1</code> para ICMP, <code>6</code> para TCP, <code>17</code> para UDP, <code>47</code> para GRE).</li>
+    <li><strong>Flags e Fragment Offset:</strong> Três bits de controle: bit reservado (deve ser 0), <strong>DF (Don't Fragment)</strong> e <strong>MF (More Fragments)</strong>. O offset indica a posição relativa do payload em múltiplos de 8 bytes.</li>
+    <li><strong>Endereços IP de Origem e Destino:</strong> Campos de 32 bits cada. No IPv4 puro não há mecanismo intrínseco de validação de autenticidade da origem, permitindo que atacantes gerem pacotes forjados (<em>IP Spoofing</em>) em ataques de negação de serviço em massa.</li>
+  </ul>
+
+  <h3>2. TCP: Controle de Estado e o 3-Way Handshake</h3>
+  <p>
+    O <strong>TCP (Transmission Control Protocol)</strong> é orientado a conexão e confiável. Ele garante a entrega
+    ordenada dos dados e retransmite perdas. Essa confiabilidade baseia-se na troca rigorosa de <strong>Números de
+    Sequência (SEQ)</strong> e <strong>Números de Confirmação (ACK)</strong>, iniciada pelo <strong>3-Way Handshake</strong>:
+  </p>
+
+  <div class="callout info">
+    <h4>O Ciclo do 3-Way Handshake</h4>
+    <ol>
+      <li><strong>Cliente &rarr; Servidor [SYN]:</strong> O cliente envia uma solicitação de sincronização com seu <em>Initial Sequence Number (ISN_c)</em>. Exemplo: <code>SEQ = 1000</code>, flag <code>SYN=1</code>.</li>
+      <li><strong>Servidor &rarr; Cliente [SYN, ACK]:</strong> O servidor responde reconhecendo o número do cliente (<code>ACK = ISN_c + 1 = 1001</code>) e gerando seu próprio número inicial (<code>SEQ = ISN_s = 5000</code>), flags <code>SYN=1, ACK=1</code>.</li>
+      <li><strong>Cliente &rarr; Servidor [ACK]:</strong> O cliente confirma o recebimento (<code>ACK = ISN_s + 1 = 5001</code>), com flag <code>ACK=1</code>. A conexão está estabelecida (<em>ESTABLISHED</em>) e a transmissão de dados pode iniciar.</li>
+    </ol>
+  </div>
+
+  <p>As 6 flags primárias de controle do cabeçalho TCP desempenham papéis fundamentais na análise de tráfego:</p>
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>SYN (Synchronize)</h4>
+      <p>Sincroniza os números de sequência iniciais. Presente apenas nos dois primeiros pacotes de abertura de conexão.</p>
+    </div>
+    <div class="info-card">
+      <h4>ACK (Acknowledgment)</h4>
+      <p>Indica que o campo <em>Acknowledgment Number</em> é válido. Quase todos os pacotes pós-handshake carregam esta flag ativada.</p>
+    </div>
+    <div class="info-card">
+      <h4>FIN (Finish)</h4>
+      <p>Solicita o encerramento gracioso e bilateral da transmissão de dados. Requer confirmação ACK mútua.</p>
+    </div>
+    <div class="info-card">
+      <h4>RST (Reset)</h4>
+      <p>Aborta a conexão imediatamente. Enviado quando um pacote chega para uma porta fechada ou por firewalls para interromper tráfego indevido.</p>
+    </div>
+    <div class="info-card">
+      <h4>PSH (Push)</h4>
+      <p>Instrui a pilha TCP receptora a entregar imediatamente os dados acumulados no buffer à aplicação, sem aguardar buffer cheio.</p>
+    </div>
+    <div class="info-card">
+      <h4>URG (Urgent)</h4>
+      <p>Indica que o ponteiro de dados urgentes contém dados que devem ser priorizados (raro no tráfego moderno).</p>
+    </div>
+  </div>
+
+  <div class="callout warning">
+    <h4>Ataque de SYN Flood e Mitigação por SYN Cookies</h4>
+    <p>
+      Em um ataque de <strong>SYN Flood</strong>, o invasor dispara milhares de pacotes <code>[SYN]</code> com IPs de origem
+      forjados (spoofados). O servidor aloca memória na tabela de conexões semi-abertas (<em>SYN backlog queue</em>) e
+      aguarda o terceiro pacote (ACK), que nunca chega. Quando a fila se esgota, o serviço para de responder a usuários
+      legítimos. A principal contramedida é o uso de <strong>SYN Cookies</strong> no kernel do sistema operacional: o servidor
+      não aloca buffer no primeiro SYN; em vez disso, codifica os parâmetros da conexão em um ISN criptográfico e só
+      reserva memória quando recebe o ACK válido correspondente.
+    </p>
+  </div>
+
+  <h3>3. UDP: Leveza e Abuso em Ataques de Amplificação</h3>
+  <p>
+    O <strong>UDP (User Datagram Protocol)</strong> opera sem conexão (<em>connectionless</em>) e com cabeçalho de apenas
+    <strong>8 bytes</strong> (Porta Origem, Porta Destino, Comprimento e Checksum). Não há garantia de entrega,
+    ordenação ou handshake. Essa ausência de estado torna o UDP ideal para streaming, jogos, DNS e VoIP, mas também o
+    torna a ferramenta preferida para ataques de <strong>DDoS por Amplificação e Reflexão</strong>.
+  </p>
+  <p>
+    Em um ataque de amplificação DNS ou NTP, o atacante envia requisições pequenas com o IP de origem forjado (apontando
+    para a vítima). Servidores abertos na Internet respondem com cargas de dados muito maiores (fator de amplificação
+    de 10x a 50x em DNS com registros ANY/EDNS, ou até 500x em servidores NTP vulneráveis ao comando <code>monlist</code>),
+    inundando a banda da vítima sem sobrecarregar a banda do atacante.
+  </p>
+
+  <h3>4. DNS: Hierarquia e Envenenamento de Cache</h3>
+  <p>
+    O <strong>DNS (Domain Name System)</strong> resolve nomes humanamente legíveis (ex.: <code>empresa.com.br</code>) em
+    endereços IP roteáveis. Ele organiza-se em uma árvore hierárquica formada pelos Root Servers (13 identidades de raiz),
+    servidores de TLD (Top-Level Domain, como <code>.br</code> ou <code>.com</code>) e Servidores Autoritativos.
+  </p>
+  <p>
+    Na ausência de validação criptográfica (<strong>DNSSEC</strong>), servidores recursivos de DNS estão expostos a
+    ataques de <strong>DNS Cache Poisoning</strong> (conhecido pelo exploit Kaminsky): o atacante bombardeia o servidor
+    recursivo com respostas forjadas contendo o mesmo <em>Transaction ID (TxID)</em> de 16 bits de uma consulta em andamento,
+    injetando um IP malicioso no cache do servidor. Usuários subsequentes são redirecionados silenciosamente para sites
+    falsos de phishing.
+  </p>
+
+  <h3>5. ARP e Ataques de Camada 2 (Man-in-the-Middle)</h3>
+  <p>
+    Na rede local (LAN), as placas de rede comunicam-se via endereços físicos MAC. O protocolo <strong>ARP (Address
+    Resolution Protocol)</strong> mapeia endereços IP em endereços MAC. O protocolo foi projetado sem qualquer autenticação:
+    qualquer estação pode anunciar <em>"eu sou o dono do IP 192.168.1.1 e meu MAC é AA:BB:CC..."</em> sem ter sido consultada
+    (resposta não solicitada ou <em>Gratuitous ARP</em>).
+  </p>
+  <p>
+    No ataque de <strong>ARP Spoofing / Poisoning</strong>, o invasor envenena a tabela ARP da vítima e do gateway padrão,
+    fazendo todo o tráfego da rede passar pela sua máquina antes de ser repassado ao roteador, viabilizando espionagem de
+    senhas em texto claro e interceptação ativa de tráfego. Contramedidas em switches corporativos incluem
+    <strong>Dynamic ARP Inspection (DAI)</strong> aliada a <strong>DHCP Snooping</strong> e <strong>Port Security</strong>.
+  </p>
+</section>
+
+<!-- SEÇÃO 3: LABORATÓRIO / SIMULADOR INTERATIVO -->
+<section class="study-section" id="laboratorio-inspetor">
+  <div class="section-title-wrap">
+    <span class="section-num">03</span>
+    <h2>Laboratório Interativo: Inspetor Visual de Pacotes e Probe de Portas</h2>
+  </div>
+
+  <p>
+    Utilize o simulador abaixo para manipular cabeçalhos IPv4 e TCP/UDP. Você pode configurar IPs, portas e flags,
+    visualizar os campos em tempo real e testar como o host de destino reage quando a porta está aberta, fechada ou
+    bloqueada por um firewall.
+  </p>
+
+  <div class="lab-box" id="packet-inspector">
+    <div class="lab-header">
+      <div class="lab-badge">Simulador Interativo em Vanilla JS</div>
+      <h3>Inspetor de Pacotes &bull; Probe de Portas e Handshake TCP</h3>
+    </div>
+
+    <div class="lab-controls-grid">
+      <!-- Protocolo -->
+      <div class="form-group">
+        <label for="packet-proto">Protocolo de Transporte:</label>
+        <select id="packet-proto" class="form-control" onchange="window.PI.onProtocolChange()">
+          <option value="TCP" selected>TCP (Transmission Control Protocol - 20 bytes base)</option>
+          <option value="UDP">UDP (User Datagram Protocol - 8 bytes base)</option>
+        </select>
+      </div>
+
+      <!-- Cenário do Destino -->
+      <div class="form-group">
+        <label for="target-state">Estado da Porta no Servidor Alvo:</label>
+        <select id="target-state" class="form-control" onchange="window.PI.atualizarCenario()">
+          <option value="open" selected>Porta Aberta (Serviço ativo escutando &bull; SYN-ACK esperado)</option>
+          <option value="closed">Porta Fechada (Host ativo sem serviço &bull; RST-ACK esperado)</option>
+          <option value="filtered">Porta Filtrada por Firewall (Drop silencioso &bull; Timeout esperado)</option>
+        </select>
+      </div>
+
+      <!-- IP Origem e Destino -->
+      <div class="form-group">
+        <label for="src-ip">IP Origem:</label>
+        <input type="text" id="src-ip" class="form-control" value="192.168.1.50" oninput="window.PI.atualizarCabecalho()">
+      </div>
+
+      <div class="form-group">
+        <label for="dst-ip">IP Destino:</label>
+        <input type="text" id="dst-ip" class="form-control" value="203.0.113.10" oninput="window.PI.atualizarCabecalho()">
+      </div>
+
+      <!-- Portas -->
+      <div class="form-group">
+        <label for="src-port">Porta de Origem (Efêmera):</label>
+        <input type="number" id="src-port" class="form-control" value="49152" min="1024" max="65535" oninput="window.PI.atualizarCabecalho()">
+      </div>
+
+      <div class="form-group">
+        <label for="dst-port">Porta de Destino (Serviço):</label>
+        <select id="dst-port-preset" class="form-control" onchange="window.PI.onPortPresetChange()">
+          <option value="80" selected>80 (HTTP Web)</option>
+          <option value="443">443 (HTTPS Web Seguro)</option>
+          <option value="22">22 (SSH Terminal Seguro)</option>
+          <option value="53">53 (DNS Resolução de Nomes)</option>
+          <option value="21">21 (FTP Transferência de Arquivos)</option>
+          <option value="3389">3389 (RDP Desktop Remoto)</option>
+          <option value="custom">Personalizada...</option>
+        </select>
+        <input type="number" id="dst-port-custom" class="form-control" style="display:none; margin-top:6px;" value="8080" min="1" max="65535" oninput="window.PI.atualizarCabecalho()">
+      </div>
+
+      <!-- TTL -->
+      <div class="form-group full-width">
+        <label for="ip-ttl">IPv4 Time to Live (TTL): <span id="ttl-val">64</span> saltos (Padrão Linux/Unix)</label>
+        <input type="range" id="ip-ttl" min="1" max="255" value="64" class="form-range" oninput="window.PI.onTtlChange(this.value)">
+      </div>
+
+      <!-- Flags TCP -->
+      <div class="form-group full-width" id="tcp-flags-container">
+        <label>Flags de Controle TCP:</label>
+        <div class="flags-btn-group">
+          <label class="flag-toggle"><input type="checkbox" id="flag-syn" checked onchange="window.PI.atualizarCabecalho()"> <span>SYN</span></label>
+          <label class="flag-toggle"><input type="checkbox" id="flag-ack" onchange="window.PI.atualizarCabecalho()"> <span>ACK</span></label>
+          <label class="flag-toggle"><input type="checkbox" id="flag-fin" onchange="window.PI.atualizarCabecalho()"> <span>FIN</span></label>
+          <label class="flag-toggle"><input type="checkbox" id="flag-rst" onchange="window.PI.atualizarCabecalho()"> <span>RST</span></label>
+          <label class="flag-toggle"><input type="checkbox" id="flag-psh" onchange="window.PI.atualizarCabecalho()"> <span>PSH</span></label>
+          <label class="flag-toggle"><input type="checkbox" id="flag-urg" onchange="window.PI.atualizarCabecalho()"> <span>URG</span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ações do Laboratório -->
+    <div class="lab-actions-bar">
+      <button type="button" class="btn primary" onclick="window.PI.testarPorta()">Disparar Pacote (Probe)</button>
+      <button type="button" class="btn secondary" onclick="window.PI.simularHandshake()">Simular 3-Way Handshake Completo</button>
+      <button type="button" class="btn ghost" onclick="window.PI.resetar()">Restaurar Padrões</button>
+    </div>
+
+    <!-- Visualizador de Cabeçalho Estruturado -->
+    <div class="packet-display-wrap">
+      <h4>Visualizador de Cabeçalho em Tempo Real (IPv4 + Transporte)</h4>
+      <div class="packet-header-grid" id="header-grid">
+        <!-- Gerado via JavaScript -->
+      </div>
+    </div>
+
+    <!-- Console de Simulação -->
+    <div class="terminal-box" style="margin-top:20px;">
+      <div class="terminal-header">
+        <span class="terminal-title">Monitor de Tráfego e Resposta do Host Alvo</span>
+        <button type="button" class="btn-copy" onclick="CS.copyCode(this, 'probe-output')">Copiar Log</button>
+      </div>
+      <pre class="terminal-content" id="probe-output">Aguardando disparo de pacote... Clique em "Disparar Pacote (Probe)" ou "Simular 3-Way Handshake Completo".</pre>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 4: CHECKLIST PRÁTICO -->
+<section class="study-section" id="checklist-pratico">
+  <div class="section-title-wrap">
+    <span class="section-num">04</span>
+    <h2>Checklist de Triage e Inspeção de Rede</h2>
+  </div>
+
+  <p>
+    Ao investigar um incidente ou realizar a triagem de tráfego anômalo no Wireshark ou tcpdump, execute este
+    procedimento metódico. Os itens marcados são salvos automaticamente no seu navegador via <code>localStorage</code>.
+  </p>
+
+  <div class="checklist">
+    <div class="checklist-header">
+      <h3>Procedimento de Análise de Tráfego e Diagnóstico de Protocolos</h3>
+      <div class="checklist-progress-bar"><div class="progress-fill" id="chk-progress"></div></div>
+    </div>
+    <ul class="checklist-items">
+      <li class="checklist-item">
+        <label>
+          <input type="checkbox" id="chk-1">
+          <span class="chk-label">
+            <strong>1. Mapeamento de Camada 2 e Tabela ARP:</strong>
+            Verifique a tabela de vizinhos ARP (<code>arp -a</code> ou <code>ip neigh</code>) em busca de endereços MAC duplicados associados a múltiplos IPs, o que evidencia envenenamento por ARP Spoofing na rede local.
+          </span>
+        </label>
+      </li>
+      <li class="checklist-item">
+        <label>
+          <input type="checkbox" id="chk-2">
+          <span class="chk-label">
+            <strong>2. Identificação de Padrões Anômalos de Flags TCP:</strong>
+            Filtre no Wireshark por combinações ilegítimas de flags que revelam port scanning furtivo, como pacotes sem nenhuma flag ativada (<em>Null Scan</em>: <code>tcp.flags == 0</code>), pacotes com flags conflitantes (<em>Xmas Scan</em>: <code>tcp.flags.fin &amp;&amp; tcp.flags.psh &amp;&amp; tcp.flags.urg</code>) ou enxurrada de <code>[SYN]</code> sem ACK subsequente (SYN Flood).
+          </span>
+        </label>
+      </li>
+      <li class="checklist-item">
+        <label>
+          <input type="checkbox" id="chk-3">
+          <span class="chk-label">
+            <strong>3. Inspeção de Anomalias de TTL (Time to Live):</strong>
+            Avalie discrepâncias drásticas no valor do TTL em conexões com o mesmo IP de origem. Se pacotes legítimos chegam com TTL 128 e repentinamente chegam pacotes com TTL 54 alegando ser o mesmo host, há forte indício de injeção de pacotes ou IP spoofing externo.
+          </span>
+        </label>
+      </li>
+      <li class="checklist-item">
+        <label>
+          <input type="checkbox" id="chk-4">
+          <span class="chk-label">
+            <strong>4. Auditoria de Tráfego DNS Suspeito:</strong>
+            Monitore consultas com nomes de domínio excessivamente longos e randômicos (ex.: subdomínios em Base64 como <code>a1b2c3d4e5.malware.com</code>), indicando canais de comando e controle (C2) ou exfiltração de dados por <em>DNS Tunneling</em>.
+          </span>
+        </label>
+      </li>
+      <li class="checklist-item">
+        <label>
+          <input type="checkbox" id="chk-5">
+          <span class="chk-label">
+            <strong>5. Verificação de Amplificação e Reflexão UDP:</strong>
+            Examine fluxos UDP em portas conhecidas (53/DNS, 123/NTP, 1900/SSDP, 389/CLDAP) onde o tamanho das respostas é desproporcionalmente superior às requisições com destino a um único IP interno.
+          </span>
+        </label>
+      </li>
+      <li class="checklist-item">
+        <label>
+          <input type="checkbox" id="chk-6">
+          <span class="chk-label">
+            <strong>6. Validação de Conexões RST Anômalas:</strong>
+            Analise picos de pacotes com flag <code>[RST]</code> ou <code>[RST, ACK]</code>. Picos concentrados podem significar que uma máquina interna comprometida está escaneando a rede interna contra portas fechadas ou que um IDS/IPS está ativamente resetando sessões maliciosas.
+          </span>
+        </label>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- SEÇÃO 5: QUESTÕES DE FIXAÇÃO -->
+<section class="study-section" id="questoes-fixacao">
+  <div class="section-title-wrap">
+    <span class="section-num">05</span>
+    <h2>Questões de Fixação e Concursos Públicos</h2>
+  </div>
+
+  <p>
+    Teste seus conhecimentos com questões técnicas concebidas a partir de bancas de concursos de TI (FGV, Cebraspe, FCC)
+    e certificações de segurança da informação (CompTIA Network+, Security+, CEH).
+  </p>
+
+  <div class="quiz-container">
+    <!-- Questão 1 -->
+    <details class="quiz-item">
+      <summary class="quiz-summary">
+        <span class="quiz-tag">Questão 1 &bull; Pilha TCP/IP &bull; Flags de Transporte</span>
+        <p class="quiz-question">
+          Durante uma varredura de portas com o utilitário <em>Nmap</em> utilizando o modo SYN Stealth Scan (<code>-sS</code>),
+          o atacante envia um pacote com a flag <code>[SYN]</code> para a porta 22/TCP de um servidor. O servidor de destino
+          responde com um pacote contendo as flags <code>[SYN, ACK]</code>. Imediatamente após receber essa resposta, qual pacote
+          o scanner envia para evitar completar a conexão na aplicação, e qual é o estado reportado para essa porta?
+        </p>
+      </summary>
+      <div class="quiz-answer">
+        <div class="answer-badge correct">Resposta Correta: O scanner envia um pacote com flag [RST] e classifica a porta como ABERTA (Open).</div>
+        <p><strong>Fundamentação Técnica:</strong></p>
+        <p>
+          No <em>SYN Stealth Scan</em> (também chamado de varredura semi-aberta ou half-open), o scanner envia um <code>[SYN]</code>.
+          Ao receber um <code>[SYN, ACK]</code>, o scanner confirma categoricamente que existe um serviço ouvindo na porta
+          (estado <strong>Open</strong>). Para não completar o 3-Way Handshake — o que abriria um socket formal no sistema operacional
+          e registraria um log de conexão completa na aplicação —, o scanner envia imediatamente um pacote <code>[RST]</code>
+          abortando a transação. Caso a porta estivesse fechada, o servidor responderia com <code>[RST, ACK]</code>.
+        </p>
+      </div>
+    </details>
+
+    <!-- Questão 2 -->
+    <details class="quiz-item">
+      <summary class="quiz-summary">
+        <span class="quiz-tag">Questão 2 &bull; Camada de Enlace &bull; Ataques Locais</span>
+        <p class="quiz-question">
+          Um analista de SOC nota que em um segmento corporativo comutada (switched) um usuário conseguiu capturar
+          credenciais enviadas via protocolo não criptografado entre duas máquinas vizinhas. Ao analisar as tabelas de
+          endereçamento das estações, constatou-se que o tráfego destinado ao Default Gateway estava sendo direcionado
+          para a placa de rede da máquina do invasor. Qual protocolo foi abusado e qual controle de segurança em switches
+          mitiga diretamente essa ameaça na Camada 2?
+        </p>
+      </summary>
+      <div class="quiz-answer">
+        <div class="answer-badge correct">Resposta Correta: Protocolo ARP (ARP Spoofing / Poisoning) &bull; Mitigação via Dynamic ARP Inspection (DAI).</div>
+        <p><strong>Fundamentação Técnica:</strong></p>
+        <p>
+          O ataque descrito é o clássico <strong>ARP Cache Poisoning</strong>, no qual o invasor envia respostas ARP forjadas
+          associando seu próprio endereço MAC ao IP do roteador (gateway). Como o ARP não exige autenticação, as máquinas
+          atualizam suas tabelas locais e passam a enviar seus quadros Ethernet ao atacante. A tecnologia de segurança em switches
+          camada 2 que resolve esse problema chama-se <strong>Dynamic ARP Inspection (DAI)</strong>: o switch intercepta todos os
+          pacotes ARP e valida se o par IP/MAC corresponde aos dados registrados na tabela de espionagem do <em>DHCP Snooping</em>,
+          descartando pacotes forjados imediatamente.
+        </p>
+      </div>
+    </details>
+
+    <!-- Questão 3 -->
+    <details class="quiz-item">
+      <summary class="quiz-summary">
+        <span class="quiz-tag">Questão 3 &bull; Serviços de Rede &bull; DNS e Spoofing</span>
+        <p class="quiz-question">
+          O protocolo DNS tradicionalmente utiliza a porta 53 sobre UDP para a maioria de suas consultas recursivas.
+          Qual é a principal vulnerabilidade inerente ao uso do UDP para resolução de nomes que facilita ataques de
+          DNS Spoofing / Cache Poisoning, e qual extensão de segurança foi padronizada pela IETF para garantir a
+          autenticidade e integridade das respostas DNS?
+        </p>
+      </summary>
+      <div class="quiz-answer">
+        <div class="answer-badge correct">Resposta Correta: Ausência de estado e falta de verificação de IP de origem (facilidade de spoofing) &bull; Mitigação via DNSSEC.</div>
+        <p><strong>Fundamentação Técnica:</strong></p>
+        <p>
+          Como o UDP não possui handshake de três vias nem controle de sequência pré-estabelecido, qualquer entidade pode forjar
+          o endereço IP de origem de um servidor DNS em um datagrama UDP. Se o invasor adivinhar ou inundar o servidor recursivo
+          com respostas contendo o <em>Transaction ID (TxID)</em> correto antes da resposta legítima chegar, o cache é envenenado.
+          Para sanar essa deficiência estrutural, foram criadas as extensões <strong>DNSSEC (DNS Security Extensions)</strong>, que
+          adicionam assinaturas digitais assimétricas (registros RRSIG, DNSKEY, DS) a cada zona DNS, permitindo que o resolvedor
+          valide criptograficamente a autenticidade e a integridade da resposta antes de aceitá-la.
+        </p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- SEÇÃO 6: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
+<section class="study-section" id="fatos-essenciais">
+  <div class="section-title-wrap">
+    <span class="section-num">06</span>
+    <h2>Fatos Essenciais e Conexões da Trilha</h2>
+  </div>
+
+  <p>
+    Sintetize os números, portas e convenções operacionais deste estudo que devem estar na ponta da língua em qualquer
+    entrevista técnica ou incidente de segurança:
+  </p>
+
+  <div class="facts-grid">
+    <div class="facts-card">
+      <span class="facts-card-num">20 B</span>
+      <span class="facts-card-label">Tamanho Base IPv4</span>
+      <p class="facts-card-desc">Sem opções. Contém TTL, protocolo encapsulado e endereços de 32 bits de origem e destino.</p>
+    </div>
+    <div class="facts-card">
+      <span class="facts-card-num">20 B</span>
+      <span class="facts-card-label">Tamanho Base TCP</span>
+      <p class="facts-card-desc">Sem opções. Contém portas, números SEQ e ACK, flags (SYN, ACK, RST, FIN) e janela de fluxo.</p>
+    </div>
+    <div class="facts-card">
+      <span class="facts-card-num">8 B</span>
+      <span class="facts-card-label">Cabeçalho UDP</span>
+      <p class="facts-card-desc">Ultra-enxuto: Porta Origem, Porta Destino, Comprimento e Checksum. Zero controle de estado.</p>
+    </div>
+    <div class="facts-card">
+      <span class="facts-card-num">1.500</span>
+      <span class="facts-card-label">MTU Padrão Ethernet</span>
+      <p class="facts-card-desc">Bytes máximos por quadro. Datagramas maiores sem DF são fragmentados em múltiplos pacotes.</p>
+    </div>
+    <div class="facts-card">
+      <span class="facts-card-num">53 / 67</span>
+      <span class="facts-card-label">Serviços Críticos UDP</span>
+      <p class="facts-card-desc">Porta 53 (DNS) e portas 67/68 (DHCP). Vetores comuns de amplificação DDoS e envenenamento local.</p>
+    </div>
+    <div class="facts-card">
+      <span class="facts-card-num">SYN-ACK</span>
+      <span class="facts-card-label">Sinal de Porta Aberta</span>
+      <p class="facts-card-desc">Se o host responder com SYN-ACK a porta está ativa. Se responder com RST-ACK está fechada.</p>
+    </div>
+  </div>
+
+  <div class="next-study-banner">
+    <div class="next-study-info">
+      <span class="next-study-kicker">Próximo Estudo Recomendado &bull; Estudo 03</span>
+      <h3>Criptografia Prática: Simétrica, Assimétrica, Hashes e PKI</h3>
+      <p>
+        Agora que você domina como os pacotes transitam em texto claro pela rede, o próximo passo é aprender como proteger
+        a confidencialidade e a integridade das mensagens com algoritmos de cifra (AES, RSA, Curvas Elípticas), funções hash
+        seguras (SHA-256) e a arquitetura de Certificados Digitais X.509.
+      </p>
+    </div>
+    <div class="next-study-action">
+      <a href="../Criptografia-Pratica/treinamento-criptografia-pratica.html" class="btn primary">Avançar para Estudo 03 &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SCRIPT DO LABORATÓRIO INTERATIVO (Vanilla JS puro & autônomo)
+     ========================================================================== -->
+<script>
+(function() {
+  'use strict';
+
+  // Objeto de controle do simulador de pacotes
+  const PI = {
+    state: {
+      protocol: 'TCP',
+      srcIp: '192.168.1.50',
+      dstIp: '203.0.113.10',
+      srcPort: 49152,
+      dstPort: 80,
+      ttl: 64,
+      targetState: 'open',
+      flags: {
+        syn: true,
+        ack: false,
+        fin: false,
+        rst: false,
+        psh: false,
+        urg: false
+      }
+    },
+
+    init: function() {
+      this.atualizarCabecalho();
+      if (window.CS && typeof window.CS.initChecklist === 'function') {
+        window.CS.initChecklist('redes-protocolos');
+      }
+    },
+
+    onProtocolChange: function() {
+      const proto = document.getElementById('packet-proto').value;
+      this.state.protocol = proto;
+      const flagsCont = document.getElementById('tcp-flags-container');
+      if (proto === 'UDP') {
+        flagsCont.style.opacity = '0.35';
+        flagsCont.style.pointerEvents = 'none';
+      } else {
+        flagsCont.style.opacity = '1';
+        flagsCont.style.pointerEvents = 'auto';
+      }
+      this.atualizarCabecalho();
+    },
+
+    onPortPresetChange: function() {
+      const select = document.getElementById('dst-port-preset');
+      const customInput = document.getElementById('dst-port-custom');
+      if (select.value === 'custom') {
+        customInput.style.display = 'block';
+        this.state.dstPort = parseInt(customInput.value, 10) || 8080;
+      } else {
+        customInput.style.display = 'none';
+        this.state.dstPort = parseInt(select.value, 10);
+      }
+      this.atualizarCabecalho();
+    },
+
+    onTtlChange: function(val) {
+      this.state.ttl = parseInt(val, 10);
+      document.getElementById('ttl-val').textContent = val;
+      this.atualizarCabecalho();
+    },
+
+    atualizarCenario: function() {
+      this.state.targetState = document.getElementById('target-state').value;
+    },
+
+    lerInputs: function() {
+      this.state.srcIp = document.getElementById('src-ip').value.trim() || '192.168.1.50';
+      this.state.dstIp = document.getElementById('dst-ip').value.trim() || '203.0.113.10';
+      this.state.srcPort = parseInt(document.getElementById('src-port').value, 10) || 49152;
+      
+      const select = document.getElementById('dst-port-preset');
+      if (select.value === 'custom') {
+        this.state.dstPort = parseInt(document.getElementById('dst-port-custom').value, 10) || 8080;
+      } else {
+        this.state.dstPort = parseInt(select.value, 10) || 80;
+      }
+
+      this.state.flags.syn = document.getElementById('flag-syn').checked;
+      this.state.flags.ack = document.getElementById('flag-ack').checked;
+      this.state.flags.fin = document.getElementById('flag-fin').checked;
+      this.state.flags.rst = document.getElementById('flag-rst').checked;
+      this.state.flags.psh = document.getElementById('flag-psh').checked;
+      this.state.flags.urg = document.getElementById('flag-urg').checked;
+    },
+
+    obterFlagsAtivas: function() {
+      if (this.state.protocol === 'UDP') return 'N/A (UDP)';
+      const ativas = [];
+      if (this.state.flags.syn) ativas.push('SYN');
+      if (this.state.flags.ack) ativas.push('ACK');
+      if (this.state.flags.fin) ativas.push('FIN');
+      if (this.state.flags.rst) ativas.push('RST');
+      if (this.state.flags.psh) ativas.push('PSH');
+      if (this.state.flags.urg) ativas.push('URG');
+      return ativas.length > 0 ? ativas.join(', ') : 'Nenhuma (Null)';
+    },
+
+    atualizarCabecalho: function() {
+      this.lerInputs();
+      const grid = document.getElementById('header-grid');
+      const isTcp = this.state.protocol === 'TCP';
+      const transportBytes = isTcp ? 20 : 8;
+      const totalBytes = 20 + transportBytes;
+
+      grid.innerHTML = `
+        <div class="header-field-cell span-8">
+          <span class="field-title">Versão IP</span>
+          <span class="field-val">IPv4 (4)</span>
+        </div>
+        <div class="header-field-cell span-8">
+          <span class="field-title">IHL (Comprimento)</span>
+          <span class="field-val">5 (20 bytes)</span>
+        </div>
+        <div class="header-field-cell span-16">
+          <span class="field-title">Total Length (IP + Payload)</span>
+          <span class="field-val">${totalBytes} Bytes</span>
+        </div>
+        <div class="header-field-cell span-8">
+          <span class="field-title">TTL (Time to Live)</span>
+          <span class="field-val">${this.state.ttl}</span>
+        </div>
+        <div class="header-field-cell span-8">
+          <span class="field-title">Protocolo Encapsulado</span>
+          <span class="field-val">${isTcp ? '6 (TCP)' : '17 (UDP)'}</span>
+        </div>
+        <div class="header-field-cell span-16">
+          <span class="field-title">Header Checksum</span>
+          <span class="field-val">0x4F8A (Válido)</span>
+        </div>
+        <div class="header-field-cell span-16">
+          <span class="field-title">Endereço IP Origem</span>
+          <span class="field-val highlight">${CS.escapeHtml(this.state.srcIp)}</span>
+        </div>
+        <div class="header-field-cell span-16">
+          <span class="field-title">Endereço IP Destino</span>
+          <span class="field-val highlight">${CS.escapeHtml(this.state.dstIp)}</span>
+        </div>
+        <div class="header-field-cell span-16">
+          <span class="field-title">Porta Origem (${this.state.protocol})</span>
+          <span class="field-val">${this.state.srcPort}</span>
+        </div>
+        <div class="header-field-cell span-16">
+          <span class="field-title">Porta Destino (${this.state.protocol})</span>
+          <span class="field-val highlight">${this.state.dstPort}</span>
+        </div>
+        ${isTcp ? `
+          <div class="header-field-cell span-16">
+            <span class="field-title">Sequence Number (SEQ)</span>
+            <span class="field-val">3481920412</span>
+          </div>
+          <div class="header-field-cell span-16">
+            <span class="field-title">Acknowledgment Number (ACK)</span>
+            <span class="field-val">${this.state.flags.ack ? '109283910' : '0 (Flag ACK ausente)'}</span>
+          </div>
+          <div class="header-field-cell span-16">
+            <span class="field-title">Flags TCP Ativas</span>
+            <span class="field-val flag-badge">${CS.escapeHtml(this.obterFlagsAtivas())}</span>
+          </div>
+          <div class="header-field-cell span-16">
+            <span class="field-title">Window Size</span>
+            <span class="field-val">64240 bytes</span>
+          </div>
+        ` : `
+          <div class="header-field-cell span-16">
+            <span class="field-title">Comprimento UDP</span>
+            <span class="field-val">8 Bytes</span>
+          </div>
+          <div class="header-field-cell span-16">
+            <span class="field-title">UDP Checksum</span>
+            <span class="field-val">0xB3E1</span>
+          </div>
+        `}
+      `;
+    },
+
+    testarPorta: function() {
+      this.lerInputs();
+      const out = document.getElementById('probe-output');
+      const dataHora = new Date().toLocaleTimeString('pt-BR');
+      const isTcp = this.state.protocol === 'TCP';
+      const flagsStr = this.obterFlagsAtivas();
+      let log = `[${dataHora}] DISPARANDO PROBE:\n`;
+      log += `  Origem: ${this.state.srcIp}:${this.state.srcPort} -> Destino: ${this.state.dstIp}:${this.state.dstPort}\n`;
+      log += `  Protocolo: ${this.state.protocol} | TTL: ${this.state.ttl}\n`;
+      if (isTcp) log += `  Flags enviadas: [${flagsStr}]\n`;
+      log += `-------------------------------------------------------------\n`;
+
+      if (isTcp) {
+        if (this.state.targetState === 'open') {
+          if (this.state.flags.syn && !this.state.flags.ack) {
+            log += `[RESPOSTA RECEBIDA] Servidor ${this.state.dstIp} respondeu com pacote:\n`;
+            log += `  <- Flags: [SYN, ACK] | SEQ: 508219010 | ACK: 3481920413\n`;
+            log += `  STATUS: PORTA ABERTA (OPEN / LISTENING)\n`;
+            log += `  Interpretação de Segurança: Há um serviço aguardando conexões. Em scanners stealth (-sS),\n`;
+            log += `  a ferramenta envia imediatamente um [RST] agora para fechar a conexão sem abrir socket formal.`;
+          } else if (this.state.flags.rst) {
+            log += `[RESPOSTA RECEBIDA] Nenhuma resposta. O pacote [RST] abortou silenciosamente a conexão.`;
+          } else {
+            log += `[RESPOSTA RECEBIDA] Servidor respondeu com [ACK] ou [RST] devido a flags fora de sequência de handshake.`;
+          }
+        } else if (this.state.targetState === 'closed') {
+          log += `[RESPOSTA RECEBIDA] Servidor ${this.state.dstIp} respondeu imediatamente com:\n`;
+          log += `  <- Flags: [RST, ACK] | SEQ: 0 | ACK: 3481920413\n`;
+          log += `  STATUS: PORTA FECHADA (CLOSED)\n`;
+          log += `  Interpretação de Segurança: O host está ativo (up), a pilha TCP/IP está funcional, mas não há\n`;
+          log += `  nenhum processo/daemom local escutando na porta ${this.state.dstPort}.`;
+        } else {
+          // Filtrada
+          log += `[TIMEOUT] Nenhuma resposta recebida após 3000ms.\n`;
+          log += `  STATUS: PORTA FILTRADA (FILTERED / BLOCKED)\n`;
+          log += `  Interpretação de Segurança: Um firewall com regras de DROP silencioso interceptou o pacote.\n`;
+          log += `  O scanner não consegue saber se a porta está aberta ou fechada por trás do firewall.`;
+        }
+      } else {
+        // UDP
+        if (this.state.targetState === 'open') {
+          log += `[RESPOSTA RECEBIDA] Resposta de datagrama UDP da aplicação (ou ausência de erro ICMP).\n`;
+          log += `  STATUS: PORTA ABERTA OU NÃO FILTRADA (OPEN | FILTERED)`;
+        } else if (this.state.targetState === 'closed') {
+          log += `[RESPOSTA RECEBIDA] Roteador/Host retornou mensagem ICMP:\n`;
+          log += `  <- ICMP Type 3, Code 3: Destination Unreachable (Port Unreachable)\n`;
+          log += `  STATUS: PORTA UDP FECHADA (CLOSED)`;
+        } else {
+          log += `[TIMEOUT] Pacote UDP descartado pelo firewall sem mensagem ICMP.\n`;
+          log += `  STATUS: PORTA UDP FILTRADA (FILTERED)`;
+        }
+      }
+
+      out.textContent = log;
+    },
+
+    simularHandshake: function() {
+      // Força modo TCP para simulação didática completa
+      document.getElementById('packet-proto').value = 'TCP';
+      this.onProtocolChange();
+      this.lerInputs();
+      const out = document.getElementById('probe-output');
+      const dataHora = new Date().toLocaleTimeString('pt-BR');
+
+      let log = `[${dataHora}] SIMULAÇÃO COMPLETA: 3-WAY HANDSHAKE TCP\n`;
+      log += `Conexão: ${this.state.srcIp}:${this.state.srcPort} -> ${this.state.dstIp}:${this.state.dstPort} (Porta ${this.state.dstPort})\n`;
+      log += `=============================================================\n\n`;
+
+      if (this.state.targetState !== 'open') {
+        log += `[ERRO] Não é possível completar o Handshake de 3 Vias!\n`;
+        log += `O estado atual da porta está configurado como '${this.state.targetState.toUpperCase()}'.\n`;
+        log += `Para um handshake completo acontecer, altere o seletor para 'Porta Aberta (Listening)'.`;
+        out.textContent = log;
+        return;
+      }
+
+      log += `PASSO 1: Cliente envia solicitação de sincronização [SYN]\n`;
+      log += `  [CLI -> SRV] Flags: [SYN] | SEQ: 1000 | ACK: 0 | Win: 64240\n`;
+      log += `  Estado no Cliente: SYN_SENT | Estado no Servidor: SYN_RECEIVED (Entra no SYN Backlog)\n\n`;
+
+      log += `PASSO 2: Servidor responde reconhecendo o cliente e solicitando sincronização [SYN, ACK]\n`;
+      log += `  [SRV -> CLI] Flags: [SYN, ACK] | SEQ: 5000 | ACK: 1001 (1000 + 1) | Win: 65535\n`;
+      log += `  Estado no Cliente: ESTABLISHED\n\n`;
+
+      log += `PASSO 3: Cliente confirma o número de sequência do servidor [ACK]\n`;
+      log += `  [CLI -> SRV] Flags: [ACK] | SEQ: 1001 | ACK: 5001 (5000 + 1) | Win: 64240\n`;
+      log += `  Estado no Servidor: ESTABLISHED\n\n`;
+
+      log += `=============================================================\n`;
+      log += `SUCESSO: Conexão TCP Bidirecional Estabelecida com Segurança!\n`;
+      log += `A partir deste ponto, inicia-se a transmissão segura de dados (ex.: TLS Client Hello no HTTPS).`;
+
+      out.textContent = log;
+    },
+
+    resetar: function() {
+      document.getElementById('packet-proto').value = 'TCP';
+      document.getElementById('target-state').value = 'open';
+      document.getElementById('src-ip').value = '192.168.1.50';
+      document.getElementById('dst-ip').value = '203.0.113.10';
+      document.getElementById('src-port').value = '49152';
+      document.getElementById('dst-port-preset').value = '80';
+      document.getElementById('dst-port-custom').style.display = 'none';
+      document.getElementById('ip-ttl').value = '64';
+      document.getElementById('ttl-val').textContent = '64';
+      document.getElementById('flag-syn').checked = true;
+      document.getElementById('flag-ack').checked = false;
+      document.getElementById('flag-fin').checked = false;
+      document.getElementById('flag-rst').checked = false;
+      document.getElementById('flag-psh').checked = false;
+      document.getElementById('flag-urg').checked = false;
+
+      this.onProtocolChange();
+      this.atualizarCabecalho();
+      document.getElementById('probe-output').textContent = 'Simulador restaurado aos padrões. Pronto para novo teste.';
+    }
+  };
+
+  // Expõe no escopo global para eventos inline
+  window.PI = PI;
+
+  // Inicializa quando o DOM estiver pronto
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { PI.init(); });
+  } else {
+    PI.init();
+  }
+})();
+</script>

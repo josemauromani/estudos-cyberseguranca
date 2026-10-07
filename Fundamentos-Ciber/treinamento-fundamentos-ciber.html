@@ -624,6 +624,181 @@ pre code {
   line-height: 1.55;
 }
 
+/* Controles e Grid do Laboratório Interativo */
+.lab-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background-color: var(--ground);
+  border-bottom: 1px solid var(--rule);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.form-control {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--t1-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.form-range {
+  width: 100%;
+  accent-color: var(--t1-blue);
+  cursor: pointer;
+}
+
+.flags-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.flag-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.flag-toggle:hover {
+  border-color: var(--t1-blue);
+}
+
+.flag-toggle input[type="checkbox"] {
+  accent-color: var(--t1-blue);
+  cursor: pointer;
+}
+
+.lab-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--rule);
+}
+
+.packet-display-wrap {
+  padding: 1.5rem;
+  background-color: var(--surface);
+}
+
+.packet-display-wrap h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.packet-header-grid {
+  display: grid;
+  grid-template-columns: repeat(32, 1fr);
+  gap: 4px;
+  background-color: var(--ground);
+  padding: 0.75rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.header-field-cell {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-width: 75px;
+}
+
+.header-field-cell.span-8 {
+  grid-column: span 8;
+}
+
+.header-field-cell.span-16 {
+  grid-column: span 16;
+}
+
+.header-field-cell.span-32 {
+  grid-column: span 32;
+}
+
+.header-field-cell .field-title {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.2rem;
+}
+
+.header-field-cell .field-val {
+  font-size: 0.88rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.header-field-cell .field-val.highlight {
+  color: var(--t1-blue);
+}
+
+.header-field-cell .field-val.flag-badge {
+  background-color: var(--sunk);
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+  .packet-header-grid {
+    grid-template-columns: repeat(16, 1fr);
+  }
+  .header-field-cell.span-8 {
+    grid-column: span 16;
+  }
+}
+
+
 /* --------------------------------------------------------------------------
    9. Botões e Controles Padrão
    -------------------------------------------------------------------------- */
