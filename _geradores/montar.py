@@ -32,6 +32,7 @@ def normalizar_chave(texto: str) -> str:
     s = texto.strip().lower()
     s = s.replace("_body.html", "").replace(".html", "").replace("_body", "")
     s = s.replace("treinamento-", "").replace("treinamento_", "")
+    s = s.replace("-e-", "").replace("_e_", "")
     s = s.replace("-", "").replace("_", "")
     return s
 

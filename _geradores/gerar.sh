@@ -59,6 +59,9 @@ comando_todos() {
         echo "[INFO] Nenhum fragmento *_body.html encontrado em _geradores/."
     else
         for body in "${bodies[@]}"; do
+            if [ -L "$body" ]; then
+                continue
+            fi
             echo "--- Compilando: $(basename "$body") ---"
             python3 "$SCRIPT_DIR/montar.py" "$body"
         done

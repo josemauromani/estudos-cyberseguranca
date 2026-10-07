@@ -1,0 +1,853 @@
+<!-- ==========================================================================
+     Estudo 03: Criptografia Prática
+     Corpo do Treinamento: Criptografia Simétrica, Assimétrica, Hashes e PKI
+     ========================================================================== -->
+
+<header class="study-header">
+  <span class="study-track-kicker">Trilha 1: Fundamentos &amp; Redes Seguras &bull; Estudo 03</span>
+  <h1 class="study-title">Criptografia Prática</h1>
+  <p class="study-lead">
+    A criptografia é a espinha dorsal matemática de toda a segurança da informação contemporânea.
+    Compreender a diferença entre cifras de bloco e fluxo, o poder das curvas elípticas, a unidirecionalidade
+    das funções hash e a cadeia de confiança X.509 é essencial para garantir confidencialidade, integridade,
+    autenticidade e não-repúdio em aplicações modernas.
+  </p>
+  <div class="study-meta-bar">
+    <span class="badge blue">NIST CSF 2.0: Protect (PR)</span>
+    <span class="badge slate">MITRE ATT&amp;CK: T1003, T1552, T1557</span>
+    <span class="badge slate">Tempo Estimado: ~45 minutos</span>
+    <span class="badge slate">Carreiras: Blue Team &bull; AppSec &bull; GRC</span>
+  </div>
+</header>
+
+<!-- SEÇÃO 1: INTRODUÇÃO E PILARES CRIPTOGRÁFICOS -->
+<section class="study-section" id="pilares-criptograficos">
+  <div class="section-title-wrap">
+    <span class="section-num">01</span>
+    <h2>Introdução e Pilares Fundamentais da Criptografia</h2>
+  </div>
+
+  <p>
+    Historicamente vista como a arte de ocultar mensagens militares, a criptografia moderna é uma ciência exata
+    baseada na teoria da informação, teoria dos números e complexidade computacional. No contexto corporativo,
+    ela atua fornecendo quatro garantias de segurança primordiais:
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>Confidencialidade</h4>
+      <p>Assegura que somente destinatários autorizados que possuem a chave criptográfica consigam decifrar e ler o conteúdo da mensagem.</p>
+    </div>
+    <div class="info-card">
+      <h4>Integridade</h4>
+      <p>Garante que a informação não foi adulterada, corrompida ou truncada durante o trânsito ou armazenamento não autorizado.</p>
+    </div>
+    <div class="info-card">
+      <h4>Autenticidade</h4>
+      <p>Comprova inequivocamente a identidade do emissor ou a legitimidade da origem do documento ou serviço.</p>
+    </div>
+    <div class="info-card">
+      <h4>Não-Repúdio</h4>
+      <p>Impede que o emissor negue a autoria da transação ou mensagem enviada, garantido pela assinatura digital com chave privada única.</p>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <h4>O Princípio de Kerckhoffs e a Máxima de Shannon</h4>
+    <p>
+      Formulado em 1883 por Auguste Kerckhoffs e refinado por Claude Shannon (<em>"the enemy knows the system"</em>),
+      este é o dogma mais importante da criptografia: <strong>a segurança de um sistema criptográfico deve depender
+      exclusivamente do sigilo da chave, e não do segredo do algoritmo</strong>. Algoritmos proprietários e secretos
+      ("segurança por obscuridade") quase invariavelmente contêm falhas matemáticas catastróficas. Padrões abertos e
+      amplamente escrutinados pela comunidade científica internacional (como o AES e o SHA-2) são os únicos confiáveis.
+    </p>
+  </div>
+
+  <h3>Os Três Estados dos Dados</h3>
+  <p>Toda estratégia de defesa em profundidade deve contemplar a proteção criptográfica nos três estados da informação:</p>
+  <ul>
+    <li><strong>Dados em Trânsito (Data in Transit):</strong> Dados trafegando por redes públicas ou internas. Protegidos por protocolos de camada de transporte e rede, como TLS 1.3, IPsec, SSH e WireGuard.</li>
+    <li><strong>Dados em Repouso (Data at Rest):</strong> Dados gravados em discos rígidos, fitas, bancos de dados ou buckets de nuvem. Protegidos por criptografia de disco completo (LUKS, BitLocker), TDE (Transparent Data Encryption) em bancos de dados e chaves gerenciadas por KMS (Key Management Service).</li>
+    <li><strong>Dados em Uso (Data in Use):</strong> Dados carregados na memória RAM e processados pela CPU. Estado historicamente mais vulnerável, hoje mitigado por tecnologias de <em>Confidential Computing</em> e enclaves de hardware protegidos (como AMD SEV e Intel SGX).</li>
+  </ul>
+</section>
+
+<!-- SEÇÃO 2: ALGORITMOS, MODOS E ARQUITETURAS -->
+<section class="study-section" id="algoritmos-modos">
+  <div class="section-title-wrap">
+    <span class="section-num">02</span>
+    <h2>Criptografia Simétrica, Assimétrica, Hashes e PKI</h2>
+  </div>
+
+  <h3>1. Criptografia Simétrica: Velocidade e Cifras Modernas</h3>
+  <p>
+    Na criptografia simétrica, a <strong>mesma chave secreta</strong> é utilizada para cifrar e decifrar os dados.
+    Sua grande vantagem é o alto desempenho computacional, permitindo cifrar terabytes de tráfego de rede ou discos
+    inteiros com impacto quase nulo na CPU graças a instruções aceleradas por hardware (como o conjunto AES-NI).
+  </p>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Algoritmo / Modo</th>
+          <th>Tipo</th>
+          <th>Tamanho de Chave</th>
+          <th>Status Atual</th>
+          <th>Avaliação de Segurança &amp; Recomendação</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>AES-GCM</strong></td>
+          <td>Bloco (128 bits) com AEAD</td>
+          <td>128, 256 bits</td>
+          <td>Recomendado (Padrão Ouro)</td>
+          <td>Galois/Counter Mode. Oferece confidencialidade e autenticação integrada em uma única passada. Padrão do TLS 1.3 e do NIST.</td>
+        </tr>
+        <tr>
+          <td><strong>ChaCha20-Poly1305</strong></td>
+          <td>Fluxo com AEAD</td>
+          <td>256 bits</td>
+          <td>Recomendado</td>
+          <td>Excelente desempenho em processadores móveis (ARM) que não possuem aceleração AES por hardware. Utilizado no WireGuard e TLS 1.3.</td>
+        </tr>
+        <tr>
+          <td><strong>AES-CBC</strong></td>
+          <td>Bloco (128 bits)</td>
+          <td>128, 256 bits</td>
+          <td>Legado / Cautela</td>
+          <td>Cipher Block Chaining. Exige IV (Vetor de Inicialização) imprevisível e esquema HMAC externo (Encrypt-then-MAC). Vulnerável a ataques de Padding Oracle se mal implementado.</td>
+        </tr>
+        <tr>
+          <td><strong>AES-ECB</strong></td>
+          <td>Bloco (128 bits)</td>
+          <td>128, 256 bits</td>
+          <td>PROIBIDO</td>
+          <td>Electronic Codebook. Cifra blocos idênticos de texto claro em blocos idênticos de texto cifrado, preservando padrões visuais e estruturais dos dados (ex.: famoso Tux do Linux visível após cifragem).</td>
+        </tr>
+        <tr>
+          <td><strong>DES / 3DES</strong></td>
+          <td>Bloco (64 bits)</td>
+          <td>56 / 112 bits</td>
+          <td>OBSOLETO / BANIDO</td>
+          <td>Chaves curtas quebráveis por força bruta e vulnerabilidade ao ataque Sweet32 devido ao tamanho de bloco minúsculo de 64 bits.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>2. Criptografia Assimétrica e Curvas Elípticas</h3>
+  <p>
+    A criptografia assimétrica soluciona o clássico problema da distribuição de chaves seguras: ela utiliza um
+    <strong>par de chaves matematicamente correlacionadas</strong>:
+  </p>
+  <ul>
+    <li><strong>Chave Pública:</strong> Pode ser distribuída abertamente para qualquer pessoa. Utilizada para <em>cifrar</em> mensagens destinadas ao proprietário ou para <em>verificar assinaturas</em> digitais emitidas por ele.</li>
+    <li><strong>Chave Privada:</strong> Mantida sob sigilo absoluto pelo proprietário. Utilizada para <em>decifrar</em> dados recebidos ou para <em>assinar digitalmente</em> documentos.</li>
+  </ul>
+
+  <div class="callout info">
+    <h4>RSA vs Curvas Elípticas (ECC) e Perfect Forward Secrecy</h4>
+    <p>
+      O <strong>RSA</strong> baseia sua segurança na dificuldade de fatorar o produto de dois grandes números primos.
+      Por exigir chaves de no mínimo <strong>2048 bits</strong> (com recomendação atual de <strong>3072 ou 4096 bits</strong>),
+      ele demanda alto consumo computacional.
+    </p>
+    <p>
+      A criptografia de <strong>Curvas Elípticas (ECC)</strong>, como o algoritmo <strong>ECDSA</strong> e as modernas curvas
+      <strong>Ed25519 / X25519</strong>, alcança o mesmo nível de segurança criptográfica com chaves de apenas
+      <strong>256 bits</strong>, gerando assinaturas menores, conexões mais rápidas e menor consumo de energia.
+    </p>
+    <p>
+      Em protocolos como o TLS 1.3, a troca de chaves ocorre exclusivamente via <strong>ECDHE (Elliptic Curve Diffie-Hellman Ephemeral)</strong>,
+      garantindo a propriedade de <strong>Perfect Forward Secrecy (PFS)</strong>: mesmo que a chave privada de longa duração do
+      servidor seja comprometida no futuro, gravações de tráfego passado realizadas por atacantes não poderão ser decifradas,
+      pois cada sessão usou chaves temporárias descartadas após o término da conexão.
+    </p>
+  </div>
+
+  <h3>3. Funções de Resumo Criptográfico (Hash) e Assinaturas Digitais</h3>
+  <p>
+    Uma função hash criptográfica recebe uma entrada de dados de qualquer tamanho e produz um resumo (digest)
+    de tamanho fixo. Suas propriedades obrigatórias são:
+  </p>
+  <ul>
+    <li><strong>Unidirecionalidade (Pre-image Resistance):</strong> É computacionalmente inviável recuperar a entrada original a partir do seu hash digest.</li>
+    <li><strong>Efeito Avalanche:</strong> A alteração de um único bit na entrada muda drasticamente mais de 50% dos bits do hash de saída.</li>
+    <li><strong>Resistência a Colisões (Collision Resistance):</strong> É computacionalmente inviável encontrar duas entradas diferentes que produzam exatamente o mesmo hash.</li>
+  </ul>
+
+  <div class="callout warning">
+    <h4>Aposentadoria do MD5 e SHA-1 &bull; Hashes para Senhas vs Hashes de Integridade</h4>
+    <p>
+      Algoritmos como <strong>MD5</strong> (quebrado em 2004) e <strong>SHA-1</strong> (colisão prática demonstrada pelo Google
+      em 2017 no ataque SHAttered) foram formalmente aposentados e <strong>não devem ser usados para segurança</strong>.
+      O padrão mínimo atual é a família <strong>SHA-2 (SHA-256, SHA-512)</strong> ou <strong>SHA-3</strong>.
+    </p>
+    <p>
+      <strong>Atenção para Armazenamento de Senhas:</strong> Funções como SHA-256 foram projetadas para serem extremamente
+      rápidas (milhões de hashes por segundo em GPUs). Por isso, <em>nunca devem ser usadas puras para senhas</em>, pois facilitam
+      ataques de força bruta e tabelas rainbow. Senhas exigem funções lentas com fator de trabalho ajustável, consumo de
+      memória e salting aleatório, como <strong>Argon2id (vencedor da Password Hashing Competition)</strong>, <strong>bcrypt</strong>
+      ou <strong>PBKDF2</strong>.
+    </p>
+  </div>
+
+  <h3>4. Infraestrutura de Chaves Públicas (PKI) e o Padrão X.509</h3>
+  <p>
+    Como ter certeza de que uma chave pública que alega pertencer a <code>banco.com.br</code> realmente pertence ao banco?
+    Essa garantia é fornecida pela <strong>PKI (Public Key Infrastructure)</strong> por meio de uma cadeia de confiança hierárquica:
+  </p>
+  <ol>
+    <li><strong>Autoridade Certificadora Raiz (Root CA):</strong> Entidade de máxima confiança pré-instalada no repositório de certificados do sistema operacional ou navegador. Possui um certificado autoassinado (Root Certificate) protegido em hardware de alta segurança (HSM) offline.</li>
+    <li><strong>Autoridade Certificadora Intermediária (Intermediate CA):</strong> Emite certificados finais no dia a dia. Se for comprometida, a Root CA pode revogá-la sem afetar a confiança de toda a cadeia global.</li>
+    <li><strong>Certificado Final / Folha (End-Entity / Leaf):</strong> Emitido para o domínio corporativo no padrão <strong>X.509</strong>, contendo a chave pública do servidor, período de validade, nome do domínio e <em>SAN (Subject Alternative Name)</em>, assinado digitalmente pela autoridade intermediária.</li>
+  </ol>
+  <p>
+    Para revogar certificados vazados antes da expiração, utilizavam-se listas de revogação volumosas (<strong>CRL</strong>).
+    O padrão moderno substituiu esse modelo por consultas em tempo real via <strong>OCSP (Online Certificate Status Protocol)</strong>
+    e, mais eficientemente, pelo <strong>OCSP Stapling</strong>, no qual o próprio servidor web anexa a resposta da CA assinada
+    junto ao handshake TLS, eliminando gargalos de desempenho e preservando a privacidade do usuário.
+  </p>
+</section>
+
+<!-- SEÇÃO 3: LABORATÓRIO INTERATIVO -->
+<section class="study-section" id="laboratorio-cripto">
+  <div class="section-title-wrap">
+    <span class="section-num">03</span>
+    <h2>Laboratório Interativo: Web Crypto API Nativa</h2>
+  </div>
+
+  <p>
+    O laboratório abaixo executa operações criptográficas <strong>reais e matematicamente autênticas</strong>
+    diretamente no seu navegador via <code>window.crypto.subtle</code> (Web Crypto API do W3C). Não há simulações
+    estáticas nem envio de dados pela rede: tudo ocorre na memória da sua máquina.
+  </p>
+
+  <div class="lab-box" id="crypto-lab">
+    <div class="lab-header">
+      <div class="lab-badge">Laboratório em Vanilla JS &bull; Web Crypto API</div>
+      <h3>Playground Criptográfico: Hashes, Cifragem AES-GCM e Cadeia PKI</h3>
+    </div>
+
+    <!-- Navegação de Abas do Lab -->
+    <div class="lab-actions-bar" style="background:var(--sunk); border-bottom:1px solid var(--rule);">
+      <button type="button" class="btn primary" id="tab-hash-btn" onclick="window.CLAB.switchTab('hash')">1. Hashes &amp; Efeito Avalanche</button>
+      <button type="button" class="btn ghost" id="tab-aes-btn" onclick="window.CLAB.switchTab('aes')">2. Cifragem Autêntica AES-GCM</button>
+      <button type="button" class="btn ghost" id="tab-pki-btn" onclick="window.CLAB.switchTab('pki')">3. Inspeção de Cadeia PKI X.509</button>
+    </div>
+
+    <!-- PAINEL 1: HASHES E EFEITO AVALANCHE -->
+    <div id="panel-hash" class="lab-panel" style="padding:1.5rem;">
+      <h4>Gerador de Digest e Demonstração do Efeito Avalanche</h4>
+      <p style="color:var(--muted); font-size:0.92rem;">
+        Digite qualquer mensagem abaixo. O digest SHA-256 é recalculado em tempo real. Clique em <em>"Alterar 1 Caractere"</em>
+        para observar a completa alteração estatística do hash resultante.
+      </p>
+
+      <div class="form-group" style="margin-bottom:1rem;">
+        <label for="hash-input-text">Texto de Entrada (Plaintext):</label>
+        <textarea id="hash-input-text" class="form-control" rows="3" oninput="window.CLAB.calcularHashReal()">O segredo da criptografia reside exclusivamente na chave.</textarea>
+      </div>
+
+      <div class="lab-actions-bar" style="padding:0; background:transparent; border:none; margin-bottom:1.25rem;">
+        <button type="button" class="btn secondary" onclick="window.CLAB.alterarUmCaractere()">Alterar 1 Caractere (Efeito Avalanche)</button>
+        <button type="button" class="btn ghost" onclick="window.CLAB.resetarHash()">Restaurar Texto Original</button>
+      </div>
+
+      <div class="terminal-box">
+        <div class="terminal-header">
+          <span class="terminal-title">Digest SHA-256 Calculado em Tempo Real (256 bits / 32 bytes / 64 hex chars)</span>
+          <button type="button" class="btn-copy" onclick="CS.copyCode(this, 'hash-digest-val')">Copiar Hash</button>
+        </div>
+        <pre class="terminal-content" id="hash-digest-val" style="color:#38BDF8; font-size:0.95rem; word-break:break-all;">Calculando...</pre>
+      </div>
+
+      <div id="avalanche-metrics" style="margin-top:1rem; padding:0.85rem 1rem; background:var(--ground); border:1px solid var(--rule); border-radius:var(--radius-sm); font-size:0.88rem; color:var(--ink);">
+        <strong>Métrica de Dispersão:</strong> Digite ou altere o texto para comparar o efeito avalanche.
+      </div>
+    </div>
+
+    <!-- PAINEL 2: AES-GCM -->
+    <div id="panel-aes" class="lab-panel" style="padding:1.5rem; display:none;">
+      <h4>Cifragem Autenticada com AES-GCM (256 bits)</h4>
+      <p style="color:var(--muted); font-size:0.92rem;">
+        Gere uma chave simétrica de 256 bits e cifre a mensagem com Vetor de Inicialização (IV de 96 bits / 12 bytes).
+        O AES-GCM protege contra leitura indevida e contra adulteração de bytes via Tag de Autenticação.
+      </p>
+
+      <div class="form-group" style="margin-bottom:1rem;">
+        <label for="aes-plaintext">Texto Claro para Cifragem:</label>
+        <input type="text" id="aes-plaintext" class="form-control" value="Transferência confidencial de R$ 500.000 para conta 12345-6.">
+      </div>
+
+      <div class="lab-actions-bar" style="padding:0; background:transparent; border:none; margin-bottom:1.25rem;">
+        <button type="button" class="btn primary" onclick="window.CLAB.cifrarAesGcm()">1. Gerar Chave e Cifrar (AES-GCM)</button>
+        <button type="button" class="btn secondary" onclick="window.CLAB.decifrarAesGcm(false)">2. Decifrar com Chave Correta</button>
+        <button type="button" class="btn ghost" style="color:var(--t3-red);" onclick="window.CLAB.decifrarAesGcm(true)">3. Testar Decifração com Dados Adulterados</button>
+      </div>
+
+      <div class="terminal-box">
+        <div class="terminal-header">
+          <span class="terminal-title">Artefatos da Cifragem AES-GCM (Chave, IV, Ciphertext e Auth Tag)</span>
+          <button type="button" class="btn-copy" onclick="CS.copyCode(this, 'aes-output')">Copiar Artefatos</button>
+        </div>
+        <pre class="terminal-content" id="aes-output" style="color:#A78BFA; font-size:0.9rem;">Clique em "1. Gerar Chave e Cifrar (AES-GCM)" para iniciar a operação matemática no navegador.</pre>
+      </div>
+    </div>
+
+    <!-- PAINEL 3: PKI X.509 -->
+    <div id="panel-pki" class="lab-panel" style="padding:1.5rem; display:none;">
+      <h4>Simulador de Validação de Cadeia de Confiança X.509</h4>
+      <p style="color:var(--muted); font-size:0.92rem;">
+        Explore os nós da hierarquia PKI abaixo. Alterne entre os cenários para observar como o navegador
+        valida as assinaturas digitais intermediárias até a raiz confiável.
+      </p>
+
+      <div class="form-group" style="margin-bottom:1.25rem;">
+        <label for="pki-scenario">Cenário de Teste de Validação da Cadeia:</label>
+        <select id="pki-scenario" class="form-control" onchange="window.CLAB.atualizarPkiCenario()">
+          <option value="valid" selected>1. Cadeia Íntegra e Válida (Root CA confiável &bull; Certificado válido)</option>
+          <option value="expired">2. Falha: Certificado do Servidor Expirado (NotAfter no passado)</option>
+          <option value="untrusted_root">3. Falha: Root CA Autoassinada Não Reconhecida (Alerta de Segurança SEC_ERROR_UNKNOWN_ISSUER)</option>
+          <option value="revoked">4. Falha: Certificado Revogado via Verificação OCSP (Alerta de Revogação Imediata)</option>
+        </select>
+      </div>
+
+      <div class="pki-tree-wrap" style="display:flex; flex-direction:column; gap:12px; margin-bottom:1.5rem;">
+        <div class="pki-node" id="node-root" style="border:1px solid var(--rule); padding:1rem; border-radius:var(--radius-sm); background:var(--ground);">
+          <strong style="color:var(--t1-blue);">[Nível 1 &bull; Root CA] GlobalTrust Primary Root Certification Authority</strong>
+          <p style="margin:0.25rem 0 0; font-size:0.85rem; color:var(--muted);">Autoassinado &bull; Instalado no Trust Store do Sistema Operacional &bull; Algoritmo: RSA 4096 bits com SHA-384</p>
+        </div>
+        <div class="pki-arrow" style="text-align:center; color:var(--muted); font-size:1.2rem;">&darr; <em>emitiu e assinou digitalmente</em></div>
+        <div class="pki-node" id="node-intermediate" style="border:1px solid var(--rule); padding:1rem; border-radius:var(--radius-sm); background:var(--ground);">
+          <strong style="color:var(--t4-purple);">[Nível 2 &bull; Intermediate CA] GlobalTrust Server TLS Issuing Authority CA G3</strong>
+          <p style="margin:0.25rem 0 0; font-size:0.85rem; color:var(--muted);">Emitido por GlobalTrust Root &bull; Validade: 5 anos &bull; Restrição básica: isCA=True &bull; Suporta OCSP Stapling</p>
+        </div>
+        <div class="pki-arrow" style="text-align:center; color:var(--muted); font-size:1.2rem;">&darr; <em>emitiu e assinou digitalmente</em></div>
+        <div class="pki-node" id="node-leaf" style="border:1px solid var(--rule); padding:1rem; border-radius:var(--radius-sm); background:var(--ground);">
+          <strong style="color:var(--t2-green);">[Nível 3 &bull; Certificado Folha] *.empresa.com.br</strong>
+          <p style="margin:0.25rem 0 0; font-size:0.85rem; color:var(--muted);">SAN: empresa.com.br, api.empresa.com.br &bull; Algoritmo: ECDSA P-256 com SHA-256 &bull; Validade: 398 dias</p>
+        </div>
+      </div>
+
+      <div class="terminal-box">
+        <div class="terminal-header">
+          <span class="terminal-title">Diagnóstico de Validação pelo Navegador / Biblioteca TLS</span>
+        </div>
+        <pre class="terminal-content" id="pki-status-output" style="color:#34D399; font-size:0.9rem;">Cadeia de confiança íntegra. Conexão TLS 1.3 estabelecida com sucesso.</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 4: CHECKLIST PRÁTICO -->
+<section class="study-section" id="checklist-cripto">
+  <div class="section-title-wrap">
+    <span class="section-num">04</span>
+    <h2>Checklist de Auditoria e Governança Criptográfica</h2>
+  </div>
+
+  <p>
+    Utilize este checklist em análises de arquitetura, testes de intrusão ou auditorias de conformidade (PCI-DSS,
+    ISO 27001, LGPD). O estado dos itens é preservado no <code>localStorage</code> do seu navegador.
+  </p>
+
+  <div class="checklist">
+    <div class="checklist-header">
+      <h3>Procedimento de Verificação de Segurança Criptográfica</h3>
+      <div class="checklist-progress-bar"><div class="progress-fill" id="chk-progress"></div></div>
+    </div>
+    <ul class="checklist-items">
+      <li class="checklist-item">
+        <label>
+          <input type="checkbox" id="chk-c1">
+          <span class="chk-label">
+            <strong>1. Banimento Total de Algoritmos Fracos ou Obsoletos:</strong>
+            Certifique-se de que algoritmos descontinuados (MD5, SHA-1, DES, 3DES, RC4) e modos inseguros como AES-ECB estejam terminantemente desativados em servidores web, APIs, bancos de dados e código-fonte.
+          </span>
+        </label>
+      </li>
+      <li class="checklist-item">
+        <label>
+          <input type="checkbox" id="chk-c2">
+          <span class="chk-label">
+            <strong>2. Adoção de Suítes de Cifragem com Autenticação (AEAD):</strong>
+            Dê preferência estrita ao AES-GCM (AES-128-GCM ou AES-256-GCM) ou ChaCha20-Poly1305 para qualquer nova rotina de cifragem simétrica, garantindo confidencialidade e integridade simultâneas.
+          </span>
+        </label>
+      </li>
+      <li class="checklist-item">
+        <label>
+          <input type="checkbox" id="chk-c3">
+          <span class="chk-label">
+            <strong>3. Configuração Adequada de Hashing de Senhas:</strong>
+            Valide que o sistema não armazena credenciais em texto claro nem com funções de hash rápido (MD5, SHA-1, SHA-256 puro). Utilize algoritmos de derivação lentos com salting único por usuário: <em>Argon2id</em> (preferencial), <em>bcrypt</em> (fator de custo &ge; 12) ou <em>PBKDF2-HMAC-SHA256</em> (&ge; 600.000 iterações).
+          </span>
+        </label>
+      </li>
+      <li class="checklist-item">
+        <label>
+          <input type="checkbox" id="chk-c4">
+          <span class="chk-label">
+            <strong>4. Garantia de Perfect Forward Secrecy (PFS) no TLS:</strong>
+            Configure servidores HTTPS para priorizar TLS 1.3 ou, no TLS 1.2, desative trocas de chaves RSA estáticas em favor de suítes baseadas em Diffie-Hellman efêmero (ECDHE).
+          </span>
+        </label>
+      </li>
+      <li class="checklist-item">
+        <label>
+          <input type="checkbox" id="chk-c5">
+          <span class="chk-label">
+            <strong>5. Ciclo de Vida e Renovação Automatizada de Certificados X.509:</strong>
+            Monitore prazos de validade com alertas prévios (&ge; 30 dias) ou utilize protocolos automatizados como o ACME (Let's Encrypt / Certbot) para evitar interrupções de serviço por certificados expirados.
+          </span>
+        </label>
+      </li>
+      <li class="checklist-item">
+        <label>
+          <input type="checkbox" id="chk-c6">
+          <span class="chk-label">
+            <strong>6. Segregação e Armazenamento Seguro de Chaves Privadas:</strong>
+            Assegure que chaves privadas e segredos nunca estejam versionados em repositórios de código (Git). Empregue cofres de segredos (HashiCorp Vault, AWS Secrets Manager, Azure Key Vault) ou Módulos de Segurança de Hardware (HSM).
+          </span>
+        </label>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- SEÇÃO 5: QUESTÕES DE FIXAÇÃO -->
+<section class="study-section" id="questoes-fixacao">
+  <div class="section-title-wrap">
+    <span class="section-num">05</span>
+    <h2>Questões de Fixação e Concursos Públicos</h2>
+  </div>
+
+  <p>
+    Analise os cenários abaixo, responda mentalmente e expanda para conferir o gabarito fundamentado com foco em
+    concursos de alto nível (PF, Bacen, TCU) e certificações CompTIA Security+ e CISSP.
+  </p>
+
+  <div class="quiz-container">
+    <!-- Questão 1 -->
+    <details class="quiz-item">
+      <summary class="quiz-summary">
+        <span class="quiz-tag">Questão 1 &bull; TLS &bull; Perfect Forward Secrecy</span>
+        <p class="quiz-question">
+          Um adversário avançado realizou a captura passiva de terabytes de tráfego HTTPS criptografado entre clientes
+          e o servidor de um tribunal durante seis meses. Anos depois, o invasor conseguiu invadir o servidor e extrair
+          a chave privada de longa duração do certificado digital da instituição. Sabendo que o servidor operava com
+          TLS 1.3 utilizando a suíte de troca de chaves ECDHE (Elliptic Curve Diffie-Hellman Ephemeral), o atacante
+          conseguirá decifrar o tráfego histórico gravado? Justifique.
+        </p>
+      </summary>
+      <div class="quiz-answer">
+        <div class="answer-badge correct">Resposta Correta: NÃO, o tráfego histórico continuará seguro devido ao Perfect Forward Secrecy (PFS).</div>
+        <p><strong>Fundamentação Técnica:</strong></p>
+        <p>
+          O TLS 1.3 implementa obrigatoriamente mecanismos com <strong>Perfect Forward Secrecy (PFS)</strong>, como o ECDHE.
+          No Diffie-Hellman efêmero, as chaves simétricas de sessão que cifram cada conexão são geradas dinamicamente a partir
+          de parâmetros matemáticos temporários descartados da memória RAM assim que a sessão é concluída. A chave privada do
+          certificado do servidor é utilizada exclusivamente para autenticação digital (assinatura da troca de chaves), e não
+          para decifrar a sessão. Portanto, mesmo com a chave privada mestre em mãos anos depois, o invasor não possui as chaves
+          efêmeras de sessão e é matematicamente incapaz de decifrar o histórico capturado.
+        </p>
+      </div>
+    </details>
+
+    <!-- Questão 2 -->
+    <details class="quiz-item">
+      <summary class="quiz-summary">
+        <span class="quiz-tag">Questão 2 &bull; Funções Hash &bull; Ataques de Colisão</span>
+        <p class="quiz-question">
+          Diferencie uma "Colisão de Hash" de um "Ataque de Pré-Imagem" e explique por que a demonstração de colisão prática
+          em algoritmos como MD5 e SHA-1 compromete imediatamente a confiabilidade de sistemas de assinatura digital de contratos
+          e emissão de certificados digitais.
+        </p>
+      </summary>
+      <div class="quiz-answer">
+        <div class="answer-badge correct">Resposta Correta: A colisão permite forjar documentos legítimos e maliciosos com o mesmo resumo assinado.</div>
+        <p><strong>Fundamentação Técnica:</strong></p>
+        <p>
+          No <em>Ataque de Pré-Imagem</em>, o atacante recebe um hash específico <code>H</code> e tenta encontrar uma mensagem <code>M</code> tal que <code>hash(M) = H</code>.
+          Já no <em>Ataque de Colisão</em>, o atacante precisa apenas encontrar duas mensagens arbitrárias quaisquer <code>M1 &ne; M2</code> que produzam o mesmo hash <code>hash(M1) = hash(M2)</code>.
+          Pelo Teorema do Aniversário, encontrar colisões é ordens de grandeza mais fácil.
+          Em assinaturas digitais, assina-se o hash do documento. Se um atacante consegue gerar um contrato inofensivo <code>M1</code> e um contrato malicioso <code>M2</code> com o mesmo hash, ele pode colher a assinatura legítima em <code>M1</code> e anexá-la a <code>M2</code>, que será validada como perfeitamente autêntica pela vítima.
+        </p>
+      </div>
+    </details>
+
+    <!-- Questão 3 -->
+    <details class="quiz-item">
+      <summary class="quiz-summary">
+        <span class="quiz-tag">Questão 3 &bull; Infraestrutura PKI &bull; Validação de Revogação</span>
+        <p class="quiz-question">
+          Ao acessar um website via HTTPS, o navegador precisa verificar se o certificado do servidor foi revogado antes
+          de seu vencimento natural. Quais são as principais limitações das Listas de Revogação de Certificados (CRL) e
+          como a tecnologia de OCSP Stapling soluciona os problemas simultâneos de latência e privacidade dos usuários?
+        </p>
+      </summary>
+      <div class="quiz-answer">
+        <div class="answer-badge correct">Resposta Correta: O OCSP Stapling elimina a consulta do cliente ao servidor da CA, reduzindo latência e protegendo a privacidade.</div>
+        <p><strong>Fundamentação Técnica:</strong></p>
+        <p>
+          A <strong>CRL</strong> exige o download periódico de listas que podem alcançar dezenas de megabytes, consumindo banda e introduzindo atrasos no handshake.
+          O <strong>OCSP tradicional</strong> resolve o tamanho fazendo consultas pontuais ao servidor respondedor da CA para cada conexão; contudo, além de adicionar latência de rede adicional (RTT) antes da página carregar, o OCSP tradicional expõe para a Autoridade Certificadora o histórico de navegação de cada usuário em tempo real (problema sério de privacidade).
+          O <strong>OCSP Stapling (RFC 6066)</strong> resolve ambos: o próprio servidor web consulta periodicamente a CA, armazena a resposta de status assinada em cache e a "grampeia" (staple) diretamente dentro do handshake TLS enviado ao navegador do usuário.
+        </p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- SEÇÃO 6: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
+<section class="study-section" id="fatos-essenciais">
+  <div class="section-title-wrap">
+    <span class="section-num">06</span>
+    <h2>Fatos Essenciais e Conexões da Trilha</h2>
+  </div>
+
+  <p>
+    Tabela de referência rápida de forças criptográficas equivalentes segundo a recomendação oficial do <strong>NIST SP 800-57</strong>:
+  </p>
+
+  <div class="facts-grid">
+    <div class="facts-card">
+      <span class="facts-card-num">128 bits</span>
+      <span class="facts-card-label">Segurança AES-128</span>
+      <p class="facts-card-desc">Equivalente a RSA de 3072 bits e Curva Elíptica (ECC) de 256 bits (ex.: ECDSA P-256 ou Ed25519).</p>
+    </div>
+    <div class="facts-card">
+      <span class="facts-card-num">256 bits</span>
+      <span class="facts-card-label">Segurança AES-256</span>
+      <p class="facts-card-desc">Equivalente a RSA de 15360 bits e Curva Elíptica de 512 bits. Recomendado para dados top secret e era pós-quântica.</p>
+    </div>
+    <div class="facts-card">
+      <span class="facts-card-num">12 bytes</span>
+      <span class="facts-card-label">Tamanho de IV (GCM)</span>
+      <p class="facts-card-desc">96 bits de Vetor de Inicialização único. Nunca reutilize o mesmo IV com a mesma chave AES em modo GCM!</p>
+    </div>
+    <div class="facts-card">
+      <span class="facts-card-num">398 dias</span>
+      <span class="facts-card-label">Validade Máxima TLS</span>
+      <p class="facts-card-desc">Limite máximo imposto por navegadores e CA/Browser Forum para certificados públicos TLS X.509.</p>
+    </div>
+    <div class="facts-card">
+      <span class="facts-card-num">Argon2id</span>
+      <span class="facts-card-label">Padrão Ouro para Senhas</span>
+      <p class="facts-card-desc">Resistente a ataques paralelos em GPU e ataques de canal lateral (side-channel). Vencedor da PHC.</p>
+    </div>
+    <div class="facts-card">
+      <span class="facts-card-num">PFS</span>
+      <span class="facts-card-label">Forward Secrecy</span>
+      <p class="facts-card-desc">Chaves efêmeras garantem que o vazamento futuro da chave do servidor não comprometa tráfego histórico gravado.</p>
+    </div>
+  </div>
+
+  <div class="next-study-banner">
+    <div class="next-study-info">
+      <span class="next-study-kicker">Próximo Estudo Recomendado &bull; Estudo 04</span>
+      <h3>Autenticação e IAM: Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</h3>
+      <p>
+        Agora que você domina as primitivas de cifras, hashes e certificados, verá como esses mecanismos sustentam a gestão
+        de identidades corporativas, autenticação multifator (TOTP/WebAuthn), validação segura de tokens JWT e políticas de
+        controle de acesso baseadas em função (RBAC).
+      </p>
+    </div>
+    <div class="next-study-action">
+      <a href="../Autenticacao-e-IAM/treinamento-autenticacao-e-iam.html" class="btn primary">Avançar para Estudo 04 &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SCRIPT DO LABORATÓRIO INTERATIVO (Web Crypto API Nativa em Vanilla JS)
+     ========================================================================== -->
+<script>
+(function() {
+  'use strict';
+
+  const CLAB = {
+    state: {
+      originalText: 'O segredo da criptografia reside exclusivamente na chave.',
+      currentAesKey: null,
+      currentAesRawKeyHex: '',
+      currentIvHex: '',
+      currentCiphertextHex: '',
+      currentTagHex: ''
+    },
+
+    init: function() {
+      this.calcularHashReal();
+      if (window.CS && typeof window.CS.initChecklist === 'function') {
+        window.CS.initChecklist('criptografia-pratica');
+      }
+    },
+
+    switchTab: function(tabName) {
+      document.getElementById('panel-hash').style.display = tabName === 'hash' ? 'block' : 'none';
+      document.getElementById('panel-aes').style.display = tabName === 'aes' ? 'block' : 'none';
+      document.getElementById('panel-pki').style.display = tabName === 'pki' ? 'block' : 'none';
+
+      document.getElementById('tab-hash-btn').className = tabName === 'hash' ? 'btn primary' : 'btn ghost';
+      document.getElementById('tab-aes-btn').className = tabName === 'aes' ? 'btn primary' : 'btn ghost';
+      document.getElementById('tab-pki-btn').className = tabName === 'pki' ? 'btn primary' : 'btn ghost';
+    },
+
+    // ------------------------------------------------------------------------
+    // PAINEL 1: CÁLCULO DE HASH REAL VIA SUBTLE CRYPTO
+    // ------------------------------------------------------------------------
+    calcularHashReal: async function() {
+      const text = document.getElementById('hash-input-text').value;
+      const out = document.getElementById('hash-digest-val');
+      const metrics = document.getElementById('avalanche-metrics');
+
+      if (!window.crypto || !window.crypto.subtle) {
+        out.textContent = 'Erro: Web Crypto API não suportada neste ambiente.';
+        return;
+      }
+
+      try {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        out.textContent = hashHex;
+
+        // Se o texto difere do original, calcula a diferença de bits (efeito avalanche)
+        if (text !== this.state.originalText) {
+          const origData = encoder.encode(this.state.originalText);
+          const origBuffer = await window.crypto.subtle.digest('SHA-256', origData);
+          const origArray = Array.from(new Uint8Array(origBuffer));
+          
+          let bitDiffCount = 0;
+          for (let i = 0; i < 32; i++) {
+            let xor = hashArray[i] ^ origArray[i];
+            while (xor > 0) {
+              if (xor & 1) bitDiffCount++;
+              xor >>= 1;
+            }
+          }
+          const pct = ((bitDiffCount / 256) * 100).toFixed(1);
+          metrics.innerHTML = `
+            <span style="color:var(--t1-blue); font-weight:600;">Efeito Avalanche Confirmado:</span>
+            A alteração causou a inversão de <strong>${bitDiffCount} de 256 bits (${pct}%)</strong> no digest SHA-256.
+            (O ideal estatístico para uma função hash forte é ~50%).
+          `;
+        } else {
+          metrics.innerHTML = `<strong>Texto original carregado.</strong> Digite ou clique em "Alterar 1 Caractere" para observar o efeito avalanche.`;
+        }
+      } catch (err) {
+        out.textContent = 'Erro ao processar hash: ' + err.message;
+      }
+    },
+
+    alterarUmCaractere: function() {
+      const input = document.getElementById('hash-input-text');
+      let val = input.value;
+      if (val.endsWith('.')) {
+        val = val.slice(0, -1) + '!';
+      } else if (val.endsWith('!')) {
+        val = val.slice(0, -1) + '?';
+      } else {
+        val = val + '.';
+      }
+      input.value = val;
+      this.calcularHashReal();
+    },
+
+    resetarHash: function() {
+      document.getElementById('hash-input-text').value = this.state.originalText;
+      this.calcularHashReal();
+    },
+
+    // ------------------------------------------------------------------------
+    // PAINEL 2: AES-GCM (256 bits) REAL VIA WEB CRYPTO API
+    // ------------------------------------------------------------------------
+    cifrarAesGcm: async function() {
+      const plaintext = document.getElementById('aes-plaintext').value;
+      const out = document.getElementById('aes-output');
+
+      if (!window.crypto || !window.crypto.subtle) {
+        out.textContent = 'Web Crypto API não suportada.';
+        return;
+      }
+
+      try {
+        // 1. Gera chave simétrica AES-GCM de 256 bits
+        const key = await window.crypto.subtle.generateKey(
+          { name: 'AES-GCM', length: 256 },
+          true,
+          ['encrypt', 'decrypt']
+        );
+        this.state.currentAesKey = key;
+
+        // Exporta bytes brutos da chave para visualização em hex
+        const rawKeyBuffer = await window.crypto.subtle.exportKey('raw', key);
+        this.state.currentAesRawKeyHex = Array.from(new Uint8Array(rawKeyBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+        // 2. Gera Vetor de Inicialização (IV) aleatório de 12 bytes (96 bits) recomendado pelo NIST
+        const iv = window.crypto.getRandomValues(new Uint8Array(12));
+        this.state.currentIvHex = Array.from(iv).map(b => b.toString(16).padStart(2, '0')).join('');
+
+        // 3. Cifra com AES-GCM (o Web Crypto API anexa a tag de 16 bytes ao final do buffer)
+        const encoder = new TextEncoder();
+        const encryptedBuffer = await window.crypto.subtle.encrypt(
+          { name: 'AES-GCM', iv: iv, tagLength: 128 },
+          key,
+          encoder.encode(plaintext)
+        );
+
+        const encArray = new Uint8Array(encryptedBuffer);
+        // Os últimos 16 bytes são a authentication tag no Web Crypto
+        const cipherBytes = encArray.slice(0, encArray.length - 16);
+        const tagBytes = encArray.slice(encArray.length - 16);
+
+        this.state.currentCiphertextHex = Array.from(cipherBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+        this.state.currentTagHex = Array.from(tagBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+
+        out.textContent = [
+          '=== CIFRAGEM AES-GCM CONCLUÍDA COM SUCESSO ===',
+          `Algoritmo: AES-GCM (Chave de 256 bits | Bloco de 128 bits)`,
+          `Chave Simétrica Gerada (32 bytes em hex):`,
+          `  ${this.state.currentAesRawKeyHex}`,
+          `Vetor de Inicialização / IV (12 bytes em hex):`,
+          `  ${this.state.currentIvHex}`,
+          `Texto Cifrado / Ciphertext (${cipherBytes.length} bytes em hex):`,
+          `  ${this.state.currentCiphertextHex}`,
+          `Authentication Tag / AEAD Tag (16 bytes / 128 bits em hex):`,
+          `  ${this.state.currentTagHex}`,
+          '',
+          `Tamanho do texto claro original: ${encoder.encode(plaintext).length} bytes`,
+          `Status: O conteúdo agora está matematicamente ilegível sem a chave e protegido contra adulteração.`
+        ].join('\n');
+      } catch (err) {
+        out.textContent = 'Erro durante a cifragem AES-GCM: ' + err.message;
+      }
+    },
+
+    decifrarAesGcm: async function(simularAdulteracao) {
+      const out = document.getElementById('aes-output');
+      if (!this.state.currentAesKey) {
+        out.textContent = 'Erro: Você precisa gerar a chave e cifrar uma mensagem primeiro (Passo 1).';
+        return;
+      }
+
+      try {
+        const ivBytes = new Uint8Array(this.state.currentIvHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+        let cipherBytes = new Uint8Array(this.state.currentCiphertextHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+        const tagBytes = new Uint8Array(this.state.currentTagHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+
+        if (simularAdulteracao) {
+          // Inverte propositalmente um byte do texto cifrado para disparar falha de autenticidade
+          cipherBytes[0] ^= 0xFF;
+        }
+
+        // Reconstrói o buffer completo exigido pelo Web Crypto (Ciphertext + Tag)
+        const combined = new Uint8Array(cipherBytes.length + tagBytes.length);
+        combined.set(cipherBytes, 0);
+        combined.set(tagBytes, cipherBytes.length);
+
+        const decryptedBuffer = await window.crypto.subtle.decrypt(
+          { name: 'AES-GCM', iv: ivBytes, tagLength: 128 },
+          this.state.currentAesKey,
+          combined
+        );
+
+        const decoder = new TextDecoder();
+        const recoveredText = decoder.decode(decryptedBuffer);
+
+        out.textContent = [
+          '=== DECIFRAÇÃO AES-GCM EXECUTADA COM SUCESSO ===',
+          `Tag de Autenticação Verificada: OK (Integridade Confirmada)`,
+          `Texto Original Recuperado:`,
+          `  "${recoveredText}"`,
+          '',
+          `Interpretação: Como a chave e a tag de 128 bits foram validadas, temos certeza matemática`,
+          `de que a mensagem não foi adulterada durante o armazenamento ou trânsito.`
+        ].join('\n');
+      } catch (err) {
+        out.textContent = [
+          '!!! FALHA CRIPTOGRÁFICA DE DECIFRAÇÃO / INTEGRIDADE !!!',
+          `Exceção capturada: ${err.name} - ${err.message}`,
+          '',
+          `DIAGNÓSTICO DE SEGURANÇA:`,
+          `O modo AES-GCM rejeitou a mensagem porque a Authentication Tag não correspondeu aos dados recebidos.`,
+          `Em um ataque real (ex.: Man-in-the-Middle ou adulteração em repouso), a operação é imediatamente`,
+          `abortada sem vazar o texto claro parcial, protegendo o sistema contra adulteração maliciosa.`
+        ].join('\n');
+      }
+    },
+
+    // ------------------------------------------------------------------------
+    // PAINEL 3: SIMULADOR DE CADEIA DE CONFIANÇA PKI
+    // ------------------------------------------------------------------------
+    atualizarPkiCenario: function() {
+      const scenario = document.getElementById('pki-scenario').value;
+      const out = document.getElementById('pki-status-output');
+      const nodeRoot = document.getElementById('node-root');
+      const nodeInter = document.getElementById('node-intermediate');
+      const nodeLeaf = document.getElementById('node-leaf');
+
+      // Reseta estilos
+      nodeRoot.style.borderColor = 'var(--rule)';
+      nodeInter.style.borderColor = 'var(--rule)';
+      nodeLeaf.style.borderColor = 'var(--rule)';
+
+      if (scenario === 'valid') {
+        nodeRoot.style.borderColor = 'var(--t2-green)';
+        nodeInter.style.borderColor = 'var(--t2-green)';
+        nodeLeaf.style.borderColor = 'var(--t2-green)';
+        out.style.color = '#34D399';
+        out.textContent = [
+          '[STATUS: 200 OK &bull; CADEIA ÍNTEGRA]',
+          '1. Assinatura do Certificado Folha validada com sucesso via chave pública da Intermediate CA.',
+          '2. Assinatura da Intermediate CA validada com sucesso via chave pública da Root CA.',
+          '3. Root CA localizada no repositório de âncoras de confiança do sistema operacional.',
+          '4. Verificação OCSP Stapling: GOOD (Certificado ativo e não revogado).',
+          'Resultado: Cadeado verde ativado no navegador. Tráfego TLS 1.3 seguro.'
+        ].join('\n');
+      } else if (scenario === 'expired') {
+        nodeLeaf.style.borderColor = 'var(--t3-red)';
+        out.style.color = '#F87171';
+        out.textContent = [
+          '[ERRO CRÍTICO: SEC_ERROR_EXPIRED_CERTIFICATE]',
+          '1. A data atual ultrapassou o campo NotAfter (validade de 398 dias expirada).',
+          '2. O navegador bloqueia imediatamente o acesso para prevenir uso de certificados abandonados.',
+          'Ação Recomendada: Renovar o certificado digital junto à autoridade certificadora (ex.: via ACME / Certbot).'
+        ].join('\n');
+      } else if (scenario === 'untrusted_root') {
+        nodeRoot.style.borderColor = 'var(--t3-red)';
+        out.style.color = '#F87171';
+        out.textContent = [
+          '[ERRO CRÍTICO: SEC_ERROR_UNKNOWN_ISSUER / MOZILLA_PKIX_ERROR_CA_CERT_INVALID]',
+          '1. A Root CA autoassinada que assinou a cadeia não está presente no Trust Store do sistema.',
+          '2. Risco de Segurança: Pode se tratar de um ataque de Man-in-the-Middle (MitM) com inspeção TLS não autorizada.',
+          'Ação: Em ambientes corporativos, instalar o certificado raiz institucional via GPO/MDM.'
+        ].join('\n');
+      } else if (scenario === 'revoked') {
+        nodeLeaf.style.borderColor = 'var(--t3-red)';
+        out.style.color = '#F87171';
+        out.textContent = [
+          '[ERRO CRÍTICO: SEC_ERROR_REVOKED_CERTIFICATE]',
+          '1. A consulta OCSP / CRL retornou status "REVOKED" (Motivo: KeyCompromise).',
+          '2. A chave privada deste certificado vazou ou foi substituída antes do prazo de validade.',
+          'Resultado: O navegador impede a navegação para proteger os usuários contra falsificação de identidade.'
+        ].join('\n');
+      }
+    }
+  };
+
+  // Expõe no escopo global
+  window.CLAB = CLAB;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { CLAB.init(); });
+  } else {
+    CLAB.init();
+  }
+})();
+</script>

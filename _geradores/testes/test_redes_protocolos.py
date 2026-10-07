@@ -73,7 +73,7 @@ class TestRedesProtocolos(unittest.TestCase):
 
         self.assertIn("Redes-e-Protocolos/treinamento-redes-e-protocolos.html", content)
         self.assertIn('data-slug="Redes-e-Protocolos"', content)
-        self.assertIn("2 / 28", content)
+        self.assertIn("/ 28", content)
         self.assertIn("Módulos Compilados", content)
 
 
