@@ -1,0 +1,947 @@
+<!-- ==========================================================================
+     Estudo 06: Hardening de Sistemas
+     Corpo do Treinamento: Bastionamento Linux e Windows (CIS Benchmarks)
+     ========================================================================== -->
+
+<header class="study-header">
+  <span class="study-track-kicker">Trilha 2: Segurança Defensiva &bull; Estudo 06</span>
+  <h1 class="study-title">Bastionamento de Sistemas Linux e Windows (CIS Benchmarks)</h1>
+  <p class="study-lead">
+    Instalações padrão de sistemas operacionais priorizam conveniência e compatibilidade retroativa,
+    mantendo portas desnecessárias abertas, serviços legados ativos e configurações permissivas de fábrica.
+    O processo metódico de <strong>Hardening (Bastionamento)</strong> reduz drasticamente a superfície de ataque,
+    implementando as diretrizes normativas dos <strong>CIS Benchmarks (Center for Internet Security)</strong>
+    nos níveis Nível 1 e Nível 2. Dominar a configuração restritiva do SSH, a blindagem de parâmetros do kernel via
+    <code>sysctl.conf</code>, o confinamento com SELinux/AppArmor, a proteção da memória do LSASS no Windows e o
+    descarte de protocolos legados (como SMBv1) é a fundação inegociável da defesa em profundidade de host.
+  </p>
+  <div class="study-meta-bar">
+    <span class="badge green">NIST CSF 2.0: Protect (PR.PS / PR.AC)</span>
+    <span class="badge slate">MITRE ATT&amp;CK: TA0005, TA0004, T1548, T1053, T1078</span>
+    <span class="badge slate">Tempo Estimado: ~50 minutos</span>
+    <span class="badge slate">Carreiras: Blue Team &bull; SysAdmin &bull; DevSecOps</span>
+  </div>
+</header>
+
+<!-- SEÇÃO 1: O QUE É HARDENING E OS CIS BENCHMARKS -->
+<section class="study-section" id="fundamentos-hardening-cis">
+  <div class="section-title-wrap">
+    <span class="section-num">01</span>
+    <h2>O que é Hardening e o Padrão Normativo CIS Benchmarks</h2>
+  </div>
+
+  <p>
+    <strong>Hardening (Bastionamento)</strong> é o processo contínuo de engenharia de segurança dedicado a eliminar
+    vulnerabilidades potenciais em um sistema operacional ou aplicação através da desativação sistemática de funções,
+    portas, protocolos, contas e privilégios não essenciais à sua finalidade operacional estrita.
+  </p>
+
+  <div class="callout danger">
+    <h4>A Ilusão da "Instalação Limpa": O Risco das Configurações Padrão de Fábrica</h4>
+    <p>
+      Sistemas operacionais recém-instalados (sejam distribuições Linux ou Windows Server) contêm centenas de configurações
+      projetadas para funcionar "out-of-the-box" sem atritos. Isso inclui autenticação por senha ativada, login direto
+      de administrador permitido, compartilhamentos administrativos de rede abertos (como <code>C$</code> e <code>ADMIN$</code>)
+      e protocolos legados de descoberta de rede respondendo a qualquer requisição. Para um atacante, uma máquina sem hardening
+      é um convite para escalação de privilégios e evasão de defesas.
+    </p>
+  </div>
+
+  <h3>O Center for Internet Security (CIS) e os Dois Níveis de Conformidade</h3>
+  <p>
+    O <strong>Center for Internet Security (CIS)</strong> é a autoridade global mais respeitada na definição de guias
+    prescritivos de endurecimento de configurações (os <strong>CIS Benchmarks</strong>). Desenvolvidos por consenso comunitário
+    entre governos, desenvolvedores e especialistas em segurança cibernética, os benchmarks dividem suas recomendações em dois níveis fundamentais:
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>CIS Nível 1 (Level 1 - Linha de Base Essencial)</h4>
+      <p>
+        Recomendações fundamentais de segurança aplicáveis a qualquer ambiente operacional.
+        <strong>Projetadas para serem implementadas com impacto mínimo ou nulo na compatibilidade e funcionalidade das aplicações</strong>.
+        <br><em>Exemplos:</em> Desativar login root direto via SSH, exigir complexidade mínima de senhas, habilitar logs de auditoria, desativar protocolos legados obsoletos.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>CIS Nível 2 (Level 2 - Defesa em Profundidade / Alta Segurança)</h4>
+      <p>
+        Configurações rigorosas para ambientes com alta sensibilidade de dados (setor financeiro, militar, infraestrutura crítica).
+        <strong>Pode introduzir atritos operacionais e quebrar softwares legados se aplicado sem planejamento de compatibilidade</strong>.
+        <br><em>Exemplos:</em> Confinamento estrito de SELinux em modo restritivo, desativação de módulos de USB no kernel, criptografia obrigatória de tráfego de gerenciamento, isolamento estrito de memória.
+      </p>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <h4>O Perigo do "Configuration Drift" (Desvio de Configuração)</h4>
+    <p>
+      O bastionamento não é um evento único realizado no provisionamento inicial do servidor. Ao longo dos meses,
+      administradores alteram permissões temporárias para testes e esquecem de revogá-las, atualizações de pacotes
+      sobrescrevem arquivos de configuração e novas dependências abrem portas desnecessárias. Esse fenômeno é chamado de
+      <strong>Configuration Drift</strong>. Ambientes maduros utilizam ferramentas de Infraestrutura como Código (IaC)
+      e conformidade contínua (como Ansible, Puppet e OpenSCAP) para reforçar diariamente a linha de base do CIS Benchmark.
+    </p>
+  </div>
+</section>
+
+<!-- SEÇÃO 2: HARDENING EM AMBIENTES LINUX -->
+<section class="study-section" id="hardening-linux">
+  <div class="section-title-wrap">
+    <span class="section-num">02</span>
+    <h2>Bastionamento Profundo em Ambientes Linux</h2>
+  </div>
+
+  <p>
+    O ecossistema Linux é a espinha dorsal de servidores corporativos e ambientes de nuvem.
+    O bastionamento de um servidor Linux corporativo engloba quatro camadas principais de proteção:
+  </p>
+
+  <h3>1. Bastionamento do Serviço SSH (`/etc/ssh/sshd_config`)</h3>
+  <p>
+    O Secure Shell (SSH) é a principal porta de entrada administrativa em servidores Linux e o alvo mais visado por botnets
+    e ataques de força bruta. A configuração recomendada pelos CIS Benchmarks inclui:
+  </p>
+
+  <div class="terminal-box">
+    <div class="terminal-header">
+      <span class="terminal-title">Diretivas Seguras para /etc/ssh/sshd_config</span>
+      <button class="terminal-copy-btn" onclick="copyCode(this, 'sshd-config-snippet')">Copiar</button>
+    </div>
+    <pre id="sshd-config-snippet"><code># 1. Proibição categórica de login direto do superusuário root
+<strong>PermitRootLogin no</strong>
+
+# 2. Desativação de autenticação baseada em senha (obriga chaves assimétricas ed25519/RSA-4096)
+<strong>PasswordAuthentication no</strong>
+<strong>PermitEmptyPasswords no</strong>
+
+# 3. Limite de tentativas de autenticação antes de desconectar
+<strong>MaxAuthTries 3</strong>
+
+# 4. Desativação de encaminhamentos desnecessários e superfície gráfica
+<strong>X11Forwarding no</strong>
+<strong>AllowTcpForwarding no</strong>
+<strong>AllowAgentForwarding no</strong>
+
+# 5. Restrição explícita de quais usuários ou grupos podem conectar
+<strong>AllowGroups ssh-users-admin</strong>
+
+# 6. Cifras e algoritmos modernos recomendados (rejeição de 3DES, CBC e SHA-1)
+<strong>KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512</strong>
+<strong>Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com</strong>
+<strong>MACs hmac-sha2-512-etm@openssh.com</strong></code></pre>
+  </div>
+
+  <h3>2. Parâmetros de Segurança do Kernel (`/etc/sysctl.conf`)</h3>
+  <p>
+    O subsistema de rede e memória do kernel Linux possui parâmetros configuráveis via <code>sysctl</code>
+    que aumentam a resiliência contra ataques de rede em Camada 3/4 e exploração de memória:
+  </p>
+
+  <div class="terminal-box">
+    <div class="terminal-header">
+      <span class="terminal-title">Parâmetros Recomendados de Hardening em /etc/sysctl.conf</span>
+      <button class="terminal-copy-btn" onclick="copyCode(this, 'sysctl-config-snippet')">Copiar</button>
+    </div>
+    <pre id="sysctl-config-snippet"><code># Prevenção contra spoofing de roteamento e pacotes forjados
+<strong>net.ipv4.ip_forward = 0</strong>
+<strong>net.ipv4.conf.all.send_redirects = 0</strong>
+<strong>net.ipv4.conf.default.send_redirects = 0</strong>
+<strong>net.ipv4.conf.all.accept_redirects = 0</strong>
+<strong>net.ipv4.conf.default.accept_redirects = 0</strong>
+<strong>net.ipv4.conf.all.accept_source_route = 0</strong>
+<strong>net.ipv4.conf.default.accept_source_route = 0</strong>
+
+# Proteção ativa contra ataques de negação de serviço TCP SYN Flood
+<strong>net.ipv4.tcp_syncookies = 1</strong>
+
+# Habilitação forçada de ASLR Completo (Address Space Layout Randomization)
+# 0 = Desativado | 1 = Conservador | 2 = Aleatorização Completa de Heap, Stack e Bibliotecas
+<strong>kernel.randomize_va_space = 2</strong>
+
+# Restrição de mensagens de diagnóstico do dmesg para usuários sem privilégios de root
+<strong>kernel.dmesg_restrict = 1</strong>
+
+# Prevenção contra ataques de escalação de privilégios com links simbólicos e hardlinks
+<strong>fs.protected_hardlinks = 1</strong>
+<strong>fs.protected_symlinks = 1</strong></code></pre>
+  </div>
+
+  <h3>3. Permissões de Arquivos, umask e Binários SUID/SGID</h3>
+  <ul>
+    <li>
+      <strong>Máscara Padrão de Arquivos (umask):</strong> A máscara padrão corporativa deve ser configurada em <code>027</code>
+      (ou <code>077</code> para ambientes ultrassensíveis). Isso garante que novos arquivos sejam criados sem permissão de leitura
+      ou escrita para "outros" usuários do sistema (permissão padrão <code>640</code> ou <code>600</code>).
+    </li>
+    <li>
+      <strong>Auditoria de Binários SUID/SGID:</strong> Binários com o bit <code>SUID</code> (como <code>/usr/bin/passwd</code>)
+      executam com os privilégios do proprietário do arquivo (tipicamente root), independentemente de quem os invocou.
+      Binários SUID desnecessários com falhas conhecidas de buffer overflow ou injeção de parâmetros são a principal porta
+      de entrada para <strong>Escalação Local de Privilégios (Privilege Escalation - T1548)</strong>.
+      <br><em>Comando de varredura:</em> <code>find / -perm -4000 -type f 2>/dev/null</code>.
+    </li>
+    <li>
+      <strong>Proteção de Arquivos de Autenticação:</strong> <code>/etc/shadow</code> deve possuir permissão estrita <code>0600</code>
+      pertencendo a <code>root:root</code> (ou <code>0640 root:shadow</code>), impedindo leitura de hashes de senha por usuários locais.
+    </li>
+  </ul>
+
+  <h3>4. Módulos de Segurança de Controle de Acesso Mandatório (MAC)</h3>
+  <p>
+    Diferente das permissões tradicionais DAC (onde o dono do arquivo decide quem tem acesso), os módulos MAC do kernel
+    restringem as ações de um processo com base em políticas rígidas, mesmo que o processo esteja rodando como <code>root</code>:
+  </p>
+  <ul>
+    <li>
+      <strong>SELinux (Security-Enhanced Linux):</strong> Utilizado em distribuições Red Hat, CentOS, Fedora e Rocky Linux.
+      Associa rótulos de contexto de segurança a processos e arquivos (tipo <code>httpd_t</code>).
+      <strong>Deve estar sempre configurado em modo Enforcing</strong> (nunca em modo <em>Permissive</em> ou <em>Disabled</em>).
+    </li>
+    <li>
+      <strong>AppArmor:</strong> Utilizado em Debian, Ubuntu e SUSE. Baseado em caminhos de arquivos e perfis específicos
+      para cada binário (armazenados em <code>/etc/apparmor.d/</code>). Os perfis devem estar em modo <strong>enforce</strong>.
+    </li>
+  </ul>
+</section>
+
+<!-- SEÇÃO 3: HARDENING EM AMBIENTES WINDOWS -->
+<section class="study-section" id="hardening-windows">
+  <div class="section-title-wrap">
+    <span class="section-num">03</span>
+    <h2>Bastionamento em Ambientes Windows Server e Active Directory</h2>
+  </div>
+
+  <p>
+    Em ambientes corporativos baseados em Microsoft Windows Server e domínios de Active Directory (AD),
+    o hardening é aplicado centralizadamente através de <strong>Objetos de Política de Grupo (GPO - <em>Group Policy Objects</em>)</strong>.
+    Os seguintes pilares representam o núcleo dos CIS Benchmarks para ecossistemas Windows:
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>1. Desativação do SMBv1</h4>
+      <p>
+        O protocolo Server Message Block versão 1 é obsoleto e vulnerável a execução remota de código (vetor histórico dos malwares WannaCry e NotPetya).
+        Deve ser categoricamente desativado no Windows Server via PowerShell:
+        <br><code>Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol</code>
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>2. Erradicação de NTLMv1 e Protocolos de Descoberta</h4>
+      <p>
+        <strong>NTLMv1:</strong> Utiliza cifras fracas de 56 bits facilmente quebradas em minutos. Force o uso exclusivo de <strong>NTLMv2 e Kerberos</strong>.
+        <br><strong>LLMNR e NetBIOS:</strong> Protocolos de difusão de rede explorados por ferramentas ofensivas (como <em>Responder</em>)
+        para capturar hashes de autenticação de máquinas Windows via envenenamento de rede (WPAD/LLMNR Poisoning).
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>3. Blindagem de Memória do Processo LSASS</h4>
+      <p>
+        O <em>Local Security Authority Subsystem Service (LSASS)</em> gerencia as credenciais ativas do sistema na memória RAM.
+        É o alvo primário de ferramentas de extração de credenciais como o <em>Mimikatz</em>.
+        <br><strong>LSA Protection:</strong> Habilite o modo <code>RunAsPPL = 1</code> no Registro para transformar o LSASS em processo protegido.
+        <br><strong>Credential Guard:</strong> Utiliza virtualização (VBS) para isolar segredos NTLM e tickets Kerberos em uma VM segura invisível ao SO.
+      </p>
+    </div>
+    <div class="info-card">
+      <h4>4. Hardening do PowerShell e Linha de Comando</h4>
+      <p>
+        O PowerShell é uma das ferramentas administrativas mais exploradas em ataques "Living off the Land" (LotL).
+        <br><strong>Constrained Language Mode (CLM):</strong> Restringe APIs sensíveis e reflexão do .NET para usuários não administrativos.
+        <br><strong>Script Block Logging (Event ID 4104):</strong> Registra o conteúdo exato de cada script executado, mesmo se obfuscado.
+      </p>
+    </div>
+  </div>
+
+  <div class="callout warning">
+    <h4>Desativação do Provedor de Segurança WDigest</h4>
+    <p>
+      O provedor <em>WDigest</em> (usado para autenticação HTTP Digest legada) mantinha senhas de usuários em <strong>texto claro</strong>
+      na memória do processo LSASS. Em sistemas modernos, deve-se garantir explicitamente no registro do Windows que o WDigest
+      não retenha credenciais desprotegidas:
+      <br><code>reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest" /v UseLogonCredential /t REG_DWORD /d 0 /f</code>
+    </p>
+  </div>
+</section>
+
+<!-- SEÇÃO 4: AUTOMAÇÃO E LINHAS DE BASE -->
+<section class="study-section" id="automacao-scap">
+  <div class="section-title-wrap">
+    <span class="section-num">04</span>
+    <h2>Automação Contínua de Conformidade e Linhas de Base</h2>
+  </div>
+
+  <p>
+    Executar comandos manuais em centenas de servidores em produção é inviável e sujeito a erros humanos graves.
+    A indústria de segurança utiliza frameworks de <strong>Compliance-as-Code (Conformidade como Código)</strong>:
+  </p>
+  <ul>
+    <li>
+      <strong>Playbooks Ansible para CIS Benchmarks:</strong> Automação declarativa que audita e aplica regras do CIS Nível 1 e 2
+      de forma idempotente (revertendo qualquer alteração não autorizada detectada).
+    </li>
+    <li>
+      <strong>OpenSCAP (Security Content Automation Protocol):</strong> Ferramenta de código aberto padronizada pelo NIST
+      que executa varreduras automatizadas nos servidores contra os perfis CIS oficiais e gera relatórios HTML interativos com a taxa de conformidade.
+    </li>
+    <li>
+      <strong>Auditorias Específicas com Lynis:</strong> Ferramenta de auditoria de segurança em Linux e Unix que analisa mais de 300 pontos
+      de configuração e gera um índice de endurecimento (<em>Hardening Index</em> de 0 a 100).
+    </li>
+  </ul>
+</section>
+
+<!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (AUDITOR CIS BENCHMARK) -->
+<section class="study-section" id="laboratorio-pratico">
+  <div class="section-title-wrap">
+    <span class="section-num">05</span>
+    <h2>Laboratório Interativo: Auditor de Configuração de Servidor (CIS Benchmark)</h2>
+  </div>
+
+  <p>
+    Avalie na prática o nível de segurança e conformidade de arquivos reais de configuração corporativos.
+    Neste laboratório desenvolvido em Vanilla JavaScript, você pode carregar snippets de configuração comumente
+    encontrados em servidores vulneráveis, disparar uma auditoria de conformidade com os CIS Benchmarks,
+    analisar os achados técnicos de segurança e aplicar correções automáticas de bastionamento com um único clique.
+  </p>
+
+  <div class="lab-box" id="hardening-lab">
+    <div class="lab-header">
+      <span class="lab-badge">LAB PRÁTICO INTERATIVO</span>
+      <h3>Auditor Interativo de Linha de Base e CIS Benchmarks</h3>
+      <p>Inspecione configurações vulneráveis de SO, calcule o score de conformidade e aplique hardening em tempo real.</p>
+    </div>
+
+    <!-- Seletor de Templates de Configuração -->
+    <div style="margin-bottom: 1.25rem;">
+      <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:0.5rem;">Selecione o Arquivo de Configuração do Servidor para Auditar:</div>
+      <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+        <button class="lab-btn" id="btn-tmpl-sshd" onclick="carregarSnippetConfig('sshd')">🐧 Linux: /etc/ssh/sshd_config</button>
+        <button class="lab-btn" id="btn-tmpl-sysctl" onclick="carregarSnippetConfig('sysctl')">⚙️ Linux: /etc/sysctl.conf (Kernel)</button>
+        <button class="lab-btn" id="btn-tmpl-windows" onclick="carregarSnippetConfig('windows')">🪟 Windows Server: Registro / GPO</button>
+      </div>
+    </div>
+
+    <!-- Editor de Configuração -->
+    <div style="margin-bottom: 1.25rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+        <label style="font-weight:700; font-size:0.875rem; color:var(--ink);" id="label-arquivo-atual">Conteúdo do Arquivo de Configuração:</label>
+        <span style="font-size:0.75rem; color:var(--muted);">(Você pode editar o texto livremente abaixo)</span>
+      </div>
+      <textarea id="config-text-input" rows="8" style="width:100%; font-family:var(--font-mono); font-size:0.825rem; padding:0.75rem; border-radius:6px; border:1px solid var(--rule); background:var(--ground); color:var(--ink); resize:vertical;"></textarea>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div style="display:flex; flex-wrap:wrap; gap:0.75rem; margin-bottom:1.5rem; align-items:center;">
+      <button class="lab-btn" style="background:#2563eb; color:#fff;" onclick="auditarConfiguracaoServidor()">🔍 Executar Auditoria de Conformidade CIS</button>
+      <button class="lab-btn lab-btn-success" onclick="aplicarHardeningAutomatico()">🛡️ Aplicar Hardening Automático Recomendado</button>
+    </div>
+
+    <!-- Painel de Resultados: Score e Estatísticas -->
+    <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1.25rem; margin-bottom:1.5rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+        <div>
+          <h4 style="margin:0; font-size:1rem; color:var(--ink);">Resultado da Auditoria de Conformidade CIS</h4>
+          <span style="font-size:0.8rem; color:var(--muted);" id="auditoria-status-sub">Pressione o botão de auditoria para avaliar o snippet.</span>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; font-weight:700;">Índice de Bastionamento</div>
+          <div id="cis-score-display" style="font-size:1.75rem; font-weight:800; color:var(--ink); font-family:var(--font-display);">-- %</div>
+        </div>
+      </div>
+
+      <!-- Barra de Progresso Visual do Score -->
+      <div style="width:100%; height:8px; background:var(--sunk); border-radius:4px; overflow:hidden; margin-bottom:1rem;">
+        <div id="cis-score-bar" style="width:0%; height:100%; background:#ef4444; transition:width 0.4s ease, background 0.4s ease;"></div>
+      </div>
+
+      <!-- Tabela de Achados e Não-Conformidades -->
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.825rem;">
+          <thead>
+            <tr style="border-bottom:2px solid var(--rule); text-align:left;">
+              <th style="padding:0.5rem; color:var(--muted); width:80px;">Severidade</th>
+              <th style="padding:0.5rem; color:var(--muted);">Parâmetro Auditado</th>
+              <th style="padding:0.5rem; color:var(--muted);">Valor Atual</th>
+              <th style="padding:0.5rem; color:var(--muted);">Recomendação CIS</th>
+              <th style="padding:0.5rem; color:var(--muted);">Risco Técnico Associado</th>
+            </tr>
+          </thead>
+          <tbody id="cis-findings-tbody">
+            <!-- Renderizado dinamicamente via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 6: CHECKLIST PRÁTICO -->
+<section class="study-section" id="checklist-hardening">
+  <div class="section-title-wrap">
+    <span class="section-num">06</span>
+    <h2>Checklist de Aplicação Prática: Auditoria de Hardening de Servidores</h2>
+  </div>
+
+  <p>
+    Utilize este checklist técnico durante implantações de servidores em produção, homologação de novas imagens douradas
+    (<em>Golden Images</em>) ou revisões de auditoria para assegurar que diretrizes fundamentais de bastionamento foram observadas:
+  </p>
+
+  <div class="checklist" id="checklist-hardening-sistemas">
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Acesso SSH Restrito a Chaves Assimétricas e Sem Login Root:</strong>
+        Em servidores Linux, <code>PermitRootLogin no</code> e <code>PasswordAuthentication no</code> estão configurados e verificados,
+        com chaves públicas autorizadas ed25519 e desativação de X11Forwarding.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Proteção de Memória e Rede do Kernel via sysctl:</strong>
+        Parâmetros <code>kernel.randomize_va_space = 2</code> (ASLR total), <code>net.ipv4.ip_forward = 0</code> e
+        <code>net.ipv4.tcp_syncookies = 1</code> estão persistidos em <code>/etc/sysctl.conf</code>.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Módulos de Controle de Acesso Mandatório Ativos (SELinux/AppArmor):</strong>
+        SELinux está em modo <code>Enforcing</code> (ou AppArmor em modo <code>enforce</code>), com políticas aplicadas
+        para os principais serviços expostos (Web, Banco de Dados, SSH).
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Erradicação Total do SMBv1 e Protocolos LLMNR/NetBIOS:</strong>
+        Em ambientes Windows, o recurso opcional SMBv1 está desinstalado, e as respostas a broadcasts LLMNR e NetBIOS
+        estão desativadas via GPO corporativa.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Proteção Ativa do Processo LSASS e Credential Guard:</strong>
+        LSA Protection habilitado com <code>RunAsPPL = 1</code>, Credential Guard ativo em hardware compatível e
+        armazenamento de texto claro no provedor WDigest desativado no Registro.
+      </span>
+    </label>
+
+    <label class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)">
+      <span class="check-box"></span>
+      <span class="check-text">
+        <strong>Auditoria de Executáveis SUID/SGID e umask Corporativo:</strong>
+        Binários com permissões SUID desnecessárias foram auditados e revogados, e o umask padrão do sistema está
+        definido em <code>027</code> para impedir privilégios de leitura por terceiros.
+      </span>
+    </label>
+  </div>
+</section>
+
+<!-- SEÇÃO 7: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
+<section class="study-section" id="questoes-fixacao">
+  <div class="section-title-wrap">
+    <span class="section-num">07</span>
+    <h2>Questões de Fixação e Concursos Públicos</h2>
+  </div>
+
+  <p>
+    Consolide seu conhecimento respondendo a questões baseadas em provas de concursos públicos de alto escalão
+    (Tribunais, Carreiras Policiais de Perícia em Computação Forense) e certificações de segurança (CompTIA Linux+, Red Hat RHCSA Security, Microsoft SC-200):
+  </p>
+
+  <div class="quiz" id="quiz-hardening-sistemas">
+    <!-- Questão 1 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 1 &bull; CIS Benchmarks e Níveis de Conformidade</span>
+        <p>
+          Ao planejar a implementação de linhas de base de segurança em uma organização bancária, o analista de segurança
+          avalia a aplicação dos CIS Benchmarks para servidores Linux. Ele observa que o guia divide suas recomendações
+          em dois níveis: CIS Nível 1 e CIS Nível 2. Considerando a finalidade e as características desses níveis,
+          assinale a afirmativa correta sobre o escopo do CIS Nível 2:
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: O CIS Nível 2 é voltado para ambientes de alta sensibilidade e defesa em profundidade, aplicando restrições mais agressivas que podem impactar a funcionalidade de softwares caso não haja planejamento de compatibilidade prévio.</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> O CIS Nível 1 destina-se a estabelecer uma barreira básica de proteção com impacto mínimo ou nulo na operabilidade padrão. O CIS Nível 2 (Defense in Depth) introduz medidas altamente restritivas (como desativação de módulos USB no kernel, políticas estritas de confinamento e auditoria agressiva) recomendadas para setores militares, financeiros ou de infraestrutura crítica, exigindo testes prévios para evitar quebra de compatibilidade em aplicações corporativas.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Questão 2 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 2 &bull; Proteção do LSASS e Dumping de Credenciais no Windows</span>
+        <p>
+          Durante uma simulação de ataque adversário (Red Team), um invasor obteve privilégios administrativos locais
+          em uma estação Windows de um analista financeiro. Ele tentou executar a ferramenta Mimikatz para extrair senhas
+          em texto claro e hashes de memória através da injeção de DLL no processo <code>lsass.exe</code>, porém a operação
+          foi bloqueada pelo sistema com erro de acesso negado. Qual configuração de hardening implementada na estação impediu essa ação?
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: Habilitação do LSA Protection (Protected Process Light - RunAsPPL), associada à desativação do provedor WDigest e Credential Guard.</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> Quando o LSA Protection é ativado (valor <code>RunAsPPL = 1</code> na chave de registro <code>HKLM\SYSTEM\CurrentControlSet\Control\Lsa</code>), o processo LSASS é executado como um <em>Protected Process Light</em>. Isso impede que qualquer processo não assinado digitalmente pela Microsoft (mesmo executando com privilégios de administrador ou SYSTEM) abra handles com direitos de leitura de memória ou injeção de código contra o LSASS, neutralizando ataques comuns de dumping de credenciais via Mimikatz.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Questão 3 -->
+    <div class="quiz-item">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 3 &bull; sysctl e Proteção de Memória no Linux</span>
+        <p>
+          Em um servidor Linux corporativo, um analista de segurança precisa assegurar que a técnica de proteção
+          contra exploração de vulnerabilidades de corrupção de memória e buffer overflow conhecida como
+          ASLR (Address Space Layout Randomization) esteja operando com o mais alto nível de aleatorização para
+          a pilha (stack), área de memória dinâmica (heap) e bibliotecas compartilhadas carregadas.
+          Qual parâmetro e valor deve constar no arquivo <code>/etc/sysctl.conf</code> para garantir essa proteção?
+        </p>
+      </div>
+      <details class="quiz-answer">
+        <summary>Ver resposta comentada</summary>
+        <div class="quiz-explanation">
+          <p>
+            <strong>Gabarito: kernel.randomize_va_space = 2</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> O parâmetro <code>kernel.randomize_va_space</code> controla a aleatorização do espaço de endereçamento virtual no Linux. O valor <code>0</code> desativa completamente o ASLR. O valor <code>1</code> ativa o modo conservador (aleatoriza a pilha, bibliotecas dinâmicas e o mapeamento mmap, mas não o heap do processo). O valor <code>2</code> representa a aleatorização completa recomendada pelos CIS Benchmarks, incluindo também a aleatorização do heap gerado via <code>brk()</code>, dificultando a previsibilidade de endereços de memória por atacantes em tentativas de exploração binária.
+          </p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 8: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
+<section class="study-section" id="fatos-essenciais">
+  <div class="section-title-wrap">
+    <span class="section-num">08</span>
+    <h2>Fatos Essenciais &bull; Transição da Trilha 2: Segurança Defensiva</h2>
+  </div>
+
+  <div class="facts-grid">
+    <div class="facts-card">
+      <h4>Superfície de Ataque Mínima</h4>
+      <p>Desative tudo o que não for estritamente obrigatório. Menos serviços e portas abertas significam menos vetores para exploração adversária.</p>
+    </div>
+    <div class="facts-card">
+      <h4>CIS Benchmarks São a Referência Global</h4>
+      <p>Nível 1 garante segurança sem quebra de compatibilidade operacional; Nível 2 aplica restrições profundas para ativos de altíssima sensibilidade.</p>
+    </div>
+    <div class="facts-card">
+      <h4>SSH Chaves-Apenas e Sem Root</h4>
+      <p>Configure PermitRootLogin no e PasswordAuthentication no. O uso exclusivo de chaves ed25519 elimina ataques automatizados de força bruta.</p>
+    </div>
+    <div class="facts-card">
+      <h4>sysctl e ASLR Total (Nível 2)</h4>
+      <p>kernel.randomize_va_space = 2 aleatoriza pilha, heap e bibliotecas na memória, frustrando ataques de buffer overflow e ROP chains.</p>
+    </div>
+    <div class="facts-card">
+      <h4>LSASS Blindado com RunAsPPL</h4>
+      <p>No Windows Server, proteja o processo LSASS contra dumping de credenciais com LSA Protection, Credential Guard e desativação do WDigest.</p>
+    </div>
+    <div class="facts-card">
+      <h4>Próximo Estudo da Trilha 2</h4>
+      <p>No <strong>Estudo 07 (Seguranca-de-Redes-Defesa)</strong>, avançaremos para sistemas ativos de detecção e prevenção (IDS/IPS Snort/Suricata, WAF e VPNs seguras).</p>
+    </div>
+  </div>
+</section>
+
+<!-- SCRIPT EMBUTIDO: SIMULADOR DE AUDITORIA CIS BENCHMARK -->
+<script>
+/**
+ * Simulador Interativo: Auditor de Configuração e CIS Benchmarks
+ * Estudos de Cibersegurança - José Mauro da Silva Brandão
+ */
+
+// Banco de Snippets de Configuração (Vulneráveis vs Corrigidos)
+const snippetsConfig = {
+  sshd: {
+    nome: "/etc/ssh/sshd_config (Servidor SSH Linux)",
+    vulneravel: `# Configuração Padrão Vulnerável de sshd_config
+Port 22
+PermitRootLogin yes
+PasswordAuthentication yes
+PermitEmptyPasswords yes
+X11Forwarding yes
+MaxAuthTries 10
+# Cifras antigas permitidas
+Ciphers 3des-cbc,aes128-cbc,aes256-cbc`,
+    corrigido: `# Configuração em Conformidade com CIS Benchmark Level 1 & 2
+Port 22
+PermitRootLogin no
+PasswordAuthentication no
+PermitEmptyPasswords no
+X11Forwarding no
+MaxAuthTries 3
+AllowGroups ssh-users-admin
+KexAlgorithms curve25519-sha256,diffie-hellman-group16-sha512
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com
+MACs hmac-sha2-512-etm@openssh.com`,
+    regras: [
+      {
+        param: "PermitRootLogin",
+        esperado: "no",
+        severidade: "Crítica",
+        mitre: "T1078 (Valid Accounts)",
+        risco: "Permite que atacantes façam força bruta direta contra o usuário root com privilégios irrestritos.",
+        recomendacao: "Definir 'PermitRootLogin no' e utilizar sudo para elevação."
+      },
+      {
+        param: "PasswordAuthentication",
+        esperado: "no",
+        severidade: "Alta",
+        mitre: "T1110 (Brute Force)",
+        risco: "Expõe o servidor a ataques de dicionário e adivinhação de senhas.",
+        recomendacao: "Definir 'PasswordAuthentication no' e exigir chaves públicas ed25519."
+      },
+      {
+        param: "PermitEmptyPasswords",
+        esperado: "no",
+        severidade: "Crítica",
+        mitre: "T1078 (Default Accounts)",
+        risco: "Permite login remoto em contas sem senha definida.",
+        recomendacao: "Definir 'PermitEmptyPasswords no'."
+      },
+      {
+        param: "X11Forwarding",
+        esperado: "no",
+        severidade: "Média",
+        mitre: "T1055 (Process Injection)",
+        risco: "Permite sequestro de sessões gráficas X11 se o servidor for comprometido.",
+        recomendacao: "Definir 'X11Forwarding no'."
+      },
+      {
+        param: "MaxAuthTries",
+        max: 4,
+        severidade: "Média",
+        mitre: "T1110 (Password Guessing)",
+        risco: "Muitas tentativas por conexão facilitam força bruta automatizada.",
+        recomendacao: "Definir 'MaxAuthTries 3'."
+      }
+    ]
+  },
+  sysctl: {
+    nome: "/etc/sysctl.conf (Parâmetros do Kernel Linux)",
+    vulneravel: `# Configuração Padrão Fraca de /etc/sysctl.conf
+net.ipv4.ip_forward = 1
+net.ipv4.tcp_syncookies = 0
+kernel.randomize_va_space = 0
+net.ipv4.conf.all.accept_redirects = 1
+kernel.dmesg_restrict = 0`,
+    corrigido: `# Configuração em Conformidade com CIS Benchmark
+net.ipv4.ip_forward = 0
+net.ipv4.tcp_syncookies = 1
+kernel.randomize_va_space = 2
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+kernel.dmesg_restrict = 1
+fs.protected_hardlinks = 1
+fs.protected_symlinks = 1`,
+    regras: [
+      {
+        param: "net.ipv4.ip_forward",
+        esperado: "0",
+        severidade: "Alta",
+        mitre: "TA0008 (Lateral Movement)",
+        risco: "Transforma o servidor em roteador, facilitando trânsito de tráfego entre sub-redes não autorizadas.",
+        recomendacao: "Definir 'net.ipv4.ip_forward = 0'."
+      },
+      {
+        param: "net.ipv4.tcp_syncookies",
+        esperado: "1",
+        severidade: "Alta",
+        mitre: "T1498 (Network DoS)",
+        risco: "Servidor desprotegido contra negação de serviço por inundação TCP SYN.",
+        recomendacao: "Definir 'net.ipv4.tcp_syncookies = 1'."
+      },
+      {
+        param: "kernel.randomize_va_space",
+        esperado: "2",
+        severidade: "Crítica",
+        mitre: "T1203 (Exploitation for Client Execution)",
+        risco: "ASLR desativado! Endereços de memória estáticos facilitam exploits de buffer overflow.",
+        recomendacao: "Definir 'kernel.randomize_va_space = 2' (ASLR Completo)."
+      },
+      {
+        param: "net.ipv4.conf.all.accept_redirects",
+        esperado: "0",
+        severidade: "Média",
+        mitre: "T1557 (Adversary-in-the-Middle)",
+        risco: "Aceita redirecionamentos ICMP, permitindo alteração maliciosa de rotas pelo invasor.",
+        recomendacao: "Definir 'net.ipv4.conf.all.accept_redirects = 0'."
+      },
+      {
+        param: "kernel.dmesg_restrict",
+        esperado: "1",
+        severidade: "Média",
+        mitre: "T1082 (System Information Discovery)",
+        risco: "Usuários comuns podem ler mensagens de diagnóstico do kernel no dmesg para descobrir vulnerabilidades.",
+        recomendacao: "Definir 'kernel.dmesg_restrict = 1'."
+      }
+    ]
+  },
+  windows: {
+    nome: "Registro / GPO (Segurança do Windows Server)",
+    vulneravel: `# Configurações Inseguras do Registro do Windows Server
+[HKLM\\SYSTEM\\CurrentControlSet\\Services\\LanmanServer\\Parameters]
+SMB1 = 1
+
+[HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa]
+RunAsPPL = 0
+LmCompatibilityLevel = 1
+
+[HKLM\\SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\WDigest]
+UseLogonCredential = 1`,
+    corrigido: `# Configurações em Conformidade com CIS Benchmark para Windows
+[HKLM\\SYSTEM\\CurrentControlSet\\Services\\LanmanServer\\Parameters]
+SMB1 = 0
+
+[HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa]
+RunAsPPL = 1
+LmCompatibilityLevel = 5
+
+[HKLM\\SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\WDigest]
+UseLogonCredential = 0`,
+    regras: [
+      {
+        param: "SMB1",
+        esperado: "0",
+        severidade: "Crítica",
+        mitre: "T1210 (Exploitation of Remote Services)",
+        risco: "Protocolo SMBv1 ativo expõe o sistema a worms e exploits de dia zero (tipo WannaCry).",
+        recomendacao: "Desativar completamente o SMBv1 (SMB1 = 0)."
+      },
+      {
+        param: "RunAsPPL",
+        esperado: "1",
+        severidade: "Crítica",
+        mitre: "T1003.001 (LSASS Memory Dumping)",
+        risco: "Processo LSASS desprotegido, permitindo extração de senhas com ferramentas como Mimikatz.",
+        recomendacao: "Habilitar LSA Protection definindo 'RunAsPPL = 1'."
+      },
+      {
+        param: "UseLogonCredential",
+        esperado: "0",
+        severidade: "Crítica",
+        mitre: "T1552 (Unsecured Credentials)",
+        risco: "WDigest armazena credenciais em texto claro na memória do Windows.",
+        recomendacao: "Definir 'UseLogonCredential = 0'."
+      },
+      {
+        param: "LmCompatibilityLevel",
+        esperado: "5",
+        severidade: "Alta",
+        mitre: "T1187 (Forced Authentication / NTLMv1)",
+        risco: "Permite autenticação NTLMv1 fraca facilmente quebrada por força bruta.",
+        recomendacao: "Definir LmCompatibilityLevel = 5 (Recusar LM e NTLM, exigir NTLMv2)."
+      }
+    ]
+  }
+};
+
+let templateAtualKey = "sshd";
+
+// Carrega o snippet selecionado no editor
+function carregarSnippetConfig(tipo) {
+  if (!snippetsConfig[tipo]) return;
+  templateAtualKey = tipo;
+
+  const inputEl = document.getElementById("config-text-input");
+  const labelEl = document.getElementById("label-arquivo-atual");
+  if (inputEl) inputEl.value = snippetsConfig[tipo].vulneravel;
+  if (labelEl) labelEl.textContent = "Arquivo: " + snippetsConfig[tipo].nome;
+
+  // Atualiza classes visuais dos botões
+  ["sshd", "sysctl", "windows"].forEach(k => {
+    const btn = document.getElementById("btn-tmpl-" + k);
+    if (btn) {
+      if (k === tipo) {
+        btn.classList.add("selected");
+        btn.style.outline = "2px solid #2563eb";
+      } else {
+        btn.classList.remove("selected");
+        btn.style.outline = "none";
+      }
+    }
+  });
+
+  auditarConfiguracaoServidor();
+}
+
+// Aplica o template de hardening já corrigido
+function aplicarHardeningAutomatico() {
+  const inputEl = document.getElementById("config-text-input");
+  if (!inputEl) return;
+  inputEl.value = snippetsConfig[templateAtualKey].corrigido;
+  auditarConfiguracaoServidor();
+}
+
+// Analisador do texto contra as regras CIS do template ativo
+function auditarConfiguracaoServidor() {
+  const inputEl = document.getElementById("config-text-input");
+  if (!inputEl) return;
+
+  const texto = inputEl.value;
+  const linhas = texto.split("\n");
+  const configMap = {};
+
+  // Parse simplificado chave = valor ou chave valor
+  linhas.forEach(linha => {
+    linha = linha.trim();
+    if (!linha || linha.startsWith("#") || linha.startsWith("[")) return;
+
+    let partes = [];
+    if (linha.includes("=")) {
+      partes = linha.split("=").map(p => p.trim());
+    } else {
+      partes = linha.split(/\s+/).map(p => p.trim());
+    }
+
+    if (partes.length >= 2) {
+      configMap[partes[0]] = partes[1];
+    }
+  });
+
+  const template = snippetsConfig[templateAtualKey];
+  const totalRegras = template.regras.length;
+  let conformes = 0;
+  const achados = [];
+
+  template.regras.forEach(r => {
+    const valorAtual = configMap[r.param];
+
+    let estaConforme = false;
+    if (r.esperado !== undefined) {
+      estaConforme = (valorAtual !== undefined && valorAtual.toLowerCase() === r.esperado.toLowerCase());
+    } else if (r.max !== undefined) {
+      estaConforme = (valorAtual !== undefined && parseInt(valorAtual, 10) <= r.max);
+    }
+
+    if (estaConforme) {
+      conformes++;
+    } else {
+      achados.push({
+        param: r.param,
+        valorAtual: valorAtual !== undefined ? valorAtual : "(Ausente / Não Definido)",
+        esperado: r.esperado !== undefined ? r.esperado : `<= ${r.max}`,
+        severidade: r.severidade,
+        mitre: r.mitre,
+        risco: r.risco,
+        recomendacao: r.recomendacao
+      });
+    }
+  });
+
+  const scorePct = Math.round((conformes / totalRegras) * 100);
+  renderizarResultadoAuditoria(scorePct, achados, totalRegras, conformes);
+}
+
+// Renderiza o score e a tabela de achados
+function renderizarResultadoAuditoria(score, achados, total, conformes) {
+  const scoreDisplay = document.getElementById("cis-score-display");
+  const scoreBar = document.getElementById("cis-score-bar");
+  const subStatus = document.getElementById("auditoria-status-sub");
+  const tbody = document.getElementById("cis-findings-tbody");
+
+  if (scoreDisplay) {
+    scoreDisplay.textContent = score + "%";
+    if (score === 100) {
+      scoreDisplay.style.color = "#10b981";
+    } else if (score >= 60) {
+      scoreDisplay.style.color = "#f59e0b";
+    } else {
+      scoreDisplay.style.color = "#ef4444";
+    }
+  }
+
+  if (scoreBar) {
+    scoreBar.style.width = score + "%";
+    if (score === 100) {
+      scoreBar.style.background = "#10b981";
+    } else if (score >= 60) {
+      scoreBar.style.background = "#f59e0b";
+    } else {
+      scoreBar.style.background = "#ef4444";
+    }
+  }
+
+  if (subStatus) {
+    if (score === 100) {
+      subStatus.innerHTML = `<strong style="color:#10b981;">🛡️ Parabéns!</strong> Todas as ${total} verificações estão em conformidade com o CIS Benchmark.`;
+    } else {
+      subStatus.innerHTML = `<strong style="color:#ef4444;">⚠️ Atenção:</strong> ${achados.length} não-conformidades encontradas (${conformes}/${total} conformes).`;
+    }
+  }
+
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  if (achados.length === 0) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td colspan="5" style="padding:1rem; text-align:center; color:#10b981; font-weight:700;">
+        ✓ Nenhuma não-conformidade detectada! O arquivo está totalmente bastionado segundo as diretrizes CIS.
+      </td>
+    `;
+    tbody.appendChild(tr);
+    return;
+  }
+
+  achados.forEach(a => {
+    let badgeSev = '<span class="badge red">CRÍTICA</span>';
+    if (a.severidade === "Alta") badgeSev = '<span class="badge amber">ALTA</span>';
+    if (a.severidade === "Média") badgeSev = '<span class="badge slate">MÉDIA</span>';
+
+    const tr = document.createElement("tr");
+    tr.style.borderBottom = "1px solid var(--rule)";
+    tr.innerHTML = `
+      <td style="padding:0.5rem;">${badgeSev}</td>
+      <td style="padding:0.5rem; font-family:var(--font-mono); font-weight:700;">${escapeHtml(a.param)}</td>
+      <td style="padding:0.5rem; font-family:var(--font-mono); color:#ef4444;">${escapeHtml(a.valorAtual)}</td>
+      <td style="padding:0.5rem; font-family:var(--font-mono); color:#10b981;">${escapeHtml(a.esperado)}</td>
+      <td style="padding:0.5rem; font-size:0.8rem; color:var(--muted);">
+        <div>${escapeHtml(a.risco)}</div>
+        <div style="font-size:0.75rem; color:var(--ink); margin-top:0.2rem;"><strong>Recomendação:</strong> ${escapeHtml(a.recomendacao)}</div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Inicialização automática do checklist e do laboratório no carregamento da página
+document.addEventListener("DOMContentLoaded", function() {
+  if (typeof initChecklist === "function") {
+    initChecklist("hardening-sistemas");
+  }
+  carregarSnippetConfig("sshd");
+});
+</script>
