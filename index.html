@@ -1,0 +1,2695 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Plataforma de estudos autoinstrucional e prática em cibersegurança com 28 módulos temáticos, 6 trilhas e simuladores interativos em JavaScript.">
+  <title>Estudos de Cibersegurança — Catálogo e Portal Central</title>
+
+  <!-- Google Fonts: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+/* ==========================================================================
+   Design System do Portal Central — Estudos em Cibersegurança
+   Autor: José Mauro da Silva Brandão
+   ========================================================================== */
+
+:root {
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+  --accent: #2563EB;
+  --accent-hover: #1D4ED8;
+
+  /* Cores das 6 Trilhas Temáticas */
+  --t1-blue: #2563EB;
+  --t2-green: #059669;
+  --t3-red: #DC2626;
+  --t4-purple: #7C3AED;
+  --t5-cyan: #0891B2;
+  --t6-amber: #D97706;
+
+  /* Estados de Sucesso / Conclusão */
+  --good: #059669;
+  --good-tint: #D1FAE5;
+  --good-dark: #065F46;
+
+  /* Tipografia Unificada */
+  --display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+}
+
+/* Suporte a Tema Escuro pelo Sistema */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #0F171C;
+    --surface: #172229;
+    --sunk: #1E2B33;
+    --ink: #E4EAED;
+    --muted: #9BABB6;
+    --rule: #2B3A44;
+    --accent: #60A5FA;
+    --accent-hover: #93C5FD;
+
+    --t1-blue: #60A5FA;
+    --t2-green: #34D399;
+    --t3-red: #F87171;
+    --t4-purple: #A78BFA;
+    --t5-cyan: #22D3EE;
+    --t6-amber: #FBBF24;
+
+    --good: #34D399;
+    --good-tint: #064E3B;
+    --good-dark: #A7F3D0;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* Override Explícito por data-theme */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #0F171C;
+  --surface: #172229;
+  --sunk: #1E2B33;
+  --ink: #E4EAED;
+  --muted: #9BABB6;
+  --rule: #2B3A44;
+  --accent: #60A5FA;
+  --accent-hover: #93C5FD;
+
+  --t1-blue: #60A5FA;
+  --t2-green: #34D399;
+  --t3-red: #F87171;
+  --t4-purple: #A78BFA;
+  --t5-cyan: #22D3EE;
+  --t6-amber: #FBBF24;
+
+  --good: #34D399;
+  --good-tint: #064E3B;
+  --good-dark: #A7F3D0;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+  --accent: #2563EB;
+  --accent-hover: #1D4ED8;
+
+  --t1-blue: #2563EB;
+  --t2-green: #059669;
+  --t3-red: #DC2626;
+  --t4-purple: #7C3AED;
+  --t5-cyan: #0891B2;
+  --t6-amber: #D97706;
+
+  --good: #059669;
+  --good-tint: #D1FAE5;
+  --good-dark: #065F46;
+}
+
+/* Resets e Layout Base */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background-color: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.portal-container {
+  max-width: 1240px;
+  margin-inline: auto;
+  padding: 32px 20px 80px;
+}
+
+/* ==========================================================================
+   Cabeçalho / Masthead
+   ========================================================================== */
+
+.masthead {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.masthead-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.kicker {
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 4px 0;
+}
+
+h1 {
+  font-family: var(--display);
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--ink);
+}
+
+.lead {
+  font-size: 1.15rem;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 72ch;
+  margin: 0;
+}
+
+.byline {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.byline strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Botão de Alternância de Tema */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--sunk);
+  border-color: var(--ink);
+}
+
+/* Barra de Estatísticas */
+.stats-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  padding: 16px 20px;
+  border-radius: 6px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-number {
+  font-family: var(--display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.stat-label {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+/* ==========================================================================
+   Barra de Progresso Global do Estudante
+   ========================================================================== */
+
+.progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  padding: 18px 22px;
+  border-radius: 6px;
+  margin-top: 24px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.progress-title {
+  font-family: var(--display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-metrics {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.progress-metrics strong {
+  color: var(--good);
+}
+
+.progress-bar-track {
+  height: 10px;
+  background: var(--sunk);
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--good);
+  transition: width 0.35s ease;
+}
+
+.progress-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-reset-progress {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.btn-reset-progress:hover {
+  color: var(--t3-red);
+}
+
+/* ==========================================================================
+   Barra de Pesquisa e Filtros Multifacetados
+   ========================================================================== */
+
+.controls-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  font-size: 1.1rem;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+#search-input {
+  width: 100%;
+  padding: 14px 44px 14px 46px;
+  font-family: var(--body);
+  font-size: 1rem;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1.5px solid var(--rule);
+  border-radius: 6px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 14px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: none;
+  padding: 4px;
+}
+
+.clear-search-btn:hover {
+  color: var(--ink);
+}
+
+/* Abas de Navegação e Filtros */
+.filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 8px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  font-family: var(--display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  color: var(--ink);
+  background: var(--sunk);
+}
+
+.tab-btn.active {
+  color: var(--ink);
+  background: var(--surface);
+  border-bottom: 3px solid var(--accent);
+}
+
+/* Painéis de Filtros Específicos */
+.filter-subpanel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  padding: 8px 0;
+}
+
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filter-badge:hover {
+  border-color: var(--ink);
+  background: var(--sunk);
+}
+
+.filter-badge.active {
+  background: var(--ink);
+  color: var(--ground);
+  border-color: var(--ink);
+}
+
+/* Indicador de Resultados */
+.results-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+   Seção: Escolha pela Necessidade Prática
+   ========================================================================== */
+
+.needs-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 36px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.needs-header h2 {
+  font-family: var(--display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+}
+
+.needs-header p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.needs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.need-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--ground);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--ink);
+  transition: all 0.2s ease;
+}
+
+.need-card:hover {
+  background: var(--sunk);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.need-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.need-title {
+  font-size: 0.92rem;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.need-target {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: auto;
+}
+
+/* ==========================================================================
+   Grid dos Cartões de Estudos (28 Módulos)
+   ========================================================================== */
+
+.studies-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.section-title-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.section-title {
+  font-family: var(--display);
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+/* Cartão Individual de Estudo */
+.study-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  scroll-margin-top: 30px;
+}
+
+.study-card:hover {
+  border-color: var(--ink);
+  box-shadow: var(--shadow-md);
+}
+
+.study-card.card-done {
+  border-color: var(--good);
+  background: linear-gradient(to bottom, var(--surface) 95%, var(--good-tint) 100%);
+}
+
+.study-card:target {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* Cabeçalho do Cartão */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.card-tile-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.track-tile {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  color: #FFFFFF;
+  font-family: var(--display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.track-tile.t1 { background: var(--t1-blue); }
+.track-tile.t2 { background: var(--t2-green); }
+.track-tile.t3 { background: var(--t3-red); }
+.track-tile.t4 { background: var(--t4-purple); }
+.track-tile.t5 { background: var(--t5-cyan); }
+.track-tile.t6 { background: var(--t6-amber); }
+
+.card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.badge-nist {
+  background: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+}
+
+.badge-time {
+  background: var(--sunk);
+  color: var(--muted);
+}
+
+.badge-sim {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.status-badge {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-badge.pronto {
+  background: var(--good-tint);
+  color: var(--good-dark);
+}
+
+.status-badge.preparo {
+  background: var(--sunk);
+  color: var(--muted);
+}
+
+/* Tipografia do Cartão */
+.study-title {
+  font-family: var(--display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--ink);
+}
+
+.study-desc {
+  font-size: 0.92rem;
+  color: var(--muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.study-ask {
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--ink);
+  background: var(--ground);
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 4px 4px 0;
+  margin: 0;
+}
+
+.study-ask strong {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* Fatos / Destaques do Cartão */
+.study-facts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.study-facts li {
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.study-facts li::before {
+  content: "•";
+  color: var(--accent);
+  font-weight: bold;
+}
+
+/* Ações e Conclusão */
+.card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+
+.btn-open-study {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--ink);
+  color: var(--ground);
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-open-study:hover {
+  background: var(--accent);
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+.btn-disabled {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--sunk);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  border-radius: 4px;
+  cursor: not-allowed;
+}
+
+.done-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.done-label input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: var(--good);
+  cursor: pointer;
+}
+
+.study-card.card-done .done-label {
+  color: var(--good);
+  font-weight: 600;
+}
+
+/* Estado de Nenhum Estudo Encontrado */
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 20px;
+  background: var(--surface);
+  border: 1px dashed var(--rule);
+  border-radius: 8px;
+}
+
+.no-results p {
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+/* ==========================================================================
+   Rodapé do Portal Central
+   ========================================================================== */
+
+.portal-footer {
+  margin-top: 60px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.portal-footer a {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Responsividade Mobile (Menor que 768px)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .portal-container {
+    padding: 20px 14px 60px;
+  }
+
+  .masthead-top {
+    flex-direction: column;
+  }
+
+  .stats-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-open-study, .btn-disabled {
+    justify-content: center;
+  }
+}
+
+  </style>
+</head>
+<body>
+
+  <div class="portal-container">
+
+    <!-- Masthead e Identidade da Plataforma -->
+    <header class="masthead">
+      <div class="masthead-top">
+        <div>
+          <p class="kicker">Plataforma Autoinstrucional &bull; 100% Offline &bull; Prática em JavaScript</p>
+          <h1>Estudos de Cibersegurança</h1>
+        </div>
+        <button class="theme-toggle-btn" aria-label="Alternar tema" onclick="toggleTheme()">
+          <span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>
+        </button>
+      </div>
+
+      <p class="lead">
+        Formação técnica de alto nível em segurança defensiva, ofensiva, arquitetura, operações de SOC, governança e riscos cibernéticos, com fundamentação normativa (NIST CSF 2.0 / MITRE ATT&amp;CK) e simuladores práticos interativos em Vanilla JS.
+      </p>
+
+      <div class="byline">
+        Curadoria e Desenvolvimento Técnico por <strong>José Mauro da Silva Brandão</strong> &bull; Edição 2026
+      </div>
+
+      <!-- Barra de Estatísticas do Portal -->
+      <div class="stats-bar">
+        <div class="stat-item">
+          <span class="stat-number">28</span>
+          <span class="stat-label">Estudos Mapeados</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">6</span>
+          <span class="stat-label">Trilhas Temáticas</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">28</span>
+          <span class="stat-label">Simuladores Interativos</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">~1265 min</span>
+          <span class="stat-label">Tempo Total (21.1h)</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">0 / 28</span>
+          <span class="stat-label">Módulos Compilados</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Rastreador de Progresso Global do Estudante -->
+    <section class="progress-section" aria-label="Progresso global">
+      <div class="progress-header">
+        <h2 class="progress-title">🎯 Progresso de Conclusão Global</h2>
+        <span class="progress-metrics" id="progress-text">0 de 28 concluídos (0%)</span>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+      <div class="progress-actions">
+        <button class="btn-reset-progress" onclick="resetProgress()">Zerar progresso salvo no navegador</button>
+      </div>
+    </section>
+
+    <!-- Controles de Busca e Filtros Multifacetados -->
+    <section class="controls-section" aria-label="Filtros e busca">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Buscar por palavra-chave, protocolo, comando, CVE, simulador ou norma..." aria-label="Buscar estudos">
+        <button class="clear-search-btn" aria-label="Limpar busca" onclick="clearSearch()">&times;</button>
+      </div>
+
+      <!-- Abas de Navegação -->
+      <nav class="filter-tabs" aria-label="Abas de filtragem">
+        <button class="tab-btn active" data-facet="todas" onclick="switchTab('todas')">Todas as Trilhas</button>
+        <button class="tab-btn" data-facet="trilhas" onclick="switchTab('trilhas')">Por Trilha Temática</button>
+        <button class="tab-btn" data-facet="carreiras" onclick="switchTab('carreiras')">Por Perfil Profissional</button>
+        <button class="tab-btn" data-facet="nist" onclick="switchTab('nist')">Por Função NIST CSF 2.0</button>
+      </nav>
+
+      <!-- Painel: Por Trilha -->
+      <div class="filter-subpanel" data-panel="trilhas" style="display: none;">
+        <button class="filter-badge active" data-value="all" onclick="setSubFilter('all', this)">Todas as Trilhas</button>
+        <button class="filter-badge" data-value="1" onclick="setSubFilter('1', this)">Trilha 1: Fundamentos &amp; Redes</button>
+        <button class="filter-badge" data-value="2" onclick="setSubFilter('2', this)">Trilha 2: Segurança Defensiva</button>
+        <button class="filter-badge" data-value="3" onclick="setSubFilter('3', this)">Trilha 3: Segurança Ofensiva</button>
+        <button class="filter-badge" data-value="4" onclick="setSubFilter('4', this)">Trilha 4: Operações &amp; SOC</button>
+        <button class="filter-badge" data-value="5" onclick="setSubFilter('5', this)">Trilha 5: Especialidades</button>
+        <button class="filter-badge" data-value="6" onclick="setSubFilter('6', this)">Trilha 6: Governança &amp; Riscos</button>
+      </div>
+
+      <!-- Painel: Por Perfil Profissional -->
+      <div class="filter-subpanel" data-panel="carreiras" style="display: none;">
+        <button class="filter-badge active" data-value="all" onclick="setSubFilter('all', this)">Todos os Perfis</button>
+        <button class="filter-badge" data-value="Blue Team &amp; Defesa" onclick="setSubFilter('Blue Team &amp; Defesa', this)">🛡️ Blue Team</button>
+        <button class="filter-badge" data-value="Red Team &amp; Pentest" onclick="setSubFilter('Red Team &amp; Pentest', this)">⚔️ Red Team</button>
+        <button class="filter-badge" data-value="AppSec &amp; DevSecOps" onclick="setSubFilter('AppSec &amp; DevSecOps', this)">💻 AppSec / DevSecOps</button>
+        <button class="filter-badge" data-value="Operações SOC &amp; Resposta" onclick="setSubFilter('Operações SOC &amp; Resposta', this)">👁️ SOC &amp; Resposta</button>
+        <button class="filter-badge" data-value="GRC &amp; Auditoria" onclick="setSubFilter('GRC &amp; Auditoria', this)">📋 GRC &amp; Auditoria</button>
+        <button class="filter-badge" data-value="Perícia Forense &amp; Malware" onclick="setSubFilter('Perícia Forense &amp; Malware', this)">🔍 Forense Digital</button>
+      </div>
+
+      <!-- Painel: Por Função NIST CSF 2.0 -->
+      <div class="filter-subpanel" data-panel="nist" style="display: none;">
+        <button class="filter-badge active" data-value="all" onclick="setSubFilter('all', this)">Todas as Funções</button>
+        <button class="filter-badge" data-value="Govern" onclick="setSubFilter('Govern', this)">🏛️ Govern (GV)</button>
+        <button class="filter-badge" data-value="Identify" onclick="setSubFilter('Identify', this)">🔎 Identify (ID)</button>
+        <button class="filter-badge" data-value="Protect" onclick="setSubFilter('Protect', this)">🛡️ Protect (PR)</button>
+        <button class="filter-badge" data-value="Detect" onclick="setSubFilter('Detect', this)">👁️ Detect (DE)</button>
+        <button class="filter-badge" data-value="Respond" onclick="setSubFilter('Respond', this)">🚨 Respond (RS)</button>
+        <button class="filter-badge" data-value="Recover" onclick="setSubFilter('Recover', this)">🔄 Recover (RC)</button>
+      </div>
+
+      <div class="results-info">
+        <span id="visible-count">Exibindo 28 de 28 estudos</span>
+        <span>Atalhos: clique nas tags ou use o campo de busca</span>
+      </div>
+    </section>
+
+    <!-- Seção: Escolha pela Necessidade Prática -->
+    <section class="needs-section" id="secao-necessidades">
+      <div class="needs-header">
+        <h2>🧭 Escolha pela Necessidade Prática</h2>
+        <p>Enfrentando um desafio operacional ou projeto corporativo? Encontre a solução direta no catálogo:</p>
+      </div>
+      <div class="needs-grid">
+      <a href="#estudo-Fundamentos-Ciber" class="need-card" onclick="focarEstudo('Fundamentos-Ciber')">
+        <span class="need-category">🛡️ Modelagem</span>
+        <span class="need-title">Preciso modelar ameaças de uma nova aplicação ou serviço</span>
+        <span class="need-target">→ Ver módulo: Tríade CIA, Ameaças e Modelagem STRIDE</span>
+      </a>
+      <a href="#estudo-Redes-e-Protocolos" class="need-card" onclick="focarEstudo('Redes-e-Protocolos')">
+        <span class="need-category">🌐 Redes</span>
+        <span class="need-title">Preciso inspecionar pacotes e dissecar o handshake TCP/IP</span>
+        <span class="need-target">→ Ver módulo: TCP/IP, DNS, Roteamento e Inspeção de Tráfego</span>
+      </a>
+      <a href="#estudo-Criptografia-Pratica" class="need-card" onclick="focarEstudo('Criptografia-Pratica')">
+        <span class="need-category">🔐 Criptografia</span>
+        <span class="need-title">Preciso escolher algoritmos de criptografia e validar certificados PKI</span>
+        <span class="need-target">→ Ver módulo: Criptografia Simétrica, Assimétrica, Hashes e PKI</span>
+      </a>
+      <a href="#estudo-Autenticacao-e-IAM" class="need-card" onclick="focarEstudo('Autenticacao-e-IAM')">
+        <span class="need-category">🔑 Identidade</span>
+        <span class="need-title">Preciso implementar autenticação multifator (MFA) e validar tokens JWT</span>
+        <span class="need-target">→ Ver módulo: Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</span>
+      </a>
+      <a href="#estudo-Segmentacao-e-Firewall" class="need-card" onclick="focarEstudo('Segmentacao-e-Firewall')">
+        <span class="need-category">🧱 Perímetro</span>
+        <span class="need-title">Preciso projetar uma DMZ com regras seguras de firewall</span>
+        <span class="need-target">→ Ver módulo: DMZ, VLANs, Regras de Firewall e Filtragem</span>
+      </a>
+      <a href="#estudo-Hardening-Sistemas" class="need-card" onclick="focarEstudo('Hardening-Sistemas')">
+        <span class="need-category">⚙️ Bastionamento</span>
+        <span class="need-title">Preciso auditar e aplicar CIS Benchmarks em servidores Linux e Windows</span>
+        <span class="need-target">→ Ver módulo: Bastionamento Linux e Windows (CIS Benchmarks)</span>
+      </a>
+      <a href="#estudo-Seguranca-de-Redes-Defesa" class="need-card" onclick="focarEstudo('Seguranca-de-Redes-Defesa')">
+        <span class="need-category">🛡️ Perímetro</span>
+        <span class="need-title">Preciso configurar regras de WAF e assinaturas de IDS/IPS</span>
+        <span class="need-target">→ Ver módulo: IDS/IPS, WAF, VPNs e Proxies Reversos</span>
+      </a>
+      <a href="#estudo-Arquitetura-Zero-Trust" class="need-card" onclick="focarEstudo('Arquitetura-Zero-Trust')">
+        <span class="need-category">🔒 Arquitetura</span>
+        <span class="need-title">Preciso planejar uma arquitetura Zero Trust e microsegmentação</span>
+        <span class="need-target">→ Ver módulo: Princípios Zero Trust e Microsegmentação</span>
+      </a>
+      <a href="#estudo-Gestao-de-Vulnerabilidades" class="need-card" onclick="focarEstudo('Gestao-de-Vulnerabilidades')">
+        <span class="need-category">📊 Vulnerabilidades</span>
+        <span class="need-title">Preciso priorizar patches de segurança e calcular scores CVSS</span>
+        <span class="need-target">→ Ver módulo: CVE, CVSS v3.1/v4.0 e Priorização de Patches</span>
+      </a>
+      <a href="#estudo-Seguranca-em-Endpoints-EDR" class="need-card" onclick="focarEstudo('Seguranca-em-Endpoints-EDR')">
+        <span class="need-category">💻 Endpoints</span>
+        <span class="need-title">Preciso detectar malware e investigar processos suspeitos em endpoints</span>
+        <span class="need-target">→ Ver módulo: Antivírus, EDR/XDR e Proteção de Host</span>
+      </a>
+      <a href="#estudo-Reconhecimento-e-OSINT" class="need-card" onclick="focarEstudo('Reconhecimento-e-OSINT')">
+        <span class="need-category">🔎 Reconhecimento</span>
+        <span class="need-title">Preciso mapear a superfície de ataque externa com OSINT e Shodan</span>
+        <span class="need-target">→ Ver módulo: Superfície de Ataque, DNS, WHOIS e Shodan</span>
+      </a>
+      <a href="#estudo-OWASP-Top-10-Web" class="need-card" onclick="focarEstudo('OWASP-Top-10-Web')">
+        <span class="need-category">🕷️ Web</span>
+        <span class="need-title">Preciso encontrar e mitigar falhas de SQL Injection e XSS no OWASP Top 10</span>
+        <span class="need-target">→ Ver módulo: Falhas Web (SQLi, XSS, CSRF, Broken Auth)</span>
+      </a>
+      <a href="#estudo-Seguranca-em-APIs" class="need-card" onclick="focarEstudo('Seguranca-em-APIs')">
+        <span class="need-category">🔌 APIs</span>
+        <span class="need-title">Preciso proteger APIs REST contra ataques BOLA/IDOR e aplicar rate limiting</span>
+        <span class="need-target">→ Ver módulo: OWASP API Security, Rate Limiting e Tokens</span>
+      </a>
+      <a href="#estudo-Pentest-Metodologias" class="need-card" onclick="focarEstudo('Pentest-Metodologias')">
+        <span class="need-category">🎯 Pentest</span>
+        <span class="need-title">Preciso definir escopo e conduzir um teste de intrusão formal (PTES)</span>
+        <span class="need-target">→ Ver módulo: Fases do Pentest (PTES), Escopo e Relatório</span>
+      </a>
+      <a href="#estudo-Engenharia-Social-e-Phishing" class="need-card" onclick="focarEstudo('Engenharia-Social-e-Phishing')">
+        <span class="need-category">🎣 Humano</span>
+        <span class="need-title">Preciso simular campanhas de phishing e validar registros DMARC/SPF</span>
+        <span class="need-target">→ Ver módulo: Pretexting, Spear Phishing e Defesas Humanas</span>
+      </a>
+      <a href="#estudo-Operacoes-SOC-e-SIEM" class="need-card" onclick="focarEstudo('Operacoes-SOC-e-SIEM')">
+        <span class="need-category">📈 SOC</span>
+        <span class="need-title">Preciso escrever regras Sigma e triar alertas em SIEM corporativo</span>
+        <span class="need-target">→ Ver módulo: Rotina de SOC L1/L2, Logs e Regras Sigma</span>
+      </a>
+      <a href="#estudo-Threat-Intelligence" class="need-card" onclick="focarEstudo('Threat-Intelligence')">
+        <span class="need-category">🧭 Inteligência</span>
+        <span class="need-title">Preciso mapear técnicas de adversários na matriz MITRE ATT&amp;CK</span>
+        <span class="need-target">→ Ver módulo: IoCs, TTPs, MITRE ATT&amp;CK e STIX/TAXII</span>
+      </a>
+      <a href="#estudo-Resposta-a-Incidentes" class="need-card" onclick="focarEstudo('Resposta-a-Incidentes')">
+        <span class="need-category">🚨 Incidentes</span>
+        <span class="need-title">Preciso conter um incidente de ransomware seguindo o NIST SP 800-61</span>
+        <span class="need-target">→ Ver módulo: Ciclo NIST SP 800-61 (Contenção e Erradicação)</span>
+      </a>
+      <a href="#estudo-Forense-Digital" class="need-card" onclick="focarEstudo('Forense-Digital')">
+        <span class="need-category">🔬 Forense</span>
+        <span class="need-title">Preciso coletar memória RAM e preservar cadeia de custódia forense</span>
+        <span class="need-target">→ Ver módulo: Cadeia de Custódia, Coleta de RAM e Artefatos</span>
+      </a>
+      <a href="#estudo-Analise-Basica-de-Malware" class="need-card" onclick="focarEstudo('Analise-Basica-de-Malware')">
+        <span class="need-category">🧪 Malware</span>
+        <span class="need-title">Preciso analisar um executável suspeito em sandbox e extrair hashes</span>
+        <span class="need-target">→ Ver módulo: Análise Estática vs Dinâmica e Sandboxes</span>
+      </a>
+      <a href="#estudo-Seguranca-em-Nuvem" class="need-card" onclick="focarEstudo('Seguranca-em-Nuvem')">
+        <span class="need-category">☁️ Nuvem</span>
+        <span class="need-title">Preciso auditar políticas de IAM e permissões em nuvem pública (AWS/Azure)</span>
+        <span class="need-target">→ Ver módulo: Responsabilidade Compartilhada e CSPM</span>
+      </a>
+      <a href="#estudo-DevSecOps-e-CI-CD" class="need-card" onclick="focarEstudo('DevSecOps-e-CI-CD')">
+        <span class="need-category">🚀 DevSecOps</span>
+        <span class="need-title">Preciso integrar SAST, SCA e gates de segurança no pipeline CI/CD</span>
+        <span class="need-target">→ Ver módulo: Shift-Left, SAST, DAST, SCA e Containers</span>
+      </a>
+      <a href="#estudo-Seguranca-em-IoT-e-OT" class="need-card" onclick="focarEstudo('Seguranca-em-IoT-e-OT')">
+        <span class="need-category">🏭 Industrial</span>
+        <span class="need-title">Preciso isolar redes industriais e entender o Modelo Purdue (TI vs TO)</span>
+        <span class="need-target">→ Ver módulo: Redes Industriais (SCADA/Modbus) e IoT</span>
+      </a>
+      <a href="#estudo-IA-e-Ciberseguranca" class="need-card" onclick="focarEstudo('IA-e-Ciberseguranca')">
+        <span class="need-category">🤖 IA</span>
+        <span class="need-title">Preciso prevenir Prompt Injection em sistemas baseados em LLM</span>
+        <span class="need-target">→ Ver módulo: Ameaças a LLMs (OWASP LLM), Deepfakes e Defesa</span>
+      </a>
+      <a href="#estudo-Gestao-de-Riscos-TI" class="need-card" onclick="focarEstudo('Gestao-de-Riscos-TI')">
+        <span class="need-category">💰 Riscos</span>
+        <span class="need-title">Preciso calcular o risco financeiro (ALE/SLE) para justificar investimentos</span>
+        <span class="need-target">→ Ver módulo: Avaliação Qualitativa vs Quantitativa (ALE/SLE)</span>
+      </a>
+      <a href="#estudo-ISO-27001-e-27002" class="need-card" onclick="focarEstudo('ISO-27001-e-27002')">
+        <span class="need-category">📜 Conformidade</span>
+        <span class="need-title">Preciso implementar os controles da ISO/IEC 27001:2022 e a SoA</span>
+        <span class="need-target">→ Ver módulo: SGSI e Controles do Anexo A (Edição 2022)</span>
+      </a>
+      <a href="#estudo-LGPD-e-Privacidade" class="need-card" onclick="focarEstudo('LGPD-e-Privacidade')">
+        <span class="need-category">⚖️ Privacidade</span>
+        <span class="need-title">Preciso elaborar um RIPD/DPIA e garantir conformidade com a LGPD</span>
+        <span class="need-target">→ Ver módulo: Bases Legais, Direitos do Titular e RIPD/DPIA</span>
+      </a>
+      <a href="#estudo-Continuidade-e-Disaster-Recovery" class="need-card" onclick="focarEstudo('Continuidade-e-Disaster-Recovery')">
+        <span class="need-category">💾 Continuidade</span>
+        <span class="need-title">Preciso calcular RTO/RPO e planejar backups com a Regra 3-2-1</span>
+        <span class="need-target">→ Ver módulo: BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1</span>
+      </a>
+      </div>
+    </section>
+
+    <!-- Seção Principal: Catálogo dos 28 Estudos -->
+    <main class="studies-section" id="secao-catalogo">
+      <div class="section-title-wrap">
+        <h2 class="section-title">📚 Módulos e Treinamentos Práticos</h2>
+      </div>
+
+      <div class="cards-grid" id="cards-grid">
+    <article class="study-card" id="estudo-Fundamentos-Ciber"
+      data-slug="Fundamentos-Ciber"
+      data-trilha="1"
+      data-nist="Identify"
+      data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,AppSec &amp; DevSecOps,Operações SOC &amp; Resposta,GRC &amp; Auditoria"
+      data-search="fundamentos-ciber tríade cia, ameaças e modelagem stride pilares da segurança da informação, vetores de ameaça e metodologia stride como identificar e categorizar vulnerabilidades arquiteturais em um sistema antes que sejam exploradas? stride threat canvas identify blue team &amp; defesa,red team &amp; pentest,appsec &amp; devsecops,operações soc &amp; resposta,grc &amp; auditoria tríade cia, autenticidade e não-repúdio taxonomia stride (spoofing a elevation of privilege) simulador stride threat canvas interativo checklist de auditoria com persistência local">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t1" title="Trilha 1: Fundamentos & Redes">
+            1
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Identify</span>
+            <span class="badge badge-time">⏱️ 40 min</span>
+            <span class="badge badge-sim">🧪 STRIDE Threat Canvas</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Tríade CIA, Ameaças e Modelagem STRIDE</h3>
+      <p class="study-desc">Pilares da segurança da informação, vetores de ameaça e metodologia STRIDE</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como identificar e categorizar vulnerabilidades arquiteturais em um sistema antes que sejam exploradas?
+      </div>
+
+      <ul class="study-facts">
+          <li>Tríade CIA, Autenticidade e Não-Repúdio</li>
+          <li>Taxonomia STRIDE (Spoofing a Elevation of Privilege)</li>
+          <li>Simulador STRIDE Threat Canvas interativo</li>
+          <li>Checklist de auditoria com persistência local</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Fundamentos-Ciber" onchange="toggleDone('Fundamentos-Ciber', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Redes-e-Protocolos"
+      data-slug="Redes-e-Protocolos"
+      data-trilha="1"
+      data-nist="Protect / Detect"
+      data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,Operações SOC &amp; Resposta"
+      data-search="redes-e-protocolos tcp/ip, dns, roteamento e inspeção de tráfego pilha de protocolos, 3-way handshake, flags tcp e vetores de ataque em rede o que cada campo dos cabeçalhos ip/tcp revela sobre a intenção do tráfego e possíveis anomalias? inspetor visual de cabeçalhos ip/tcp/udp protect / detect blue team &amp; defesa,red team &amp; pentest,operações soc &amp; resposta pilha tcp/ip em 4 camadas e modelo osi dissecação de flags syn/ack/fin/rst vulnerabilidades em dns e envenenamento arp simulador de montagem de pacotes e resposta de host">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t1" title="Trilha 1: Fundamentos & Redes">
+            1
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect / Detect</span>
+            <span class="badge badge-time">⏱️ 50 min</span>
+            <span class="badge badge-sim">🧪 Inspetor Visual de Cabeçalhos IP/TCP/UDP</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">TCP/IP, DNS, Roteamento e Inspeção de Tráfego</h3>
+      <p class="study-desc">Pilha de protocolos, 3-way handshake, flags TCP e vetores de ataque em rede</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        O que cada campo dos cabeçalhos IP/TCP revela sobre a intenção do tráfego e possíveis anomalias?
+      </div>
+
+      <ul class="study-facts">
+          <li>Pilha TCP/IP em 4 camadas e modelo OSI</li>
+          <li>Dissecação de flags SYN/ACK/FIN/RST</li>
+          <li>Vulnerabilidades em DNS e envenenamento ARP</li>
+          <li>Simulador de montagem de pacotes e resposta de host</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Redes-e-Protocolos" onchange="toggleDone('Redes-e-Protocolos', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Criptografia-Pratica"
+      data-slug="Criptografia-Pratica"
+      data-trilha="1"
+      data-nist="Protect"
+      data-carreiras="Blue Team &amp; Defesa,AppSec &amp; DevSecOps,GRC &amp; Auditoria"
+      data-search="criptografia-pratica criptografia simétrica, assimétrica, hashes e pki algoritmos modernos de cifragem, funções de resumo e infraestrutura de chaves públicas qual algoritmo criptográfico utilizar para garantir confidencialidade sem comprometer o desempenho? lab de cifras (web crypto api) protect blue team &amp; defesa,appsec &amp; devsecops,grc &amp; auditoria cifras aes-gcm e chacha20-poly1305 curvas elípticas (ecdsa/ed25519) vs rsa cadeia de confiança x.509 e revogação crl/ocsp lab nativo com web crypto api sem bibliotecas externas">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t1" title="Trilha 1: Fundamentos & Redes">
+            1
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Lab de Cifras (Web Crypto API)</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Criptografia Simétrica, Assimétrica, Hashes e PKI</h3>
+      <p class="study-desc">Algoritmos modernos de cifragem, funções de resumo e infraestrutura de chaves públicas</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Qual algoritmo criptográfico utilizar para garantir confidencialidade sem comprometer o desempenho?
+      </div>
+
+      <ul class="study-facts">
+          <li>Cifras AES-GCM e ChaCha20-Poly1305</li>
+          <li>Curvas Elípticas (ECDSA/Ed25519) vs RSA</li>
+          <li>Cadeia de confiança X.509 e revogação CRL/OCSP</li>
+          <li>Lab nativo com Web Crypto API sem bibliotecas externas</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Criptografia-Pratica" onchange="toggleDone('Criptografia-Pratica', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Autenticacao-e-IAM"
+      data-slug="Autenticacao-e-IAM"
+      data-trilha="1"
+      data-nist="Protect"
+      data-carreiras="AppSec &amp; DevSecOps,Blue Team &amp; Defesa,GRC &amp; Auditoria"
+      data-search="autenticacao-e-iam senhas, mfa, oauth 2.0, tokens jwt e rbac controle de acesso robusto, fatores múltiplos, autorização moderna e federação de identidades como garantir que apenas identidades legítimas acessem recursos corporativos críticos com privilégio mínimo? validador e decodificador jwt + matriz rbac protect appsec &amp; devsecops,blue team &amp; defesa,grc &amp; auditoria hashing com argon2, bcrypt e proteção de credenciais protocolos totp (rfc 6238) e webauthn/fido2 ataques a tokens jwt (algoritmo &#x27;none&#x27;, chave fraca) validador de jwt e matriz de permissões rbac">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t1" title="Trilha 1: Fundamentos & Redes">
+            1
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Validador e Decodificador JWT + Matriz RBAC</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</h3>
+      <p class="study-desc">Controle de acesso robusto, fatores múltiplos, autorização moderna e federação de identidades</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como garantir que apenas identidades legítimas acessem recursos corporativos críticos com privilégio mínimo?
+      </div>
+
+      <ul class="study-facts">
+          <li>Hashing com Argon2, bcrypt e proteção de credenciais</li>
+          <li>Protocolos TOTP (RFC 6238) e WebAuthn/FIDO2</li>
+          <li>Ataques a tokens JWT (algoritmo &#x27;none&#x27;, chave fraca)</li>
+          <li>Validador de JWT e matriz de permissões RBAC</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Autenticacao-e-IAM" onchange="toggleDone('Autenticacao-e-IAM', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Segmentacao-e-Firewall"
+      data-slug="Segmentacao-e-Firewall"
+      data-trilha="1"
+      data-nist="Protect"
+      data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta"
+      data-search="segmentacao-e-firewall dmz, vlans, regras de firewall e filtragem arquitetura de perímetros, isolamento inter-vlan e ordem de precedência de regras de filtragem como isolar servidores públicos da rede corporativa sensível garantindo regra default drop? simulador de regras de firewall (pass / drop) protect blue team &amp; defesa,operações soc &amp; resposta arquitetura de dmz em 2 estágios tabela de estados conntrack (stateful vs stateless) trunking 802.1q e segregação inter-vlan simulador de filtragem com ordem de precedência first-match">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t1" title="Trilha 1: Fundamentos & Redes">
+            1
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 40 min</span>
+            <span class="badge badge-sim">🧪 Simulador de Regras de Firewall (Pass / Drop)</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">DMZ, VLANs, Regras de Firewall e Filtragem</h3>
+      <p class="study-desc">Arquitetura de perímetros, isolamento inter-VLAN e ordem de precedência de regras de filtragem</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como isolar servidores públicos da rede corporativa sensível garantindo regra Default Drop?
+      </div>
+
+      <ul class="study-facts">
+          <li>Arquitetura de DMZ em 2 estágios</li>
+          <li>Tabela de estados conntrack (Stateful vs Stateless)</li>
+          <li>Trunking 802.1Q e segregação inter-VLAN</li>
+          <li>Simulador de filtragem com ordem de precedência First-Match</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Segmentacao-e-Firewall" onchange="toggleDone('Segmentacao-e-Firewall', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Hardening-Sistemas"
+      data-slug="Hardening-Sistemas"
+      data-trilha="2"
+      data-nist="Protect"
+      data-carreiras="Blue Team &amp; Defesa,AppSec &amp; DevSecOps,Operações SOC &amp; Resposta"
+      data-search="hardening-sistemas bastionamento linux e windows (cis benchmarks) redução da superfície de ataque operacional em servidores corporativos linux e windows quais configurações padrão de fábrica expõem servidores corporativos a ataques imediatos? auditor interativo de configuração de servidor protect blue team &amp; defesa,appsec &amp; devsecops,operações soc &amp; resposta cis benchmarks nível 1 e nível 2 bastionamento de ssh (/etc/ssh/sshd_config) e pam módulos de segurança do kernel (apparmor e selinux) auditor interativo de arquivos de configuração de so">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t2" title="Trilha 2: Segurança Defensiva">
+            2
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 50 min</span>
+            <span class="badge badge-sim">🧪 Auditor Interativo de Configuração de Servidor</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Bastionamento Linux e Windows (CIS Benchmarks)</h3>
+      <p class="study-desc">Redução da superfície de ataque operacional em servidores corporativos Linux e Windows</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Quais configurações padrão de fábrica expõem servidores corporativos a ataques imediatos?
+      </div>
+
+      <ul class="study-facts">
+          <li>CIS Benchmarks Nível 1 e Nível 2</li>
+          <li>Bastionamento de SSH (/etc/ssh/sshd_config) e PAM</li>
+          <li>Módulos de segurança do kernel (AppArmor e SELinux)</li>
+          <li>Auditor interativo de arquivos de configuração de SO</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Hardening-Sistemas" onchange="toggleDone('Hardening-Sistemas', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Seguranca-de-Redes-Defesa"
+      data-slug="Seguranca-de-Redes-Defesa"
+      data-trilha="2"
+      data-nist="Protect / Detect"
+      data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta"
+      data-search="seguranca-de-redes-defesa ids/ips, waf, vpns e proxies reversos sistemas de inspeção profunda de tráfego, mitigação de ameaças web e túneis criptografados como interceptar e bloquear tráfego hostil antes que ele atinja serviços internos sensíveis? analisador de regras snort/suricata vs tráfego protect / detect blue team &amp; defesa,operações soc &amp; resposta assinaturas snort/suricata e detecção heurística waf core rule set (crs) contra injeções web túneis seguros com wireguard e ipsec ikev2 analisador de payloads de tráfego com alertas em tempo real">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t2" title="Trilha 2: Segurança Defensiva">
+            2
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect / Detect</span>
+            <span class="badge badge-time">⏱️ 50 min</span>
+            <span class="badge badge-sim">🧪 Analisador de Regras Snort/Suricata vs Tráfego</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">IDS/IPS, WAF, VPNs e Proxies Reversos</h3>
+      <p class="study-desc">Sistemas de inspeção profunda de tráfego, mitigação de ameaças web e túneis criptografados</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como interceptar e bloquear tráfego hostil antes que ele atinja serviços internos sensíveis?
+      </div>
+
+      <ul class="study-facts">
+          <li>Assinaturas Snort/Suricata e detecção heurística</li>
+          <li>WAF Core Rule Set (CRS) contra injeções web</li>
+          <li>Túneis seguros com WireGuard e IPsec IKEv2</li>
+          <li>Analisador de payloads de tráfego com alertas em tempo real</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Seguranca-de-Redes-Defesa" onchange="toggleDone('Seguranca-de-Redes-Defesa', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Arquitetura-Zero-Trust"
+      data-slug="Arquitetura-Zero-Trust"
+      data-trilha="2"
+      data-nist="Protect"
+      data-carreiras="Blue Team &amp; Defesa,GRC &amp; Auditoria"
+      data-search="arquitetura-zero-trust princípios zero trust e microsegmentação implementação prática do nist sp 800-207, decisão de acesso contínua e perímetros definidos por software por que não se deve mais confiar na rede interna mesmo após autenticação inicial bem-sucedida? motor de decisão de acesso zero trust (pdp/pep) protect blue team &amp; defesa,grc &amp; auditoria nist sp 800-207: never trust, always verify, assume breach componentes centrais: pdp (decision) e pep (enforcement) acesso contextual baseado em postura do dispositivo e risco motor de decisão de acesso em tempo real com score de risco">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t2" title="Trilha 2: Segurança Defensiva">
+            2
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 40 min</span>
+            <span class="badge badge-sim">🧪 Motor de Decisão de Acesso Zero Trust (PDP/PEP)</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Princípios Zero Trust e Microsegmentação</h3>
+      <p class="study-desc">Implementação prática do NIST SP 800-207, decisão de acesso contínua e perímetros definidos por software</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Por que não se deve mais confiar na rede interna mesmo após autenticação inicial bem-sucedida?
+      </div>
+
+      <ul class="study-facts">
+          <li>NIST SP 800-207: Never Trust, Always Verify, Assume Breach</li>
+          <li>Componentes centrais: PDP (Decision) e PEP (Enforcement)</li>
+          <li>Acesso contextual baseado em postura do dispositivo e risco</li>
+          <li>Motor de decisão de acesso em tempo real com score de risco</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Arquitetura-Zero-Trust" onchange="toggleDone('Arquitetura-Zero-Trust', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Gestao-de-Vulnerabilidades"
+      data-slug="Gestao-de-Vulnerabilidades"
+      data-trilha="2"
+      data-nist="Identify / Protect"
+      data-carreiras="Blue Team &amp; Defesa,GRC &amp; Auditoria,Operações SOC &amp; Resposta"
+      data-search="gestao-de-vulnerabilidades cve, cvss v3.1/v4.0 e priorização de patches ciclo de vida de vulnerabilidades, cálculo de criticidade de riscos e correlação com ameaças ativas como determinar qual vulnerabilidade corrigir primeiro entre centenas de falhas detectadas em varreduras? calculadora interativa de score cvss v3.1 / v4.0 identify / protect blue team &amp; defesa,grc &amp; auditoria,operações soc &amp; resposta métricas base, temporal e ambiental do cvss novidades do cvss v4.0 e integração com epss catálogo cisa kev (known exploited vulnerabilities) calculadora vetorial com geração da string cvss">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t2" title="Trilha 2: Segurança Defensiva">
+            2
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Identify / Protect</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Calculadora Interativa de Score CVSS v3.1 / v4.0</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">CVE, CVSS v3.1/v4.0 e Priorização de Patches</h3>
+      <p class="study-desc">Ciclo de vida de vulnerabilidades, cálculo de criticidade de riscos e correlação com ameaças ativas</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como determinar qual vulnerabilidade corrigir primeiro entre centenas de falhas detectadas em varreduras?
+      </div>
+
+      <ul class="study-facts">
+          <li>Métricas Base, Temporal e Ambiental do CVSS</li>
+          <li>Novidades do CVSS v4.0 e integração com EPSS</li>
+          <li>Catálogo CISA KEV (Known Exploited Vulnerabilities)</li>
+          <li>Calculadora vetorial com geração da string CVSS</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Gestao-de-Vulnerabilidades" onchange="toggleDone('Gestao-de-Vulnerabilidades', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Seguranca-em-Endpoints-EDR"
+      data-slug="Seguranca-em-Endpoints-EDR"
+      data-trilha="2"
+      data-nist="Protect / Detect"
+      data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,Perícia Forense &amp; Malware"
+      data-search="seguranca-em-endpoints-edr antivírus, edr/xdr e proteção de host telemetria comportamental de processos, detecção de técnicas evasivas e contenção de hosts como identificar a presença de um adversário no endpoint antes que ocorra dano ou exfiltração? linha do tempo de telemetria e detecção edr protect / detect blue team &amp; defesa,operações soc &amp; resposta,perícia forense &amp; malware evolução de antivírus baseado em assinatura para edr/xdr sysmon e event ids do windows (event id 1, 3, 10) árvores de processos maliciosos parent-child simulador de telemetria com isolamento de máquina da rede">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t2" title="Trilha 2: Segurança Defensiva">
+            2
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect / Detect</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Linha do Tempo de Telemetria e Detecção EDR</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Antivírus, EDR/XDR e Proteção de Host</h3>
+      <p class="study-desc">Telemetria comportamental de processos, detecção de técnicas evasivas e contenção de hosts</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como identificar a presença de um adversário no endpoint antes que ocorra dano ou exfiltração?
+      </div>
+
+      <ul class="study-facts">
+          <li>Evolução de antivírus baseado em assinatura para EDR/XDR</li>
+          <li>Sysmon e Event IDs do Windows (Event ID 1, 3, 10)</li>
+          <li>Árvores de processos maliciosos parent-child</li>
+          <li>Simulador de telemetria com isolamento de máquina da rede</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Seguranca-em-Endpoints-EDR" onchange="toggleDone('Seguranca-em-Endpoints-EDR', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Reconhecimento-e-OSINT"
+      data-slug="Reconhecimento-e-OSINT"
+      data-trilha="3"
+      data-nist="Identify"
+      data-carreiras="Red Team &amp; Pentest,Operações SOC &amp; Resposta"
+      data-search="reconhecimento-e-osint superfície de ataque, dns, whois e shodan mapeamento ético de pegada digital, inteligência de fontes abertas e enumeração de ativos expostos o que um atacante consegue descobrir sobre nossa infraestrutura sem enviar um único pacote invasivo? terminal simulado de osint e enumeração identify red team &amp; pentest,operações soc &amp; resposta reconhecimento passivo vs ativo e pegada digital google dorks, certificate transparency logs e whois consultas especializadas em shodan e censys terminal interativo com comandos de enumeração simulados">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t3" title="Trilha 3: Segurança Ofensiva">
+            3
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Identify</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Terminal Simulado de OSINT e Enumeração</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Superfície de Ataque, DNS, WHOIS e Shodan</h3>
+      <p class="study-desc">Mapeamento ético de pegada digital, inteligência de fontes abertas e enumeração de ativos expostos</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        O que um atacante consegue descobrir sobre nossa infraestrutura sem enviar um único pacote invasivo?
+      </div>
+
+      <ul class="study-facts">
+          <li>Reconhecimento passivo vs ativo e pegada digital</li>
+          <li>Google Dorks, Certificate Transparency Logs e WHOIS</li>
+          <li>Consultas especializadas em Shodan e Censys</li>
+          <li>Terminal interativo com comandos de enumeração simulados</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Reconhecimento-e-OSINT" onchange="toggleDone('Reconhecimento-e-OSINT', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-OWASP-Top-10-Web"
+      data-slug="OWASP-Top-10-Web"
+      data-trilha="3"
+      data-nist="Protect"
+      data-carreiras="AppSec &amp; DevSecOps,Red Team &amp; Pentest"
+      data-search="owasp-top-10-web falhas web (sqli, xss, csrf, broken auth) principais riscos de segurança em aplicações web e métodos definitivos de remediação em código como desenvolvedores podem eliminar falhas críticas de injeção diretamente na raiz do código? playground de injeção e sanitização web protect appsec &amp; devsecops,red team &amp; pentest categorias a01 a a10 do owasp top 10 prepared statements para imunização contra sql injection content security policy (csp) contra ataques xss playground interativo de injeção com filtros sanitizadores">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t3" title="Trilha 3: Segurança Ofensiva">
+            3
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 55 min</span>
+            <span class="badge badge-sim">🧪 Playground de Injeção e Sanitização Web</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Falhas Web (SQLi, XSS, CSRF, Broken Auth)</h3>
+      <p class="study-desc">Principais riscos de segurança em aplicações web e métodos definitivos de remediação em código</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como desenvolvedores podem eliminar falhas críticas de injeção diretamente na raiz do código?
+      </div>
+
+      <ul class="study-facts">
+          <li>Categorias A01 a A10 do OWASP Top 10</li>
+          <li>Prepared Statements para imunização contra SQL Injection</li>
+          <li>Content Security Policy (CSP) contra ataques XSS</li>
+          <li>Playground interativo de injeção com filtros sanitizadores</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="OWASP-Top-10-Web" onchange="toggleDone('OWASP-Top-10-Web', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Seguranca-em-APIs"
+      data-slug="Seguranca-em-APIs"
+      data-trilha="3"
+      data-nist="Protect"
+      data-carreiras="AppSec &amp; DevSecOps,Red Team &amp; Pentest"
+      data-search="seguranca-em-apis owasp api security, rate limiting e tokens proteção de microsserviços, controle de autorização em nível de objeto (bola) e limitação de taxa por que firewalls convencionais falham em detectar abusos lógicos e quebras de bola em apis? simulador de chamadas de api com rate limiter protect appsec &amp; devsecops,red team &amp; pentest owasp api security top 10 (foco em bola e broken auth) algoritmos de rate limiting: token bucket e leaky bucket validação rigorosa de esquemas e proteção contra mass assignment simulador de requisições rest com bloqueios http 429 e 403">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t3" title="Trilha 3: Segurança Ofensiva">
+            3
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 40 min</span>
+            <span class="badge badge-sim">🧪 Simulador de Chamadas de API com Rate Limiter</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">OWASP API Security, Rate Limiting e Tokens</h3>
+      <p class="study-desc">Proteção de microsserviços, controle de autorização em nível de objeto (BOLA) e limitação de taxa</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Por que firewalls convencionais falham em detectar abusos lógicos e quebras de BOLA em APIs?
+      </div>
+
+      <ul class="study-facts">
+          <li>OWASP API Security Top 10 (foco em BOLA e Broken Auth)</li>
+          <li>Algoritmos de rate limiting: Token Bucket e Leaky Bucket</li>
+          <li>Validação rigorosa de esquemas e proteção contra Mass Assignment</li>
+          <li>Simulador de requisições REST com bloqueios HTTP 429 e 403</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Seguranca-em-APIs" onchange="toggleDone('Seguranca-em-APIs', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Pentest-Metodologias"
+      data-slug="Pentest-Metodologias"
+      data-trilha="3"
+      data-nist="Identify"
+      data-carreiras="Red Team &amp; Pentest,GRC &amp; Auditoria"
+      data-search="pentest-metodologias fases do pentest (ptes), escopo e relatório estruturação profissional de testes de intrusão, regras de engajamento e relatórios técnicos e executivos como conduzir um teste de invasão ético agregando valor real ao negócio sem indisponibilizar sistemas? construtor de matriz de achados e relatórios de pentest identify red team &amp; pentest,grc &amp; auditoria as 7 fases do padrão ptes (do pré-engajamento ao relatório) modalidades white-box, gray-box e black-box regras de engajamento (roe) e comunicação de incidentes construtor interativo de matriz de achados e relatórios">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t3" title="Trilha 3: Segurança Ofensiva">
+            3
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Identify</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Construtor de Matriz de Achados e Relatórios de Pentest</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Fases do Pentest (PTES), Escopo e Relatório</h3>
+      <p class="study-desc">Estruturação profissional de testes de intrusão, regras de engajamento e relatórios técnicos e executivos</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como conduzir um teste de invasão ético agregando valor real ao negócio sem indisponibilizar sistemas?
+      </div>
+
+      <ul class="study-facts">
+          <li>As 7 fases do padrão PTES (do pré-engajamento ao relatório)</li>
+          <li>Modalidades White-Box, Gray-Box e Black-Box</li>
+          <li>Regras de engajamento (RoE) e comunicação de incidentes</li>
+          <li>Construtor interativo de matriz de achados e relatórios</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Pentest-Metodologias" onchange="toggleDone('Pentest-Metodologias', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Engenharia-Social-e-Phishing"
+      data-slug="Engenharia-Social-e-Phishing"
+      data-trilha="3"
+      data-nist="Protect"
+      data-carreiras="Red Team &amp; Pentest,Blue Team &amp; Defesa,GRC &amp; Auditoria"
+      data-search="engenharia-social-e-phishing pretexting, spear phishing e defesas humanas gatilhos comportamentais, autenticação de e-mail (spf/dkim/dmarc) e conscientização corporativa como proteger a organização do elo mais explorado da cadeia de segurança: o fator humano? analisador de e-mails suspeitos (spot the indicators) protect red team &amp; pentest,blue team &amp; defesa,grc &amp; auditoria táticas de pretexting, spear phishing e whaling autenticação de e-mail com spf, dkim e políticas dmarc tokens físicos fido2 contra ataques de adversary-in-the-middle analisador interativo de e-mails com detecção de indicadores">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t3" title="Trilha 3: Segurança Ofensiva">
+            3
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 40 min</span>
+            <span class="badge badge-sim">🧪 Analisador de E-mails Suspeitos (Spot the Indicators)</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Pretexting, Spear Phishing e Defesas Humanas</h3>
+      <p class="study-desc">Gatilhos comportamentais, autenticação de e-mail (SPF/DKIM/DMARC) e conscientização corporativa</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como proteger a organização do elo mais explorado da cadeia de segurança: o fator humano?
+      </div>
+
+      <ul class="study-facts">
+          <li>Táticas de pretexting, spear phishing e whaling</li>
+          <li>Autenticação de e-mail com SPF, DKIM e políticas DMARC</li>
+          <li>Tokens físicos FIDO2 contra ataques de adversary-in-the-middle</li>
+          <li>Analisador interativo de e-mails com detecção de indicadores</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Engenharia-Social-e-Phishing" onchange="toggleDone('Engenharia-Social-e-Phishing', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Operacoes-SOC-e-SIEM"
+      data-slug="Operacoes-SOC-e-SIEM"
+      data-trilha="4"
+      data-nist="Detect"
+      data-carreiras="Operações SOC &amp; Resposta,Blue Team &amp; Defesa"
+      data-search="operacoes-soc-e-siem rotina de soc l1/l2, logs e regras sigma estrutura operacional de um centro de monitoramento, ciclo de vida de alertas e regras sigma portáveis como separar ruído de alertas genuínos em fluxos corporativos de milhões de eventos por segundo? console siem com busca de logs e alertas detect operações soc &amp; resposta,blue team &amp; defesa estrutura de níveis soc n1 (triagem), n2 (investigação) e n3 (hunting) métricas operacionais: mttd e mttr formato de regras de detecção sigma e conversão para siem console interativo estilo siem com pesquisa de logs e alertas">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t4" title="Trilha 4: Operações, SOC & Resposta">
+            4
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Detect</span>
+            <span class="badge badge-time">⏱️ 50 min</span>
+            <span class="badge badge-sim">🧪 Console SIEM com Busca de Logs e Alertas</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Rotina de SOC L1/L2, Logs e Regras Sigma</h3>
+      <p class="study-desc">Estrutura operacional de um centro de monitoramento, ciclo de vida de alertas e regras Sigma portáveis</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como separar ruído de alertas genuínos em fluxos corporativos de milhões de eventos por segundo?
+      </div>
+
+      <ul class="study-facts">
+          <li>Estrutura de níveis SOC N1 (triagem), N2 (investigação) e N3 (hunting)</li>
+          <li>Métricas operacionais: MTTD e MTTR</li>
+          <li>Formato de regras de detecção Sigma e conversão para SIEM</li>
+          <li>Console interativo estilo SIEM com pesquisa de logs e alertas</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Operacoes-SOC-e-SIEM" onchange="toggleDone('Operacoes-SOC-e-SIEM', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Threat-Intelligence"
+      data-slug="Threat-Intelligence"
+      data-trilha="4"
+      data-nist="Identify / Detect"
+      data-carreiras="Operações SOC &amp; Resposta,Blue Team &amp; Defesa"
+      data-search="threat-intelligence iocs, ttps, mitre att&amp;amp;ck e stix/taxii transformação de dados brutos de ameaças em inteligência acionável e compartilhamento padronizado por que focar em técnicas e táticas de adversários é infinitamente mais eficaz que caçar hashes e ips? mapeador de iocs e ttps na matriz att&amp;amp;ck identify / detect operações soc &amp; resposta,blue team &amp; defesa pirâmide da dor de david bianco e robustez defensiva navegação na matriz mitre att&amp;ck enterprise padrões de compartilhamento stix 2.1 e taxii mapeador interativo de iocs com visualização de técnicas">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t4" title="Trilha 4: Operações, SOC & Resposta">
+            4
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Identify / Detect</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Mapeador de IoCs e TTPs na Matriz ATT&amp;CK</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">IoCs, TTPs, MITRE ATT&amp;CK e STIX/TAXII</h3>
+      <p class="study-desc">Transformação de dados brutos de ameaças em inteligência acionável e compartilhamento padronizado</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Por que focar em técnicas e táticas de adversários é infinitamente mais eficaz que caçar hashes e IPs?
+      </div>
+
+      <ul class="study-facts">
+          <li>Pirâmide da Dor de David Bianco e robustez defensiva</li>
+          <li>Navegação na Matriz MITRE ATT&amp;CK Enterprise</li>
+          <li>Padrões de compartilhamento STIX 2.1 e TAXII</li>
+          <li>Mapeador interativo de IoCs com visualização de técnicas</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Threat-Intelligence" onchange="toggleDone('Threat-Intelligence', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Resposta-a-Incidentes"
+      data-slug="Resposta-a-Incidentes"
+      data-trilha="4"
+      data-nist="Respond"
+      data-carreiras="Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,GRC &amp; Auditoria"
+      data-search="resposta-a-incidentes ciclo nist sp 800-61 (contenção e erradicação) gestão operacional de crises cibernéticas, etapas formais de resposta e playbooks de contenção ágil quais passos imediatos tomar para conter um ataque ativo sem destruir evidências forenses vitais? runbook interativo em árvore de decisão respond operações soc &amp; resposta,perícia forense &amp; malware,grc &amp; auditoria ciclo em 4 fases do nist sp 800-61 rev 2 contenção de curto prazo vs contenção de longo prazo condução de lições aprendidas e retrospectiva sem culpa simulador de crise em árvore de decisão com ramificações">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t4" title="Trilha 4: Operações, SOC & Resposta">
+            4
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Respond</span>
+            <span class="badge badge-time">⏱️ 50 min</span>
+            <span class="badge badge-sim">🧪 Runbook Interativo em Árvore de Decisão</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Ciclo NIST SP 800-61 (Contenção e Erradicação)</h3>
+      <p class="study-desc">Gestão operacional de crises cibernéticas, etapas formais de resposta e playbooks de contenção ágil</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Quais passos imediatos tomar para conter um ataque ativo sem destruir evidências forenses vitais?
+      </div>
+
+      <ul class="study-facts">
+          <li>Ciclo em 4 fases do NIST SP 800-61 Rev 2</li>
+          <li>Contenção de curto prazo vs contenção de longo prazo</li>
+          <li>Condução de lições aprendidas e retrospectiva sem culpa</li>
+          <li>Simulador de crise em árvore de decisão com ramificações</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Resposta-a-Incidentes" onchange="toggleDone('Resposta-a-Incidentes', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Forense-Digital"
+      data-slug="Forense-Digital"
+      data-trilha="4"
+      data-nist="Respond"
+      data-carreiras="Perícia Forense &amp; Malware,Operações SOC &amp; Resposta"
+      data-search="forense-digital cadeia de custódia, coleta de ram e artefatos metodologia pericial rigorosa, ordem de volatilidade, integridade de cópias e análise de artefatos do so como reconstruir os passos exatos de um invasor e produzir provas digitais legalmente irrefutáveis? analisador de timeline de evidências e logs forenses respond perícia forense &amp; malware,operações soc &amp; resposta norma iso/iec 27037 e ordem de volatilidade rfc 3227 bloqueadores de escrita físicos/lógicos e hashes sha-256 artefatos forenses de host: prefetch, shimcache, $mft e registro analisador interativo de super-timeline de eventos">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t4" title="Trilha 4: Operações, SOC & Resposta">
+            4
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Respond</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Analisador de Timeline de Evidências e Logs Forenses</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Cadeia de Custódia, Coleta de RAM e Artefatos</h3>
+      <p class="study-desc">Metodologia pericial rigorosa, ordem de volatilidade, integridade de cópias e análise de artefatos do SO</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como reconstruir os passos exatos de um invasor e produzir provas digitais legalmente irrefutáveis?
+      </div>
+
+      <ul class="study-facts">
+          <li>Norma ISO/IEC 27037 e ordem de volatilidade RFC 3227</li>
+          <li>Bloqueadores de escrita físicos/lógicos e hashes SHA-256</li>
+          <li>Artefatos forenses de host: Prefetch, Shimcache, $MFT e Registro</li>
+          <li>Analisador interativo de super-timeline de eventos</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Forense-Digital" onchange="toggleDone('Forense-Digital', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Analise-Basica-de-Malware"
+      data-slug="Analise-Basica-de-Malware"
+      data-trilha="4"
+      data-nist="Detect / Respond"
+      data-carreiras="Perícia Forense &amp; Malware,Operações SOC &amp; Resposta"
+      data-search="analise-basica-de-malware análise estática vs dinâmica e sandboxes inspeção inicial de artefatos maliciosos, cálculo de entropia, importações e relatórios de sandboxes o que o binário suspeito é capaz de fazer, e quais indicadores ele gera ao rodar em ambiente isolado? inspetor de metadados pe/elf e hashes detect / respond perícia forense &amp; malware,operações soc &amp; resposta diferenças entre análise estática e dinâmica em sandbox estrutura do cabeçalho portable executable (pe) e seções cálculo de entropia de shannon para detectar packers (upx) inspetor interativo de metadados de binários e chamadas de api">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t4" title="Trilha 4: Operações, SOC & Resposta">
+            4
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Detect / Respond</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Inspetor de Metadados PE/ELF e Hashes</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Análise Estática vs Dinâmica e Sandboxes</h3>
+      <p class="study-desc">Inspeção inicial de artefatos maliciosos, cálculo de entropia, importações e relatórios de sandboxes</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        O que o binário suspeito é capaz de fazer, e quais indicadores ele gera ao rodar em ambiente isolado?
+      </div>
+
+      <ul class="study-facts">
+          <li>Diferenças entre análise estática e dinâmica em sandbox</li>
+          <li>Estrutura do cabeçalho Portable Executable (PE) e seções</li>
+          <li>Cálculo de entropia de Shannon para detectar packers (UPX)</li>
+          <li>Inspetor interativo de metadados de binários e chamadas de API</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Analise-Basica-de-Malware" onchange="toggleDone('Analise-Basica-de-Malware', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Seguranca-em-Nuvem"
+      data-slug="Seguranca-em-Nuvem"
+      data-trilha="5"
+      data-nist="Protect"
+      data-carreiras="AppSec &amp; DevSecOps,Blue Team &amp; Defesa,GRC &amp; Auditoria"
+      data-search="seguranca-em-nuvem responsabilidade compartilhada e cspm arquiteturas seguras em provedores de nuvem, gestão de postura e políticas de acesso a dados onde termina a obrigação do provedor de nuvem e onde começa a responsabilidade da sua organização? auditor de permissões s3 e políticas iam cloud protect appsec &amp; devsecops,blue team &amp; defesa,grc &amp; auditoria modelo de responsabilidade compartilhada (iaas, paas, saas) endurecimento de políticas iam e proteção de buckets s3 postura de segurança em nuvem com cspm e cwpp auditor interativo de arquivos de políticas json de nuvem">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t5" title="Trilha 5: Especialidades & Fronteiras">
+            5
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Auditor de Permissões S3 e Políticas IAM Cloud</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Responsabilidade Compartilhada e CSPM</h3>
+      <p class="study-desc">Arquiteturas seguras em provedores de nuvem, gestão de postura e políticas de acesso a dados</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Onde termina a obrigação do provedor de nuvem e onde começa a responsabilidade da sua organização?
+      </div>
+
+      <ul class="study-facts">
+          <li>Modelo de Responsabilidade Compartilhada (IaaS, PaaS, SaaS)</li>
+          <li>Endurecimento de políticas IAM e proteção de buckets S3</li>
+          <li>Postura de segurança em nuvem com CSPM e CWPP</li>
+          <li>Auditor interativo de arquivos de políticas JSON de nuvem</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Seguranca-em-Nuvem" onchange="toggleDone('Seguranca-em-Nuvem', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-DevSecOps-e-CI-CD"
+      data-slug="DevSecOps-e-CI-CD"
+      data-trilha="5"
+      data-nist="Protect"
+      data-carreiras="AppSec &amp; DevSecOps"
+      data-search="devsecops-e-ci-cd shift-left, sast, dast, sca e containers automação de segurança no ciclo de entrega contínua, governança de dependências e proteção de containers como detectar e bloquear vulnerabilidades em código e dependências antes do deploy em produção? simulador de pipeline ci/cd com security gates protect appsec &amp; devsecops filosofia shift-left e ciclo ssdlc integração de testes sast, dast e sca com sbom boas práticas em dockerfiles e imagens distroless simulador de pipeline ci/cd com parametrização de thresholds de quebra">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t5" title="Trilha 5: Especialidades & Fronteiras">
+            5
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Simulador de Pipeline CI/CD com Security Gates</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Shift-Left, SAST, DAST, SCA e Containers</h3>
+      <p class="study-desc">Automação de segurança no ciclo de entrega contínua, governança de dependências e proteção de containers</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como detectar e bloquear vulnerabilidades em código e dependências antes do deploy em produção?
+      </div>
+
+      <ul class="study-facts">
+          <li>Filosofia Shift-Left e ciclo SSDLC</li>
+          <li>Integração de testes SAST, DAST e SCA com SBOM</li>
+          <li>Boas práticas em Dockerfiles e imagens distroless</li>
+          <li>Simulador de pipeline CI/CD com parametrização de thresholds de quebra</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="DevSecOps-e-CI-CD" onchange="toggleDone('DevSecOps-e-CI-CD', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Seguranca-em-IoT-e-OT"
+      data-slug="Seguranca-em-IoT-e-OT"
+      data-trilha="5"
+      data-nist="Protect"
+      data-carreiras="Blue Team &amp; Defesa"
+      data-search="seguranca-em-iot-e-ot redes industriais (scada/modbus) e iot proteção de sistemas de controle operacional, modelo purdue, protocolos legados e isolamento físico como proteger sistemas ciberfísicos que não suportam paradas, patches frequentes ou criptografia pesada? mapeador do modelo purdue (ti vs to) protect blue team &amp; defesa convergência ti e to e prioridades de disponibilidade níveis 0 a 5 do modelo purdue para sistemas ics/scada limitações de segurança do protocolo modbus tcp (porta 502) mapeador arquitetural interativo de zonas industriais">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t5" title="Trilha 5: Especialidades & Fronteiras">
+            5
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 40 min</span>
+            <span class="badge badge-sim">🧪 Mapeador do Modelo Purdue (TI vs TO)</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Redes Industriais (SCADA/Modbus) e IoT</h3>
+      <p class="study-desc">Proteção de sistemas de controle operacional, Modelo Purdue, protocolos legados e isolamento físico</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como proteger sistemas ciberfísicos que não suportam paradas, patches frequentes ou criptografia pesada?
+      </div>
+
+      <ul class="study-facts">
+          <li>Convergência TI e TO e prioridades de disponibilidade</li>
+          <li>Níveis 0 a 5 do Modelo Purdue para sistemas ICS/SCADA</li>
+          <li>Limitações de segurança do protocolo Modbus TCP (porta 502)</li>
+          <li>Mapeador arquitetural interativo de zonas industriais</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Seguranca-em-IoT-e-OT" onchange="toggleDone('Seguranca-em-IoT-e-OT', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-IA-e-Ciberseguranca"
+      data-slug="IA-e-Ciberseguranca"
+      data-trilha="5"
+      data-nist="Protect / Detect"
+      data-carreiras="AppSec &amp; DevSecOps,Blue Team &amp; Defesa"
+      data-search="ia-e-ciberseguranca ameaças a llms (owasp llm), deepfakes e defesa segurança de modelos fundacionais, vetores de injeção de prompt, envenenamento e uso defensivo de ia como impedir que usuários maliciosos manipulem instruções de sistemas baseados em inteligência artificial? lab de prompt injection e defesas protect / detect appsec &amp; devsecops,blue team &amp; defesa owasp top 10 for llm applications (llm01 prompt injection) ataques de data poisoning e vazamento de dados sensíveis mecanismos de guardrails de entrada e sanitização de prompts laboratório interativo de bypass de chatbot e aplicação de defesas">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t5" title="Trilha 5: Especialidades & Fronteiras">
+            5
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect / Detect</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Lab de Prompt Injection e Defesas</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Ameaças a LLMs (OWASP LLM), Deepfakes e Defesa</h3>
+      <p class="study-desc">Segurança de modelos fundacionais, vetores de injeção de prompt, envenenamento e uso defensivo de IA</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como impedir que usuários maliciosos manipulem instruções de sistemas baseados em inteligência artificial?
+      </div>
+
+      <ul class="study-facts">
+          <li>OWASP Top 10 for LLM Applications (LLM01 Prompt Injection)</li>
+          <li>Ataques de Data Poisoning e vazamento de dados sensíveis</li>
+          <li>Mecanismos de guardrails de entrada e sanitização de prompts</li>
+          <li>Laboratório interativo de bypass de chatbot e aplicação de defesas</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="IA-e-Ciberseguranca" onchange="toggleDone('IA-e-Ciberseguranca', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Gestao-de-Riscos-TI"
+      data-slug="Gestao-de-Riscos-TI"
+      data-trilha="6"
+      data-nist="Govern / Identify"
+      data-carreiras="GRC &amp; Auditoria"
+      data-search="gestao-de-riscos-ti avaliação qualitativa vs quantitativa (ale/sle) metodologias de análise de risco, matrizes 5x5, cálculo financeiro de perdas e justificativa de roi como quantificar em reais o impacto de uma ameaça para justificar orçamentos de cibersegurança à diretoria? calculadora de matriz 5x5 e risco financeiro (ale/sle) govern / identify grc &amp; auditoria normas iso 31000 e nist sp 800-30 fórmulas quantitativas: sle = av * ef e ale = sle * aro estratégias de tratamento de risco: mitigar, aceitar, transferir, evitar calculadora interativa com matriz 5x5 e cálculo de viabilidade rosi">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t6" title="Trilha 6: Governança, Riscos & Conformidade">
+            6
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Govern / Identify</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Calculadora de Matriz 5x5 e Risco Financeiro (ALE/SLE)</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Avaliação Qualitativa vs Quantitativa (ALE/SLE)</h3>
+      <p class="study-desc">Metodologias de análise de risco, matrizes 5x5, cálculo financeiro de perdas e justificativa de ROI</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como quantificar em reais o impacto de uma ameaça para justificar orçamentos de cibersegurança à diretoria?
+      </div>
+
+      <ul class="study-facts">
+          <li>Normas ISO 31000 e NIST SP 800-30</li>
+          <li>Fórmulas quantitativas: SLE = AV * EF e ALE = SLE * ARO</li>
+          <li>Estratégias de tratamento de risco: Mitigar, Aceitar, Transferir, Evitar</li>
+          <li>Calculadora interativa com matriz 5x5 e cálculo de viabilidade ROSI</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Gestao-de-Riscos-TI" onchange="toggleDone('Gestao-de-Riscos-TI', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-ISO-27001-e-27002"
+      data-slug="ISO-27001-e-27002"
+      data-trilha="6"
+      data-nist="Govern"
+      data-carreiras="GRC &amp; Auditoria"
+      data-search="iso-27001-e-27002 sgsi e controles do anexo a (edição 2022) estrutura do sistema de gestão de segurança da informação, os 93 controles e declaração de aplicabilidade como estruturar um sgsi auditável e alinhar controles técnicos e organizacionais ao padrão internacional? matriz de controles e declaração de aplicabilidade (soa) govern grc &amp; auditoria estrutura hls da iso/iec 27001:2022 (cláusulas 4 a 10) os 93 controles consolidados em 4 temas organizacionais elaboração e manutenção da declaração de aplicabilidade (soa) matriz interativa de aplicabilidade com sumário percentual">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t6" title="Trilha 6: Governança, Riscos & Conformidade">
+            6
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Govern</span>
+            <span class="badge badge-time">⏱️ 50 min</span>
+            <span class="badge badge-sim">🧪 Matriz de Controles e Declaração de Aplicabilidade (SoA)</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">SGSI e Controles do Anexo A (Edição 2022)</h3>
+      <p class="study-desc">Estrutura do Sistema de Gestão de Segurança da Informação, os 93 controles e Declaração de Aplicabilidade</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como estruturar um SGSI auditável e alinhar controles técnicos e organizacionais ao padrão internacional?
+      </div>
+
+      <ul class="study-facts">
+          <li>Estrutura HLS da ISO/IEC 27001:2022 (cláusulas 4 a 10)</li>
+          <li>Os 93 controles consolidados em 4 temas organizacionais</li>
+          <li>Elaboração e manutenção da Declaração de Aplicabilidade (SoA)</li>
+          <li>Matriz interativa de aplicabilidade com sumário percentual</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="ISO-27001-e-27002" onchange="toggleDone('ISO-27001-e-27002', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-LGPD-e-Privacidade"
+      data-slug="LGPD-e-Privacidade"
+      data-trilha="6"
+      data-nist="Govern / Protect"
+      data-carreiras="GRC &amp; Auditoria"
+      data-search="lgpd-e-privacidade bases legais, direitos do titular e ripd/dpia conformidade com a lei 13.709/2018, governança de dados pessoais e relatórios de impacto à privacidade qual base legal legitima o tratamento de dados pessoais e como demonstrar conformidade perante a anpd? construtor de avaliação de impacto à privacidade (ripd) govern / protect grc &amp; auditoria as 10 bases legais da lgpd para dados pessoais e sensíveis garantia dos direitos dos titulares e atuação do dpo/encarregado protocolo de notificação de incidentes à anpd (art. 48) construtor interativo de relatório de impacto à privacidade (ripd)">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t6" title="Trilha 6: Governança, Riscos & Conformidade">
+            6
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Govern / Protect</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Construtor de Avaliação de Impacto à Privacidade (RIPD)</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Bases Legais, Direitos do Titular e RIPD/DPIA</h3>
+      <p class="study-desc">Conformidade com a Lei 13.709/2018, governança de dados pessoais e relatórios de impacto à privacidade</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Qual base legal legitima o tratamento de dados pessoais e como demonstrar conformidade perante a ANPD?
+      </div>
+
+      <ul class="study-facts">
+          <li>As 10 bases legais da LGPD para dados pessoais e sensíveis</li>
+          <li>Garantia dos direitos dos titulares e atuação do DPO/Encarregado</li>
+          <li>Protocolo de notificação de incidentes à ANPD (art. 48)</li>
+          <li>Construtor interativo de Relatório de Impacto à Privacidade (RIPD)</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="LGPD-e-Privacidade" onchange="toggleDone('LGPD-e-Privacidade', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Continuidade-e-Disaster-Recovery"
+      data-slug="Continuidade-e-Disaster-Recovery"
+      data-trilha="6"
+      data-nist="Recover"
+      data-carreiras="GRC &amp; Auditoria,Blue Team &amp; Defesa"
+      data-search="continuidade-e-disaster-recovery bcp, drp, cálculo de rto/rpo e regra 3-2-1 planejamento de continuidade de negócios, estratégias de recuperação de desastres e resiliência a desastres quanto tempo a organização suporta ficar inoperante e qual volume de dados pode ser perdido em um desastre? calculadora de rto/rpo e validador da estratégia 3-2-1 recover grc &amp; auditoria,blue team &amp; defesa diferenciação operacional entre bcp, drp e análise bia definição e cálculo de slas de rto e rpo estratégia de backup 3-2-1 e cópias imutáveis/air-gapped calculadora interativa de resiliência e simulação de perdas">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t6" title="Trilha 6: Governança, Riscos & Conformidade">
+            6
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Recover</span>
+            <span class="badge badge-time">⏱️ 40 min</span>
+            <span class="badge badge-sim">🧪 Calculadora de RTO/RPO e Validador da Estratégia 3-2-1</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1</h3>
+      <p class="study-desc">Planejamento de continuidade de negócios, estratégias de recuperação de desastres e resiliência a desastres</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Quanto tempo a organização suporta ficar inoperante e qual volume de dados pode ser perdido em um desastre?
+      </div>
+
+      <ul class="study-facts">
+          <li>Diferenciação operacional entre BCP, DRP e análise BIA</li>
+          <li>Definição e cálculo de SLAs de RTO e RPO</li>
+          <li>Estratégia de backup 3-2-1 e cópias imutáveis/air-gapped</li>
+          <li>Calculadora interativa de resiliência e simulação de perdas</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Continuidade-e-Disaster-Recovery" onchange="toggleDone('Continuidade-e-Disaster-Recovery', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+        <div class="no-results" id="no-results-msg" style="display: none;">
+          <p>Nenhum estudo encontrado com os critérios de busca aplicados.</p>
+          <button class="btn-open-study" onclick="clearSearch(); switchTab('todas');">Limpar Filtros e Busca</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Rodapé Geral do Portal -->
+    <footer class="portal-footer">
+      <p>&copy; 2026 Estudos de Cibersegurança &bull; Material Autoinstrucional e Prático 100% Offline</p>
+      <p>Desenvolvido e mantido por <strong>José Mauro da Silva Brandão</strong> &bull; Alinhado a NIST CSF 2.0, MITRE ATT&amp;CK Enterprise, ISO/IEC 27001:2022 e LGPD (Lei nº 13.709/2018).</p>
+    </footer>
+
+  </div>
+
+  <script>
+
+  // Gerenciador de Tema (Claro / Escuro)
+  function initTheme() {
+    const savedTheme = localStorage.getItem('cs_theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+    applyTheme(theme);
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('cs_theme', theme);
+    const icon = document.querySelector('.theme-icon');
+    const label = document.querySelector('.theme-label');
+    if (icon && label) {
+      if (theme === 'dark') {
+        icon.textContent = '☀️';
+        label.textContent = 'Claro';
+      } else {
+        icon.textContent = '🌙';
+        label.textContent = 'Escuro';
+      }
+    }
+  }
+
+  function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    applyTheme(nextTheme);
+  }
+
+  // Gerenciador de Progresso Global do Estudante
+  const TOTAL_ESTUDOS = 28;
+
+  function initProgress() {
+    let concluidos = 0;
+    const cards = document.querySelectorAll('.study-card');
+    
+    cards.forEach(card => {
+      const slug = card.getAttribute('data-slug');
+      const isDone = localStorage.getItem('cs_done_' + slug) === 'true';
+      const checkbox = card.querySelector('input[type="checkbox"]');
+      if (checkbox) {
+        checkbox.checked = isDone;
+      }
+      if (isDone) {
+        card.classList.add('card-done');
+        concluidos++;
+      } else {
+        card.classList.remove('card-done');
+      }
+    });
+
+    updateProgressUI(concluidos);
+  }
+
+  function toggleDone(slug, isDone) {
+    if (isDone) {
+      localStorage.setItem('cs_done_' + slug, 'true');
+    } else {
+      localStorage.removeItem('cs_done_' + slug);
+    }
+    const card = document.getElementById('estudo-' + slug);
+    if (card) {
+      if (isDone) {
+        card.classList.add('card-done');
+      } else {
+        card.classList.remove('card-done');
+      }
+    }
+    initProgress();
+  }
+
+  function resetProgress() {
+    if (confirm('Deseja realmente zerar todo o progresso de estudos concluídos registrado neste navegador?')) {
+      const cards = document.querySelectorAll('.study-card');
+      cards.forEach(card => {
+        const slug = card.getAttribute('data-slug');
+        localStorage.removeItem('cs_done_' + slug);
+      });
+      initProgress();
+    }
+  }
+
+  function updateProgressUI(concluidos) {
+    const pct = Math.round((concluidos / TOTAL_ESTUDOS) * 100);
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    if (progressBar) {
+      progressBar.style.width = pct + '%';
+    }
+    if (progressText) {
+      progressText.innerHTML = `<strong>${concluidos}</strong> de <strong>${TOTAL_ESTUDOS}</strong> concluídos (${pct}%)`;
+    }
+  }
+
+  // Filtros Multifacetados e Busca em Tempo Real
+  let currentFacet = 'todas';
+  let currentFilterValue = 'all';
+
+  function switchTab(facetName) {
+    currentFacet = facetName;
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-facet') === facetName);
+    });
+
+    document.querySelectorAll('.filter-subpanel').forEach(panel => {
+      panel.style.display = panel.getAttribute('data-panel') === facetName ? 'flex' : 'none';
+    });
+
+    currentFilterValue = 'all';
+    document.querySelectorAll(`.filter-subpanel[data-panel="${facetName}"] .filter-badge`).forEach(b => {
+      b.classList.toggle('active', b.getAttribute('data-value') === 'all');
+    });
+
+    filtrarCards();
+  }
+
+  function setSubFilter(value, element) {
+    currentFilterValue = value;
+    const parent = element.parentElement;
+    parent.querySelectorAll('.filter-badge').forEach(b => b.classList.remove('active'));
+    element.classList.add('active');
+    filtrarCards();
+  }
+
+  function filtrarCards() {
+    const query = (document.getElementById('search-input').value || '').trim().toLowerCase();
+    const clearBtn = document.querySelector('.clear-search-btn');
+    if (clearBtn) {
+      clearBtn.style.display = query.length > 0 ? 'block' : 'none';
+    }
+
+    const cards = document.querySelectorAll('.study-card');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const cardSearch = card.getAttribute('data-search') || '';
+      const cardTrilha = card.getAttribute('data-trilha');
+      const cardNist = card.getAttribute('data-nist');
+      const cardCarreiras = card.getAttribute('data-carreiras') || '';
+
+      let matchSearch = !query || cardSearch.includes(query);
+      let matchFacet = true;
+
+      if (currentFacet === 'trilhas' && currentFilterValue !== 'all') {
+        matchFacet = cardTrilha === currentFilterValue;
+      } else if (currentFacet === 'nist' && currentFilterValue !== 'all') {
+        matchFacet = cardNist.includes(currentFilterValue);
+      } else if (currentFacet === 'carreiras' && currentFilterValue !== 'all') {
+        matchFacet = cardCarreiras.includes(currentFilterValue);
+      }
+
+      if (matchSearch && matchFacet) {
+        card.style.display = 'flex';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    const info = document.getElementById('visible-count');
+    if (info) {
+      info.textContent = `Exibindo ${visibleCount} de ${TOTAL_ESTUDOS} estudos`;
+    }
+
+    const noResults = document.getElementById('no-results-msg');
+    if (noResults) {
+      noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+  }
+
+  function clearSearch() {
+    const input = document.getElementById('search-input');
+    if (input) {
+      input.value = '';
+      input.focus();
+      filtrarCards();
+    }
+  }
+
+  function focarEstudo(slug) {
+    const card = document.getElementById('estudo-' + slug);
+    if (card) {
+      card.style.display = 'flex';
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.classList.add('highlight-pulse');
+      setTimeout(() => card.classList.remove('highlight-pulse'), 2000);
+    }
+  }
+
+  // Inicialização no Carregamento do DOM
+  document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    initProgress();
+    
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', filtrarCards);
+    }
+
+    // Suporte a âncora direta na URL (ex: #estudo-Fundamentos-Ciber)
+    if (window.location.hash) {
+      const hashId = window.location.hash.substring(1);
+      const target = document.getElementById(hashId);
+      if (target) {
+        setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+      }
+    }
+  });
+
+  </script>
+</body>
+</html>
