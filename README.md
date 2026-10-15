@@ -83,6 +83,24 @@ O portal `index.html` conta com:
 
 ---
 
+## 🎯 Rota por Vaga: Analista de Segurança da Informação
+
+O portal (`index.html`) traz a seção **Rota por Vaga**, que liga cada requisito de uma vaga de Analista de Segurança da Informação aos módulos que o cobrem (principais e de apoio):
+
+| Competência da vaga | Módulos principais | Módulos de apoio |
+|---|---|---|
+| Soluções de Cyber Security (Firewalls, Antivírus, DLP, AntiSpam, WAF, Filtro de conteúdo) | 05, 07, 10, 29 | 15 |
+| Banco de dados relacionais | 30 | 12 |
+| Inglês | 32 | — |
+| PCI-DSS, ISO 27001/27002, ISO 31000 e NIST | 25, 26, 31 | 18 |
+| Resposta a incidentes | 18 | 16, 19 |
+| Controles de segurança da informação | 26 | 06, 08 |
+| Formação e certificações | 33 | — |
+
+O portal também exibe a **Matriz de Certificações** (CEH, CISM, CISSP, CCSP, GSEC e Security+), com os módulos que cobrem cada uma.
+
+---
+
 ## 🛠️ Como o Material é Gerado
 
 A plataforma utiliza um pipeline de compilação em Python puro e Shell Script, localizado na pasta `_geradores/`.
@@ -137,6 +155,7 @@ O currículo é estruturado de forma a atender diferentes objetivos e momentos d
 - **Operações, SOC & Forense:** Análise de logs SIEM, regras Sigma, inteligência de ameaças (CTI), resposta a incidentes e análise básica de malware.
 - **Engenharia de Nuvem & DevSecOps:** Segurança em provedores cloud (AWS/Azure/GCP), pipelines CI/CD seguros, conteinerização e IoT/TO.
 - **Governança, Riscos e Conformidade (GRC):** Metodologias de avaliação de risco (ALE/SLE), ISO/IEC 27001/27002:2022, LGPD e planos de continuidade/DRP.
+- **Analista de Segurança da Informação:** Perfil generalista de vaga corporativa: soluções de segurança (firewall, EDR, DLP), bancos de dados, normas (PCI-DSS, ISO 27001/27002/31000, NIST), controles, resposta a incidentes, inglês técnico e certificações.
 
 ---
 

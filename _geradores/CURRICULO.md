@@ -2,7 +2,7 @@
 
 ## 1. Visão Geral e Filosofia Pedagógica
 
-O currículo de **Estudos de Cibersegurança** foi concebido como uma formação autoinstrucional, prática e modular, dividida em **28 módulos temáticos** organizados em **6 trilhas estruturantes**. 
+O currículo de **Estudos de Cibersegurança** foi concebido como uma formação autoinstrucional, prática e modular, dividida em **33 módulos temáticos** organizados em **7 trilhas estruturantes**. 
 
 O projeto segue quatro diretrizes fundamentais:
 1. **Teoria Pragmática e Direta ao Ponto:** Eliminação de floreios acadêmicos desnecessários; foco no que engenheiros, analistas e auditores de segurança executam na rotina corporativa e no que bancas de concursos e certificações (CompTIA Security+, CySA+, PenTest+, CEH, CISSP) cobram.
@@ -10,24 +10,25 @@ O projeto segue quatro diretrizes fundamentais:
 3. **Duplo Mapeamento Normativo:** Integração orgânica entre a pedagogia por trilhas temáticas e os frameworks internacionais:
    - **NIST Cybersecurity Framework (CSF) 2.0:** Govern, Identify, Protect, Detect, Respond, Recover.
    - **MITRE ATT&CK Matrix:** Táticas e técnicas reais de adversários cibernéticos.
-4. **Alinhamento a Perfis de Carreira:** Blue Team / Defesa, Red Team / Pentest, Engenharia de Nuvem & DevSecOps, Resposta a Incidentes / SOC e Governança, Risco e Conformidade (GRC).
+4. **Alinhamento a Perfis de Carreira:** Blue Team / Defesa, Red Team / Pentest, Engenharia de Nuvem & DevSecOps, Resposta a Incidentes / SOC, Governança, Risco e Conformidade (GRC) e Analista de Segurança da Informação (perfil generalista de vaga corporativa).
 
 ---
 
-## 2. Mapa das 6 Trilhas Temáticas
+## 2. Mapa das 7 Trilhas Temáticas
 
 | Trilha | Denominação | Cor do Tema | Foco Técnico | Módulos |
 |---|---|---|---|---|
 | **Trilha 1** | Fundamentos & Redes | `#2563EB` (Azul) | Base sólida: CIA, protocolos, criptografia, IAM e perímetro | 01 ao 05 |
-| **Trilha 2** | Segurança Defensiva | `#059669` (Verde) | Bastionamento, defesas de rede, Zero Trust, vulnerabilidades e EDR | 06 ao 10 |
+| **Trilha 2** | Segurança Defensiva | `#059669` (Verde) | Bastionamento, defesas de rede, Zero Trust, vulnerabilidades e EDR | 06 ao 10, 29, 30 |
 | **Trilha 3** | Segurança Ofensiva | `#DC2626` (Vermelho) | Reconhecimento, falhas web, APIs, testes de intrusão e phishing | 11 ao 15 |
 | **Trilha 4** | Operações, SOC & Resposta | `#7C3AED` (Roxo) | Monitoramento, SIEM, CTI, contenção de incidentes e forense | 16 ao 20 |
 | **Trilha 5** | Especialidades & Fronteiras | `#0891B2` (Ciano) | Nuvem pública, DevSecOps/CI-CD, IoT/TO (Purdue) e Inteligência Artificial | 21 ao 24 |
-| **Trilha 6** | Governança, Riscos & Conformidade | `#D97706` (Âmbar) | Gestão de risco (ALE/SLE), ISO 27001/27002, LGPD e continuidade de negócios | 25 ao 28 |
+| **Trilha 6** | Governança, Riscos & Conformidade | `#D97706` (Âmbar) | Gestão de risco (ALE/SLE), ISO 27001/27002, LGPD e continuidade de negócios | 25 ao 28, 31 |
+| **Trilha 7** | Carreira & Formação | `#DB2777` (Rosa) | Inglês técnico, formação acadêmica, certificações e preparação para vagas | 32 e 33 |
 
 ---
 
-## 3. Detalhamento dos 28 Módulos de Aprendizagem
+## 3. Detalhamento dos 33 Módulos de Aprendizagem
 
 ### Trilha 1: Fundamentos & Redes (`#2563EB`)
 
@@ -125,6 +126,24 @@ O projeto segue quatro diretrizes fundamentais:
 - **Conceitos-Chave:** Heurística e ML no host, Sysmon Event ID 1 (Process Create), Event ID 3 (Network Connect), Process Injection, LSASS dumping detecção, Isolamento de host em rede.
 - **Simulador Interativo em JS:** *Linha do Tempo de Telemetria e Detecção EDR* — Simula eventos de um endpoint atacado (Office disparando PowerShell, conexão de rede externa, modificação de registro) e permite ao analista identificar anomalias e executar a ação de isolamento de host.
 
+#### 29. Protecao-de-Dados-e-Conteudo
+- **Título:** DLP, AntiSpam e Filtro de Conteúdo
+- **Função NIST CSF 2.0:** *Protect (PR) / Detect (DE)*
+- **Tempo Estimado:** 50 minutos | **Carreiras:** Blue Team, SOC, GRC, Analista de Segurança da Informação
+- **Objetivos de Aprendizagem:** Diferenciar DLP de rede, de endpoint e de nuvem (CASB); construir detectores por padrão (regex), por checksum (Luhn) e por dicionário; explicar a autenticação de e-mail (SPF, DKIM, DMARC) e a filtragem antispam por reputação e conteúdo; configurar filtro de conteúdo e URL por categoria em proxy seguro (SWG).
+- **Pré-requisitos:** Redes-e-Protocolos, Seguranca-de-Redes-Defesa.
+- **Conceitos-Chave:** Dados em uso, em trânsito e em repouso, Classificação da informação, Falso positivo vs falso negativo em DLP, Quarentena, Políticas DMARC (`none`, `quarantine`, `reject`), SWG, Categorização de URL, Inspeção TLS.
+- **Simulador Interativo em JS:** *Gateway de Conteúdo* — O aluno escolhe ou edita uma mensagem de e-mail ou um upload web de exemplo, que passa por três estágios em sequência: AntiSpam (SPF, DKIM, DMARC e reputação do remetente), DLP (detectores de CPF com dígito verificador, cartão de pagamento com Luhn e palavras-chave configuráveis) e Filtro de URL (bloqueio por categoria do domínio). O resultado final é Permitir, Quarentena ou Bloquear, com a justificativa de cada estágio, e o aluno pode alterar políticas e limiares e reprocessar.
+
+#### 30. Seguranca-de-Bancos-de-Dados
+- **Título:** Bancos de Dados Relacionais: SQL, Privilégios e Auditoria
+- **Função NIST CSF 2.0:** *Protect (PR) / Detect (DE)*
+- **Tempo Estimado:** 50 minutos | **Carreiras:** Blue Team, AppSec, GRC, Analista de Segurança da Informação
+- **Objetivos de Aprendizagem:** Revisar o modelo relacional (tabelas, chaves, JOIN, normalização) e SQL DDL/DML/DCL; aplicar menor privilégio com roles, `GRANT`/`REVOKE`, views e Row-Level Security; configurar auditoria de banco; proteger dados com TDE, criptografia de coluna, mascaramento dinâmico e backups cifrados; prevenir SQLi com prepared statements.
+- **Pré-requisitos:** Autenticacao-e-IAM, Criptografia-Pratica.
+- **Conceitos-Chave:** ACID, DDL vs DML vs DCL, Roles e esquemas, RLS, TDE, Dynamic Data Masking, Auditoria nativa (pgAudit, SQL Server Audit), Database Activity Monitoring (DAM), Contas de serviço, Hardening de SGBD (CIS Benchmarks para PostgreSQL, MySQL e SQL Server).
+- **Simulador Interativo em JS:** *Matriz GRANT/REVOKE* — Um esquema fictício com 3 a 4 tabelas, roles e usuários. O aluno concede e revoga privilégios (`SELECT`, `INSERT`, `UPDATE`, `DELETE`) por role e tabela e então executa uma lista de consultas de usuários fictícios. Cada consulta é marcada como permitida ou negada, gera uma entrada na trilha de auditoria e, quando houver mascaramento ativo, mostra o valor mascarado.
+
 ---
 
 ### Trilha 3: Segurança Ofensiva (`#DC2626`)
@@ -197,12 +216,12 @@ O projeto segue quatro diretrizes fundamentais:
 - **Simulador Interativo em JS:** *Mapeador de IoCs e TTPs na Matriz ATT&CK* — Permite ao analista colar relatórios de inteligência, extrair IoCs e relacionar técnicas descritas às colunas da matriz MITRE ATT&CK, gerando mapa visual de calor de táticas do adversário.
 
 #### 18. Resposta-a-Incidentes
-- **Título:** Ciclo NIST SP 800-61 (Contenção e Erradicação)
+- **Título:** Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)
 - **Função NIST CSF 2.0:** *Respond (RS)*
 - **Tempo Estimado:** 50 minutos | **Carreiras:** Incident Responder, SOC N2/N3, Gestores
-- **Objetivos de Aprendizagem:** Executar as 4 etapas do ciclo de incidentes do NIST SP 800-61 Rev 2: 1. Preparação, 2. Detecção & Análise, 3. Contenção, Erradicação & Recuperação, 4. Atividades Pós-Incidente (Lições Aprendidas); elaborar playbooks de resposta; gerenciar comunicação com stakeholders e órgãos reguladores.
+- **Objetivos de Aprendizagem:** Executar as 4 etapas do ciclo de incidentes do NIST SP 800-61 Rev 2: 1. Preparação, 2. Detecção & Análise, 3. Contenção, Erradicação & Recuperação, 4. Atividades Pós-Incidente (Lições Aprendidas); elaborar playbooks de resposta; gerenciar comunicação com stakeholders e órgãos reguladores; conhecer a NIST SP 800-61 Rev. 3 (2025), que reorganiza a resposta a incidentes segundo as funções do CSF 2.0, ao lado do ciclo clássico da Rev. 2.
 - **Pré-requisitos:** Operacoes-SOC-e-SIEM.
-- **Conceitos-Chave:** Contenção de curto vs longo prazo, Preservação de evidências voláteis antes do reboot, Erradicação de persistência de malware, Post-Mortem / Retrospectiva sem culpados (Blameless).
+- **Conceitos-Chave:** Contenção de curto vs longo prazo, Preservação de evidências voláteis antes do reboot, Erradicação de persistência de malware, Post-Mortem / Retrospectiva sem culpados (Blameless), NIST SP 800-61 Rev. 3 e funções do CSF 2.0.
 - **Simulador Interativo em JS:** *Runbook Interativo em Árvore de Decisão* — Simula um incidente crítico de segurança (ex.: Ransomware em progressão ou vazamento de banco de dados). O usuário toma decisões passo a passo com ramificações em árvore e cronômetro de impacto no negócio.
 
 #### 19. Forense-Digital
@@ -268,21 +287,21 @@ O projeto segue quatro diretrizes fundamentais:
 ### Trilha 6: Governança, Riscos & Conformidade (`#D97706`)
 
 #### 25. Gestao-de-Riscos-TI
-- **Título:** Avaliação Qualitativa vs Quantitativa (ALE/SLE)
+- **Título:** ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)
 - **Função NIST CSF 2.0:** *Govern (GV) / Identify (ID)*
 - **Tempo Estimado:** 45 minutos | **Carreiras:** GRC, Auditores, CISO, Gestores
-- **Objetivos de Aprendizagem:** Conduzir análises de risco qualitativas utilizando matrizes de probabilidade e impacto (5x5); dominar cálculos quantitativos de risco financeiro: Valor do Ativo (AV), Fator de Exposição (EF), Expectativa de Perda Única (SLE = AV * EF), Taxa Anualizada de Ocorrência (ARO) e Expectativa de Perda Anualizada (ALE = SLE * ARO); justificar o Retorno sobre Investimento em Segurança (ROSI).
+- **Objetivos de Aprendizagem:** Conduzir análises de risco qualitativas utilizando matrizes de probabilidade e impacto (5x5); dominar cálculos quantitativos de risco financeiro: Valor do Ativo (AV), Fator de Exposição (EF), Expectativa de Perda Única (SLE = AV * EF), Taxa Anualizada de Ocorrência (ARO) e Expectativa de Perda Anualizada (ALE = SLE * ARO); justificar o Retorno sobre Investimento em Segurança (ROSI); aplicar os princípios, a estrutura e o processo da ISO 31000:2018 (contexto, identificação, análise, avaliação, tratamento, monitoramento e comunicação).
 - **Pré-requisitos:** Fundamentos-Ciber.
-- **Conceitos-Chave:** ISO 31000, NIST SP 800-30, Matriz Qualitativa 5x5, Fórmulas de cálculo de SLE e ALE, Estratégias de tratamento de risco: Mitigar, Aceitar, Transferir, Evitar.
+- **Conceitos-Chave:** ISO 31000:2018 (princípios, estrutura e processo), NIST SP 800-30, Matriz Qualitativa 5x5, Fórmulas de cálculo de SLE e ALE, Estratégias de tratamento de risco: Mitigar, Aceitar, Transferir, Evitar.
 - **Simulador Interativo em JS:** *Calculadora de Matriz 5x5 e Risco Financeiro (ALE/SLE)* — Permite ao aluno posicionar cenários de risco na matriz qualitativa e calcular automaticamente valores financeiros de impacto anualizado com simulação de viabilidade econômica de contramedidas (Custo do controle vs Redução da ALE).
 
 #### 26. ISO-27001-e-27002
-- **Título:** SGSI e Controles do Anexo A (Edição 2022)
+- **Título:** SGSI, Anexo A, CIS Controls e NIST 800-53
 - **Função NIST CSF 2.0:** *Govern (GV)*
 - **Tempo Estimado:** 50 minutos | **Carreiras:** Auditores ISO, GRC, Compliance
-- **Objetivos de Aprendizagem:** Compreender a estrutura de alto nível (HLS) do Sistema de Gestão de Segurança da Informação (SGSI) da ABNT NBR ISO/IEC 27001:2022 (cláusulas 4 a 10); dominar a nova estrutura consolidada dos 93 controles do Anexo A divididos nos 4 temas: Organizacionais (37), Pessoas (8), Físicos (14) e Tecnológicos (34); elaborar a Declaração de Aplicabilidade (SoA).
+- **Objetivos de Aprendizagem:** Compreender a estrutura de alto nível (HLS) do Sistema de Gestão de Segurança da Informação (SGSI) da ABNT NBR ISO/IEC 27001:2022 (cláusulas 4 a 10); dominar a nova estrutura consolidada dos 93 controles do Anexo A divididos nos 4 temas: Organizacionais (37), Pessoas (8), Físicos (14) e Tecnológicos (34); elaborar a Declaração de Aplicabilidade (SoA); fazer o crosswalk dos controles do Anexo A com os CIS Controls v8.1 (IG1/IG2/IG3) e com o NIST SP 800-53 Rev. 5.
 - **Pré-requisitos:** Gestao-de-Riscos-TI.
-- **Conceitos-Chave:** Ciclo PDCA no SGSI, Cláusula 6.1.2/6.1.3 Avaliação e tratamento de riscos, Anexo A ed. 2022 (93 controles e novos atributos como Threat Intelligence e Masking), Declaração de Aplicabilidade (SoA), Auditorias Internas e Externas (Fase 1 e Fase 2).
+- **Conceitos-Chave:** Ciclo PDCA no SGSI, Cláusula 6.1.2/6.1.3 Avaliação e tratamento de riscos, Anexo A ed. 2022 (93 controles e novos atributos como Threat Intelligence e Masking), Declaração de Aplicabilidade (SoA), Auditorias Internas e Externas (Fase 1 e Fase 2), CIS Controls v8.1 (Grupos de Implementação IG1/IG2/IG3), NIST SP 800-53 Rev. 5.
 - **Simulador Interativo em JS:** *Matriz de Controles e Declaração de Aplicabilidade (SoA)* — Tabela interativa com os 4 temas do Anexo A onde o estudante seleciona controles, define justificativa de inclusão/exclusão e gera o sumário percentual da Declaração de Aplicabilidade da organização.
 
 #### 27. LGPD-e-Privacidade
@@ -303,6 +322,35 @@ O projeto segue quatro diretrizes fundamentais:
 - **Conceitos-Chave:** BIA (Business Impact Analysis), MTPD (Maximum Tolerable Period of Disruption), RTO vs RPO, Hot Site vs Warm Site vs Cold Site, Regra de Backup 3-2-1, Backups Imutáveis contra Ransomware, Testes de restauração periódicos (Tabletop, Simulação real).
 - **Simulador Interativo em JS:** *Calculadora de RTO/RPO e Validador da Estratégia 3-2-1* — Permite ao aluno configurar diferentes estratégias de backup (frequência de snapshots, replicação geográfica, mídia offline) e simular cenários de desastre para verificar se a perda de dados e o tempo de indisponibilidade respeitam os SLAs de RTO e RPO definidos pelo negócio.
 
+#### 31. PCI-DSS
+- **Título:** PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos
+- **Função NIST CSF 2.0:** *Govern (GV) / Protect (PR)*
+- **Tempo Estimado:** 45 minutos | **Carreiras:** GRC, Auditores, Blue Team, Analista de Segurança da Informação
+- **Objetivos de Aprendizagem:** Conhecer os 6 objetivos e os 12 requisitos do PCI DSS v4.0.1; delimitar o ambiente de dados do portador do cartão (CDE) e usar segmentação para reduzir o escopo; diferenciar dados do portador (PAN) de dados sensíveis de autenticação (SAD); escolher entre os tipos de SAQ e entender ROC/QSA; distinguir a abordagem definida da customizada (v4.x).
+- **Pré-requisitos:** Segmentacao-e-Firewall, ISO-27001-e-27002.
+- **Conceitos-Chave:** PAN, SAD, CVV, Tokenização vs truncamento vs criptografia, CDE e sistemas "connected-to", Segmentação validada por teste, SAQ A, A-EP, B, C, D, QSA, ISA, ROC, AOC, Níveis de comerciante, Requisitos que passaram a ser obrigatórios em 31/03/2025.
+- **Simulador Interativo em JS:** *Delimitador de Escopo CDE* — Um inventário de cerca de 10 sistemas fictícios (POS, servidor de aplicação, banco de dados, AD, estação de RH, gateway de pagamento terceirizado etc.). Para cada sistema, o aluno indica se ele armazena, processa ou transmite PAN, se está conectado ao CDE e se está segmentado; o simulador classifica cada um como dentro, conectado ou fora do escopo, explica o motivo e sugere o tipo de SAQ do cenário.
+
+### Trilha 7: Carreira & Formação (`#DB2777`)
+
+#### 32. Ingles-Tecnico-Ciber
+- **Título:** Inglês Técnico para Segurança da Informação
+- **Função NIST CSF 2.0:** *Protect (PR)* (categoria PR.AT, Awareness and Training)
+- **Tempo Estimado:** 40 minutos | **Carreiras:** Todas (Fundação Universal), Analista de Segurança da Informação
+- **Objetivos de Aprendizagem:** Ler advisories, registros CVE/NVD, RFCs e documentação de fabricantes em inglês; dominar o vocabulário técnico essencial e os falsos cognatos da área; redigir em inglês um resumo de incidente e um e-mail técnico curto.
+- **Pré-requisitos:** Nenhum.
+- **Conceitos-Chave:** Estrutura de um advisory (Summary, Affected Versions, Impact, Mitigation, Workaround), Verbos modais em requisitos normativos (MUST, SHOULD, MAY, conforme a RFC 2119), Falsos cognatos (*exploit*, *eventually*, *actually*), Siglas comuns, Registro formal vs informal.
+- **Simulador Interativo em JS:** *Leitor de Advisory* — Um boletim de segurança em inglês, no formato realista de CVE/fabricante e totalmente fictício. Cada termo técnico é clicável e mostra tradução e definição em pt-BR. Ao final há perguntas de compreensão (versão afetada, impacto, mitigação recomendada) com correção comentada, e um glossário com flashcards guarda o progresso em `localStorage`.
+
+#### 33. Certificacoes-e-Carreira
+- **Título:** Formação, Certificações e Carreira
+- **Função NIST CSF 2.0:** *Protect (PR)* (categoria PR.AT, Awareness and Training)
+- **Tempo Estimado:** 35 minutos | **Carreiras:** Todas (Fundação Universal), Analista de Segurança da Informação
+- **Objetivos de Aprendizagem:** Comparar graduações (Ciência da Computação, Sistemas de Informação) e pós-graduações em SI; conhecer CEH, CISM, CISSP, CCSP, GSEC e Security+ (órgão emissor, foco, domínios, experiência exigida e manutenção por CPE); montar um plano de certificação coerente com o perfil de carreira; usar o NICE Framework (NIST SP 800-181) para descrever papéis.
+- **Pré-requisitos:** Nenhum.
+- **Conceitos-Chave:** Certificações de entrada vs gestão vs especialidade, Pré-requisitos de experiência e status *Associate of ISC2*, CPE e renovação, NICE Framework.
+- **Simulador Interativo em JS:** *Planejador de Certificações* — O aluno escolhe uma ou mais certificações-alvo; o simulador mostra os domínios de cada uma, os módulos do currículo que cobrem cada domínio e os domínios ainda sem módulo (lacunas), além de uma sugestão de ordem de estudo. Os dados vêm de uma estrutura JS embutida no próprio módulo, coerente com a Matriz de Certificações do portal.
+
 ---
 
 ## 4. Matriz de Mapeamento com Frameworks Globais
@@ -311,11 +359,11 @@ O projeto segue quatro diretrizes fundamentais:
 
 | Função NIST CSF 2.0 | Quantidade de Módulos | Módulos Vinculados |
 |---|---|---|
-| **GOVERN (GV)** | 3 módulos | 25, 26, 27 |
-| **IDENTIFY (ID)** | 7 módulos | 01, 09, 11, 14, 17, 25 |
-| **PROTECT (PR)** | 16 módulos | 02, 03, 04, 05, 06, 07, 08, 09, 10, 12, 13, 15, 21, 22, 23, 24, 27 |
-| **DETECT (DE)** | 8 módulos | 02, 07, 10, 16, 17, 20, 24 |
-| **RESPOND (RS)** | 4 módulos | 18, 19, 20 |
+| **GOVERN (GV)** | 4 módulos | 25, 26, 27, 31 |
+| **IDENTIFY (ID)** | 6 módulos | 01, 09, 11, 14, 17, 25 |
+| **PROTECT (PR)** | 22 módulos | 02, 03, 04, 05, 06, 07, 08, 09, 10, 12, 13, 15, 21, 22, 23, 24, 27, 29, 30, 31, 32, 33 |
+| **DETECT (DE)** | 9 módulos | 02, 07, 10, 16, 17, 20, 24, 29, 30 |
+| **RESPOND (RS)** | 3 módulos | 18, 19, 20 |
 | **RECOVER (RC)** | 1 módulo | 28 |
 
 *(Nota: Alguns módulos cobrem mais de uma função normativa, como Detecção e Proteção conjugadas).*
@@ -336,3 +384,6 @@ Para orientar estudantes e profissionais com focos específicos, a matriz curric
    `01 -> 08 -> 09 -> 25 -> 26 -> 27 -> 28`
 5. **Rota Perícia & Resposta a Incidentes:**  
    `01 -> 02 -> 06 -> 10 -> 16 -> 18 -> 19 -> 20`
+6. **Rota 6: Analista de Segurança da Informação (vaga):**  
+   `01 -> 05 -> 07 -> 10 -> 29 -> 30 -> 06 -> 26 -> 25 -> 31 -> 18 -> 32 -> 33`  
+   Cada competência da vaga também aparece, com os módulos principais e de apoio, na seção "Rota por Vaga" do portal (`index.html`).

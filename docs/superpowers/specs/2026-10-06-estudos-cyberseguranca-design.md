@@ -6,6 +6,8 @@
 **Repositório:** `estudos_cyberseguranca`  
 **Referência Metodológica:** Superpowers Spec-Driven Development (SDD)
 
+> **Atualização 2026-10-15:** grade ampliada para 33 módulos / 7 trilhas — ver [2026-10-15-competencias-vaga-analista-si-design.md](2026-10-15-competencias-vaga-analista-si-design.md).
+
 ---
 
 ## 1. Visão Geral e Propósito

@@ -44,6 +44,18 @@ class TestCurriculo(unittest.TestCase):
             )
             self.assertTrue(len(nist) > 0, f"NIST function vazia em {slug}")
 
+    def test_curriculo_cobre_33_modulos_e_rota(self):
+        """CURRICULO.md cita todos os slugs, a Trilha 7, a Rota 6 e os escopos ampliados."""
+        txt = self.curriculo_file.read_text(encoding="utf-8")
+        for linha in self.estudos_file.read_text(encoding="utf-8").splitlines():
+            if linha.strip() and not linha.startswith("#"):
+                self.assertIn(linha.split("|")[0].strip(), txt)
+        self.assertIn("Trilha 7: Carreira & Formação", txt)
+        self.assertIn("Rota 6: Analista de Segurança da Informação", txt)
+        self.assertIn("ISO 31000", txt)
+        self.assertIn("CIS Controls v8.1", txt)
+        self.assertIn("800-61 Rev. 3", txt)
+
     def test_documentacao_pedagogica_exists(self):
         """Verifica se CURRICULO.md e GUIA-DO-AUTOR.md existem e têm conteúdo substancial."""
         self.assertTrue(self.curriculo_file.exists(), "CURRICULO.md deve existir")
