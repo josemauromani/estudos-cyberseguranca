@@ -33,7 +33,7 @@ class TestAssets(unittest.TestCase):
         for token in tokens_fundamentais:
             self.assertIn(token, content, f"Token ausente no CSS: {token}")
 
-        # Cores das 6 trilhas
+        # Cores das 7 trilhas
         trilhas = [
             "--t1-blue",
             "--t2-green",
@@ -41,6 +41,7 @@ class TestAssets(unittest.TestCase):
             "--t4-purple",
             "--t5-cyan",
             "--t6-amber",
+            "--t7-rose",
         ]
         for t in trilhas:
             self.assertIn(t, content, f"Cor de trilha ausente no CSS: {t}")
@@ -53,6 +54,13 @@ class TestAssets(unittest.TestCase):
         ]
         for f in fontes:
             self.assertIn(f, content, f"Família de fonte ausente no CSS: {f}")
+
+    def test_trilha7_tokens_em_4_blocos(self):
+        for nome in ("base.css", "index.css"):
+            css = (self.root / "_geradores" / nome).read_text(encoding="utf-8")
+            self.assertEqual(css.count("--t7-rose:"), 4, nome)
+        self.assertIn(".badge-t7", self.css_file.read_text(encoding="utf-8"))
+        self.assertIn(".track-tile.t7", (self.root / "_geradores" / "index.css").read_text(encoding="utf-8"))
 
     def test_base_css_contains_component_classes(self):
         """Verifica as classes de componentes do Design System."""

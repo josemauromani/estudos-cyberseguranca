@@ -13,13 +13,14 @@
   --accent: #2563EB;
   --accent-hover: #1D4ED8;
 
-  /* Cores das 6 Trilhas Temáticas */
+  /* Cores das 7 Trilhas Temáticas */
   --t1-blue: #2563EB;
   --t2-green: #059669;
   --t3-red: #DC2626;
   --t4-purple: #7C3AED;
   --t5-cyan: #0891B2;
   --t6-amber: #D97706;
+  --t7-rose: #DB2777;
 
   /* Estados de Sucesso / Conclusão */
   --good: #059669;
@@ -54,6 +55,7 @@
     --t4-purple: #A78BFA;
     --t5-cyan: #22D3EE;
     --t6-amber: #FBBF24;
+    --t7-rose: #F472B6;
 
     --good: #34D399;
     --good-tint: #064E3B;
@@ -82,6 +84,7 @@
   --t4-purple: #A78BFA;
   --t5-cyan: #22D3EE;
   --t6-amber: #FBBF24;
+  --t7-rose: #F472B6;
 
   --good: #34D399;
   --good-tint: #064E3B;
@@ -105,6 +108,7 @@
   --t4-purple: #7C3AED;
   --t5-cyan: #0891B2;
   --t6-amber: #D97706;
+  --t7-rose: #DB2777;
 
   --good: #059669;
   --good-tint: #D1FAE5;
@@ -681,6 +685,7 @@ h1 {
 .track-tile.t4 { background: var(--t4-purple); }
 .track-tile.t5 { background: var(--t5-cyan); }
 .track-tile.t6 { background: var(--t6-amber); }
+.track-tile.t7 { background: var(--t7-rose); }
 
 .card-badges {
   display: flex;

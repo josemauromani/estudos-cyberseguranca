@@ -1,6 +1,6 @@
 # Estudos de Cibersegurança
 
-> Plataforma autoinstrucional, prática e enciclopédica sobre segurança da informação, defesa cibernética e governança corporativa, estruturada em **28 módulos temáticos** organizados em **6 trilhas estruturantes**.
+> Plataforma autoinstrucional, prática e enciclopédica sobre segurança da informação, defesa cibernética e governança corporativa, estruturada em **33 módulos temáticos** organizados em **7 trilhas estruturantes**.
 
 ---
 
@@ -43,7 +43,7 @@ O portal `index.html` conta com:
 
 ---
 
-## 📚 Grade Curricular dos 28 Módulos
+## 📚 Grade Curricular dos 33 Módulos
 
 | # | Slug / Pasta | Título do Estudo | Trilha Temática | Função NIST CSF 2.0 | Simulador Interativo em JavaScript |
 |:---:|---|---|---|:---:|---|
@@ -64,17 +64,22 @@ O portal `index.html` conta com:
 | **15** | `Engenharia-Social-e-Phishing` | Pretexting, Spear Phishing e Defesas Humanas | Trilha 3: Segurança Ofensiva | Protect | Analisador de e-mails suspeitos (Spot the Indicators) |
 | **16** | `Operacoes-SOC-e-SIEM` | Rotina de SOC L1/L2, Logs e Regras Sigma | Trilha 4: Operações & SOC | Detect | Console SIEM com busca de logs e alertas |
 | **17** | `Threat-Intelligence` | IoCs, TTPs, MITRE ATT&CK e STIX/TAXII | Trilha 4: Operações & SOC | Identify / Detect | Mapeador de IoCs e TTPs na matriz ATT&CK |
-| **18** | `Resposta-a-Incidentes` | Ciclo NIST SP 800-61 (Contenção e Erradicação) | Trilha 4: Operações & SOC | Respond | Runbook interativo em árvore de decisão |
+| **18** | `Resposta-a-Incidentes` | Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação) | Trilha 4: Operações & SOC | Respond | Runbook interativo em árvore de decisão |
 | **19** | `Forense-Digital` | Cadeia de Custódia, Coleta de RAM e Artefatos | Trilha 4: Operações & SOC | Respond | Analisador de timeline de evidências e logs |
 | **20** | `Analise-Basica-de-Malware` | Análise Estática vs Dinâmica e Sandboxes | Trilha 4: Operações & SOC | Detect / Respond | Inspetor de metadados PE/ELF e hashes |
 | **21** | `Seguranca-em-Nuvem` | Responsabilidade Compartilhada e CSPM | Trilha 5: Especialidades | Protect | Auditor de permissões S3 e políticas IAM Cloud |
 | **22** | `DevSecOps-e-CI-CD` | Shift-Left, SAST, DAST, SCA e Containers | Trilha 5: Especialidades | Protect | Simulador de pipeline CI/CD com security gates |
 | **23** | `Seguranca-em-IoT-e-OT` | Redes Industriais (SCADA/Modbus) e IoT | Trilha 5: Especialidades | Protect | Mapeador do Modelo Purdue (TI vs TO) |
 | **24** | `IA-e-Ciberseguranca` | Ameaças a LLMs (OWASP LLM), Deepfakes e Defesa | Trilha 5: Especialidades | Protect / Detect | Lab de Prompt Injection e defesas |
-| **25** | `Gestao-de-Riscos-TI` | Avaliação Qualitativa vs Quantitativa (ALE/SLE) | Trilha 6: Governança & Riscos | Govern / Identify | Calculadora de matriz 5x5 e risco financeiro |
-| **26** | `ISO-27001-e-27002` | SGSI e Controles do Anexo A (Edição 2022) | Trilha 6: Governança & Riscos | Govern | Matriz de Controles e Declaração de Aplicabilidade |
+| **25** | `Gestao-de-Riscos-TI` | ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE) | Trilha 6: Governança & Riscos | Govern / Identify | Calculadora de matriz 5x5 e risco financeiro |
+| **26** | `ISO-27001-e-27002` | SGSI, Anexo A, CIS Controls e NIST 800-53 | Trilha 6: Governança & Riscos | Govern | Matriz de Controles e Declaração de Aplicabilidade |
 | **27** | `LGPD-e-Privacidade` | Bases Legais, Direitos do Titular e RIPD/DPIA | Trilha 6: Governança & Riscos | Govern / Protect | Construtor de Avaliação de Impacto (RIPD) |
 | **28** | `Continuidade-e-Disaster-Recovery` | BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1 | Trilha 6: Governança & Riscos | Recover | Calculadora de RTO/RPO e estratégia 3-2-1 |
+| **29** | `Protecao-de-Dados-e-Conteudo` | DLP, AntiSpam e Filtro de Conteúdo | Trilha 2: Segurança Defensiva | Protect / Detect | Gateway de Conteúdo |
+| **30** | `Seguranca-de-Bancos-de-Dados` | Bancos de Dados Relacionais: SQL, Privilégios e Auditoria | Trilha 2: Segurança Defensiva | Protect / Detect | Matriz GRANT/REVOKE |
+| **31** | `PCI-DSS` | PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos | Trilha 6: Governança & Riscos | Govern / Protect | Delimitador de Escopo CDE |
+| **32** | `Ingles-Tecnico-Ciber` | Inglês Técnico para Segurança da Informação | Trilha 7: Carreira & Formação | Protect | Leitor de Advisory |
+| **33** | `Certificacoes-e-Carreira` | Formação, Certificações e Carreira | Trilha 7: Carreira & Formação | Protect | Planejador de Certificações |
 
 ---
 
@@ -84,7 +89,7 @@ A plataforma utiliza um pipeline de compilação em Python puro e Shell Script, 
 
 ### Estrutura do Pipeline
 
-- `_geradores/estudos.txt`: Catálogo canônico dos 28 estudos com metadados estruturais (slug, título, pasta, arquivo HTML, número da trilha, cor do tema e função NIST CSF 2.0).
+- `_geradores/estudos.txt`: Catálogo canônico dos 33 estudos com metadados estruturais (slug, título, pasta, arquivo HTML, número da trilha, cor do tema e função NIST CSF 2.0).
 - `_geradores/CURRICULO.md`: Matriz pedagógica detalhada com competências, pré-requisitos e especificações de cada simulador interativo.
 - `_geradores/GUIA-DO-AUTOR.md`: Manual editorial e técnico para criação de novos módulos ou expansão de conteúdo.
 - `_geradores/base.css` e `_geradores/base.js`: Design System responsivo com suporte a temas claro e escuro, além de controladores de quizzes, checklists e utilitários de simulação.

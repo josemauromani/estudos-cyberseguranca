@@ -21,13 +21,14 @@
   --muted: #566672;
   --rule: #D3DBE0;
 
-  /* Cores Temáticas das 6 Trilhas */
+  /* Cores Temáticas das 7 Trilhas */
   --t1-blue: #2563EB;     /* Trilha 1: Fundamentos & Princípios */
   --t2-green: #059669;    /* Trilha 2: Defesa & Operações Blue Team */
   --t3-red: #DC2626;      /* Trilha 3: Segurança Ofensiva & Red Team */
   --t4-purple: #7C3AED;   /* Trilha 4: Engenharia, Cloud & AppSec */
   --t5-cyan: #0891B2;     /* Trilha 5: Criptografia & Identidade */
   --t6-amber: #D97706;    /* Trilha 6: Governança, Risco & Regulação */
+  --t7-rose: #DB2777;
 
   /* Cores de Alerta / Callouts */
   --tip-color: #059669;
@@ -86,6 +87,7 @@
     --t4-purple: #A78BFA;
     --t5-cyan: #22D3EE;
     --t6-amber: #FBBF24;
+    --t7-rose: #F472B6;
 
     /* Alertas no Dark Mode */
     --tip-color: #34D399;
@@ -124,6 +126,7 @@
   --t4-purple: #A78BFA;
   --t5-cyan: #22D3EE;
   --t6-amber: #FBBF24;
+  --t7-rose: #F472B6;
 
   --tip-color: #34D399;
   --tip-bg: rgba(5, 150, 105, 0.18);
@@ -160,6 +163,7 @@
   --t4-purple: #7C3AED;
   --t5-cyan: #0891B2;
   --t6-amber: #D97706;
+  --t7-rose: #DB2777;
 
   --tip-color: #059669;
   --tip-bg: #ECFDF5;
@@ -380,6 +384,7 @@ pre code {
 .badge-t4 { background-color: rgba(124, 58, 237, 0.15); color: var(--t4-purple); }
 .badge-t5 { background-color: rgba(8, 145, 178, 0.15); color: var(--t5-cyan); }
 .badge-t6 { background-color: rgba(217, 119, 6, 0.15); color: var(--t6-amber); }
+.badge-t7 { background-color: rgba(219, 39, 119, 0.15); color: var(--t7-rose); }
 
 .hero-subtitle {
   font-size: 1.15rem;

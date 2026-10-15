@@ -2,13 +2,13 @@
 """
 Metadados Ricos e Catálogo Central — Estudos em Cibersegurança
 =============================================================
-Centraliza informações detalhadas dos 28 módulos temáticos, trilhas,
+Centraliza informações detalhadas dos 33 módulos temáticos, trilhas,
 funções NIST CSF 2.0, perfis de carreira e matriz de necessidades práticas.
 """
 
 from typing import Dict, List, Any
 
-# 1. TRILHAS ESTRUTURANTES (6 Trilhas)
+# 1. TRILHAS ESTRUTURANTES (7 Trilhas)
 TRILHAS: Dict[int, Dict[str, Any]] = {
     1: {
         "id": 1,
@@ -51,6 +51,13 @@ TRILHAS: Dict[int, Dict[str, Any]] = {
         "cor": "#D97706",
         "cor_nome": "amber",
         "descricao": "Alinhamento estratégico: Avaliação de riscos (ALE/SLE), SGSI ISO 27001/27002, privacidade LGPD e continuidade BCP/DRP.",
+    },
+    7: {
+        "id": 7,
+        "nome": "Carreira & Formação",
+        "cor": "#DB2777",
+        "cor_nome": "rose",
+        "descricao": "Inglês técnico, formação acadêmica, certificações e preparação para vagas de segurança.",
     },
 }
 
@@ -604,17 +611,17 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         ],
     },
     "Resposta-a-Incidentes": {
-        "titulo": "Ciclo NIST SP 800-61 (Contenção e Erradicação)",
-        "subtitulo": "Gestão operacional de crises cibernéticas, etapas formais de resposta e playbooks de contenção ágil",
+        "titulo": "Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)",
+        "subtitulo": "Gestão operacional de crises cibernéticas, ciclo clássico da Rev. 2, reorganização da Rev. 3 pelas funções do CSF 2.0 e playbooks de contenção ágil",
         "trilha": 4,
         "nist": "Respond",
         "mitre": "TA0040 Impact",
         "carreiras": ["Operações SOC & Resposta", "Perícia Forense & Malware", "GRC & Auditoria"],
         "tempo_minutos": 50,
-        "pergunta_chave": "Quais passos imediatos tomar para conter um ataque ativo sem destruir evidências forenses vitais?",
+        "pergunta_chave": "Quais passos imediatos tomar para conter um ataque ativo sem destruir evidências forenses vitais, seguindo o ciclo da Rev. 2 e a organização da Rev. 3?",
         "simulador_nome": "Runbook Interativo em Árvore de Decisão",
         "fatos": [
-            "Ciclo em 4 fases do NIST SP 800-61 Rev 2",
+            "Ciclo em 4 fases do NIST SP 800-61 Rev. 2 e a reorganização da Rev. 3 (2025) pelas funções do CSF 2.0",
             "Contenção de curto prazo vs contenção de longo prazo",
             "Condução de lições aprendidas e retrospectiva sem culpa",
             "Simulador de crise em árvore de decisão com ramificações",
@@ -723,35 +730,35 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         ],
     },
     "Gestao-de-Riscos-TI": {
-        "titulo": "Avaliação Qualitativa vs Quantitativa (ALE/SLE)",
-        "subtitulo": "Metodologias de análise de risco, matrizes 5x5, cálculo financeiro de perdas e justificativa de ROI",
+        "titulo": "ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)",
+        "subtitulo": "Processo da ISO 31000:2018, metodologias de análise de risco, matrizes 5x5, cálculo financeiro de perdas e justificativa de ROI",
         "trilha": 6,
         "nist": "Govern / Identify",
         "mitre": "Governança Corporativa",
         "carreiras": ["GRC & Auditoria"],
         "tempo_minutos": 45,
-        "pergunta_chave": "Como quantificar em reais o impacto de uma ameaça para justificar orçamentos de cibersegurança à diretoria?",
+        "pergunta_chave": "Como conduzir o processo de riscos da ISO 31000:2018 e quantificar em reais o impacto de uma ameaça para justificar orçamentos à diretoria?",
         "simulador_nome": "Calculadora de Matriz 5x5 e Risco Financeiro (ALE/SLE)",
         "fatos": [
-            "Normas ISO 31000 e NIST SP 800-30",
+            "Processo da ISO 31000:2018: contexto, identificação, análise, avaliação, tratamento, monitoramento e comunicação, ao lado do NIST SP 800-30",
             "Fórmulas quantitativas: SLE = AV * EF e ALE = SLE * ARO",
             "Estratégias de tratamento de risco: Mitigar, Aceitar, Transferir, Evitar",
             "Calculadora interativa com matriz 5x5 e cálculo de viabilidade ROSI",
         ],
     },
     "ISO-27001-e-27002": {
-        "titulo": "SGSI e Controles do Anexo A (Edição 2022)",
-        "subtitulo": "Estrutura do Sistema de Gestão de Segurança da Informação, os 93 controles e Declaração de Aplicabilidade",
+        "titulo": "SGSI, Anexo A, CIS Controls e NIST 800-53",
+        "subtitulo": "Estrutura do SGSI, os 93 controles do Anexo A, Declaração de Aplicabilidade e crosswalk com CIS Controls v8.1 e NIST SP 800-53 Rev. 5",
         "trilha": 6,
         "nist": "Govern",
         "mitre": "Conformidade Normativa",
         "carreiras": ["GRC & Auditoria"],
         "tempo_minutos": 50,
-        "pergunta_chave": "Como estruturar um SGSI auditável e alinhar controles técnicos e organizacionais ao padrão internacional?",
+        "pergunta_chave": "Como estruturar um SGSI auditável e mapear os controles do Anexo A para CIS Controls v8.1 (IG1/IG2/IG3) e NIST SP 800-53 Rev. 5?",
         "simulador_nome": "Matriz de Controles e Declaração de Aplicabilidade (SoA)",
         "fatos": [
             "Estrutura HLS da ISO/IEC 27001:2022 (cláusulas 4 a 10)",
-            "Os 93 controles consolidados em 4 temas organizacionais",
+            "Os 93 controles consolidados em 4 temas organizacionais, com crosswalk para CIS Controls v8.1 (IG1/IG2/IG3) e NIST SP 800-53 Rev. 5",
             "Elaboração e manutenção da Declaração de Aplicabilidade (SoA)",
             "Matriz interativa de aplicabilidade com sumário percentual",
         ],
@@ -788,6 +795,91 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
             "Definição e cálculo de SLAs de RTO e RPO",
             "Estratégia de backup 3-2-1 e cópias imutáveis/air-gapped",
             "Calculadora interativa de resiliência e simulação de perdas",
+        ],
+    },
+    "Protecao-de-Dados-e-Conteudo": {
+        "titulo": "DLP, AntiSpam e Filtro de Conteúdo",
+        "subtitulo": "Prevenção de perda de dados, autenticação de e-mail (SPF, DKIM, DMARC) e filtragem de conteúdo e URL em proxy seguro",
+        "trilha": 2,
+        "nist": "Protect / Detect",
+        "mitre": "TA0010 Exfiltration (T1048, T1567) / T1566 Phishing",
+        "carreiras": ["Blue Team & Defesa", "Operações SOC & Resposta", "GRC & Auditoria"],
+        "tempo_minutos": 50,
+        "pergunta_chave": "Como impedir que dados sensíveis saiam da organização por e-mail ou web sem bloquear o trabalho legítimo?",
+        "simulador_nome": "Gateway de Conteúdo",
+        "fatos": [
+            "DLP de rede, de endpoint e de nuvem (CASB), com detectores por regex, checksum (Luhn) e dicionário",
+            "Autenticação de e-mail com SPF, DKIM e DMARC (none, quarantine, reject) e antispam por reputação",
+            "Filtro de URL por categoria em SWG, inspeção TLS e o equilíbrio entre falso positivo e falso negativo",
+            "Simulador Gateway de Conteúdo: AntiSpam, DLP e filtro de URL com veredito Permitir, Quarentena ou Bloquear",
+        ],
+    },
+    "Seguranca-de-Bancos-de-Dados": {
+        "titulo": "Bancos de Dados Relacionais: SQL, Privilégios e Auditoria",
+        "subtitulo": "Modelo relacional, SQL DDL/DML/DCL, menor privilégio, auditoria nativa e proteção de dados em repouso",
+        "trilha": 2,
+        "nist": "Protect / Detect",
+        "mitre": "T1190 Exploit Public-Facing Application / T1078 Valid Accounts / T1213 Data from Information Repositories",
+        "carreiras": ["Blue Team & Defesa", "AppSec & DevSecOps", "GRC & Auditoria"],
+        "tempo_minutos": 50,
+        "pergunta_chave": "Quem pode ler e alterar cada tabela do banco, e como provar isso numa auditoria?",
+        "simulador_nome": "Matriz GRANT/REVOKE",
+        "fatos": [
+            "Modelo relacional, ACID e as linguagens SQL DDL, DML e DCL",
+            "Menor privilégio com roles, GRANT/REVOKE, views e Row-Level Security",
+            "TDE, criptografia de coluna, mascaramento dinâmico, auditoria nativa e prepared statements contra SQLi",
+            "Simulador Matriz GRANT/REVOKE com consultas permitidas ou negadas e trilha de auditoria",
+        ],
+    },
+    "PCI-DSS": {
+        "titulo": "PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos",
+        "subtitulo": "Os 6 objetivos e 12 requisitos do padrão de cartões, delimitação do CDE, segmentação para reduzir escopo e tipos de SAQ",
+        "trilha": 6,
+        "nist": "Govern / Protect",
+        "mitre": "TA0009 Collection / TA0010 Exfiltration",
+        "carreiras": ["GRC & Auditoria", "Blue Team & Defesa"],
+        "tempo_minutos": 45,
+        "pergunta_chave": "Quais sistemas entram no escopo do PCI DSS e como reduzir esse escopo sem abrir mão da conformidade?",
+        "simulador_nome": "Delimitador de Escopo CDE",
+        "fatos": [
+            "6 objetivos e 12 requisitos do PCI DSS v4.0.1, com a diferença entre abordagem definida e customizada",
+            "PAN versus dados sensíveis de autenticação (SAD) e tokenização versus truncamento versus criptografia",
+            "CDE, sistemas conectados, segmentação validada por teste, SAQ A, A-EP, B, C e D, ROC, QSA e AOC",
+            "Simulador Delimitador de Escopo CDE: sistemas dentro, conectados ou fora do escopo, com sugestão de SAQ",
+        ],
+    },
+    "Ingles-Tecnico-Ciber": {
+        "titulo": "Inglês Técnico para Segurança da Informação",
+        "subtitulo": "Leitura de advisories, registros CVE/NVD e RFCs, vocabulário essencial, falsos cognatos e redação técnica em inglês",
+        "trilha": 7,
+        "nist": "Protect",
+        "mitre": "N/A (módulo de carreira)",
+        "carreiras": ["Blue Team & Defesa", "Red Team & Pentest", "Operações SOC & Resposta", "Perícia Forense & Malware", "AppSec & DevSecOps", "GRC & Auditoria"],
+        "tempo_minutos": 40,
+        "pergunta_chave": "Como ler um boletim de segurança em inglês e extrair versão afetada, impacto e mitigação sem erro de interpretação?",
+        "simulador_nome": "Leitor de Advisory",
+        "fatos": [
+            "Estrutura de um advisory: Summary, Affected Versions, Impact, Mitigation e Workaround",
+            "Verbos modais normativos MUST, SHOULD e MAY conforme a RFC 2119",
+            "Falsos cognatos da área (exploit, eventually, actually) e diferença entre registro formal e informal",
+            "Simulador Leitor de Advisory: termos clicáveis, perguntas de compreensão e flashcards de glossário",
+        ],
+    },
+    "Certificacoes-e-Carreira": {
+        "titulo": "Formação, Certificações e Carreira",
+        "subtitulo": "Graduações e pós em segurança, certificações CEH, CISM, CISSP, CCSP, GSEC e Security+, e papéis do NICE Framework",
+        "trilha": 7,
+        "nist": "Protect",
+        "mitre": "N/A (módulo de carreira)",
+        "carreiras": ["Blue Team & Defesa", "Red Team & Pentest", "Operações SOC & Resposta", "Perícia Forense & Malware", "AppSec & DevSecOps", "GRC & Auditoria"],
+        "tempo_minutos": 35,
+        "pergunta_chave": "Qual combinação de formação e certificações leva ao perfil de carreira desejado, e que lacunas ainda restam?",
+        "simulador_nome": "Planejador de Certificações",
+        "fatos": [
+            "Graduações (Ciência da Computação, Sistemas de Informação) e pós-graduações em segurança da informação",
+            "Certificações de entrada, gestão e especialidade: órgão emissor, domínios, experiência exigida e CPE",
+            "NICE Framework (NIST SP 800-181) para descrever papéis profissionais",
+            "Simulador Planejador de Certificações: domínios cobertos pelo currículo, lacunas e ordem de estudo",
         ],
     },
 }

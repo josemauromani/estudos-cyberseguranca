@@ -11,8 +11,8 @@ class TestCurriculo(unittest.TestCase):
         self.curriculo_file = self.root / "_geradores" / "CURRICULO.md"
         self.guia_file = self.root / "_geradores" / "GUIA-DO-AUTOR.md"
 
-    def test_estudos_txt_contains_28_valid_entries(self):
-        """Verifica se estudos.txt existe e possui exatamente 28 registros válidos com 7 campos."""
+    def test_estudos_txt_contains_33_valid_entries(self):
+        """Verifica se estudos.txt existe e possui exatamente 33 registros válidos com 7 campos."""
         self.assertTrue(self.estudos_file.exists(), "estudos.txt deve existir")
 
         lines = [
@@ -20,7 +20,7 @@ class TestCurriculo(unittest.TestCase):
             for line in self.estudos_file.read_text(encoding="utf-8").splitlines()
             if line.strip() and not line.startswith("#")
         ]
-        self.assertEqual(len(lines), 28, f"Esperava 28 estudos, encontrou {len(lines)}")
+        self.assertEqual(len(lines), 33, f"Esperava 33 estudos, encontrou {len(lines)}")
 
         slugs = set()
         for line in lines:
@@ -32,7 +32,7 @@ class TestCurriculo(unittest.TestCase):
             slugs.add(slug)
 
             self.assertTrue(
-                1 <= int(trilha) <= 6, f"Trilha inválida em {slug}: {trilha} (deve ser 1 a 6)"
+                1 <= int(trilha) <= 7, f"Trilha inválida em {slug}: {trilha} (deve ser 1 a 7)"
             )
             self.assertTrue(
                 cor.startswith("#"), f"Cor inválida em {slug}: {cor} (deve iniciar com #)"

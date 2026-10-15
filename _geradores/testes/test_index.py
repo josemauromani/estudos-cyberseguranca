@@ -19,12 +19,12 @@ class TestIndexDados(unittest.TestCase):
         self.root = Path(__file__).resolve().parent.parent.parent
         self.estudos_txt = self.root / "_geradores" / "estudos.txt"
 
-    def test_estudos_dados_has_28_entries(self):
-        """Verifica se ESTUDOS_DADOS possui exatamente 28 estudos."""
-        self.assertEqual(len(ESTUDOS_DADOS), 28, "ESTUDOS_DADOS deve conter exatamente 28 estudos.")
+    def test_estudos_dados_has_33_entries(self):
+        """Verifica se ESTUDOS_DADOS possui exatamente 33 estudos."""
+        self.assertEqual(len(ESTUDOS_DADOS), 33, "ESTUDOS_DADOS deve conter exatamente 33 estudos.")
 
     def test_estudos_slugs_match_estudos_txt_exactly(self):
-        """Verifica se todos os 28 slugs em ESTUDOS_DADOS coincidem exatamente com estudos.txt."""
+        """Verifica se todos os 33 slugs em ESTUDOS_DADOS coincidem exatamente com estudos.txt."""
         self.assertTrue(self.estudos_txt.exists(), "estudos.txt deve existir.")
         slugs_txt = set()
         for linha in self.estudos_txt.read_text(encoding="utf-8").splitlines():
@@ -33,7 +33,7 @@ class TestIndexDados(unittest.TestCase):
                 slug = linha.split("|")[0].strip()
                 slugs_txt.add(slug)
 
-        self.assertEqual(len(slugs_txt), 28)
+        self.assertEqual(len(slugs_txt), 33)
         self.assertEqual(
             set(ESTUDOS_DADOS.keys()),
             slugs_txt,
@@ -62,15 +62,26 @@ class TestIndexDados(unittest.TestCase):
                     tipo,
                     f"Campo '{campo}' no estudo '{slug}' deve ser do tipo {tipo.__name__}, obteve {type(dados[campo]).__name__}",
                 )
-            self.assertTrue(1 <= dados["trilha"] <= 6, f"Trilha inválida em {slug}: {dados['trilha']}")
+            self.assertTrue(1 <= dados["trilha"] <= 7, f"Trilha inválida em {slug}: {dados['trilha']}")
             self.assertGreater(dados["tempo_minutos"], 0, f"Tempo deve ser positivo em {slug}")
             self.assertTrue(len(dados["carreiras"]) > 0, f"Lista de carreiras vazia em {slug}")
             self.assertTrue(len(dados["fatos"]) > 0, f"Lista de fatos vazia em {slug}")
 
+    def test_titulo_trilha_nist_coincidem_com_estudos_txt(self):
+        for linha in self.estudos_txt.read_text(encoding="utf-8").splitlines():
+            linha = linha.strip()
+            if not linha or linha.startswith("#"):
+                continue
+            slug, titulo, _pasta, _arq, trilha, _cor, nist = [p.strip() for p in linha.split("|")]
+            d = ESTUDOS_DADOS[slug]
+            self.assertEqual(d["titulo"], titulo, slug)
+            self.assertEqual(d["trilha"], int(trilha), slug)
+            self.assertEqual(d["nist"], nist, slug)
+
     def test_trilhas_definition(self):
-        """Verifica se as 6 trilhas estruturantes estão cadastradas com cor e descrição."""
-        self.assertEqual(len(TRILHAS), 6, "TRILHAS deve ter exatamente 6 registros.")
-        for tid in range(1, 7):
+        """Verifica se as 7 trilhas estruturantes estão cadastradas com cor e descrição."""
+        self.assertEqual(len(TRILHAS), 7, "TRILHAS deve ter exatamente 7 registros.")
+        for tid in range(1, 8):
             self.assertIn(tid, TRILHAS, f"Trilha ID {tid} ausente em TRILHAS.")
             info = TRILHAS[tid]
             self.assertEqual(info["id"], tid)
@@ -115,8 +126,8 @@ class TestBuildIndex(unittest.TestCase):
         self.assertIn("José Mauro da Silva Brandão", conteudo)
 
         # Estatísticas do masthead
-        self.assertIn("28", conteudo)  # 28 estudos
-        self.assertIn("6", conteudo)   # 6 trilhas
+        self.assertIn("33", conteudo)  # 33 estudos
+        self.assertIn("7", conteudo)   # 7 trilhas
         self.assertIn("simuladores", conteudo.lower())
 
         # Seções principais

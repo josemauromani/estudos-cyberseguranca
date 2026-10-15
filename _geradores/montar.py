@@ -237,7 +237,7 @@ def main(argv=None):
     parser.add_argument(
         "--trilha",
         default=None,
-        help="Número da trilha (1 a 6) para sobrescrever o valor do catálogo.",
+        help="Número da trilha (1 a 7) para sobrescrever o valor do catálogo.",
     )
 
     args = parser.parse_args(argv)
