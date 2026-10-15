@@ -4,9 +4,12 @@
 
 import sys
 import unittest
+from html import escape
 from pathlib import Path
 
 GERADORES_DIR = Path(__file__).resolve().parent.parent
+GERADORES = GERADORES_DIR
+ROOT = GERADORES_DIR.parent
 sys.path.insert(0, str(GERADORES_DIR))
 
 from index_dados import (  # noqa: E402
@@ -16,6 +19,13 @@ from index_dados import (  # noqa: E402
     NECESSIDADES,
     ROTA_VAGA,
     ROTULO_ANALISTA_SI,
+)
+
+from build_index import (  # noqa: E402
+    gerar_index_html,
+    render_certificacoes,
+    render_chip_modulo,
+    render_rota_vaga,
 )
 
 ESTUDOS_TXT = GERADORES_DIR / "estudos.txt"
@@ -59,6 +69,54 @@ class TestRotaVagaDados(unittest.TestCase):
         alvo = {"Protecao-de-Dados-e-Conteudo", "Seguranca-de-Bancos-de-Dados", "PCI-DSS",
                 "Ingles-Tecnico-Ciber", "Certificacoes-e-Carreira"}
         self.assertTrue(alvo <= {n["slug"] for n in NECESSIDADES})
+
+
+def _status(disponiveis):
+    return {s: {"disponivel": s in disponiveis, "caminho_relativo": f"{s}/treinamento-{s.lower()}.html"}
+            for s in SLUGS}
+
+
+class TestRotaVagaRender(unittest.TestCase):
+    def test_chip_disponivel_e_pendente(self):
+        st = _status({"Segmentacao-e-Firewall"})
+        self.assertIn('<a href="Segmentacao-e-Firewall/treinamento-segmentacao-e-firewall.html"',
+                      render_chip_modulo("Segmentacao-e-Firewall", st))
+        pend = render_chip_modulo("PCI-DSS", st)
+        self.assertIn('aria-disabled="true"', pend)
+        self.assertNotIn("<a ", pend)
+        self.assertIn("31 · ", pend)  # número do módulo = posição em estudos.txt
+
+    def test_contador_so_principais(self):
+        # 15 é só apoio em "solucoes"; não pode contar
+        html = render_rota_vaga(ROTA_VAGA, _status({"Engenharia-Social-e-Phishing"}))
+        self.assertIn("0 de 7 competências com módulo disponível", html)
+        html = render_rota_vaga(ROTA_VAGA, _status({"Segmentacao-e-Firewall", "Seguranca-de-Bancos-de-Dados"}))
+        self.assertIn("2 de 7 competências com módulo disponível", html)
+
+    def test_contador_zero(self):
+        self.assertIn("0 de 7", render_rota_vaga(ROTA_VAGA, _status(set())))
+
+    def test_certificacoes_render(self):
+        html = render_certificacoes(CERTIFICACOES, _status(set()))
+        for c in CERTIFICACOES:
+            self.assertIn(escape(c["sigla"]), html)
+        self.assertEqual(html.count('<tr class="cert-row"'), 6)
+        self.assertIn("Confira os requisitos atuais no site oficial do órgão emissor", html)
+
+    def test_portal_contem_secoes_na_ordem(self):
+        conteudo = Path(gerar_index_html(output_path=ROOT / "index.html")).read_text(encoding="utf-8")
+        i_nec = conteudo.index('id="secao-necessidades"')
+        i_rota = conteudo.index('id="secao-rota-vaga"')
+        i_cert = conteudo.index('id="secao-certificacoes"')
+        i_cat = conteudo.index('id="secao-catalogo"')
+        self.assertTrue(i_nec < i_rota < i_cert < i_cat)
+        self.assertIn("Rota por Vaga: Analista de Segurança da Informação", conteudo)
+        self.assertIn("Matriz de Certificações", conteudo)
+
+    def test_css_responsivo_certificacoes(self):
+        css = (GERADORES / "index.css").read_text(encoding="utf-8")
+        bloco = css[css.index("@media (max-width: 640px)"):]
+        self.assertIn(".cert-table", bloco)
 
 
 if __name__ == "__main__":

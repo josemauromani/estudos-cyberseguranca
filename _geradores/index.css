@@ -909,6 +909,120 @@ h1 {
 }
 
 /* ==========================================================================
+   Rota por Vaga e Matriz de Certificações
+   ========================================================================== */
+
+.vaga-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 36px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.vaga-section .needs-header h2 {
+  border-left: 4px solid var(--t7-rose);
+  padding-left: 10px;
+}
+
+.vaga-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+}
+
+.vaga-competencia {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--ground);
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--t7-rose);
+  border-radius: 6px;
+}
+
+.vaga-competencia h3 {
+  font-family: var(--display);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.vaga-texto {
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.vaga-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.vaga-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  background: var(--surface);
+  border: 1px solid var(--t7-rose);
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 0.78rem;
+  text-decoration: none;
+}
+
+a.vaga-chip:hover {
+  background: var(--sunk);
+  text-decoration: none;
+}
+
+.vaga-chip.apoio {
+  border-color: var(--rule);
+  border-style: dashed;
+  color: var(--muted);
+}
+
+.vaga-chip.pendente {
+  opacity: .55;
+  cursor: default;
+}
+
+.cert-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.cert-table th,
+.cert-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.cert-table th {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.cert-nome {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.cert-nota {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* ==========================================================================
    Responsividade Mobile (Menor que 768px)
    ========================================================================== */
 
@@ -936,5 +1050,46 @@ h1 {
 
   .btn-open-study, .btn-disabled {
     justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .vaga-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cert-table thead {
+    display: none;
+  }
+
+  .cert-table,
+  .cert-table tbody {
+    display: block;
+  }
+
+  .cert-table tr,
+  .cert-table td {
+    display: block;
+  }
+
+  .cert-table tr {
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+  }
+
+  .cert-table td {
+    border-bottom: 0;
+    padding: 6px 0;
+  }
+
+  .cert-table td::before {
+    content: attr(data-label);
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    color: var(--muted);
   }
 }

@@ -27,9 +27,11 @@ sys.path.insert(0, str(GERADORES_DIR))
 
 from index_dados import (
     CARREIRAS,
+    CERTIFICACOES,
     ESTUDOS_DADOS,
     FUNCOES_NIST,
     NECESSIDADES,
+    ROTA_VAGA,
     TRILHAS,
 )
 from montar import carregar_catalogo_estudos
@@ -211,6 +213,77 @@ def render_filtros_carreira(carreiras: Dict[str, dict]) -> str:
     return "\n        ".join(botoes)
 
 
+def render_chip_modulo(slug: str, status_map: Dict[str, dict], apoio: bool = False) -> str:
+    """Chip de módulo: link se disponível, senão span desabilitado."""
+    numero = list(ESTUDOS_DADOS).index(slug) + 1
+    texto = f"{numero:02d} · {escape(ESTUDOS_DADOS[slug]['titulo'])}"
+    info = status_map.get(slug, {"disponivel": False, "caminho_relativo": ""})
+    extra = " apoio" if apoio else ""
+    if info["disponivel"]:
+        href = escape(info["caminho_relativo"], quote=True)
+        return f'<a href="{href}" class="vaga-chip{extra}">{texto}</a>'
+    return f'<span class="vaga-chip pendente{extra}" aria-disabled="true" title="Em construção">{texto}</span>'
+
+
+def render_rota_vaga(rota: List[dict], status_map: Dict[str, dict]) -> str:
+    """Seção 'Rota por Vaga' com as competências e seus módulos."""
+    cobertas = sum(
+        1 for c in rota if any(status_map.get(s, {}).get("disponivel") for s in c["principais"])
+    )
+    artigos = []
+    for c in rota:
+        chips = [render_chip_modulo(s, status_map) for s in c["principais"]]
+        chips += [render_chip_modulo(s, status_map, apoio=True) for s in c["apoio"]]
+        chips_html = "\n          ".join(chips)
+        artigos.append(f"""      <article class="vaga-competencia" id="vaga-{escape(c['id'], quote=True)}">
+        <h3>{c['icone']} {escape(c['competencia'])}</h3>
+        <p class="vaga-texto">{escape(c['texto_vaga'])}</p>
+        <div class="vaga-chips">
+          {chips_html}
+        </div>
+      </article>""")
+    corpo = "\n".join(artigos)
+    return f"""    <section class="vaga-section" id="secao-rota-vaga">
+      <div class="needs-header">
+        <h2>🎯 Rota por Vaga: Analista de Segurança da Informação</h2>
+        <p>{cobertas} de {len(rota)} competências com módulo disponível</p>
+      </div>
+      <div class="vaga-grid">
+{corpo}
+      </div>
+    </section>"""
+
+
+def render_certificacoes(certs: List[dict], status_map: Dict[str, dict]) -> str:
+    """Seção 'Matriz de Certificações' (tabela responsiva)."""
+    linhas = []
+    for c in certs:
+        chips = " ".join(render_chip_modulo(s, status_map) for s in c["modulos"])
+        linhas.append(f"""          <tr class="cert-row">
+            <td data-label="Sigla"><strong>{escape(c['sigla'])}</strong><br><span class="cert-nome">{escape(c['nome'])}</span></td>
+            <td data-label="Órgão">{escape(c['orgao'])}</td>
+            <td data-label="Foco">{escape(c['foco'])}</td>
+            <td data-label="Experiência">{escape(c['experiencia'])}</td>
+            <td data-label="Módulos"><div class="vaga-chips">{chips}</div></td>
+          </tr>""")
+    corpo = "\n".join(linhas)
+    return f"""    <section class="vaga-section" id="secao-certificacoes">
+      <div class="needs-header">
+        <h2>🎓 Matriz de Certificações</h2>
+        <p>Quais módulos preparam para cada certificação.</p>
+      </div>
+      <table class="cert-table">
+        <thead>
+          <tr><th>Sigla</th><th>Órgão</th><th>Foco</th><th>Experiência</th><th>Módulos</th></tr>
+        </thead>
+        <tbody>
+{corpo}
+        </tbody>
+      </table>
+      <p class="cert-nota">Confira os requisitos atuais no site oficial do órgão emissor.</p>
+    </section>"""
+
+
 def gerar_index_html(
     output_path: Optional[Path] = None,
     css_path: Optional[Path] = None,
@@ -224,6 +297,8 @@ def gerar_index_html(
     stats = calcular_estatisticas(catalogo, ESTUDOS_DADOS)
 
     necessidades_html = render_necessidades_grid(NECESSIDADES)
+    rota_vaga_html = render_rota_vaga(ROTA_VAGA, stats["status_map"])
+    certificacoes_html = render_certificacoes(CERTIFICACOES, stats["status_map"])
     cards_html = render_study_cards(catalogo, ESTUDOS_DADOS, stats["status_map"])
 
     filtros_trilha_html = render_filtros_trilha(TRILHAS)
@@ -630,6 +705,10 @@ def gerar_index_html(
 {necessidades_html}
       </div>
     </section>
+
+{rota_vaga_html}
+
+{certificacoes_html}
 
     <!-- Seção Principal: Catálogo dos Estudos -->
     <main class="studies-section" id="secao-catalogo">
