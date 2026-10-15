@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Plataforma de estudos autoinstrucional e prática em cibersegurança com 28 módulos temáticos, 6 trilhas e simuladores interativos em JavaScript.">
+  <meta name="description" content="Plataforma de estudos autoinstrucional e prática em cibersegurança com 33 módulos temáticos, 7 trilhas e simuladores interativos em JavaScript.">
   <title>Estudos de Cibersegurança — Catálogo e Portal Central</title>
 
   <!-- Google Fonts: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono -->
@@ -27,13 +27,14 @@
   --accent: #2563EB;
   --accent-hover: #1D4ED8;
 
-  /* Cores das 6 Trilhas Temáticas */
+  /* Cores das 7 Trilhas Temáticas */
   --t1-blue: #2563EB;
   --t2-green: #059669;
   --t3-red: #DC2626;
   --t4-purple: #7C3AED;
   --t5-cyan: #0891B2;
   --t6-amber: #D97706;
+  --t7-rose: #DB2777;
 
   /* Estados de Sucesso / Conclusão */
   --good: #059669;
@@ -68,6 +69,7 @@
     --t4-purple: #A78BFA;
     --t5-cyan: #22D3EE;
     --t6-amber: #FBBF24;
+    --t7-rose: #F472B6;
 
     --good: #34D399;
     --good-tint: #064E3B;
@@ -96,6 +98,7 @@
   --t4-purple: #A78BFA;
   --t5-cyan: #22D3EE;
   --t6-amber: #FBBF24;
+  --t7-rose: #F472B6;
 
   --good: #34D399;
   --good-tint: #064E3B;
@@ -119,6 +122,7 @@
   --t4-purple: #7C3AED;
   --t5-cyan: #0891B2;
   --t6-amber: #D97706;
+  --t7-rose: #DB2777;
 
   --good: #059669;
   --good-tint: #D1FAE5;
@@ -695,6 +699,7 @@ h1 {
 .track-tile.t4 { background: var(--t4-purple); }
 .track-tile.t5 { background: var(--t5-cyan); }
 .track-tile.t6 { background: var(--t6-amber); }
+.track-tile.t7 { background: var(--t7-rose); }
 
 .card-badges {
   display: flex;
@@ -977,23 +982,23 @@ h1 {
       <!-- Barra de Estatísticas do Portal -->
       <div class="stats-bar">
         <div class="stat-item">
-          <span class="stat-number">28</span>
+          <span class="stat-number">33</span>
           <span class="stat-label">Estudos Mapeados</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">6</span>
+          <span class="stat-number">7</span>
           <span class="stat-label">Trilhas Temáticas</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">28</span>
+          <span class="stat-number">33</span>
           <span class="stat-label">Simuladores Interativos</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">~1265 min</span>
-          <span class="stat-label">Tempo Total (21.1h)</span>
+          <span class="stat-number">~1485 min</span>
+          <span class="stat-label">Tempo Total (24.8h)</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">11 / 28</span>
+          <span class="stat-number">11 / 33</span>
           <span class="stat-label">Módulos Compilados</span>
         </div>
       </div>
@@ -1003,7 +1008,7 @@ h1 {
     <section class="progress-section" aria-label="Progresso global">
       <div class="progress-header">
         <h2 class="progress-title">🎯 Progresso de Conclusão Global</h2>
-        <span class="progress-metrics" id="progress-text">0 de 28 concluídos (0%)</span>
+        <span class="progress-metrics" id="progress-text">0 de 33 concluídos (0%)</span>
       </div>
       <div class="progress-bar-track">
         <div class="progress-bar-fill" id="progress-bar"></div>
@@ -1035,20 +1040,21 @@ h1 {
         <button class="filter-badge" data-value="1" onclick="setSubFilter('1', this)">Trilha 1: Fundamentos &amp; Redes</button>
         <button class="filter-badge" data-value="2" onclick="setSubFilter('2', this)">Trilha 2: Segurança Defensiva</button>
         <button class="filter-badge" data-value="3" onclick="setSubFilter('3', this)">Trilha 3: Segurança Ofensiva</button>
-        <button class="filter-badge" data-value="4" onclick="setSubFilter('4', this)">Trilha 4: Operações &amp; SOC</button>
-        <button class="filter-badge" data-value="5" onclick="setSubFilter('5', this)">Trilha 5: Especialidades</button>
-        <button class="filter-badge" data-value="6" onclick="setSubFilter('6', this)">Trilha 6: Governança &amp; Riscos</button>
+        <button class="filter-badge" data-value="4" onclick="setSubFilter('4', this)">Trilha 4: Operações, SOC &amp; Resposta</button>
+        <button class="filter-badge" data-value="5" onclick="setSubFilter('5', this)">Trilha 5: Especialidades &amp; Fronteiras</button>
+        <button class="filter-badge" data-value="6" onclick="setSubFilter('6', this)">Trilha 6: Governança, Riscos &amp; Conformidade</button>
+        <button class="filter-badge" data-value="7" onclick="setSubFilter('7', this)">Trilha 7: Carreira &amp; Formação</button>
       </div>
 
       <!-- Painel: Por Perfil Profissional -->
       <div class="filter-subpanel" data-panel="carreiras" style="display: none;">
         <button class="filter-badge active" data-value="all" onclick="setSubFilter('all', this)">Todos os Perfis</button>
-        <button class="filter-badge" data-value="Blue Team &amp; Defesa" onclick="setSubFilter('Blue Team &amp; Defesa', this)">🛡️ Blue Team</button>
-        <button class="filter-badge" data-value="Red Team &amp; Pentest" onclick="setSubFilter('Red Team &amp; Pentest', this)">⚔️ Red Team</button>
-        <button class="filter-badge" data-value="AppSec &amp; DevSecOps" onclick="setSubFilter('AppSec &amp; DevSecOps', this)">💻 AppSec / DevSecOps</button>
-        <button class="filter-badge" data-value="Operações SOC &amp; Resposta" onclick="setSubFilter('Operações SOC &amp; Resposta', this)">👁️ SOC &amp; Resposta</button>
+        <button class="filter-badge" data-value="Blue Team &amp; Defesa" onclick="setSubFilter('Blue Team &amp; Defesa', this)">🛡️ Blue Team &amp; Defesa</button>
+        <button class="filter-badge" data-value="Red Team &amp; Pentest" onclick="setSubFilter('Red Team &amp; Pentest', this)">⚔️ Red Team &amp; Pentest</button>
+        <button class="filter-badge" data-value="AppSec &amp; DevSecOps" onclick="setSubFilter('AppSec &amp; DevSecOps', this)">💻 AppSec &amp; DevSecOps</button>
+        <button class="filter-badge" data-value="Operações SOC &amp; Resposta" onclick="setSubFilter('Operações SOC &amp; Resposta', this)">👁️ Operações SOC &amp; Resposta</button>
         <button class="filter-badge" data-value="GRC &amp; Auditoria" onclick="setSubFilter('GRC &amp; Auditoria', this)">📋 GRC &amp; Auditoria</button>
-        <button class="filter-badge" data-value="Perícia Forense &amp; Malware" onclick="setSubFilter('Perícia Forense &amp; Malware', this)">🔍 Forense Digital</button>
+        <button class="filter-badge" data-value="Perícia Forense &amp; Malware" onclick="setSubFilter('Perícia Forense &amp; Malware', this)">🔍 Perícia Forense &amp; Malware</button>
       </div>
 
       <!-- Painel: Por Função NIST CSF 2.0 -->
@@ -1063,7 +1069,7 @@ h1 {
       </div>
 
       <div class="results-info">
-        <span id="visible-count">Exibindo 28 de 28 estudos</span>
+        <span id="visible-count">Exibindo 33 de 33 estudos</span>
         <span>Atalhos: clique nas tags ou use o campo de busca</span>
       </div>
     </section>
@@ -1163,7 +1169,7 @@ h1 {
       <a href="#estudo-Resposta-a-Incidentes" class="need-card" onclick="focarEstudo('Resposta-a-Incidentes')">
         <span class="need-category">🚨 Incidentes</span>
         <span class="need-title">Preciso conter um incidente de ransomware seguindo o NIST SP 800-61</span>
-        <span class="need-target">→ Ver módulo: Ciclo NIST SP 800-61 (Contenção e Erradicação)</span>
+        <span class="need-target">→ Ver módulo: Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)</span>
       </a>
       <a href="#estudo-Forense-Digital" class="need-card" onclick="focarEstudo('Forense-Digital')">
         <span class="need-category">🔬 Forense</span>
@@ -1198,12 +1204,12 @@ h1 {
       <a href="#estudo-Gestao-de-Riscos-TI" class="need-card" onclick="focarEstudo('Gestao-de-Riscos-TI')">
         <span class="need-category">💰 Riscos</span>
         <span class="need-title">Preciso calcular o risco financeiro (ALE/SLE) para justificar investimentos</span>
-        <span class="need-target">→ Ver módulo: Avaliação Qualitativa vs Quantitativa (ALE/SLE)</span>
+        <span class="need-target">→ Ver módulo: ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)</span>
       </a>
       <a href="#estudo-ISO-27001-e-27002" class="need-card" onclick="focarEstudo('ISO-27001-e-27002')">
         <span class="need-category">📜 Conformidade</span>
         <span class="need-title">Preciso implementar os controles da ISO/IEC 27001:2022 e a SoA</span>
-        <span class="need-target">→ Ver módulo: SGSI e Controles do Anexo A (Edição 2022)</span>
+        <span class="need-target">→ Ver módulo: SGSI, Anexo A, CIS Controls e NIST 800-53</span>
       </a>
       <a href="#estudo-LGPD-e-Privacidade" class="need-card" onclick="focarEstudo('LGPD-e-Privacidade')">
         <span class="need-category">⚖️ Privacidade</span>
@@ -1218,7 +1224,7 @@ h1 {
       </div>
     </section>
 
-    <!-- Seção Principal: Catálogo dos 28 Estudos -->
+    <!-- Seção Principal: Catálogo dos Estudos -->
     <main class="studies-section" id="secao-catalogo">
       <div class="section-title-wrap">
         <h2 class="section-title">📚 Módulos e Treinamentos Práticos</h2>
@@ -1995,7 +2001,7 @@ h1 {
       data-trilha="4"
       data-nist="Respond"
       data-carreiras="Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,GRC &amp; Auditoria"
-      data-search="resposta-a-incidentes ciclo nist sp 800-61 (contenção e erradicação) gestão operacional de crises cibernéticas, etapas formais de resposta e playbooks de contenção ágil quais passos imediatos tomar para conter um ataque ativo sem destruir evidências forenses vitais? runbook interativo em árvore de decisão respond operações soc &amp; resposta,perícia forense &amp; malware,grc &amp; auditoria ciclo em 4 fases do nist sp 800-61 rev 2 contenção de curto prazo vs contenção de longo prazo condução de lições aprendidas e retrospectiva sem culpa simulador de crise em árvore de decisão com ramificações">
+      data-search="resposta-a-incidentes ciclo nist sp 800-61 rev. 2 e rev. 3 (contenção e erradicação) gestão operacional de crises cibernéticas, ciclo clássico da rev. 2, reorganização da rev. 3 pelas funções do csf 2.0 e playbooks de contenção ágil quais passos imediatos tomar para conter um ataque ativo sem destruir evidências forenses vitais, seguindo o ciclo da rev. 2 e a organização da rev. 3? runbook interativo em árvore de decisão respond operações soc &amp; resposta,perícia forense &amp; malware,grc &amp; auditoria ciclo em 4 fases do nist sp 800-61 rev. 2 e a reorganização da rev. 3 (2025) pelas funções do csf 2.0 contenção de curto prazo vs contenção de longo prazo condução de lições aprendidas e retrospectiva sem culpa simulador de crise em árvore de decisão com ramificações">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -2011,16 +2017,16 @@ h1 {
         <span class="status-badge preparo">Em elaboração</span>
       </div>
 
-      <h3 class="study-title">Ciclo NIST SP 800-61 (Contenção e Erradicação)</h3>
-      <p class="study-desc">Gestão operacional de crises cibernéticas, etapas formais de resposta e playbooks de contenção ágil</p>
+      <h3 class="study-title">Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)</h3>
+      <p class="study-desc">Gestão operacional de crises cibernéticas, ciclo clássico da Rev. 2, reorganização da Rev. 3 pelas funções do CSF 2.0 e playbooks de contenção ágil</p>
 
       <div class="study-ask">
         <strong>Responde a:</strong>
-        Quais passos imediatos tomar para conter um ataque ativo sem destruir evidências forenses vitais?
+        Quais passos imediatos tomar para conter um ataque ativo sem destruir evidências forenses vitais, seguindo o ciclo da Rev. 2 e a organização da Rev. 3?
       </div>
 
       <ul class="study-facts">
-          <li>Ciclo em 4 fases do NIST SP 800-61 Rev 2</li>
+          <li>Ciclo em 4 fases do NIST SP 800-61 Rev. 2 e a reorganização da Rev. 3 (2025) pelas funções do CSF 2.0</li>
           <li>Contenção de curto prazo vs contenção de longo prazo</li>
           <li>Condução de lições aprendidas e retrospectiva sem culpa</li>
           <li>Simulador de crise em árvore de decisão com ramificações</li>
@@ -2310,7 +2316,7 @@ h1 {
       data-trilha="6"
       data-nist="Govern / Identify"
       data-carreiras="GRC &amp; Auditoria"
-      data-search="gestao-de-riscos-ti avaliação qualitativa vs quantitativa (ale/sle) metodologias de análise de risco, matrizes 5x5, cálculo financeiro de perdas e justificativa de roi como quantificar em reais o impacto de uma ameaça para justificar orçamentos de cibersegurança à diretoria? calculadora de matriz 5x5 e risco financeiro (ale/sle) govern / identify grc &amp; auditoria normas iso 31000 e nist sp 800-30 fórmulas quantitativas: sle = av * ef e ale = sle * aro estratégias de tratamento de risco: mitigar, aceitar, transferir, evitar calculadora interativa com matriz 5x5 e cálculo de viabilidade rosi">
+      data-search="gestao-de-riscos-ti iso 31000 e avaliação qualitativa vs quantitativa (ale/sle) processo da iso 31000:2018, metodologias de análise de risco, matrizes 5x5, cálculo financeiro de perdas e justificativa de roi como conduzir o processo de riscos da iso 31000:2018 e quantificar em reais o impacto de uma ameaça para justificar orçamentos à diretoria? calculadora de matriz 5x5 e risco financeiro (ale/sle) govern / identify grc &amp; auditoria processo da iso 31000:2018: contexto, identificação, análise, avaliação, tratamento, monitoramento e comunicação, ao lado do nist sp 800-30 fórmulas quantitativas: sle = av * ef e ale = sle * aro estratégias de tratamento de risco: mitigar, aceitar, transferir, evitar calculadora interativa com matriz 5x5 e cálculo de viabilidade rosi">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -2326,16 +2332,16 @@ h1 {
         <span class="status-badge preparo">Em elaboração</span>
       </div>
 
-      <h3 class="study-title">Avaliação Qualitativa vs Quantitativa (ALE/SLE)</h3>
-      <p class="study-desc">Metodologias de análise de risco, matrizes 5x5, cálculo financeiro de perdas e justificativa de ROI</p>
+      <h3 class="study-title">ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)</h3>
+      <p class="study-desc">Processo da ISO 31000:2018, metodologias de análise de risco, matrizes 5x5, cálculo financeiro de perdas e justificativa de ROI</p>
 
       <div class="study-ask">
         <strong>Responde a:</strong>
-        Como quantificar em reais o impacto de uma ameaça para justificar orçamentos de cibersegurança à diretoria?
+        Como conduzir o processo de riscos da ISO 31000:2018 e quantificar em reais o impacto de uma ameaça para justificar orçamentos à diretoria?
       </div>
 
       <ul class="study-facts">
-          <li>Normas ISO 31000 e NIST SP 800-30</li>
+          <li>Processo da ISO 31000:2018: contexto, identificação, análise, avaliação, tratamento, monitoramento e comunicação, ao lado do NIST SP 800-30</li>
           <li>Fórmulas quantitativas: SLE = AV * EF e ALE = SLE * ARO</li>
           <li>Estratégias de tratamento de risco: Mitigar, Aceitar, Transferir, Evitar</li>
           <li>Calculadora interativa com matriz 5x5 e cálculo de viabilidade ROSI</li>
@@ -2355,7 +2361,7 @@ h1 {
       data-trilha="6"
       data-nist="Govern"
       data-carreiras="GRC &amp; Auditoria"
-      data-search="iso-27001-e-27002 sgsi e controles do anexo a (edição 2022) estrutura do sistema de gestão de segurança da informação, os 93 controles e declaração de aplicabilidade como estruturar um sgsi auditável e alinhar controles técnicos e organizacionais ao padrão internacional? matriz de controles e declaração de aplicabilidade (soa) govern grc &amp; auditoria estrutura hls da iso/iec 27001:2022 (cláusulas 4 a 10) os 93 controles consolidados em 4 temas organizacionais elaboração e manutenção da declaração de aplicabilidade (soa) matriz interativa de aplicabilidade com sumário percentual">
+      data-search="iso-27001-e-27002 sgsi, anexo a, cis controls e nist 800-53 estrutura do sgsi, os 93 controles do anexo a, declaração de aplicabilidade e crosswalk com cis controls v8.1 e nist sp 800-53 rev. 5 como estruturar um sgsi auditável e mapear os controles do anexo a para cis controls v8.1 (ig1/ig2/ig3) e nist sp 800-53 rev. 5? matriz de controles e declaração de aplicabilidade (soa) govern grc &amp; auditoria estrutura hls da iso/iec 27001:2022 (cláusulas 4 a 10) os 93 controles consolidados em 4 temas organizacionais, com crosswalk para cis controls v8.1 (ig1/ig2/ig3) e nist sp 800-53 rev. 5 elaboração e manutenção da declaração de aplicabilidade (soa) matriz interativa de aplicabilidade com sumário percentual">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -2371,17 +2377,17 @@ h1 {
         <span class="status-badge preparo">Em elaboração</span>
       </div>
 
-      <h3 class="study-title">SGSI e Controles do Anexo A (Edição 2022)</h3>
-      <p class="study-desc">Estrutura do Sistema de Gestão de Segurança da Informação, os 93 controles e Declaração de Aplicabilidade</p>
+      <h3 class="study-title">SGSI, Anexo A, CIS Controls e NIST 800-53</h3>
+      <p class="study-desc">Estrutura do SGSI, os 93 controles do Anexo A, Declaração de Aplicabilidade e crosswalk com CIS Controls v8.1 e NIST SP 800-53 Rev. 5</p>
 
       <div class="study-ask">
         <strong>Responde a:</strong>
-        Como estruturar um SGSI auditável e alinhar controles técnicos e organizacionais ao padrão internacional?
+        Como estruturar um SGSI auditável e mapear os controles do Anexo A para CIS Controls v8.1 (IG1/IG2/IG3) e NIST SP 800-53 Rev. 5?
       </div>
 
       <ul class="study-facts">
           <li>Estrutura HLS da ISO/IEC 27001:2022 (cláusulas 4 a 10)</li>
-          <li>Os 93 controles consolidados em 4 temas organizacionais</li>
+          <li>Os 93 controles consolidados em 4 temas organizacionais, com crosswalk para CIS Controls v8.1 (IG1/IG2/IG3) e NIST SP 800-53 Rev. 5</li>
           <li>Elaboração e manutenção da Declaração de Aplicabilidade (SoA)</li>
           <li>Matriz interativa de aplicabilidade com sumário percentual</li>
       </ul>
@@ -2485,6 +2491,231 @@ h1 {
       </div>
     </article>
 
+    <article class="study-card" id="estudo-Protecao-de-Dados-e-Conteudo"
+      data-slug="Protecao-de-Dados-e-Conteudo"
+      data-trilha="2"
+      data-nist="Protect / Detect"
+      data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,GRC &amp; Auditoria"
+      data-search="protecao-de-dados-e-conteudo dlp, antispam e filtro de conteúdo prevenção de perda de dados, autenticação de e-mail (spf, dkim, dmarc) e filtragem de conteúdo e url em proxy seguro como impedir que dados sensíveis saiam da organização por e-mail ou web sem bloquear o trabalho legítimo? gateway de conteúdo protect / detect blue team &amp; defesa,operações soc &amp; resposta,grc &amp; auditoria dlp de rede, de endpoint e de nuvem (casb), com detectores por regex, checksum (luhn) e dicionário autenticação de e-mail com spf, dkim e dmarc (none, quarantine, reject) e antispam por reputação filtro de url por categoria em swg, inspeção tls e o equilíbrio entre falso positivo e falso negativo simulador gateway de conteúdo: antispam, dlp e filtro de url com veredito permitir, quarentena ou bloquear">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t2" title="Trilha 2: Segurança Defensiva">
+            2
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect / Detect</span>
+            <span class="badge badge-time">⏱️ 50 min</span>
+            <span class="badge badge-sim">🧪 Gateway de Conteúdo</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">DLP, AntiSpam e Filtro de Conteúdo</h3>
+      <p class="study-desc">Prevenção de perda de dados, autenticação de e-mail (SPF, DKIM, DMARC) e filtragem de conteúdo e URL em proxy seguro</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como impedir que dados sensíveis saiam da organização por e-mail ou web sem bloquear o trabalho legítimo?
+      </div>
+
+      <ul class="study-facts">
+          <li>DLP de rede, de endpoint e de nuvem (CASB), com detectores por regex, checksum (Luhn) e dicionário</li>
+          <li>Autenticação de e-mail com SPF, DKIM e DMARC (none, quarantine, reject) e antispam por reputação</li>
+          <li>Filtro de URL por categoria em SWG, inspeção TLS e o equilíbrio entre falso positivo e falso negativo</li>
+          <li>Simulador Gateway de Conteúdo: AntiSpam, DLP e filtro de URL com veredito Permitir, Quarentena ou Bloquear</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Protecao-de-Dados-e-Conteudo" onchange="toggleDone('Protecao-de-Dados-e-Conteudo', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Seguranca-de-Bancos-de-Dados"
+      data-slug="Seguranca-de-Bancos-de-Dados"
+      data-trilha="2"
+      data-nist="Protect / Detect"
+      data-carreiras="Blue Team &amp; Defesa,AppSec &amp; DevSecOps,GRC &amp; Auditoria"
+      data-search="seguranca-de-bancos-de-dados bancos de dados relacionais: sql, privilégios e auditoria modelo relacional, sql ddl/dml/dcl, menor privilégio, auditoria nativa e proteção de dados em repouso quem pode ler e alterar cada tabela do banco, e como provar isso numa auditoria? matriz grant/revoke protect / detect blue team &amp; defesa,appsec &amp; devsecops,grc &amp; auditoria modelo relacional, acid e as linguagens sql ddl, dml e dcl menor privilégio com roles, grant/revoke, views e row-level security tde, criptografia de coluna, mascaramento dinâmico, auditoria nativa e prepared statements contra sqli simulador matriz grant/revoke com consultas permitidas ou negadas e trilha de auditoria">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t2" title="Trilha 2: Segurança Defensiva">
+            2
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect / Detect</span>
+            <span class="badge badge-time">⏱️ 50 min</span>
+            <span class="badge badge-sim">🧪 Matriz GRANT/REVOKE</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Bancos de Dados Relacionais: SQL, Privilégios e Auditoria</h3>
+      <p class="study-desc">Modelo relacional, SQL DDL/DML/DCL, menor privilégio, auditoria nativa e proteção de dados em repouso</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Quem pode ler e alterar cada tabela do banco, e como provar isso numa auditoria?
+      </div>
+
+      <ul class="study-facts">
+          <li>Modelo relacional, ACID e as linguagens SQL DDL, DML e DCL</li>
+          <li>Menor privilégio com roles, GRANT/REVOKE, views e Row-Level Security</li>
+          <li>TDE, criptografia de coluna, mascaramento dinâmico, auditoria nativa e prepared statements contra SQLi</li>
+          <li>Simulador Matriz GRANT/REVOKE com consultas permitidas ou negadas e trilha de auditoria</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Seguranca-de-Bancos-de-Dados" onchange="toggleDone('Seguranca-de-Bancos-de-Dados', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-PCI-DSS"
+      data-slug="PCI-DSS"
+      data-trilha="6"
+      data-nist="Govern / Protect"
+      data-carreiras="GRC &amp; Auditoria,Blue Team &amp; Defesa"
+      data-search="pci-dss pci dss v4.0.1: escopo cde e os 12 requisitos os 6 objetivos e 12 requisitos do padrão de cartões, delimitação do cde, segmentação para reduzir escopo e tipos de saq quais sistemas entram no escopo do pci dss e como reduzir esse escopo sem abrir mão da conformidade? delimitador de escopo cde govern / protect grc &amp; auditoria,blue team &amp; defesa 6 objetivos e 12 requisitos do pci dss v4.0.1, com a diferença entre abordagem definida e customizada pan versus dados sensíveis de autenticação (sad) e tokenização versus truncamento versus criptografia cde, sistemas conectados, segmentação validada por teste, saq a, a-ep, b, c e d, roc, qsa e aoc simulador delimitador de escopo cde: sistemas dentro, conectados ou fora do escopo, com sugestão de saq">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t6" title="Trilha 6: Governança, Riscos & Conformidade">
+            6
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Govern / Protect</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Delimitador de Escopo CDE</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos</h3>
+      <p class="study-desc">Os 6 objetivos e 12 requisitos do padrão de cartões, delimitação do CDE, segmentação para reduzir escopo e tipos de SAQ</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Quais sistemas entram no escopo do PCI DSS e como reduzir esse escopo sem abrir mão da conformidade?
+      </div>
+
+      <ul class="study-facts">
+          <li>6 objetivos e 12 requisitos do PCI DSS v4.0.1, com a diferença entre abordagem definida e customizada</li>
+          <li>PAN versus dados sensíveis de autenticação (SAD) e tokenização versus truncamento versus criptografia</li>
+          <li>CDE, sistemas conectados, segmentação validada por teste, SAQ A, A-EP, B, C e D, ROC, QSA e AOC</li>
+          <li>Simulador Delimitador de Escopo CDE: sistemas dentro, conectados ou fora do escopo, com sugestão de SAQ</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="PCI-DSS" onchange="toggleDone('PCI-DSS', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Ingles-Tecnico-Ciber"
+      data-slug="Ingles-Tecnico-Ciber"
+      data-trilha="7"
+      data-nist="Protect"
+      data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,AppSec &amp; DevSecOps,GRC &amp; Auditoria"
+      data-search="ingles-tecnico-ciber inglês técnico para segurança da informação leitura de advisories, registros cve/nvd e rfcs, vocabulário essencial, falsos cognatos e redação técnica em inglês como ler um boletim de segurança em inglês e extrair versão afetada, impacto e mitigação sem erro de interpretação? leitor de advisory protect blue team &amp; defesa,red team &amp; pentest,operações soc &amp; resposta,perícia forense &amp; malware,appsec &amp; devsecops,grc &amp; auditoria estrutura de um advisory: summary, affected versions, impact, mitigation e workaround verbos modais normativos must, should e may conforme a rfc 2119 falsos cognatos da área (exploit, eventually, actually) e diferença entre registro formal e informal simulador leitor de advisory: termos clicáveis, perguntas de compreensão e flashcards de glossário">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t7" title="Trilha 7: Carreira & Formação">
+            7
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 40 min</span>
+            <span class="badge badge-sim">🧪 Leitor de Advisory</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Inglês Técnico para Segurança da Informação</h3>
+      <p class="study-desc">Leitura de advisories, registros CVE/NVD e RFCs, vocabulário essencial, falsos cognatos e redação técnica em inglês</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como ler um boletim de segurança em inglês e extrair versão afetada, impacto e mitigação sem erro de interpretação?
+      </div>
+
+      <ul class="study-facts">
+          <li>Estrutura de um advisory: Summary, Affected Versions, Impact, Mitigation e Workaround</li>
+          <li>Verbos modais normativos MUST, SHOULD e MAY conforme a RFC 2119</li>
+          <li>Falsos cognatos da área (exploit, eventually, actually) e diferença entre registro formal e informal</li>
+          <li>Simulador Leitor de Advisory: termos clicáveis, perguntas de compreensão e flashcards de glossário</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Ingles-Tecnico-Ciber" onchange="toggleDone('Ingles-Tecnico-Ciber', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Certificacoes-e-Carreira"
+      data-slug="Certificacoes-e-Carreira"
+      data-trilha="7"
+      data-nist="Protect"
+      data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,AppSec &amp; DevSecOps,GRC &amp; Auditoria"
+      data-search="certificacoes-e-carreira formação, certificações e carreira graduações e pós em segurança, certificações ceh, cism, cissp, ccsp, gsec e security+, e papéis do nice framework qual combinação de formação e certificações leva ao perfil de carreira desejado, e que lacunas ainda restam? planejador de certificações protect blue team &amp; defesa,red team &amp; pentest,operações soc &amp; resposta,perícia forense &amp; malware,appsec &amp; devsecops,grc &amp; auditoria graduações (ciência da computação, sistemas de informação) e pós-graduações em segurança da informação certificações de entrada, gestão e especialidade: órgão emissor, domínios, experiência exigida e cpe nice framework (nist sp 800-181) para descrever papéis profissionais simulador planejador de certificações: domínios cobertos pelo currículo, lacunas e ordem de estudo">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t7" title="Trilha 7: Carreira & Formação">
+            7
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 35 min</span>
+            <span class="badge badge-sim">🧪 Planejador de Certificações</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Formação, Certificações e Carreira</h3>
+      <p class="study-desc">Graduações e pós em segurança, certificações CEH, CISM, CISSP, CCSP, GSEC e Security+, e papéis do NICE Framework</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Qual combinação de formação e certificações leva ao perfil de carreira desejado, e que lacunas ainda restam?
+      </div>
+
+      <ul class="study-facts">
+          <li>Graduações (Ciência da Computação, Sistemas de Informação) e pós-graduações em segurança da informação</li>
+          <li>Certificações de entrada, gestão e especialidade: órgão emissor, domínios, experiência exigida e CPE</li>
+          <li>NICE Framework (NIST SP 800-181) para descrever papéis profissionais</li>
+          <li>Simulador Planejador de Certificações: domínios cobertos pelo currículo, lacunas e ordem de estudo</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Certificacoes-e-Carreira" onchange="toggleDone('Certificacoes-e-Carreira', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
         <div class="no-results" id="no-results-msg" style="display: none;">
           <p>Nenhum estudo encontrado com os critérios de busca aplicados.</p>
           <button class="btn-open-study" onclick="clearSearch(); switchTab('todas');">Limpar Filtros e Busca</button>
@@ -2583,7 +2814,7 @@ h1 {
   // --------------------------------------------------------------------------
   // 3. Gerenciador de Progresso Global do Estudante
   // --------------------------------------------------------------------------
-  const TOTAL_ESTUDOS = 28;
+  const TOTAL_ESTUDOS = 33;
 
   function initProgress() {
     let concluidos = 0;
