@@ -85,6 +85,46 @@ class TestRotaVagaRender(unittest.TestCase):
         self.assertIn('aria-disabled="true"', pend)
         self.assertNotIn("<a ", pend)
         self.assertIn("31 · ", pend)  # número do módulo = posição em estudos.txt
+        self.assertIn("⏳ 31 · ", pend)
+        disp = render_chip_modulo("Segmentacao-e-Firewall", st)
+        self.assertNotIn("⏳", disp)
+
+    def test_css_pendente_sem_opacity(self):
+        css = (GERADORES / "index.css").read_text(encoding="utf-8")
+        ini = css.index(".vaga-chip.pendente {")
+        regra = css[ini:css.index("}", ini)]
+        self.assertNotIn("opacity", regra)
+        self.assertIn("dashed", regra)
+
+    def test_legenda_dos_estados(self):
+        html = render_rota_vaga(ROTA_VAGA, _status(set()))
+        self.assertIn("em construção", html)
+        self.assertIn("apoio", html)
+        self.assertIn('class="vaga-legenda"', html)
+
+    def test_texto_vaga_igual_a_competencia_omitido(self):
+        item = {"id": "x", "competencia": "Inglês", "texto_vaga": " inglês ", "icone": "🌍",
+                "principais": ["Ingles-Tecnico-Ciber"], "apoio": []}
+        html = render_rota_vaga([item], _status(set()))
+        self.assertNotIn('<p class="vaga-texto">', html)
+        item["texto_vaga"] = "Leitura de manuais em Inglês"
+        self.assertIn('<p class="vaga-texto">', render_rota_vaga([item], _status(set())))
+
+    def test_chips_ordenados_por_numero(self):
+        import re
+        item = next(c for c in ROTA_VAGA if c["id"] == "solucoes")
+        html = render_rota_vaga([item], _status(set()))
+        nums = re.findall(r"(\d\d) · ", html.split('class="vaga-chips"')[1])
+        principais = [f"{list(ESTUDOS_DADOS).index(s) + 1:02d}" for s in item["principais"]]
+        self.assertEqual(nums[:len(principais)], sorted(principais))
+        self.assertEqual(nums[:4], ["05", "07", "10", "29"])
+        apoio = nums[len(principais):]
+        self.assertEqual(apoio, sorted(apoio))
+
+    def test_botao_filtro_usa_dataset(self):
+        from build_index import _botao_filtro
+        b = _botao_filtro("O'Brien", "x")
+        self.assertIn('onclick="setSubFilter(this.dataset.value, this)"', b)
 
     def test_contador_so_principais(self):
         # 15 é só apoio em "solucoes"; não pode contar

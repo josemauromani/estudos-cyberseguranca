@@ -385,5 +385,5 @@ Para orientar estudantes e profissionais com focos específicos, a matriz curric
 5. **Rota Perícia & Resposta a Incidentes:**  
    `01 -> 02 -> 06 -> 10 -> 16 -> 18 -> 19 -> 20`
 6. **Rota 6: Analista de Segurança da Informação (vaga):**  
-   `01 -> 05 -> 07 -> 10 -> 29 -> 30 -> 06 -> 26 -> 25 -> 31 -> 18 -> 32 -> 33`  
+   `01 -> 05 -> 06 -> 07 -> 10 -> 29 -> 30 -> 25 -> 26 -> 31 -> 18 -> 32 -> 33`  
    Cada competência da vaga também aparece, com os módulos principais e de apoio, na seção "Rota por Vaga" do portal (`index.html`).

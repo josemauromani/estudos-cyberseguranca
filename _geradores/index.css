@@ -570,7 +570,7 @@ h1 {
 }
 
 /* ==========================================================================
-   Grid dos Cartões de Estudos (28 Módulos)
+   Grid dos Cartões de Estudos (Módulos)
    ========================================================================== */
 
 .studies-section {
@@ -980,14 +980,26 @@ a.vaga-chip:hover {
 }
 
 .vaga-chip.apoio {
+  background: transparent;
   border-color: var(--rule);
-  border-style: dashed;
   color: var(--muted);
+  font-size: 0.72rem;
 }
 
 .vaga-chip.pendente {
-  opacity: .55;
+  border-style: dashed;
+  color: var(--ink);
   cursor: default;
+}
+
+.vaga-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin: 8px 0 0;
 }
 
 .cert-table {

@@ -344,7 +344,7 @@ NECESSIDADES: List[Dict[str, str]] = [
         "icone": "💳",
     },
     {
-        "desafio": "Preciso ler um advisory de segurança em inglês com segurança",
+        "desafio": "Preciso ler e interpretar um advisory de segurança em inglês",
         "slug": "Ingles-Tecnico-Ciber",
         "categoria": "Inglês",
         "icone": "🌍",
@@ -469,7 +469,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
     },
 ]
 
-# 5. METADADOS RICOS DOS 28 ESTUDOS CANÔNICOS
+# 5. METADADOS RICOS DOS ESTUDOS CANÔNICOS
 ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
     "Fundamentos-Ciber": {
         "titulo": "Tríade CIA, Ameaças e Modelagem STRIDE",

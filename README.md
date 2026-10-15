@@ -37,7 +37,7 @@ xdg-open index.html          # No Linux
 
 O portal `index.html` conta com:
 - **Estatísticas em Tempo Real:** contagem de módulos disponíveis, horas estimadas e progresso individual de conclusão gravado no navegador.
-- **Filtros Dinâmicos:** visualização por trilha temática, perfil profissional (Blue Team, Red Team, AppSec, GRC, Cloud/DevSecOps) e função do NIST CSF 2.0.
+- **Filtros Dinâmicos:** visualização por trilha temática, perfil profissional (Blue Team, Red Team, AppSec, GRC, Cloud/DevSecOps, Analista de Segurança da Informação) e função do NIST CSF 2.0.
 - **Matriz "Escolha pela Necessidade":** atalhos para os módulos com base em problemas práticos reais do dia a dia corporativo.
 - **Busca Instantânea:** pesquisa rápida por título, termos técnicos ou conceitos-chave.
 

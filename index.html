@@ -584,7 +584,7 @@ h1 {
 }
 
 /* ==========================================================================
-   Grid dos Cartões de Estudos (28 Módulos)
+   Grid dos Cartões de Estudos (Módulos)
    ========================================================================== */
 
 .studies-section {
@@ -994,14 +994,26 @@ a.vaga-chip:hover {
 }
 
 .vaga-chip.apoio {
+  background: transparent;
   border-color: var(--rule);
-  border-style: dashed;
   color: var(--muted);
+  font-size: 0.72rem;
 }
 
 .vaga-chip.pendente {
-  opacity: .55;
+  border-style: dashed;
+  color: var(--ink);
   cursor: default;
+}
+
+.vaga-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin: 8px 0 0;
 }
 
 .cert-table {
@@ -1191,26 +1203,26 @@ a.vaga-chip:hover {
 
       <!-- Painel: Por Trilha -->
       <div class="filter-subpanel" data-panel="trilhas" style="display: none;">
-        <button class="filter-badge active" data-value="all" onclick="setSubFilter('all', this)">Todas as Trilhas</button>
-        <button class="filter-badge" data-value="1" onclick="setSubFilter('1', this)">Trilha 1: Fundamentos &amp; Redes</button>
-        <button class="filter-badge" data-value="2" onclick="setSubFilter('2', this)">Trilha 2: Segurança Defensiva</button>
-        <button class="filter-badge" data-value="3" onclick="setSubFilter('3', this)">Trilha 3: Segurança Ofensiva</button>
-        <button class="filter-badge" data-value="4" onclick="setSubFilter('4', this)">Trilha 4: Operações, SOC &amp; Resposta</button>
-        <button class="filter-badge" data-value="5" onclick="setSubFilter('5', this)">Trilha 5: Especialidades &amp; Fronteiras</button>
-        <button class="filter-badge" data-value="6" onclick="setSubFilter('6', this)">Trilha 6: Governança, Riscos &amp; Conformidade</button>
-        <button class="filter-badge" data-value="7" onclick="setSubFilter('7', this)">Trilha 7: Carreira &amp; Formação</button>
+        <button class="filter-badge active" data-value="all" onclick="setSubFilter(this.dataset.value, this)">Todas as Trilhas</button>
+        <button class="filter-badge" data-value="1" onclick="setSubFilter(this.dataset.value, this)">Trilha 1: Fundamentos &amp; Redes</button>
+        <button class="filter-badge" data-value="2" onclick="setSubFilter(this.dataset.value, this)">Trilha 2: Segurança Defensiva</button>
+        <button class="filter-badge" data-value="3" onclick="setSubFilter(this.dataset.value, this)">Trilha 3: Segurança Ofensiva</button>
+        <button class="filter-badge" data-value="4" onclick="setSubFilter(this.dataset.value, this)">Trilha 4: Operações, SOC &amp; Resposta</button>
+        <button class="filter-badge" data-value="5" onclick="setSubFilter(this.dataset.value, this)">Trilha 5: Especialidades &amp; Fronteiras</button>
+        <button class="filter-badge" data-value="6" onclick="setSubFilter(this.dataset.value, this)">Trilha 6: Governança, Riscos &amp; Conformidade</button>
+        <button class="filter-badge" data-value="7" onclick="setSubFilter(this.dataset.value, this)">Trilha 7: Carreira &amp; Formação</button>
       </div>
 
       <!-- Painel: Por Perfil Profissional -->
       <div class="filter-subpanel" data-panel="carreiras" style="display: none;">
-        <button class="filter-badge active" data-value="all" onclick="setSubFilter('all', this)">Todos os Perfis</button>
-        <button class="filter-badge" data-value="Blue Team &amp; Defesa" onclick="setSubFilter('Blue Team &amp; Defesa', this)">🛡️ Blue Team &amp; Defesa</button>
-        <button class="filter-badge" data-value="Red Team &amp; Pentest" onclick="setSubFilter('Red Team &amp; Pentest', this)">⚔️ Red Team &amp; Pentest</button>
-        <button class="filter-badge" data-value="AppSec &amp; DevSecOps" onclick="setSubFilter('AppSec &amp; DevSecOps', this)">💻 AppSec &amp; DevSecOps</button>
-        <button class="filter-badge" data-value="Operações SOC &amp; Resposta" onclick="setSubFilter('Operações SOC &amp; Resposta', this)">👁️ Operações SOC &amp; Resposta</button>
-        <button class="filter-badge" data-value="GRC &amp; Auditoria" onclick="setSubFilter('GRC &amp; Auditoria', this)">📋 GRC &amp; Auditoria</button>
-        <button class="filter-badge" data-value="Perícia Forense &amp; Malware" onclick="setSubFilter('Perícia Forense &amp; Malware', this)">🔍 Perícia Forense &amp; Malware</button>
-        <button class="filter-badge" data-value="Analista de Segurança da Informação" onclick="setSubFilter('Analista de Segurança da Informação', this)">🎯 Analista de Segurança da Informação</button>
+        <button class="filter-badge active" data-value="all" onclick="setSubFilter(this.dataset.value, this)">Todos os Perfis</button>
+        <button class="filter-badge" data-value="Blue Team &amp; Defesa" onclick="setSubFilter(this.dataset.value, this)">🛡️ Blue Team &amp; Defesa</button>
+        <button class="filter-badge" data-value="Red Team &amp; Pentest" onclick="setSubFilter(this.dataset.value, this)">⚔️ Red Team &amp; Pentest</button>
+        <button class="filter-badge" data-value="AppSec &amp; DevSecOps" onclick="setSubFilter(this.dataset.value, this)">💻 AppSec &amp; DevSecOps</button>
+        <button class="filter-badge" data-value="Operações SOC &amp; Resposta" onclick="setSubFilter(this.dataset.value, this)">👁️ Operações SOC &amp; Resposta</button>
+        <button class="filter-badge" data-value="GRC &amp; Auditoria" onclick="setSubFilter(this.dataset.value, this)">📋 GRC &amp; Auditoria</button>
+        <button class="filter-badge" data-value="Perícia Forense &amp; Malware" onclick="setSubFilter(this.dataset.value, this)">🔍 Perícia Forense &amp; Malware</button>
+        <button class="filter-badge" data-value="Analista de Segurança da Informação" onclick="setSubFilter(this.dataset.value, this)">🎯 Analista de Segurança da Informação</button>
       </div>
 
       <!-- Painel: Por Função NIST CSF 2.0 -->
@@ -1394,7 +1406,7 @@ a.vaga-chip:hover {
       </a>
       <a href="#estudo-Ingles-Tecnico-Ciber" class="need-card" onclick="focarEstudo('Ingles-Tecnico-Ciber')">
         <span class="need-category">🌍 Inglês</span>
-        <span class="need-title">Preciso ler um advisory de segurança em inglês com segurança</span>
+        <span class="need-title">Preciso ler e interpretar um advisory de segurança em inglês</span>
         <span class="need-target">→ Ver módulo: Inglês Técnico para Segurança da Informação</span>
       </a>
       <a href="#estudo-Certificacoes-e-Carreira" class="need-card" onclick="focarEstudo('Certificacoes-e-Carreira')">
@@ -1409,6 +1421,11 @@ a.vaga-chip:hover {
       <div class="needs-header">
         <h2>🎯 Rota por Vaga: Analista de Segurança da Informação</h2>
         <p>1 de 7 competências com módulo disponível</p>
+        <p class="vaga-legenda">Legenda:
+          <span class="vaga-chip">módulo disponível (link)</span>
+          <span class="vaga-chip pendente">⏳ em construção</span>
+          <span class="vaga-chip apoio">apoio (módulo complementar)</span>
+        </p>
       </div>
       <div class="vaga-grid">
       <article class="vaga-competencia" id="vaga-solucoes">
@@ -1416,51 +1433,48 @@ a.vaga-chip:hover {
         <p class="vaga-texto">Soluções de Cyber Security (Firewalls, Antivírus, DLP, AntiSpam, WAF, Filtro de conteúdo)</p>
         <div class="vaga-chips">
           <a href="Segmentacao-e-Firewall/treinamento-segmentacao-e-firewall.html" class="vaga-chip">05 · DMZ, VLANs, Regras de Firewall e Filtragem</a>
-          <a href="Seguranca-em-Endpoints-EDR/treinamento-seguranca-em-endpoints-edr.html" class="vaga-chip">10 · Antivírus, EDR/XDR e Proteção de Host</a>
-          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">29 · DLP, AntiSpam e Filtro de Conteúdo</span>
           <a href="Seguranca-de-Redes-Defesa/treinamento-seguranca-de-redes-defesa.html" class="vaga-chip">07 · IDS/IPS, WAF, VPNs e Proxies Reversos</a>
-          <span class="vaga-chip pendente apoio" aria-disabled="true" title="Em construção">15 · Pretexting, Spear Phishing e Defesas Humanas</span>
+          <a href="Seguranca-em-Endpoints-EDR/treinamento-seguranca-em-endpoints-edr.html" class="vaga-chip">10 · Antivírus, EDR/XDR e Proteção de Host</a>
+          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 29 · DLP, AntiSpam e Filtro de Conteúdo</span>
+          <span class="vaga-chip pendente apoio" aria-disabled="true" title="Em construção">⏳ 15 · Pretexting, Spear Phishing e Defesas Humanas</span>
         </div>
       </article>
       <article class="vaga-competencia" id="vaga-banco_dados">
         <h3>🗄️ Banco de dados relacionais</h3>
-        <p class="vaga-texto">Banco de dados relacionais</p>
         <div class="vaga-chips">
-          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">30 · Bancos de Dados Relacionais: SQL, Privilégios e Auditoria</span>
-          <span class="vaga-chip pendente apoio" aria-disabled="true" title="Em construção">12 · Falhas Web (SQLi, XSS, CSRF, Broken Auth)</span>
+          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 30 · Bancos de Dados Relacionais: SQL, Privilégios e Auditoria</span>
+          <span class="vaga-chip pendente apoio" aria-disabled="true" title="Em construção">⏳ 12 · Falhas Web (SQLi, XSS, CSRF, Broken Auth)</span>
         </div>
       </article>
       <article class="vaga-competencia" id="vaga-ingles">
         <h3>🌍 Inglês</h3>
-        <p class="vaga-texto">Inglês</p>
         <div class="vaga-chips">
-          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">32 · Inglês Técnico para Segurança da Informação</span>
+          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 32 · Inglês Técnico para Segurança da Informação</span>
         </div>
       </article>
       <article class="vaga-competencia" id="vaga-normas">
         <h3>📜 PCI-DSS, ISO 27001/27002, ISO 31000 e NIST</h3>
         <p class="vaga-texto">Requisitos PCI-DSS, ISO 27.001 e 27.002, 31.000 e NIST</p>
         <div class="vaga-chips">
-          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">31 · PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos</span>
-          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">26 · SGSI, Anexo A, CIS Controls e NIST 800-53</span>
-          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">25 · ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)</span>
-          <span class="vaga-chip pendente apoio" aria-disabled="true" title="Em construção">18 · Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)</span>
+          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 25 · ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)</span>
+          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 26 · SGSI, Anexo A, CIS Controls e NIST 800-53</span>
+          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 31 · PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos</span>
+          <span class="vaga-chip pendente apoio" aria-disabled="true" title="Em construção">⏳ 18 · Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)</span>
         </div>
       </article>
       <article class="vaga-competencia" id="vaga-resposta_incidentes">
         <h3>🚨 Resposta a incidentes</h3>
         <p class="vaga-texto">Resposta a incidentes de segurança da informação</p>
         <div class="vaga-chips">
-          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">18 · Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)</span>
-          <span class="vaga-chip pendente apoio" aria-disabled="true" title="Em construção">16 · Rotina de SOC L1/L2, Logs e Regras Sigma</span>
-          <span class="vaga-chip pendente apoio" aria-disabled="true" title="Em construção">19 · Cadeia de Custódia, Coleta de RAM e Artefatos</span>
+          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 18 · Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)</span>
+          <span class="vaga-chip pendente apoio" aria-disabled="true" title="Em construção">⏳ 16 · Rotina de SOC L1/L2, Logs e Regras Sigma</span>
+          <span class="vaga-chip pendente apoio" aria-disabled="true" title="Em construção">⏳ 19 · Cadeia de Custódia, Coleta de RAM e Artefatos</span>
         </div>
       </article>
       <article class="vaga-competencia" id="vaga-controles">
         <h3>🔐 Controles de segurança da informação</h3>
-        <p class="vaga-texto">Controles de segurança da Informação</p>
         <div class="vaga-chips">
-          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">26 · SGSI, Anexo A, CIS Controls e NIST 800-53</span>
+          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 26 · SGSI, Anexo A, CIS Controls e NIST 800-53</span>
           <a href="Hardening-Sistemas/treinamento-hardening-sistemas.html" class="vaga-chip apoio">06 · Bastionamento Linux e Windows (CIS Benchmarks)</a>
           <a href="Arquitetura-Zero-Trust/treinamento-arquitetura-zero-trust.html" class="vaga-chip apoio">08 · Princípios Zero Trust e Microsegmentação</a>
         </div>
@@ -1469,7 +1483,7 @@ a.vaga-chip:hover {
         <h3>🎓 Formação e certificações</h3>
         <p class="vaga-texto">Ensino Superior completo (preferencialmente Ciências da Computação ou Sistemas de Informação); Pós-graduação em Segurança da Informação e/ou certificação (CEH, CISM, CCSP, CISSP, GSEC)</p>
         <div class="vaga-chips">
-          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">33 · Formação, Certificações e Carreira</span>
+          <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 33 · Formação, Certificações e Carreira</span>
         </div>
       </article>
       </div>
@@ -1490,42 +1504,42 @@ a.vaga-chip:hover {
             <td data-label="Órgão">EC-Council</td>
             <td data-label="Foco">Técnica / ofensiva</td>
             <td data-label="Experiência">2 anos em SI ou treinamento oficial</td>
-            <td data-label="Módulos"><div class="vaga-chips"><a href="Redes-e-Protocolos/treinamento-redes-e-protocolos.html" class="vaga-chip">02 · TCP/IP, DNS, Roteamento e Inspeção de Tráfego</a> <a href="Reconhecimento-e-OSINT/treinamento-reconhecimento-e-osint.html" class="vaga-chip">11 · Superfície de Ataque, DNS, WHOIS e Shodan</a> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">12 · Falhas Web (SQLi, XSS, CSRF, Broken Auth)</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">13 · OWASP API Security, Rate Limiting e Tokens</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">14 · Fases do Pentest (PTES), Escopo e Relatório</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">15 · Pretexting, Spear Phishing e Defesas Humanas</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">20 · Análise Estática vs Dinâmica e Sandboxes</span></div></td>
+            <td data-label="Módulos"><div class="vaga-chips"><a href="Redes-e-Protocolos/treinamento-redes-e-protocolos.html" class="vaga-chip">02 · TCP/IP, DNS, Roteamento e Inspeção de Tráfego</a> <a href="Reconhecimento-e-OSINT/treinamento-reconhecimento-e-osint.html" class="vaga-chip">11 · Superfície de Ataque, DNS, WHOIS e Shodan</a> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 12 · Falhas Web (SQLi, XSS, CSRF, Broken Auth)</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 13 · OWASP API Security, Rate Limiting e Tokens</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 14 · Fases do Pentest (PTES), Escopo e Relatório</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 15 · Pretexting, Spear Phishing e Defesas Humanas</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 20 · Análise Estática vs Dinâmica e Sandboxes</span></div></td>
           </tr>
           <tr class="cert-row">
             <td data-label="Sigla"><strong>CISM</strong><br><span class="cert-nome">Certified Information Security Manager</span></td>
             <td data-label="Órgão">ISACA</td>
             <td data-label="Foco">Gestão de programa de SI</td>
             <td data-label="Experiência">5 anos em SI, sendo 3 em gestão</td>
-            <td data-label="Módulos"><div class="vaga-chips"><span class="vaga-chip pendente" aria-disabled="true" title="Em construção">18 · Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">25 · ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">26 · SGSI, Anexo A, CIS Controls e NIST 800-53</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">28 · BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">31 · PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos</span></div></td>
+            <td data-label="Módulos"><div class="vaga-chips"><span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 18 · Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 25 · ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 26 · SGSI, Anexo A, CIS Controls e NIST 800-53</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 28 · BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 31 · PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos</span></div></td>
           </tr>
           <tr class="cert-row">
             <td data-label="Sigla"><strong>CISSP</strong><br><span class="cert-nome">Certified Information Systems Security Professional</span></td>
             <td data-label="Órgão">ISC2</td>
             <td data-label="Foco">Generalista sênior (8 domínios)</td>
             <td data-label="Experiência">5 anos em 2+ domínios (1 ano dispensável por graduação ou certificação aprovada)</td>
-            <td data-label="Módulos"><div class="vaga-chips"><a href="Fundamentos-Ciber/treinamento-fundamentos-ciber.html" class="vaga-chip">01 · Tríade CIA, Ameaças e Modelagem STRIDE</a> <a href="Criptografia-Pratica/treinamento-criptografia-pratica.html" class="vaga-chip">03 · Criptografia Simétrica, Assimétrica, Hashes e PKI</a> <a href="Autenticacao-e-IAM/treinamento-autenticacao-e-iam.html" class="vaga-chip">04 · Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</a> <a href="Segmentacao-e-Firewall/treinamento-segmentacao-e-firewall.html" class="vaga-chip">05 · DMZ, VLANs, Regras de Firewall e Filtragem</a> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">18 · Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">22 · Shift-Left, SAST, DAST, SCA e Containers</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">25 · ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">26 · SGSI, Anexo A, CIS Controls e NIST 800-53</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">28 · BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">30 · Bancos de Dados Relacionais: SQL, Privilégios e Auditoria</span></div></td>
+            <td data-label="Módulos"><div class="vaga-chips"><a href="Fundamentos-Ciber/treinamento-fundamentos-ciber.html" class="vaga-chip">01 · Tríade CIA, Ameaças e Modelagem STRIDE</a> <a href="Criptografia-Pratica/treinamento-criptografia-pratica.html" class="vaga-chip">03 · Criptografia Simétrica, Assimétrica, Hashes e PKI</a> <a href="Autenticacao-e-IAM/treinamento-autenticacao-e-iam.html" class="vaga-chip">04 · Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</a> <a href="Segmentacao-e-Firewall/treinamento-segmentacao-e-firewall.html" class="vaga-chip">05 · DMZ, VLANs, Regras de Firewall e Filtragem</a> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 18 · Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 22 · Shift-Left, SAST, DAST, SCA e Containers</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 25 · ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 26 · SGSI, Anexo A, CIS Controls e NIST 800-53</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 28 · BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 30 · Bancos de Dados Relacionais: SQL, Privilégios e Auditoria</span></div></td>
           </tr>
           <tr class="cert-row">
             <td data-label="Sigla"><strong>CCSP</strong><br><span class="cert-nome">Certified Cloud Security Professional</span></td>
             <td data-label="Órgão">ISC2</td>
             <td data-label="Foco">Segurança em nuvem (6 domínios)</td>
             <td data-label="Experiência">5 anos em TI, sendo 3 em SI e 1 em nuvem (CISSP substitui)</td>
-            <td data-label="Módulos"><div class="vaga-chips"><a href="Criptografia-Pratica/treinamento-criptografia-pratica.html" class="vaga-chip">03 · Criptografia Simétrica, Assimétrica, Hashes e PKI</a> <a href="Autenticacao-e-IAM/treinamento-autenticacao-e-iam.html" class="vaga-chip">04 · Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</a> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">21 · Responsabilidade Compartilhada e CSPM</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">22 · Shift-Left, SAST, DAST, SCA e Containers</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">27 · Bases Legais, Direitos do Titular e RIPD/DPIA</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">30 · Bancos de Dados Relacionais: SQL, Privilégios e Auditoria</span></div></td>
+            <td data-label="Módulos"><div class="vaga-chips"><a href="Criptografia-Pratica/treinamento-criptografia-pratica.html" class="vaga-chip">03 · Criptografia Simétrica, Assimétrica, Hashes e PKI</a> <a href="Autenticacao-e-IAM/treinamento-autenticacao-e-iam.html" class="vaga-chip">04 · Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</a> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 21 · Responsabilidade Compartilhada e CSPM</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 22 · Shift-Left, SAST, DAST, SCA e Containers</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 27 · Bases Legais, Direitos do Titular e RIPD/DPIA</span> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 30 · Bancos de Dados Relacionais: SQL, Privilégios e Auditoria</span></div></td>
           </tr>
           <tr class="cert-row">
             <td data-label="Sigla"><strong>GSEC</strong><br><span class="cert-nome">GIAC Security Essentials</span></td>
             <td data-label="Órgão">GIAC (SANS)</td>
             <td data-label="Foco">Técnica generalista</td>
             <td data-label="Experiência">Sem exigência formal</td>
-            <td data-label="Módulos"><div class="vaga-chips"><a href="Redes-e-Protocolos/treinamento-redes-e-protocolos.html" class="vaga-chip">02 · TCP/IP, DNS, Roteamento e Inspeção de Tráfego</a> <a href="Criptografia-Pratica/treinamento-criptografia-pratica.html" class="vaga-chip">03 · Criptografia Simétrica, Assimétrica, Hashes e PKI</a> <a href="Segmentacao-e-Firewall/treinamento-segmentacao-e-firewall.html" class="vaga-chip">05 · DMZ, VLANs, Regras de Firewall e Filtragem</a> <a href="Hardening-Sistemas/treinamento-hardening-sistemas.html" class="vaga-chip">06 · Bastionamento Linux e Windows (CIS Benchmarks)</a> <a href="Seguranca-de-Redes-Defesa/treinamento-seguranca-de-redes-defesa.html" class="vaga-chip">07 · IDS/IPS, WAF, VPNs e Proxies Reversos</a> <a href="Seguranca-em-Endpoints-EDR/treinamento-seguranca-em-endpoints-edr.html" class="vaga-chip">10 · Antivírus, EDR/XDR e Proteção de Host</a> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">16 · Rotina de SOC L1/L2, Logs e Regras Sigma</span></div></td>
+            <td data-label="Módulos"><div class="vaga-chips"><a href="Redes-e-Protocolos/treinamento-redes-e-protocolos.html" class="vaga-chip">02 · TCP/IP, DNS, Roteamento e Inspeção de Tráfego</a> <a href="Criptografia-Pratica/treinamento-criptografia-pratica.html" class="vaga-chip">03 · Criptografia Simétrica, Assimétrica, Hashes e PKI</a> <a href="Segmentacao-e-Firewall/treinamento-segmentacao-e-firewall.html" class="vaga-chip">05 · DMZ, VLANs, Regras de Firewall e Filtragem</a> <a href="Hardening-Sistemas/treinamento-hardening-sistemas.html" class="vaga-chip">06 · Bastionamento Linux e Windows (CIS Benchmarks)</a> <a href="Seguranca-de-Redes-Defesa/treinamento-seguranca-de-redes-defesa.html" class="vaga-chip">07 · IDS/IPS, WAF, VPNs e Proxies Reversos</a> <a href="Seguranca-em-Endpoints-EDR/treinamento-seguranca-em-endpoints-edr.html" class="vaga-chip">10 · Antivírus, EDR/XDR e Proteção de Host</a> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 16 · Rotina de SOC L1/L2, Logs e Regras Sigma</span></div></td>
           </tr>
           <tr class="cert-row">
             <td data-label="Sigla"><strong>Security+</strong><br><span class="cert-nome">CompTIA Security+ (SY0-701)</span></td>
             <td data-label="Órgão">CompTIA</td>
             <td data-label="Foco">Entrada / fundamentos</td>
             <td data-label="Experiência">Recomendada, sem exigência formal</td>
-            <td data-label="Módulos"><div class="vaga-chips"><a href="Fundamentos-Ciber/treinamento-fundamentos-ciber.html" class="vaga-chip">01 · Tríade CIA, Ameaças e Modelagem STRIDE</a> <a href="Redes-e-Protocolos/treinamento-redes-e-protocolos.html" class="vaga-chip">02 · TCP/IP, DNS, Roteamento e Inspeção de Tráfego</a> <a href="Criptografia-Pratica/treinamento-criptografia-pratica.html" class="vaga-chip">03 · Criptografia Simétrica, Assimétrica, Hashes e PKI</a> <a href="Autenticacao-e-IAM/treinamento-autenticacao-e-iam.html" class="vaga-chip">04 · Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</a> <a href="Segmentacao-e-Firewall/treinamento-segmentacao-e-firewall.html" class="vaga-chip">05 · DMZ, VLANs, Regras de Firewall e Filtragem</a> <a href="Gestao-de-Vulnerabilidades/treinamento-gestao-de-vulnerabilidades.html" class="vaga-chip">09 · CVE, CVSS v3.1/v4.0 e Priorização de Patches</a> <a href="Seguranca-em-Endpoints-EDR/treinamento-seguranca-em-endpoints-edr.html" class="vaga-chip">10 · Antivírus, EDR/XDR e Proteção de Host</a> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">18 · Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)</span></div></td>
+            <td data-label="Módulos"><div class="vaga-chips"><a href="Fundamentos-Ciber/treinamento-fundamentos-ciber.html" class="vaga-chip">01 · Tríade CIA, Ameaças e Modelagem STRIDE</a> <a href="Redes-e-Protocolos/treinamento-redes-e-protocolos.html" class="vaga-chip">02 · TCP/IP, DNS, Roteamento e Inspeção de Tráfego</a> <a href="Criptografia-Pratica/treinamento-criptografia-pratica.html" class="vaga-chip">03 · Criptografia Simétrica, Assimétrica, Hashes e PKI</a> <a href="Autenticacao-e-IAM/treinamento-autenticacao-e-iam.html" class="vaga-chip">04 · Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</a> <a href="Segmentacao-e-Firewall/treinamento-segmentacao-e-firewall.html" class="vaga-chip">05 · DMZ, VLANs, Regras de Firewall e Filtragem</a> <a href="Gestao-de-Vulnerabilidades/treinamento-gestao-de-vulnerabilidades.html" class="vaga-chip">09 · CVE, CVSS v3.1/v4.0 e Priorização de Patches</a> <a href="Seguranca-em-Endpoints-EDR/treinamento-seguranca-em-endpoints-edr.html" class="vaga-chip">10 · Antivírus, EDR/XDR e Proteção de Host</a> <span class="vaga-chip pendente" aria-disabled="true" title="Em construção">⏳ 18 · Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)</span></div></td>
           </tr>
         </tbody>
       </table>

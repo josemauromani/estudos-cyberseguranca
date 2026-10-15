@@ -467,7 +467,7 @@
     | RESPOND | 3 | 18, 19, 20 |
     | RECOVER | 1 | 28 |
 
-  - §5: `6. **Rota 6: Analista de Segurança da Informação (vaga):**` com a sequência `01 -> 05 -> 07 -> 10 -> 29 -> 30 -> 06 -> 26 -> 25 -> 31 -> 18 -> 32 -> 33`, seguida de uma frase que remete à seção do portal.
+  - §5: `6. **Rota 6: Analista de Segurança da Informação (vaga):**` com a sequência `01 -> 05 -> 06 -> 07 -> 10 -> 29 -> 30 -> 25 -> 26 -> 31 -> 18 -> 32 -> 33`, seguida de uma frase que remete à seção do portal.
 
 - [ ] **Step 4: Conferir a tabela NIST**
 

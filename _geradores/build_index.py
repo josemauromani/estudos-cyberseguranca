@@ -192,7 +192,7 @@ def _botao_filtro(valor: str, rotulo: str, ativo: bool = False) -> str:
     classe = "filter-badge active" if ativo else "filter-badge"
     return (
         f'<button class="{classe}" data-value="{valor}" '
-        f"onclick=\"setSubFilter('{valor}', this)\">{rotulo}</button>"
+        f'onclick="setSubFilter(this.dataset.value, this)">{rotulo}</button>'
     )
 
 
@@ -218,6 +218,8 @@ def render_chip_modulo(slug: str, status_map: Dict[str, dict], apoio: bool = Fal
     numero = list(ESTUDOS_DADOS).index(slug) + 1
     texto = f"{numero:02d} · {escape(ESTUDOS_DADOS[slug]['titulo'])}"
     info = status_map.get(slug, {"disponivel": False, "caminho_relativo": ""})
+    if not info["disponivel"]:
+        texto = f"⏳ {texto}"
     extra = " apoio" if apoio else ""
     if info["disponivel"]:
         href = escape(info["caminho_relativo"], quote=True)
@@ -232,12 +234,16 @@ def render_rota_vaga(rota: List[dict], status_map: Dict[str, dict]) -> str:
     )
     artigos = []
     for c in rota:
-        chips = [render_chip_modulo(s, status_map) for s in c["principais"]]
-        chips += [render_chip_modulo(s, status_map, apoio=True) for s in c["apoio"]]
+        por_numero = lambda s: list(ESTUDOS_DADOS).index(s)  # noqa: E731
+        chips = [render_chip_modulo(s, status_map) for s in sorted(c["principais"], key=por_numero)]
+        chips += [render_chip_modulo(s, status_map, apoio=True) for s in sorted(c["apoio"], key=por_numero)]
         chips_html = "\n          ".join(chips)
+        if c["texto_vaga"].strip().lower() == c["competencia"].strip().lower():
+            texto_html = ""
+        else:
+            texto_html = f"\n        <p class=\"vaga-texto\">{escape(c['texto_vaga'])}</p>"
         artigos.append(f"""      <article class="vaga-competencia" id="vaga-{escape(c['id'], quote=True)}">
-        <h3>{c['icone']} {escape(c['competencia'])}</h3>
-        <p class="vaga-texto">{escape(c['texto_vaga'])}</p>
+        <h3>{c['icone']} {escape(c['competencia'])}</h3>{texto_html}
         <div class="vaga-chips">
           {chips_html}
         </div>
@@ -247,6 +253,11 @@ def render_rota_vaga(rota: List[dict], status_map: Dict[str, dict]) -> str:
       <div class="needs-header">
         <h2>🎯 Rota por Vaga: Analista de Segurança da Informação</h2>
         <p>{cobertas} de {len(rota)} competências com módulo disponível</p>
+        <p class="vaga-legenda">Legenda:
+          <span class="vaga-chip">módulo disponível (link)</span>
+          <span class="vaga-chip pendente">⏳ em construção</span>
+          <span class="vaga-chip apoio">apoio (módulo complementar)</span>
+        </p>
       </div>
       <div class="vaga-grid">
 {corpo}

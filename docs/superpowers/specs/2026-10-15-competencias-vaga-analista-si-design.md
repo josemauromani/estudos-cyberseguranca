@@ -1,7 +1,7 @@
 # Design Spec: Competências da Vaga "Analista de Segurança da Informação"
 
 **Data:** 2026-10-15
-**Status:** Em Revisão (Aguardando Aprovação do Usuário)
+**Status:** Aprovada e implementada (branch feat/competencias-vaga-analista-si)
 **Repositório:** `estudos_cyberseguranca`
 **Spec de origem:** [`2026-10-06-estudos-cyberseguranca-design.md`](2026-10-06-estudos-cyberseguranca-design.md)
 **Referência Metodológica:** Superpowers Spec-Driven Development (SDD)
@@ -249,7 +249,7 @@ O filtro de carreira em `build_index.py` usa `cardCarreiras.includes(valor)`. Ne
 | Preciso impedir vazamento de CPF e cartões por e-mail e upload | Protecao-de-Dados-e-Conteudo | DLP | 🚫 |
 | Preciso aplicar menor privilégio e auditoria em um banco de dados | Seguranca-de-Bancos-de-Dados | Banco de Dados | 🗄️ |
 | Preciso delimitar o escopo PCI-DSS de um ambiente de pagamento | PCI-DSS | Conformidade | 💳 |
-| Preciso ler um advisory de segurança em inglês com segurança | Ingles-Tecnico-Ciber | Inglês | 🌍 |
+| Preciso ler e interpretar um advisory de segurança em inglês | Ingles-Tecnico-Ciber | Inglês | 🌍 |
 | Preciso escolher qual certificação de segurança tirar primeiro | Certificacoes-e-Carreira | Carreira | 🎓 |
 
 ### 3.5 Seções novas no portal (`index.html`)
