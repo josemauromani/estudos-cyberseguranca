@@ -5,8 +5,13 @@ test_autenticacao_iam.py
 Testes automatizados para o Estudo 04: Autenticacao-e-IAM
 """
 
+import sys
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from index_dados import ESTUDOS_DADOS  # noqa: E402
 
 
 class TestAutenticacaoIAM(unittest.TestCase):
@@ -81,7 +86,7 @@ class TestAutenticacaoIAM(unittest.TestCase):
 
         self.assertIn("Autenticacao-e-IAM/treinamento-autenticacao-e-iam.html", content)
         self.assertIn('data-slug="Autenticacao-e-IAM"', content)
-        self.assertIn("/ 28", content)
+        self.assertIn(f"/ {len(ESTUDOS_DADOS)}", content)
         self.assertIn("Módulos Compilados", content)
 
 

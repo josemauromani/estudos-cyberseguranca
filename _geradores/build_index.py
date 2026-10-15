@@ -4,7 +4,7 @@
 Construtor do Portal Central — Estudos em Cibersegurança
 ========================================================
 Gera a página raiz index.html a partir de index_dados.py, index.css e do
-status de compilação de cada um dos 28 estudos do catálogo.
+status de compilação de cada um dos estudos do catálogo.
 
 Uso via CLI:
     python3 _geradores/build_index.py [caminho_saida]
@@ -104,7 +104,7 @@ def render_study_cards(
     dados: Dict[str, dict],
     status_map: Dict[str, dict],
 ) -> str:
-    """Gera o HTML dos 28 cartões de estudos com metadados e simuladores."""
+    """Gera o HTML dos cartões de estudos com metadados e simuladores."""
     cards_html = []
 
     for slug, d in dados.items():
@@ -185,6 +185,32 @@ def render_study_cards(
     return "\n\n".join(cards_html)
 
 
+def _botao_filtro(valor: str, rotulo: str, ativo: bool = False) -> str:
+    """Gera um botão de filtro; valor e rótulo já devem estar escapados."""
+    classe = "filter-badge active" if ativo else "filter-badge"
+    return (
+        f'<button class="{classe}" data-value="{valor}" '
+        f"onclick=\"setSubFilter('{valor}', this)\">{rotulo}</button>"
+    )
+
+
+def render_filtros_trilha(trilhas: Dict[int, dict]) -> str:
+    """Gera os botões do filtro por trilha a partir de TRILHAS."""
+    botoes = [_botao_filtro("all", "Todas as Trilhas", ativo=True)]
+    for tid, info in trilhas.items():
+        botoes.append(_botao_filtro(str(tid), f"Trilha {tid}: {escape(info['nome'])}"))
+    return "\n        ".join(botoes)
+
+
+def render_filtros_carreira(carreiras: Dict[str, dict]) -> str:
+    """Gera os botões do filtro por perfil profissional a partir de CARREIRAS."""
+    botoes = [_botao_filtro("all", "Todos os Perfis", ativo=True)]
+    for info in carreiras.values():
+        nome = escape(info["nome"])
+        botoes.append(_botao_filtro(nome, f"{info['icone']} {nome}"))
+    return "\n        ".join(botoes)
+
+
 def gerar_index_html(
     output_path: Optional[Path] = None,
     css_path: Optional[Path] = None,
@@ -199,6 +225,9 @@ def gerar_index_html(
 
     necessidades_html = render_necessidades_grid(NECESSIDADES)
     cards_html = render_study_cards(catalogo, ESTUDOS_DADOS, stats["status_map"])
+
+    filtros_trilha_html = render_filtros_trilha(TRILHAS)
+    filtros_carreira_html = render_filtros_carreira(CARREIRAS)
 
     # JavaScript do Portal Central
     portal_js = """
@@ -283,7 +312,7 @@ def gerar_index_html(
   // --------------------------------------------------------------------------
   // 3. Gerenciador de Progresso Global do Estudante
   // --------------------------------------------------------------------------
-  const TOTAL_ESTUDOS = 28;
+  const TOTAL_ESTUDOS = __TOTAL_ESTUDOS__;
 
   function initProgress() {
     let concluidos = 0;
@@ -466,13 +495,14 @@ def gerar_index_html(
     }
   });
 """
+    portal_js = portal_js.replace("__TOTAL_ESTUDOS__", str(stats["total_estudos"]))
 
     html_content = f"""<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Plataforma de estudos autoinstrucional e prática em cibersegurança com 28 módulos temáticos, 6 trilhas e simuladores interativos em JavaScript.">
+  <meta name="description" content="Plataforma de estudos autoinstrucional e prática em cibersegurança com {stats["total_estudos"]} módulos temáticos, {stats["total_trilhas"]} trilhas e simuladores interativos em JavaScript.">
   <title>Estudos de Cibersegurança — Catálogo e Portal Central</title>
 
   <!-- Google Fonts: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono -->
@@ -537,7 +567,7 @@ def gerar_index_html(
     <section class="progress-section" aria-label="Progresso global">
       <div class="progress-header">
         <h2 class="progress-title">🎯 Progresso de Conclusão Global</h2>
-        <span class="progress-metrics" id="progress-text">0 de 28 concluídos (0%)</span>
+        <span class="progress-metrics" id="progress-text">0 de {stats["total_estudos"]} concluídos (0%)</span>
       </div>
       <div class="progress-bar-track">
         <div class="progress-bar-fill" id="progress-bar"></div>
@@ -565,24 +595,12 @@ def gerar_index_html(
 
       <!-- Painel: Por Trilha -->
       <div class="filter-subpanel" data-panel="trilhas" style="display: none;">
-        <button class="filter-badge active" data-value="all" onclick="setSubFilter('all', this)">Todas as Trilhas</button>
-        <button class="filter-badge" data-value="1" onclick="setSubFilter('1', this)">Trilha 1: Fundamentos &amp; Redes</button>
-        <button class="filter-badge" data-value="2" onclick="setSubFilter('2', this)">Trilha 2: Segurança Defensiva</button>
-        <button class="filter-badge" data-value="3" onclick="setSubFilter('3', this)">Trilha 3: Segurança Ofensiva</button>
-        <button class="filter-badge" data-value="4" onclick="setSubFilter('4', this)">Trilha 4: Operações &amp; SOC</button>
-        <button class="filter-badge" data-value="5" onclick="setSubFilter('5', this)">Trilha 5: Especialidades</button>
-        <button class="filter-badge" data-value="6" onclick="setSubFilter('6', this)">Trilha 6: Governança &amp; Riscos</button>
+        {filtros_trilha_html}
       </div>
 
       <!-- Painel: Por Perfil Profissional -->
       <div class="filter-subpanel" data-panel="carreiras" style="display: none;">
-        <button class="filter-badge active" data-value="all" onclick="setSubFilter('all', this)">Todos os Perfis</button>
-        <button class="filter-badge" data-value="Blue Team &amp; Defesa" onclick="setSubFilter('Blue Team &amp; Defesa', this)">🛡️ Blue Team</button>
-        <button class="filter-badge" data-value="Red Team &amp; Pentest" onclick="setSubFilter('Red Team &amp; Pentest', this)">⚔️ Red Team</button>
-        <button class="filter-badge" data-value="AppSec &amp; DevSecOps" onclick="setSubFilter('AppSec &amp; DevSecOps', this)">💻 AppSec / DevSecOps</button>
-        <button class="filter-badge" data-value="Operações SOC &amp; Resposta" onclick="setSubFilter('Operações SOC &amp; Resposta', this)">👁️ SOC &amp; Resposta</button>
-        <button class="filter-badge" data-value="GRC &amp; Auditoria" onclick="setSubFilter('GRC &amp; Auditoria', this)">📋 GRC &amp; Auditoria</button>
-        <button class="filter-badge" data-value="Perícia Forense &amp; Malware" onclick="setSubFilter('Perícia Forense &amp; Malware', this)">🔍 Forense Digital</button>
+        {filtros_carreira_html}
       </div>
 
       <!-- Painel: Por Função NIST CSF 2.0 -->
@@ -613,7 +631,7 @@ def gerar_index_html(
       </div>
     </section>
 
-    <!-- Seção Principal: Catálogo dos 28 Estudos -->
+    <!-- Seção Principal: Catálogo dos Estudos -->
     <main class="studies-section" id="secao-catalogo">
       <div class="section-title-wrap">
         <h2 class="section-title">📚 Módulos e Treinamentos Práticos</h2>

@@ -5,8 +5,13 @@ test_segmentacao_firewall.py
 Testes automatizados para o Estudo 05: Segmentacao-e-Firewall
 """
 
+import sys
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from index_dados import ESTUDOS_DADOS  # noqa: E402
 
 
 class TestSegmentacaoFirewall(unittest.TestCase):
@@ -76,7 +81,7 @@ class TestSegmentacaoFirewall(unittest.TestCase):
 
         self.assertIn("Segmentacao-e-Firewall/treinamento-segmentacao-e-firewall.html", content)
         self.assertIn('data-slug="Segmentacao-e-Firewall"', content)
-        self.assertIn("/ 28", content)
+        self.assertIn(f"/ {len(ESTUDOS_DADOS)}", content)
         self.assertIn("Módulos Compilados", content)
 
 

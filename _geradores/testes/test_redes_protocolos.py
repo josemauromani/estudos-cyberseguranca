@@ -5,8 +5,13 @@ test_redes_protocolos.py
 Testes automatizados para o Estudo 02: Redes-e-Protocolos
 """
 
+import sys
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from index_dados import ESTUDOS_DADOS  # noqa: E402
 
 
 class TestRedesProtocolos(unittest.TestCase):
@@ -73,7 +78,7 @@ class TestRedesProtocolos(unittest.TestCase):
 
         self.assertIn("Redes-e-Protocolos/treinamento-redes-e-protocolos.html", content)
         self.assertIn('data-slug="Redes-e-Protocolos"', content)
-        self.assertIn("/ 28", content)
+        self.assertIn(f"/ {len(ESTUDOS_DADOS)}", content)
         self.assertIn("Módulos Compilados", content)
 
 

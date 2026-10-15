@@ -3,12 +3,13 @@
 import os
 import sys
 import unittest
+from html import escape
 from pathlib import Path
 
 # Adiciona o diretório _geradores ao sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from build_index import gerar_index_html
+from build_index import gerar_index_html, render_filtros_carreira, render_filtros_trilha
 from index_dados import CARREIRAS, ESTUDOS_DADOS, FUNCOES_NIST, NECESSIDADES, TRILHAS
 
 
@@ -152,6 +153,38 @@ class TestBuildIndex(unittest.TestCase):
         self.assertIn("card", conteudo)
         self.assertIn("highlight-pulse", conteudo)
         self.assertIn("pulseHighlight", conteudo)
+
+
+class TestPortalDerivado(unittest.TestCase):
+    """Garante que filtros, totais e meta do portal derivam dos dados."""
+
+    def setUp(self):
+        self.root = Path(__file__).resolve().parent.parent.parent
+        self.out = self.root / "index.html"
+
+    def test_botoes_trilha_gerados_de_TRILHAS(self):
+        html = render_filtros_trilha(TRILHAS)
+        for tid, info in TRILHAS.items():
+            self.assertIn(f'data-value="{tid}"', html)
+            self.assertIn(f"Trilha {tid}: {escape(info['nome'])}", html)
+        self.assertIn('data-value="all"', html)
+
+    def test_botoes_carreira_gerados_de_CARREIRAS(self):
+        html = render_filtros_carreira(CARREIRAS)
+        for c in CARREIRAS.values():
+            self.assertIn(f'data-value="{escape(c["nome"])}"', html)
+            self.assertIn(c["icone"], html)
+        self.assertIn('data-value="all"', html)
+
+    def test_total_estudos_js_dinamico(self):
+        conteudo = Path(gerar_index_html(output_path=self.out)).read_text(encoding="utf-8")
+        self.assertIn(f"const TOTAL_ESTUDOS = {len(ESTUDOS_DADOS)};", conteudo)
+        self.assertIn(f"0 de {len(ESTUDOS_DADOS)} concluídos", conteudo)
+        self.assertNotIn("TOTAL_ESTUDOS = 28", conteudo)
+
+    def test_meta_description_usa_contagens(self):
+        conteudo = Path(gerar_index_html(output_path=self.out)).read_text(encoding="utf-8")
+        self.assertIn(f"com {len(ESTUDOS_DADOS)} módulos temáticos, {len(TRILHAS)} trilhas", conteudo)
 
 
 if __name__ == "__main__":

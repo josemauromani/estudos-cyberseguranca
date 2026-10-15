@@ -5,8 +5,13 @@ test_gestao_vulnerabilidades.py
 Testes automatizados para o Estudo 09: Gestao-de-Vulnerabilidades
 """
 
+import sys
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from index_dados import ESTUDOS_DADOS  # noqa: E402
 
 
 class TestGestaoVulnerabilidades(unittest.TestCase):
@@ -77,7 +82,7 @@ class TestGestaoVulnerabilidades(unittest.TestCase):
 
         self.assertIn("Gestao-de-Vulnerabilidades/treinamento-gestao-de-vulnerabilidades.html", content)
         self.assertIn('data-slug="Gestao-de-Vulnerabilidades"', content)
-        self.assertIn("/ 28", content)
+        self.assertIn(f"/ {len(ESTUDOS_DADOS)}", content)
         self.assertIn("Módulos Compilados", content)
 
 

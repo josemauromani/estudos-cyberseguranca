@@ -5,8 +5,13 @@ test_hardening_sistemas.py
 Testes automatizados para o Estudo 06: Hardening-Sistemas
 """
 
+import sys
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from index_dados import ESTUDOS_DADOS  # noqa: E402
 
 
 class TestHardeningSistemas(unittest.TestCase):
@@ -77,7 +82,7 @@ class TestHardeningSistemas(unittest.TestCase):
 
         self.assertIn("Hardening-Sistemas/treinamento-hardening-sistemas.html", content)
         self.assertIn('data-slug="Hardening-Sistemas"', content)
-        self.assertIn("/ 28", content)
+        self.assertIn(f"/ {len(ESTUDOS_DADOS)}", content)
         self.assertIn("Módulos Compilados", content)
 
 

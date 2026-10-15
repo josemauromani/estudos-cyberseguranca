@@ -5,8 +5,13 @@ test_arquitetura_zero_trust.py
 Testes automatizados para o Estudo 08: Arquitetura-Zero-Trust
 """
 
+import sys
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from index_dados import ESTUDOS_DADOS  # noqa: E402
 
 
 class TestArquiteturaZeroTrust(unittest.TestCase):
@@ -74,7 +79,7 @@ class TestArquiteturaZeroTrust(unittest.TestCase):
 
         self.assertIn("Arquitetura-Zero-Trust/treinamento-arquitetura-zero-trust.html", content)
         self.assertIn('data-slug="Arquitetura-Zero-Trust"', content)
-        self.assertIn("/ 28", content)
+        self.assertIn(f"/ {len(ESTUDOS_DADOS)}", content)
         self.assertIn("Módulos Compilados", content)
 
 

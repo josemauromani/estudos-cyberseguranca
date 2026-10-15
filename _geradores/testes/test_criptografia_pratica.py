@@ -5,8 +5,13 @@ test_criptografia_pratica.py
 Testes automatizados para o Estudo 03: Criptografia-Pratica
 """
 
+import sys
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from index_dados import ESTUDOS_DADOS  # noqa: E402
 
 
 class TestCriptografiaPratica(unittest.TestCase):
@@ -74,7 +79,7 @@ class TestCriptografiaPratica(unittest.TestCase):
 
         self.assertIn("Criptografia-Pratica/treinamento-criptografia-pratica.html", content)
         self.assertIn('data-slug="Criptografia-Pratica"', content)
-        self.assertIn("/ 28", content)
+        self.assertIn(f"/ {len(ESTUDOS_DADOS)}", content)
         self.assertIn("Módulos Compilados", content)
 
 

@@ -5,8 +5,13 @@ test_seguranca_endpoints_edr.py
 Testes automatizados para o Estudo 10: Seguranca-em-Endpoints-EDR
 """
 
+import sys
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from index_dados import ESTUDOS_DADOS  # noqa: E402
 
 
 class TestSegurancaEndpointsEdr(unittest.TestCase):
@@ -77,7 +82,7 @@ class TestSegurancaEndpointsEdr(unittest.TestCase):
 
         self.assertIn("Seguranca-em-Endpoints-EDR/treinamento-seguranca-em-endpoints-edr.html", content)
         self.assertIn('data-slug="Seguranca-em-Endpoints-EDR"', content)
-        self.assertIn("/ 28", content)
+        self.assertIn(f"/ {len(ESTUDOS_DADOS)}", content)
 
 
 if __name__ == "__main__":

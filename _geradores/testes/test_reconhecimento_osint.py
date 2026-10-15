@@ -5,8 +5,13 @@ test_reconhecimento_osint.py
 Testes automatizados para o Estudo 11: Reconhecimento-e-OSINT
 """
 
+import sys
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from index_dados import ESTUDOS_DADOS  # noqa: E402
 
 
 class TestReconhecimentoOsint(unittest.TestCase):
@@ -76,7 +81,7 @@ class TestReconhecimentoOsint(unittest.TestCase):
 
         self.assertIn("Reconhecimento-e-OSINT/treinamento-reconhecimento-e-osint.html", content)
         self.assertIn('data-slug="Reconhecimento-e-OSINT"', content)
-        self.assertIn("/ 28", content)
+        self.assertIn(f"/ {len(ESTUDOS_DADOS)}", content)
 
 
 if __name__ == "__main__":

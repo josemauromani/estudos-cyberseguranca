@@ -5,8 +5,13 @@ test_seguranca_redes_defesa.py
 Testes automatizados para o Estudo 07: Seguranca-de-Redes-Defesa
 """
 
+import sys
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from index_dados import ESTUDOS_DADOS  # noqa: E402
 
 
 class TestSegurancaRedesDefesa(unittest.TestCase):
@@ -75,7 +80,7 @@ class TestSegurancaRedesDefesa(unittest.TestCase):
 
         self.assertIn("Seguranca-de-Redes-Defesa/treinamento-seguranca-de-redes-defesa.html", content)
         self.assertIn('data-slug="Seguranca-de-Redes-Defesa"', content)
-        self.assertIn("/ 28", content)
+        self.assertIn(f"/ {len(ESTUDOS_DADOS)}", content)
         self.assertIn("Módulos Compilados", content)
 
 
