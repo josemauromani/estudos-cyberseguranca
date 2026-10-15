@@ -1055,6 +1055,7 @@ h1 {
         <button class="filter-badge" data-value="Operações SOC &amp; Resposta" onclick="setSubFilter('Operações SOC &amp; Resposta', this)">👁️ Operações SOC &amp; Resposta</button>
         <button class="filter-badge" data-value="GRC &amp; Auditoria" onclick="setSubFilter('GRC &amp; Auditoria', this)">📋 GRC &amp; Auditoria</button>
         <button class="filter-badge" data-value="Perícia Forense &amp; Malware" onclick="setSubFilter('Perícia Forense &amp; Malware', this)">🔍 Perícia Forense &amp; Malware</button>
+        <button class="filter-badge" data-value="Analista de Segurança da Informação" onclick="setSubFilter('Analista de Segurança da Informação', this)">🎯 Analista de Segurança da Informação</button>
       </div>
 
       <!-- Painel: Por Função NIST CSF 2.0 -->
@@ -1220,6 +1221,31 @@ h1 {
         <span class="need-category">💾 Continuidade</span>
         <span class="need-title">Preciso calcular RTO/RPO e planejar backups com a Regra 3-2-1</span>
         <span class="need-target">→ Ver módulo: BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1</span>
+      </a>
+      <a href="#estudo-Protecao-de-Dados-e-Conteudo" class="need-card" onclick="focarEstudo('Protecao-de-Dados-e-Conteudo')">
+        <span class="need-category">🚫 DLP</span>
+        <span class="need-title">Preciso impedir vazamento de CPF e cartões por e-mail e upload</span>
+        <span class="need-target">→ Ver módulo: DLP, AntiSpam e Filtro de Conteúdo</span>
+      </a>
+      <a href="#estudo-Seguranca-de-Bancos-de-Dados" class="need-card" onclick="focarEstudo('Seguranca-de-Bancos-de-Dados')">
+        <span class="need-category">🗄️ Banco de Dados</span>
+        <span class="need-title">Preciso aplicar menor privilégio e auditoria em um banco de dados</span>
+        <span class="need-target">→ Ver módulo: Bancos de Dados Relacionais: SQL, Privilégios e Auditoria</span>
+      </a>
+      <a href="#estudo-PCI-DSS" class="need-card" onclick="focarEstudo('PCI-DSS')">
+        <span class="need-category">💳 Conformidade</span>
+        <span class="need-title">Preciso delimitar o escopo PCI-DSS de um ambiente de pagamento</span>
+        <span class="need-target">→ Ver módulo: PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos</span>
+      </a>
+      <a href="#estudo-Ingles-Tecnico-Ciber" class="need-card" onclick="focarEstudo('Ingles-Tecnico-Ciber')">
+        <span class="need-category">🌍 Inglês</span>
+        <span class="need-title">Preciso ler um advisory de segurança em inglês com segurança</span>
+        <span class="need-target">→ Ver módulo: Inglês Técnico para Segurança da Informação</span>
+      </a>
+      <a href="#estudo-Certificacoes-e-Carreira" class="need-card" onclick="focarEstudo('Certificacoes-e-Carreira')">
+        <span class="need-category">🎓 Carreira</span>
+        <span class="need-title">Preciso escolher qual certificação de segurança tirar primeiro</span>
+        <span class="need-target">→ Ver módulo: Formação, Certificações e Carreira</span>
       </a>
       </div>
     </section>
@@ -1415,8 +1441,8 @@ h1 {
       data-slug="Segmentacao-e-Firewall"
       data-trilha="1"
       data-nist="Protect"
-      data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta"
-      data-search="segmentacao-e-firewall dmz, vlans, regras de firewall e filtragem arquitetura de perímetros, isolamento inter-vlan e ordem de precedência de regras de filtragem como isolar servidores públicos da rede corporativa sensível garantindo regra default drop? simulador de regras de firewall (pass / drop) protect blue team &amp; defesa,operações soc &amp; resposta arquitetura de dmz em 2 estágios tabela de estados conntrack (stateful vs stateless) trunking 802.1q e segregação inter-vlan simulador de filtragem com ordem de precedência first-match">
+      data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,Analista de Segurança da Informação"
+      data-search="segmentacao-e-firewall dmz, vlans, regras de firewall e filtragem arquitetura de perímetros, isolamento inter-vlan e ordem de precedência de regras de filtragem como isolar servidores públicos da rede corporativa sensível garantindo regra default drop? simulador de regras de firewall (pass / drop) protect blue team &amp; defesa,operações soc &amp; resposta,analista de segurança da informação arquitetura de dmz em 2 estágios tabela de estados conntrack (stateful vs stateless) trunking 802.1q e segregação inter-vlan simulador de filtragem com ordem de precedência first-match">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -1460,8 +1486,8 @@ h1 {
       data-slug="Hardening-Sistemas"
       data-trilha="2"
       data-nist="Protect"
-      data-carreiras="Blue Team &amp; Defesa,AppSec &amp; DevSecOps,Operações SOC &amp; Resposta"
-      data-search="hardening-sistemas bastionamento linux e windows (cis benchmarks) redução da superfície de ataque operacional em servidores corporativos linux e windows quais configurações padrão de fábrica expõem servidores corporativos a ataques imediatos? auditor interativo de configuração de servidor protect blue team &amp; defesa,appsec &amp; devsecops,operações soc &amp; resposta cis benchmarks nível 1 e nível 2 bastionamento de ssh (/etc/ssh/sshd_config) e pam módulos de segurança do kernel (apparmor e selinux) auditor interativo de arquivos de configuração de so">
+      data-carreiras="Blue Team &amp; Defesa,AppSec &amp; DevSecOps,Operações SOC &amp; Resposta,Analista de Segurança da Informação"
+      data-search="hardening-sistemas bastionamento linux e windows (cis benchmarks) redução da superfície de ataque operacional em servidores corporativos linux e windows quais configurações padrão de fábrica expõem servidores corporativos a ataques imediatos? auditor interativo de configuração de servidor protect blue team &amp; defesa,appsec &amp; devsecops,operações soc &amp; resposta,analista de segurança da informação cis benchmarks nível 1 e nível 2 bastionamento de ssh (/etc/ssh/sshd_config) e pam módulos de segurança do kernel (apparmor e selinux) auditor interativo de arquivos de configuração de so">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -1505,8 +1531,8 @@ h1 {
       data-slug="Seguranca-de-Redes-Defesa"
       data-trilha="2"
       data-nist="Protect / Detect"
-      data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta"
-      data-search="seguranca-de-redes-defesa ids/ips, waf, vpns e proxies reversos sistemas de inspeção profunda de tráfego, mitigação de ameaças web e túneis criptografados como interceptar e bloquear tráfego hostil antes que ele atinja serviços internos sensíveis? analisador de regras snort/suricata vs tráfego protect / detect blue team &amp; defesa,operações soc &amp; resposta assinaturas snort/suricata e detecção heurística waf core rule set (crs) contra injeções web túneis seguros com wireguard e ipsec ikev2 analisador de payloads de tráfego com alertas em tempo real">
+      data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,Analista de Segurança da Informação"
+      data-search="seguranca-de-redes-defesa ids/ips, waf, vpns e proxies reversos sistemas de inspeção profunda de tráfego, mitigação de ameaças web e túneis criptografados como interceptar e bloquear tráfego hostil antes que ele atinja serviços internos sensíveis? analisador de regras snort/suricata vs tráfego protect / detect blue team &amp; defesa,operações soc &amp; resposta,analista de segurança da informação assinaturas snort/suricata e detecção heurística waf core rule set (crs) contra injeções web túneis seguros com wireguard e ipsec ikev2 analisador de payloads de tráfego com alertas em tempo real">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -1550,8 +1576,8 @@ h1 {
       data-slug="Arquitetura-Zero-Trust"
       data-trilha="2"
       data-nist="Protect"
-      data-carreiras="Blue Team &amp; Defesa,GRC &amp; Auditoria"
-      data-search="arquitetura-zero-trust princípios zero trust e microsegmentação implementação prática do nist sp 800-207, decisão de acesso contínua e perímetros definidos por software por que não se deve mais confiar na rede interna mesmo após autenticação inicial bem-sucedida? motor de decisão de acesso zero trust (pdp/pep) protect blue team &amp; defesa,grc &amp; auditoria nist sp 800-207: never trust, always verify, assume breach componentes centrais: pdp (decision) e pep (enforcement) acesso contextual baseado em postura do dispositivo e risco motor de decisão de acesso em tempo real com score de risco">
+      data-carreiras="Blue Team &amp; Defesa,GRC &amp; Auditoria,Analista de Segurança da Informação"
+      data-search="arquitetura-zero-trust princípios zero trust e microsegmentação implementação prática do nist sp 800-207, decisão de acesso contínua e perímetros definidos por software por que não se deve mais confiar na rede interna mesmo após autenticação inicial bem-sucedida? motor de decisão de acesso zero trust (pdp/pep) protect blue team &amp; defesa,grc &amp; auditoria,analista de segurança da informação nist sp 800-207: never trust, always verify, assume breach componentes centrais: pdp (decision) e pep (enforcement) acesso contextual baseado em postura do dispositivo e risco motor de decisão de acesso em tempo real com score de risco">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -1640,8 +1666,8 @@ h1 {
       data-slug="Seguranca-em-Endpoints-EDR"
       data-trilha="2"
       data-nist="Protect / Detect"
-      data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,Perícia Forense &amp; Malware"
-      data-search="seguranca-em-endpoints-edr antivírus, edr/xdr e proteção de host telemetria comportamental de processos, detecção de técnicas evasivas e contenção de hosts como identificar a presença de um adversário no endpoint antes que ocorra dano ou exfiltração? linha do tempo de telemetria e detecção edr protect / detect blue team &amp; defesa,operações soc &amp; resposta,perícia forense &amp; malware evolução de antivírus baseado em assinatura para edr/xdr sysmon e event ids do windows (event id 1, 3, 10) árvores de processos maliciosos parent-child simulador de telemetria com isolamento de máquina da rede">
+      data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,Analista de Segurança da Informação"
+      data-search="seguranca-em-endpoints-edr antivírus, edr/xdr e proteção de host telemetria comportamental de processos, detecção de técnicas evasivas e contenção de hosts como identificar a presença de um adversário no endpoint antes que ocorra dano ou exfiltração? linha do tempo de telemetria e detecção edr protect / detect blue team &amp; defesa,operações soc &amp; resposta,perícia forense &amp; malware,analista de segurança da informação evolução de antivírus baseado em assinatura para edr/xdr sysmon e event ids do windows (event id 1, 3, 10) árvores de processos maliciosos parent-child simulador de telemetria com isolamento de máquina da rede">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -1730,8 +1756,8 @@ h1 {
       data-slug="OWASP-Top-10-Web"
       data-trilha="3"
       data-nist="Protect"
-      data-carreiras="AppSec &amp; DevSecOps,Red Team &amp; Pentest"
-      data-search="owasp-top-10-web falhas web (sqli, xss, csrf, broken auth) principais riscos de segurança em aplicações web e métodos definitivos de remediação em código como desenvolvedores podem eliminar falhas críticas de injeção diretamente na raiz do código? playground de injeção e sanitização web protect appsec &amp; devsecops,red team &amp; pentest categorias a01 a a10 do owasp top 10 prepared statements para imunização contra sql injection content security policy (csp) contra ataques xss playground interativo de injeção com filtros sanitizadores">
+      data-carreiras="AppSec &amp; DevSecOps,Red Team &amp; Pentest,Analista de Segurança da Informação"
+      data-search="owasp-top-10-web falhas web (sqli, xss, csrf, broken auth) principais riscos de segurança em aplicações web e métodos definitivos de remediação em código como desenvolvedores podem eliminar falhas críticas de injeção diretamente na raiz do código? playground de injeção e sanitização web protect appsec &amp; devsecops,red team &amp; pentest,analista de segurança da informação categorias a01 a a10 do owasp top 10 prepared statements para imunização contra sql injection content security policy (csp) contra ataques xss playground interativo de injeção com filtros sanitizadores">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -1865,8 +1891,8 @@ h1 {
       data-slug="Engenharia-Social-e-Phishing"
       data-trilha="3"
       data-nist="Protect"
-      data-carreiras="Red Team &amp; Pentest,Blue Team &amp; Defesa,GRC &amp; Auditoria"
-      data-search="engenharia-social-e-phishing pretexting, spear phishing e defesas humanas gatilhos comportamentais, autenticação de e-mail (spf/dkim/dmarc) e conscientização corporativa como proteger a organização do elo mais explorado da cadeia de segurança: o fator humano? analisador de e-mails suspeitos (spot the indicators) protect red team &amp; pentest,blue team &amp; defesa,grc &amp; auditoria táticas de pretexting, spear phishing e whaling autenticação de e-mail com spf, dkim e políticas dmarc tokens físicos fido2 contra ataques de adversary-in-the-middle analisador interativo de e-mails com detecção de indicadores">
+      data-carreiras="Red Team &amp; Pentest,Blue Team &amp; Defesa,GRC &amp; Auditoria,Analista de Segurança da Informação"
+      data-search="engenharia-social-e-phishing pretexting, spear phishing e defesas humanas gatilhos comportamentais, autenticação de e-mail (spf/dkim/dmarc) e conscientização corporativa como proteger a organização do elo mais explorado da cadeia de segurança: o fator humano? analisador de e-mails suspeitos (spot the indicators) protect red team &amp; pentest,blue team &amp; defesa,grc &amp; auditoria,analista de segurança da informação táticas de pretexting, spear phishing e whaling autenticação de e-mail com spf, dkim e políticas dmarc tokens físicos fido2 contra ataques de adversary-in-the-middle analisador interativo de e-mails com detecção de indicadores">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -1910,8 +1936,8 @@ h1 {
       data-slug="Operacoes-SOC-e-SIEM"
       data-trilha="4"
       data-nist="Detect"
-      data-carreiras="Operações SOC &amp; Resposta,Blue Team &amp; Defesa"
-      data-search="operacoes-soc-e-siem rotina de soc l1/l2, logs e regras sigma estrutura operacional de um centro de monitoramento, ciclo de vida de alertas e regras sigma portáveis como separar ruído de alertas genuínos em fluxos corporativos de milhões de eventos por segundo? console siem com busca de logs e alertas detect operações soc &amp; resposta,blue team &amp; defesa estrutura de níveis soc n1 (triagem), n2 (investigação) e n3 (hunting) métricas operacionais: mttd e mttr formato de regras de detecção sigma e conversão para siem console interativo estilo siem com pesquisa de logs e alertas">
+      data-carreiras="Operações SOC &amp; Resposta,Blue Team &amp; Defesa,Analista de Segurança da Informação"
+      data-search="operacoes-soc-e-siem rotina de soc l1/l2, logs e regras sigma estrutura operacional de um centro de monitoramento, ciclo de vida de alertas e regras sigma portáveis como separar ruído de alertas genuínos em fluxos corporativos de milhões de eventos por segundo? console siem com busca de logs e alertas detect operações soc &amp; resposta,blue team &amp; defesa,analista de segurança da informação estrutura de níveis soc n1 (triagem), n2 (investigação) e n3 (hunting) métricas operacionais: mttd e mttr formato de regras de detecção sigma e conversão para siem console interativo estilo siem com pesquisa de logs e alertas">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -2000,8 +2026,8 @@ h1 {
       data-slug="Resposta-a-Incidentes"
       data-trilha="4"
       data-nist="Respond"
-      data-carreiras="Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,GRC &amp; Auditoria"
-      data-search="resposta-a-incidentes ciclo nist sp 800-61 rev. 2 e rev. 3 (contenção e erradicação) gestão operacional de crises cibernéticas, ciclo clássico da rev. 2, reorganização da rev. 3 pelas funções do csf 2.0 e playbooks de contenção ágil quais passos imediatos tomar para conter um ataque ativo sem destruir evidências forenses vitais, seguindo o ciclo da rev. 2 e a organização da rev. 3? runbook interativo em árvore de decisão respond operações soc &amp; resposta,perícia forense &amp; malware,grc &amp; auditoria ciclo em 4 fases do nist sp 800-61 rev. 2 e a reorganização da rev. 3 (2025) pelas funções do csf 2.0 contenção de curto prazo vs contenção de longo prazo condução de lições aprendidas e retrospectiva sem culpa simulador de crise em árvore de decisão com ramificações">
+      data-carreiras="Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,GRC &amp; Auditoria,Analista de Segurança da Informação"
+      data-search="resposta-a-incidentes ciclo nist sp 800-61 rev. 2 e rev. 3 (contenção e erradicação) gestão operacional de crises cibernéticas, ciclo clássico da rev. 2, reorganização da rev. 3 pelas funções do csf 2.0 e playbooks de contenção ágil quais passos imediatos tomar para conter um ataque ativo sem destruir evidências forenses vitais, seguindo o ciclo da rev. 2 e a organização da rev. 3? runbook interativo em árvore de decisão respond operações soc &amp; resposta,perícia forense &amp; malware,grc &amp; auditoria,analista de segurança da informação ciclo em 4 fases do nist sp 800-61 rev. 2 e a reorganização da rev. 3 (2025) pelas funções do csf 2.0 contenção de curto prazo vs contenção de longo prazo condução de lições aprendidas e retrospectiva sem culpa simulador de crise em árvore de decisão com ramificações">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -2045,8 +2071,8 @@ h1 {
       data-slug="Forense-Digital"
       data-trilha="4"
       data-nist="Respond"
-      data-carreiras="Perícia Forense &amp; Malware,Operações SOC &amp; Resposta"
-      data-search="forense-digital cadeia de custódia, coleta de ram e artefatos metodologia pericial rigorosa, ordem de volatilidade, integridade de cópias e análise de artefatos do so como reconstruir os passos exatos de um invasor e produzir provas digitais legalmente irrefutáveis? analisador de timeline de evidências e logs forenses respond perícia forense &amp; malware,operações soc &amp; resposta norma iso/iec 27037 e ordem de volatilidade rfc 3227 bloqueadores de escrita físicos/lógicos e hashes sha-256 artefatos forenses de host: prefetch, shimcache, $mft e registro analisador interativo de super-timeline de eventos">
+      data-carreiras="Perícia Forense &amp; Malware,Operações SOC &amp; Resposta,Analista de Segurança da Informação"
+      data-search="forense-digital cadeia de custódia, coleta de ram e artefatos metodologia pericial rigorosa, ordem de volatilidade, integridade de cópias e análise de artefatos do so como reconstruir os passos exatos de um invasor e produzir provas digitais legalmente irrefutáveis? analisador de timeline de evidências e logs forenses respond perícia forense &amp; malware,operações soc &amp; resposta,analista de segurança da informação norma iso/iec 27037 e ordem de volatilidade rfc 3227 bloqueadores de escrita físicos/lógicos e hashes sha-256 artefatos forenses de host: prefetch, shimcache, $mft e registro analisador interativo de super-timeline de eventos">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -2315,8 +2341,8 @@ h1 {
       data-slug="Gestao-de-Riscos-TI"
       data-trilha="6"
       data-nist="Govern / Identify"
-      data-carreiras="GRC &amp; Auditoria"
-      data-search="gestao-de-riscos-ti iso 31000 e avaliação qualitativa vs quantitativa (ale/sle) processo da iso 31000:2018, metodologias de análise de risco, matrizes 5x5, cálculo financeiro de perdas e justificativa de roi como conduzir o processo de riscos da iso 31000:2018 e quantificar em reais o impacto de uma ameaça para justificar orçamentos à diretoria? calculadora de matriz 5x5 e risco financeiro (ale/sle) govern / identify grc &amp; auditoria processo da iso 31000:2018: contexto, identificação, análise, avaliação, tratamento, monitoramento e comunicação, ao lado do nist sp 800-30 fórmulas quantitativas: sle = av * ef e ale = sle * aro estratégias de tratamento de risco: mitigar, aceitar, transferir, evitar calculadora interativa com matriz 5x5 e cálculo de viabilidade rosi">
+      data-carreiras="GRC &amp; Auditoria,Analista de Segurança da Informação"
+      data-search="gestao-de-riscos-ti iso 31000 e avaliação qualitativa vs quantitativa (ale/sle) processo da iso 31000:2018, metodologias de análise de risco, matrizes 5x5, cálculo financeiro de perdas e justificativa de roi como conduzir o processo de riscos da iso 31000:2018 e quantificar em reais o impacto de uma ameaça para justificar orçamentos à diretoria? calculadora de matriz 5x5 e risco financeiro (ale/sle) govern / identify grc &amp; auditoria,analista de segurança da informação processo da iso 31000:2018: contexto, identificação, análise, avaliação, tratamento, monitoramento e comunicação, ao lado do nist sp 800-30 fórmulas quantitativas: sle = av * ef e ale = sle * aro estratégias de tratamento de risco: mitigar, aceitar, transferir, evitar calculadora interativa com matriz 5x5 e cálculo de viabilidade rosi">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -2360,8 +2386,8 @@ h1 {
       data-slug="ISO-27001-e-27002"
       data-trilha="6"
       data-nist="Govern"
-      data-carreiras="GRC &amp; Auditoria"
-      data-search="iso-27001-e-27002 sgsi, anexo a, cis controls e nist 800-53 estrutura do sgsi, os 93 controles do anexo a, declaração de aplicabilidade e crosswalk com cis controls v8.1 e nist sp 800-53 rev. 5 como estruturar um sgsi auditável e mapear os controles do anexo a para cis controls v8.1 (ig1/ig2/ig3) e nist sp 800-53 rev. 5? matriz de controles e declaração de aplicabilidade (soa) govern grc &amp; auditoria estrutura hls da iso/iec 27001:2022 (cláusulas 4 a 10) os 93 controles consolidados em 4 temas organizacionais, com crosswalk para cis controls v8.1 (ig1/ig2/ig3) e nist sp 800-53 rev. 5 elaboração e manutenção da declaração de aplicabilidade (soa) matriz interativa de aplicabilidade com sumário percentual">
+      data-carreiras="GRC &amp; Auditoria,Analista de Segurança da Informação"
+      data-search="iso-27001-e-27002 sgsi, anexo a, cis controls e nist 800-53 estrutura do sgsi, os 93 controles do anexo a, declaração de aplicabilidade e crosswalk com cis controls v8.1 e nist sp 800-53 rev. 5 como estruturar um sgsi auditável e mapear os controles do anexo a para cis controls v8.1 (ig1/ig2/ig3) e nist sp 800-53 rev. 5? matriz de controles e declaração de aplicabilidade (soa) govern grc &amp; auditoria,analista de segurança da informação estrutura hls da iso/iec 27001:2022 (cláusulas 4 a 10) os 93 controles consolidados em 4 temas organizacionais, com crosswalk para cis controls v8.1 (ig1/ig2/ig3) e nist sp 800-53 rev. 5 elaboração e manutenção da declaração de aplicabilidade (soa) matriz interativa de aplicabilidade com sumário percentual">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -2495,8 +2521,8 @@ h1 {
       data-slug="Protecao-de-Dados-e-Conteudo"
       data-trilha="2"
       data-nist="Protect / Detect"
-      data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,GRC &amp; Auditoria"
-      data-search="protecao-de-dados-e-conteudo dlp, antispam e filtro de conteúdo prevenção de perda de dados, autenticação de e-mail (spf, dkim, dmarc) e filtragem de conteúdo e url em proxy seguro como impedir que dados sensíveis saiam da organização por e-mail ou web sem bloquear o trabalho legítimo? gateway de conteúdo protect / detect blue team &amp; defesa,operações soc &amp; resposta,grc &amp; auditoria dlp de rede, de endpoint e de nuvem (casb), com detectores por regex, checksum (luhn) e dicionário autenticação de e-mail com spf, dkim e dmarc (none, quarantine, reject) e antispam por reputação filtro de url por categoria em swg, inspeção tls e o equilíbrio entre falso positivo e falso negativo simulador gateway de conteúdo: antispam, dlp e filtro de url com veredito permitir, quarentena ou bloquear">
+      data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,GRC &amp; Auditoria,Analista de Segurança da Informação"
+      data-search="protecao-de-dados-e-conteudo dlp, antispam e filtro de conteúdo prevenção de perda de dados, autenticação de e-mail (spf, dkim, dmarc) e filtragem de conteúdo e url em proxy seguro como impedir que dados sensíveis saiam da organização por e-mail ou web sem bloquear o trabalho legítimo? gateway de conteúdo protect / detect blue team &amp; defesa,operações soc &amp; resposta,grc &amp; auditoria,analista de segurança da informação dlp de rede, de endpoint e de nuvem (casb), com detectores por regex, checksum (luhn) e dicionário autenticação de e-mail com spf, dkim e dmarc (none, quarantine, reject) e antispam por reputação filtro de url por categoria em swg, inspeção tls e o equilíbrio entre falso positivo e falso negativo simulador gateway de conteúdo: antispam, dlp e filtro de url com veredito permitir, quarentena ou bloquear">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -2540,8 +2566,8 @@ h1 {
       data-slug="Seguranca-de-Bancos-de-Dados"
       data-trilha="2"
       data-nist="Protect / Detect"
-      data-carreiras="Blue Team &amp; Defesa,AppSec &amp; DevSecOps,GRC &amp; Auditoria"
-      data-search="seguranca-de-bancos-de-dados bancos de dados relacionais: sql, privilégios e auditoria modelo relacional, sql ddl/dml/dcl, menor privilégio, auditoria nativa e proteção de dados em repouso quem pode ler e alterar cada tabela do banco, e como provar isso numa auditoria? matriz grant/revoke protect / detect blue team &amp; defesa,appsec &amp; devsecops,grc &amp; auditoria modelo relacional, acid e as linguagens sql ddl, dml e dcl menor privilégio com roles, grant/revoke, views e row-level security tde, criptografia de coluna, mascaramento dinâmico, auditoria nativa e prepared statements contra sqli simulador matriz grant/revoke com consultas permitidas ou negadas e trilha de auditoria">
+      data-carreiras="Blue Team &amp; Defesa,AppSec &amp; DevSecOps,GRC &amp; Auditoria,Analista de Segurança da Informação"
+      data-search="seguranca-de-bancos-de-dados bancos de dados relacionais: sql, privilégios e auditoria modelo relacional, sql ddl/dml/dcl, menor privilégio, auditoria nativa e proteção de dados em repouso quem pode ler e alterar cada tabela do banco, e como provar isso numa auditoria? matriz grant/revoke protect / detect blue team &amp; defesa,appsec &amp; devsecops,grc &amp; auditoria,analista de segurança da informação modelo relacional, acid e as linguagens sql ddl, dml e dcl menor privilégio com roles, grant/revoke, views e row-level security tde, criptografia de coluna, mascaramento dinâmico, auditoria nativa e prepared statements contra sqli simulador matriz grant/revoke com consultas permitidas ou negadas e trilha de auditoria">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -2585,8 +2611,8 @@ h1 {
       data-slug="PCI-DSS"
       data-trilha="6"
       data-nist="Govern / Protect"
-      data-carreiras="GRC &amp; Auditoria,Blue Team &amp; Defesa"
-      data-search="pci-dss pci dss v4.0.1: escopo cde e os 12 requisitos os 6 objetivos e 12 requisitos do padrão de cartões, delimitação do cde, segmentação para reduzir escopo e tipos de saq quais sistemas entram no escopo do pci dss e como reduzir esse escopo sem abrir mão da conformidade? delimitador de escopo cde govern / protect grc &amp; auditoria,blue team &amp; defesa 6 objetivos e 12 requisitos do pci dss v4.0.1, com a diferença entre abordagem definida e customizada pan versus dados sensíveis de autenticação (sad) e tokenização versus truncamento versus criptografia cde, sistemas conectados, segmentação validada por teste, saq a, a-ep, b, c e d, roc, qsa e aoc simulador delimitador de escopo cde: sistemas dentro, conectados ou fora do escopo, com sugestão de saq">
+      data-carreiras="GRC &amp; Auditoria,Blue Team &amp; Defesa,Analista de Segurança da Informação"
+      data-search="pci-dss pci dss v4.0.1: escopo cde e os 12 requisitos os 6 objetivos e 12 requisitos do padrão de cartões, delimitação do cde, segmentação para reduzir escopo e tipos de saq quais sistemas entram no escopo do pci dss e como reduzir esse escopo sem abrir mão da conformidade? delimitador de escopo cde govern / protect grc &amp; auditoria,blue team &amp; defesa,analista de segurança da informação 6 objetivos e 12 requisitos do pci dss v4.0.1, com a diferença entre abordagem definida e customizada pan versus dados sensíveis de autenticação (sad) e tokenização versus truncamento versus criptografia cde, sistemas conectados, segmentação validada por teste, saq a, a-ep, b, c e d, roc, qsa e aoc simulador delimitador de escopo cde: sistemas dentro, conectados ou fora do escopo, com sugestão de saq">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -2630,8 +2656,8 @@ h1 {
       data-slug="Ingles-Tecnico-Ciber"
       data-trilha="7"
       data-nist="Protect"
-      data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,AppSec &amp; DevSecOps,GRC &amp; Auditoria"
-      data-search="ingles-tecnico-ciber inglês técnico para segurança da informação leitura de advisories, registros cve/nvd e rfcs, vocabulário essencial, falsos cognatos e redação técnica em inglês como ler um boletim de segurança em inglês e extrair versão afetada, impacto e mitigação sem erro de interpretação? leitor de advisory protect blue team &amp; defesa,red team &amp; pentest,operações soc &amp; resposta,perícia forense &amp; malware,appsec &amp; devsecops,grc &amp; auditoria estrutura de um advisory: summary, affected versions, impact, mitigation e workaround verbos modais normativos must, should e may conforme a rfc 2119 falsos cognatos da área (exploit, eventually, actually) e diferença entre registro formal e informal simulador leitor de advisory: termos clicáveis, perguntas de compreensão e flashcards de glossário">
+      data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,AppSec &amp; DevSecOps,GRC &amp; Auditoria,Analista de Segurança da Informação"
+      data-search="ingles-tecnico-ciber inglês técnico para segurança da informação leitura de advisories, registros cve/nvd e rfcs, vocabulário essencial, falsos cognatos e redação técnica em inglês como ler um boletim de segurança em inglês e extrair versão afetada, impacto e mitigação sem erro de interpretação? leitor de advisory protect blue team &amp; defesa,red team &amp; pentest,operações soc &amp; resposta,perícia forense &amp; malware,appsec &amp; devsecops,grc &amp; auditoria,analista de segurança da informação estrutura de um advisory: summary, affected versions, impact, mitigation e workaround verbos modais normativos must, should e may conforme a rfc 2119 falsos cognatos da área (exploit, eventually, actually) e diferença entre registro formal e informal simulador leitor de advisory: termos clicáveis, perguntas de compreensão e flashcards de glossário">
       
       <div class="card-header">
         <div class="card-tile-group">
@@ -2675,8 +2701,8 @@ h1 {
       data-slug="Certificacoes-e-Carreira"
       data-trilha="7"
       data-nist="Protect"
-      data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,AppSec &amp; DevSecOps,GRC &amp; Auditoria"
-      data-search="certificacoes-e-carreira formação, certificações e carreira graduações e pós em segurança, certificações ceh, cism, cissp, ccsp, gsec e security+, e papéis do nice framework qual combinação de formação e certificações leva ao perfil de carreira desejado, e que lacunas ainda restam? planejador de certificações protect blue team &amp; defesa,red team &amp; pentest,operações soc &amp; resposta,perícia forense &amp; malware,appsec &amp; devsecops,grc &amp; auditoria graduações (ciência da computação, sistemas de informação) e pós-graduações em segurança da informação certificações de entrada, gestão e especialidade: órgão emissor, domínios, experiência exigida e cpe nice framework (nist sp 800-181) para descrever papéis profissionais simulador planejador de certificações: domínios cobertos pelo currículo, lacunas e ordem de estudo">
+      data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,AppSec &amp; DevSecOps,GRC &amp; Auditoria,Analista de Segurança da Informação"
+      data-search="certificacoes-e-carreira formação, certificações e carreira graduações e pós em segurança, certificações ceh, cism, cissp, ccsp, gsec e security+, e papéis do nice framework qual combinação de formação e certificações leva ao perfil de carreira desejado, e que lacunas ainda restam? planejador de certificações protect blue team &amp; defesa,red team &amp; pentest,operações soc &amp; resposta,perícia forense &amp; malware,appsec &amp; devsecops,grc &amp; auditoria,analista de segurança da informação graduações (ciência da computação, sistemas de informação) e pós-graduações em segurança da informação certificações de entrada, gestão e especialidade: órgão emissor, domínios, experiência exigida e cpe nice framework (nist sp 800-181) para descrever papéis profissionais simulador planejador de certificações: domínios cobertos pelo currículo, lacunas e ordem de estudo">
       
       <div class="card-header">
         <div class="card-tile-group">
