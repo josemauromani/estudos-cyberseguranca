@@ -205,6 +205,10 @@
   padding: 0;
 }
 
+img, select, input, textarea {
+  max-width: 100%;
+}
+
 html {
   font-size: 16px;
   scroll-behavior: smooth;
@@ -261,6 +265,10 @@ code, kbd, samp {
   padding: 0.15rem 0.35rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--rule);
+}
+
+:not(pre) > code {
+  overflow-wrap: anywhere;
 }
 
 pre {
@@ -582,6 +590,11 @@ pre code {
   border: 1px solid var(--rule);
 }
 
+.lab-controls > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .lab-controls label {
   font-size: 0.9rem;
   font-weight: 600;
@@ -801,6 +814,10 @@ pre code {
   .header-field-cell.span-8 {
     grid-column: span 16;
   }
+}
+
+.edr-grid-container {
+  grid-template-columns: 1fr 1fr;
 }
 
 
@@ -1138,6 +1155,10 @@ tr:hover td {
   .lab-body { padding: 1rem; }
   .lab-controls { flex-direction: column; align-items: stretch; }
   .top-nav-inner { padding: 0.5rem 1rem; }
+  .nav-title { display: none; }
+  .nav-actions .badge { display: none; }
+  .btn { overflow-wrap: anywhere; }
+  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media print {
@@ -1381,7 +1402,7 @@ Digite <span style="color: #4ade80; font-weight: bold;">help</span> ou clique no
                 <!-- Linha de Entrada do Prompt -->
                 <div style="display: flex; align-items: center; border-top: 1px solid #1e293b; padding-top: 0.5rem;">
                     <span style="color: #4ade80; margin-right: 0.5rem; font-weight: bold;">analista@osint-box:~$</span>
-                    <input type="text" id="osint-cli-input" style="flex: 1; background: transparent; border: none; outline: none; color: #f8fafc; font-family: inherit; font-size: inherit;" placeholder="Digite um comando aqui..." onkeydown="tratarInputTerminal(event)" autofocus>
+                    <input type="text" id="osint-cli-input" style="flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: #f8fafc; font-family: inherit; font-size: inherit;" placeholder="Digite um comando aqui..." onkeydown="tratarInputTerminal(event)" autofocus>
                     <button class="btn" style="padding: 0.25rem 0.75rem; font-size: 0.75rem; background: #DC2626; color: white;" onclick="executarComandoOsint()">Executar</button>
                 </div>
             </div>
