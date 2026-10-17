@@ -151,37 +151,39 @@
   </div>
 
   <h3>Faixas Oficiais de Severidade Qualitativa</h3>
-  <table style="width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.875rem;">
-    <thead>
-      <tr style="border-bottom:2px solid var(--rule); text-align:left;">
-        <th style="padding:0.6rem; color:var(--muted);">Faixa Numérica</th>
-        <th style="padding:0.6rem; color:var(--muted);">Classificação de Severidade</th>
-        <th style="padding:0.6rem; color:var(--muted);">Exemplo Prático Típico</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr style="border-bottom:1px solid var(--rule);">
-        <td style="padding:0.6rem; font-weight:700; color:#ef4444;">9.0 &ndash; 10.0</td>
-        <td style="padding:0.6rem;"><span class="badge red">CRÍTICA (Critical)</span></td>
-        <td style="padding:0.6rem; color:var(--muted);">RCE não autenticado pela Internet com privilégios de root (ex: Log4Shell).</td>
-      </tr>
-      <tr style="border-bottom:1px solid var(--rule);">
-        <td style="padding:0.6rem; font-weight:700; color:#f59e0b;">7.0 &ndash; 8.9</td>
-        <td style="padding:0.6rem;"><span class="badge amber">ALTA (High)</span></td>
-        <td style="padding:0.6rem; color:var(--muted);">Escalação local de privilégios para root ou vazamento de banco de dados restrito.</td>
-      </tr>
-      <tr style="border-bottom:1px solid var(--rule);">
-        <td style="padding:0.6rem; font-weight:700; color:#0891b2;">4.0 &ndash; 6.9</td>
-        <td style="padding:0.6rem;"><span class="badge blue">MÉDIA (Medium)</span></td>
-        <td style="padding:0.6rem; color:var(--muted);">Cross-Site Scripting (XSS) refletido ou negação de serviço de componente menor.</td>
-      </tr>
-      <tr style="border-bottom:1px solid var(--rule);">
-        <td style="padding:0.6rem; font-weight:700; color:var(--muted);">0.1 &ndash; 3.9</td>
-        <td style="padding:0.6rem;"><span class="badge slate">BAIXA (Low)</span></td>
-        <td style="padding:0.6rem; color:var(--muted);">Vazamento de informações de versão em cabeçalho ou ataque exigindo acesso físico.</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table style="width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.875rem;">
+      <thead>
+        <tr style="border-bottom:2px solid var(--rule); text-align:left;">
+          <th style="padding:0.6rem; color:var(--muted);">Faixa Numérica</th>
+          <th style="padding:0.6rem; color:var(--muted);">Classificação de Severidade</th>
+          <th style="padding:0.6rem; color:var(--muted);">Exemplo Prático Típico</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--rule);">
+          <td style="padding:0.6rem; font-weight:700; color:#ef4444;">9.0 &ndash; 10.0</td>
+          <td style="padding:0.6rem;"><span class="badge red">CRÍTICA (Critical)</span></td>
+          <td style="padding:0.6rem; color:var(--muted);">RCE não autenticado pela Internet com privilégios de root (ex: Log4Shell).</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--rule);">
+          <td style="padding:0.6rem; font-weight:700; color:#f59e0b;">7.0 &ndash; 8.9</td>
+          <td style="padding:0.6rem;"><span class="badge amber">ALTA (High)</span></td>
+          <td style="padding:0.6rem; color:var(--muted);">Escalação local de privilégios para root ou vazamento de banco de dados restrito.</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--rule);">
+          <td style="padding:0.6rem; font-weight:700; color:#0891b2;">4.0 &ndash; 6.9</td>
+          <td style="padding:0.6rem;"><span class="badge blue">MÉDIA (Medium)</span></td>
+          <td style="padding:0.6rem; color:var(--muted);">Cross-Site Scripting (XSS) refletido ou negação de serviço de componente menor.</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--rule);">
+          <td style="padding:0.6rem; font-weight:700; color:var(--muted);">0.1 &ndash; 3.9</td>
+          <td style="padding:0.6rem;"><span class="badge slate">BAIXA (Low)</span></td>
+          <td style="padding:0.6rem; color:var(--muted);">Vazamento de informações de versão em cabeçalho ou ataque exigindo acesso físico.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <h3>As Principais Inovações do CVSS v4.0</h3>
   <p>
@@ -298,42 +300,44 @@
   </div>
 
   <h3>Matriz Recomendada de Acordos de Nível de Serviço (SLAs de Patching)</h3>
-  <table style="width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.875rem;">
-    <thead>
-      <tr style="border-bottom:2px solid var(--rule); text-align:left;">
-        <th style="padding:0.6rem; color:var(--muted);">Classificação de Risco Real</th>
-        <th style="padding:0.6rem; color:var(--muted);">Critérios Combinados</th>
-        <th style="padding:0.6rem; color:var(--muted);">SLA de Correção Máximo</th>
-        <th style="padding:0.6rem; color:var(--muted);">Ação Operacional Exigida</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr style="border-bottom:1px solid var(--rule);">
-        <td style="padding:0.6rem; font-weight:700; color:#ef4444;">EMERGÊNCIA MÁXIMA</td>
-        <td style="padding:0.6rem;">Presente no <strong>CISA KEV</strong> ou <strong>EPSS &gt; 50%</strong></td>
-        <td style="padding:0.6rem; font-weight:700;">Até 48 horas</td>
-        <td style="padding:0.6rem; color:var(--muted);">Mobilização imediata em regime de força-tarefa ou isolamento do ativo.</td>
-      </tr>
-      <tr style="border-bottom:1px solid var(--rule);">
-        <td style="padding:0.6rem; font-weight:700; color:#f59e0b;">ALTA PRIORIDADE</td>
-        <td style="padding:0.6rem;">CVSS &ge; 9.0 (Crítica) sem KEV ativo</td>
-        <td style="padding:0.6rem; font-weight:700;">Até 7 dias</td>
-        <td style="padding:0.6rem; color:var(--muted);">Testes de regressão acelerados e aplicação na próxima janela de manutenção.</td>
-      </tr>
-      <tr style="border-bottom:1px solid var(--rule);">
-        <td style="padding:0.6rem; font-weight:700; color:#0891b2;">MÉDIA PRIORIDADE</td>
-        <td style="padding:0.6rem;">CVSS 7.0 &ndash; 8.9 (Alta) sem exploit ativo</td>
-        <td style="padding:0.6rem; font-weight:700;">Até 30 dias</td>
-        <td style="padding:0.6rem; color:var(--muted);">Ciclo regular mensal de patching de sistemas operacionais e aplicações.</td>
-      </tr>
-      <tr style="border-bottom:1px solid var(--rule);">
-        <td style="padding:0.6rem; font-weight:700; color:var(--muted);">BAIXA PRIORIDADE</td>
-        <td style="padding:0.6rem;">CVSS &lt; 7.0 e baixo EPSS</td>
-        <td style="padding:0.6rem; font-weight:700;">Até 90 dias</td>
-        <td style="padding:0.6rem; color:var(--muted);">Correção durante manutenções programadas ou grandes upgrades de versão.</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table style="width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.875rem;">
+      <thead>
+        <tr style="border-bottom:2px solid var(--rule); text-align:left;">
+          <th style="padding:0.6rem; color:var(--muted);">Classificação de Risco Real</th>
+          <th style="padding:0.6rem; color:var(--muted);">Critérios Combinados</th>
+          <th style="padding:0.6rem; color:var(--muted);">SLA de Correção Máximo</th>
+          <th style="padding:0.6rem; color:var(--muted);">Ação Operacional Exigida</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--rule);">
+          <td style="padding:0.6rem; font-weight:700; color:#ef4444;">EMERGÊNCIA MÁXIMA</td>
+          <td style="padding:0.6rem;">Presente no <strong>CISA KEV</strong> ou <strong>EPSS &gt; 50%</strong></td>
+          <td style="padding:0.6rem; font-weight:700;">Até 48 horas</td>
+          <td style="padding:0.6rem; color:var(--muted);">Mobilização imediata em regime de força-tarefa ou isolamento do ativo.</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--rule);">
+          <td style="padding:0.6rem; font-weight:700; color:#f59e0b;">ALTA PRIORIDADE</td>
+          <td style="padding:0.6rem;">CVSS &ge; 9.0 (Crítica) sem KEV ativo</td>
+          <td style="padding:0.6rem; font-weight:700;">Até 7 dias</td>
+          <td style="padding:0.6rem; color:var(--muted);">Testes de regressão acelerados e aplicação na próxima janela de manutenção.</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--rule);">
+          <td style="padding:0.6rem; font-weight:700; color:#0891b2;">MÉDIA PRIORIDADE</td>
+          <td style="padding:0.6rem;">CVSS 7.0 &ndash; 8.9 (Alta) sem exploit ativo</td>
+          <td style="padding:0.6rem; font-weight:700;">Até 30 dias</td>
+          <td style="padding:0.6rem; color:var(--muted);">Ciclo regular mensal de patching de sistemas operacionais e aplicações.</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--rule);">
+          <td style="padding:0.6rem; font-weight:700; color:var(--muted);">BAIXA PRIORIDADE</td>
+          <td style="padding:0.6rem;">CVSS &lt; 7.0 e baixo EPSS</td>
+          <td style="padding:0.6rem; font-weight:700;">Até 90 dias</td>
+          <td style="padding:0.6rem; color:var(--muted);">Correção durante manutenções programadas ou grandes upgrades de versão.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </section>
 
 <!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (CALCULADORA CVSS & PRIORIZADOR) -->

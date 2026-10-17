@@ -191,6 +191,10 @@
   padding: 0;
 }
 
+img, select, input, textarea {
+  max-width: 100%;
+}
+
 html {
   font-size: 16px;
   scroll-behavior: smooth;
@@ -247,6 +251,10 @@ code, kbd, samp {
   padding: 0.15rem 0.35rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--rule);
+}
+
+:not(pre) > code {
+  overflow-wrap: anywhere;
 }
 
 pre {
@@ -568,6 +576,11 @@ pre code {
   border: 1px solid var(--rule);
 }
 
+.lab-controls > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .lab-controls label {
   font-size: 0.9rem;
   font-weight: 600;
@@ -787,6 +800,10 @@ pre code {
   .header-field-cell.span-8 {
     grid-column: span 16;
   }
+}
+
+.edr-grid-container {
+  grid-template-columns: 1fr 1fr;
 }
 
 
@@ -1124,6 +1141,10 @@ tr:hover td {
   .lab-body { padding: 1rem; }
   .lab-controls { flex-direction: column; align-items: stretch; }
   .top-nav-inner { padding: 0.5rem 1rem; }
+  .nav-title { display: none; }
+  .nav-actions .badge { display: none; }
+  .btn { overflow-wrap: anywhere; }
+  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media print {
