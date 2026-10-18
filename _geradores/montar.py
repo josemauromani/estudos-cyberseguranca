@@ -26,6 +26,14 @@ DEFAULT_ESTUDOS_TXT = GERADORES_DIR / "estudos.txt"
 DEFAULT_BASE_CSS = GERADORES_DIR / "base.css"
 DEFAULT_BASE_JS = GERADORES_DIR / "base.js"
 
+if str(GERADORES_DIR) not in sys.path:
+    sys.path.insert(0, str(GERADORES_DIR))
+
+try:
+    from diagramas import processar_diagramas_html
+except ImportError:
+    from _geradores.diagramas import processar_diagramas_html
+
 
 def normalizar_chave(texto: str) -> str:
     """Normaliza identificador para correspondência insensível a formato e separadores."""
@@ -95,6 +103,7 @@ def montar_treinamento(
     meta: Optional[dict] = None,
     css_path: Optional[Path] = None,
     js_path: Optional[Path] = None,
+    recompilar_diagramas: bool = False,
 ) -> Path:
     """Compila um fragmento HTML em um arquivo de treinamento standalone completo.
 
@@ -105,6 +114,7 @@ def montar_treinamento(
         meta: Metadados contextuais opcionais (slug, trilha, nist, etc.).
         css_path: Caminho customizado para base.css (padrão: _geradores/base.css).
         js_path: Caminho customizado para base.js (padrão: _geradores/base.js).
+        recompilar_diagramas: Se True, força a recompilação dos diagramas Mermaid ignorando cache.
 
     Returns:
         Path para o arquivo gerado.
@@ -141,6 +151,9 @@ def montar_treinamento(
 
     # Leitura do conteúdo do corpo
     body_content = body_path.read_text(encoding="utf-8").strip()
+
+    # Processamento e pré-compilação de diagramas Mermaid embutidos
+    body_content = processar_diagramas_html(body_content, forcar=recompilar_diagramas)
 
     # Montagem do rodapé padronizado
     footer_html = """    <footer class="study-footer">
@@ -239,6 +252,12 @@ def main(argv=None):
         default=None,
         help="Número da trilha (1 a 7) para sobrescrever o valor do catálogo.",
     )
+    parser.add_argument(
+        "--recompilar-diagramas",
+        action="store_true",
+        default=False,
+        help="Força a recompilação de diagramas Mermaid mesmo se estiverem em cache.",
+    )
 
     args = parser.parse_args(argv)
 
@@ -270,6 +289,7 @@ def main(argv=None):
         output_path=output_path,
         titulo=args.titulo,
         meta=meta,
+        recompilar_diagramas=args.recompilar_diagramas,
     )
 
     print(f"[OK] Treinamento compilado com sucesso em: {caminho_final}")

@@ -171,6 +171,60 @@ class TestMontar(unittest.TestCase):
             self.assertIn("<!DOCTYPE html>", content)
             self.assertIn("Criptografia Simétrica, Assimétrica", content)
 
+    def test_montar_treinamento_com_diagrama_mermaid(self):
+        """Verifica a integração e pré-compilação de diagramas Mermaid em montar_treinamento."""
+        self.assertIsNotNone(montar_treinamento, "montar_treinamento deve ser importável")
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            body = tmp_path / "diagrama_body.html"
+            body.write_text(
+                '<pre class="mermaid" data-title="Teste">flowchart TD\nA-->B</pre>',
+                encoding="utf-8",
+            )
+
+            output = tmp_path / "treinamento-diagrama.html"
+            res = montar_treinamento(
+                body_html_path=body,
+                output_path=output,
+                titulo="Treinamento com Diagrama",
+            )
+
+            self.assertTrue(res.exists())
+            content = res.read_text(encoding="utf-8")
+
+            self.assertIn("diagram-box", content)
+            self.assertIn("diagram-header", content)
+            self.assertIn("Teste", content)
+            self.assertIn("diagram-svg-wrap", content)
+            self.assertIn("<svg", content)
+
+    def test_cli_com_recompilar_diagramas(self):
+        """Verifica a execução do CLI com flag --recompilar-diagramas."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            body = tmp_path / "diagrama_cli_body.html"
+            body.write_text(
+                '<pre class="mermaid" data-title="CLI Teste">flowchart LR\nA-->B</pre>',
+                encoding="utf-8",
+            )
+            output = tmp_path / "saida-cli-diagrama.html"
+
+            cmd = [
+                sys.executable,
+                str(self.montar_py),
+                str(body),
+                str(output),
+                "--recompilar-diagramas",
+            ]
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, f"CLI falhou: {result.stderr}")
+            self.assertTrue(output.exists())
+            content = output.read_text(encoding="utf-8")
+            self.assertIn("diagram-box", content)
+            self.assertIn("CLI Teste", content)
+            self.assertIn("<svg", content)
+
 
 if __name__ == "__main__":
     unittest.main()

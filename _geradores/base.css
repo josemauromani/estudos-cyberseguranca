@@ -57,6 +57,8 @@
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-pill: 9999px;
+  --radius: var(--radius-md);
+  --accent: var(--t1-blue);
 
   /* Sombras */
   --shadow-sm: 0 1px 2px rgba(15, 23, 28, 0.05);
@@ -1120,7 +1122,66 @@ tr:hover td {
 }
 
 /* --------------------------------------------------------------------------
-   14. Rodapé e Referências
+   14. Diagramas de Arquitetura e Fluxo (Mermaid pré-compilado em SVG)
+   -------------------------------------------------------------------------- */
+.diagram-box {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.diagram-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 1rem;
+  background: var(--ground);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.diagram-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.diagram-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.725rem;
+  font-family: var(--font-mono);
+}
+
+.diagram-svg-wrap {
+  padding: 1.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  text-align: center;
+  background: var(--surface);
+}
+
+.diagram-svg-wrap svg {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+  margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   15. Rodapé e Referências
    -------------------------------------------------------------------------- */
 .study-footer {
   margin-top: 3.5rem;
@@ -1132,7 +1193,7 @@ tr:hover td {
 }
 
 /* --------------------------------------------------------------------------
-   15. Responsividade & Impressão (@media)
+   16. Responsividade & Impressão (@media)
    -------------------------------------------------------------------------- */
 @media (max-width: 640px) {
   h1 { font-size: 1.85rem; }
