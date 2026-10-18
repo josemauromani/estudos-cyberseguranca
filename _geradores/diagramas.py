@@ -4,6 +4,7 @@ Módulo de extração, compilação e cache de diagramas Mermaid para SVG.
 from __future__ import annotations
 
 import hashlib
+import html as html_lib
 import re
 import subprocess
 import sys
@@ -62,7 +63,7 @@ def calcular_hash_mermaid(codigo: str) -> str:
     """
     Calcula hash SHA-256 de 12 caracteres hexadecimais sobre o código Mermaid normalizado.
     """
-    normalizado = codigo.strip().encode("utf-8")
+    normalizado = codigo.strip().replace("\r\n", "\n").encode("utf-8")
     return hashlib.sha256(normalizado).hexdigest()[:12]
 
 
@@ -177,16 +178,17 @@ def processar_diagramas_html(
             # Fallback seguro: mantém o bloco original intacto
             continue
 
-        titulo = bloco["titulo"] if bloco["titulo"] else "Diagrama de Arquitetura"
+        titulo_puro = bloco["titulo"] if bloco["titulo"] else "Diagrama de Arquitetura"
+        titulo_escapado = html_lib.escape(titulo_puro, quote=True)
         svg_inline = svg_content.strip()
 
         markup_substituto = (
             f'<div class="diagram-box">\n'
             f'  <div class="diagram-header">\n'
-            f'    <span class="diagram-title">{titulo}</span>\n'
+            f'    <span class="diagram-title">{titulo_escapado}</span>\n'
             f'    <span class="diagram-badge">Mermaid Arquitetura</span>\n'
             f'  </div>\n'
-            f'  <div class="diagram-svg-wrap" role="img" aria-label="{titulo}">\n'
+            f'  <div class="diagram-svg-wrap" role="img" aria-label="{titulo_escapado}">\n'
             f'    {svg_inline}\n'
             f'  </div>\n'
             f'</div>'
