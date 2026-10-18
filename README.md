@@ -45,6 +45,50 @@ O portal `index.html` conta com:
 
 ## 📚 Grade Curricular dos 33 Módulos
 
+### Estrutura das Trilhas e Percurso Formativo
+
+```mermaid
+flowchart TD
+    subgraph Fundacao["1. Fundação Universal"]
+        T1["Trilha 1: Fundamentos & Redes<br><small>Módulos 01 a 05 | CIA, TCP/IP, Criptografia, IAM e Perímetro</small>"]
+    end
+
+    subgraph Tecnicas["2. Trilhas Técnicas e Especialidades"]
+        T2["Trilha 2: Segurança Defensiva<br><small>Módulos 06 a 10, 29, 30 | Hardening, Firewalls, Zero Trust, EDR e DB</small>"]
+        T3["Trilha 3: Segurança Ofensiva<br><small>Módulos 11 a 15 | Reconhecimento, OWASP Top 10, APIs e Pentest</small>"]
+        T4["Trilha 4: Operações, SOC & Resposta<br><small>Módulos 16 a 20 | SIEM, Sigma, CTI, Resposta e Forense</small>"]
+        T5["Trilha 5: Especialidades & Fronteiras<br><small>Módulos 21 a 24 | Nuvem, DevSecOps, IoT/TO e IA</small>"]
+    end
+
+    subgraph Governanca["3. Governança e Estratégia"]
+        T6["Trilha 6: Governança, Riscos & Conformidade<br><small>Módulos 25 a 28, 31 | ISO 27001, NIST CSF, LGPD e PCI-DSS</small>"]
+        T7["Trilha 7: Carreira & Formação<br><small>Módulos 32 e 33 | Inglês Técnico e Planejamento Profissional</small>"]
+    end
+
+    subgraph Conexoes["4. Rota Profissional e Certificações"]
+        ROTA["🎯 Rota Analista de Segurança da Informação<br><small>Firewall, EDR, DLP, SQL, Normas, Incidentes e Controles</small>"]
+        CERTS["🏆 Certificações Internacionais & Concursos<br><small>CompTIA Security+, CySA+, CEH, CISSP, CISM e Provas de TI</small>"]
+    end
+
+    T1 --> T2
+    T1 --> T3
+    T1 --> T6
+
+    T2 --> T4
+    T3 --> T4
+    T2 --> T5
+
+    T2 --> ROTA
+    T4 --> ROTA
+    T6 --> ROTA
+    T7 --> ROTA
+
+    T2 --> CERTS
+    T4 --> CERTS
+    T6 --> CERTS
+    T7 --> CERTS
+```
+
 | # | Slug / Pasta | Título do Estudo | Trilha Temática | Função NIST CSF 2.0 | Simulador Interativo em JavaScript |
 |:---:|---|---|---|:---:|---|
 | **01** | `Fundamentos-Ciber` | Tríade CIA, Ameaças e Modelagem STRIDE | Trilha 1: Fundamentos & Redes | Identify | STRIDE Threat Canvas interativo |
@@ -104,6 +148,37 @@ O portal também exibe a **Matriz de Certificações** (CEH, CISM, CISSP, CCSP, 
 ## 🛠️ Como o Material é Gerado
 
 A plataforma utiliza um pipeline de compilação em Python puro e Shell Script, localizado na pasta `_geradores/`.
+
+### Fluxo do Pipeline de Compilação
+
+```mermaid
+flowchart LR
+    subgraph Fontes["Arquivos Fonte (_geradores/)"]
+        direction TB
+        B["_body.html<br>(Fragmentos e Labs)"]
+        E["estudos.txt<br>(Catálogo e Metadados)"]
+        A["base.css & base.js<br>(Design System e Engine)"]
+    end
+
+    subgraph Compilacao["Pipeline de Compilação"]
+        direction TB
+        M["montar.py<br>(Injeção de Assets e Validação)"]
+        D["diagramas.py<br>(Renderização SVG Mermaid + Cache)"]
+        M <--> D
+    end
+
+    subgraph Saida["Entrega Offline Standalone"]
+        direction TB
+        H["treinamento-*.html<br>(33 Módulos 100% Offline)"]
+        I["index.html<br>(Portal Central Dinâmico)"]
+    end
+
+    B --> M
+    E --> M
+    A --> M
+    M --> H
+    E --> I
+```
 
 ### Estrutura do Pipeline
 

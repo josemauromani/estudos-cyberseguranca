@@ -161,6 +161,44 @@ Todos os módulos utilizam as classes CSS padronizadas em `base.css`:
 </div>
 ```
 
+### 3.6 Diagramas Arquiteturais e Lógicos (`.diagram-box` e `<pre class="mermaid">`)
+
+Para esquemas arquiteturais, fluxos de decisão e dissecção de protocolos, utilize a sintaxe canônica **Mermaid** encapsulada no container `.diagram-box`:
+
+```html
+<div class="diagram-box">
+  <div class="diagram-header">
+    <span class="diagram-title">Estrutura do Quadro Ethernet e Tag IEEE 802.1Q</span>
+    <span class="diagram-badge">Mermaid</span>
+  </div>
+  <pre class="mermaid" data-title="Estrutura do Quadro Ethernet e Tag IEEE 802.1Q">
+flowchart TD
+    subgraph Quadro["Quadro Ethernet 802.3"]
+        DMAC["MAC Destino<br><small>6 bytes</small>"]
+        SMAC["MAC Origem<br><small>6 bytes</small>"]
+        TAG["Tag 802.1Q<br><small>4 bytes (Opcional)</small>"]
+        TP["EtherType<br><small>2 bytes</small>"]
+        PAY["Payload de Dados<br><small>46 a 1500 bytes</small>"]
+        FCS["FCS / CRC<br><small>4 bytes</small>"]
+    end
+    DMAC --> SMAC --> TAG --> TP --> PAY --> FCS
+  </pre>
+</div>
+```
+
+#### Boas Práticas de Diagramação:
+1. **Orientação:** Prefira `flowchart TD` (vertical de cima para baixo) para hierarquias conceituais, árvores de decisão ou planos de controle e dados. Utilize `flowchart LR` (horizontal da esquerda para a direita) para pipelines e trajetórias lineares de pacotes.
+2. **Nós Explicativos e Quebras de Linha:** Utilize `<br>` e `<small>` para adicionar legendas técnicas e tamanhos de campos sem alargar os nós desnecessariamente (ex.: `id["Policy Engine (PE)<br><small>Avaliação e Cálculo de Risco</small>"]`).
+3. **Escapamento e Aspas Duplas:** Sempre envolva o texto dos nós entre aspas duplas: `node["Texto com (Parênteses)"]` para evitar erros de sintaxe no parser Mermaid.
+4. **Agrupamento por Subgrafos:** Use `subgraph Nome["Título Visível"]` para isolar zonas de segurança (ex.: DMZ vs LAN), planos arquiteturais (Controle vs Dados) ou camadas da pilha OSI/TCP-IP.
+5. **Responsividade Móvel:** Evite cadeias horizontais longas sem quebras; prefira fluxos em colunas ou em cascata que caibam confortavelmente em telas de 360px a 480px.
+
+#### Pré-compilação Automática e Cache de SVGs:
+- **Zero Runtime Externo:** A plataforma preserva o compromisso de **100% offline**. Nenhum arquivo JavaScript do Mermaid (`mermaid.min.js`) ou requisição CDN é executada no navegador do aluno.
+- **Pipeline no `montar.py`:** Durante a compilação, o compilador detecta blocos `<pre class="mermaid">`, calcula o hash SHA-256 do código e busca o vetor SVG pré-renderizado em `_geradores/cache_diagramas/<hash>.svg`.
+- **Injeção SVG Direta:** O bloco `<pre>` é substituído por `<div class="diagram-svg-wrap" role="img" aria-label="..."><svg>...</svg></div>`, com renderização vetorial cristalina em qualquer densidade de pixels.
+- **Geração Automática via CLI:** Se um diagrama novo for criado ou um existente for editado, o compilador invoca `npx @mermaid-js/mermaid-cli` em Chromium headless com fundo transparente e tema escuro, persistindo o novo SVG no cache. Compilações subsequentes utilizam o cache instantaneamente sem necessidade de invocar o Node.js.
+
 ---
 
 ## 4. Diretrizes Técnicas para Simuladores em JavaScript
@@ -202,5 +240,6 @@ Antes de publicar ou compilar um novo estudo, confirme se todos os critérios ab
 - [ ] O simulador prático em JS funciona sem disparar erros no console do navegador (`F12`).
 - [ ] Os checklists gravam o estado no `localStorage` e o restauram ao recarregar a página.
 - [ ] Todas as questões do quiz possuem feedback pedagógico justificando as alternativas.
+- [ ] Diagramas arquiteturais utilizam `<pre class="mermaid">` e compilam para SVG sem quebra visual.
 - [ ] A compilação via `./_geradores/gerar.sh <slug>` executa com sucesso (`exit code 0`).
 - [ ] O arquivo gerado funciona 100% offline via protocolo `file:///`.

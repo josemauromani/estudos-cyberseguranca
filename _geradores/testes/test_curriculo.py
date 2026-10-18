@@ -67,6 +67,30 @@ class TestCurriculo(unittest.TestCase):
             self.guia_file.stat().st_size, 1000, "GUIA-DO-AUTOR.md deve conter diretrizes completas"
         )
 
+    def test_diagramas_mermaid_na_documentacao(self):
+        """Verifica se README.md, CURRICULO.md e GUIA-DO-AUTOR.md possuem os diagramas e diretrizes Mermaid."""
+        readme_file = self.root / "README.md"
+        self.assertTrue(readme_file.exists(), "README.md deve existir")
+
+        readme_txt = readme_file.read_text(encoding="utf-8")
+        self.assertIn("```mermaid", readme_txt)
+        self.assertIn("flowchart LR", readme_txt)
+        self.assertIn("flowchart TD", readme_txt)
+        self.assertIn("diagramas.py", readme_txt)
+        self.assertIn("Rota Analista de Segurança da Informação", readme_txt)
+
+        curriculo_txt = self.curriculo_file.read_text(encoding="utf-8")
+        self.assertIn("```mermaid", curriculo_txt)
+        self.assertIn("NIST CSF 2.0 (Funções Centrais)", curriculo_txt)
+        self.assertIn("Govern (GV)", curriculo_txt)
+        self.assertIn("Recover (RC)", curriculo_txt)
+
+        guia_txt = self.guia_file.read_text(encoding="utf-8")
+        self.assertIn("Diagramas Arquiteturais e Lógicos", guia_txt)
+        self.assertIn('pre class="mermaid"', guia_txt)
+        self.assertIn("cache_diagramas", guia_txt)
+        self.assertIn("npx @mermaid-js/mermaid-cli", guia_txt)
+
 
 if __name__ == "__main__":
     unittest.main()

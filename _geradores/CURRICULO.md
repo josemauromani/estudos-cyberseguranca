@@ -16,6 +16,57 @@ O projeto segue quatro diretrizes fundamentais:
 
 ## 2. Mapa das 7 Trilhas Temáticas
 
+A matriz pedagógica conecta diretamente as 7 trilhas estruturantes aos 6 pilares de governança e operação técnica preconizados pelo **NIST CSF 2.0**:
+
+```mermaid
+flowchart LR
+    subgraph Trilhas["7 Trilhas Temáticas"]
+        direction TB
+        T1["Trilha 1: Fundamentos & Redes"]
+        T2["Trilha 2: Segurança Defensiva"]
+        T3["Trilha 3: Segurança Ofensiva"]
+        T4["Trilha 4: Operações, SOC & Resposta"]
+        T5["Trilha 5: Especialidades & Fronteiras"]
+        T6["Trilha 6: Governança, Riscos & Conformidade"]
+        T7["Trilha 7: Carreira & Formação"]
+    end
+
+    subgraph NIST["NIST CSF 2.0 (Funções Centrais)"]
+        direction TB
+        GV["Govern (GV)<br><small>Políticas, Governança e Riscos</small>"]
+        ID["Identify (ID)<br><small>Mapeamento de Ativos e Ameaças</small>"]
+        PR["Protect (PR)<br><small>Salvaguardas, IAM e Hardening</small>"]
+        DE["Detect (DE)<br><small>Monitoramento, Logs e Telemetria</small>"]
+        RS["Respond (RS)<br><small>Contenção e Resposta a Incidentes</small>"]
+        RC["Recover (RC)<br><small>Continuidade e Resiliência Operacional</small>"]
+    end
+
+    T1 --> ID
+    T1 --> PR
+    T1 --> DE
+
+    T2 --> ID
+    T2 --> PR
+    T2 --> DE
+
+    T3 --> ID
+    T3 --> PR
+
+    T4 --> ID
+    T4 --> DE
+    T4 --> RS
+
+    T5 --> PR
+    T5 --> DE
+
+    T6 --> GV
+    T6 --> ID
+    T6 --> PR
+    T6 --> RC
+
+    T7 --> PR
+```
+
 | Trilha | Denominação | Cor do Tema | Foco Técnico | Módulos |
 |---|---|---|---|---|
 | **Trilha 1** | Fundamentos & Redes | `#2563EB` (Azul) | Base sólida: CIA, protocolos, criptografia, IAM e perímetro | 01 ao 05 |
