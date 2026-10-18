@@ -123,21 +123,36 @@
     </div>
   </div>
 
-  <div class="terminal-box">
-    <div class="terminal-header">
-      <span class="terminal-title">Estrutura da Tag IEEE 802.1Q (4 Bytes inseridos no quadro Ethernet)</span>
-      <button class="terminal-copy-btn" onclick="copyCode(this, 'vlan-tag-struct')">Copiar</button>
-    </div>
-    <pre id="vlan-tag-struct"><code>[ Preâmbulo ] [ MAC Destino ] [ MAC Origem ] [ 802.1Q Tag: 4 Bytes ] [ EtherType ] [ Dados ] [ FCS ]
-                                                │
-                 ┌──────────────────────────────┴──────────────────────────────┐
-                 ▼                                                             ▼
-           TPID (2 Bytes)                                                TCI (2 Bytes)
-         Valor: 0x8100 (Indica presença da tag)   ┌─────────────────┬───────────┴───────────┐
-                                                  ▼                 ▼                       ▼
-                                            PCP (3 bits)       DEI (1 bit)             VID (12 bits)
-                                            (Prioridade QoS)  (Drop Elegible)       <strong>VLAN ID (1 a 4094)</strong></code></pre>
-  </div>
+  <pre class="mermaid" data-title="Estrutura da Tag IEEE 802.1Q">
+flowchart TD
+    subgraph QUADRO["Quadro Ethernet com Tag 802.1Q (Camada 2)"]
+        direction LR
+        P["Preâmbulo<br><small>8 Bytes</small>"]
+        DMAC["MAC Destino<br><small>6 Bytes</small>"]
+        SMAC["MAC Origem<br><small>6 Bytes</small>"]
+        TAG["Tag IEEE 802.1Q<br><small>4 Bytes</small>"]
+        ET["EtherType<br><small>2 Bytes</small>"]
+        PAY["Payload IPv4/IPv6<br><small>46 - 1500 Bytes</small>"]
+        FCS["FCS CRC-32<br><small>4 Bytes</small>"]
+
+        P --- DMAC --- SMAC --- TAG --- ET --- PAY --- FCS
+    end
+
+    subgraph TAG_EXP["Detalhamento da Tag IEEE 802.1Q (4 Bytes / 32 bits)"]
+        direction TB
+        TPID["TPID: Tag Protocol Identifier (2 Bytes)<br><strong>Valor Fixo: 0x8100</strong> (Identifica quadro 802.1Q)"]
+
+        subgraph TCI["TCI: Tag Control Information (2 Bytes / 16 bits)"]
+            direction LR
+            PCP["PCP (3 bits)<br><small>Priority Code Point (QoS 802.1p)</small>"]
+            DEI["DEI (1 bit)<br><small>Drop Eligible Indicator</small>"]
+            VID["VID (12 bits)<br><small>VLAN ID (Faixa: 1 a 4094)</small>"]
+            PCP --- DEI --- VID
+        end
+    end
+
+    TAG ==>|"Decomposição"| TAG_EXP
+  </pre>
 
   <div class="callout warning">
     <h4>Ataques de Salto de VLAN (VLAN Hopping) e Mitigações de Hardening</h4>

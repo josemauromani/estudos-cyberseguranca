@@ -119,28 +119,23 @@
     </div>
   </div>
 
-  <div class="terminal-box">
-    <div class="terminal-header">
-      <span class="terminal-title">Fluxo Lógico de Decisão NIST SP 800-207</span>
-      <button class="terminal-copy-btn" onclick="copyCode(this, 'nist-zta-diagram')">Copiar</button>
-    </div>
-    <pre id="nist-zta-diagram"><code>┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                               PLANO DE CONTROLE (PDP)                                  │
-│   ┌────────────────────────────────┐            ┌──────────────────────────────────┐   │
-│   │    Policy Engine (PE)          │◄──────────►│   Policy Administrator (PA)      │   │
-│   │   (Avaliação e Cálculo Risco)  │            │  (Comando de Abertura/Revogação) │   │
-│   └───────────────▲────────────────┘            └─────────────────┬────────────────┘   │
-└───────────────────┼───────────────────────────────────────────────┼────────────────────┘
-                    │ Telemetria & Contexto                         │ Comando de Acesso
-                    │ (SIEM, EDR, RH, Threat Intel)                 ▼
-┌───────────────────┴───────────────────────────────────────────────┴────────────────────┐
-│                                PLANO DE DADOS (DATA PLANE)                             │
-│   ┌─────────────┐                      ┌───────────────────┐           ┌───────────┐   │
-│   │   Subject   │ ═══════════════════► │        PEP        │ ════════► │  Recurso  │   │
-│   │  (Usuário)  │                      │ (Gateway / Proxy) │           │ Protegido │   │
-│   └─────────────┘                      └───────────────────┘           └───────────┘   │
-└────────────────────────────────────────────────────────────────────────────────────────┘</code></pre>
-  </div>
+  <pre class="mermaid" data-title="Fluxo Lógico de Decisão NIST SP 800-207">
+flowchart TD
+    subgraph PDP["PLANO DE CONTROLE (PDP)"]
+        PE["Policy Engine (PE)<br><small>Avaliação e Cálculo de Risco</small>"]
+        PA["Policy Administrator (PA)<br><small>Comando de Abertura/Revogação</small>"]
+        PE <--> PA
+    end
+    subgraph DP["PLANO DE DADOS (DATA PLANE)"]
+        Subject["Subject<br><small>Usuário / Dispositivo</small>"]
+        PEP["PEP Gateway<br><small>Ponto de Execução de Políticas</small>"]
+        Recurso["Recurso Protegido<br><small>Workload / Banco / App</small>"]
+        Subject ==>|"1. Requisição de Acesso"| PEP
+        PEP ==>|"3. Acesso Autorizado"| Recurso
+    end
+    Subject -.->|"Telemetria & Contexto"| PE
+    PA -->|"2. Comando de Acesso"| PEP
+  </pre>
 </section>
 
 <!-- SEÇÃO 3: MICROSEGMENTAÇÃO E ZTNA VS VPN -->

@@ -133,22 +133,36 @@
     </div>
   </div>
 
-  <div class="terminal-box">
-    <div class="terminal-header">
-      <span class="terminal-title">Formato Canônico da String de Vetor CVSS v3.1</span>
-      <button class="terminal-copy-btn" onclick="copyCode(this, 'cvss-vector-example')">Copiar</button>
-    </div>
-    <pre id="cvss-vector-example"><code>CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H  &bull;  Score: <strong>10.0 (Crítica)</strong>
-  │      │    │    │    │    │   │   │   └─ Disponibilidade: High
-  │      │    │    │    │    │   │   └───── Integridade: High
-  │      │    │    │    │    │   └───────── Confidencialidade: High
-  │      │    │    │    │    └───────────── Escopo: Changed (Impacto expandido)
-  │      │    │    │    └────────────────── Interação do Usuário: None
-  │      │    │    └─────────────────────── Privilégios Exigidos: None
-  │      │    └──────────────────────────── Complexidade de Ataque: Low
-  │      └───────────────────────────────── Vetor de Ataque: Network (Remoto)
-  └──────────────────────────────────────── Versão do Padrão: CVSS v3.1</code></pre>
-  </div>
+  <pre class="mermaid" data-title="Métricas Base do Vetor CVSS v3.1">
+flowchart LR
+    subgraph EXP["Métricas de Explorabilidade (Exploitability)"]
+        direction TB
+        AV["AV: Attack Vector<br><small>N (Network) / A (Adjacent) / L (Local) / P (Physical)</small>"]
+        AC["AC: Attack Complexity<br><small>L (Low) / H (High)</small>"]
+        PR["PR: Privileges Required<br><small>N (None) / L (Low) / H (High)</small>"]
+        UI["UI: User Interaction<br><small>N (None) / R (Required)</small>"]
+    end
+
+    subgraph SCOPE["Métrica de Escopo (Scope)"]
+        direction TB
+        S["S: Scope<br><strong>U (Unchanged)</strong> vs <strong>C (Changed)</strong><br><small>Transpõe fronteira de autorização do componente</small>"]
+    end
+
+    subgraph IMP["Métricas de Impacto (Impacto CIA)"]
+        direction TB
+        C["C: Confidentiality<br><small>N (None) / L (Low) / H (High)</small>"]
+        I["I: Integrity<br><small>N (None) / L (Low) / H (High)</small>"]
+        A["A: Availability<br><small>N (None) / L (Low) / H (High)</small>"]
+    end
+
+    subgraph SCORE["Score Base CVSS v3.1"]
+        BS["Base Score (0.0 - 10.0)<br><small>None (0.0) &bull; Baixa (0.1-3.9)<br>Média (4.0-6.9) &bull; Alta (7.0-8.9)<br>Crítica (9.0-10.0)</small>"]
+    end
+
+    EXP --> SCOPE
+    SCOPE --> IMP
+    IMP --> SCORE
+  </pre>
 
   <h3>Faixas Oficiais de Severidade Qualitativa</h3>
   <div class="table-responsive">

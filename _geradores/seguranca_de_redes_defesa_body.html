@@ -57,6 +57,40 @@
     </div>
   </div>
 
+  <pre class="mermaid" data-title="Topologia Comparativa: IDS vs IPS e Proxies Reversos">
+flowchart TD
+    subgraph WAN["Origem do Tráfego"]
+        CLI["Clientes & Atacantes<br><small>Internet / Rede Externa</small>"]
+    end
+
+    subgraph TOPOLOGIAS["Topologias de Inspeção e Defesa"]
+        subgraph MODO_IPS["Modo In-Line Ativo: IPS"]
+            direction LR
+            IPS_IN["Fluxo Direto"] --> IPS["IPS em Linha<br><small>Snort 3 / Suricata (AF_PACKET/NFQ)</small>"]
+            IPS -->|"Detectou Assinatura"| DROP["Ação DROP / TCP RST<br><small>Bloqueio em Tempo Real</small>"]
+            IPS -->|"Tráfego Limpo"| SRV1["Servidores Internos"]
+        end
+
+        subgraph MODO_IDS["Modo Passivo Fora-de-Banda: IDS"]
+            direction LR
+            TAP["Network TAP / Porta SPAN"] -->|"Cópia Espelhada"| IDS["IDS Passivo<br><small>Snort / Suricata</small>"]
+            IDS -->|"Gera Alerta"| SIEM["SIEM / SOC (EVE JSON)<br><small>Zero impacto na latência</small>"]
+            TAP -->|"Fluxo Direto Sem Bloqueio"| SRV2["Host Destino"]
+        end
+
+        subgraph MODO_WAF["Inspeção L7 & Terminação: WAF / Proxy Reverso"]
+            direction LR
+            WAF_IN["Requisição HTTPS"] --> WAF["WAF / Reverse Proxy<br><small>Terminação TLS + OWASP CRS</small>"]
+            WAF -->|"Score Anomalia Excedido"| WAF_403["HTTP 403 Forbidden<br><small>SQLi / XSS Interceptado</small>"]
+            WAF -->|"mTLS / Conexão Limpa"| APPS["Web Apps / APIs"]
+        end
+    end
+
+    CLI ==> MODO_IPS
+    CLI ==> MODO_IDS
+    CLI ==> MODO_WAF
+  </pre>
+
   <h3>Motores de Inspeção: Snort vs Suricata</h3>
   <p>
     Os dois motores de código aberto mais consagrados mundialmente compartilham sintaxes de regras compatíveis,

@@ -71,6 +71,8 @@
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-pill: 9999px;
+  --radius: var(--radius-md);
+  --accent: var(--t1-blue);
 
   /* Sombras */
   --shadow-sm: 0 1px 2px rgba(15, 23, 28, 0.05);
@@ -1134,7 +1136,66 @@ tr:hover td {
 }
 
 /* --------------------------------------------------------------------------
-   14. Rodapé e Referências
+   14. Diagramas de Arquitetura e Fluxo (Mermaid pré-compilado em SVG)
+   -------------------------------------------------------------------------- */
+.diagram-box {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.diagram-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 1rem;
+  background: var(--ground);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.diagram-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.diagram-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.725rem;
+  font-family: var(--font-mono);
+}
+
+.diagram-svg-wrap {
+  padding: 1.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  text-align: center;
+  background: var(--surface);
+}
+
+.diagram-svg-wrap svg {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+  margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   15. Rodapé e Referências
    -------------------------------------------------------------------------- */
 .study-footer {
   margin-top: 3.5rem;
@@ -1146,7 +1207,7 @@ tr:hover td {
 }
 
 /* --------------------------------------------------------------------------
-   15. Responsividade & Impressão (@media)
+   16. Responsividade & Impressão (@media)
    -------------------------------------------------------------------------- */
 @media (max-width: 640px) {
   h1 { font-size: 1.85rem; }
@@ -1335,22 +1396,15 @@ tr:hover td {
     </div>
   </div>
 
-  <div class="terminal-box">
-    <div class="terminal-header">
-      <span class="terminal-title">Formato Canônico da String de Vetor CVSS v3.1</span>
-      <button class="terminal-copy-btn" onclick="copyCode(this, 'cvss-vector-example')">Copiar</button>
-    </div>
-    <pre id="cvss-vector-example"><code>CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H  &bull;  Score: <strong>10.0 (Crítica)</strong>
-  │      │    │    │    │    │   │   │   └─ Disponibilidade: High
-  │      │    │    │    │    │   │   └───── Integridade: High
-  │      │    │    │    │    │   └───────── Confidencialidade: High
-  │      │    │    │    │    └───────────── Escopo: Changed (Impacto expandido)
-  │      │    │    │    └────────────────── Interação do Usuário: None
-  │      │    │    └─────────────────────── Privilégios Exigidos: None
-  │      │    └──────────────────────────── Complexidade de Ataque: Low
-  │      └───────────────────────────────── Vetor de Ataque: Network (Remoto)
-  └──────────────────────────────────────── Versão do Padrão: CVSS v3.1</code></pre>
+  <div class="diagram-box">
+  <div class="diagram-header">
+    <span class="diagram-title">Métricas Base do Vetor CVSS v3.1</span>
+    <span class="diagram-badge">Mermaid Arquitetura</span>
   </div>
+  <div class="diagram-svg-wrap" role="img" aria-label="Métricas Base do Vetor CVSS v3.1">
+    <svg id="my-svg" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 1288px; background-color: transparent;" viewBox="4 4 1288 403" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#my-svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#ccc;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#a44141;}#my-svg .error-text{fill:#ddd;stroke:#ddd;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:lightgrey;stroke:lightgrey;}#my-svg .marker.cross{stroke:lightgrey;}#my-svg svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#my-svg p{margin:0;}#my-svg .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#ccc;}#my-svg .cluster-label text{fill:#F9FFFE;}#my-svg .cluster-label span{color:#F9FFFE;}#my-svg .cluster-label span p{background-color:transparent;}#my-svg .label text,#my-svg span{fill:#ccc;color:#ccc;}#my-svg .node rect,#my-svg .node circle,#my-svg .node ellipse,#my-svg .node polygon,#my-svg .node path{fill:#1f2020;stroke:#ccc;stroke-width:1px;}#my-svg .rough-node .label text,#my-svg .node .label text,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-anchor:middle;}#my-svg .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#my-svg .rough-node .label,#my-svg .node .label,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-align:center;}#my-svg .node.clickable{cursor:pointer;}#my-svg .root .anchor path{fill:lightgrey!important;stroke-width:0;stroke:lightgrey;}#my-svg .arrowheadPath{fill:lightgrey;}#my-svg .edgePaths .path{stroke:lightgrey;stroke-width:1px;}#my-svg .flowchart-link{stroke:lightgrey;fill:none;}#my-svg .edgeLabel{background-color:hsl(0, 0%, 34.4117647059%);text-align:center;}#my-svg .edgeLabel p{background-color:hsl(0, 0%, 34.4117647059%);}#my-svg .edgeLabel rect{opacity:0.5;background-color:hsl(0, 0%, 34.4117647059%);fill:hsl(0, 0%, 34.4117647059%);}#my-svg .labelBkg{background-color:rgba(87.75, 87.75, 87.75, 0.5);}#my-svg .cluster rect{fill:hsl(180, 1.5873015873%, 28.3529411765%);stroke:rgba(255, 255, 255, 0.25);stroke-width:1px;}#my-svg .cluster text{fill:#F9FFFE;}#my-svg .cluster span{color:#F9FFFE;}#my-svg .node .collapsed-indicator{fill:rgba(255, 255, 255, 0.25);stroke:none;opacity:0.6;}#my-svg .node .collapsed-separator{stroke:rgba(255, 255, 255, 0.25);stroke-width:0.75px;}#my-svg div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(20, 1.5873015873%, 12.3529411765%);border:1px solid rgba(255, 255, 255, 0.25);border-radius:2px;pointer-events:none;z-index:100;}#my-svg .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#ccc;}#my-svg rect.text{fill:none;stroke-width:0;}#my-svg .icon-shape,#my-svg .image-shape{background-color:hsl(0, 0%, 34.4117647059%);text-align:center;}#my-svg .icon-shape p,#my-svg .image-shape p{background-color:hsl(0, 0%, 34.4117647059%);padding:2px;}#my-svg .icon-shape .label rect,#my-svg .image-shape .label rect{opacity:0.5;background-color:hsl(0, 0%, 34.4117647059%);fill:hsl(0, 0%, 34.4117647059%);}#my-svg .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#my-svg .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#my-svg .node .neo-node{stroke:#ccc;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#my-svg [data-look="neo"].node path{stroke:url(#my-svg-gradient);stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#ccc;filter:none;}#my-svg [data-look="neo"].node circle{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node circle .state-start{fill:#000000;}#my-svg [data-look="neo"].icon-shape .icon{fill:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="my-svg_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"/></marker><marker id="my-svg_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"/></marker><g class="root"><g class="clusters"><g class="cluster" id="my-svg-SCORE" data-look="neo"><rect style="" x="1084" y="72" width="200" height="267"/><g class="cluster-label" transform="translate(1108.4375, 72)"><foreignObject width="151.125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel"><p>Score Base CVSS v3.1</p></span></div></foreignObject></g></g><g class="cluster" id="my-svg-IMP" data-look="neo"><rect style="" x="668" y="48" width="376" height="315"/><g class="cluster-label" transform="translate(732.0234375, 48)"><foreignObject width="247.953125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel"><p>Métricas de Impacto (Impacto CIA)</p></span></div></foreignObject></g></g><g class="cluster" id="my-svg-SCOPE" data-look="neo"><rect style="" x="428" y="84" width="200" height="243"/><g class="cluster-label" transform="translate(433.859375, 84)"><foreignObject width="188.28125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel"><p>Métrica de Escopo (Scope)</p></span></div></foreignObject></g></g><g class="cluster" id="my-svg-EXP" data-look="neo"><rect style="" x="12" y="12" width="376" height="387"/><g class="cluster-label" transform="translate(44.9375, 12)"><foreignObject width="310.125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel"><p>Métricas de Explorabilidade (Exploitability)</p></span></div></foreignObject></g></g></g><g class="edges edgePaths"><path d="M388,205.5L424,205.5" id="my-svg-L_EXP_SCOPE_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_EXP_SCOPE_0" data-points="W3sieCI6Mzg4LCJ5IjoyMDUuNX0seyJ4Ijo0MjgsInkiOjIwNS41fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M628,205.5L664,205.5" id="my-svg-L_SCOPE_IMP_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_SCOPE_IMP_0" data-points="W3sieCI6NjI4LCJ5IjoyMDUuNX0seyJ4Ijo2NjgsInkiOjIwNS41fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M1044,205.5L1080,205.5" id="my-svg-L_IMP_SCORE_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_IMP_SCORE_0" data-points="W3sieCI6MTA0NCwieSI6MjA1LjV9LHsieCI6MTA4NCwieSI6MjA1LjV9XQ==" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/></g><g class="edgeLabels"/><g class="nodes"><g class="node default" id="my-svg-flowchart-AV-0" data-look="neo" transform="translate(288, 291)"><rect class="basic label-container" style="" x="-76" y="-84" width="152" height="168"/><g class="label" style="" transform="translate(-60, -72)"><rect/><foreignObject width="120" height="144"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>AV: Attack Vector<br /><small>N (Network) / A (Adjacent) / L (Local) / P (Physical)</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-AC-1" data-look="neo" transform="translate(112, 111)"><rect class="basic label-container" style="" x="-76" y="-48" width="152" height="96"/><g class="label" style="" transform="translate(-60, -36)"><rect/><foreignObject width="120" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>AC: Attack Complexity<br /><small>L (Low) / H (High)</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-PR-2" data-look="neo" transform="translate(288, 123)"><rect class="basic label-container" style="" x="-76" y="-60" width="152" height="120"/><g class="label" style="" transform="translate(-60, -48)"><rect/><foreignObject width="120" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>PR: Privileges Required<br /><small>N (None) / L (Low) / H (High)</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-UI-3" data-look="neo" transform="translate(112, 267)"><rect class="basic label-container" style="" x="-76" y="-60" width="152" height="120"/><g class="label" style="" transform="translate(-60, -48)"><rect/><foreignObject width="120" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>UI: User Interaction<br /><small>N (None) / R (Required)</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-S-4" data-look="neo" transform="translate(528, 219)"><rect class="basic label-container" style="" x="-76" y="-84" width="152" height="168"/><g class="label" style="" transform="translate(-60, -72)"><rect/><foreignObject width="120" height="144"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>S: Scope<br /><strong>U (Unchanged)</strong> vs <strong>C (Changed)</strong><br /><small>Transpõe fronteira de autorização do componente</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-C-5" data-look="neo" transform="translate(768, 279)"><rect class="basic label-container" style="" x="-76" y="-60" width="152" height="120"/><g class="label" style="" transform="translate(-60, -48)"><rect/><foreignObject width="120" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>C: Confidentiality<br /><small>N (None) / L (Low) / H (High)</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-I-6" data-look="neo" transform="translate(768, 147)"><rect class="basic label-container" style="" x="-76" y="-48" width="152" height="96"/><g class="label" style="" transform="translate(-60, -36)"><rect/><foreignObject width="120" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>I: Integrity<br /><small>N (None) / L (Low) / H (High)</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-A-7" data-look="neo" transform="translate(944, 147)"><rect class="basic label-container" style="" x="-76" y="-48" width="152" height="96"/><g class="label" style="" transform="translate(-60, -36)"><rect/><foreignObject width="120" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>A: Availability<br /><small>N (None) / L (Low) / H (High)</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-BS-8" data-look="neo" transform="translate(1184, 219)"><rect class="basic label-container" style="" x="-76" y="-96" width="152" height="192"/><g class="label" style="" transform="translate(-60, -84)"><rect/><foreignObject width="120" height="168"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Base Score (0.0 - 10.0)<br /><small>None (0.0) • Baixa (0.1-3.9)<br />Média (4.0-6.9) • Alta (7.0-8.9)<br />Crítica (9.0-10.0)</small></p></span></div></foreignObject></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#FFFFFF"/></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#FFFFFF"/></filter></defs><linearGradient id="my-svg-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#cccccc" stop-opacity="1"/><stop offset="100%" stop-color="hsl(180, 0%, 18.3529411765%)" stop-opacity="1"/></linearGradient></svg>
+  </div>
+</div>
 
   <h3>Faixas Oficiais de Severidade Qualitativa</h3>
   <div class="table-responsive">
