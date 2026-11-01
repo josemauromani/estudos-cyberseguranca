@@ -1,0 +1,761 @@
+<!-- Estudo 32: Ingles-Tecnico-Ciber Body Fragment -->
+<article class="study-container" data-slug="ingles-tecnico">
+
+    <!-- SEÇÃO 1: INTRODUÇÃO E ANATOMIA DO ADVISORY -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: A Segurança Acontece em Inglês</h2>
+        </div>
+
+        <p class="lead-text">
+            O boletim do fabricante sai em inglês, o registro do CVE é em inglês, a RFC é em inglês e a prova da certificação também. Na hora de um incidente, ninguém espera a tradução. Este estudo não é um curso de inglês: é um treino de leitura e escrita para as situações que um analista enfrenta toda semana. Ler um advisory sem errar a versão afetada, entender o peso de um MUST numa norma e escrever um resumo curto e claro.
+        </p>
+
+        <h3>Anatomia de um Advisory</h3>
+        <p>
+            Um <strong>advisory</strong> (boletim de segurança) de fabricante ou de CERT segue quase sempre a mesma estrutura. Saber o que procurar em cada seção é metade da leitura:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Seção</th><th>O que extrair</th><th>Frases típicas</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Summary</strong></td><td>O que é a falha, quem pode explorar, gravidade</td><td><em>"allows an unauthenticated remote attacker to…"</em></td></tr>
+                    <tr><td><strong>Affected Versions</strong></td><td>Se o seu ambiente está exposto</td><td><em>"7.2.0 through 7.2.4"</em>, <em>"prior to 7.2.0 are not affected"</em></td></tr>
+                    <tr><td><strong>Impact</strong></td><td>O que o atacante consegue depois de explorar</td><td><em>"Successful exploitation could allow…"</em></td></tr>
+                    <tr><td><strong>Mitigation</strong></td><td>A correção definitiva e as versões corrigidas</td><td><em>"Upgrade to…"</em>, <em>"fixed in"</em>, <em>"addresses this issue"</em></td></tr>
+                    <tr><td><strong>Workaround</strong></td><td>O paliativo até a correção, e suas limitações</td><td><em>"If you cannot upgrade immediately…"</em></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">📏</span>
+                <strong>Intervalos de versão: leia a preposição</strong>
+            </div>
+            <p>
+                <em>"through 7.2.4"</em> inclui a 7.2.4. <em>"prior to 7.2.5"</em> e <em>"before 7.2.5"</em> excluem a 7.2.5. <em>"up to 7.2.4"</em> costuma incluir, mas é ambíguo: confira a seção de versões corrigidas. <em>"7.2.x"</em> é toda a série 7.2. Um erro aqui deixa um servidor vulnerável fora do plano de correção.
+            </p>
+        </div>
+
+        <h3>Os Registros em Volta do Advisory</h3>
+        <ul>
+            <li><strong>CVE</strong> (<em>Common Vulnerabilities and Exposures</em>): o identificador único da falha, no formato <code>CVE-ANO-NÚMERO</code>.</li>
+            <li><strong>NVD</strong> (<em>National Vulnerability Database</em>, do NIST): enriquece o CVE com pontuação, produtos afetados e referências.</li>
+            <li><strong>CWE</strong> (<em>Common Weakness Enumeration</em>): o tipo de fraqueza, como CWE-306 (falta de autenticação em função crítica).</li>
+            <li><strong>CVSS</strong> (<em>Common Vulnerability Scoring System</em>): a pontuação de 0 a 10 e o vetor que a explica (Estudo 09).</li>
+            <li><strong>KEV</strong> (<em>Known Exploited Vulnerabilities</em>): o catálogo da CISA com falhas comprovadamente exploradas; quando um advisory diz <em>"exploited in the wild"</em>, a prioridade sobe.</li>
+        </ul>
+        <p>
+            O vetor <code>AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</code> se lê assim: ataque pela rede (<em>Attack Vector: Network</em>), baixa complexidade, nenhum privilégio, nenhuma interação do usuário, escopo inalterado e impacto alto em confidencialidade, integridade e disponibilidade. Em CVSS v3.1, isso dá 9.8, Critical.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Roteiro de Leitura de um Advisory</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Roteiro de Leitura de um Advisory">
+flowchart TD
+    S["1. Summary<br><small>o que é, quem explora, gravidade</small>"]
+    A["2. Affected Versions<br><small>compare com o inventário</small>"]
+    D{"Alguma versão<br>afetada no ambiente?"}
+    M["3. Impact e Mitigation<br><small>versão corrigida e passos extras</small>"]
+    W["4. Workaround<br><small>paliativo com prazo, se não der para corrigir já</small>"]
+    R["Registrar a análise<br><small>e acompanhar novas versões do advisory</small>"]
+    S --> A
+    A --> D
+    D -->|"sim"| M
+    M --> W
+    W --> R
+    D -->|"não"| R
+            </pre>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: VERBOS, FALSOS COGNATOS, SIGLAS E REDAÇÃO -->
+    <section class="study-section" id="linguagem">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Verbos Normativos, Falsos Cognatos e Redação</h2>
+        </div>
+
+        <h3>MUST, SHOULD e MAY: a RFC 2119</h3>
+        <p>
+            Normas e especificações em inglês usam palavras-chave com sentido fixo, definidas na <strong>RFC 2119</strong>. A <strong>RFC 8174</strong> esclareceu que elas só têm esse sentido quando escritas em MAIÚSCULAS; as duas juntas formam o BCP 14.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Palavra-chave</th><th>Sentido</th><th>Tradução útil</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>MUST</strong>, REQUIRED, SHALL</td><td>Requisito absoluto</td><td>deve, é obrigatório</td></tr>
+                    <tr><td><strong>MUST NOT</strong>, SHALL NOT</td><td>Proibição absoluta</td><td>não deve, é proibido</td></tr>
+                    <tr><td><strong>SHOULD</strong>, RECOMMENDED</td><td>Recomendação forte; pode haver motivo válido para não seguir, desde que as consequências sejam entendidas</td><td>deveria, é recomendado</td></tr>
+                    <tr><td><strong>SHOULD NOT</strong>, NOT RECOMMENDED</td><td>Desaconselhado, com as mesmas ressalvas</td><td>não deveria</td></tr>
+                    <tr><td><strong>MAY</strong>, OPTIONAL</td><td>Opcional, a critério de quem implementa</td><td>pode, é opcional</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Falsos Cognatos da Área</h3>
+        <p>
+            Os <strong>falsos cognatos</strong> parecem palavras do português e significam outra coisa. Na segurança, alguns mudam o sentido de um alerta:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Inglês</th><th>Significa</th><th>Não significa</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>exploit</strong></td><td>Explorar uma falha; o código que faz isso</td><td>"explorar" no sentido de investigar (<em>explore</em>)</td></tr>
+                    <tr><td><strong>eventually</strong></td><td>Por fim, mais cedo ou mais tarde</td><td>"eventualmente", de vez em quando (<em>occasionally</em>)</td></tr>
+                    <tr><td><strong>actually</strong></td><td>Na verdade, de fato</td><td>"atualmente" (<em>currently</em>)</td></tr>
+                    <tr><td><strong>issue</strong></td><td>Problema, falha, chamado</td><td>"edição" (só no sentido de número de revista)</td></tr>
+                    <tr><td><strong>address</strong> (verbo)</td><td>Tratar, corrigir</td><td>"endereçar" uma carta</td></tr>
+                    <tr><td><strong>assume</strong></td><td>Supor, presumir</td><td>"assumir" uma responsabilidade (<em>take on</em>)</td></tr>
+                    <tr><td><strong>deprecated</strong></td><td>Descontinuado, será removido</td><td>"depreciado" (perda de valor contábil)</td></tr>
+                    <tr><td><strong>realize</strong></td><td>Perceber</td><td>"realizar" (<em>carry out</em>)</td></tr>
+                    <tr><td><strong>sensible</strong></td><td>Sensato</td><td>"sensível" (<em>sensitive</em>, como em <em>sensitive data</em>)</td></tr>
+                    <tr><td><strong>resume</strong></td><td>Retomar</td><td>"resumir" (<em>summarize</em>)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Registro Formal e Informal</h3>
+        <p>
+            O <strong>registro formal</strong> vale para cliente, fornecedor, auditor e diretoria: frases completas, sem gíria, sem abreviações de chat. O <strong>registro informal</strong> aparece no chat do time e em tickets internos: <em>FYI</em>, <em>ASAP</em>, <em>LGTM</em>. Em dúvida, escreva formal; ninguém reclama de clareza.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Informal</th><th>Formal</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><em>FYI, the server got hacked.</em></td><td><em>Please be advised that the server was compromised.</em></td></tr>
+                    <tr><td><em>Can you fix it ASAP?</em></td><td><em>Could you please apply the fix by Friday, March 16?</em></td></tr>
+                    <tr><td><em>Lmk if you need anything.</em></td><td><em>Please let me know if you need any further information.</em></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Modelos de Redação</h3>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">incident-summary.txt — resumo de incidente</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ing-resumo')">Copiar</button>
+            </div>
+            <pre><code id="code-ing-resumo">Incident Summary: Compromise of VPN appliance (INC-2099-031)
+
+What happened: On March 14, an unauthenticated attacker exploited
+CVE-2099-12345 on our QuillGate VPN appliance (version 7.2.3).
+
+Impact: The attacker gained root access to the appliance. We found no
+evidence of access to internal servers so far.
+
+Actions taken: We disabled the external management interface,
+upgraded the appliance to 7.2.5 and rotated all stored credentials.
+
+Next steps: Complete log review by March 18 and report to management.</code></pre>
+        </div>
+        <p>
+            Estrutura: <em>What happened</em>, <em>Impact</em>, <em>Actions taken</em>, <em>Next steps</em>. Frases curtas, voz ativa, datas explícitas e o que ainda não se sabe dito com <em>so far</em> ("até agora").
+        </p>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">email.txt — e-mail técnico curto ao fornecedor</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ing-email')">Copiar</button>
+            </div>
+            <pre><code id="code-ing-email">Subject: Request for fixed version timeline (CVE-2099-12345)
+
+Dear Quillon Support team,
+
+We run QuillGate 7.3.0 in production and understand from advisory
+QSA-2099-007 that this version is affected.
+
+Could you please confirm whether 7.3.1 is the only fixed version for
+the 7.3 branch, and whether the workaround affects site-to-site tunnels?
+
+Thank you in advance.
+
+Best regards,
+Ana Souza
+Information Security Analyst, Ipê Store</code></pre>
+        </div>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">💡</span>
+                <strong>Uma pergunta por parágrafo</strong>
+            </div>
+            <p>
+                Contexto numa frase, perguntas numeradas ou separadas, prazo explícito quando houver. Quem responde em outro fuso horário consegue responder de uma vez, sem uma segunda rodada de e-mails.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Leitor de Advisory</h2>
+        </div>
+
+        <p class="lead-text">
+            Leia o boletim abaixo, totalmente fictício. Os termos sublinhados são clicáveis e mostram tradução e definição. Depois responda às perguntas de compreensão e treine o glossário com os flashcards, que guardam o seu progresso neste navegador.
+        </p>
+
+        <div class="lab-box ing-lab" id="ing-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Laboratório de Leitura Técnica</span>
+                    <h3 id="ing-titulo" style="margin: 0.4rem 0 0.2rem 0;"></h3>
+                    <p id="ing-aviso" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <div id="ing-legenda" style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; font-size: 0.8rem;"></div>
+                <div id="ing-advisory" lang="en" style="border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 1rem; background: var(--surface); line-height: 1.7; overflow-wrap: anywhere;"></div>
+                <div id="ing-definicao" aria-live="polite" style="margin: 0.75rem 0; padding: 0.75rem; border-radius: var(--radius-md); background: var(--sunk); font-size: 0.9rem;"></div>
+
+                <h4 style="margin-top: 1.5rem;">Perguntas de compreensão</h4>
+                <div id="ing-perguntas" style="display: grid; gap: 1rem;"></div>
+                <p id="ing-placar" style="font-weight: 600; margin: 0.75rem 0 0 0;" aria-live="polite"></p>
+
+                <h4 style="margin-top: 1.5rem;">Flashcards do glossário</h4>
+                <div id="ing-flashcards"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Leitura de um Advisory</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista sempre que chegar um boletim de segurança. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="ingles-tecnico">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ing-1">
+                <label for="chk-ing-1"><strong>Gravidade e explorabilidade:</strong> li o Summary, a nota CVSS com o vetor e se há <em>exploitation in the wild</em> ou entrada no KEV.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ing-2">
+                <label for="chk-ing-2"><strong>Versões conferidas:</strong> comparei <em>Affected Versions</em> com o inventário, prestando atenção a <em>through</em>, <em>prior to</em> e séries <em>.x</em>.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ing-3">
+                <label for="chk-ing-3"><strong>Versão corrigida anotada:</strong> sei para qual versão atualizar em cada série e se há passos extras, como trocar credenciais.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ing-4">
+                <label for="chk-ing-4"><strong>Workaround com prazo:</strong> se apliquei o paliativo, registrei as limitações dele e a data da correção definitiva.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ing-5">
+                <label for="chk-ing-5"><strong>Indicadores verificados:</strong> procurei os indicadores de comprometimento citados antes de dar o caso por encerrado.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ing-6">
+                <label for="chk-ing-6"><strong>Palavras-chave respeitadas:</strong> tratei MUST e MUST NOT como obrigatórios e documentei quando não segui um SHOULD.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ing-7">
+                <label for="chk-ing-7"><strong>Resumo para a gestão:</strong> escrevi em poucas linhas o que é, se estamos expostos, o que fizemos e o próximo passo.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Falso cognato):</strong> O fornecedor escreve: <em>"We will eventually release a fix for the 6.x branch."</em> O que ele prometeu?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Que a correção sai em algum momento, sem data.</p>
+                    <p><em>Eventually</em> é "por fim, mais cedo ou mais tarde", não "eventualmente". Para o plano de correção, isso significa ausência de prazo: aplique o workaround e cobre uma data.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Falso cognato):</strong> Como traduzir <em>"The appliance is actually exposed to the internet"</em>?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> "Na verdade, o equipamento está exposto à internet."</p>
+                    <p><em>Actually</em> corrige uma suposição anterior. "Atualmente" seria <em>currently</em>.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (RFC 2119):</strong> Uma especificação diz <em>"Clients SHOULD validate the certificate chain."</em> Um cliente que não valida está fora da especificação?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não necessariamente: SHOULD é recomendação forte, que admite exceção justificada.</p>
+                    <p>Se fosse MUST, seria requisito absoluto. Em segurança, deixar de seguir um SHOULD exige justificativa documentada e entendimento do risco.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Versões):</strong> O advisory diz <em>"versions 5.1.0 through 5.1.7 are affected; fixed in 5.1.8"</em>. Você roda a 5.1.7. Está exposto?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Sim.</p>
+                    <p><em>Through</em> inclui o último número: o intervalo vai da 5.1.0 à 5.1.7, inclusive. A primeira versão segura é a 5.1.8.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (CVSS):</strong> No vetor <code>AV:N/AC:L/PR:N/UI:N</code>, o que significam <code>PR:N</code> e <code>UI:N</code>?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O atacante não precisa de privilégio (<em>Privileges Required: None</em>) nem de interação de um usuário (<em>User Interaction: None</em>).</p>
+                    <p>Junto com <code>AV:N</code> (pela rede), descreve uma falha explorável remotamente por qualquer pessoa, sem clique de ninguém: a combinação que mais preocupa.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Registro):</strong> Qual frase é adequada para informar um cliente sobre um incidente?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> <em>"Please be advised that we identified unauthorized access to one of our systems on March 14."</em></p>
+                    <p>Registro formal, voz ativa e data explícita. <em>"FYI, we got hacked"</em> é informal demais e vago para um cliente.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Cinco seções</h4>
+                <p>Summary, Affected Versions, Impact, Mitigation e Workaround.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. RFC 2119</h4>
+                <p>MUST é obrigatório, SHOULD é recomendado, MAY é opcional; só em maiúsculas (RFC 8174).</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Falsos cognatos</h4>
+                <p>Exploit, eventually, actually, issue, assume, deprecated, realize, sensible.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Escrita curta</h4>
+                <p>What happened, Impact, Actions taken, Next steps; formal para quem é de fora.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>RFC 2119 e RFC 8174 — Key words for use in RFCs to Indicate Requirement Levels (BCP 14).</li>
+            <li>CVE Program — formato e ciclo de vida dos registros CVE.</li>
+            <li>NIST — National Vulnerability Database (NVD).</li>
+            <li>FIRST — Common Vulnerability Scoring System v3.1 e v4.0: especificação.</li>
+            <li>MITRE — Common Weakness Enumeration (CWE).</li>
+            <li>CISA — Known Exploited Vulnerabilities Catalog.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 09 — Gestão de Vulnerabilidades e 18 — Resposta a Incidentes</strong>
+            </div>
+            <p>
+                O Estudo 09 transforma o advisory em prioridade de correção com CVSS e contexto; o Estudo 18 é onde o resumo de incidente que você escreveu aqui entra no processo.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="ing-dados">
+{
+ "aviso": "Boletim fictício: fabricante, produto, CVE (ano 2099) e domínios .example foram inventados para o laboratório.",
+ "chave_storage": "cs_ingles_flashcards",
+ "advisory": {
+  "titulo": "QSA-2099-007: QuillGate VPN — Unauthenticated Remote Code Execution",
+  "cve": "CVE-2099-12345",
+  "secoes": [
+   {"titulo": "Overview", "texto": "Vendor: Quillon Systems\nProduct: QuillGate VPN appliance\n[[CVE|cve]] ID: CVE-2099-12345\n[[CVSS|cvss]] v3.1 base score: 9.8 Critical (AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H)\nWeakness: [[CWE|cwe]]-306, Missing Authentication for Critical Function\nType: unauthenticated [[RCE|rce]]"},
+   {"titulo": "Summary", "texto": "A [[vulnerability|vulnerability]] in the [[web management interface|management-interface]] of QuillGate VPN [[appliances|appliance]] allows an [[unauthenticated|unauthenticated]] remote attacker to [[execute arbitrary code|arbitrary-code]] with root [[privileges|privileges]]. Quillon Systems is aware of [[exploitation in the wild|in-the-wild]], and the [[issue|issue]] has been added to the [[KEV|kev]] catalog. Customers [[MUST|must]] apply the fix as soon as possible."},
+   {"titulo": "Affected Versions", "texto": "QuillGate 7.2.0 [[through|through]] 7.2.4 and 7.3.0 are affected. Versions [[prior to|prior-to]] 7.2.0 are not affected, because the [[vulnerable|vulnerable]] [[endpoint|endpoint]] was introduced in 7.2.0. QuillGate 6.x has reached [[end of life|eol]] and is [[deprecated|deprecated]]; it will not receive security fixes."},
+   {"titulo": "Impact", "texto": "Successful [[exploitation|exploitation]] allows an attacker to take full control of the appliance, read the [[credentials|credentials]] stored in its configuration and move into the internal network. A public [[proof-of-concept|poc]] [[exploit|exploit]] is available. Customers who [[assume|assume]] that the interface is reachable only from the internal network should [[actually|actually]] check their firewall rules: older installations expose it on the external interface by default."},
+   {"titulo": "Mitigation", "texto": "[[Upgrade|upgrade]] to QuillGate 7.2.5 or 7.3.1, which [[address|address]] this vulnerability. Administrators [[SHOULD|should]] also [[rotate|rotate]] all credentials stored on the appliance and review the [[logs|logs]] for the [[indicators of compromise|ioc]] listed below. Customers who [[eventually|eventually]] upgrade without checking for compromise may leave an attacker [[backdoor|backdoor]] in place."},
+   {"titulo": "Workaround", "texto": "If you cannot upgrade immediately, disable the web management interface on the external interface. This [[workaround|workaround]] reduces the [[attack surface|attack-surface]] but does not fix the vulnerability, and it [[MUST NOT|must-not]] be considered a permanent solution. You [[MAY|may]] keep the interface enabled on the internal management network."},
+   {"titulo": "Indicators of Compromise", "texto": "Requests to /api/v2/diag/exec from unknown IP addresses; new executable files in /var/tmp; outbound connections from the appliance to any host other than updates.quillon.example."},
+   {"titulo": "Contact", "texto": "This issue was reported through [[coordinated disclosure|coordinated-disclosure]]. Report security issues to the Quillon [[PSIRT|psirt]] at psirt@quillon.example."}
+  ]
+ },
+ "glossario": {
+  "vulnerability": {"termo": "vulnerability", "tipo": "tecnico", "traducao": "vulnerabilidade", "definicao": "Fraqueza que pode ser explorada para violar a segurança do sistema."},
+  "management-interface": {"termo": "web management interface", "tipo": "tecnico", "traducao": "interface web de gerenciamento", "definicao": "Painel administrativo acessado pelo navegador para configurar o equipamento."},
+  "appliance": {"termo": "appliance", "tipo": "tecnico", "traducao": "equipamento dedicado", "definicao": "Hardware ou máquina virtual pronta, vendida para uma função específica, como VPN ou firewall."},
+  "unauthenticated": {"termo": "unauthenticated", "tipo": "tecnico", "traducao": "não autenticado", "definicao": "Sem login: o atacante não precisa de usuário nem senha."},
+  "arbitrary-code": {"termo": "execute arbitrary code", "tipo": "tecnico", "traducao": "executar código arbitrário", "definicao": "Rodar qualquer comando ou programa que o atacante escolher."},
+  "privileges": {"termo": "privileges", "tipo": "tecnico", "traducao": "privilégios", "definicao": "Permissões da conta; root é o nível máximo num sistema Unix."},
+  "in-the-wild": {"termo": "exploitation in the wild", "tipo": "tecnico", "traducao": "exploração em ataques reais", "definicao": "A falha já está sendo usada por atacantes fora de laboratório; a prioridade de correção sobe."},
+  "issue": {"termo": "issue", "tipo": "falso-cognato", "traducao": "problema, falha, chamado", "definicao": "Não é \"edição\". Em advisories, é a própria falha; em projetos, um chamado ou tíquete."},
+  "kev": {"termo": "KEV", "tipo": "sigla", "traducao": "Vulnerabilidades Sabidamente Exploradas", "definicao": "Known Exploited Vulnerabilities: catálogo da CISA com falhas comprovadamente exploradas."},
+  "must": {"termo": "MUST", "tipo": "modal", "traducao": "deve (obrigatório)", "definicao": "RFC 2119: requisito absoluto. Sinônimos: REQUIRED e SHALL."},
+  "through": {"termo": "through", "tipo": "tecnico", "traducao": "até, inclusive", "definicao": "Em intervalos de versão, inclui o último número: \"7.2.0 through 7.2.4\" inclui a 7.2.4."},
+  "prior-to": {"termo": "prior to", "tipo": "tecnico", "traducao": "anterior a", "definicao": "Exclui a versão citada: \"prior to 7.2.0\" significa até a 7.1.x."},
+  "vulnerable": {"termo": "vulnerable", "tipo": "tecnico", "traducao": "vulnerável", "definicao": "Que contém a falha e pode ser explorado."},
+  "endpoint": {"termo": "endpoint", "tipo": "tecnico", "traducao": "endpoint (rota da API)", "definicao": "Aqui, um caminho da API web. Em outros contextos, a estação ou servidor protegido pelo EDR."},
+  "eol": {"termo": "EoL", "tipo": "sigla", "traducao": "fim de vida", "definicao": "End of Life: o fabricante não lança mais correções, nem de segurança."},
+  "deprecated": {"termo": "deprecated", "tipo": "falso-cognato", "traducao": "descontinuado", "definicao": "Não é \"depreciado\" no sentido contábil: é algo que não deve mais ser usado e será removido."},
+  "exploitation": {"termo": "exploitation", "tipo": "tecnico", "traducao": "exploração (de uma falha)", "definicao": "O ato de usar a vulnerabilidade para obter acesso ou efeito indevido."},
+  "credentials": {"termo": "credentials", "tipo": "tecnico", "traducao": "credenciais", "definicao": "Usuários, senhas, chaves e tokens usados para autenticar."},
+  "poc": {"termo": "PoC", "tipo": "sigla", "traducao": "prova de conceito", "definicao": "Proof of Concept: código que demonstra que a falha é explorável; reduz o esforço de quem ataca."},
+  "exploit": {"termo": "exploit", "tipo": "falso-cognato", "traducao": "código de exploração; explorar uma falha", "definicao": "Não é \"explorar\" no sentido de investigar (explore). É o código ou o ato de tirar proveito de uma vulnerabilidade."},
+  "assume": {"termo": "assume", "tipo": "falso-cognato", "traducao": "supor, presumir", "definicao": "Não é \"assumir uma responsabilidade\" (take on). \"Customers who assume\" = clientes que supõem."},
+  "actually": {"termo": "actually", "tipo": "falso-cognato", "traducao": "na verdade, de fato", "definicao": "Não é \"atualmente\" (currently). Introduz uma correção do que se supunha."},
+  "upgrade": {"termo": "upgrade", "tipo": "tecnico", "traducao": "atualizar (para versão mais nova)", "definicao": "Instalar uma versão superior do software ou firmware."},
+  "address": {"termo": "address", "tipo": "falso-cognato", "traducao": "tratar, corrigir", "definicao": "Como verbo, \"which address this vulnerability\" = que corrigem esta vulnerabilidade. Não é \"endereçar\"."},
+  "should": {"termo": "SHOULD", "tipo": "modal", "traducao": "deveria (recomendado)", "definicao": "RFC 2119: recomendação forte; pode haver motivo válido para não seguir, com o risco entendido. Sinônimo: RECOMMENDED."},
+  "rotate": {"termo": "rotate", "tipo": "tecnico", "traducao": "trocar (credenciais)", "definicao": "Substituir senhas, chaves e tokens por novos e invalidar os antigos."},
+  "logs": {"termo": "logs", "tipo": "tecnico", "traducao": "registros (logs)", "definicao": "Registros de eventos do sistema usados para investigar o que aconteceu."},
+  "ioc": {"termo": "IoC", "tipo": "sigla", "traducao": "indicadores de comprometimento", "definicao": "Indicators of Compromise: sinais técnicos de invasão, como IPs, arquivos e requisições suspeitas."},
+  "eventually": {"termo": "eventually", "tipo": "falso-cognato", "traducao": "por fim, mais cedo ou mais tarde", "definicao": "Não é \"eventualmente\" (occasionally). \"Customers who eventually upgrade\" = clientes que acabam atualizando."},
+  "backdoor": {"termo": "backdoor", "tipo": "tecnico", "traducao": "porta dos fundos", "definicao": "Acesso escondido deixado pelo atacante para voltar mesmo depois da correção."},
+  "workaround": {"termo": "workaround", "tipo": "tecnico", "traducao": "paliativo, solução de contorno", "definicao": "Medida temporária que reduz o risco sem corrigir a falha."},
+  "attack-surface": {"termo": "attack surface", "tipo": "tecnico", "traducao": "superfície de ataque", "definicao": "O conjunto de pontos que um atacante pode tentar usar para entrar."},
+  "must-not": {"termo": "MUST NOT", "tipo": "modal", "traducao": "não deve (proibido)", "definicao": "RFC 2119: proibição absoluta. Sinônimo: SHALL NOT."},
+  "may": {"termo": "MAY", "tipo": "modal", "traducao": "pode (opcional)", "definicao": "RFC 2119: opcional, a critério de quem implementa. Sinônimo: OPTIONAL."},
+  "coordinated-disclosure": {"termo": "coordinated disclosure", "tipo": "tecnico", "traducao": "divulgação coordenada", "definicao": "O pesquisador avisa o fabricante e só publica depois que a correção existe ou o prazo combinado vence."},
+  "psirt": {"termo": "PSIRT", "tipo": "sigla", "traducao": "time de resposta a incidentes de produto", "definicao": "Product Security Incident Response Team: equipe do fabricante que recebe relatos e publica advisories."},
+  "cve": {"termo": "CVE", "tipo": "sigla", "traducao": "identificador público de vulnerabilidade", "definicao": "Common Vulnerabilities and Exposures: o identificador único da falha, no formato CVE-ANO-NÚMERO."},
+  "cvss": {"termo": "CVSS", "tipo": "sigla", "traducao": "sistema de pontuação de vulnerabilidades", "definicao": "Common Vulnerability Scoring System: nota de 0 a 10 com um vetor que explica a nota."},
+  "cwe": {"termo": "CWE", "tipo": "sigla", "traducao": "catálogo de tipos de fraqueza", "definicao": "Common Weakness Enumeration: classifica a causa da falha, como CWE-306 (falta de autenticação)."},
+  "rce": {"termo": "RCE", "tipo": "sigla", "traducao": "execução remota de código", "definicao": "Remote Code Execution: o atacante roda comandos no sistema a partir da rede."},
+  "realize": {"termo": "realize", "tipo": "falso-cognato", "traducao": "perceber", "definicao": "Não é \"realizar\" (carry out). \"We realized the server was exposed\" = percebemos que o servidor estava exposto."},
+  "sensible": {"termo": "sensible", "tipo": "falso-cognato", "traducao": "sensato", "definicao": "Não é \"sensível\". Dado sensível é sensitive data."}
+ },
+ "perguntas": [
+  {
+   "enunciado": "Quais versões do QuillGate precisam de correção?",
+   "opcoes": [
+    {"texto": "7.2.0 a 7.2.4 (inclusive) e 7.3.0", "correta": true, "comentario": "Correto. \"Through\" inclui a 7.2.4, e a 7.3.0 é citada à parte."},
+    {"texto": "Todas as versões anteriores a 7.2.5", "correta": false, "comentario": "Não. \"Versions prior to 7.2.0 are not affected\": a 7.1.x nunca teve a rota vulnerável. A 6.x não é afetada, mas está sem suporte (EoL), o que é outro problema."},
+    {"texto": "Apenas a 7.3.0", "correta": false, "comentario": "Não. A série 7.2 de 7.2.0 até 7.2.4 também é afetada."},
+    {"texto": "7.2.5 e 7.3.1", "correta": false, "comentario": "Não. Essas são as versões corrigidas, citadas em Mitigation."}
+   ]
+  },
+  {
+   "enunciado": "Qual é o impacto descrito?",
+   "opcoes": [
+    {"texto": "Um atacante sem login executa código como root no equipamento", "correta": true, "comentario": "Correto. \"Unauthenticated remote attacker\" e \"execute arbitrary code with root privileges\"."},
+    {"texto": "Um usuário autenticado consegue ler a configuração", "correta": false, "comentario": "Não. O ponto crítico é justamente não precisar de autenticação, e o efeito vai além de leitura."},
+    {"texto": "O equipamento fica indisponível por alguns minutos", "correta": false, "comentario": "Não. O advisory descreve controle total do equipamento, não negação de serviço."}
+   ]
+  },
+  {
+   "enunciado": "O que o advisory manda fazer para resolver o problema?",
+   "opcoes": [
+    {"texto": "Atualizar para 7.2.5 ou 7.3.1, trocar as credenciais e procurar indicadores de comprometimento", "correta": true, "comentario": "Correto. A atualização corrige a falha; trocar credenciais e revisar logs trata uma possível invasão anterior."},
+    {"texto": "Desligar a interface de gerenciamento externa e encerrar o caso", "correta": false, "comentario": "Não. Isso é o workaround, que \"MUST NOT be considered a permanent solution\"."},
+    {"texto": "Voltar para a versão 6.x, que não é afetada", "correta": false, "comentario": "Não. A 6.x está em fim de vida (EoL) e não recebe nenhuma correção de segurança."}
+   ]
+  },
+  {
+   "enunciado": "O que significa \"it MUST NOT be considered a permanent solution\"?",
+   "opcoes": [
+    {"texto": "É proibido tratar o workaround como solução definitiva", "correta": true, "comentario": "Correto. MUST NOT é proibição absoluta pela RFC 2119."},
+    {"texto": "Não é recomendado, mas pode ser aceitável em alguns casos", "correta": false, "comentario": "Não. Isso seria SHOULD NOT. MUST NOT não admite exceção."},
+    {"texto": "O fabricante ainda não decidiu se o workaround é permanente", "correta": false, "comentario": "Não. A frase é uma instrução clara, não uma dúvida do fabricante."}
+   ]
+  },
+  {
+   "enunciado": "O que \"Quillon Systems is aware of exploitation in the wild\" diz sobre a urgência?",
+   "opcoes": [
+    {"texto": "A falha já está sendo explorada em ataques reais, então a correção é urgente", "correta": true, "comentario": "Correto. \"In the wild\" significa fora do laboratório; por isso a falha entrou no KEV."},
+    {"texto": "Pesquisadores demonstraram a falha em laboratório", "correta": false, "comentario": "Não. Isso é uma prova de conceito (PoC), citada à parte em Impact."},
+    {"texto": "A falha pode vir a ser explorada no futuro", "correta": false, "comentario": "Não. \"Is aware of exploitation\" fala de algo que já está acontecendo."}
+   ]
+  }
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var ING = JSON.parse(document.getElementById("ing-dados").textContent);
+    var RE_TERMO = /\[\[([^|\]]+)\|([^\]]+)\]\]/g;
+    var TIPOS = {
+        "tecnico": ["Termo técnico", "rgba(37, 99, 235, 0.55)"],
+        "falso-cognato": ["Falso cognato", "rgba(220, 38, 38, 0.65)"],
+        "modal": ["Verbo normativo (RFC 2119)", "rgba(124, 58, 237, 0.65)"],
+        "sigla": ["Sigla", "rgba(5, 150, 105, 0.65)"]
+    };
+    var respostas = {};
+    var deck = Object.keys(ING.glossario);
+    var indice = 0;
+    var virado = false;
+    var conhecidos = {};
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function selo(tipo) {
+        return el("span", TIPOS[tipo][0], "display: inline-block; padding: 0.1rem 0.5rem; border-radius: var(--radius-pill); font-size: 0.75rem; font-weight: 600; border: 2px solid " + TIPOS[tipo][1] + ";");
+    }
+
+    function lerProgresso() {
+        try {
+            var bruto = window.localStorage.getItem(ING.chave_storage);
+            var lista = bruto ? JSON.parse(bruto) : [];
+            conhecidos = {};
+            if (Array.isArray(lista)) lista.forEach(function(k) { if (ING.glossario[k]) conhecidos[k] = true; });
+        } catch (e) {
+            conhecidos = {};
+        }
+    }
+    function salvarProgresso() {
+        try {
+            window.localStorage.setItem(ING.chave_storage, JSON.stringify(Object.keys(conhecidos)));
+        } catch (e) { /* armazenamento indisponível: o progresso vale só nesta visita */ }
+    }
+
+    function linhaComTermos(linha) {
+        var frag = document.createDocumentFragment();
+        var ultimo = 0, m;
+        RE_TERMO.lastIndex = 0;
+        while ((m = RE_TERMO.exec(linha)) !== null) {
+            if (m.index > ultimo) frag.appendChild(document.createTextNode(linha.slice(ultimo, m.index)));
+            var chave = m[2];
+            var b = el("button", m[1], "background: none; border: none; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; " +
+                "text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; text-decoration-color: " + TIPOS[ING.glossario[chave].tipo][1] + ";");
+            b.type = "button";
+            b.className = "ing-termo";
+            b.setAttribute("data-termo", chave);
+            b.setAttribute("aria-label", m[1] + ": ver tradução");
+            b.addEventListener("click", function(ev) { mostrarTermoIngles(ev.currentTarget.getAttribute("data-termo"), ev.currentTarget); });
+            frag.appendChild(b);
+            ultimo = m.index + m[0].length;
+        }
+        if (ultimo < linha.length) frag.appendChild(document.createTextNode(linha.slice(ultimo)));
+        return frag;
+    }
+
+    function renderizarAdvisory() {
+        document.getElementById("ing-titulo").textContent = ING.advisory.titulo;
+        document.getElementById("ing-aviso").textContent = ING.aviso;
+        var leg = document.getElementById("ing-legenda");
+        leg.replaceChildren();
+        Object.keys(TIPOS).forEach(function(t) { leg.appendChild(selo(t)); });
+        var box = document.getElementById("ing-advisory");
+        box.replaceChildren();
+        ING.advisory.secoes.forEach(function(s) {
+            box.appendChild(el("h5", s.titulo, "margin: 0.9rem 0 0.25rem 0; font-size: 0.95rem;"));
+            s.texto.split("\n").forEach(function(linha) {
+                var p = el("p", null, "margin: 0 0 0.35rem 0;");
+                p.appendChild(linhaComTermos(linha));
+                box.appendChild(p);
+            });
+        });
+        box.firstChild.style.marginTop = "0";
+    }
+
+    window.mostrarTermoIngles = function(chave, origem) {
+        var g = ING.glossario[chave];
+        if (!g) return;
+        var box = document.getElementById("ing-definicao");
+        box.replaceChildren();
+        var topo = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 0.3rem;");
+        var t = el("strong", g.termo);
+        t.setAttribute("lang", "en");
+        topo.appendChild(t);
+        topo.appendChild(selo(g.tipo));
+        box.appendChild(topo);
+        box.appendChild(el("p", "Tradução: " + g.traducao, "margin: 0 0 0.25rem 0; font-weight: 600;"));
+        box.appendChild(el("p", g.definicao, "margin: 0;"));
+        if (origem && origem.parentNode) {
+            var par = origem.closest("p");
+            par.parentNode.insertBefore(box, par.nextSibling);
+        }
+    };
+
+    function renderizarPerguntas() {
+        var box = document.getElementById("ing-perguntas");
+        box.replaceChildren();
+        ING.perguntas.forEach(function(p, i) {
+            var card = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 0.75rem;");
+            card.appendChild(el("p", (i + 1) + ". " + p.enunciado, "margin: 0 0 0.5rem 0; font-weight: 600;"));
+            var ops = el("div", null, "display: grid; gap: 0.4rem;");
+            p.opcoes.forEach(function(o, j) {
+                var escolhida = respostas[i] === j;
+                var respondida = respostas[i] !== undefined;
+                var cor = respondida && (o.correta ? "rgba(22, 163, 74, 0.25)" : (escolhida ? "rgba(220, 38, 38, 0.28)" : "transparent"));
+                var b = el("button", o.texto, "text-align: left; padding: 0.5rem 0.7rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); background: " + (cor || "var(--surface)") + "; color: var(--ink); cursor: pointer; font: inherit; font-size: 0.88rem;");
+                b.type = "button";
+                b.setAttribute("aria-pressed", escolhida ? "true" : "false");
+                b.addEventListener("click", function() { responderPerguntaIngles(i, j); });
+                ops.appendChild(b);
+            });
+            card.appendChild(ops);
+            if (respostas[i] !== undefined) {
+                var o = p.opcoes[respostas[i]];
+                card.appendChild(el("p", (o.correta ? "✓ " : "✗ ") + o.comentario, "margin: 0.5rem 0 0 0; font-size: 0.85rem; color: " + (o.correta ? "var(--tip-color)" : "var(--danger-color)") + ";"));
+            }
+            box.appendChild(card);
+        });
+        var feitas = Object.keys(respostas).length;
+        var certas = Object.keys(respostas).filter(function(i) { return ING.perguntas[i].opcoes[respostas[i]].correta; }).length;
+        document.getElementById("ing-placar").textContent = "Acertos: " + certas + " de " + feitas + " respondidas (" + ING.perguntas.length + " no total).";
+    }
+
+    window.responderPerguntaIngles = function(i, j) {
+        if (!ING.perguntas[i] || !ING.perguntas[i].opcoes[j]) return;
+        respostas[i] = j;
+        renderizarPerguntas();
+    };
+
+    function pendentes() {
+        return deck.filter(function(k) { return !conhecidos[k]; });
+    }
+
+    function renderizarFlashcards() {
+        var box = document.getElementById("ing-flashcards");
+        box.replaceChildren();
+        var total = deck.length, sabe = total - pendentes().length;
+        box.appendChild(el("p", "Dominados: " + sabe + " de " + total + " termos.", "margin: 0 0 0.6rem 0; font-weight: 600;"));
+        var barra = el("div", null, "height: 0.5rem; background: var(--sunk); border-radius: var(--radius-pill); overflow: hidden; margin-bottom: 0.75rem;");
+        barra.appendChild(el("div", null, "height: 100%; width: " + Math.round(sabe / total * 100) + "%; background: var(--accent);"));
+        box.appendChild(barra);
+        var acoes = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;");
+        if (!pendentes().length) {
+            box.appendChild(el("p", "Você marcou todos os termos como conhecidos. Reinicie para revisar.", "margin: 0;"));
+        } else {
+            var k = deck[indice];
+            var g = ING.glossario[k];
+            var card = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 1.25rem; text-align: center; background: var(--surface); min-height: 6rem;");
+            var frente = el("p", g.termo, "font-size: 1.3rem; font-weight: 700; margin: 0 0 0.4rem 0;");
+            frente.setAttribute("lang", "en");
+            card.appendChild(frente);
+            card.appendChild(selo(g.tipo));
+            if (virado) {
+                card.appendChild(el("p", g.traducao, "margin: 0.6rem 0 0.25rem 0; font-weight: 600;"));
+                card.appendChild(el("p", g.definicao, "margin: 0; font-size: 0.88rem;"));
+            }
+            box.appendChild(card);
+            var bVirar = el("button", virado ? "Esconder tradução" : "Virar");
+            bVirar.type = "button";
+            bVirar.className = "btn-primary";
+            bVirar.addEventListener("click", virarFlashcard);
+            acoes.appendChild(bVirar);
+            var bSei = el("button", "Sei");
+            bSei.type = "button";
+            bSei.className = "btn-secondary";
+            bSei.addEventListener("click", function() { marcarFlashcard(true); });
+            acoes.appendChild(bSei);
+            var bRev = el("button", "Revisar depois");
+            bRev.type = "button";
+            bRev.className = "btn-secondary";
+            bRev.addEventListener("click", function() { marcarFlashcard(false); });
+            acoes.appendChild(bRev);
+        }
+        var bReset = el("button", "Reiniciar progresso");
+        bReset.type = "button";
+        bReset.className = "btn-secondary";
+        bReset.addEventListener("click", reiniciarFlashcards);
+        acoes.appendChild(bReset);
+        box.appendChild(acoes);
+    }
+
+    function proximo() {
+        var resto = pendentes();
+        if (!resto.length) return;
+        for (var passo = 1; passo <= deck.length; passo++) {
+            var k = deck[(indice + passo) % deck.length];
+            if (!conhecidos[k]) { indice = deck.indexOf(k); return; }
+        }
+    }
+
+    window.virarFlashcard = function() {
+        virado = !virado;
+        renderizarFlashcards();
+    };
+
+    window.marcarFlashcard = function(sabe) {
+        if (!pendentes().length) return;
+        if (sabe) {
+            conhecidos[deck[indice]] = true;
+            salvarProgresso();
+        }
+        virado = false;
+        proximo();
+        renderizarFlashcards();
+    };
+
+    window.reiniciarFlashcards = function() {
+        conhecidos = {};
+        salvarProgresso();
+        indice = 0;
+        virado = false;
+        renderizarFlashcards();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        renderizarAdvisory();
+        document.getElementById("ing-definicao").appendChild(el("span", "Clique num termo sublinhado para ver a tradução e a definição.", "color: var(--muted);"));
+        renderizarPerguntas();
+        lerProgresso();
+        indice = 0;
+        if (conhecidos[deck[0]]) proximo();
+        renderizarFlashcards();
+        if (typeof initChecklist === "function") {
+            initChecklist("ingles-tecnico");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
