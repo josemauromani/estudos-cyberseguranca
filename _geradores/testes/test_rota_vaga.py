@@ -159,5 +159,19 @@ class TestRotaVagaRender(unittest.TestCase):
         self.assertIn(".cert-table", bloco)
 
 
+class TestContadorDoPortalReal(unittest.TestCase):
+    def test_contador_da_rota_bate_com_modulos_compilados(self):
+        """O "X de 7" do index.html versionado reflete os módulos principais já compilados."""
+        compilados = set()
+        for linha in ESTUDOS_TXT.read_text(encoding="utf-8").splitlines():
+            if linha.strip() and not linha.startswith("#"):
+                slug, _t, pasta, arquivo = [p.strip() for p in linha.split("|")[:4]]
+                if (ROOT / pasta / arquivo).exists():
+                    compilados.add(slug)
+        cobertas = sum(1 for c in ROTA_VAGA if set(c["principais"]) & compilados)
+        html = (ROOT / "index.html").read_text(encoding="utf-8")
+        self.assertIn(f"{cobertas} de {len(ROTA_VAGA)} competências com módulo disponível", html)
+
+
 if __name__ == "__main__":
     unittest.main()

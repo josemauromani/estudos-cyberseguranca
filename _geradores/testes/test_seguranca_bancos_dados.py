@@ -125,7 +125,6 @@ class TestSegurancaBancosDados(unittest.TestCase):
         self.assertIn("Seguranca-de-Bancos-de-Dados/treinamento-seguranca-de-bancos-de-dados.html", content)
         self.assertIn('data-slug="Seguranca-de-Bancos-de-Dados"', content)
         self.assertIn(f"/ {len(ESTUDOS_DADOS)}", content)
-        self.assertIn("5 de 7 competências com módulo disponível", content)
 
 
 if __name__ == "__main__":

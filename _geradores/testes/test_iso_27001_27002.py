@@ -125,7 +125,6 @@ class TestIso27001e27002(unittest.TestCase):
         self.assertIn("ISO-27001-e-27002/treinamento-iso-27001-e-27002.html", content)
         self.assertIn('data-slug="ISO-27001-e-27002"', content)
         self.assertIn(f"/ {len(ESTUDOS_DADOS)}", content)
-        self.assertIn("4 de 7 competências com módulo disponível", content)
 
 
 if __name__ == "__main__":
