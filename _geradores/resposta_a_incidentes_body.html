@@ -1,0 +1,804 @@
+<!-- Estudo 18: Resposta-a-Incidentes Body Fragment -->
+<article class="study-container" data-slug="resposta-incidentes">
+
+    <!-- SEÇÃO 1: INTRODUÇÃO -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: Quando o Alerta Vira Incidente</h2>
+        </div>
+
+        <p class="lead-text">
+            São 6h12 de uma segunda-feira e o EDR dispara: um processo apagou as cópias de sombra (<em>shadow copies</em>) do servidor de arquivos e centenas de documentos estão sendo renomeados. As decisões da próxima hora definem se o problema fica restrito a um servidor ou se derruba a empresa por uma semana. Este módulo ensina a tomar essas decisões com método.
+        </p>
+
+        <p>
+            A referência mundial para isso é a publicação <strong>NIST SP 800-61</strong> (National Institute of Standards and Technology, Special Publication 800-61). A <strong>NIST SP 800-61 Rev. 2</strong> (2012) consagrou o ciclo de vida em quatro fases que provas e certificações ainda cobram. A <strong>NIST SP 800-61 Rev. 3</strong> (abril de 2025) substituiu a Rev. 2 e reorganizou a resposta a incidentes segundo as seis funções do <strong>CSF 2.0</strong> (Cybersecurity Framework). Você vai estudar as duas, porque o mercado ainda fala a língua da Rev. 2 e os programas novos já são desenhados pela Rev. 3.
+        </p>
+
+        <h3>Evento, Alerta e Incidente</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Termo</th>
+                        <th>Definição operacional</th>
+                        <th>Exemplo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Evento</strong></td>
+                        <td>Qualquer ocorrência observável em um sistema ou rede.</td>
+                        <td>Um usuário fez login na VPN às 2h40.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Alerta</strong></td>
+                        <td>Evento que uma regra de detecção marcou como suspeito e que precisa de triagem.</td>
+                        <td>O SIEM sinaliza login de conta de serviço a partir de um país incomum.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Incidente</strong></td>
+                        <td>Ocorrência que compromete, ou ameaça de forma iminente, a confidencialidade, a integridade ou a disponibilidade, ou que viola política de segurança.</td>
+                        <td>A conta de serviço exporta a tabela de clientes para um armazenamento externo.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Priorização: Severidade Não É Só "Alta ou Baixa"</h3>
+        <p>
+            A Rev. 2 propõe três fatores para priorizar incidentes, que continuam úteis em qualquer matriz de severidade:
+        </p>
+        <ul>
+            <li><strong>Impacto funcional:</strong> quanto do negócio parou (nenhum, baixo, médio, alto).</li>
+            <li><strong>Impacto informacional:</strong> que dado foi afetado (nenhum, privacidade, proprietário, integridade).</li>
+            <li><strong>Recuperabilidade:</strong> quanto esforço a recuperação exige (regular, complementado, estendido, não recuperável).</li>
+        </ul>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">💡</span>
+                <strong>Declare cedo, rebaixe depois</strong>
+            </div>
+            <p>
+                Abrir um incidente e depois rebaixá-lo custa minutos. Esperar "mais alertas para ter certeza" custa horas de propagação. Times maduros declaram o incidente assim que a triagem indica comprometimento provável e ajustam a severidade conforme a análise avança.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: CICLO DE VIDA -->
+    <section class="study-section" id="ciclo">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>O Ciclo de Vida: Rev. 2, Rev. 3 e a Contenção na Prática</h2>
+        </div>
+
+        <h3>O Ciclo Clássico da NIST SP 800-61 Rev. 2</h3>
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Ciclo de Vida da Resposta a Incidentes (NIST SP 800-61 Rev. 2)</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Ciclo de Vida da Resposta a Incidentes (NIST SP 800-61 Rev. 2)">
+flowchart TD
+    P["1. Preparação<br><small>Plano, equipe, ferramentas, playbooks, backups testados</small>"]
+    D["2. Detecção e Análise<br><small>Triagem, escopo, severidade, notificação</small>"]
+    C["3. Contenção, Erradicação e Recuperação<br><small>Isolar, remover a causa, restaurar e validar</small>"]
+    L["4. Atividades Pós-Incidente<br><small>Lições aprendidas, métricas, melhorias</small>"]
+    P --> D
+    D --> C
+    C -->|"novos indicadores"| D
+    C --> L
+    L -->|"melhorias"| P
+            </pre>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Fase (Rev. 2)</th>
+                        <th>O que acontece</th>
+                        <th>Saída esperada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Preparação</strong></td>
+                        <td>Política e plano de resposta, equipe e contatos de plantão, ferramentas (EDR, SIEM, kit forense), playbooks e backups offline testados.</td>
+                        <td>Capacidade de responder antes de precisar.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Detecção e Análise</strong></td>
+                        <td>Triagem dos alertas, confirmação do incidente, definição de escopo e severidade, registro em ticket e notificação das partes interessadas.</td>
+                        <td>Incidente declarado, classificado e com responsável.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Contenção, Erradicação e Recuperação</strong></td>
+                        <td>Impedir que o dano cresça, preservar evidências, eliminar a causa (malware, persistência, credenciais comprometidas) e devolver os sistemas à produção com monitoramento reforçado.</td>
+                        <td>Ameaça removida e operação restabelecida.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Atividades Pós-Incidente</strong></td>
+                        <td>Reunião de lições aprendidas, relatório final, métricas e plano de melhorias com dono e prazo.</td>
+                        <td>Controles e playbooks melhores para o próximo incidente.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>A Reorganização da NIST SP 800-61 Rev. 3 pelo CSF 2.0</h3>
+        <p>
+            A Rev. 3 deixa de tratar a resposta como um ciclo isolado e a descreve como parte da gestão de risco de cibersegurança, usando as funções do CSF 2.0. A preparação se espalha por Govern, Identify e Protect; a resposta propriamente dita fica em Detect, Respond e Recover; e as lições aprendidas alimentam a melhoria contínua, que no CSF 2.0 é a categoria <em>Improvement</em> (ID.IM) da função Identify.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Fase da Rev. 2</th>
+                        <th>Funções do CSF 2.0 na Rev. 3</th>
+                        <th>Exemplos de atividades</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Preparação</td>
+                        <td><strong>Govern</strong>, <strong>Identify</strong>, <strong>Protect</strong></td>
+                        <td>Papéis e responsabilidades, inventário de ativos, playbooks, backups protegidos, treinamento.</td>
+                    </tr>
+                    <tr>
+                        <td>Detecção e Análise</td>
+                        <td><strong>Detect</strong> (e a análise de <strong>Respond</strong>)</td>
+                        <td>Monitoramento contínuo, triagem de eventos, análise de escopo e de causa.</td>
+                    </tr>
+                    <tr>
+                        <td>Contenção, Erradicação e Recuperação</td>
+                        <td><strong>Respond</strong> e <strong>Recover</strong></td>
+                        <td>Contenção, erradicação, comunicação do incidente, restauração e validação.</td>
+                    </tr>
+                    <tr>
+                        <td>Atividades Pós-Incidente</td>
+                        <td><strong>Identify</strong> (Improvement) e <strong>Govern</strong></td>
+                        <td>Lições aprendidas transformadas em melhorias de política, controles e processos.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">📝</span>
+                <strong>Na prova, confira qual revisão está sendo cobrada</strong>
+            </div>
+            <p>
+                Editais e bancos de questões de certificação ainda usam as quatro fases da Rev. 2. Se a questão fala em "fases do ciclo de resposta do NIST", responda pela Rev. 2. Se fala em "CSF 2.0" ou "perfil comunitário", ela se refere à Rev. 3.
+            </p>
+        </div>
+
+        <h3>Contenção de Curto Prazo vs Contenção de Longo Prazo</h3>
+        <p>
+            <strong>Contenção de curto prazo</strong> é a ação imediata para parar o dano: isolar o host pela rede via EDR, desabilitar a conta comprometida, bloquear um domínio de comando e controle. <strong>Contenção de longo prazo</strong> mantém o ambiente funcionando com segurança enquanto a erradicação é preparada: segmentar a VLAN afetada, subir um servidor temporário limpo, exigir MFA para todos os acessos administrativos.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Critério para escolher a estratégia</th>
+                        <th>Pergunta a fazer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Dano potencial</td><td>O que continua sendo perdido a cada hora sem contenção?</td></tr>
+                    <tr><td>Preservação de evidências</td><td>A ação apaga memória, logs ou artefatos que a investigação vai precisar?</td></tr>
+                    <tr><td>Disponibilidade do serviço</td><td>Quais serviços essenciais param e por quanto tempo?</td></tr>
+                    <tr><td>Tempo e recursos</td><td>Quanto tempo e quantas pessoas a ação exige?</td></tr>
+                    <tr><td>Efetividade e duração</td><td>A contenção é total ou parcial? É provisória ou definitiva?</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">⚠️</span>
+                <strong>Desligar o servidor não é contenção, é destruição de evidência</strong>
+            </div>
+            <p>
+                Reiniciar ou cortar a energia apaga a memória RAM, onde ficam processos maliciosos, chaves de criptografia, conexões ativas e comandos executados. Prefira isolar o host pela rede mantendo-o ligado, coletar os dados voláteis e só então decidir.
+            </p>
+        </div>
+
+        <h3>Preservação de Evidências: Ordem de Volatilidade (RFC 3227)</h3>
+        <p>
+            A <strong>RFC 3227</strong> (Guidelines for Evidence Collection and Archiving) define a <strong>Ordem de volatilidade</strong>: colete primeiro o que desaparece mais rápido. Em ordem: registradores e cache; tabela de roteamento, cache ARP, tabela de processos, estatísticas do kernel e memória; sistemas de arquivos temporários; disco; logs remotos e dados de monitoramento; configuração física e topologia de rede; mídias de arquivamento. O módulo 19 (Forense Digital) aprofunda a coleta e a cadeia de custódia.
+        </p>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Coleta volátil mínima antes de qualquer reinício (Linux)</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ir-volatil')">Copiar</button>
+            </div>
+            <pre><code id="code-ir-volatil"># Grave tudo em mídia externa, nunca no disco do host suspeito
+OUT=/mnt/evidencias/fs01-$(date -u +%Y%m%dT%H%M%SZ)
+mkdir -p "$OUT"
+
+date -u                   &gt; "$OUT/00-hora-utc.txt"
+w                         &gt; "$OUT/01-usuarios-logados.txt"
+ps auxwwf                 &gt; "$OUT/02-processos.txt"
+ss -tunap                 &gt; "$OUT/03-conexoes.txt"
+ip neigh                  &gt; "$OUT/04-arp.txt"
+ip route                  &gt; "$OUT/05-rotas.txt"
+ls -la /proc/*/exe 2&gt;/dev/null &gt; "$OUT/06-binarios-em-execucao.txt"
+
+# Integridade: hash de cada arquivo coletado
+sha256sum "$OUT"/* &gt; "$OUT/SHA256SUMS"</code></pre>
+        </div>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Equivalente rápido no Windows (PowerShell como administrador)</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ir-volatil-win')">Copiar</button>
+            </div>
+            <pre><code id="code-ir-volatil-win">$out = "E:\evidencias\ws042-$((Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ'))"
+New-Item -ItemType Directory -Path $out | Out-Null
+
+Get-Process | Select-Object Id, ProcessName, Path, StartTime | Export-Csv "$out\processos.csv" -NoTypeInformation
+Get-NetTCPConnection | Export-Csv "$out\conexoes.csv" -NoTypeInformation
+Get-CimInstance Win32_Service | Select-Object Name, State, PathName | Export-Csv "$out\servicos.csv" -NoTypeInformation
+
+Get-ChildItem $out | Get-FileHash -Algorithm SHA256 | Export-Csv "$out\hashes.csv" -NoTypeInformation</code></pre>
+        </div>
+
+        <h3>Erradicação e Recuperação</h3>
+        <ul>
+            <li><strong>Erradicação:</strong> remover malware e mecanismos de persistência (tarefas agendadas, serviços, chaves Run, contas criadas pelo atacante), revogar credenciais comprometidas e corrigir a vulnerabilidade que permitiu a entrada.</li>
+            <li><strong>Recuperação:</strong> reconstruir a partir de imagens confiáveis, restaurar backups verificados, voltar os sistemas à produção em etapas e manter monitoramento reforçado para detectar reinfecção.</li>
+        </ul>
+
+        <h3>Playbooks e Comunicação</h3>
+        <p>
+            Um <strong>Playbook</strong> é o roteiro de resposta para um tipo de incidente. Um bom playbook traz: critérios de acionamento, papéis (quem decide, quem executa, quem comunica), passos de contenção com dono, evidências a coletar, critérios de encerramento e lista de contatos internos e externos.
+        </p>
+        <p>
+            A comunicação faz parte da resposta. Se o incidente envolve dados pessoais e pode causar risco ou dano relevante aos titulares, a LGPD exige comunicar a Autoridade Nacional de Proteção de Dados (ANPD) e os titulares. A <strong>Resolução CD/ANPD nº 15/2024</strong> fixa o prazo de <strong>3 dias úteis</strong> para a comunicação à ANPD, contados do conhecimento de que o incidente afetou dados pessoais. O módulo 43 (Gestão de Crise e Comunicação) detalha esse fluxo.
+        </p>
+
+        <h3>Atividades Pós-Incidente</h3>
+        <p>
+            A reunião de lições aprendidas deve ser uma retrospectiva sem culpa (<strong>Blameless</strong> post-mortem): o objetivo é entender por que o processo e os controles permitiram o erro, não achar um culpado. Pessoas que temem punição escondem informação, e a próxima resposta piora.
+        </p>
+        <ul>
+            <li><strong>MTTD</strong> (Mean Time to Detect): tempo médio entre o início do ataque e a detecção.</li>
+            <li><strong>MTTR</strong> (Mean Time to Respond, ou to Recover, conforme a definição adotada pela organização): tempo médio entre a detecção e a contenção ou recuperação. Documente qual definição você usa.</li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Runbook Interativo em Árvore de Decisão</h2>
+        </div>
+
+        <p class="lead-text">
+            Escolha um cenário e conduza a resposta. Cada decisão mostra a fase da Rev. 2 e a função da Rev. 3 a que pertence, avança o cronômetro de impacto no negócio e pode destruir evidências ou permitir que o ataque se espalhe. No final, você recebe um relatório com a pontuação e os comentários sobre cada escolha.
+        </p>
+
+        <div class="lab-box ir-lab" id="ir-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Laboratório de Resposta a Incidentes</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Runbook Interativo em Árvore de Decisão</h3>
+                    <p style="margin: 0; font-size: 0.9rem; color: var(--muted);">Dois cenários fictícios. Nenhuma ação sai do seu navegador.</p>
+                </div>
+            </div>
+
+            <div class="lab-actions-bar" style="margin: 1rem 0; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                <button class="btn-primary" type="button" onclick="iniciarCenarioIR('ransomware')">Cenário 1: Ransomware em progressão</button>
+                <button class="btn-primary" type="button" onclick="iniciarCenarioIR('vazamento-bd')">Cenário 2: Vazamento de banco de dados</button>
+                <button class="btn-secondary" type="button" onclick="reiniciarIR()">Reiniciar</button>
+            </div>
+
+            <div class="lab-body">
+            <div id="ir-status" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.85rem;" aria-live="polite">
+                <span id="ir-cronometro" style="padding: 0.3rem 0.7rem; border: 1px solid var(--rule); border-radius: 999px;">⏱️ Impacto: T+0 h</span>
+                <span id="ir-evidencia" style="padding: 0.3rem 0.7rem; border: 1px solid var(--rule); border-radius: 999px;">🧾 Evidências: preservadas</span>
+                <span id="ir-propagacao" style="padding: 0.3rem 0.7rem; border: 1px solid var(--rule); border-radius: 999px;">🦠 Propagação: contida</span>
+                <span id="ir-pontos" style="padding: 0.3rem 0.7rem; border: 1px solid var(--rule); border-radius: 999px;">🎯 Pontos: 0</span>
+            </div>
+
+            <p style="margin: 0 0 1rem 0; font-size: 0.8rem; color: var(--muted);">O cronômetro soma as horas de indisponibilidade ou de exposição que cada decisão causa, incluindo as consequências: reinfecção, propagação, empresa parada ou credencial ainda ativa.</p>
+
+            <div id="ir-painel" style="padding: 1.25rem; background: var(--ground); border: 1px solid var(--rule); border-radius: 8px;">
+                <h4 id="ir-titulo" style="margin-top: 0;">Escolha um cenário para começar</h4>
+                <p id="ir-situacao" style="margin-bottom: 1rem;">Os botões acima carregam o cenário. Leia a situação, escolha uma ação e acompanhe as consequências.</p>
+                <div id="ir-opcoes" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+            </div>
+
+            <div id="ir-feedback" style="margin-top: 1rem;" aria-live="polite"></div>
+
+            <div style="margin-top: 1.25rem;">
+                <h4 style="margin-bottom: 0.5rem;">Linha do tempo das decisões</h4>
+                <ol id="ir-historico" style="padding-left: 1.25rem; font-size: 0.9rem;"></ol>
+            </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Prontidão para Resposta a Incidentes</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para avaliar se a sua organização está preparada antes do próximo incidente. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="resposta-incidentes">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ir-1">
+                <label for="chk-ir-1"><strong>Plano e papéis definidos:</strong> existe um plano de resposta aprovado pela direção, com coordenador do incidente, substitutos e contatos de plantão atualizados.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ir-2">
+                <label for="chk-ir-2"><strong>Playbooks para os cenários mais prováveis:</strong> ransomware, vazamento de dados, conta comprometida e phishing têm playbooks com critérios de acionamento e de encerramento.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ir-3">
+                <label for="chk-ir-3"><strong>Isolamento sem desligar:</strong> o EDR permite isolar hosts pela rede mantendo-os ligados, e a equipe sabe acionar essa função.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ir-4">
+                <label for="chk-ir-4"><strong>Kit de coleta volátil pronto:</strong> há mídia externa, ferramentas de captura de memória e roteiro de coleta segundo a RFC 3227, com cálculo de hash SHA-256.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ir-5">
+                <label for="chk-ir-5"><strong>Logs suficientes e centralizados:</strong> autenticação, VPN, proxy, EDR e auditoria de banco de dados chegam ao SIEM com retenção que cobre o tempo médio de detecção.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ir-6">
+                <label for="chk-ir-6"><strong>Fluxo de comunicação regulatória:</strong> DPO e jurídico estão no plano, e o modelo de comunicação à ANPD em 3 dias úteis está pronto.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ir-7">
+                <label for="chk-ir-7"><strong>Lições aprendidas com dono e prazo:</strong> todo incidente relevante termina com retrospectiva sem culpa, métricas (MTTD, MTTR) e plano de ação acompanhado até a conclusão.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Concursos</h2>
+        </div>
+
+        <p class="lead-text">
+            Questões no estilo de certificações (Security+, CySA+, CISSP) e de concursos de TI:
+        </p>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Fases da Rev. 2):</strong> Um analista confirma que uma estação está se comunicando com um servidor de comando e controle e a isola da rede pelo EDR. Segundo a NIST SP 800-61 Rev. 2, essa ação pertence a qual fase?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Contenção, Erradicação e Recuperação.</p>
+                    <p>A confirmação da comunicação maliciosa foi feita em Detecção e Análise, mas isolar o host é uma ação de contenção de curto prazo. Preparação seria ter o EDR implantado antes; Atividades Pós-Incidente seria discutir, depois, por que o host foi comprometido.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Evidências):</strong> Um servidor está criptografando arquivos neste momento. O gerente pede para reiniciá-lo "para parar o vírus". Qual é a melhor resposta técnica?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Isolar o servidor pela rede, mantendo-o ligado, e coletar a memória e os dados voláteis antes de qualquer reinício.</p>
+                    <p>Reiniciar apaga a RAM, que pode conter o processo malicioso, a chave de criptografia e as conexões ativas. Pela ordem de volatilidade da RFC 3227, memória e estado de rede vêm antes do disco. O isolamento interrompe a propagação sem destruir a evidência.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Rev. 3 e CSF 2.0):</strong> Na NIST SP 800-61 Rev. 3, a melhoria contínua que resulta das lições aprendidas é associada principalmente a qual função do CSF 2.0?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Identify, pela categoria Improvement (ID.IM).</p>
+                    <p>A Rev. 3 distribui a antiga fase de Atividades Pós-Incidente pela melhoria contínua do CSF 2.0, que fica na função Identify. Respond e Recover cobrem a resposta e a restauração; Govern estabelece a estratégia e os papéis que recebem essas melhorias.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Contenção de longo prazo):</strong> Qual das ações abaixo é um exemplo de contenção de longo prazo: (a) desabilitar a conta comprometida; (b) isolar o host pelo EDR; (c) colocar o segmento afetado em uma VLAN de quarentena com regras restritivas enquanto os servidores são reconstruídos; (d) bloquear o IP de comando e controle?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> (c).</p>
+                    <p>As alternativas (a), (b) e (d) são ações imediatas para parar o dano, ou seja, contenção de curto prazo. A quarentena do segmento mantém o ambiente operando com segurança por dias, enquanto a erradicação e a reconstrução são preparadas, o que caracteriza a contenção de longo prazo.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Pós-incidente):</strong> Após um vazamento causado por um colaborador que publicou uma senha em um repositório público, a diretoria quer demiti-lo e encerrar o caso. Por que essa abordagem enfraquece o programa de resposta?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque trata a causa como falha individual e ignora as falhas de processo e de controle.</p>
+                    <p>A retrospectiva sem culpa (blameless) perguntaria por que um segredo podia ser publicado sem ser detectado: falta de varredura de segredos no CI, ausência de cofre de segredos, privilégios excessivos da conta. Punir sem corrigir esses pontos deixa o mesmo caminho aberto e faz as pessoas esconderem erros no futuro.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Quatro fases, seis funções</h4>
+                <p>A Rev. 2 organiza a resposta em quatro fases; a Rev. 3 (2025) distribui as mesmas atividades pelas seis funções do CSF 2.0.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Isolar não é desligar</h4>
+                <p>Contenção de curto prazo para o dano sem apagar a memória. Desligar o host destrói evidências voláteis.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Volátil primeiro</h4>
+                <p>A RFC 3227 manda coletar do mais volátil ao menos volátil, com hash de cada artefato.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Lições sem culpa</h4>
+                <p>A retrospectiva blameless corrige processos e controles; métricas como MTTD e MTTR mostram se a resposta melhorou.</p>
+            </div>
+        </div>
+
+        <h3>Referências Normativas</h3>
+        <ul>
+            <li>NIST SP 800-61 Rev. 3 (2025): Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile.</li>
+            <li>NIST SP 800-61 Rev. 2 (2012): Computer Security Incident Handling Guide (substituída pela Rev. 3).</li>
+            <li>NIST Cybersecurity Framework (CSF) 2.0 (2024).</li>
+            <li>RFC 3227: Guidelines for Evidence Collection and Archiving.</li>
+            <li>ISO/IEC 27035 (partes 1 e 2): gestão de incidentes de segurança da informação.</li>
+            <li>Resolução CD/ANPD nº 15/2024: Regulamento de Comunicação de Incidente de Segurança.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximo Estudo: Estudo 19 — Forense-Digital</strong>
+            </div>
+            <p>
+                Você aprendeu a conter sem destruir evidências. O próximo passo é coletá-las e analisá-las com cadeia de custódia, linha do tempo e artefatos do sistema operacional.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DOS CENÁRIOS DO RUNBOOK (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="ir-cenarios">
+{
+  "ransomware": {
+    "titulo": "Ransomware em progressão no servidor de arquivos",
+    "descricao": "Empresa fictícia de logística com 400 estações. O servidor de arquivos FS-01 começa a ter documentos criptografados numa segunda-feira de manhã.",
+    "inicio": "r0",
+    "nos": {
+      "r0": {
+        "fase": "Três meses antes",
+        "situacao": "Na revisão trimestral de segurança, sobra orçamento para uma única iniciativa de preparação. O que você prioriza?",
+        "opcoes": [
+          {"texto": "Testar o playbook de ransomware em um exercício e validar a restauração dos backups offline.", "fase_rev2": "Preparação", "funcao_rev3": "Protect", "horas": 0, "evidencia": true, "propagacao": false, "pontos": 10, "comentario": "Playbook testado e backup restaurável são o que encurta a recuperação quando o ataque acontece.", "proximo": "r1"},
+          {"texto": "Adiar: nunca tivemos incidente grave e o antivírus está atualizado.", "fase_rev2": "Preparação", "funcao_rev3": "Govern", "horas": 0, "evidencia": true, "propagacao": false, "pontos": -5, "comentario": "Ausência de incidentes passados não é controle. Sem teste, ninguém sabe se o backup restaura nem quem decide o quê.", "proximo": "r1"}
+        ]
+      },
+      "r1": {
+        "fase": "Segunda-feira, 06h12",
+        "situacao": "O EDR alerta: em FS-01, o comando vssadmin apagou as cópias de sombra e arquivos do compartilhamento Financeiro estão sendo renomeados com a extensão .lockx.",
+        "opcoes": [
+          {"texto": "Declarar incidente de severidade alta, abrir o ticket e acionar o coordenador de resposta.", "fase_rev2": "Detecção e Análise", "funcao_rev3": "Detect", "horas": 0.5, "evidencia": true, "propagacao": false, "pontos": 10, "comentario": "Apagar cópias de sombra e renomear em massa é um indicador forte de ransomware. Declarar cedo ganha tempo.", "proximo": "r2"},
+          {"texto": "Esperar mais alertas para confirmar antes de escalar.", "fase_rev2": "Detecção e Análise", "funcao_rev3": "Detect", "horas": 6, "evidencia": true, "propagacao": true, "pontos": -10, "comentario": "Cada hora de espera é uma hora de criptografia e de movimentação lateral. A severidade pode ser rebaixada depois.", "proximo": "r2"},
+          {"texto": "Reiniciar FS-01 para interromper o processo.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Respond", "horas": 4, "evidencia": false, "propagacao": true, "pontos": -15, "comentario": "O reinício apaga a memória com o processo e possíveis chaves, e não impede que outros hosts já infectados continuem.", "proximo": "r2"}
+        ]
+      },
+      "r2": {
+        "fase": "06h40",
+        "situacao": "A telemetria mostra conexões SMB de FS-01 para 14 estações e um beacon HTTPS para um IP externo desconhecido.",
+        "opcoes": [
+          {"texto": "Isolar FS-01 e as 14 estações pela rede via EDR, mantendo-os ligados.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Respond", "horas": 0.5, "evidencia": true, "propagacao": false, "pontos": 15, "comentario": "Contenção de curto prazo correta: interrompe a propagação e o comando e controle sem perder a memória.", "proximo": "r3"},
+          {"texto": "Desligar a energia de todos os servidores do datacenter.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Respond", "horas": 24, "evidencia": false, "propagacao": false, "pontos": -5, "comentario": "Para a propagação, mas derruba a empresa inteira e destrói as evidências voláteis de todos os servidores.", "proximo": "r3"},
+          {"texto": "Bloquear só o IP externo no firewall e manter os hosts na rede.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Respond", "horas": 10, "evidencia": true, "propagacao": true, "pontos": -5, "comentario": "Corta um canal de comando e controle, mas a propagação interna por SMB continua.", "proximo": "r3"}
+        ]
+      },
+      "r3": {
+        "fase": "07h30",
+        "situacao": "FS-01 está isolado e ligado. Antes de mexer mais nele, o que fazer?",
+        "opcoes": [
+          {"texto": "Coletar memória e dados voláteis seguindo a RFC 3227 e calcular o hash de cada artefato.", "fase_rev2": "Detecção e Análise", "funcao_rev3": "Respond", "horas": 1.5, "evidencia": true, "propagacao": false, "pontos": 10, "comentario": "A memória pode conter a chave, o binário e os comandos do atacante. O hash garante a integridade da evidência.", "proximo": "r4"},
+          {"texto": "Restaurar o backup imediatamente por cima do servidor.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Recover", "horas": 8, "evidencia": false, "propagacao": false, "pontos": -10, "comentario": "Sobrescreve as evidências e restaura sem saber como o atacante entrou, o que convida a reinfecção.", "proximo": "r4"}
+        ]
+      },
+      "r4": {
+        "fase": "10h00",
+        "situacao": "A análise mostra que a conta de serviço svc-backup, com privilégio de administrador do domínio, foi usada para a movimentação lateral.",
+        "opcoes": [
+          {"texto": "Redefinir as credenciais privilegiadas comprometidas, incluindo svc-backup e krbtgt (duas vezes), e revogar sessões ativas.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Respond", "horas": 2, "evidencia": true, "propagacao": false, "pontos": 15, "comentario": "Com um administrador do domínio comprometido, só redefinir a senha do usuário inicial não basta. A dupla redefinição do krbtgt invalida tickets Kerberos forjados.", "proximo": "r5"},
+          {"texto": "Trocar apenas a senha do usuário que abriu o e-mail de phishing.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Respond", "horas": 16, "evidencia": true, "propagacao": true, "pontos": -10, "comentario": "O atacante já tem uma credencial muito mais poderosa e continua ativo no domínio.", "proximo": "r5"}
+        ]
+      },
+      "r5": {
+        "fase": "13h00",
+        "situacao": "Há indícios de que uma planilha com nome, CPF e endereço de clientes foi enviada para fora antes da criptografia.",
+        "opcoes": [
+          {"texto": "Acionar DPO e jurídico, avaliar o risco aos titulares e preparar a comunicação à ANPD dentro de 3 dias úteis.", "fase_rev2": "Detecção e Análise", "funcao_rev3": "Respond", "horas": 1, "evidencia": true, "propagacao": false, "pontos": 10, "comentario": "Dados pessoais com risco relevante exigem comunicação à ANPD e aos titulares. O prazo corre a partir do conhecimento.", "proximo": "r6"},
+          {"texto": "Esperar a recuperação completa para decidir se comunica.", "fase_rev2": "Detecção e Análise", "funcao_rev3": "Respond", "horas": 0, "evidencia": true, "propagacao": false, "pontos": -10, "comentario": "A recuperação pode levar dias e o prazo regulatório não espera. Comunicação faz parte da resposta, não vem depois dela.", "proximo": "r6"}
+        ]
+      },
+      "r6": {
+        "fase": "Terça-feira",
+        "situacao": "Os hosts estão contidos e as credenciais foram redefinidas. Como voltar à operação?",
+        "opcoes": [
+          {"texto": "Reconstruir a partir de imagens limpas, restaurar backups verificados offline e voltar em etapas com monitoramento reforçado.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Recover", "horas": 12, "evidencia": true, "propagacao": false, "pontos": 15, "comentario": "Mais lento no início, mas elimina persistências desconhecidas e detecta cedo uma reinfecção.", "proximo": "r7"},
+          {"texto": "Rodar o antivírus, apagar os arquivos maliciosos encontrados e religar os hosts na rede.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Recover", "horas": 36, "evidencia": true, "propagacao": true, "pontos": -15, "comentario": "O antivírus não encontra tarefas agendadas, contas criadas e outros mecanismos de persistência. A reinfecção é provável.", "proximo": "r7"}
+        ]
+      },
+      "r7": {
+        "fase": "Duas semanas depois",
+        "situacao": "A operação está normalizada. Como encerrar o incidente?",
+        "opcoes": [
+          {"texto": "Conduzir uma retrospectiva sem culpa, medir MTTD e MTTR e criar um plano de ação com dono e prazo, atualizando o playbook.", "fase_rev2": "Atividades Pós-Incidente", "funcao_rev3": "Identify", "horas": 2, "evidencia": true, "propagacao": false, "pontos": 10, "comentario": "É assim que o próximo incidente fica mais curto e mais barato.", "proximo": "fim-licoes"},
+          {"texto": "Identificar e punir o colaborador que clicou no phishing e encerrar o caso.", "fase_rev2": "Atividades Pós-Incidente", "funcao_rev3": "Govern", "horas": 1, "evidencia": true, "propagacao": false, "pontos": -10, "comentario": "Os controles que falharam (privilégio excessivo de svc-backup, falta de segmentação) continuam lá. Punir sem corrigir repete o incidente.", "proximo": "fim-sem-licoes"}
+        ]
+      },
+      "fim-licoes": {"final": true, "situacao": "Incidente encerrado com plano de melhorias em andamento. O próximo ataque vai encontrar uma empresa mais preparada."},
+      "fim-sem-licoes": {"final": true, "situacao": "Incidente encerrado sem aprendizado. As falhas que permitiram o ataque continuam abertas."}
+    }
+  },
+  "vazamento-bd": {
+    "titulo": "Vazamento de banco de dados por credencial comprometida",
+    "descricao": "Varejista online fictício. Uma conta de serviço do sistema de relatórios começa a consultar a tabela de clientes de madrugada.",
+    "inicio": "v0",
+    "nos": {
+      "v0": {
+        "fase": "Duas semanas antes",
+        "situacao": "A auditoria interna aponta que as consultas ao banco de clientes não são registradas nem enviadas ao SIEM.",
+        "opcoes": [
+          {"texto": "Habilitar a auditoria do banco de dados e enviar os registros ao SIEM com retenção de 90 dias.", "fase_rev2": "Preparação", "funcao_rev3": "Protect", "horas": 0, "evidencia": true, "propagacao": false, "pontos": 10, "comentario": "Sem log de consultas não há como saber o que saiu. É a evidência central de um vazamento.", "proximo": "v1"},
+          {"texto": "Aceitar o risco sem registro formal, porque o banco fica em rede interna.", "fase_rev2": "Preparação", "funcao_rev3": "Govern", "horas": 0, "evidencia": false, "propagacao": false, "pontos": -10, "comentario": "Estar em rede interna não impede o uso de uma credencial válida. E aceitar risco sem registro formal não é gestão de risco.", "proximo": "v1"}
+        ]
+      },
+      "v1": {
+        "fase": "Quarta-feira, 02h40",
+        "situacao": "Alerta no SIEM: a conta svc-relatorios executou 380 consultas SELECT * na tabela clientes a partir de um endereço de VPN incomum.",
+        "opcoes": [
+          {"texto": "Fazer a triagem: confirmar com o dono da aplicação, cruzar com os logs da VPN e abrir o incidente.", "fase_rev2": "Detecção e Análise", "funcao_rev3": "Detect", "horas": 1, "evidencia": true, "propagacao": false, "pontos": 10, "comentario": "Contexto confirma rapidamente que o padrão não é do sistema de relatórios.", "proximo": "v2"},
+          {"texto": "Fechar como falso positivo, porque é uma conta de serviço conhecida.", "fase_rev2": "Detecção e Análise", "funcao_rev3": "Detect", "horas": 12, "evidencia": true, "propagacao": true, "pontos": -15, "comentario": "Contas de serviço são alvos preferidos justamente por serem confiáveis. O vazamento continua até alguém de fora avisar.", "proximo": "v2"}
+        ]
+      },
+      "v2": {
+        "fase": "03h30",
+        "situacao": "Os logs do proxy mostram 2 GB saindo para um serviço de armazenamento externo a partir da mesma sessão de VPN.",
+        "opcoes": [
+          {"texto": "Desabilitar svc-relatorios, encerrar a sessão de VPN e bloquear o destino no proxy.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Respond", "horas": 0.5, "evidencia": true, "propagacao": false, "pontos": 15, "comentario": "Três ações cirúrgicas de curto prazo que param a exfiltração sem derrubar a loja.", "proximo": "v3"},
+          {"texto": "Derrubar o banco de dados de produção.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Respond", "horas": 8, "evidencia": true, "propagacao": false, "pontos": -5, "comentario": "Para a exfiltração, mas tira a loja do ar sem necessidade. A credencial continua válida para quando o banco voltar.", "proximo": "v3"},
+          {"texto": "Só monitorar, para ver até onde o atacante vai, sem decisão formal.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Respond", "horas": 6, "evidencia": true, "propagacao": true, "pontos": -10, "comentario": "Observar o atacante pode ser estratégia legítima, mas só com decisão formal da direção e do jurídico, porque cada minuto vaza mais dados de clientes.", "proximo": "v3"}
+        ]
+      },
+      "v3": {
+        "fase": "05h00",
+        "situacao": "A exfiltração parou. Como preservar o registro do que aconteceu?",
+        "opcoes": [
+          {"texto": "Exportar os logs de auditoria do banco, da VPN e do proxy, calcular o hash SHA-256 e registrar a cadeia de custódia.", "fase_rev2": "Detecção e Análise", "funcao_rev3": "Respond", "horas": 1, "evidencia": true, "propagacao": false, "pontos": 10, "comentario": "Esses registros provam o escopo do vazamento para a ANPD, para os titulares e, se preciso, para a Justiça.", "proximo": "v4"},
+          {"texto": "Apagar a conta e limpar os logs antigos para liberar espaço.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Respond", "horas": 4, "evidencia": false, "propagacao": false, "pontos": -15, "comentario": "Sem logs ninguém consegue dizer quais dados vazaram, e a empresa terá de assumir o pior cenário.", "proximo": "v4"}
+        ]
+      },
+      "v4": {
+        "fase": "09h00",
+        "situacao": "A análise mostra 48 mil registros com nome, CPF e e-mail. A senha de svc-relatorios estava em um repositório Git público.",
+        "opcoes": [
+          {"texto": "Classificar o impacto informacional como dado pessoal, acionar DPO e jurídico e preparar a comunicação à ANPD e aos titulares dentro de 3 dias úteis.", "fase_rev2": "Detecção e Análise", "funcao_rev3": "Respond", "horas": 1, "evidencia": true, "propagacao": false, "pontos": 15, "comentario": "CPF e e-mail de 48 mil pessoas é risco relevante. A Resolução CD/ANPD nº 15/2024 dá 3 dias úteis para comunicar a ANPD.", "proximo": "v5"},
+          {"texto": "Tratar como incidente apenas de TI, sem envolver o jurídico.", "fase_rev2": "Detecção e Análise", "funcao_rev3": "Respond", "horas": 0, "evidencia": true, "propagacao": false, "pontos": -15, "comentario": "Um vazamento de dados pessoais tem obrigações legais. Deixar o jurídico de fora expõe a empresa a sanção por omissão.", "proximo": "v5"}
+        ]
+      },
+      "v5": {
+        "fase": "Quinta-feira",
+        "situacao": "É hora de eliminar a causa do incidente.",
+        "opcoes": [
+          {"texto": "Revogar e trocar todos os segredos expostos no repositório, removê-los do histórico do Git, movê-los para um cofre de segredos e reduzir os privilégios da conta.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Respond", "horas": 6, "evidencia": true, "propagacao": false, "pontos": 15, "comentario": "O repositório podia ter outros segredos. Cofre e menor privilégio fecham a causa, não só o sintoma.", "proximo": "v6"},
+          {"texto": "Trocar só a senha de svc-relatorios.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Respond", "horas": 10, "evidencia": true, "propagacao": true, "pontos": -10, "comentario": "Outros segredos do mesmo repositório continuam expostos, e a conta segue com acesso a mais dados do que precisa.", "proximo": "v6"}
+        ]
+      },
+      "v6": {
+        "fase": "Sexta-feira",
+        "situacao": "O sistema de relatórios está parado desde a contenção. Como reativá-lo?",
+        "opcoes": [
+          {"texto": "Reativar com a nova credencial, MFA obrigatório na VPN e monitoramento reforçado por 30 dias.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Recover", "horas": 4, "evidencia": true, "propagacao": false, "pontos": 10, "comentario": "Recuperação com controles novos e vigilância para detectar uma segunda tentativa.", "proximo": "v7"},
+          {"texto": "Reativar imediatamente com a configuração antiga para não atrasar os relatórios.", "fase_rev2": "Contenção, Erradicação e Recuperação", "funcao_rev3": "Recover", "horas": 12, "evidencia": true, "propagacao": true, "pontos": -10, "comentario": "A VPN sem MFA continua sendo a porta de entrada que o atacante já conhece.", "proximo": "v7"}
+        ]
+      },
+      "v7": {
+        "fase": "Duas semanas depois",
+        "situacao": "O incidente foi comunicado e o sistema voltou. Como encerrar?",
+        "opcoes": [
+          {"texto": "Conduzir uma retrospectiva sem culpa, medir MTTD e MTTR e incluir varredura de segredos no pipeline de CI como ação com dono e prazo.", "fase_rev2": "Atividades Pós-Incidente", "funcao_rev3": "Identify", "horas": 2, "evidencia": true, "propagacao": false, "pontos": 10, "comentario": "A varredura de segredos no CI impede que a mesma causa volte a acontecer.", "proximo": "fim-licoes"},
+          {"texto": "Encerrar sem relatório, porque o problema já foi resolvido.", "fase_rev2": "Atividades Pós-Incidente", "funcao_rev3": "Govern", "horas": 0, "evidencia": true, "propagacao": false, "pontos": -10, "comentario": "Sem relatório não há aprendizado nem prova de diligência para auditores e para a ANPD.", "proximo": "fim-sem-licoes"}
+        ]
+      },
+      "fim-licoes": {"final": true, "situacao": "Vazamento contido, comunicado no prazo e com a causa corrigida no processo de desenvolvimento."},
+      "fim-sem-licoes": {"final": true, "situacao": "Vazamento contido, mas sem aprendizado registrado. A próxima credencial publicada terá o mesmo destino."}
+    }
+  }
+}
+</script>
+
+<!-- MOTOR DO RUNBOOK INTERATIVO -->
+<script>
+(function() {
+    var CENARIOS = JSON.parse(document.getElementById("ir-cenarios").textContent);
+    var estado = null;
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+
+    function maxPontos(cenario) {
+        var memo = {};
+        function melhor(nid) {
+            if (memo[nid] !== undefined) return memo[nid];
+            var no = cenario.nos[nid];
+            if (no.final) return (memo[nid] = 0);
+            var m = -Infinity;
+            no.opcoes.forEach(function(op) { m = Math.max(m, op.pontos + melhor(op.proximo)); });
+            return (memo[nid] = m);
+        }
+        return melhor(cenario.inicio);
+    }
+
+    function atualizarStatus() {
+        document.getElementById("ir-cronometro").textContent = "⏱️ Impacto: T+" + estado.horas + " h";
+        document.getElementById("ir-evidencia").textContent = estado.evidencia ? "🧾 Evidências: preservadas" : "🧾 Evidências: perdidas";
+        document.getElementById("ir-propagacao").textContent = estado.propagacao ? "🦠 Propagação: ocorreu" : "🦠 Propagação: contida";
+        document.getElementById("ir-pontos").textContent = "🎯 Pontos: " + estado.pontos;
+    }
+
+    function renderizarNo() {
+        var cenario = CENARIOS[estado.chave];
+        var no = cenario.nos[estado.atual];
+        var titulo = document.getElementById("ir-titulo");
+        var situacao = document.getElementById("ir-situacao");
+        var opcoes = document.getElementById("ir-opcoes");
+        opcoes.replaceChildren();
+
+        if (no.final) {
+            titulo.textContent = "Relatório final: " + cenario.titulo;
+            situacao.textContent = no.situacao;
+            opcoes.appendChild(relatorio(cenario));
+            return;
+        }
+
+        titulo.textContent = cenario.titulo + " — " + no.fase;
+        situacao.textContent = no.situacao;
+        no.opcoes.forEach(function(op, i) {
+            var b = el("button", op.texto, "text-align: left; white-space: normal;");
+            b.type = "button";
+            b.className = "btn-secondary";
+            b.addEventListener("click", function() { escolherOpcaoIR(i); });
+            opcoes.appendChild(b);
+        });
+    }
+
+    function relatorio(cenario) {
+        var box = el("div");
+        var maximo = maxPontos(cenario);
+        var pct = maximo > 0 ? Math.max(0, Math.round(100 * estado.pontos / maximo)) : 0;
+        var nivel = pct >= 85 ? "Resposta exemplar" : pct >= 50 ? "Resposta adequada, com pontos a melhorar" : "Resposta arriscada: revise o playbook";
+        box.appendChild(el("p", "Pontuação: " + estado.pontos + " de " + maximo + " (" + pct + "%) — " + nivel + ".", "font-weight: 700;"));
+        box.appendChild(el("p", "Impacto acumulado: " + estado.horas + " h. Evidências " + (estado.evidencia ? "preservadas" : "perdidas") + ". Propagação " + (estado.propagacao ? "ocorreu" : "contida") + "."));
+
+        var fases = [];
+        estado.historico.forEach(function(h) {
+            var rotulo = h.fase_rev2 + " → " + h.funcao_rev3;
+            if (fases.indexOf(rotulo) === -1) fases.push(rotulo);
+        });
+        box.appendChild(el("p", "Fases percorridas (Rev. 2 → Rev. 3):", "margin-bottom: 0.25rem;"));
+        var ul = el("ul");
+        fases.forEach(function(f) { ul.appendChild(el("li", f)); });
+        box.appendChild(ul);
+
+        var erros = estado.historico.filter(function(h) { return h.pontos < 0; });
+        if (erros.length) {
+            box.appendChild(el("p", "Decisões a revisar:", "margin-bottom: 0.25rem;"));
+            var ue = el("ul");
+            erros.forEach(function(h) { ue.appendChild(el("li", h.texto + " — " + h.comentario)); });
+            box.appendChild(ue);
+        } else {
+            box.appendChild(el("p", "Nenhuma decisão a revisar."));
+        }
+        var b = el("button", "Jogar novamente");
+        b.type = "button";
+        b.className = "btn-primary";
+        b.addEventListener("click", function() { iniciarCenarioIR(estado.chave); });
+        box.appendChild(b);
+        return box;
+    }
+
+    window.iniciarCenarioIR = function(chave) {
+        if (!CENARIOS[chave]) return;
+        estado = {chave: chave, atual: CENARIOS[chave].inicio, horas: 0, evidencia: true, propagacao: false, pontos: 0, historico: []};
+        document.getElementById("ir-feedback").replaceChildren(el("p", CENARIOS[chave].descricao, "color: var(--muted);"));
+        document.getElementById("ir-historico").replaceChildren();
+        atualizarStatus();
+        renderizarNo();
+    };
+
+    window.escolherOpcaoIR = function(indice) {
+        if (!estado) return;
+        var no = CENARIOS[estado.chave].nos[estado.atual];
+        if (no.final || !no.opcoes[indice]) return;
+        var op = no.opcoes[indice];
+        estado.horas = Math.round((estado.horas + op.horas) * 10) / 10;
+        estado.evidencia = estado.evidencia && op.evidencia;
+        estado.propagacao = estado.propagacao || op.propagacao;
+        estado.pontos += op.pontos;
+        estado.historico.push(op);
+
+        var item = el("li", no.fase + ": " + op.texto + " [" + op.fase_rev2 + " | " + op.funcao_rev3 + "]");
+        document.getElementById("ir-historico").appendChild(item);
+
+        var fb = document.getElementById("ir-feedback");
+        var cor = op.pontos >= 0 ? "#059669" : "#DC2626";
+        var caixa = el("div", null, "border-left: 4px solid " + cor + "; padding: 0.5rem 0.75rem; background: var(--surface);");
+        caixa.appendChild(el("strong", (op.pontos >= 0 ? "Boa decisão (+" : "Decisão arriscada (") + op.pontos + " pontos)"));
+        caixa.appendChild(el("p", op.comentario, "margin: 0.25rem 0 0 0;"));
+        caixa.appendChild(el("p", "Fase Rev. 2: " + op.fase_rev2 + " | Função Rev. 3: " + op.funcao_rev3 + " | +" + op.horas + " h", "margin: 0.25rem 0 0 0; font-size: 0.8rem; color: var(--muted);"));
+        fb.replaceChildren(caixa);
+
+        estado.atual = op.proximo;
+        atualizarStatus();
+        renderizarNo();
+    };
+
+    window.reiniciarIR = function() {
+        estado = null;
+        document.getElementById("ir-titulo").textContent = "Escolha um cenário para começar";
+        document.getElementById("ir-situacao").textContent = "Os botões acima carregam o cenário. Leia a situação, escolha uma ação e acompanhe as consequências.";
+        document.getElementById("ir-opcoes").replaceChildren();
+        document.getElementById("ir-feedback").replaceChildren();
+        document.getElementById("ir-historico").replaceChildren();
+        document.getElementById("ir-cronometro").textContent = "⏱️ Impacto: T+0 h";
+        document.getElementById("ir-evidencia").textContent = "🧾 Evidências: preservadas";
+        document.getElementById("ir-propagacao").textContent = "🦠 Propagação: contida";
+        document.getElementById("ir-pontos").textContent = "🎯 Pontos: 0";
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof initChecklist === "function") {
+            initChecklist("resposta-incidentes");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>

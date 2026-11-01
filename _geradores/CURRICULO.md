@@ -288,7 +288,7 @@ flowchart LR
 - **Objetivos de Aprendizagem:** Executar as 4 etapas do ciclo de incidentes do NIST SP 800-61 Rev 2: 1. Preparação, 2. Detecção & Análise, 3. Contenção, Erradicação & Recuperação, 4. Atividades Pós-Incidente (Lições Aprendidas); elaborar playbooks de resposta; gerenciar comunicação com stakeholders e órgãos reguladores; conhecer a NIST SP 800-61 Rev. 3 (2025), que reorganiza a resposta a incidentes segundo as funções do CSF 2.0, ao lado do ciclo clássico da Rev. 2.
 - **Pré-requisitos:** Operacoes-SOC-e-SIEM.
 - **Conceitos-Chave:** Contenção de curto vs longo prazo, Preservação de evidências voláteis antes do reboot, Erradicação de persistência de malware, Post-Mortem / Retrospectiva sem culpados (Blameless), NIST SP 800-61 Rev. 3 e funções do CSF 2.0.
-- **Simulador Interativo em JS:** *Runbook Interativo em Árvore de Decisão* — Simula um incidente crítico de segurança (ex.: Ransomware em progressão ou vazamento de banco de dados). O usuário toma decisões passo a passo com ramificações em árvore e cronômetro de impacto no negócio.
+- **Simulador Interativo em JS:** *Runbook Interativo em Árvore de Decisão* — Dois cenários à escolha do aluno: ransomware em progressão no servidor de arquivos e vazamento de banco de dados por credencial comprometida. Em cada um, o aluno toma 8 decisões; cada opção mostra a fase da Rev. 2 e a função da Rev. 3, avança o cronômetro de impacto no negócio e pode destruir evidências ou permitir propagação. O final traz pontuação, fases percorridas e comentários sobre as decisões a revisar.
 
 #### 19. Forense-Digital
 - **Título:** Cadeia de Custódia, Coleta de RAM e Artefatos
