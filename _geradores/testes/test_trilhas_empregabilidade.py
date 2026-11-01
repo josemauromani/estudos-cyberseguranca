@@ -11,9 +11,9 @@ from pathlib import Path
 GERADORES_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(GERADORES_DIR))
 
-from index_dados import CARREIRAS, ESTUDOS_DADOS, TRILHAS  # noqa: E402
+from index_dados import CARREIRAS, CERTIFICACOES, ESTUDOS_DADOS, NECESSIDADES, ROTA_VAGA, TRILHAS  # noqa: E402
 
-from build_index import gerar_index_html  # noqa: E402
+from build_index import gerar_index_html, render_rota_vaga  # noqa: E402
 
 NOVOS = [
     "Linux-para-Seguranca",
@@ -67,6 +67,74 @@ class TestCatalogoNovo(unittest.TestCase):
             if slug in NOVOS[8:]:
                 self.assertEqual(m.group(1), "10", slug)
         self.assertIn('data-value="10"', html)
+
+
+class TestLigacoesNovas(unittest.TestCase):
+    def test_principais_da_rota_intactos(self):
+        self.assertEqual({c["id"]: c["principais"] for c in ROTA_VAGA}, {
+            "solucoes": ["Segmentacao-e-Firewall", "Seguranca-em-Endpoints-EDR", "Protecao-de-Dados-e-Conteudo", "Seguranca-de-Redes-Defesa"],
+            "banco_dados": ["Seguranca-de-Bancos-de-Dados"],
+            "ingles": ["Ingles-Tecnico-Ciber"],
+            "normas": ["PCI-DSS", "ISO-27001-e-27002", "Gestao-de-Riscos-TI"],
+            "resposta_incidentes": ["Resposta-a-Incidentes"],
+            "controles": ["ISO-27001-e-27002"],
+            "formacao": ["Certificacoes-e-Carreira"],
+        })
+
+    def test_apoios_novos(self):
+        esperado = {
+            "solucoes": ["Linux-para-Seguranca", "PowerShell-e-Windows-Interno"],
+            "controles": ["Active-Directory-Fundamentos", "PAM-e-Acessos-Privilegiados"],
+            "resposta_incidentes": ["Ransomware-Prevencao-a-Recuperacao", "Gestao-de-Crise-e-Comunicacao"],
+            "formacao": ["Laboratorio-Domestico-e-Portfolio"],
+        }
+        apoio = {c["id"]: c["apoio"] for c in ROTA_VAGA}
+        for cid, novos in esperado.items():
+            with self.subTest(competencia=cid):
+                self.assertEqual(apoio[cid][-len(novos):], novos)
+        for cid in set(apoio) - set(esperado):
+            self.assertFalse(set(apoio[cid]) & set(NOVOS), cid)
+
+    def test_necessidades_novas(self):
+        esperado = [
+            ("Preciso investigar um servidor Linux suspeito pela linha de comando", "Linux-para-Seguranca", "Ferramentas", "🐧"),
+            ("Preciso automatizar a triagem de logs e consultar a reputação de IPs", "Python-para-Seguranca", "Automação", "🐍"),
+            ("Preciso reconstruir uma intrusão a partir dos eventos do Windows", "PowerShell-e-Windows-Interno", "Ferramentas", "🪟"),
+            ("Preciso montar um laboratório e um portfólio para entrevistas", "Laboratorio-Domestico-e-Portfolio", "Carreira", "🧪"),
+            ("Preciso entender Kerberos e a herança de GPOs no Active Directory", "Active-Directory-Fundamentos", "Identidade", "🏛️"),
+            ("Preciso detectar Kerberoasting e fechar caminhos até Domain Admin", "Ataques-e-Defesa-no-AD", "Identidade", "🕸️"),
+            ("Preciso controlar e auditar contas de administrador", "PAM-e-Acessos-Privilegiados", "Identidade", "🗝️"),
+            ("Preciso escrever políticas de acesso condicional no Entra ID", "Identidade-Hibrida-e-Nuvem", "Identidade", "☁️"),
+            ("Preciso conter um ataque de ransomware e retomar a operação", "Ransomware-Prevencao-a-Recuperacao", "Resiliência", "🔒"),
+            ("Preciso coordenar a crise e comunicar o incidente à ANPD", "Gestao-de-Crise-e-Comunicacao", "Resiliência", "📣"),
+            ("Preciso conduzir um exercício tabletop com a diretoria", "Exercicios-Tabletop", "Resiliência", "🎲"),
+            ("Preciso garantir que o backup sobreviva a um admin de domínio comprometido", "Backup-Imutavel-e-Recuperacao", "Resiliência", "💾"),
+        ]
+        obtido = [(n["desafio"], n["slug"], n["categoria"], n["icone"]) for n in NECESSIDADES if n["slug"] in NOVOS]
+        self.assertEqual(obtido, esperado)
+
+    def test_certificacoes_novas(self):
+        esperado = {
+            "GSEC": ["Linux-para-Seguranca", "PowerShell-e-Windows-Interno", "Active-Directory-Fundamentos"],
+            "Security+": ["PAM-e-Acessos-Privilegiados", "Ransomware-Prevencao-a-Recuperacao", "Backup-Imutavel-e-Recuperacao"],
+            "CISSP": ["Active-Directory-Fundamentos", "PAM-e-Acessos-Privilegiados", "Backup-Imutavel-e-Recuperacao"],
+            "CISM": ["Gestao-de-Crise-e-Comunicacao", "Exercicios-Tabletop"],
+            "CEH": ["Ataques-e-Defesa-no-AD"],
+            "CCSP": [],
+        }
+        for c in CERTIFICACOES:
+            with self.subTest(sigla=c["sigla"]):
+                self.assertEqual([m for m in c["modulos"] if m in NOVOS], esperado[c["sigla"]])
+                n = len(esperado[c["sigla"]])
+                if n:
+                    self.assertEqual(c["modulos"][-n:], esperado[c["sigla"]])
+
+    def test_chips_de_apoio_novos_tem_data_slug(self):
+        html = render_rota_vaga(ROTA_VAGA, {})
+        ini = html.index('id="vaga-controles"')
+        artigo = html[ini:html.index("</article>", ini)]
+        self.assertIn('data-slug="Active-Directory-Fundamentos"', artigo)
+        self.assertIn('data-slug="PAM-e-Acessos-Privilegiados"', artigo)
 
 
 if __name__ == "__main__":

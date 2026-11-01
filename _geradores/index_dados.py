@@ -376,6 +376,78 @@ NECESSIDADES: List[Dict[str, str]] = [
         "categoria": "Carreira",
         "icone": "🎓",
     },
+    {
+        "desafio": "Preciso investigar um servidor Linux suspeito pela linha de comando",
+        "slug": "Linux-para-Seguranca",
+        "categoria": "Ferramentas",
+        "icone": "🐧",
+    },
+    {
+        "desafio": "Preciso automatizar a triagem de logs e consultar a reputação de IPs",
+        "slug": "Python-para-Seguranca",
+        "categoria": "Automação",
+        "icone": "🐍",
+    },
+    {
+        "desafio": "Preciso reconstruir uma intrusão a partir dos eventos do Windows",
+        "slug": "PowerShell-e-Windows-Interno",
+        "categoria": "Ferramentas",
+        "icone": "🪟",
+    },
+    {
+        "desafio": "Preciso montar um laboratório e um portfólio para entrevistas",
+        "slug": "Laboratorio-Domestico-e-Portfolio",
+        "categoria": "Carreira",
+        "icone": "🧪",
+    },
+    {
+        "desafio": "Preciso entender Kerberos e a herança de GPOs no Active Directory",
+        "slug": "Active-Directory-Fundamentos",
+        "categoria": "Identidade",
+        "icone": "🏛️",
+    },
+    {
+        "desafio": "Preciso detectar Kerberoasting e fechar caminhos até Domain Admin",
+        "slug": "Ataques-e-Defesa-no-AD",
+        "categoria": "Identidade",
+        "icone": "🕸️",
+    },
+    {
+        "desafio": "Preciso controlar e auditar contas de administrador",
+        "slug": "PAM-e-Acessos-Privilegiados",
+        "categoria": "Identidade",
+        "icone": "🗝️",
+    },
+    {
+        "desafio": "Preciso escrever políticas de acesso condicional no Entra ID",
+        "slug": "Identidade-Hibrida-e-Nuvem",
+        "categoria": "Identidade",
+        "icone": "☁️",
+    },
+    {
+        "desafio": "Preciso conter um ataque de ransomware e retomar a operação",
+        "slug": "Ransomware-Prevencao-a-Recuperacao",
+        "categoria": "Resiliência",
+        "icone": "🔒",
+    },
+    {
+        "desafio": "Preciso coordenar a crise e comunicar o incidente à ANPD",
+        "slug": "Gestao-de-Crise-e-Comunicacao",
+        "categoria": "Resiliência",
+        "icone": "📣",
+    },
+    {
+        "desafio": "Preciso conduzir um exercício tabletop com a diretoria",
+        "slug": "Exercicios-Tabletop",
+        "categoria": "Resiliência",
+        "icone": "🎲",
+    },
+    {
+        "desafio": "Preciso garantir que o backup sobreviva a um admin de domínio comprometido",
+        "slug": "Backup-Imutavel-e-Recuperacao",
+        "categoria": "Resiliência",
+        "icone": "💾",
+    },
 ]
 
 # 4b. ROTA DA VAGA: competências exigidas -> módulos
@@ -386,7 +458,7 @@ ROTA_VAGA: List[Dict[str, Any]] = [
         "texto_vaga": "Soluções de Cyber Security (Firewalls, Antivírus, DLP, AntiSpam, WAF, Filtro de conteúdo)",
         "icone": "🧱",
         "principais": ["Segmentacao-e-Firewall", "Seguranca-em-Endpoints-EDR", "Protecao-de-Dados-e-Conteudo", "Seguranca-de-Redes-Defesa"],
-        "apoio": ["Engenharia-Social-e-Phishing"],
+        "apoio": ["Engenharia-Social-e-Phishing", "Linux-para-Seguranca", "PowerShell-e-Windows-Interno"],
     },
     {
         "id": "banco_dados",
@@ -418,7 +490,7 @@ ROTA_VAGA: List[Dict[str, Any]] = [
         "texto_vaga": "Resposta a incidentes de segurança da informação",
         "icone": "🚨",
         "principais": ["Resposta-a-Incidentes"],
-        "apoio": ["Operacoes-SOC-e-SIEM", "Forense-Digital"],
+        "apoio": ["Operacoes-SOC-e-SIEM", "Forense-Digital", "Ransomware-Prevencao-a-Recuperacao", "Gestao-de-Crise-e-Comunicacao"],
     },
     {
         "id": "controles",
@@ -426,7 +498,7 @@ ROTA_VAGA: List[Dict[str, Any]] = [
         "texto_vaga": "Controles de segurança da Informação",
         "icone": "🔐",
         "principais": ["ISO-27001-e-27002"],
-        "apoio": ["Hardening-Sistemas", "Arquitetura-Zero-Trust"],
+        "apoio": ["Hardening-Sistemas", "Arquitetura-Zero-Trust", "Active-Directory-Fundamentos", "PAM-e-Acessos-Privilegiados"],
     },
     {
         "id": "formacao",
@@ -434,7 +506,7 @@ ROTA_VAGA: List[Dict[str, Any]] = [
         "texto_vaga": "Ensino Superior completo (preferencialmente Ciências da Computação ou Sistemas de Informação); Pós-graduação em Segurança da Informação e/ou certificação (CEH, CISM, CCSP, CISSP, GSEC)",
         "icone": "🎓",
         "principais": ["Certificacoes-e-Carreira"],
-        "apoio": [],
+        "apoio": ["Laboratorio-Domestico-e-Portfolio"],
     },
 ]
 
@@ -446,7 +518,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "orgao": "EC-Council",
         "foco": "Técnica / ofensiva",
         "experiencia": "2 anos em SI ou treinamento oficial",
-        "modulos": ["Redes-e-Protocolos", "Reconhecimento-e-OSINT", "OWASP-Top-10-Web", "Seguranca-em-APIs", "Pentest-Metodologias", "Engenharia-Social-e-Phishing", "Analise-Basica-de-Malware"],
+        "modulos": ["Redes-e-Protocolos", "Reconhecimento-e-OSINT", "OWASP-Top-10-Web", "Seguranca-em-APIs", "Pentest-Metodologias", "Engenharia-Social-e-Phishing", "Analise-Basica-de-Malware", "Ataques-e-Defesa-no-AD"],
     },
     {
         "sigla": "CISM",
@@ -454,7 +526,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "orgao": "ISACA",
         "foco": "Gestão de programa de SI",
         "experiencia": "5 anos em SI, sendo 3 em gestão",
-        "modulos": ["Resposta-a-Incidentes", "Gestao-de-Riscos-TI", "ISO-27001-e-27002", "Continuidade-e-Disaster-Recovery", "PCI-DSS"],
+        "modulos": ["Resposta-a-Incidentes", "Gestao-de-Riscos-TI", "ISO-27001-e-27002", "Continuidade-e-Disaster-Recovery", "PCI-DSS", "Gestao-de-Crise-e-Comunicacao", "Exercicios-Tabletop"],
     },
     {
         "sigla": "CISSP",
@@ -462,7 +534,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "orgao": "ISC2",
         "foco": "Generalista sênior (8 domínios)",
         "experiencia": "5 anos em 2+ domínios (1 ano dispensável por graduação ou certificação aprovada)",
-        "modulos": ["Fundamentos-Ciber", "Criptografia-Pratica", "Autenticacao-e-IAM", "Segmentacao-e-Firewall", "Resposta-a-Incidentes", "DevSecOps-e-CI-CD", "Gestao-de-Riscos-TI", "ISO-27001-e-27002", "Continuidade-e-Disaster-Recovery", "Seguranca-de-Bancos-de-Dados"],
+        "modulos": ["Fundamentos-Ciber", "Criptografia-Pratica", "Autenticacao-e-IAM", "Segmentacao-e-Firewall", "Resposta-a-Incidentes", "DevSecOps-e-CI-CD", "Gestao-de-Riscos-TI", "ISO-27001-e-27002", "Continuidade-e-Disaster-Recovery", "Seguranca-de-Bancos-de-Dados", "Active-Directory-Fundamentos", "PAM-e-Acessos-Privilegiados", "Backup-Imutavel-e-Recuperacao"],
     },
     {
         "sigla": "CCSP",
@@ -478,7 +550,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "orgao": "GIAC (SANS)",
         "foco": "Técnica generalista",
         "experiencia": "Sem exigência formal",
-        "modulos": ["Redes-e-Protocolos", "Criptografia-Pratica", "Segmentacao-e-Firewall", "Hardening-Sistemas", "Seguranca-de-Redes-Defesa", "Seguranca-em-Endpoints-EDR", "Operacoes-SOC-e-SIEM"],
+        "modulos": ["Redes-e-Protocolos", "Criptografia-Pratica", "Segmentacao-e-Firewall", "Hardening-Sistemas", "Seguranca-de-Redes-Defesa", "Seguranca-em-Endpoints-EDR", "Operacoes-SOC-e-SIEM", "Linux-para-Seguranca", "PowerShell-e-Windows-Interno", "Active-Directory-Fundamentos"],
     },
     {
         "sigla": "Security+",
@@ -486,7 +558,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "orgao": "CompTIA",
         "foco": "Entrada / fundamentos",
         "experiencia": "Recomendada, sem exigência formal",
-        "modulos": ["Fundamentos-Ciber", "Redes-e-Protocolos", "Criptografia-Pratica", "Autenticacao-e-IAM", "Segmentacao-e-Firewall", "Gestao-de-Vulnerabilidades", "Seguranca-em-Endpoints-EDR", "Resposta-a-Incidentes"],
+        "modulos": ["Fundamentos-Ciber", "Redes-e-Protocolos", "Criptografia-Pratica", "Autenticacao-e-IAM", "Segmentacao-e-Firewall", "Gestao-de-Vulnerabilidades", "Seguranca-em-Endpoints-EDR", "Resposta-a-Incidentes", "PAM-e-Acessos-Privilegiados", "Ransomware-Prevencao-a-Recuperacao", "Backup-Imutavel-e-Recuperacao"],
     },
 ]
 
