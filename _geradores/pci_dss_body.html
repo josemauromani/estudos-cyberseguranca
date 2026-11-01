@@ -1,0 +1,884 @@
+<!-- Estudo 31: PCI-DSS Body Fragment -->
+<article class="study-container" data-slug="pci-dss">
+
+    <!-- SEÇÃO 1: INTRODUÇÃO -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: Quem Aceita Cartão Assina um Contrato</h2>
+        </div>
+
+        <p class="lead-text">
+            O PCI DSS (<em>Payment Card Industry Data Security Standard</em>) não é lei: é uma exigência contratual. As bandeiras (Visa, Mastercard, American Express, Discover, JCB) criaram o PCI SSC (<em>PCI Security Standards Council</em>), que publica o padrão; o adquirente que credencia a loja exige que ela valide a conformidade todo ano. Quem descumpre paga multas repassadas pelo adquirente e, depois de um vazamento, pode perder o direito de aceitar cartão. A pergunta que decide quanto esforço isso custa é sempre a mesma: <strong>quais sistemas estão no escopo?</strong>
+        </p>
+
+        <p>
+            A versão vigente é o <strong>PCI DSS v4.0.1</strong>, publicada em junho de 2024 como revisão pontual da v4.0. A v3.2.1 foi aposentada em 31/03/2024, e os requisitos que a v4.0 marcou como "boas práticas até 31/03/2025" passaram a ser obrigatórios nessa data. Neste estudo você volta à <strong>Ipê Store</strong>, a loja online fictícia do Estudo 25, que processa cerca de 400 mil transações de e-commerce por ano e decidiu tokenizar os cartões.
+        </p>
+
+        <h3>Os 6 Objetivos e os 12 Requisitos</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Nº</th><th>Requisito (tradução livre)</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-objetivo="1"><th colspan="2">Objetivo 1 — Construir e manter redes e sistemas seguros</th></tr>
+                    <tr data-requisito="1"><td><strong>1</strong></td><td>Instalar e manter controles de segurança de rede</td></tr>
+                    <tr data-requisito="2"><td><strong>2</strong></td><td>Aplicar configurações seguras a todos os componentes do sistema</td></tr>
+                    <tr data-objetivo="2"><th colspan="2">Objetivo 2 — Proteger os dados da conta</th></tr>
+                    <tr data-requisito="3"><td><strong>3</strong></td><td>Proteger os dados da conta armazenados</td></tr>
+                    <tr data-requisito="4"><td><strong>4</strong></td><td>Proteger os dados do portador com criptografia forte na transmissão por redes abertas e públicas</td></tr>
+                    <tr data-objetivo="3"><th colspan="2">Objetivo 3 — Manter um programa de gestão de vulnerabilidades</th></tr>
+                    <tr data-requisito="5"><td><strong>5</strong></td><td>Proteger sistemas e redes contra software malicioso</td></tr>
+                    <tr data-requisito="6"><td><strong>6</strong></td><td>Desenvolver e manter sistemas e software seguros</td></tr>
+                    <tr data-objetivo="4"><th colspan="2">Objetivo 4 — Implementar medidas fortes de controle de acesso</th></tr>
+                    <tr data-requisito="7"><td><strong>7</strong></td><td>Restringir o acesso a componentes e dados do portador pela necessidade de conhecer</td></tr>
+                    <tr data-requisito="8"><td><strong>8</strong></td><td>Identificar usuários e autenticar o acesso aos componentes do sistema</td></tr>
+                    <tr data-requisito="9"><td><strong>9</strong></td><td>Restringir o acesso físico aos dados do portador</td></tr>
+                    <tr data-objetivo="5"><th colspan="2">Objetivo 5 — Monitorar e testar as redes regularmente</th></tr>
+                    <tr data-requisito="10"><td><strong>10</strong></td><td>Registrar e monitorar todo acesso a componentes do sistema e aos dados do portador</td></tr>
+                    <tr data-requisito="11"><td><strong>11</strong></td><td>Testar regularmente a segurança de sistemas e redes</td></tr>
+                    <tr data-objetivo="6"><th colspan="2">Objetivo 6 — Manter uma política de segurança da informação</th></tr>
+                    <tr data-requisito="12"><td><strong>12</strong></td><td>Apoiar a segurança da informação com políticas e programas organizacionais</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: DADOS E ESCOPO -->
+    <section class="study-section" id="escopo">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Dados da Conta, Escopo, SAQ e Validação</h2>
+        </div>
+
+        <h3>PAN e Dados Sensíveis de Autenticação (SAD)</h3>
+        <p>
+            O padrão chama de <strong>dados da conta</strong> dois grupos com regras opostas:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Grupo</th><th>Elementos</th><th>Pode armazenar após a autorização?</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Dados do portador</strong></td><td>PAN (número do cartão), nome do portador, data de validade, código de serviço</td><td>Sim, se houver necessidade de negócio e o PAN estiver ilegível (3.5.1)</td></tr>
+                    <tr><td><strong>SAD</strong> (<em>Sensitive Authentication Data</em>)</td><td>Dados completos da trilha (tarja ou chip), código de verificação (CVV2, CVC2, CID), PIN e bloco de PIN</td><td><strong>Não</strong>, nem criptografado (3.3.1). Só emissores têm exceção</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Como Deixar o PAN Ilegível</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Técnica</th><th>O que faz</th><th>Efeito no escopo</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>tokenização</strong></td><td>Troca o PAN por um token sem valor; o cofre que liga token e PAN fica com o provedor</td><td>Tira do escopo os sistemas que só veem o token, se a loja não consegue reverter</td></tr>
+                    <tr><td><strong>truncamento</strong></td><td>Apaga de forma permanente parte do PAN armazenado</td><td>O dado truncado deixa de ser PAN</td></tr>
+                    <tr><td><strong>mascaramento</strong></td><td>Esconde dígitos só na exibição; no máximo o BIN e os 4 últimos aparecem (3.4.1)</td><td>Nenhum: o PAN completo continua guardado</td></tr>
+                    <tr><td><strong>Criptografia forte</strong></td><td>Cifra o PAN; quem tem a chave recupera o número</td><td>O sistema continua no CDE e ganha a gestão de chaves (3.6 e 3.7)</td></tr>
+                    <tr><td><strong>Hash com chave</strong></td><td>Hash criptográfico com chave secreta, exigido para hashes de PAN desde 2025 (3.5.1.1)</td><td>Hash sem chave de um número de 16 dígitos é quebrado por força bruta</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">🧩</span>
+                <strong>Hash e truncamento do mesmo PAN não podem conviver soltos</strong>
+            </div>
+            <p>
+                Se o mesmo cartão aparece truncado num sistema (6 primeiros e 4 últimos) e com hash em outro, o atacante só precisa testar os 6 dígitos do meio contra o hash. O padrão exige controles para que as duas versões não possam ser correlacionadas.
+            </p>
+        </div>
+
+        <h3>O Que Entra no Escopo</h3>
+        <ul>
+            <li><strong>CDE</strong> (<em>Cardholder Data Environment</em>): pessoas, processos e tecnologias que armazenam, processam ou transmitem dados do portador ou SAD, mais os sistemas com conectividade irrestrita a eles.</li>
+            <li><strong>Sistemas conectados ou que impactam a segurança</strong>: não tocam no cartão, mas podem afetar a segurança do CDE ou da captura. Exemplos: Active Directory, SIEM, bastion de administração, servidores de atualização e o site que carrega a página de pagamento.</li>
+            <li><strong>Fora do escopo</strong>: sistemas sem acesso ao CDE e sem capacidade de afetar sua segurança. Sem segmentação, a rede plana inteira entra no escopo.</li>
+            <li><strong>Prestadores terceiros (TPSP)</strong>: o gateway, o provedor de nuvem, o call center terceirizado. Eles validam a própria conformidade, e a loja os gerencia pelo requisito 12.8 (lista, contrato, matriz de responsabilidades e acompanhamento do AOC deles).</li>
+        </ul>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Zonas de Escopo do PCI DSS</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Zonas de Escopo do PCI DSS">
+flowchart TD
+    subgraph CDE["CDE"]
+        C1["Armazena, processa ou transmite<br><small>PAN ou SAD</small>"]
+    end
+    subgraph CON["Conectados ou que impactam a segurança"]
+        C2["AD, SIEM, bastion, atualizações<br><small>e o site que carrega a captura</small>"]
+    end
+    subgraph FORA["Fora do escopo"]
+        C3["Sem acesso ao CDE<br><small>segmentação testada (11.4.5)</small>"]
+    end
+    T["Prestador terceiro (TPSP)<br><small>contrato e AOC (12.8)</small>"]
+    C2 -->|"acesso controlado"| C1
+    C3 --x|"bloqueado pela segmentação"| C1
+    C1 -->|"envia dados do cartão"| T
+            </pre>
+        </div>
+
+        <p>
+            A segmentação é opcional, mas é a principal ferramenta para reduzir o escopo. Ela precisa ser provada: o comerciante faz teste de invasão nos controles de segmentação ao menos a cada 12 meses e após mudanças (11.4.5); prestadores de serviço, a cada 6 meses (11.4.6). O escopo inteiro é documentado e confirmado ao menos a cada 12 meses e após mudanças significativas (12.5.2).
+        </p>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🗄️</span>
+                <strong>Tokenizar não apaga o passado</strong>
+            </div>
+            <p>
+                Depois de migrar para o token, procure PAN em backups, logs de aplicação, planilhas exportadas e tickets de atendimento. Enquanto uma cópia antiga existir, o sistema que a guarda continua no CDE. Ferramentas de descoberta de dados varrem arquivos e bancos atrás de números que passam no algoritmo de Luhn.
+            </p>
+        </div>
+
+        <h3>Níveis de Comerciante e Forma de Validação</h3>
+        <p>
+            Cada bandeira define seus níveis, e o adquirente informa à loja qual se aplica. Os critérios da Visa são a referência mais citada:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Nível</th><th>Critério (Visa)</th><th>Validação típica</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Nível 1</strong></td><td>Mais de 6 milhões de transações por ano, ou loja que sofreu vazamento</td><td>ROC anual feito por QSA (ou por ISA, se a bandeira aceitar) e AOC</td></tr>
+                    <tr><td><strong>Nível 2</strong></td><td>De 1 a 6 milhões de transações</td><td>SAQ e AOC; algumas bandeiras exigem ROC</td></tr>
+                    <tr><td><strong>Nível 3</strong></td><td>De 20 mil a 1 milhão de transações de e-commerce</td><td>SAQ e AOC</td></tr>
+                    <tr><td><strong>Nível 4</strong></td><td>Menos de 20 mil de e-commerce, ou até 1 milhão no total</td><td>SAQ e AOC, conforme o adquirente</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <ul>
+            <li><strong>QSA</strong> (<em>Qualified Security Assessor</em>): auditor de empresa credenciada pelo PCI SSC.</li>
+            <li><strong>ISA</strong> (<em>Internal Security Assessor</em>): funcionário da própria empresa treinado e certificado pelo PCI SSC.</li>
+            <li><strong>ROC</strong> (<em>Report on Compliance</em>): relatório detalhado da avaliação.</li>
+            <li><strong>AOC</strong> (<em>Attestation of Compliance</em>): declaração assinada que acompanha o ROC ou o SAQ; é o documento que você pede aos seus TPSPs.</li>
+            <li><strong>ASV</strong> (<em>Approved Scanning Vendor</em>): empresa que faz a varredura externa trimestral de vulnerabilidades (11.3.2).</li>
+        </ul>
+
+        <h3>Os Tipos de SAQ</h3>
+        <p>
+            O SAQ (<em>Self-Assessment Questionnaire</em>) é a autoavaliação. Cada tipo existe para um modelo de captura, e quanto menos a loja toca no cartão, menor o questionário:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>SAQ</th><th>Quando se aplica</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>A</strong></td><td>Cartão não presente (e-commerce, telefone) com todas as funções de dados do cartão terceirizadas; no e-commerce, a página de pagamento é inteira do terceiro (iframe ou redirecionamento)</td></tr>
+                    <tr><td><strong>SAQ A-EP</strong></td><td>E-commerce parcialmente terceirizado: o site da loja não recebe o PAN, mas controla como ele chega ao terceiro (JavaScript ou <em>direct post</em>)</td></tr>
+                    <tr><td><strong>B</strong></td><td>Só máquinas de impressão (imprinter) ou terminais standalone com linha discada, sem armazenamento eletrônico</td></tr>
+                    <tr><td><strong>B-IP</strong></td><td>Terminais standalone aprovados pelo PCI PTS, conectados por IP ao processador</td></tr>
+                    <tr><td><strong>C-VT</strong></td><td>Digitação manual, uma transação por vez, no terminal virtual web do provedor, em computador isolado</td></tr>
+                    <tr><td><strong>C</strong></td><td>Sistema de pagamento conectado à internet, sem armazenamento eletrônico de dados do cartão</td></tr>
+                    <tr><td><strong>P2PE</strong></td><td>Só terminais de uma solução de criptografia ponto a ponto validada pelo PCI SSC</td></tr>
+                    <tr><td><strong>SAQ D</strong></td><td>Todos os demais casos (há versões para comerciantes e para prestadores de serviço); cobre todos os requisitos aplicáveis</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Terceirizar a captura não terceiriza a conformidade</strong>
+            </div>
+            <p>
+                Com SAQ A, a loja ainda valida a conformidade todo ano, gerencia o gateway como TPSP (12.8) e protege o próprio site: quem altera a página pode trocar o iframe por um formulário falso. Na revisão do SAQ A publicada em 2025, os requisitos 6.4.3 e 11.6.1 saíram do questionário, mas a loja passou a ter de confirmar, como critério de elegibilidade, que o site está protegido contra ataques de script que afetem o pagamento.
+            </p>
+        </div>
+
+        <h3>Abordagem Definida e Abordagem Customizada</h3>
+        <p>
+            Na <strong>abordagem definida</strong>, a empresa implementa o requisito como está escrito e o avaliador segue os procedimentos de teste do padrão. Na <strong>abordagem customizada</strong>, novidade da v4, a empresa desenha um controle próprio que atinja o objetivo declarado do requisito, documenta uma análise de risco direcionada para cada requisito assim tratado (12.3.2) e uma matriz de controles, e um QSA desenha os testes. Ela não está disponível para quem valida por SAQ.
+        </p>
+        <p>
+            A <strong>análise de risco direcionada</strong> também aparece na abordagem definida (12.3.1): quando o requisito deixa a frequência a critério da empresa, como a revisão de logs dos sistemas menos críticos (10.4.2.1), a frequência precisa ser justificada por uma análise de risco documentada. É o mesmo raciocínio do Estudo 25, aplicado a um controle.
+        </p>
+
+        <h3>O Que Passou a Valer em 31/03/2025</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Requisito</th><th>O que exige</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>8.4.2</strong></td><td>MFA em todo acesso não console ao CDE, não só no acesso administrativo ou remoto</td></tr>
+                    <tr><td><strong>8.3.6</strong></td><td>Senhas com no mínimo 12 caracteres (8, se o sistema não suportar 12), com letras e números</td></tr>
+                    <tr><td><strong>5.4.1</strong></td><td>Mecanismos que detectem e protejam o pessoal contra phishing</td></tr>
+                    <tr><td><strong>6.4.3</strong></td><td>Inventário, autorização e garantia de integridade de cada script da página de pagamento</td></tr>
+                    <tr><td><strong>11.6.1</strong></td><td>Detecção de alteração não autorizada nos cabeçalhos HTTP e no conteúdo da página de pagamento, ao menos semanalmente</td></tr>
+                    <tr><td><strong>10.4.1.1</strong></td><td>Revisão de logs com mecanismos automatizados</td></tr>
+                    <tr><td><strong>12.3.1</strong></td><td>Análise de risco direcionada para os requisitos de frequência flexível</td></tr>
+                    <tr><td><strong>3.5.1.1</strong></td><td>Hashes de PAN feitos com chave</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Delimitador de Escopo CDE</h2>
+        </div>
+
+        <p class="lead-text">
+            Escolha uma das três arquiteturas de checkout da Ipê Store. No <strong>modo exercício</strong>, classifique cada sistema do inventário e escolha o SAQ; depois confira o gabarito e o motivo de cada resposta. No <strong>modo livre</strong>, ligue e desligue os atributos de cada sistema e veja a classificação e o SAQ mudarem.
+        </p>
+
+        <div class="lab-box pci-lab" id="pci-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Laboratório de Escopo PCI DSS</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Inventário da Ipê Store</h3>
+                    <p id="pci-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">1. Arquitetura do checkout</h4>
+                <div id="pci-arquiteturas" role="group" aria-label="Arquitetura do checkout" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+                <p id="pci-arq-desc" style="font-size: 0.9rem; margin: 0.75rem 0 1.25rem 0;"></p>
+
+                <h4>2. Modo</h4>
+                <div id="pci-modos" role="group" aria-label="Modo do simulador" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+                <p id="pci-modo-ajuda" style="font-size: 0.85rem; color: var(--muted); margin: 0.5rem 0 1.25rem 0;"></p>
+
+                <h4>3. Inventário</h4>
+                <div id="pci-sistemas" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 0.75rem;"></div>
+
+                <h4>4. SAQ</h4>
+                <div id="pci-saq" style="font-size: 0.9rem;"></div>
+
+                <div id="pci-resumo" style="margin-top: 1rem; font-size: 0.9rem;" aria-live="polite"></div>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                    <button class="btn-primary" type="button" id="pci-btn-conferir" onclick="conferirEscopoPCI()">Conferir respostas</button>
+                    <button class="btn-secondary" type="button" id="pci-btn-restaurar" onclick="restaurarPCI()">Limpar respostas</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Escopo e Conformidade PCI DSS</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para preparar a validação anual ou revisar um ambiente de pagamento. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="pci-dss">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-pci-1">
+                <label for="chk-pci-1"><strong>Fluxo do cartão desenhado:</strong> diagramas de rede e de fluxo de dados mostram por onde o cartão entra, passa e sai (1.2.3 e 1.2.4).</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-pci-2">
+                <label for="chk-pci-2"><strong>Escopo confirmado:</strong> o inventário de sistemas em escopo foi revisto nos últimos 12 meses e após a última mudança significativa (12.5.2).</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-pci-3">
+                <label for="chk-pci-3"><strong>Nenhum SAD guardado:</strong> uma varredura de descoberta de dados confirmou que não há CVV, trilha ou PIN em bancos, logs, backups e planilhas.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-pci-4">
+                <label for="chk-pci-4"><strong>PAN ilegível e mascarado:</strong> onde o PAN existe, está tokenizado, truncado, cifrado ou com hash com chave, e as telas mostram no máximo o BIN e os 4 últimos dígitos.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-pci-5">
+                <label for="chk-pci-5"><strong>Segmentação testada:</strong> o teste de invasão dos controles de segmentação foi feito nos últimos 12 meses e após mudanças na rede (11.4.5).</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-pci-6">
+                <label for="chk-pci-6"><strong>Terceiros sob controle:</strong> cada TPSP tem contrato, matriz de responsabilidades e AOC vigente acompanhado ao menos uma vez por ano (12.8).</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-pci-7">
+                <label for="chk-pci-7"><strong>Requisitos de 2025 em operação:</strong> MFA em todo acesso ao CDE (8.4.2), scripts da página de pagamento inventariados e monitorados (6.4.3 e 11.6.1) e revisão automatizada de logs (10.4.1.1).</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Concursos</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (SAD):</strong> Para facilitar a recompra, um desenvolvedor propõe guardar o CVV2 do cliente cifrado com AES-256 e chave num HSM. A proposta atende ao PCI DSS?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. O CVV2 é dado sensível de autenticação e não pode ser armazenado após a autorização, mesmo criptografado (3.3.1).</p>
+                    <p>A criptografia forte serve para o PAN, que pode ser guardado com necessidade de negócio. Para recompra, a solução é o token do gateway (card-on-file), sem guardar nem o PAN nem o código.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (SAQ):</strong> Uma loja usa um script do gateway na própria página de pagamento: o navegador envia o cartão direto ao gateway e a loja recebe um token. Nenhum servidor da loja recebe o PAN. Qual SAQ se aplica?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> SAQ A-EP.</p>
+                    <p>A página que captura o cartão é servida pela loja, então quem compromete o site pode trocar o script e roubar os cartões (skimming). O SAQ A exige que a página de pagamento seja inteira do terceiro, via iframe ou redirecionamento.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Escopo):</strong> O Active Directory autentica os administradores dos servidores do CDE, mas não armazena nem processa dados de cartão. Ele está no escopo?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Sim, como sistema conectado que impacta a segurança do CDE.</p>
+                    <p>Quem controla o AD decide quem entra nos servidores do CDE. Por isso ele recebe os requisitos aplicáveis, como hardening, MFA, logs e gestão de vulnerabilidades, mesmo sem tocar no cartão.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Segmentação):</strong> Uma loja usa firewall para isolar o CDE do restante da rede e quer reduzir o escopo. O que o PCI DSS exige para aceitar essa segmentação?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Teste de invasão dos controles de segmentação ao menos a cada 12 meses e após mudanças (11.4.5); a cada 6 meses para prestadores de serviço (11.4.6).</p>
+                    <p>O teste precisa provar que os segmentos fora do escopo não alcançam o CDE. Segmentação não testada não reduz escopo: a rede inteira volta a ser avaliada.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Abordagem customizada):</strong> Uma loja de Nível 4 que valida por SAQ quer substituir um requisito por um controle próprio, usando a abordagem customizada. Isso é possível?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. A abordagem customizada não está disponível para quem valida por SAQ.</p>
+                    <p>Ela exige análise de risco direcionada para cada requisito customizado (12.3.2), matriz de controles e testes desenhados por um avaliador, o que só acontece numa avaliação com ROC. Quem valida por SAQ usa a abordagem definida.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (MFA):</strong> Desde 31/03/2025, quais acessos ao CDE exigem MFA pelo requisito 8.4.2?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Todo acesso não console ao CDE, de qualquer usuário, e não só o administrativo.</p>
+                    <p>Antes, o MFA era obrigatório para acesso administrativo e acesso remoto. O 8.4.2 estende a exigência a todo acesso ao CDE, e o 8.4.3 continua cobrindo o acesso remoto vindo de fora da rede.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. 6 objetivos, 12 requisitos</h4>
+                <p>Rede, dados, vulnerabilidades, acesso, monitoramento e política. A v4.0.1 é a versão vigente.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. SAD nunca fica</h4>
+                <p>CVV, trilha e PIN não são armazenados após a autorização, nem cifrados. PAN pode, se ilegível.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Escopo decide o custo</h4>
+                <p>CDE mais conectados. Tokenização e segmentação testada reduzem o escopo; terceiros entram pelo 12.8.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. SAQ segue a captura</h4>
+                <p>Iframe ou redirecionamento: A. Script na página da loja: A-EP. Cartão nos próprios sistemas: D.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>PCI SSC — PCI DSS v4.0.1: Requirements and Testing Procedures (junho de 2024).</li>
+            <li>PCI SSC — Guidance for PCI DSS Scoping and Network Segmentation.</li>
+            <li>PCI SSC — Self-Assessment Questionnaire Instructions and Guidelines e os SAQs de cada tipo.</li>
+            <li>PCI SSC — Information Supplement: Tokenization Product Security Guidelines.</li>
+            <li>PCI SSC — Glossário de termos, abreviações e acrônimos do PCI DSS.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 29 — Proteção de Dados e Conteúdo e 30 — Segurança de Bancos de Dados</strong>
+            </div>
+            <p>
+                O Estudo 29 mostra como o DLP encontra PAN fora do lugar, em e-mails, uploads e planilhas. O Estudo 30 aplica os requisitos 7, 8 e 10 ao banco que ainda guarda dados do portador.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="pci-dados">
+{
+ "contexto": "Loja online fictícia, Nível 3 pela régua da Visa (cerca de 400 mil transações de e-commerce por ano). Sistemas e fornecedores inventados para o laboratório.",
+ "saq_opcoes": ["A", "A-EP", "B", "B-IP", "C", "C-VT", "P2PE", "D"],
+ "arquiteturas": [
+  {
+   "id": "proprio",
+   "nome": "Checkout próprio",
+   "descricao": "O formulário de cartão é do site da Ipê; o servidor recebe o número do cartão e o envia ao gateway. O banco guarda o cartão cifrado para compras com um clique.",
+   "captura_no_site": true,
+   "saq": "D",
+   "explicacao_saq": "A loja armazena, processa e transmite PAN nos próprios sistemas, então nenhum SAQ simplificado se aplica: sobra o SAQ D, com todos os requisitos aplicáveis."
+  },
+  {
+   "id": "javascript",
+   "nome": "JavaScript do gateway",
+   "descricao": "A página de pagamento é servida pela Ipê, mas um script do gateway captura o cartão e o envia direto do navegador ao gateway (direct post). A loja recebe só um token.",
+   "captura_no_site": true,
+   "saq": "A-EP",
+   "explicacao_saq": "Nenhum sistema da loja recebe o PAN, mas o site controla como o cartão chega ao gateway: SAQ A-EP. A página de pagamento vira alvo de skimming, daí os requisitos 6.4.3 e 11.6.1."
+  },
+  {
+   "id": "iframe",
+   "nome": "Iframe do gateway",
+   "descricao": "Todo o formulário de cartão é servido pelo gateway dentro de um iframe (ou numa página de redirecionamento). A loja recebe só um token.",
+   "captura_no_site": false,
+   "saq": "A",
+   "explicacao_saq": "Todas as funções de dados do cartão estão com um terceiro validado: SAQ A, o mais curto. A loja ainda protege o site contra ataques de script que afetem o pagamento e gerencia o gateway como TPSP."
+  }
+ ],
+ "sistemas": [
+  {
+   "id": "web-loja", "nome": "Servidor web da loja", "terceiro": false,
+   "por_arquitetura": {
+    "proprio": {"descricao": "Hospeda o site e o formulário de pagamento; o número do cartão chega a ele no envio do checkout.", "pan": true, "impacta": true, "segmentado": false, "motivo": "Transmite o PAN: faz parte do CDE."},
+    "javascript": {"descricao": "Serve a página de pagamento que carrega o script do gateway; o navegador envia o cartão direto ao gateway.", "pan": false, "impacta": true, "segmentado": false, "motivo": "Não recebe o PAN, mas quem altera a página altera o script de captura (skimming): impacta a segurança."},
+    "iframe": {"descricao": "Mostra a página do pedido com um iframe; o formulário de cartão inteiro vem do gateway.", "pan": false, "impacta": true, "segmentado": false, "motivo": "Quem altera a página pode trocar o iframe por um formulário falso: continua impactando a segurança, com um SAQ bem menor."}
+   }
+  },
+  {
+   "id": "app-checkout", "nome": "Servidor de aplicação do checkout", "terceiro": false,
+   "por_arquitetura": {
+    "proprio": {"descricao": "Recebe o cartão do servidor web e chama a API do gateway para autorizar a compra.", "pan": true, "impacta": true, "segmentado": false, "motivo": "Processa e transmite o PAN: CDE."},
+    "javascript": {"descricao": "Monta a página de pagamento com o script do gateway e assina a requisição com a chave da loja; depois recebe só o token.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Controla o script e a chave que a página de pagamento usa: impacta a segurança da captura."},
+    "iframe": {"descricao": "Recebe do gateway, de servidor para servidor, o token e os 4 últimos dígitos do cartão.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Só vê o token, que não tem valor para o atacante, e não controla a página de pagamento: fora do escopo."}
+   }
+  },
+  {
+   "id": "db-pedidos", "nome": "Banco de dados de pedidos", "terceiro": false,
+   "por_arquitetura": {
+    "proprio": {"descricao": "Guarda o número do cartão cifrado para compras com um clique.", "pan": true, "impacta": true, "segmentado": false, "motivo": "Armazena PAN, mesmo cifrado: CDE, com gestão de chaves."},
+    "javascript": {"descricao": "Guarda o token do gateway e os 4 últimos dígitos; os cartões antigos foram expurgados.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Token e 4 últimos dígitos não são PAN: fora do escopo, desde que os dados antigos tenham sido expurgados."},
+    "iframe": {"descricao": "Guarda o token do gateway e os 4 últimos dígitos; os cartões antigos foram expurgados.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Token e 4 últimos dígitos não são PAN: fora do escopo, desde que os dados antigos tenham sido expurgados."}
+   }
+  },
+  {
+   "id": "backup", "nome": "Servidor de backup", "terceiro": false,
+   "por_arquitetura": {
+    "proprio": {"descricao": "Recebe cópias diárias do banco de pedidos.", "pan": true, "impacta": true, "segmentado": false, "motivo": "Armazena cópias do PAN: CDE. É no backup que o cartão esquecido costuma sobreviver."},
+    "javascript": {"descricao": "Recebe cópias do banco de pedidos, que agora só tem tokens; as cópias antigas com cartões foram destruídas.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Sem PAN nas cópias: fora do escopo. Sem destruir as cópias antigas, ele continuaria no CDE."},
+    "iframe": {"descricao": "Recebe cópias do banco de pedidos, que agora só tem tokens; as cópias antigas com cartões foram destruídas.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Sem PAN nas cópias: fora do escopo. Sem destruir as cópias antigas, ele continuaria no CDE."}
+   }
+  },
+  {
+   "id": "estacao-sac", "nome": "Estações do atendimento (SAC)", "terceiro": false,
+   "por_arquitetura": {
+    "proprio": {"descricao": "Os atendentes abrem o pedido no backoffice, que mostra o número completo do cartão.", "pan": true, "impacta": false, "segmentado": false, "motivo": "Exibe o PAN completo, então processa dados do cartão: CDE. Mascarar a tela (3.4.1) seria o primeiro passo."},
+    "javascript": {"descricao": "O backoffice mostra só a bandeira e os 4 últimos dígitos.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Não vê PAN nem acessa sistemas em escopo: fora do escopo."},
+    "iframe": {"descricao": "O backoffice mostra só a bandeira e os 4 últimos dígitos.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Não vê PAN nem acessa sistemas em escopo: fora do escopo."}
+   }
+  },
+  {
+   "id": "ad", "nome": "Active Directory", "terceiro": false,
+   "por_arquitetura": {
+    "proprio": {"descricao": "Autentica os administradores dos servidores do checkout.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Quem controla o AD decide quem entra nos sistemas do CDE: impacta a segurança."},
+    "javascript": {"descricao": "Autentica os administradores dos servidores web e de aplicação.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Controla o acesso aos sistemas que montam a página de pagamento: impacta a segurança."},
+    "iframe": {"descricao": "Autentica os administradores do servidor web.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Controla o acesso ao servidor que hospeda o iframe: impacta a segurança."}
+   }
+  },
+  {
+   "id": "siem", "nome": "SIEM", "terceiro": false,
+   "por_arquitetura": {
+    "proprio": {"descricao": "Recebe e guarda os logs dos servidores do checkout.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Guarda a trilha do requisito 10 e se conecta aos sistemas do CDE: impacta a segurança."},
+    "javascript": {"descricao": "Recebe e guarda os logs dos servidores web e de aplicação.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Guarda a trilha dos sistemas em escopo e se conecta a eles: impacta a segurança."},
+    "iframe": {"descricao": "Recebe e guarda os logs do servidor web.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Guarda a trilha do sistema em escopo e se conecta a ele: impacta a segurança."}
+   }
+  },
+  {
+   "id": "bastion", "nome": "Bastion de administração", "terceiro": false,
+   "por_arquitetura": {
+    "proprio": {"descricao": "Único caminho de acesso administrativo aos servidores do checkout.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Dá acesso administrativo ao CDE: impacta a segurança, e é onde o MFA do 8.4.2 entra."},
+    "javascript": {"descricao": "Único caminho de acesso administrativo aos servidores web e de aplicação.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Dá acesso administrativo aos sistemas em escopo: impacta a segurança."},
+    "iframe": {"descricao": "Único caminho de acesso administrativo ao servidor web.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Dá acesso administrativo ao sistema em escopo: impacta a segurança."}
+   }
+  },
+  {
+   "id": "servidor-arquivos", "nome": "Servidor de arquivos do escritório", "terceiro": false,
+   "por_arquitetura": {
+    "proprio": {"descricao": "Fica na mesma rede plana do banco de pedidos, sem firewall entre eles.", "pan": false, "impacta": false, "segmentado": false, "motivo": "Não toca no cartão, mas sem segmentação qualquer máquina dessa rede alcança o CDE: entra no escopo."},
+    "javascript": {"descricao": "Continua na rede do escritório, que não tem mais nenhum sistema em escopo.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Sem caminho para sistemas em escopo: fora do escopo."},
+    "iframe": {"descricao": "Continua na rede do escritório, que não tem mais nenhum sistema em escopo.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Sem caminho para sistemas em escopo: fora do escopo."}
+   }
+  },
+  {
+   "id": "estacao-rh", "nome": "Estações do RH", "terceiro": false,
+   "por_arquitetura": {
+    "proprio": {"descricao": "Ficam numa VLAN isolada por firewall, sem acesso aos servidores da loja; a segmentação é testada todo ano.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Segmentação testada e nenhum acesso: fora do escopo."},
+    "javascript": {"descricao": "Ficam numa VLAN isolada por firewall, sem acesso aos servidores da loja; a segmentação é testada todo ano.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Segmentação testada e nenhum acesso: fora do escopo."},
+    "iframe": {"descricao": "Ficam numa VLAN isolada por firewall, sem acesso aos servidores da loja; a segmentação é testada todo ano.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Segmentação testada e nenhum acesso: fora do escopo."}
+   }
+  },
+  {
+   "id": "gateway", "nome": "Gateway de pagamento", "terceiro": true,
+   "por_arquitetura": {
+    "proprio": {"descricao": "Empresa terceira que recebe o cartão do servidor de aplicação e autoriza a compra na adquirente.", "pan": true, "impacta": true, "segmentado": false, "motivo": "Processa e armazena PAN, mas é um TPSP: a Ipê exige contrato, matriz de responsabilidades e o AOC dele (12.8)."},
+    "javascript": {"descricao": "Empresa terceira que recebe o cartão direto do navegador do cliente e devolve um token.", "pan": true, "impacta": true, "segmentado": false, "motivo": "Processa e armazena PAN, mas é um TPSP: a Ipê exige contrato, matriz de responsabilidades e o AOC dele (12.8)."},
+    "iframe": {"descricao": "Empresa terceira que serve o formulário de cartão no iframe e devolve um token.", "pan": true, "impacta": true, "segmentado": false, "motivo": "Processa e armazena PAN, mas é um TPSP: a Ipê exige contrato, matriz de responsabilidades e o AOC dele (12.8)."}
+   }
+  }
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var PCI = JSON.parse(document.getElementById("pci-dados").textContent);
+    var ROTULO = { cde: "CDE", conectado: "Conectado / impacta", fora: "Fora do escopo", terceiro: "Terceiro (TPSP)" };
+    var COR = {
+        cde: "rgba(220, 38, 38, 0.30)", conectado: "rgba(234, 88, 12, 0.28)",
+        fora: "rgba(22, 163, 74, 0.25)", terceiro: "rgba(37, 99, 235, 0.25)"
+    };
+    var ATRIBUTOS = [
+        ["pan", "Armazena, processa ou transmite PAN"],
+        ["impacta", "Tem acesso ao escopo ou afeta sua segurança"],
+        ["segmentado", "Isolado dos sistemas em escopo por segmentação testada"]
+    ];
+    var arq = "proprio";
+    var modo = "exercicio";
+    var respostas = {};
+    var saqResposta = "";
+    var conferido = false;
+    var livres = {};
+    var badges = {};
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function arquitetura() {
+        return PCI.arquiteturas.filter(function(a) { return a.id === arq; })[0];
+    }
+
+    // Regra única de classificação (a mesma dos testes em Python).
+    function classificar(sistema, attrs) {
+        if (sistema.terceiro) return "terceiro";
+        if (attrs.pan) return "cde";
+        if (attrs.impacta || !attrs.segmentado) return "conectado";
+        return "fora";
+    }
+    function saqDe(attrsDe) {
+        var comPan = PCI.sistemas.some(function(s) { return !s.terceiro && attrsDe(s).pan; });
+        if (comPan) return "D";
+        return arquitetura().captura_no_site ? "A-EP" : "A";
+    }
+    function gabarito(s) {
+        return classificar(s, s.por_arquitetura[arq]);
+    }
+    function porque(s, attrs) {
+        if (s.terceiro) return "Prestador terceiro: valida a própria conformidade; a loja o gerencia pelo 12.8.";
+        if (attrs.pan) return "Armazena, processa ou transmite PAN.";
+        if (attrs.impacta) return "Não toca no PAN, mas tem acesso ao escopo ou afeta sua segurança.";
+        if (!attrs.segmentado) return "Não toca no PAN, mas está na mesma rede, sem segmentação.";
+        return "Sem PAN, sem impacto e isolado por segmentação testada.";
+    }
+    function copiarAtributos() {
+        livres = {};
+        PCI.sistemas.forEach(function(s) {
+            var a = s.por_arquitetura[arq];
+            livres[s.id] = { pan: a.pan, impacta: a.impacta, segmentado: a.segmentado };
+        });
+    }
+    function selo(cat) {
+        return el("span", ROTULO[cat], "display: inline-block; padding: 0.15rem 0.55rem; border-radius: var(--radius-pill); font-size: 0.8rem; font-weight: 600; background: " + COR[cat] + ";");
+    }
+
+    function renderizarBotoes() {
+        var boxA = document.getElementById("pci-arquiteturas");
+        boxA.replaceChildren();
+        PCI.arquiteturas.forEach(function(a) {
+            var b = el("button", a.nome);
+            b.type = "button";
+            b.className = a.id === arq ? "btn-primary" : "btn-secondary";
+            b.setAttribute("aria-pressed", a.id === arq ? "true" : "false");
+            b.style.fontSize = "0.85rem";
+            b.addEventListener("click", function() { selecionarArquiteturaPCI(a.id); });
+            boxA.appendChild(b);
+        });
+        document.getElementById("pci-arq-desc").textContent = arquitetura().descricao;
+
+        var boxM = document.getElementById("pci-modos");
+        boxM.replaceChildren();
+        [["exercicio", "Modo exercício"], ["livre", "Modo livre"]].forEach(function(par) {
+            var b = el("button", par[1]);
+            b.type = "button";
+            b.className = par[0] === modo ? "btn-primary" : "btn-secondary";
+            b.setAttribute("aria-pressed", par[0] === modo ? "true" : "false");
+            b.style.fontSize = "0.85rem";
+            b.addEventListener("click", function() { alternarModoPCI(par[0]); });
+            boxM.appendChild(b);
+        });
+        document.getElementById("pci-modo-ajuda").textContent = modo === "exercicio"
+            ? "Classifique cada sistema e escolha o SAQ; depois clique em Conferir respostas."
+            : "Altere os atributos dos sistemas da loja; a classificação e o SAQ mudam na hora. O gateway é terceiro e não pode ser editado.";
+        document.getElementById("pci-btn-conferir").hidden = modo !== "exercicio";
+        document.getElementById("pci-btn-restaurar").textContent = modo === "exercicio" ? "Limpar respostas" : "Restaurar atributos da arquitetura";
+    }
+
+    function cartaoBase(s) {
+        var card = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 0.75rem; background: var(--surface); min-width: 0;");
+        card.appendChild(el("strong", s.nome, "display: block; margin-bottom: 0.25rem;"));
+        card.appendChild(el("p", s.por_arquitetura[arq].descricao, "font-size: 0.85rem; margin: 0 0 0.6rem 0;"));
+        return card;
+    }
+
+    function cartaoExercicio(s) {
+        var card = cartaoBase(s);
+        var sel = el("select", null, "width: 100%;");
+        sel.className = "form-control";
+        sel.setAttribute("aria-label", "Classificação de " + s.nome);
+        sel.appendChild(el("option", "Classifique…"));
+        sel.options[0].value = "";
+        ["cde", "conectado", "fora", "terceiro"].forEach(function(cat) {
+            var o = el("option", ROTULO[cat]);
+            o.value = cat;
+            sel.appendChild(o);
+        });
+        sel.value = respostas[s.id] || "";
+        sel.addEventListener("change", function() {
+            respostas[s.id] = sel.value;
+            if (conferido) { conferido = false; renderizarTudo(); } else { renderizarResumo(); }
+        });
+        card.appendChild(sel);
+        if (conferido) {
+            var certo = gabarito(s);
+            var ok = respostas[s.id] === certo;
+            var linha = el("p", null, "font-size: 0.85rem; margin: 0.6rem 0 0 0;");
+            linha.appendChild(el("strong", ok ? "✓ Correto: " : "✗ Gabarito: ", "color: " + (ok ? "var(--tip-color)" : "var(--danger-color)") + ";"));
+            linha.appendChild(selo(certo));
+            linha.appendChild(el("span", " " + s.por_arquitetura[arq].motivo));
+            card.appendChild(linha);
+            card.style.borderColor = ok ? "var(--tip-border)" : "var(--danger-border)";
+        }
+        return card;
+    }
+
+    function cartaoLivre(s) {
+        var card = cartaoBase(s);
+        ATRIBUTOS.forEach(function(par) {
+            var rot = el("label", null, "display: flex; gap: 0.5rem; align-items: flex-start; font-size: 0.85rem; margin-bottom: 0.3rem;");
+            var cb = el("input");
+            cb.type = "checkbox";
+            cb.checked = livres[s.id][par[0]];
+            cb.disabled = s.terceiro;
+            cb.addEventListener("change", function() {
+                livres[s.id][par[0]] = cb.checked;
+                atualizarSelo(s);
+                renderizarSaq();
+                renderizarResumo();
+            });
+            rot.appendChild(cb);
+            rot.appendChild(el("span", par[1]));
+            card.appendChild(rot);
+        });
+        var linha = el("p", null, "font-size: 0.85rem; margin: 0.5rem 0 0 0;");
+        badges[s.id] = linha;
+        card.appendChild(linha);
+        atualizarSelo(s);
+        return card;
+    }
+
+    function atualizarSelo(s) {
+        var linha = badges[s.id];
+        if (!linha) return;
+        linha.replaceChildren();
+        linha.appendChild(selo(classificar(s, livres[s.id])));
+        linha.appendChild(el("span", " " + porque(s, livres[s.id])));
+    }
+
+    function renderizarSistemas() {
+        var box = document.getElementById("pci-sistemas");
+        box.replaceChildren();
+        badges = {};
+        PCI.sistemas.forEach(function(s) {
+            box.appendChild(modo === "exercicio" ? cartaoExercicio(s) : cartaoLivre(s));
+        });
+    }
+
+    function renderizarSaq() {
+        var box = document.getElementById("pci-saq");
+        box.replaceChildren();
+        if (modo === "livre") {
+            var calc = saqDe(function(s) { return livres[s.id]; });
+            var p = el("p", null, "margin: 0;");
+            p.appendChild(el("span", "SAQ sugerido: "));
+            p.appendChild(el("strong", calc));
+            p.appendChild(el("span", calc === "D"
+                ? " — algum sistema da loja armazena, processa ou transmite PAN."
+                : (arquitetura().captura_no_site
+                    ? " — a loja não toca no PAN, mas a página dela controla a captura."
+                    : " — a captura inteira está com o terceiro.")));
+            box.appendChild(p);
+            return;
+        }
+        var rot = el("label", "Qual SAQ a Ipê Store deve preencher nesta arquitetura? ", "display: block; margin-bottom: 0.4rem;");
+        rot.setAttribute("for", "pci-saq-select");
+        box.appendChild(rot);
+        var sel = el("select", null, "max-width: 12rem;");
+        sel.className = "form-control";
+        sel.id = "pci-saq-select";
+        sel.appendChild(el("option", "Escolha…"));
+        sel.options[0].value = "";
+        PCI.saq_opcoes.forEach(function(op) {
+            var o = el("option", "SAQ " + op);
+            o.value = op;
+            sel.appendChild(o);
+        });
+        sel.value = saqResposta;
+        sel.addEventListener("change", function() {
+            saqResposta = sel.value;
+            if (conferido) { conferido = false; renderizarTudo(); } else { renderizarResumo(); }
+        });
+        box.appendChild(sel);
+        if (conferido) {
+            var a = arquitetura();
+            var ok = saqResposta === a.saq;
+            var fb = el("p", null, "margin: 0.6rem 0 0 0;");
+            fb.appendChild(el("strong", ok ? "✓ Correto: SAQ " + a.saq + ". " : "✗ O SAQ desta arquitetura é o " + a.saq + ". ",
+                "color: " + (ok ? "var(--tip-color)" : "var(--danger-color)") + ";"));
+            fb.appendChild(el("span", a.explicacao_saq));
+            box.appendChild(fb);
+        }
+    }
+
+    function contagem(classificacao) {
+        var c = { cde: 0, conectado: 0, fora: 0, terceiro: 0 };
+        PCI.sistemas.forEach(function(s) { c[classificacao(s)]++; });
+        return c;
+    }
+    function linhaContagem(c) {
+        var p = el("p", null, "display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin: 0.4rem 0 0 0;");
+        ["cde", "conectado", "fora", "terceiro"].forEach(function(cat) {
+            var s = selo(cat);
+            s.textContent = ROTULO[cat] + ": " + c[cat];
+            p.appendChild(s);
+        });
+        p.appendChild(el("strong", "Em escopo: " + (c.cde + c.conectado) + " de " + PCI.sistemas.length + " sistemas"));
+        return p;
+    }
+
+    function renderizarResumo() {
+        var box = document.getElementById("pci-resumo");
+        box.replaceChildren();
+        if (modo === "livre") {
+            box.appendChild(el("strong", "Resultado com os atributos atuais"));
+            box.appendChild(linhaContagem(contagem(function(s) { return classificar(s, livres[s.id]); })));
+            return;
+        }
+        var respondidos = PCI.sistemas.filter(function(s) { return respostas[s.id]; }).length;
+        if (!conferido) {
+            box.appendChild(el("span", "Respondidos: " + respondidos + " de " + PCI.sistemas.length + " sistemas" +
+                (saqResposta ? ", SAQ escolhido." : ", SAQ pendente."), "color: var(--muted);"));
+            return;
+        }
+        var acertos = PCI.sistemas.filter(function(s) { return respostas[s.id] === gabarito(s); }).length;
+        var saqOk = saqResposta === arquitetura().saq;
+        box.appendChild(el("strong", "Acertos: " + acertos + " de " + PCI.sistemas.length + " sistemas; SAQ " + (saqOk ? "correto" : "incorreto") + "."));
+        box.appendChild(el("p", "Gabarito desta arquitetura:", "margin: 0.6rem 0 0 0;"));
+        box.appendChild(linhaContagem(contagem(gabarito)));
+    }
+
+    function renderizarTudo() {
+        renderizarBotoes();
+        renderizarSistemas();
+        renderizarSaq();
+        renderizarResumo();
+    }
+
+    window.selecionarArquiteturaPCI = function(id) {
+        if (!PCI.arquiteturas.some(function(a) { return a.id === id; })) return;
+        arq = id;
+        respostas = {};
+        saqResposta = "";
+        conferido = false;
+        copiarAtributos();
+        renderizarTudo();
+    };
+
+    window.alternarModoPCI = function(m) {
+        if (m !== "exercicio" && m !== "livre") return;
+        modo = m;
+        renderizarTudo();
+    };
+
+    window.conferirEscopoPCI = function() {
+        conferido = true;
+        renderizarTudo();
+    };
+
+    window.restaurarPCI = function() {
+        if (modo === "exercicio") {
+            respostas = {};
+            saqResposta = "";
+            conferido = false;
+        } else {
+            copiarAtributos();
+        }
+        renderizarTudo();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("pci-contexto").textContent = PCI.contexto;
+        copiarAtributos();
+        renderizarTudo();
+        if (typeof initChecklist === "function") {
+            initChecklist("pci-dss");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
