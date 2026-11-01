@@ -19,13 +19,13 @@ class TestRedesProtocolos(unittest.TestCase):
 
     def setUp(self):
         self.root = Path(__file__).resolve().parent.parent.parent
-        self.body_path = self.root / "_geradores" / "redes_protocolos_body.html"
+        self.body_path = self.root / "_geradores" / "redes_e_protocolos_body.html"
         self.compiled_path = self.root / "Redes-e-Protocolos" / "treinamento-redes-e-protocolos.html"
         self.portal_path = self.root / "index.html"
 
     def test_body_and_compiled_files_exist(self):
         """Verifica se o fragmento body e o treinamento final compilado existem."""
-        self.assertTrue(self.body_path.exists(), "O arquivo _geradores/redes_protocolos_body.html deve existir.")
+        self.assertTrue(self.body_path.exists(), "O arquivo _geradores/redes_e_protocolos_body.html deve existir.")
         self.assertTrue(self.compiled_path.exists(), "O arquivo Redes-e-Protocolos/treinamento-redes-e-protocolos.html deve existir.")
 
     def test_teoria_e_conceitos_fundamentais(self):
