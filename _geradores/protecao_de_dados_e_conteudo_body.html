@@ -1,0 +1,933 @@
+<!-- Estudo 29: Protecao-de-Dados-e-Conteudo Body Fragment -->
+<article class="study-container" data-slug="protecao-dados-conteudo">
+
+    <!-- SEÇÃO 1: INTRODUÇÃO -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: O Que Entra e o Que Sai</h2>
+        </div>
+
+        <p class="lead-text">
+            Firewall e EDR olham para conexões e processos. Três outros filtros olham para o <strong>conteúdo</strong>: o AntiSpam decide se um e-mail recebido é confiável, o DLP (<em>Data Loss Prevention</em>) impede que dados sensíveis saiam, e o filtro de conteúdo do proxy seguro decide quais sites podem ser acessados. Os três erram nos dois sentidos: deixam passar o que deviam barrar (falso negativo) e barram o trabalho legítimo (falso positivo). Neste estudo você vai entender como cada um decide e configurar as políticas da <strong>Ipê Store</strong>, a loja online fictícia dos Estudos 25 e 31.
+        </p>
+
+        <h3>Estados do Dado e Classificação da Informação</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Estado</th><th>Onde está</th><th>Quem protege</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>em uso</strong></td><td>Aberto numa aplicação, na área de transferência, sendo impresso</td><td>DLP de endpoint</td></tr>
+                    <tr><td><strong>em trânsito</strong></td><td>E-mail, upload web, transferência de arquivo</td><td>DLP de rede, gateway de e-mail, SWG</td></tr>
+                    <tr><td><strong>em repouso</strong></td><td>Servidor de arquivos, banco de dados, armazenamento em nuvem</td><td>Descoberta de dados, CASB em modo API, criptografia</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Nenhum desses filtros funciona sem <strong>classificação da informação</strong>: a política precisa saber o que é público, interno, confidencial ou restrito. A ISO/IEC 27001:2022 cobre isso no controle 5.12 (classificação) e 5.13 (rotulagem); o controle 8.12 trata da prevenção de vazamento de dados. Rótulos aplicados ao documento, manualmente ou por regra, viram um sinal que o DLP lê junto com o conteúdo.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 2: COMO CADA FILTRO DECIDE -->
+    <section class="study-section" id="filtros">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>DLP, Autenticação de E-mail e Filtro de URL</h2>
+        </div>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Estágios do Gateway de Conteúdo</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Estágios do Gateway de Conteúdo">
+flowchart TD
+    E["E-mail recebido"] --> AS["AntiSpam<br><small>reputação, SPF, DKIM, DMARC e conteúdo</small>"]
+    S["E-mail enviado ou upload web"] --> DLP["DLP<br><small>CPF, cartão e palavras-chave</small>"]
+    AS --> U["Filtro de URL<br><small>categoria dos links e do destino</small>"]
+    DLP --> U
+    U --> V["Veredito: o mais severo<br><small>Permitir, Quarentena ou Bloquear</small>"]
+            </pre>
+        </div>
+
+        <h3>DLP: Onde Ele Enxerga</h3>
+        <ul>
+            <li><strong>DLP de rede</strong>: integrado ao gateway de e-mail e ao proxy; vê o que sai por SMTP e HTTP(S), desde que o TLS seja inspecionado.</li>
+            <li><strong>DLP de endpoint</strong>: agente na estação; vê cópia para USB, impressão, área de transferência e upload pelo navegador, mesmo fora da rede da empresa.</li>
+            <li><strong>DLP de nuvem (CASB)</strong>: o <em>Cloud Access Security Broker</em> atua inline, como proxy, ou por API, varrendo o que já está guardado no SaaS e revelando o uso de aplicações não autorizadas (shadow IT).</li>
+        </ul>
+
+        <h3>DLP: Como Ele Reconhece um Dado</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Detector</th><th>Como funciona</th><th>Limitação</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>regex</strong></td><td>Padrão de formato, como <code>\d{3}\.\d{3}\.\d{3}-\d{2}</code></td><td>Sozinho gera falso positivo: número de pedido no mesmo formato</td></tr>
+                    <tr><td><strong>Checksum</strong></td><td>Confere o dígito verificador do CPF ou o algoritmo de Luhn do cartão</td><td>Ainda aceita números válidos que não são de clientes</td></tr>
+                    <tr><td><strong>dicionário</strong></td><td>Palavras-chave como "confidencial" ou "salários"</td><td>Muito ruído se usado isolado</td></tr>
+                    <tr><td><strong>Proximidade</strong></td><td>Exige a palavra "CPF" ou "cartão" perto do número</td><td>Perde planilhas sem cabeçalho</td></tr>
+                    <tr><td><strong>EDM</strong> (<em>Exact Data Match</em>)</td><td>Compara com hashes da base real de clientes</td><td>Exige manter a base de referência atualizada</td></tr>
+                    <tr><td><strong>Fingerprinting</strong></td><td>Reconhece trechos de documentos sigilosos registrados</td><td>Só protege o que foi registrado</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            O <strong>dígito verificador</strong> do CPF são os dois últimos números, calculados a partir dos nove primeiros. Para o primeiro, multiplique os nove dígitos por 10, 9, …, 2, some e calcule o resto da divisão por 11: resto menor que 2 vira 0, senão o dígito é 11 menos o resto. O segundo repete a conta com os dez primeiros dígitos e pesos de 11 a 2. O <strong>Luhn</strong> do cartão dobra um dígito sim, um não, a partir da direita (subtraindo 9 quando passa de 9) e exige que a soma seja múltipla de 10.
+        </p>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">python3 — detectores com checksum</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-cdc-checksum')">Copiar</button>
+            </div>
+            <pre><code id="code-cdc-checksum">import re
+
+def cpf_valido(txt):
+    d = re.sub(r"\D", "", txt)
+    if len(d) != 11 or len(set(d)) == 1:
+        return False
+    for n in (9, 10):
+        r = sum(int(d[i]) * (n + 1 - i) for i in range(n)) % 11
+        if int(d[n]) != (0 if r &lt; 2 else 11 - r):
+            return False
+    return True
+
+def luhn(txt):
+    total = 0
+    for i, x in enumerate(int(c) for c in re.sub(r"\D", "", txt)[::-1]):
+        if i % 2:
+            x = x * 2 - 9 if x * 2 &gt; 9 else x * 2
+        total += x
+    return total % 10 == 0
+
+print(cpf_valido("274.618.903-87"), cpf_valido("123.456.789-00"))  # True False
+print(luhn("4111 1111 1111 1111"), luhn("4000 1234 5678 9010"))      # True False</code></pre>
+        </div>
+
+        <p>
+            O DLP decide com <strong>limiares</strong> e <strong>ações</strong>. Um CPF num e-mail costuma ser o do próprio cliente pedindo ajuda; cem CPFs numa planilha indo para fora é vazamento. As ações vão de monitorar e alertar a pedir justificativa, colocar em <strong>quarentena</strong> para revisão, cifrar ou bloquear. A implantação madura começa em modo monitorar, mede o falso positivo e só depois bloqueia.
+        </p>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>DLP também trata dados pessoais</strong>
+            </div>
+            <p>
+                A LGPD exige medidas de segurança para proteger dados pessoais (art. 46), e o DLP é uma delas. Mas o próprio DLP lê e-mails e arquivos dos colaboradores: a empresa precisa de base legal, transparência sobre o monitoramento numa política de uso aceitável e acesso restrito aos alertas, que contêm justamente os dados sensíveis.
+            </p>
+        </div>
+
+        <h3>E-mail: SPF, DKIM e DMARC</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Mecanismo</th><th>O que verifica</th><th>Ponto fraco</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>SPF</strong> (RFC 7208)</td><td>Se o IP que entregou a mensagem está autorizado pelo domínio do envelope (<code>MAIL FROM</code>)</td><td>Não olha o remetente que o usuário vê (<code>From</code>) e quebra no encaminhamento</td></tr>
+                    <tr><td><strong>DKIM</strong> (RFC 6376)</td><td>Assinatura criptográfica de cabeçalhos e corpo pelo domínio <code>d=</code></td><td>Qualquer domínio pode assinar; a assinatura sozinha não liga ao <code>From</code></td></tr>
+                    <tr><td><strong>DMARC</strong> (RFC 7489)</td><td>Exige que SPF ou DKIM passe <strong>e</strong> esteja alinhado com o domínio do <code>From</code>; publica a política para falhas</td><td>Não impede domínio parecido registrado pelo atacante</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            O <strong>alinhamento</strong> relaxado (o padrão) aceita subdomínios do mesmo domínio organizacional: <code>mail.fornecedor.example</code> alinha com <code>fornecedor.example</code>. O domínio organizacional é calculado com a Public Suffix List, para que <code>loja.com.br</code> e <code>outra.com.br</code> não sejam tratados como o mesmo dono. A política diz ao destinatário o que fazer quando o DMARC falha: <code>p=none</code> só gera relatórios, <code>p=quarantine</code> manda para a quarentena ou spam, <code>p=reject</code> recusa a mensagem.
+        </p>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">bash — registros e resultado de autenticação</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-cdc-dmarc')">Copiar</button>
+            </div>
+            <pre><code id="code-cdc-dmarc">$ dig +short TXT ipestore.example
+"v=spf1 include:_spf.provedor-email.example -all"
+$ dig +short TXT seletor1._domainkey.ipestore.example
+"v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA..."
+$ dig +short TXT _dmarc.ipestore.example
+"v=DMARC1; p=reject; rua=mailto:dmarc@ipestore.example; adkim=r; aspf=r"
+
+# Cabeçalho de um BEC: SPF e DKIM passam, mas de outro domínio
+Authentication-Results: mx.ipestore.example;
+  spf=pass smtp.mailfrom=mailer.promo-hub.example;
+  dkim=pass header.d=promo-hub.example;
+  dmarc=fail (p=reject) header.from=fornecedor-embalagens.example</code></pre>
+        </div>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">💡</span>
+                <strong>O caminho até p=reject</strong>
+            </div>
+            <p>
+                Publique <code>p=none</code> com <code>rua</code>, leia os relatórios agregados para descobrir todos os serviços que enviam em nome do domínio (marketing, CRM, cobrança), autentique cada um e só então suba para <code>p=quarantine</code> e <code>p=reject</code>. Domínios que não enviam e-mail devem publicar <code>v=spf1 -all</code> e <code>p=reject</code> desde o primeiro dia. Desde 2024, Gmail e Yahoo exigem SPF, DKIM e DMARC de quem envia mais de 5 mil mensagens por dia para eles.
+            </p>
+        </div>
+
+        <h3>AntiSpam: Reputação e Conteúdo</h3>
+        <p>
+            Antes de ler o corpo, o gateway consulta a <strong>reputação</strong>: listas de bloqueio por DNS (DNSBL), histórico do IP e idade do domínio. Domínios registrados há poucos dias são suspeitos por definição. Depois, regras de conteúdo somam pontos ("urgente", "confirme sua senha", "nova conta bancária") e um limiar decide a quarentena. Encaminhamentos legítimos que quebram SPF e DKIM podem ser preservados com ARC (RFC 8617).
+        </p>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">🎣</span>
+                <strong>DMARC não para domínio parecido</strong>
+            </div>
+            <p>
+                <code>ipe-store-suporte.example</code> pertence ao atacante, que publica SPF, DKIM e até DMARC para ele: a autenticação passa. Contra isso valem a reputação (domínio novo), as regras de conteúdo, o bloqueio da categoria do link no proxy, o aviso de "remetente externo" e o treinamento. Phishing é a técnica T1566 do MITRE ATT&amp;CK.
+            </p>
+        </div>
+
+        <h3>Filtro de Conteúdo e URL no SWG</h3>
+        <p>
+            O <strong>SWG</strong> (<em>Secure Web Gateway</em>) é o proxy que aplica a política de navegação: classifica cada domínio numa <strong>categoria</strong> (negócios, nuvem pessoal, phishing, domínio recém-registrado) e permite, avisa ou bloqueia. Uploads para armazenamento pessoal são o caminho clássico de exfiltração (T1567, <em>Exfiltration Over Web Service</em>). Um filtro DNS é uma camada mais leve, que bloqueia pela resolução do nome.
+        </p>
+        <p>
+            Sem <strong>inspeção TLS</strong>, o proxy só vê o nome do site (SNI) e não lê o conteúdo enviado, então o DLP de rede fica cego. Para inspecionar, o proxy abre a conexão e apresenta um certificado emitido por uma CA corporativa instalada nas estações. Bancos, saúde e aplicações com certificado fixado (<em>pinning</em>) ficam em lista de exceção, por privacidade e para não quebrar.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Gateway de Conteúdo</h2>
+        </div>
+
+        <p class="lead-text">
+            Escolha um dos oito itens que chegam ao gateway da Ipê Store: e-mails recebidos, e-mails enviados e uploads. Edite o texto, mude o resultado do SPF e do DKIM ou as políticas, e veja cada estágio justificar a decisão. O veredito final é o mais severo entre os estágios que se aplicam.
+        </p>
+
+        <div class="lab-box cdc-lab" id="cdc-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Laboratório de Proteção de Conteúdo</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Gateway de Conteúdo da Ipê Store</h3>
+                    <p id="cdc-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">1. Item</h4>
+                <div id="cdc-itens" role="group" aria-label="Itens de exemplo" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+
+                <div id="cdc-item" style="margin: 1rem 0 1.25rem 0;">
+                    <dl id="cdc-cabecalhos" style="font-size: 0.85rem; margin: 0 0 0.75rem 0; display: grid; grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr); gap: 0.25rem 0.75rem; overflow-wrap: anywhere;"></dl>
+                    <div id="cdc-autenticacao" style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem;">
+                        <label style="display: flex; flex-direction: column; font-size: 0.85rem; gap: 0.25rem;">Resultado do SPF
+                            <select class="form-control" id="cdc-spf"></select>
+                        </label>
+                        <label style="display: flex; flex-direction: column; font-size: 0.85rem; gap: 0.25rem;">Resultado do DKIM
+                            <select class="form-control" id="cdc-dkim"></select>
+                        </label>
+                    </div>
+                    <label for="cdc-corpo" style="font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">Conteúdo (editável)</label>
+                    <textarea class="form-control" id="cdc-corpo" rows="6" style="width: 100%; box-sizing: border-box; resize: vertical;"></textarea>
+                </div>
+
+                <h4>2. Políticas</h4>
+                <div id="cdc-politicas" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 1rem; font-size: 0.85rem;">
+                    <fieldset style="border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 0.75rem; min-width: 0;">
+                        <legend style="font-weight: 600;">AntiSpam</legend>
+                        <label style="display: flex; gap: 0.5rem; margin-bottom: 0.4rem;"><input type="checkbox" id="pol-respeitar-dmarc"> Aplicar a política DMARC do remetente</label>
+                        <label style="display: flex; gap: 0.5rem; margin-bottom: 0.4rem;"><input type="checkbox" id="pol-bloquear-lista"> Bloquear IP em lista de bloqueio (DNSBL)</label>
+                        <label style="display: flex; flex-direction: column; gap: 0.25rem;">Quarentena a partir de quantos pontos de spam
+                            <input class="form-control" type="number" min="1" max="30" id="pol-limiar-spam">
+                        </label>
+                    </fieldset>
+                    <fieldset style="border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 0.75rem; min-width: 0;">
+                        <legend style="font-weight: 600;">DLP</legend>
+                        <label style="display: flex; gap: 0.5rem; margin-bottom: 0.4rem;"><input type="checkbox" id="pol-validar-cpf"> Validar o dígito verificador do CPF</label>
+                        <label style="display: flex; gap: 0.5rem; margin-bottom: 0.4rem;"><input type="checkbox" id="pol-validar-luhn"> Validar o cartão com Luhn</label>
+                        <label style="display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.4rem;">Bloquear a partir de quantos CPFs
+                            <input class="form-control" type="number" min="1" max="100" id="pol-limiar-cpf">
+                        </label>
+                        <label style="display: flex; flex-direction: column; gap: 0.25rem;">Palavras-chave para quarentena (separadas por vírgula)
+                            <input class="form-control" type="text" id="pol-palavras">
+                        </label>
+                    </fieldset>
+                    <fieldset style="border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 0.75rem; min-width: 0;">
+                        <legend style="font-weight: 600;">Filtro de URL: categorias bloqueadas</legend>
+                        <div id="pol-categorias"></div>
+                        <p style="margin: 0.4rem 0 0 0; color: var(--muted);">Domínio sem categoria vai para quarentena.</p>
+                    </fieldset>
+                </div>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                    <button class="btn-primary" type="button" onclick="processarConteudo()">Processar</button>
+                    <button class="btn-secondary" type="button" onclick="restaurarConteudo()">Restaurar itens e políticas</button>
+                </div>
+
+                <h4 style="margin-top: 1.5rem;">3. Resultado</h4>
+                <div id="cdc-pipeline" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 0.75rem;"></div>
+                <div id="cdc-veredito" style="margin-top: 1rem; font-size: 0.95rem;" aria-live="polite"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Proteção de Dados e Conteúdo</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para revisar a proteção de e-mail, web e dados de uma organização. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="protecao-dados-conteudo">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-cdc-1">
+                <label for="chk-cdc-1"><strong>Informação classificada:</strong> existe uma política de classificação com níveis definidos, e os documentos sensíveis recebem rótulo.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-cdc-2">
+                <label for="chk-cdc-2"><strong>Domínios autenticados:</strong> todos os domínios publicam SPF, DKIM e DMARC, inclusive os que não enviam e-mail (<code>v=spf1 -all</code> e <code>p=reject</code>).</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-cdc-3">
+                <label for="chk-cdc-3"><strong>DMARC em evolução:</strong> os relatórios agregados são lidos e a política saiu de <code>p=none</code> para <code>quarantine</code> ou <code>reject</code>.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-cdc-4">
+                <label for="chk-cdc-4"><strong>Detectores validados:</strong> as regras de DLP usam dígito verificador, Luhn ou proximidade, e os limiares foram testados contra falso positivo.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-cdc-5">
+                <label for="chk-cdc-5"><strong>Implantação gradual:</strong> o DLP começou em modo monitorar, tem fluxo de quarentena com justificativa e dono para revisar os alertas.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-cdc-6">
+                <label for="chk-cdc-6"><strong>Navegação filtrada:</strong> o SWG bloqueia phishing, domínios recém-registrados e nuvem pessoal não autorizada, e inspeciona TLS com exceções documentadas.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-cdc-7">
+                <label for="chk-cdc-7"><strong>Monitoramento transparente e integrado:</strong> os colaboradores conhecem a política de uso aceitável, e os alertas de DLP, AntiSpam e SWG chegam ao SIEM.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Concursos</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Alinhamento DMARC):</strong> Uma mensagem tem <code>From: financeiro@fornecedor.example</code>. O SPF passa para <code>mailer.promo-hub.example</code> e o DKIM passa com <code>d=promo-hub.example</code>. Qual é o resultado do DMARC?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Falha (<code>fail</code>).</p>
+                    <p>SPF e DKIM passaram, mas para um domínio diferente do que aparece no <code>From</code>. O DMARC exige que pelo menos um deles passe alinhado com o domínio do <code>From</code>. É o padrão de um BEC enviado por serviço de disparo em massa.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Domínio parecido):</strong> Um phishing de <code>ipe-store-suporte.example</code> chegou com SPF, DKIM e DMARC aprovados. Como isso é possível, e o que o teria barrado?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O domínio é do atacante, que configurou a própria autenticação. Reputação (domínio recém-registrado), regras de conteúdo e o bloqueio da categoria do link no proxy teriam barrado.</p>
+                    <p>O DMARC prova que a mensagem veio do domínio do <code>From</code>, não que o domínio é legítimo. Aviso de remetente externo e treinamento completam a defesa.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Política DMARC):</strong> Um domínio publica <code>p=none</code>. O que acontece com as mensagens falsas que falham no DMARC, e para que serve essa política?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Nada é pedido ao destinatário: as mensagens seguem para os outros filtros. A política serve para receber relatórios e mapear quem envia em nome do domínio.</p>
+                    <p>É a primeira etapa da implantação. Ficar em <code>p=none</code> para sempre deixa o domínio livre para falsificação.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Falso positivo):</strong> A regra de DLP que procura CPF por regex bloqueia relatórios cujos números de pedido têm o formato <code>000.000.000-00</code>. Qual ajuste reduz o falso positivo sem abrir mão da detecção?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Validar o dígito verificador do CPF e, se necessário, exigir a palavra "CPF" por perto.</p>
+                    <p>Desligar a regra ou subir muito o limiar troca o falso positivo por falso negativo. A validação por checksum elimina a maioria dos números que só têm o formato certo.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Inspeção TLS):</strong> Por que o DLP de rede não detecta uma planilha de clientes enviada por HTTPS a um drive pessoal se o proxy não faz inspeção TLS?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Sem inspeção, o proxy só vê o nome do destino (SNI); o conteúdo vai cifrado.</p>
+                    <p>Ele ainda pode bloquear a categoria "nuvem pessoal", mas não lê o arquivo. A inspeção exige uma CA corporativa nas estações e exceções para bancos, saúde e aplicações com certificado fixado.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Tipo de DLP):</strong> A empresa quer impedir que analistas copiem a base de clientes para um pendrive. Que tipo de DLP é necessário?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> DLP de endpoint.</p>
+                    <p>A cópia para USB nunca passa pela rede, então o DLP do gateway e o CASB não a veem. O agente na estação controla USB, impressão e área de transferência.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Três lugares do DLP</h4>
+                <p>Rede (e-mail e proxy), endpoint (USB, impressão) e nuvem (CASB inline ou por API).</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Detector com checksum</h4>
+                <p>Regex acha o formato; dígito verificador e Luhn eliminam o falso positivo.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. DMARC exige alinhamento</h4>
+                <p>SPF ou DKIM precisa passar para o domínio do From. none monitora, quarantine isola, reject recusa.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. SWG precisa de TLS</h4>
+                <p>Categoria bloqueia pelo destino; ler o conteúdo exige inspeção TLS com exceções.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>RFC 7208 (SPF), RFC 6376 (DKIM), RFC 7489 (DMARC) e RFC 8617 (ARC).</li>
+            <li>NIST SP 800-177 Rev. 1 — Trustworthy Email.</li>
+            <li>CIS Controls v8.1 — Controle 3 (Proteção de Dados) e Controle 9 (Proteções de E-mail e Navegador).</li>
+            <li>ISO/IEC 27001:2022 — controles 5.12, 5.13 e 8.12.</li>
+            <li>Lei nº 13.709/2018 (LGPD), arts. 46 a 49.</li>
+            <li>MITRE ATT&amp;CK — T1566 (Phishing), T1048 e T1567 (Exfiltração).</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 31 — PCI-DSS e 15 — Engenharia Social e Phishing</strong>
+            </div>
+            <p>
+                O DLP com Luhn é como a Ipê Store encontra PAN fora do lugar, uma exigência do escopo PCI. O Estudo 15 aprofunda o lado humano do phishing que o AntiSpam não consegue barrar sozinho.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="cdc-dados">
+{
+ "contexto": "Loja online fictícia. Todos os domínios usam o sufixo reservado .example (RFC 2606); nomes, CPFs e cartões são inventados ou números de teste públicos.",
+ "dominio_interno": "ipestore.example",
+ "resultados_spf": ["pass", "fail", "softfail", "neutral", "none"],
+ "resultados_dkim": ["pass", "fail", "none"],
+ "idade_dominio_novo": 30,
+ "pontos_dominio_novo": 3,
+ "regras_spam": [
+  {"termo": "urgente", "pontos": 2},
+  {"termo": "clique aqui", "pontos": 2},
+  {"termo": "senha", "pontos": 2},
+  {"termo": "será bloqueada", "pontos": 3},
+  {"termo": "nova conta bancária", "pontos": 3},
+  {"termo": "promoção", "pontos": 1},
+  {"termo": "grátis", "pontos": 1},
+  {"termo": "últimas horas", "pontos": 1}
+ ],
+ "categorias": {
+  "phishing": "Phishing e fraude",
+  "recem-registrado": "Domínio recém-registrado",
+  "nuvem-pessoal": "Armazenamento em nuvem pessoal",
+  "negocios": "Negócios",
+  "financeiro": "Serviços financeiros",
+  "marketing": "Marketing e publicidade",
+  "noticias": "Notícias"
+ },
+ "dominios": {
+  "ipestore.example": "negocios",
+  "fornecedor-embalagens.example": "negocios",
+  "promo-hub.example": "marketing",
+  "marketplace-parceiro.example": "marketing",
+  "ipe-store-suporte.example": "recem-registrado",
+  "noticias-varejo.example": "noticias",
+  "drive-pessoal.example": "nuvem-pessoal",
+  "gateway-pagamentos.example": "financeiro"
+ },
+ "politica_padrao": {
+  "respeitar_dmarc": true,
+  "bloquear_lista": true,
+  "limiar_spam": 5,
+  "validar_cpf": true,
+  "validar_luhn": true,
+  "limiar_cpf": 3,
+  "palavras_chave": ["confidencial", "salários"],
+  "categorias_bloqueadas": ["phishing", "recem-registrado", "nuvem-pessoal"]
+ },
+ "itens": [
+  {
+   "id": "fatura-fornecedor",
+   "titulo": "Fatura do fornecedor",
+   "tipo": "email-entrada",
+   "de": "financeiro@fornecedor-embalagens.example",
+   "para": "contas@ipestore.example",
+   "envelope": "bounces@mail.fornecedor-embalagens.example",
+   "spf": "pass",
+   "dkim": "pass",
+   "dkim_dominio": "fornecedor-embalagens.example",
+   "dmarc_politica": "reject",
+   "lista_bloqueio": false,
+   "idade_dominio_dias": 2900,
+   "assunto": "Fatura 2025-118 de embalagens",
+   "corpo": "Olá, segue a fatura de outubro das caixas de papelão. O boleto está no portal https://portal.fornecedor-embalagens.example/faturas/2025-118 e qualquer dúvida é só responder este e-mail.\n\nEquipe financeira",
+   "esperado": "permitir",
+   "licao": "SPF e DKIM passam alinhados ao domínio do From e o link é de uma categoria permitida."
+  },
+  {
+   "id": "bec-troca-conta",
+   "titulo": "Fornecedor pede troca de conta",
+   "tipo": "email-entrada",
+   "de": "financeiro@fornecedor-embalagens.example",
+   "para": "contas@ipestore.example",
+   "envelope": "campanha@mailer.promo-hub.example",
+   "spf": "pass",
+   "dkim": "pass",
+   "dkim_dominio": "promo-hub.example",
+   "dmarc_politica": "reject",
+   "lista_bloqueio": false,
+   "idade_dominio_dias": 2900,
+   "assunto": "Atualização de dados bancários",
+   "corpo": "Bom dia. A partir deste mês, nossos pagamentos devem ser feitos na nova conta bancária abaixo. É urgente atualizar antes do vencimento de sexta.\n\nBanco 999, agência 0001, conta 12345-6.",
+   "esperado": "bloquear",
+   "licao": "SPF e DKIM passam, mas para promo-hub.example: nenhum está alinhado ao From, o DMARC falha e o p=reject do fornecedor manda bloquear."
+  },
+  {
+   "id": "dominio-parecido",
+   "titulo": "Phishing de domínio parecido",
+   "tipo": "email-entrada",
+   "de": "suporte@ipe-store-suporte.example",
+   "para": "admin@ipestore.example",
+   "envelope": "bounce@ipe-store-suporte.example",
+   "spf": "pass",
+   "dkim": "pass",
+   "dkim_dominio": "ipe-store-suporte.example",
+   "dmarc_politica": "reject",
+   "lista_bloqueio": false,
+   "idade_dominio_dias": 3,
+   "assunto": "Sua conta será bloqueada",
+   "corpo": "Detectamos acesso incomum ao painel da loja. Para evitar o bloqueio, confirme sua senha em 24 horas. Clique aqui: https://ipe-store-suporte.example/login",
+   "esperado": "bloquear",
+   "licao": "O domínio é do atacante e passa no DMARC. Quem barra é a pontuação de conteúdo com domínio novo (quarentena) e a categoria do link (bloqueio)."
+  },
+  {
+   "id": "newsletter-parceiro",
+   "titulo": "Newsletter de parceiro",
+   "tipo": "email-entrada",
+   "de": "ofertas@marketplace-parceiro.example",
+   "para": "comercial@ipestore.example",
+   "envelope": "news@envios.promo-hub.example",
+   "spf": "pass",
+   "dkim": "none",
+   "dkim_dominio": "marketplace-parceiro.example",
+   "dmarc_politica": "none",
+   "lista_bloqueio": false,
+   "idade_dominio_dias": 1500,
+   "assunto": "Promoção de Black Friday para lojistas parceiros",
+   "corpo": "Últimas horas: anúncio grátis no marketplace. Clique aqui e veja a análise do setor: https://noticias-varejo.example/black-friday",
+   "esperado": "quarentena",
+   "licao": "O DMARC falha, mas p=none só monitora. A quarentena vem da pontuação de conteúdo, que chega ao limiar."
+  },
+  {
+   "id": "planilha-cpfs",
+   "titulo": "Planilha de clientes para agência",
+   "tipo": "email-saida",
+   "de": "marketing@ipestore.example",
+   "para": "contato@agencia-marketing.example",
+   "assunto": "Base de clientes para campanha",
+   "corpo": "Segue a lista confidencial dos clientes para a campanha:\nAna Souza, CPF 274.618.903-87\nBruno Lima, CPF 815.302.746-80\nCarla Dias, CPF 460.917.258-58\nDaniel Rocha, CPF 123.456.789-00",
+   "esperado": "bloquear",
+   "licao": "Três CPFs com dígito verificador correto saindo para fora atingem o limiar de bloqueio. O quarto número não é um CPF válido e não conta."
+  },
+  {
+   "id": "relatorio-pedidos",
+   "titulo": "Relatório com números de pedido",
+   "tipo": "email-saida",
+   "de": "operacoes@ipestore.example",
+   "para": "auditoria@consultoria-auditoria.example",
+   "assunto": "Pedidos com divergência de frete",
+   "corpo": "Pedidos para conferência:\n104.220.318-90\n104.220.319-71\n104.220.320-05\n104.220.321-86\nO código interno de pedido usa o mesmo formato do CPF.",
+   "esperado": "permitir",
+   "licao": "Os números têm formato de CPF, mas nenhum passa no dígito verificador. Desligue a validação e veja o falso positivo bloquear o relatório."
+  },
+  {
+   "id": "backup-drive-pessoal",
+   "titulo": "Backup enviado a drive pessoal",
+   "tipo": "upload",
+   "url": "https://drive-pessoal.example/upload",
+   "arquivo": "pedidos-2024.csv",
+   "corpo": "pedido;cliente;cartao\n88123;Ana;4111 1111 1111 1111\n88124;Bruno;5555 5555 5555 4444\n88125;Carla;4000 1234 5678 9010",
+   "esperado": "bloquear",
+   "licao": "Dois números passam no Luhn e o destino é nuvem pessoal: o DLP e o filtro de URL bloqueiam, cada um por seu motivo."
+  },
+  {
+   "id": "conciliacao-gateway",
+   "titulo": "Conciliação para o gateway",
+   "tipo": "upload",
+   "url": "https://dashboard.gateway-pagamentos.example/conciliacao",
+   "arquivo": "conciliacao-outubro.csv",
+   "corpo": "pedido;cartao;valor\n88123;4111 11** **** 1111;R$ 249,90\n88124;5555 55** **** 4444;R$ 89,00",
+   "esperado": "permitir",
+   "licao": "Os cartões estão mascarados (só BIN e 4 últimos) e o destino é um serviço financeiro permitido."
+  }
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var CDC = JSON.parse(document.getElementById("cdc-dados").textContent);
+    var SEVERIDADE = { permitir: 0, quarentena: 1, bloquear: 2 };
+    var ROTULO = { permitir: "Permitir", quarentena: "Quarentena", bloquear: "Bloquear" };
+    var COR = { permitir: "rgba(22, 163, 74, 0.25)", quarentena: "rgba(202, 138, 4, 0.30)", bloquear: "rgba(220, 38, 38, 0.32)" };
+    var TIPO = { "email-entrada": "E-mail recebido", "email-saida": "E-mail enviado", "upload": "Upload web" };
+    var RE_CPF = /\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/g;
+    var RE_CARTAO = /\b(?:\d[ -]?){12,18}\d\b/g;
+    var RE_URL = /https?:\/\/[^\s<>"']+/g;
+    var atual = null;
+    var edicoes = {};
+    var pol = null;
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function copia(o) { return JSON.parse(JSON.stringify(o)); }
+    function item(id) { return CDC.itens.filter(function(i) { return i.id === id; })[0]; }
+    function maior(lista) {
+        return lista.reduce(function(a, b) { return SEVERIDADE[b] > SEVERIDADE[a] ? b : a; }, "permitir");
+    }
+    function digitos(t) { return t.replace(/\D/g, ""); }
+    function dominio(endereco) { return endereco.split("@").pop().toLowerCase(); }
+    function org(dom) { return dom.toLowerCase().split(".").slice(-2).join("."); }
+
+    function cpfValido(t) {
+        var d = digitos(t);
+        if (d.length !== 11 || /^(\d)\1+$/.test(d)) return false;
+        for (var n = 9; n <= 10; n++) {
+            var s = 0;
+            for (var i = 0; i < n; i++) s += Number(d[i]) * (n + 1 - i);
+            var r = s % 11;
+            if (Number(d[n]) !== (r < 2 ? 0 : 11 - r)) return false;
+        }
+        return true;
+    }
+    function luhnValido(t) {
+        var d = digitos(t).split("").reverse();
+        var total = 0;
+        d.forEach(function(c, i) {
+            var x = Number(c);
+            if (i % 2) { x *= 2; if (x > 9) x -= 9; }
+            total += x;
+        });
+        return total % 10 === 0;
+    }
+    function unicos(lista) {
+        var vistos = {};
+        return lista.filter(function(x) { if (vistos[x]) return false; vistos[x] = true; return true; });
+    }
+
+    // Estado editável do item atual (corpo, SPF e DKIM).
+    function versao(it) {
+        var e = edicoes[it.id] || {};
+        var v = copia(it);
+        if (e.corpo !== undefined) v.corpo = e.corpo;
+        if (e.spf !== undefined) v.spf = e.spf;
+        if (e.dkim !== undefined) v.dkim = e.dkim;
+        return v;
+    }
+
+    function antispam(it) {
+        if (it.tipo !== "email-entrada") return null;
+        var r = { nome: "AntiSpam", motivos: [] };
+        if (pol.bloquear_lista && it.lista_bloqueio) {
+            r.veredito = "bloquear";
+            r.motivos.push("IP do remetente em lista de bloqueio (DNSBL).");
+            return r;
+        }
+        var de = dominio(it.de);
+        var spfAlinhado = it.spf === "pass" && org(dominio(it.envelope)) === org(de);
+        var dkimAlinhado = it.dkim === "pass" && org(it.dkim_dominio) === org(de);
+        var dmarcOk = spfAlinhado || dkimAlinhado;
+        r.motivos.push("SPF " + it.spf + " para " + dominio(it.envelope) + (spfAlinhado ? " (alinhado)" : " (não alinhado com " + de + ")") + ".");
+        r.motivos.push("DKIM " + it.dkim + (it.dkim === "pass" ? " com d=" + it.dkim_dominio + (dkimAlinhado ? " (alinhado)" : " (não alinhado)") : "") + ".");
+        var v = "permitir";
+        if (dmarcOk) {
+            r.motivos.push("DMARC pass: a mensagem veio mesmo de " + de + ", o que não prova que o domínio é legítimo.");
+        } else {
+            var acao = { reject: "bloquear", quarantine: "quarentena", none: "permitir" }[it.dmarc_politica];
+            if (pol.respeitar_dmarc) {
+                v = acao;
+                r.motivos.push("DMARC fail com p=" + it.dmarc_politica + " publicado por " + de + (it.dmarc_politica === "none" ? ": o dono do domínio só pediu relatórios." : ": " + ROTULO[acao].toLowerCase() + "."));
+            } else {
+                r.motivos.push("DMARC fail com p=" + it.dmarc_politica + ", mas a política do remetente está desligada no gateway.");
+            }
+        }
+        var texto = (it.assunto + " " + it.corpo).toLowerCase();
+        var pontos = 0, achados = [];
+        CDC.regras_spam.forEach(function(regra) {
+            if (texto.indexOf(regra.termo) !== -1) { pontos += regra.pontos; achados.push(regra.termo + " +" + regra.pontos); }
+        });
+        if (it.idade_dominio_dias < CDC.idade_dominio_novo) {
+            pontos += CDC.pontos_dominio_novo;
+            achados.push("domínio com " + it.idade_dominio_dias + " dias +" + CDC.pontos_dominio_novo);
+        }
+        r.motivos.push("Pontuação de spam: " + pontos + " (limiar " + pol.limiar_spam + ")" + (achados.length ? ": " + achados.join(", ") : "") + ".");
+        if (pontos >= pol.limiar_spam) v = maior([v, "quarentena"]);
+        r.veredito = v;
+        return r;
+    }
+
+    function dlp(it) {
+        if (it.tipo === "email-entrada") return null;
+        var r = { nome: "DLP", motivos: [] };
+        if (it.tipo === "email-saida" && dominio(it.para) === CDC.dominio_interno) {
+            r.veredito = "permitir";
+            r.motivos.push("Destinatário interno: o DLP registra, mas não bloqueia.");
+            return r;
+        }
+        var texto = (it.assunto || "") + " " + it.corpo;
+        var brutosCpf = texto.match(RE_CPF) || [];
+        var cpfs = unicos(brutosCpf.filter(function(m) { return !pol.validar_cpf || cpfValido(m); }).map(digitos));
+        var brutosCartao = texto.match(RE_CARTAO) || [];
+        var cartoes = unicos(brutosCartao.filter(function(m) { return !pol.validar_luhn || luhnValido(m); }).map(digitos));
+        var palavras = pol.palavras_chave.filter(function(p) { return p.trim() && texto.toLowerCase().indexOf(p.trim().toLowerCase()) !== -1; });
+        r.motivos.push("CPF: " + brutosCpf.length + " no formato, " + cpfs.length + " contados" + (pol.validar_cpf ? " após o dígito verificador" : " (sem validar o dígito verificador)") + "; bloqueia a partir de " + pol.limiar_cpf + ".");
+        r.motivos.push("Cartão: " + brutosCartao.length + " no formato, " + cartoes.length + " contados" + (pol.validar_luhn ? " após o Luhn" : " (sem validar o Luhn)") + "; qualquer cartão completo bloqueia.");
+        r.motivos.push("Palavras-chave: " + (palavras.length ? palavras.join(", ") : "nenhuma") + ".");
+        var v = "permitir";
+        if (palavras.length) v = "quarentena";
+        if (cartoes.length || cpfs.length >= pol.limiar_cpf) v = "bloquear";
+        r.veredito = v;
+        return r;
+    }
+
+    function filtroUrl(it) {
+        var r = { nome: "Filtro de URL", motivos: [] };
+        var urls = it.tipo === "upload" ? [it.url] : (it.corpo.match(RE_URL) || []);
+        var v = "permitir";
+        if (!urls.length) r.motivos.push("Nenhum link no conteúdo.");
+        urls.forEach(function(u) {
+            var host = u.replace(/^https?:\/\//, "").split("/")[0].split(":")[0].toLowerCase();
+            var cat = CDC.dominios[org(host)] || "nao-categorizado";
+            var nome = CDC.categorias[cat] || "Não categorizado";
+            var acao = "permitir";
+            if (pol.categorias_bloqueadas.indexOf(cat) !== -1) acao = "bloquear";
+            else if (cat === "nao-categorizado") acao = "quarentena";
+            v = maior([v, acao]);
+            r.motivos.push(host + ": " + nome + " → " + ROTULO[acao] + ".");
+        });
+        r.veredito = v;
+        return r;
+    }
+
+    function cartaoEstagio(nome, res, naoAplica) {
+        var c = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 0.75rem; min-width: 0;" +
+            (res ? " background: " + COR[res.veredito] + ";" : " opacity: 0.6;"));
+        var t = el("div", null, "display: flex; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.4rem;");
+        t.appendChild(el("strong", nome));
+        t.appendChild(el("span", res ? ROTULO[res.veredito] : "Não se aplica", "font-weight: 600;"));
+        c.appendChild(t);
+        var ul = el("ul", null, "margin: 0; padding-left: 1.1rem; font-size: 0.82rem; overflow-wrap: anywhere;");
+        (res ? res.motivos : [naoAplica]).forEach(function(m) { ul.appendChild(el("li", m)); });
+        c.appendChild(ul);
+        return c;
+    }
+
+    window.processarConteudo = function() {
+        var it = versao(item(atual));
+        var as = antispam(it), dl = dlp(it), ur = filtroUrl(it);
+        var box = document.getElementById("cdc-pipeline");
+        box.replaceChildren();
+        box.appendChild(cartaoEstagio("1. AntiSpam", as, "Só para e-mail recebido: autenticação e spam de quem envia para a Ipê."));
+        box.appendChild(cartaoEstagio("2. DLP", dl, "Só para o que sai: e-mail enviado e upload."));
+        box.appendChild(cartaoEstagio("3. Filtro de URL", ur, ""));
+        var final = maior([as, dl, ur].filter(Boolean).map(function(r) { return r.veredito; }));
+        var v = document.getElementById("cdc-veredito");
+        v.replaceChildren();
+        var linha = el("p", null, "margin: 0; padding: 0.6rem 0.8rem; border-radius: var(--radius-md); background: " + COR[final] + ";");
+        linha.appendChild(el("strong", "Veredito final: " + ROTULO[final] + ". "));
+        var original = item(atual);
+        linha.appendChild(el("span", original.licao));
+        v.appendChild(linha);
+        if (final !== original.esperado) {
+            v.appendChild(el("p", "Com as suas alterações o resultado mudou: o esperado com a política padrão e o texto original é " + ROTULO[original.esperado] + ".",
+                "margin: 0.5rem 0 0 0; font-size: 0.85rem; color: var(--muted);"));
+        }
+        v.setAttribute("data-veredito", final);
+    };
+
+    function renderizarItens() {
+        var box = document.getElementById("cdc-itens");
+        box.replaceChildren();
+        CDC.itens.forEach(function(it) {
+            var b = el("button", it.titulo);
+            b.type = "button";
+            b.className = it.id === atual ? "btn-primary" : "btn-secondary";
+            b.setAttribute("aria-pressed", it.id === atual ? "true" : "false");
+            b.style.fontSize = "0.85rem";
+            b.addEventListener("click", function() { selecionarItemConteudo(it.id); });
+            box.appendChild(b);
+        });
+    }
+
+    function renderizarItem() {
+        var it = versao(item(atual));
+        var dl = document.getElementById("cdc-cabecalhos");
+        dl.replaceChildren();
+        var linhas = [["Tipo", TIPO[it.tipo]]];
+        if (it.tipo === "upload") {
+            linhas.push(["Destino", it.url], ["Arquivo", it.arquivo]);
+        } else {
+            linhas.push(["De", it.de], ["Para", it.para], ["Assunto", it.assunto]);
+        }
+        if (it.tipo === "email-entrada") {
+            linhas.push(["Envelope (MAIL FROM)", it.envelope], ["DMARC do From", "p=" + it.dmarc_politica + " (publicado por " + dominio(it.de) + ")"],
+                ["Reputação", (it.lista_bloqueio ? "IP em lista de bloqueio" : "IP fora de listas") + ", domínio com " + it.idade_dominio_dias + " dias"]);
+        }
+        linhas.forEach(function(par) {
+            dl.appendChild(el("dt", par[0], "font-weight: 600;"));
+            dl.appendChild(el("dd", par[1], "margin: 0;"));
+        });
+        var auth = document.getElementById("cdc-autenticacao");
+        auth.hidden = it.tipo !== "email-entrada";
+        if (it.tipo === "email-entrada") {
+            document.getElementById("cdc-spf").value = it.spf;
+            document.getElementById("cdc-dkim").value = it.dkim;
+            document.getElementById("cdc-dkim").title = "Assinatura com d=" + it.dkim_dominio;
+        }
+        document.getElementById("cdc-corpo").value = it.corpo;
+    }
+
+    function preencherOpcoes(id, lista) {
+        var sel = document.getElementById(id);
+        sel.replaceChildren();
+        lista.forEach(function(v) { var o = el("option", v); o.value = v; sel.appendChild(o); });
+    }
+
+    function renderizarPoliticas() {
+        document.getElementById("pol-respeitar-dmarc").checked = pol.respeitar_dmarc;
+        document.getElementById("pol-bloquear-lista").checked = pol.bloquear_lista;
+        document.getElementById("pol-limiar-spam").value = pol.limiar_spam;
+        document.getElementById("pol-validar-cpf").checked = pol.validar_cpf;
+        document.getElementById("pol-validar-luhn").checked = pol.validar_luhn;
+        document.getElementById("pol-limiar-cpf").value = pol.limiar_cpf;
+        document.getElementById("pol-palavras").value = pol.palavras_chave.join(", ");
+        var box = document.getElementById("pol-categorias");
+        box.replaceChildren();
+        Object.keys(CDC.categorias).forEach(function(cat) {
+            var rot = el("label", null, "display: flex; gap: 0.5rem; margin-bottom: 0.3rem;");
+            var cb = el("input");
+            cb.type = "checkbox";
+            cb.checked = pol.categorias_bloqueadas.indexOf(cat) !== -1;
+            cb.addEventListener("change", function() {
+                pol.categorias_bloqueadas = pol.categorias_bloqueadas.filter(function(c) { return c !== cat; });
+                if (cb.checked) pol.categorias_bloqueadas.push(cat);
+                processarConteudo();
+            });
+            rot.appendChild(cb);
+            rot.appendChild(el("span", CDC.categorias[cat]));
+            box.appendChild(rot);
+        });
+    }
+
+    function lerPoliticas() {
+        pol.respeitar_dmarc = document.getElementById("pol-respeitar-dmarc").checked;
+        pol.bloquear_lista = document.getElementById("pol-bloquear-lista").checked;
+        pol.validar_cpf = document.getElementById("pol-validar-cpf").checked;
+        pol.validar_luhn = document.getElementById("pol-validar-luhn").checked;
+        var ls = parseInt(document.getElementById("pol-limiar-spam").value, 10);
+        if (ls >= 1) pol.limiar_spam = ls;
+        var lc = parseInt(document.getElementById("pol-limiar-cpf").value, 10);
+        if (lc >= 1) pol.limiar_cpf = lc;
+        pol.palavras_chave = document.getElementById("pol-palavras").value.split(",").map(function(p) { return p.trim(); }).filter(Boolean);
+        processarConteudo();
+    }
+
+    window.selecionarItemConteudo = function(id) {
+        if (!item(id)) return;
+        atual = id;
+        renderizarItens();
+        renderizarItem();
+        processarConteudo();
+    };
+
+    window.restaurarConteudo = function() {
+        edicoes = {};
+        pol = copia(CDC.politica_padrao);
+        renderizarPoliticas();
+        selecionarItemConteudo(atual || CDC.itens[0].id);
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("cdc-contexto").textContent = CDC.contexto;
+        preencherOpcoes("cdc-spf", CDC.resultados_spf);
+        preencherOpcoes("cdc-dkim", CDC.resultados_dkim);
+        function editar(campo, valor) {
+            edicoes[atual] = edicoes[atual] || {};
+            edicoes[atual][campo] = valor;
+            processarConteudo();
+        }
+        document.getElementById("cdc-corpo").addEventListener("input", function(e) { editar("corpo", e.target.value); });
+        document.getElementById("cdc-spf").addEventListener("change", function(e) { editar("spf", e.target.value); });
+        document.getElementById("cdc-dkim").addEventListener("change", function(e) { editar("dkim", e.target.value); });
+        ["pol-respeitar-dmarc", "pol-bloquear-lista", "pol-validar-cpf", "pol-validar-luhn"].forEach(function(id) {
+            document.getElementById(id).addEventListener("change", lerPoliticas);
+        });
+        ["pol-limiar-spam", "pol-limiar-cpf", "pol-palavras"].forEach(function(id) {
+            document.getElementById(id).addEventListener("change", lerPoliticas);
+        });
+        restaurarConteudo();
+        if (typeof initChecklist === "function") {
+            initChecklist("protecao-dados-conteudo");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
