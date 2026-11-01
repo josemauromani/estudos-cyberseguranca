@@ -1,0 +1,1891 @@
+<!-- Estudo 16: Operacoes-SOC-e-SIEM Body Fragment -->
+<article class="study-container" data-slug="operacoes-soc-siem">
+
+    <!-- SEÇÃO 1: INTRODUÇÃO E OPERAÇÃO -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: Milhões de Eventos, Poucos Alertas que Importam</h2>
+        </div>
+
+        <p class="lead-text">
+            Um SOC (<em>Security Operations Center</em>) existe para responder a uma pergunta o tempo todo: alguma coisa ruim está acontecendo agora? O SIEM (<em>Security Information and Event Management</em>) junta os logs, as regras de detecção transformam eventos em alertas, e as pessoas decidem o que é real. O inimigo diário não é só o atacante: é o ruído. Uma regra que alerta demais é ignorada; uma regra que não alerta deixa o ataque passar. Neste estudo você vai buscar em logs, ajustar regras Sigma e fazer a triagem de um ataque real a um servidor da Ipê Store.
+        </p>
+
+        <h3>Níveis do SOC</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Nível</th><th>Função</th><th>Entrega</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>N1</strong> (triagem)</td><td>Recebe o alerta, confere contexto, separa falso positivo de verdadeiro, escala</td><td>Alerta classificado em minutos, com evidência anexada</td></tr>
+                    <tr><td><strong>N2</strong> (investigação)</td><td>Reconstrói a linha do tempo, define escopo, inicia a contenção</td><td>Incidente aberto e conduzido (Estudo 18)</td></tr>
+                    <tr><td><strong>N3</strong> (caça e engenharia)</td><td>Caça ameaças sem alerta (<em>threat hunting</em>), cria e ajusta regras</td><td>Novas detecções e menos ruído</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Métricas que o Gestor Vai Cobrar</h3>
+        <ul>
+            <li><strong>MTTD</strong> (<em>Mean Time to Detect</em>): do início da atividade maliciosa até o primeiro alerta.</li>
+            <li><strong>MTTA</strong> (<em>Mean Time to Acknowledge</em>): do alerta até alguém assumi-lo.</li>
+            <li><strong>MTTR</strong> (<em>Mean Time to Respond</em>, ou <em>to Recover</em>, conforme o contrato): do alerta até a contenção ou a recuperação. Defina qual é antes de medir.</li>
+            <li><strong>Taxa de falso positivo</strong> por regra: um <strong>falso positivo</strong> alerta sem ataque e consome o analista; um <strong>falso negativo</strong> é o ataque sem alerta, e só aparece depois, no incidente.</li>
+        </ul>
+
+        <h3>O Caminho do Log até o Alerta</h3>
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Pipeline do SIEM e Níveis do SOC</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Pipeline do SIEM e Níveis do SOC">
+flowchart TD
+    F["Fontes<br><small>AD, servidores, EDR, firewall, VPN, nuvem</small>"]
+    C["Coleta<br><small>agentes, syslog, WEF, APIs</small>"]
+    N["Parsing e normalização<br><small>ECS, CEF, LEEF, OCSF</small>"]
+    E["Enriquecimento<br><small>GeoIP, threat intel, ativo e identidade</small>"]
+    D["Detecção<br><small>regras Sigma e correlação</small>"]
+    T1["N1: triagem do alerta"]
+    T2["N2: investigação e resposta"]
+    H["N3: caça e engenharia de detecção"]
+    F --> C
+    C --> N
+    N --> E
+    E --> D
+    D --> T1
+    T1 -->|"verdadeiro positivo"| T2
+    T1 -->|"falso positivo"| H
+    H -->|"nova regra ou ajuste"| D
+            </pre>
+        </div>
+        <p>
+            A <strong>normalização</strong> dá o mesmo nome ao mesmo dado vindo de fontes diferentes: o IP de origem do firewall e o do Windows viram o mesmo campo. Os esquemas mais citados são o ECS (<em>Elastic Common Schema</em>), o CEF (<em>Common Event Format</em>, da ArcSight), o LEEF (<em>Log Event Extended Format</em>, do QRadar) e o OCSF (<em>Open Cybersecurity Schema Framework</em>), aberto e adotado por vários fornecedores. O <strong>enriquecimento</strong> acrescenta contexto (país do IP, dono do ativo, se o usuário é administrador), a <strong>correlação</strong> liga eventos diferentes no tempo, e a <strong>retenção</strong> define por quanto tempo os logs ficam pesquisáveis.
+        </p>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Log também é requisito</strong>
+            </div>
+            <p>
+                O PCI DSS exige revisão de logs com mecanismos automatizados (10.4.1.1) e retenção da trilha de auditoria por 12 meses, com os 3 mais recentes disponíveis de imediato (10.5.1). Sem relógio sincronizado (NTP) entre as fontes, a linha do tempo de um incidente não fecha.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: EVENTOS, BUSCA E SIGMA -->
+    <section class="study-section" id="deteccao">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Eventos do Windows, Linguagens de Busca e Regras Sigma</h2>
+        </div>
+
+        <h3>Os Eventos que Mais Aparecem num SOC</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Evento</th><th>Significado</th><th>Uso típico</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>4624</strong> / <strong>4625</strong></td><td>Logon com sucesso / com falha</td><td>Força bruta (T1110) e conta válida usada por atacante (T1078)</td></tr>
+                    <tr><td><strong>4688</strong></td><td>Processo criado (exige a política de auditoria e a opção de incluir a linha de comando)</td><td>Execução suspeita</td></tr>
+                    <tr><td><strong>Sysmon</strong> evento 1</td><td>Processo criado, com linha de comando, processo pai e hash</td><td>PowerShell malicioso (T1059.001)</td></tr>
+                    <tr><td><strong>4720</strong></td><td>Conta de usuário criada</td><td>Persistência (T1136.001)</td></tr>
+                    <tr><td><strong>4732</strong></td><td>Membro adicionado a grupo local de segurança</td><td>Escalada e persistência (T1098)</td></tr>
+                    <tr><td><strong>1102</strong></td><td>Log de auditoria apagado</td><td>Ocultação de rastro (T1070.001)</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            O campo <strong>LogonType</strong> diz como foi o logon: 2 é interativo (no teclado), 3 é de rede (compartilhamento, serviço) e 10 é remoto interativo (RDP). Um 4624 com LogonType 10 vindo de IP externo, às 2h, merece atenção imediata.
+        </p>
+
+        <h3>Uma Pergunta, Três Linguagens</h3>
+        <p>
+            Cada SIEM tem a sua linguagem. Atenção à sigla <em>KQL</em>: ela serve para duas linguagens diferentes, a <strong>Kibana Query Language</strong> (Elastic) e a <strong>Kusto Query Language</strong> (Microsoft Sentinel e Defender). A mesma pergunta, "quais IPs mais falharam no logon?":
+        </p>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">consultas — falhas de logon por IP</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-soc-consultas')">Copiar</button>
+            </div>
+            <pre><code id="code-soc-consultas"># Splunk (SPL); o nome do campo depende do add-on de Windows
+index=wineventlog EventCode=4625 | stats count by src_ip | sort -count
+
+# Microsoft Sentinel (Kusto Query Language)
+SecurityEvent | where EventID == 4625 | summarize count() by IpAddress
+
+# Elastic (Kibana Query Language, campos ECS) + agregação no painel
+event.code:4625 and winlog.event_data.LogonType:10</code></pre>
+        </div>
+
+        <h3>Sigma: a Regra que Viaja entre SIEMs</h3>
+        <p>
+            <strong>Sigma</strong> é um formato aberto, em YAML, para descrever detecções em logs sem depender do SIEM. A regra diz <strong>logsource</strong> (de onde vem o log), <strong>detection</strong> (os critérios, com uma <strong>condition</strong> que os combina), <strong>falsepositives</strong> (o que costuma disparar sem ataque) e o nível. Ferramentas como o <strong>pySigma</strong> e o <strong>sigma-cli</strong> convertem a regra para SPL, Kusto, consultas do Elastic e outros formatos.
+        </p>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">rdp_externo.yml — regra Sigma e conversão</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-soc-sigma')">Copiar</button>
+            </div>
+            <pre><code id="code-soc-sigma">title: Logon RDP vindo de fora da rede interna
+status: experimental
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4624
+    LogonType: 10
+  filter:
+    IpAddress|startswith:
+      - '10.'
+      - '192.168.'
+  condition: selection and not filter
+falsepositives:
+  - Acesso de fornecedor autorizado sem VPN
+level: high
+tags:
+  - attack.t1078
+
+$ sigma convert -t splunk -p splunk_windows rdp_externo.yml</code></pre>
+        </div>
+        <ul>
+            <li>Dentro de uma seleção, campos diferentes se combinam com <strong>E</strong>; os itens de uma lista, com <strong>OU</strong>.</li>
+            <li>Modificadores mudam a comparação: <code>|contains</code>, <code>|startswith</code>, <code>|endswith</code>, <code>|all</code> (todos os itens da lista), entre outros. A comparação de texto ignora maiúsculas.</li>
+            <li>A <code>condition</code> usa <code>and</code>, <code>or</code>, <code>not</code>, parênteses e formas como <code>1 of selection*</code>.</li>
+            <li>Contagens no tempo, como "25 falhas em 5 minutos", ficam nas regras de correlação do Sigma, uma especificação à parte. Uma regra de evento único não enxerga força bruta.</li>
+        </ul>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🔧</span>
+                <strong>Ajuste com filtro estreito, não desligando a regra</strong>
+            </div>
+            <p>
+                Quando uma regra dispara num processo legítimo conhecido, exclua exatamente aquele caso (processo pai, caminho, conta de serviço) com um <code>filter</code> e registre o motivo em <code>falsepositives</code>. Excluir "tudo que roda como SYSTEM" cria um ponto cego que o atacante aprende a usar.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Console SIEM com Busca de Logs e Alertas</h2>
+        </div>
+
+        <p class="lead-text">
+            O SIEM da Ipê Store recebeu os eventos do servidor SRV-ERP01 de uma madrugada. Busque nos logs, ajuste as regras Sigma, reproduza o fluxo para ver os alertas chegando e faça a triagem. As missões no fim conferem as suas respostas.
+        </p>
+
+        <div class="lab-box soc-lab" id="soc-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Laboratório de SOC</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Console SIEM — SRV-ERP01</h3>
+                    <p id="soc-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">1. Busca nos logs</h4>
+                <p style="font-size: 0.85rem; margin: 0 0 0.5rem 0; color: var(--muted);">Sintaxe didática: <code>campo:valor</code> (aspas para valores com espaço ou <code>:</code>, <code>*</code> como curinga), <code>and</code>, <code>or</code>, <code>not</code>, parênteses, <code>campo&gt;N</code>, texto livre e <code>| stats count by campo</code>.</p>
+                <div id="soc-busca" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <input class="form-control" type="text" id="soc-consulta" aria-label="Consulta" style="flex: 1 1 260px; min-width: 0;" spellcheck="false" autocomplete="off">
+                    <button class="btn-primary" type="button" onclick="executarBuscaSoc()">Buscar</button>
+                </div>
+                <div id="soc-exemplos" style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem;"></div>
+                <div id="soc-resultados" style="margin-top: 0.75rem; font-size: 0.82rem;" aria-live="polite"></div>
+
+                <h4 style="margin-top: 1.5rem;">2. Regras Sigma</h4>
+                <div id="soc-regras" style="display: flex; flex-wrap: wrap; gap: 0.4rem;"></div>
+                <label style="display: flex; gap: 0.5rem; align-items: center; margin: 0.75rem 0 0.4rem 0; font-size: 0.85rem;"><input type="checkbox" id="soc-regra-ativa"> Regra ativa no fluxo de alertas</label>
+                <label for="soc-yaml" style="font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">YAML da regra (editável)</label>
+                <textarea class="form-control" id="soc-yaml" rows="16" spellcheck="false" style="width: 100%; box-sizing: border-box; resize: vertical; font-size: 0.8rem;"></textarea>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                    <button class="btn-primary" type="button" onclick="aplicarRegraSigma()">Aplicar e testar na base</button>
+                    <button class="btn-secondary" type="button" id="soc-restaurar-regra">Restaurar esta regra</button>
+                </div>
+                <div id="soc-regra-status" style="margin-top: 0.6rem; font-size: 0.85rem;" aria-live="polite"></div>
+
+                <h4 style="margin-top: 1.5rem;">3. Fluxo em tempo real e fila de alertas</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+                    <button class="btn-primary" type="button" onclick="reproduzirFluxoSoc()">Reproduzir</button>
+                    <button class="btn-secondary" type="button" onclick="pausarFluxoSoc()">Pausar</button>
+                    <label style="font-size: 0.85rem; display: flex; gap: 0.4rem; align-items: center;">Velocidade
+                        <select class="form-control" id="soc-velocidade">
+                            <option value="450">Lenta</option>
+                            <option value="160" selected>Normal</option>
+                            <option value="30">Rápida</option>
+                        </select>
+                    </label>
+                </div>
+                <div id="soc-relogio" style="font-family: var(--font-mono); font-size: 0.85rem; margin-top: 0.5rem;"></div>
+                <div id="soc-fluxo" role="log" aria-label="Eventos chegando" style="margin-top: 0.4rem; background: #0f172a; color: #e2e8f0; border-radius: var(--radius-sm); padding: 0.6rem; font-family: var(--font-mono); font-size: 0.75rem; min-height: 6rem; max-height: 14rem; overflow-y: auto; overflow-wrap: anywhere;"></div>
+                <div id="soc-mttd" style="margin-top: 0.75rem; font-size: 0.9rem;" aria-live="polite"></div>
+                <div id="soc-alertas" style="display: grid; gap: 0.6rem; margin-top: 0.75rem;"></div>
+
+                <h4 style="margin-top: 1.5rem;">4. Missões</h4>
+                <div id="soc-missoes" style="display: grid; gap: 0.9rem; font-size: 0.88rem;">
+                    <div>
+                        <label for="missao-ip" style="display: block; margin-bottom: 0.3rem;"><strong>Missão 1:</strong> qual IP fez a força bruta contra o SRV-ERP01?</label>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <input class="form-control" type="text" id="missao-ip" style="flex: 1 1 180px; min-width: 0;" autocomplete="off">
+                            <button class="btn-secondary" type="button" onclick="verificarMissaoSoc(1)">Verificar</button>
+                        </div>
+                        <p id="missao-1-resultado" style="margin: 0.3rem 0 0 0;"></p>
+                    </div>
+                    <div>
+                        <label for="missao-conta" style="display: block; margin-bottom: 0.3rem;"><strong>Missão 2:</strong> com qual conta o atacante conseguiu entrar?</label>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <input class="form-control" type="text" id="missao-conta" style="flex: 1 1 180px; min-width: 0;" autocomplete="off">
+                            <button class="btn-secondary" type="button" onclick="verificarMissaoSoc(2)">Verificar</button>
+                        </div>
+                        <p id="missao-2-resultado" style="margin: 0.3rem 0 0 0;"></p>
+                    </div>
+                    <div>
+                        <p style="margin: 0 0 0.3rem 0;"><strong>Missão 3:</strong> ajuste a regra "Execução de PowerShell" para não alertar o script legítimo de inventário, mantendo o alerta do ataque. Aplique a regra e verifique.</p>
+                        <button class="btn-secondary" type="button" onclick="verificarMissaoSoc(3)">Verificar regra ajustada</button>
+                        <p id="missao-3-resultado" style="margin: 0.3rem 0 0 0;"></p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.25rem;">
+                    <button class="btn-secondary" type="button" onclick="restaurarSoc()">Restaurar laboratório</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Operação do SOC</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para avaliar a maturidade de um SOC ou a cobertura de um SIEM. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="operacoes-soc-siem">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-soc-1">
+                <label for="chk-soc-1"><strong>Fontes críticas no SIEM:</strong> controladores de domínio, servidores críticos, EDR, firewall, VPN e nuvem enviam logs, com relógio sincronizado por NTP.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-soc-2">
+                <label for="chk-soc-2"><strong>Processos com linha de comando:</strong> o evento 4688 inclui a linha de comando ou o Sysmon está instalado nos servidores e estações.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-soc-3">
+                <label for="chk-soc-3"><strong>Dados normalizados:</strong> as fontes estão mapeadas para um esquema único (ECS, OCSF ou o do fornecedor), e as consultas usam os campos normalizados.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-soc-4">
+                <label for="chk-soc-4"><strong>Regras como código:</strong> as detecções ficam versionadas (Sigma num repositório), com teste contra eventos de exemplo antes de ir para produção.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-soc-5">
+                <label for="chk-soc-5"><strong>Runbook por regra:</strong> cada alerta tem dono, nível, mapeamento MITRE ATT&amp;CK e passos de triagem para o N1.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-soc-6">
+                <label for="chk-soc-6"><strong>Métricas acompanhadas:</strong> MTTD, MTTA, MTTR e a taxa de falso positivo por regra são revistos todo mês, e regras ruidosas entram em ajuste.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-soc-7">
+                <label for="chk-soc-7"><strong>Retenção e integridade:</strong> os logs ficam retidos pelo prazo exigido (PCI DSS, LGPD, contratos) e protegidos contra alteração, inclusive por administradores.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (MTTD):</strong> A força bruta começou às 02:10 e o primeiro alerta saiu às 02:14. Depois da triagem, o servidor foi isolado às 02:40. Qual foi o tempo de detecção?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> 4 minutos (02:10 até 02:14).</p>
+                    <p>O MTTD mede do início da atividade maliciosa até o alerta. Os 26 minutos seguintes, até o isolamento, entram no MTTR. A média vem de muitos incidentes, não de um só.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Eventos):</strong> Você vê 30 eventos 4625 de um IP externo seguidos de um 4624 com LogonType 10 do mesmo IP. O que isso indica?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Força bruta por RDP que terminou em logon bem-sucedido: conta comprometida.</p>
+                    <p>As falhas sozinhas são tentativa (T1110); o 4624 tipo 10 do mesmo IP mostra que uma senha funcionou (T1078). A prioridade é bloquear o IP, desativar a conta e investigar o que foi feito na sessão.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Sigma):</strong> Uma seleção tem <code>EventID: 4624</code> e <code>LogonType: [2, 10]</code>. Quais eventos ela pega?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Logons bem-sucedidos (4624) que sejam do tipo 2 ou do tipo 10.</p>
+                    <p>Campos diferentes na mesma seleção combinam com E; itens da lista combinam com OU. Para exigir todos os itens de uma lista, use o modificador <code>|all</code>.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Ajuste):</strong> A regra "Execução de PowerShell" gera 200 alertas por dia, quase todos de um agente de inventário. Qual é o melhor ajuste?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Um <code>filter</code> que exclua exatamente o processo pai do agente, com o motivo em <code>falsepositives</code>.</p>
+                    <p>Desligar a regra ou excluir a conta SYSTEM inteira cria ponto cego. O filtro estreito mantém a detecção para todo o resto.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Detecção):</strong> Por que uma regra Sigma comum não detecta 25 falhas de logon em 4 minutos?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque ela avalia um evento por vez; contar eventos no tempo exige correlação.</p>
+                    <p>Uma falha de logon isolada é normal. A detecção de força bruta precisa de agregação (contagem por IP numa janela), feita pelas regras de correlação do Sigma ou pelo recurso equivalente do SIEM.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Normalização):</strong> O firewall chama o IP de origem de <code>src</code> e o Windows, de <code>IpAddress</code>. Qual etapa do SIEM resolve isso, e por que importa?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A normalização, que mapeia os dois para o mesmo campo do esquema (por exemplo, <code>source.ip</code> no ECS).</p>
+                    <p>Sem ela, cada consulta e cada regra precisa conhecer o nome do campo em cada fonte, e a correlação entre firewall e Windows fica frágil.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Níveis do SOC</h4>
+                <p>N1 faz triagem, N2 investiga e responde, N3 caça ameaças e escreve detecções.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Métricas</h4>
+                <p>MTTD até o alerta, MTTA até alguém assumir, MTTR até conter; e falso positivo por regra.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Eventos-chave</h4>
+                <p>4624/4625 (logon), 4688 ou Sysmon 1 (processo), 4720, 4732 e 1102.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Sigma</h4>
+                <p>logsource, detection e condition em YAML; campos com E, listas com OU; convertida por pySigma.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>SigmaHQ — Sigma Specification, repositório de regras e pySigma / sigma-cli.</li>
+            <li>Microsoft — documentação dos eventos de auditoria de segurança do Windows e do Sysmon.</li>
+            <li>MITRE ATT&amp;CK — T1110, T1078, T1059.001, T1136.001, T1098 e T1070.001.</li>
+            <li>Elastic Common Schema (ECS) e Open Cybersecurity Schema Framework (OCSF).</li>
+            <li>NIST SP 800-92 — Guide to Computer Security Log Management.</li>
+            <li>PCI DSS v4.0.1 — requisito 10 (registro e monitoramento).</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 18 — Resposta a Incidentes e 17 — Threat Intelligence</strong>
+            </div>
+            <p>
+                O alerta verdadeiro que você triou vira incidente no Estudo 18. O Estudo 17 mostra de onde vêm os indicadores e as TTPs que alimentam o enriquecimento e as novas regras.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="soc-dados">
+{
+ "contexto": "Servidor SRV-ERP01 da Ipê Store, madrugada e manhã de 03/11/2025. Eventos fictícios; o IP externo é da faixa de documentação 203.0.113.0/24 (RFC 5737).",
+ "eventos": [
+  {
+   "id": "e01",
+   "ts": "2025-11-03T01:55:00",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": false,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4624,
+    "TargetUserName": "svc_backup",
+    "IpAddress": "10.20.1.10",
+    "LogonType": 3
+   }
+  },
+  {
+   "id": "e02",
+   "ts": "2025-11-03T02:00:00",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": false,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4624,
+    "TargetUserName": "svc_backup",
+    "IpAddress": "10.20.1.10",
+    "LogonType": 3
+   }
+  },
+  {
+   "id": "e03",
+   "ts": "2025-11-03T02:10:05",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "administrador",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e04",
+   "ts": "2025-11-03T02:10:15",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "admin",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e05",
+   "ts": "2025-11-03T02:10:25",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "erp_admin",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e06",
+   "ts": "2025-11-03T02:10:35",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "backup",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e07",
+   "ts": "2025-11-03T02:10:45",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "suporte",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e08",
+   "ts": "2025-11-03T02:10:55",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "administrador",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e09",
+   "ts": "2025-11-03T02:11:05",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "admin",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e10",
+   "ts": "2025-11-03T02:11:15",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "erp_admin",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e11",
+   "ts": "2025-11-03T02:11:25",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "backup",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e12",
+   "ts": "2025-11-03T02:11:35",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "suporte",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e13",
+   "ts": "2025-11-03T02:11:45",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "administrador",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e14",
+   "ts": "2025-11-03T02:11:55",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "admin",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e15",
+   "ts": "2025-11-03T02:12:05",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "erp_admin",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e16",
+   "ts": "2025-11-03T02:12:15",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "backup",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e17",
+   "ts": "2025-11-03T02:12:25",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "suporte",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e18",
+   "ts": "2025-11-03T02:12:35",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "administrador",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e19",
+   "ts": "2025-11-03T02:12:45",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "admin",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e20",
+   "ts": "2025-11-03T02:12:55",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "erp_admin",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e21",
+   "ts": "2025-11-03T02:13:05",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "backup",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e22",
+   "ts": "2025-11-03T02:13:15",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "suporte",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e23",
+   "ts": "2025-11-03T02:13:25",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "administrador",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e24",
+   "ts": "2025-11-03T02:13:35",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "admin",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e25",
+   "ts": "2025-11-03T02:13:45",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "erp_admin",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e26",
+   "ts": "2025-11-03T02:13:55",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "backup",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e27",
+   "ts": "2025-11-03T02:14:05",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "suporte",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e28",
+   "ts": "2025-11-03T02:14:40",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4624,
+    "TargetUserName": "erp_admin",
+    "IpAddress": "203.0.113.45",
+    "LogonType": 10
+   },
+   "nota": "Logon RDP bem-sucedido vindo de IP externo, logo depois de 25 falhas do mesmo endereço: força bruta (T1110) que terminou em conta válida comprometida (T1078)."
+  },
+  {
+   "id": "e29",
+   "ts": "2025-11-03T02:15:00",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": false,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4624,
+    "TargetUserName": "svc_backup",
+    "IpAddress": "10.20.1.10",
+    "LogonType": 3
+   }
+  },
+  {
+   "id": "e30",
+   "ts": "2025-11-03T02:16:10",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 1,
+    "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "CommandLine": "powershell.exe -nop -w hidden -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQA",
+    "ParentImage": "C:\\Windows\\explorer.exe",
+    "User": "IPESTORE\\erp_admin"
+   },
+   "nota": "PowerShell oculto com comando em Base64, aberto pela sessão RDP do erp_admin às 2h: execução maliciosa (T1059.001)."
+  },
+  {
+   "id": "e31",
+   "ts": "2025-11-03T02:18:00",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4720,
+    "TargetUserName": "suporte_ti",
+    "SubjectUserName": "erp_admin"
+   }
+  },
+  {
+   "id": "e32",
+   "ts": "2025-11-03T02:18:20",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4732,
+    "TargetUserName": "Administradores",
+    "MemberName": "suporte_ti",
+    "SubjectUserName": "erp_admin"
+   },
+   "nota": "Conta recém-criada (suporte_ti, evento 4720) colocada no grupo Administradores pelo erp_admin de madrugada: persistência (T1136.001 e T1098)."
+  },
+  {
+   "id": "e33",
+   "ts": "2025-11-03T02:21:00",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": true,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 1102,
+    "SubjectUserName": "erp_admin"
+   },
+   "nota": "O log de segurança foi apagado pela conta comprometida: tentativa de esconder o rastro (T1070.001)."
+  },
+  {
+   "id": "e34",
+   "ts": "2025-11-03T06:00:00",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": false,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4624,
+    "TargetUserName": "svc_backup",
+    "IpAddress": "10.20.1.10",
+    "LogonType": 3
+   }
+  },
+  {
+   "id": "e35",
+   "ts": "2025-11-03T07:30:00",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "malicioso": false,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 1,
+    "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "CommandLine": "powershell.exe -ExecutionPolicy Bypass -File \"C:\\Program Files\\GestorTI\\inventario.ps1\"",
+    "ParentImage": "C:\\Program Files\\GestorTI\\agent.exe",
+    "User": "NT AUTHORITY\\SYSTEM"
+   },
+   "nota": "Script de inventário do agente GestorTI, que roda todo dia às 7h30 como SYSTEM: comportamento conhecido e legítimo."
+  },
+  {
+   "id": "e36",
+   "ts": "2025-11-03T08:01:10",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": false,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "ana.souza",
+    "IpAddress": "10.20.5.31",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e37",
+   "ts": "2025-11-03T08:01:25",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": false,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4625,
+    "TargetUserName": "ana.souza",
+    "IpAddress": "10.20.5.31",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e38",
+   "ts": "2025-11-03T08:01:40",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": false,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4624,
+    "TargetUserName": "ana.souza",
+    "IpAddress": "10.20.5.31",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "e39",
+   "ts": "2025-11-03T08:05:00",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "malicioso": false,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 1,
+    "Image": "C:\\Program Files\\Microsoft Office\\root\\Office16\\EXCEL.EXE",
+    "CommandLine": "\"EXCEL.EXE\" \"C:\\Users\\ana.souza\\Documents\\fechamento-outubro.xlsx\"",
+    "ParentImage": "C:\\Windows\\explorer.exe",
+    "User": "IPESTORE\\ana.souza"
+   }
+  },
+  {
+   "id": "e40",
+   "ts": "2025-11-03T08:30:00",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": false,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4624,
+    "TargetUserName": "svc_backup",
+    "IpAddress": "10.20.1.10",
+    "LogonType": 3
+   }
+  },
+  {
+   "id": "e41",
+   "ts": "2025-11-03T08:45:00",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": false,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4624,
+    "TargetUserName": "joao.lima",
+    "IpAddress": "10.20.5.40",
+    "LogonType": 3
+   }
+  },
+  {
+   "id": "e42",
+   "ts": "2025-11-03T08:50:00",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "malicioso": false,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 1,
+    "Image": "C:\\Windows\\System32\\cmd.exe",
+    "CommandLine": "cmd.exe /c ipconfig /all",
+    "ParentImage": "C:\\Windows\\explorer.exe",
+    "User": "IPESTORE\\ti.admin"
+   }
+  },
+  {
+   "id": "e43",
+   "ts": "2025-11-03T09:00:00",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "malicioso": false,
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "EventID": 4624,
+    "TargetUserName": "svc_backup",
+    "IpAddress": "10.20.1.10",
+    "LogonType": 3
+   }
+  }
+ ],
+ "regras": [
+  {
+   "id": "rdp-externo",
+   "titulo": "Logon RDP vindo de fora da rede interna",
+   "nivel": "high",
+   "descricao": "Logon interativo remoto (RDP) bem-sucedido a partir de IP que não é da rede interna.",
+   "tags": [
+    "attack.initial-access",
+    "attack.t1078",
+    "attack.t1021.001"
+   ],
+   "falsos_positivos": [
+    "Acesso de fornecedor autorizado sem VPN"
+   ],
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "deteccao": {
+    "selection": {
+     "EventID": 4624,
+     "LogonType": 10
+    },
+    "filter": {
+     "IpAddress|startswith": [
+      "10.",
+      "192.168.",
+      "172.16."
+     ]
+    },
+    "condition": "selection and not filter"
+   },
+   "esperado": [
+    "e28"
+   ]
+  },
+  {
+   "id": "ps-codificado",
+   "titulo": "PowerShell com comando codificado",
+   "nivel": "high",
+   "descricao": "PowerShell iniciado com o parâmetro -enc ou -encodedcommand, comum para esconder o comando.",
+   "tags": [
+    "attack.execution",
+    "attack.t1059.001"
+   ],
+   "falsos_positivos": [
+    "Ferramentas de gestão que codificam scripts legítimos"
+   ],
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "deteccao": {
+    "selection": {
+     "Image|endswith": "\\powershell.exe",
+     "CommandLine|contains": [
+      " -enc ",
+      " -encodedcommand "
+     ]
+    },
+    "condition": "selection"
+   },
+   "esperado": [
+    "e30"
+   ]
+  },
+  {
+   "id": "grupo-admin",
+   "titulo": "Membro adicionado ao grupo Administradores",
+   "nivel": "high",
+   "descricao": "Uma conta foi adicionada ao grupo local de administradores.",
+   "tags": [
+    "attack.persistence",
+    "attack.t1098"
+   ],
+   "falsos_positivos": [
+    "Mudança aprovada pela TI, registrada em chamado"
+   ],
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "deteccao": {
+    "selection": {
+     "EventID": 4732,
+     "TargetUserName": [
+      "Administrators",
+      "Administradores"
+     ]
+    },
+    "condition": "selection"
+   },
+   "esperado": [
+    "e32"
+   ]
+  },
+  {
+   "id": "log-apagado",
+   "titulo": "Log de segurança apagado",
+   "nivel": "high",
+   "descricao": "O log de segurança do Windows foi limpo.",
+   "tags": [
+    "attack.defense-evasion",
+    "attack.t1070.001"
+   ],
+   "falsos_positivos": [
+    "Manutenção raríssima e documentada"
+   ],
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "deteccao": {
+    "selection": {
+     "EventID": 1102
+    },
+    "condition": "selection"
+   },
+   "esperado": [
+    "e33"
+   ]
+  },
+  {
+   "id": "ps-execucao",
+   "titulo": "Execução de PowerShell",
+   "nivel": "low",
+   "descricao": "Qualquer execução de powershell.exe. Regra ampla, útil para caça, ruidosa como alerta.",
+   "tags": [
+    "attack.execution",
+    "attack.t1059.001"
+   ],
+   "falsos_positivos": [
+    "Scripts administrativos e agentes de gestão"
+   ],
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "deteccao": {
+    "selection": {
+     "Image|endswith": "\\powershell.exe"
+    },
+    "condition": "selection"
+   },
+   "esperado": [
+    "e30",
+    "e35"
+   ]
+  }
+ ],
+ "missoes": {
+  "ip": "203.0.113.45",
+  "conta": "erp_admin",
+  "regra_ruidosa": "ps-execucao",
+  "solucao_deteccao": {
+   "selection": {
+    "Image|endswith": "\\powershell.exe"
+   },
+   "filter": {
+    "ParentImage|endswith": "\\GestorTI\\agent.exe"
+   },
+   "condition": "selection and not filter"
+  }
+ }
+}
+</script>
+
+<script>
+(function() {
+    var SOC = JSON.parse(document.getElementById("soc-dados").textContent);
+    var MODS = ["contains", "startswith", "endswith", "all"];
+    var NIVEIS = ["informational", "low", "medium", "high", "critical"];
+    var COR_NIVEL = { informational: "rgba(100, 116, 139, 0.3)", low: "rgba(37, 99, 235, 0.25)", medium: "rgba(202, 138, 4, 0.3)", high: "rgba(234, 88, 12, 0.32)", critical: "rgba(220, 38, 38, 0.38)" };
+    var EXEMPLOS = ["EventID:4625", "EventID:4625 | stats count by TargetUserName", "LogonType:10 and not IpAddress:10.*", "EventID:1 and CommandLine:*-enc*", "svc_backup"];
+    var regras = [];
+    var textos = {};
+    var ativas = {};
+    var atual = null;
+    var fluxo = { idx: 0, timer: null, alertas: [], triagem: {} };
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function copia(o) { return JSON.parse(JSON.stringify(o)); }
+    function plural(n, um, varios) { return n + " " + (n === 1 ? um : varios); }
+    function evento(id) { return SOC.eventos.filter(function(e) { return e.id === id; })[0]; }
+    function hora(ts) { return ts.slice(11); }
+    function campo(e, nome) {
+        var k = Object.keys(e.campos).filter(function(c) { return c.toLowerCase() === String(nome).toLowerCase(); })[0];
+        return k === undefined ? null : e.campos[k];
+    }
+    function resumo(e) {
+        return Object.keys(e.campos).filter(function(k) { return k !== "Computer" && k !== "EventID"; })
+            .map(function(k) { return k + "=" + e.campos[k]; }).join("; ");
+    }
+    function curinga(padrao, ancorado) {
+        var r = String(padrao).toLowerCase().replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*").replace(/\?/g, ".");
+        return new RegExp(ancorado ? "^" + r + "$" : r);
+    }
+
+    // ------------------------------------------------------------ avaliador Sigma
+    function casaValor(valor, esperado, mods) {
+        if (valor === null || valor === undefined) return false;
+        var a = String(valor).toLowerCase(), b = String(esperado).toLowerCase();
+        if (mods.indexOf("contains") !== -1) return a.indexOf(b) !== -1;
+        if (mods.indexOf("startswith") !== -1) return a.indexOf(b) === 0;
+        if (mods.indexOf("endswith") !== -1) return a.length >= b.length && a.slice(a.length - b.length) === b;
+        if (b.indexOf("*") !== -1 || b.indexOf("?") !== -1) return curinga(b, true).test(a);
+        return a === b;
+    }
+    function casaSelecao(e, sel) {
+        return Object.keys(sel).every(function(chave) {
+            var partes = chave.split("|"), nome = partes[0], mods = partes.slice(1);
+            var vals = Array.isArray(sel[chave]) ? sel[chave] : [sel[chave]];
+            var testes = vals.map(function(v) { return casaValor(campo(e, nome), v, mods); });
+            return mods.indexOf("all") !== -1 ? testes.every(Boolean) : testes.some(Boolean);
+        });
+    }
+    // Compila a condition num avaliador; lança erro legível se algo não existir.
+    function compilarCondicao(cond, nomes) {
+        var tokens = String(cond).match(/\(|\)|[^\s()]+/g) || [];
+        var pos = 0;
+        function ver() { return pos < tokens.length ? tokens[pos].toLowerCase() : null; }
+        function pegar() { if (pos >= tokens.length) throw new Error("condition termina antes do esperado"); return tokens[pos++]; }
+        function ou() {
+            var a = e_();
+            while (ver() === "or") { pegar(); var b = e_(), x = a; a = (function(p, q) { return function(r) { return p(r) || q(r); }; })(x, b); }
+            return a;
+        }
+        function e_() {
+            var a = nao();
+            while (ver() === "and") { pegar(); var b = nao(), x = a; a = (function(p, q) { return function(r) { return p(r) && q(r); }; })(x, b); }
+            return a;
+        }
+        function nao() {
+            if (ver() === "not") { pegar(); var a = nao(); return function(r) { return !a(r); }; }
+            return prim();
+        }
+        function prim() {
+            var t = pegar();
+            if (t === "(") { var v = ou(); if (pegar() !== ")") throw new Error("parêntese não fechado na condition"); return v; }
+            if (t === ")") throw new Error("parêntese fechado sem abrir na condition");
+            var tl = t.toLowerCase();
+            if ((tl === "1" || tl === "all") && ver() === "of") {
+                pegar();
+                var alvo = pegar();
+                var lista = alvo === "them" ? nomes.slice() : nomes.filter(function(n) { return curinga(alvo, true).test(n.toLowerCase()); });
+                if (!lista.length) throw new Error("'" + alvo + "' não corresponde a nenhuma seleção");
+                return function(r) { var vs = lista.map(function(n) { return r[n]; }); return tl === "1" ? vs.some(Boolean) : vs.every(Boolean); };
+            }
+            if (["and", "or", "not", "of"].indexOf(tl) !== -1) throw new Error("palavra '" + t + "' fora do lugar na condition");
+            if (nomes.indexOf(t) === -1) throw new Error("a condition cita '" + t + "', que não existe em detection");
+            return function(r) { return r[t]; };
+        }
+        if (!tokens.length) throw new Error("condition vazia");
+        var f = ou();
+        if (pos !== tokens.length) throw new Error("sobrou '" + tokens[pos] + "' no fim da condition");
+        return f;
+    }
+    function preparar(regra) {
+        var nomes = Object.keys(regra.deteccao).filter(function(n) { return n !== "condition"; });
+        regra._cond = compilarCondicao(regra.deteccao.condition, nomes);
+        regra._nomes = nomes;
+        return regra;
+    }
+    function regraCasa(regra, e) {
+        var ls = Object.keys(regra.logsource).every(function(k) { return e.logsource[k] === regra.logsource[k]; });
+        if (!ls) return false;
+        var r = {};
+        regra._nomes.forEach(function(n) { r[n] = casaSelecao(e, regra.deteccao[n]); });
+        return regra._cond(r);
+    }
+    function disparos(regra) { return SOC.eventos.filter(function(e) { return regraCasa(regra, e); }); }
+
+    // ------------------------------------------------------- YAML (subconjunto)
+    function yamlEscalar(v) {
+        if (typeof v === "number") return String(v);
+        var s = String(v);
+        if (/^[A-Za-z_][A-Za-z0-9_.\- ()*]*$/.test(s) && !/\s$/.test(s) && ["true", "false", "null", "yes", "no"].indexOf(s.toLowerCase()) === -1) return s;
+        return "'" + s.replace(/'/g, "''") + "'";
+    }
+    function paraYaml(r) {
+        var l = [];
+        l.push("title: " + yamlEscalar(r.titulo));
+        l.push("status: experimental");
+        if (r.descricao) l.push("description: " + yamlEscalar(r.descricao));
+        l.push("logsource:");
+        Object.keys(r.logsource).forEach(function(k) { l.push("  " + k + ": " + yamlEscalar(r.logsource[k])); });
+        l.push("detection:");
+        Object.keys(r.deteccao).filter(function(n) { return n !== "condition"; }).forEach(function(n) {
+            l.push("  " + n + ":");
+            Object.keys(r.deteccao[n]).forEach(function(k) {
+                var v = r.deteccao[n][k];
+                if (Array.isArray(v)) {
+                    l.push("    " + k + ":");
+                    v.forEach(function(x) { l.push("      - " + yamlEscalar(x)); });
+                } else {
+                    l.push("    " + k + ": " + yamlEscalar(v));
+                }
+            });
+        });
+        l.push("  condition: " + yamlEscalar(r.deteccao.condition));
+        if (r.falsos_positivos && r.falsos_positivos.length) {
+            l.push("falsepositives:");
+            r.falsos_positivos.forEach(function(x) { l.push("  - " + yamlEscalar(x)); });
+        }
+        l.push("level: " + r.nivel);
+        if (r.tags && r.tags.length) {
+            l.push("tags:");
+            r.tags.forEach(function(x) { l.push("  - " + yamlEscalar(x)); });
+        }
+        return l.join("\n");
+    }
+    function erroLinha(n, msg) { return new Error("Linha " + n + ": " + msg); }
+    function tirarComentario(s) {
+        var q = null;
+        for (var i = 0; i < s.length; i++) {
+            var c = s[i];
+            if (q) { if (c === q) q = null; continue; }
+            if (c === "'" || c === "\"") q = c;
+            else if (c === "#" && (i === 0 || /\s/.test(s[i - 1]))) return s.slice(0, i);
+        }
+        return s;
+    }
+    function dividirLista(s, n) {
+        var itens = [], atual = "", q = null;
+        for (var i = 0; i < s.length; i++) {
+            var c = s[i];
+            if (q) { atual += c; if (c === q) q = null; continue; }
+            if (c === "'" || c === "\"") { q = c; atual += c; continue; }
+            if (c === ",") { itens.push(atual); atual = ""; continue; }
+            atual += c;
+        }
+        if (q) throw erroLinha(n, "aspas não fechadas");
+        if (atual.trim() || itens.length) itens.push(atual);
+        return itens.map(function(x) { return lerEscalar(x, n); });
+    }
+    function lerEscalar(s, n) {
+        s = s.trim();
+        if (!s) throw erroLinha(n, "valor vazio");
+        if (s[0] === "'") {
+            if (s.length < 2 || s[s.length - 1] !== "'") throw erroLinha(n, "aspas simples não fechadas");
+            return s.slice(1, -1).replace(/''/g, "'");
+        }
+        if (s[0] === "\"") {
+            if (s.length < 2 || s[s.length - 1] !== "\"") throw erroLinha(n, "aspas duplas não fechadas");
+            return s.slice(1, -1).replace(/\\(["\\])/g, "$1");
+        }
+        if (s[0] === "[") {
+            if (s[s.length - 1] !== "]") throw erroLinha(n, "lista entre colchetes não fechada");
+            return dividirLista(s.slice(1, -1), n);
+        }
+        if (/^-?\d+$/.test(s)) return Number(s);
+        if (/:\s/.test(s)) throw erroLinha(n, "use aspas em valores que contêm ': '");
+        return s;
+    }
+    function lerYaml(texto) {
+        var linhas = [];
+        texto.split("\n").forEach(function(raw, i) {
+            var ind = raw.match(/^[ \t]*/)[0];
+            if (ind.indexOf("\t") !== -1) throw erroLinha(i + 1, "use espaços para indentar, não tabulação");
+            var t = tirarComentario(raw).replace(/\s+$/, "");
+            if (!t.trim()) return;
+            linhas.push({ n: i + 1, ind: ind.length, txt: t.trim() });
+        });
+        var pos = 0;
+        function ehItem(l) { return l.txt === "-" || l.txt.indexOf("- ") === 0; }
+        function bloco(ind) { return ehItem(linhas[pos]) ? lista(ind) : mapa(ind); }
+        function lista(ind) {
+            var out = [];
+            while (pos < linhas.length && linhas[pos].ind === ind && ehItem(linhas[pos])) {
+                var l = linhas[pos], resto = l.txt.slice(1).trim();
+                if (!resto) throw erroLinha(l.n, "item de lista vazio");
+                if (/^[^'"\[]+:(\s|$)/.test(resto)) throw erroLinha(l.n, "listas de mapas não são suportadas neste laboratório");
+                out.push(lerEscalar(resto, l.n));
+                pos++;
+            }
+            return out;
+        }
+        function mapa(ind) {
+            var out = {};
+            while (pos < linhas.length && linhas[pos].ind === ind) {
+                var l = linhas[pos];
+                if (ehItem(l)) throw erroLinha(l.n, "item de lista fora do lugar");
+                var m = l.txt.match(/^([^:'"]+?)\s*:(?:\s+(.*))?$/);
+                if (!m) throw erroLinha(l.n, "esperava 'chave: valor'");
+                var chave = m[1].trim();
+                if (Object.prototype.hasOwnProperty.call(out, chave)) throw erroLinha(l.n, "chave repetida: " + chave);
+                pos++;
+                if (m[2] !== undefined && m[2] !== "") {
+                    out[chave] = lerEscalar(m[2], l.n);
+                } else if (pos < linhas.length && linhas[pos].ind > ind) {
+                    out[chave] = bloco(linhas[pos].ind);
+                } else {
+                    out[chave] = null;
+                }
+            }
+            if (pos < linhas.length && linhas[pos].ind > ind) throw erroLinha(linhas[pos].n, "indentação inesperada");
+            return out;
+        }
+        if (!linhas.length) throw new Error("o YAML está vazio");
+        if (linhas[0].ind !== 0) throw erroLinha(linhas[0].n, "a primeira chave não pode ser indentada");
+        var raiz = mapa(0);
+        if (pos < linhas.length) throw erroLinha(linhas[pos].n, "indentação inesperada");
+        return raiz;
+    }
+    function ehEscalar(v) { return typeof v === "string" || typeof v === "number"; }
+    function yamlParaRegra(texto, base) {
+        var y = lerYaml(texto);
+        if (!ehEscalar(y.title)) throw new Error("falta 'title'");
+        if (NIVEIS.indexOf(y.level) === -1) throw new Error("'level' deve ser um de: " + NIVEIS.join(", "));
+        if (!y.logsource || typeof y.logsource !== "object" || Array.isArray(y.logsource)) throw new Error("falta o mapa 'logsource'");
+        Object.keys(y.logsource).forEach(function(k) { if (!ehEscalar(y.logsource[k])) throw new Error("logsource." + k + " deve ser um valor simples"); });
+        var d = y.detection;
+        if (!d || typeof d !== "object" || Array.isArray(d)) throw new Error("falta o mapa 'detection'");
+        if (!ehEscalar(d.condition)) throw new Error("falta 'detection.condition'");
+        Object.keys(d).filter(function(n) { return n !== "condition"; }).forEach(function(n) {
+            var sel = d[n];
+            if (!sel || typeof sel !== "object" || Array.isArray(sel)) throw new Error("detection." + n + " deve ser um mapa de campos");
+            Object.keys(sel).forEach(function(k) {
+                k.split("|").slice(1).forEach(function(m) {
+                    if (MODS.indexOf(m) === -1) throw new Error("modificador '" + m + "' não suportado aqui (use " + MODS.join(", ") + ")");
+                });
+                var v = sel[k];
+                if (!(ehEscalar(v) || (Array.isArray(v) && v.length && v.every(ehEscalar)))) throw new Error("detection." + n + "." + k + " deve ser um valor ou uma lista de valores");
+            });
+        });
+        var r = {
+            id: base.id, titulo: String(y.title), nivel: y.level, descricao: y.description ? String(y.description) : "",
+            tags: Array.isArray(y.tags) ? y.tags : [], falsos_positivos: Array.isArray(y.falsepositives) ? y.falsepositives : [],
+            logsource: y.logsource, deteccao: d
+        };
+        try { preparar(r); } catch (e) { throw new Error(e.message); }
+        return r;
+    }
+
+    // ------------------------------------------------------------ busca nos logs
+    function tokensBusca(s) {
+        var out = [], i = 0;
+        while (i < s.length) {
+            var c = s[i];
+            if (/\s/.test(c)) { i++; continue; }
+            if (c === "(" || c === ")" || c === ":") { out.push({ t: c }); i++; continue; }
+            if (c === ">" || c === "<") { var op = s[i + 1] === "=" ? c + "=" : c; out.push({ t: "op", v: op }); i += op.length; continue; }
+            if (c === "\"") {
+                var j = s.indexOf("\"", i + 1);
+                if (j === -1) throw new Error("aspas não fechadas na consulta");
+                out.push({ t: "str", v: s.slice(i + 1, j) }); i = j + 1; continue;
+            }
+            var m = s.slice(i).match(/^[^\s()":<>]+/);
+            out.push({ t: "pal", v: m[0] }); i += m[0].length;
+        }
+        return out;
+    }
+    function compilarBusca(s) {
+        var tk = tokensBusca(s), pos = 0;
+        function ver() { return tk[pos]; }
+        function kw(p) { var x = tk[pos]; return x && x.t === "pal" && x.v.toLowerCase() === p; }
+        function ou() { var a = e_(); while (kw("or")) { pos++; var b = e_(), x = a; a = (function(p, q) { return function(e) { return p(e) || q(e); }; })(x, b); } return a; }
+        function e_() {
+            var a = nao();
+            while (ver() && ver().t !== ")" && !kw("or")) {
+                if (kw("and")) pos++;
+                var b = nao(), x = a; a = (function(p, q) { return function(e) { return p(e) && q(e); }; })(x, b);
+            }
+            return a;
+        }
+        function nao() { if (kw("not")) { pos++; var a = nao(); return function(e) { return !a(e); }; } return prim(); }
+        function prim() {
+            var x = tk[pos++];
+            if (!x) throw new Error("a consulta termina antes do esperado");
+            if (x.t === "(") { var v = ou(); var f = tk[pos++]; if (!f || f.t !== ")") throw new Error("parêntese não fechado"); return v; }
+            if (x.t === ")" || x.t === ":" || x.t === "op") throw new Error("símbolo '" + (x.v || x.t) + "' fora do lugar");
+            var nx = tk[pos];
+            if (x.t === "pal" && nx && nx.t === ":") {
+                pos++;
+                var val = tk[pos++];
+                if (!val || (val.t !== "pal" && val.t !== "str")) throw new Error("faltou o valor depois de '" + x.v + ":'");
+                var re = curinga(val.v, true), nome = x.v;
+                return function(e) { var c = campo(e, nome); return c !== null && re.test(String(c).toLowerCase()); };
+            }
+            if (x.t === "pal" && nx && nx.t === "op") {
+                pos++;
+                var num = tk[pos++];
+                if (!num || isNaN(Number(num.v))) throw new Error("comparação com '" + nx.v + "' precisa de um número");
+                var n = Number(num.v), op = nx.v, nm = x.v;
+                return function(e) {
+                    var c = Number(campo(e, nm));
+                    if (campo(e, nm) === null || isNaN(c)) return false;
+                    return op === ">" ? c > n : op === "<" ? c < n : op === ">=" ? c >= n : c <= n;
+                };
+            }
+            var livre = curinga(x.v, false);
+            return function(e) { return Object.keys(e.campos).some(function(k) { return livre.test(String(e.campos[k]).toLowerCase()); }); };
+        }
+        if (!tk.length) return function() { return true; };
+        var f = ou();
+        if (pos !== tk.length) throw new Error("não entendi a partir de '" + (tk[pos].v || tk[pos].t) + "'");
+        return f;
+    }
+
+    window.executarBuscaSoc = function() {
+        var q = document.getElementById("soc-consulta").value;
+        var box = document.getElementById("soc-resultados");
+        box.replaceChildren();
+        var corte = -1, aspas = false;
+        for (var i = 0; i < q.length; i++) { if (q[i] === "\"") aspas = !aspas; if (q[i] === "|" && !aspas) { corte = i; break; } }
+        var filtro = corte === -1 ? q : q.slice(0, corte), comando = corte === -1 ? "" : q.slice(corte + 1).trim();
+        var f, stats = null;
+        try {
+            f = compilarBusca(filtro);
+            if (comando) {
+                var m = comando.match(/^stats\s+count\s+by\s+([A-Za-z0-9_]+)$/i);
+                if (!m) throw new Error("depois do '|' só há suporte a 'stats count by campo'");
+                stats = m[1];
+            }
+        } catch (e) {
+            box.appendChild(el("p", "Erro na consulta: " + e.message, "color: var(--danger-color); margin: 0;"));
+            return;
+        }
+        var achados = SOC.eventos.filter(f);
+        if (stats) {
+            var cont = {};
+            achados.forEach(function(e) { var v = campo(e, stats); var k = v === null ? "(sem campo)" : String(v); cont[k] = (cont[k] || 0) + 1; });
+            var linhas = Object.keys(cont).sort(function(a, b) { return cont[b] - cont[a]; });
+            box.appendChild(el("p", achados.length + " eventos, " + linhas.length + " valores de " + stats + ":", "margin: 0 0 0.4rem 0; font-weight: 600;"));
+            var t = el("table"); t.className = "data-table";
+            var th = el("tr"); th.appendChild(el("th", stats)); th.appendChild(el("th", "count")); var thead = el("thead"); thead.appendChild(th); t.appendChild(thead);
+            var tb = el("tbody");
+            linhas.forEach(function(k) { var tr = el("tr"); tr.appendChild(el("td", k)); tr.appendChild(el("td", String(cont[k]))); tb.appendChild(tr); });
+            t.appendChild(tb);
+            var w = el("div"); w.className = "table-responsive"; w.appendChild(t); box.appendChild(w);
+            return;
+        }
+        box.appendChild(el("p", achados.length + " de " + SOC.eventos.length + " eventos" + (achados.length > 60 ? " (mostrando os 60 primeiros)" : "") + ".", "margin: 0 0 0.4rem 0; font-weight: 600;"));
+        if (!achados.length) return;
+        var lista = el("ol", null, "list-style: none; margin: 0; padding: 0; max-height: 22rem; overflow-y: auto; border: 1px solid var(--rule); border-radius: var(--radius-sm);");
+        lista.setAttribute("aria-label", "Eventos encontrados");
+        achados.slice(0, 60).forEach(function(e, i) {
+            var li = el("li", null, "padding: 0.4rem 0.6rem;" + (i ? " border-top: 1px solid var(--rule);" : ""));
+            li.appendChild(el("div", hora(e.ts) + " · EventID " + e.campos.EventID + " · " + e.campos.Computer, "font-family: var(--font-mono); font-weight: 600;"));
+            li.appendChild(el("div", resumo(e), "font-family: var(--font-mono); overflow-wrap: break-word; word-break: break-word;"));
+            lista.appendChild(li);
+        });
+        box.appendChild(lista);
+    };
+
+    // ------------------------------------------------------------- editor Sigma
+    function regraAtual() { return regras.filter(function(r) { return r.id === atual; })[0]; }
+    function renderizarListaRegras() {
+        var box = document.getElementById("soc-regras");
+        box.replaceChildren();
+        regras.forEach(function(r) {
+            var b = el("button", (ativas[r.id] ? "● " : "○ ") + r.titulo);
+            b.type = "button";
+            b.className = r.id === atual ? "btn-primary" : "btn-secondary";
+            b.setAttribute("aria-pressed", r.id === atual ? "true" : "false");
+            b.style.fontSize = "0.8rem";
+            b.addEventListener("click", function() { selecionarRegra(r.id); });
+            box.appendChild(b);
+        });
+    }
+    function selecionarRegra(id) {
+        atual = id;
+        document.getElementById("soc-yaml").value = textos[id];
+        document.getElementById("soc-regra-ativa").checked = !!ativas[id];
+        document.getElementById("soc-regra-status").replaceChildren();
+        renderizarListaRegras();
+    }
+    function mostrarDisparos(r) {
+        var box = document.getElementById("soc-regra-status");
+        box.replaceChildren();
+        var hits = disparos(r);
+        box.appendChild(el("p", "Regra válida. Dispara em " + plural(hits.length, "evento", "eventos") + " da base:", "margin: 0 0 0.3rem 0; font-weight: 600; color: var(--tip-color);"));
+        var ul = el("ul", null, "margin: 0; padding-left: 1.2rem; font-family: var(--font-mono); font-size: 0.75rem; overflow-wrap: anywhere;");
+        hits.forEach(function(e) { ul.appendChild(el("li", hora(e.ts) + " · " + e.campos.EventID + " · " + resumo(e))); });
+        box.appendChild(ul);
+    }
+    window.aplicarRegraSigma = function() {
+        var base = regraAtual();
+        var texto = document.getElementById("soc-yaml").value;
+        textos[base.id] = texto;
+        try {
+            var nova = yamlParaRegra(texto, base);
+            regras[regras.indexOf(base)] = nova;
+            mostrarDisparos(nova);
+            renderizarListaRegras();
+        } catch (e) {
+            var box = document.getElementById("soc-regra-status");
+            box.replaceChildren();
+            box.appendChild(el("p", "Regra não aplicada. " + e.message, "margin: 0; color: var(--danger-color);"));
+        }
+    };
+
+    // ------------------------------------------------------- fluxo e alertas
+    function linhaFluxo(e) {
+        var box = document.getElementById("soc-fluxo");
+        var d = el("div", hora(e.ts) + "  " + e.campos.Computer + "  " + e.campos.EventID + "  " + resumo(e));
+        box.insertBefore(d, box.firstChild);
+        while (box.childNodes.length > 40) box.removeChild(box.lastChild);
+    }
+    function segundos(ts) { var p = ts.slice(11).split(":"); return Number(p[0]) * 3600 + Number(p[1]) * 60 + Number(p[2]); }
+    function renderizarAlertas() {
+        var box = document.getElementById("soc-alertas");
+        box.replaceChildren();
+        for (var i = fluxo.alertas.length - 1; i >= 0; i--) {
+            (function(i) {
+                var a = fluxo.alertas[i], e = a.evento;
+                var c = el("div", null, "border: 1px solid var(--rule); border-left: 6px solid " + COR_NIVEL[a.regra.nivel] + "; border-radius: var(--radius-md); padding: 0.6rem 0.75rem; font-size: 0.85rem; min-width: 0;");
+                var topo = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: space-between;");
+                topo.appendChild(el("strong", a.regra.titulo));
+                topo.appendChild(el("span", a.regra.nivel + " · " + hora(e.ts), "font-family: var(--font-mono); font-size: 0.78rem;"));
+                c.appendChild(topo);
+                c.appendChild(el("p", "EventID " + e.campos.EventID + " · " + resumo(e), "margin: 0.3rem 0; font-family: var(--font-mono); font-size: 0.75rem; overflow-wrap: anywhere;"));
+                var t = fluxo.triagem[i];
+                if (t === undefined) {
+                    var acoes = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.4rem;");
+                    var bV = el("button", "Verdadeiro positivo"); bV.type = "button"; bV.className = "btn-secondary"; bV.style.fontSize = "0.8rem";
+                    bV.addEventListener("click", function() { triarAlertaSoc(i, true); });
+                    var bF = el("button", "Falso positivo"); bF.type = "button"; bF.className = "btn-secondary"; bF.style.fontSize = "0.8rem";
+                    bF.addEventListener("click", function() { triarAlertaSoc(i, false); });
+                    acoes.appendChild(bV); acoes.appendChild(bF); c.appendChild(acoes);
+                } else {
+                    var certo = t === e.malicioso;
+                    c.appendChild(el("p", (certo ? "✓ Triagem correta: " : "✗ Triagem incorreta: ") + (e.malicioso ? "verdadeiro positivo. " : "falso positivo. ") + (e.nota || ""),
+                        "margin: 0; color: " + (certo ? "var(--tip-color)" : "var(--danger-color)") + ";"));
+                }
+                box.appendChild(c);
+            })(i);
+        }
+    }
+    function resumoMttd() {
+        var box = document.getElementById("soc-mttd");
+        box.replaceChildren();
+        var primeiroMal = SOC.eventos.filter(function(e) { return e.malicioso; })[0];
+        var vp = fluxo.alertas.filter(function(a) { return a.evento.malicioso; });
+        var fp = fluxo.alertas.length - vp.length;
+        var texto = "Fluxo concluído: " + plural(fluxo.alertas.length, "alerta", "alertas") + ": " + plural(vp.length, "verdadeiro positivo", "verdadeiros positivos") + " e " + plural(fp, "falso positivo", "falsos positivos") + ". ";
+        if (!vp.length) {
+            texto += "Nenhum alerta verdadeiro: o ataque passou inteiro sem detecção (falso negativo).";
+        } else {
+            var d = segundos(vp[0].evento.ts) - segundos(primeiroMal.ts);
+            texto += "A atividade maliciosa começou às " + hora(primeiroMal.ts) + " e o primeiro alerta verdadeiro saiu às " + hora(vp[0].evento.ts) +
+                ": tempo de detecção de " + Math.floor(d / 60) + " min " + (d % 60) + " s. As falhas de logon anteriores não geram alerta porque nenhuma regra de evento único conta tentativas.";
+        }
+        box.appendChild(el("p", texto, "margin: 0; padding: 0.6rem 0.75rem; background: var(--sunk); border-radius: var(--radius-md);"));
+    }
+    function passo() {
+        if (fluxo.idx >= SOC.eventos.length) { pausarFluxoSoc(); resumoMttd(); return; }
+        var e = SOC.eventos[fluxo.idx++];
+        document.getElementById("soc-relogio").textContent = "Relógio do SIEM: " + e.ts.replace("T", " ") + " · evento " + fluxo.idx + " de " + SOC.eventos.length;
+        linhaFluxo(e);
+        var novos = regras.filter(function(r) { return ativas[r.id] && regraCasa(r, e); });
+        novos.forEach(function(r) { fluxo.alertas.push({ regra: r, evento: e }); });
+        if (novos.length) renderizarAlertas();
+        if (fluxo.idx >= SOC.eventos.length) { pausarFluxoSoc(); resumoMttd(); }
+    }
+    function limparFluxo() {
+        pausarFluxoSoc();
+        fluxo.idx = 0; fluxo.alertas = []; fluxo.triagem = {};
+        document.getElementById("soc-fluxo").replaceChildren();
+        document.getElementById("soc-alertas").replaceChildren();
+        document.getElementById("soc-mttd").replaceChildren();
+        document.getElementById("soc-relogio").textContent = "Relógio do SIEM parado. Clique em Reproduzir.";
+    }
+    window.reproduzirFluxoSoc = function() {
+        if (fluxo.timer) return;
+        if (fluxo.idx >= SOC.eventos.length) limparFluxo();
+        var ms = Number(document.getElementById("soc-velocidade").value) || 160;
+        fluxo.timer = setInterval(passo, ms);
+    };
+    window.pausarFluxoSoc = function() {
+        if (fluxo.timer) { clearInterval(fluxo.timer); fluxo.timer = null; }
+    };
+    window.triarAlertaSoc = function(i, verdadeiro) {
+        if (!fluxo.alertas[i]) return;
+        fluxo.triagem[i] = !!verdadeiro;
+        renderizarAlertas();
+    };
+
+    // ------------------------------------------------------------------ missões
+    function resultado(n, ok, msg) {
+        var p = document.getElementById("missao-" + n + "-resultado");
+        p.textContent = (ok ? "✓ " : "✗ ") + msg;
+        p.style.color = ok ? "var(--tip-color)" : "var(--danger-color)";
+    }
+    window.verificarMissaoSoc = function(n) {
+        if (n === 1) {
+            var ip = document.getElementById("missao-ip").value.trim();
+            if (ip === SOC.missoes.ip) resultado(1, true, "Correto. São 25 falhas de logon RDP desse endereço entre 02:10 e 02:14.");
+            else resultado(1, false, "Ainda não. Dica: conte as falhas de logon (4625) agrupando pelo campo de IP.");
+        } else if (n === 2) {
+            var conta = document.getElementById("missao-conta").value.trim().toLowerCase();
+            if (conta === SOC.missoes.conta.toLowerCase()) resultado(2, true, "Correto. O 4624 das 02:14:40 mostra o logon RDP bem-sucedido dessa conta a partir do IP atacante.");
+            else resultado(2, false, "Ainda não. Dica: procure logons bem-sucedidos (4624) vindos do IP da missão 1.");
+        } else if (n === 3) {
+            var r = regras.filter(function(x) { return x.id === SOC.missoes.regra_ruidosa; })[0];
+            var hits = disparos(r);
+            var mal = hits.filter(function(e) { return e.malicioso; }).length, ben = hits.length - mal;
+            var totalMal = SOC.eventos.filter(function(e) { return e.malicioso && e.logsource.category === "process_creation"; }).length;
+            if (mal === totalMal && ben === 0) resultado(3, true, "Correto. A regra continua pegando o PowerShell do ataque e não alerta mais o inventário.");
+            else if (ben > 0) resultado(3, false, "A regra ainda alerta " + plural(ben, "evento legítimo", "eventos legítimos") + ". Acrescente um filter para o processo pai do agente e use 'selection and not filter'.");
+            else resultado(3, false, "O falso positivo sumiu, mas a regra deixou de pegar o PowerShell do ataque: o filtro ficou largo demais.");
+        }
+    };
+
+    window.restaurarSoc = function() {
+        limparFluxo();
+        regras = SOC.regras.map(function(r) { return preparar(copia(r)); });
+        textos = {}; ativas = {};
+        regras.forEach(function(r) { textos[r.id] = paraYaml(r); ativas[r.id] = true; });
+        selecionarRegra(regras[0].id);
+        document.getElementById("soc-consulta").value = "EventID:4625";
+        executarBuscaSoc();
+        [1, 2, 3].forEach(function(n) { document.getElementById("missao-" + n + "-resultado").textContent = ""; });
+        document.getElementById("missao-ip").value = "";
+        document.getElementById("missao-conta").value = "";
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("soc-contexto").textContent = SOC.contexto;
+        var ex = document.getElementById("soc-exemplos");
+        EXEMPLOS.forEach(function(q) {
+            var b = el("button", q, "font-family: var(--font-mono); font-size: 0.75rem; padding: 0.2rem 0.5rem;");
+            b.type = "button";
+            b.className = "btn-secondary";
+            b.addEventListener("click", function() { document.getElementById("soc-consulta").value = q; executarBuscaSoc(); });
+            ex.appendChild(b);
+        });
+        document.getElementById("soc-consulta").addEventListener("keydown", function(e) { if (e.key === "Enter") executarBuscaSoc(); });
+        document.getElementById("soc-regra-ativa").addEventListener("change", function(e) { ativas[atual] = e.target.checked; renderizarListaRegras(); });
+        document.getElementById("soc-restaurar-regra").addEventListener("click", function() {
+            var orig = SOC.regras.filter(function(r) { return r.id === atual; })[0];
+            var r = preparar(copia(orig));
+            regras = regras.map(function(x) { return x.id === atual ? r : x; });
+            textos[atual] = paraYaml(r);
+            selecionarRegra(atual);
+        });
+        restaurarSoc();
+        if (typeof initChecklist === "function") {
+            initChecklist("operacoes-soc-siem");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
