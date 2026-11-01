@@ -37,6 +37,15 @@ class TestPortalResponsivo(unittest.TestCase):
         """Os cards do catálogo não impõem largura mínima pelo conteúdo."""
         self.assertIn("min-width: 0", regra(self.css, ".study-card"))
 
+    def test_cabecalho_do_card_nao_estoura_no_desktop(self):
+        """Em qualquer largura, o grupo de selos encolhe e o selo do simulador quebra linha."""
+        self.assertIn("min-width: 0", regra(self.css, ".card-tile-group"))
+        self.assertIn("min-width: 0", regra(self.css, ".card-badges"))
+        simulador = regra(self.css, ".badge-sim")
+        self.assertIn("white-space: normal", simulador)
+        self.assertIn("overflow-wrap: anywhere", simulador)
+        self.assertIn("flex-shrink: 0", regra(self.css, ".status-badge"))
+
     def test_selos_quebram_linha_no_celular(self):
         """No celular, os selos (NIST, MITRE, carreiras) podem quebrar linha."""
         mobile = bloco_media(self.css, "max-width: 768px")
