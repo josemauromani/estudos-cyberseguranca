@@ -415,7 +415,7 @@ flowchart LR
 - **Objetivos de Aprendizagem:** Comparar graduações (Ciência da Computação, Sistemas de Informação) e pós-graduações em SI; conhecer CEH, CISM, CISSP, CCSP, GSEC e Security+ (órgão emissor, foco, domínios, experiência exigida e manutenção por CPE); montar um plano de certificação coerente com o perfil de carreira; usar o NICE Framework (NIST SP 800-181) para descrever papéis.
 - **Pré-requisitos:** Nenhum.
 - **Conceitos-Chave:** Certificações de entrada vs gestão vs especialidade, Pré-requisitos de experiência e status *Associate of ISC2*, CPE e renovação, NICE Framework.
-- **Simulador Interativo em JS:** *Planejador de Certificações* — O aluno escolhe uma ou mais certificações-alvo; o simulador mostra os domínios de cada uma, os módulos do currículo que cobrem cada domínio e os domínios ainda sem módulo (lacunas), além de uma sugestão de ordem de estudo. Os dados vêm de uma estrutura JS embutida no próprio módulo, coerente com a Matriz de Certificações do portal.
+- **Simulador Interativo em JS:** *Planejador de Certificações* — O aluno escolhe uma ou mais certificações-alvo; o simulador mostra os domínios de cada uma, os módulos do currículo que cobrem cada domínio e os domínios ainda sem módulo (lacunas), além de uma sugestão de ordem de estudo. O aluno também informa a própria experiência (anos em TI, segurança, gestão e nuvem, graduação e treinamento oficial) e o simulador indica, por certificação, se ele já está elegível ou se o caminho é o status Associate of ISC2 ou a experiência posterior aceita pela ISACA. Os dados vêm de uma estrutura JS embutida no próprio módulo, coerente com a Matriz de Certificações do portal.
 
 ---
 
