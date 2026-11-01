@@ -1,7 +1,12 @@
 """Testes unitários para o Design System (base.css) e biblioteca JavaScript (base.js)."""
 
+import sys
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from index_dados import TRILHAS  # noqa: E402
 
 
 class TestAssets(unittest.TestCase):
@@ -33,18 +38,7 @@ class TestAssets(unittest.TestCase):
         for token in tokens_fundamentais:
             self.assertIn(token, content, f"Token ausente no CSS: {token}")
 
-        # Cores das 7 trilhas
-        trilhas = [
-            "--t1-blue",
-            "--t2-green",
-            "--t3-red",
-            "--t4-purple",
-            "--t5-cyan",
-            "--t6-amber",
-            "--t7-rose",
-        ]
-        for t in trilhas:
-            self.assertIn(t, content, f"Cor de trilha ausente no CSS: {t}")
+        # Cores das trilhas: ver test_tokens_de_cada_trilha (derivado de TRILHAS)
 
         # Tipografia
         fontes = [
@@ -55,12 +49,17 @@ class TestAssets(unittest.TestCase):
         for f in fontes:
             self.assertIn(f, content, f"Família de fonte ausente no CSS: {f}")
 
-    def test_trilha7_tokens_em_4_blocos(self):
-        for nome in ("base.css", "index.css"):
-            css = (self.root / "_geradores" / nome).read_text(encoding="utf-8")
-            self.assertEqual(css.count("--t7-rose:"), 4, nome)
-        self.assertIn(".badge-t7", self.css_file.read_text(encoding="utf-8"))
-        self.assertIn(".track-tile.t7", (self.root / "_geradores" / "index.css").read_text(encoding="utf-8"))
+    def test_tokens_de_cada_trilha(self):
+        """Cada trilha de TRILHAS tem token nos 4 blocos de tema, selo e bloco."""
+        base = self.css_file.read_text(encoding="utf-8")
+        index = (self.root / "_geradores" / "index.css").read_text(encoding="utf-8")
+        for tid, info in TRILHAS.items():
+            token = f"--t{tid}-{info['cor_nome']}:"
+            with self.subTest(trilha=tid):
+                self.assertEqual(base.count(token), 4)
+                self.assertEqual(index.count(token), 4)
+                self.assertIn(f".badge-t{tid} ", base)
+                self.assertIn(f".track-tile.t{tid} ", index)
 
     def test_base_css_contains_component_classes(self):
         """Verifica as classes de componentes do Design System."""

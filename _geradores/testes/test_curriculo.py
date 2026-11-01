@@ -1,7 +1,12 @@
 """Testes de integridade do catálogo curricular e documentação pedagógica."""
 
+import sys
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from index_dados import TRILHAS  # noqa: E402
 
 
 class TestCurriculo(unittest.TestCase):
@@ -11,16 +16,24 @@ class TestCurriculo(unittest.TestCase):
         self.curriculo_file = self.root / "_geradores" / "CURRICULO.md"
         self.guia_file = self.root / "_geradores" / "GUIA-DO-AUTOR.md"
 
-    def test_estudos_txt_contains_33_valid_entries(self):
-        """Verifica se estudos.txt existe e possui exatamente 33 registros válidos com 7 campos."""
-        self.assertTrue(self.estudos_file.exists(), "estudos.txt deve existir")
-
-        lines = [
+    def _linhas_catalogo(self):
+        """Linhas não vazias e não comentadas de estudos.txt."""
+        return [
             line.strip()
             for line in self.estudos_file.read_text(encoding="utf-8").splitlines()
             if line.strip() and not line.startswith("#")
         ]
-        self.assertEqual(len(lines), 33, f"Esperava 33 estudos, encontrou {len(lines)}")
+
+    def test_tamanho_da_grade(self):
+        """Único ponto com os totais fixos: crescer a grade é decisão explícita."""
+        self.assertEqual(len(self._linhas_catalogo()), 33)
+        self.assertEqual(len(TRILHAS), 7)
+
+    def test_estudos_txt_formato_valido(self):
+        """Verifica se cada registro de estudos.txt tem 7 campos válidos."""
+        self.assertTrue(self.estudos_file.exists(), "estudos.txt deve existir")
+
+        lines = self._linhas_catalogo()
 
         slugs = set()
         for line in lines:
@@ -31,9 +44,7 @@ class TestCurriculo(unittest.TestCase):
             self.assertNotIn(slug, slugs, f"Slug duplicado: {slug}")
             slugs.add(slug)
 
-            self.assertTrue(
-                1 <= int(trilha) <= 7, f"Trilha inválida em {slug}: {trilha} (deve ser 1 a 7)"
-            )
+            self.assertIn(int(trilha), TRILHAS, f"Trilha inválida em {slug}: {trilha}")
             self.assertTrue(
                 cor.startswith("#"), f"Cor inválida em {slug}: {cor} (deve iniciar com #)"
             )
@@ -44,7 +55,7 @@ class TestCurriculo(unittest.TestCase):
             )
             self.assertTrue(len(nist) > 0, f"NIST function vazia em {slug}")
 
-    def test_curriculo_cobre_33_modulos_e_rota(self):
+    def test_curriculo_cobre_modulos_e_rota(self):
         """CURRICULO.md cita todos os slugs, a Trilha 7, a Rota 6 e os escopos ampliados."""
         txt = self.curriculo_file.read_text(encoding="utf-8")
         for linha in self.estudos_file.read_text(encoding="utf-8").splitlines():

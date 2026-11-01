@@ -67,8 +67,8 @@ class TestCLI(unittest.TestCase):
         index_file = ROOT_DIR / "index.html"
         self.assertTrue(index_file.exists(), "index.html deve existir após execução de 'gerar.sh portal'.")
 
-    def test_readme_contains_all_33_studies(self):
-        """Verifica se README.md existe e contém referências a todos os 33 estudos."""
+    def test_readme_contains_all_studies(self):
+        """Verifica se README.md existe e contém referências a todos os estudos do catálogo."""
         self.assertTrue(README_MD.exists(), "README.md raiz deve existir.")
         readme_content = README_MD.read_text(encoding="utf-8")
 
@@ -78,7 +78,7 @@ class TestCLI(unittest.TestCase):
             for l in ESTUDOS_TXT.read_text(encoding="utf-8").splitlines()
             if l.strip() and not l.strip().startswith("#")
         ]
-        self.assertEqual(len(estudos_linhas), 33, "Devem existir exatamente 33 estudos no catálogo.")
+        self.assertGreater(len(estudos_linhas), 0, "O catálogo não pode estar vazio.")
 
         # Verifica presença de cada estudo no README (por slug ou título)
         faltantes = []
