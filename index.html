@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Plataforma de estudos autoinstrucional e prática em cibersegurança com 33 módulos temáticos, 7 trilhas e simuladores interativos em JavaScript.">
+  <meta name="description" content="Plataforma de estudos autoinstrucional e prática em cibersegurança com 45 módulos temáticos, 10 trilhas e simuladores interativos em JavaScript.">
   <title>Estudos de Cibersegurança — Catálogo e Portal Central</title>
 
   <!-- Google Fonts: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono -->
@@ -35,6 +35,9 @@
   --t5-cyan: #0891B2;
   --t6-amber: #D97706;
   --t7-rose: #DB2777;
+  --t8-slate: #475569;
+  --t9-indigo: #4F46E5;
+  --t10-orange: #C2410C;
 
   /* Estados de Sucesso / Conclusão */
   --good: #059669;
@@ -70,6 +73,9 @@
     --t5-cyan: #22D3EE;
     --t6-amber: #FBBF24;
     --t7-rose: #F472B6;
+    --t8-slate: #94A3B8;
+    --t9-indigo: #818CF8;
+    --t10-orange: #FB923C;
 
     --good: #34D399;
     --good-tint: #064E3B;
@@ -99,6 +105,9 @@
   --t5-cyan: #22D3EE;
   --t6-amber: #FBBF24;
   --t7-rose: #F472B6;
+  --t8-slate: #94A3B8;
+  --t9-indigo: #818CF8;
+  --t10-orange: #FB923C;
 
   --good: #34D399;
   --good-tint: #064E3B;
@@ -123,6 +132,9 @@
   --t5-cyan: #0891B2;
   --t6-amber: #D97706;
   --t7-rose: #DB2777;
+  --t8-slate: #475569;
+  --t9-indigo: #4F46E5;
+  --t10-orange: #C2410C;
 
   --good: #059669;
   --good-tint: #D1FAE5;
@@ -703,6 +715,9 @@ h1 {
 .track-tile.t5 { background: var(--t5-cyan); }
 .track-tile.t6 { background: var(--t6-amber); }
 .track-tile.t7 { background: var(--t7-rose); }
+.track-tile.t8 { background: var(--t8-slate); }
+.track-tile.t9 { background: var(--t9-indigo); }
+.track-tile.t10 { background: var(--t10-orange); }
 
 .card-badges {
   display: flex;
@@ -1170,23 +1185,23 @@ a.vaga-chip:hover {
       <!-- Barra de Estatísticas do Portal -->
       <div class="stats-bar">
         <div class="stat-item">
-          <span class="stat-number">33</span>
+          <span class="stat-number">45</span>
           <span class="stat-label">Estudos Mapeados</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">7</span>
+          <span class="stat-number">10</span>
           <span class="stat-label">Trilhas Temáticas</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">33</span>
+          <span class="stat-number">45</span>
           <span class="stat-label">Simuladores Interativos</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">~1485 min</span>
-          <span class="stat-label">Tempo Total (24.8h)</span>
+          <span class="stat-number">~2030 min</span>
+          <span class="stat-label">Tempo Total (33.8h)</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">11 / 33</span>
+          <span class="stat-number">11 / 45</span>
           <span class="stat-label">Módulos Compilados</span>
         </div>
       </div>
@@ -1196,7 +1211,7 @@ a.vaga-chip:hover {
     <section class="progress-section" aria-label="Progresso global">
       <div class="progress-header">
         <h2 class="progress-title">🎯 Progresso de Conclusão Global</h2>
-        <span class="progress-metrics" id="progress-text">0 de 33 concluídos (0%)</span>
+        <span class="progress-metrics" id="progress-text">0 de 45 concluídos (0%)</span>
       </div>
       <div class="progress-bar-track">
         <div class="progress-bar-fill" id="progress-bar"></div>
@@ -1232,6 +1247,9 @@ a.vaga-chip:hover {
         <button class="filter-badge" data-value="5" onclick="setSubFilter(this.dataset.value, this)">Trilha 5: Especialidades &amp; Fronteiras</button>
         <button class="filter-badge" data-value="6" onclick="setSubFilter(this.dataset.value, this)">Trilha 6: Governança, Riscos &amp; Conformidade</button>
         <button class="filter-badge" data-value="7" onclick="setSubFilter(this.dataset.value, this)">Trilha 7: Carreira &amp; Formação</button>
+        <button class="filter-badge" data-value="8" onclick="setSubFilter(this.dataset.value, this)">Trilha 8: Ferramentas &amp; Automação do Analista</button>
+        <button class="filter-badge" data-value="9" onclick="setSubFilter(this.dataset.value, this)">Trilha 9: Identidade Corporativa &amp; Active Directory</button>
+        <button class="filter-badge" data-value="10" onclick="setSubFilter(this.dataset.value, this)">Trilha 10: Resiliência, Crise &amp; Ransomware</button>
       </div>
 
       <!-- Painel: Por Perfil Profissional -->
@@ -1258,7 +1276,7 @@ a.vaga-chip:hover {
       </div>
 
       <div class="results-info">
-        <span id="visible-count">Exibindo 33 de 33 estudos</span>
+        <span id="visible-count">Exibindo 45 de 45 estudos</span>
         <span>Atalhos: clique nas tags ou use o campo de busca</span>
       </div>
     </section>
@@ -3059,6 +3077,546 @@ a.vaga-chip:hover {
       </div>
     </article>
 
+    <article class="study-card" id="estudo-Linux-para-Seguranca"
+      data-slug="Linux-para-Seguranca"
+      data-trilha="8"
+      data-nist="Protect / Detect"
+      data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,Red Team &amp; Pentest,Analista de Segurança da Informação"
+      data-search="linux-para-seguranca linux para segurança: shell, permissões e logs linha de comando, permissões, usuários, processos e logs para investigar um servidor linux que comandos revelam, em poucos minutos, se um servidor linux foi comprometido? terminal de investigação linux protect / detect blue team &amp; defesa,operações soc &amp; resposta,red team &amp; pentest,analista de segurança da informação permissões octais, suid/sgid e sudoers investigação de auth.log e journalctl processos, portas e persistência em cron terminal simulado com missões de investigação">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t8" title="Trilha 8: Ferramentas & Automação do Analista">
+            8
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect / Detect</span>
+            <span class="badge badge-time">⏱️ 50 min</span>
+            <span class="badge badge-sim">🧪 Terminal de Investigação Linux</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Linux para Segurança: Shell, Permissões e Logs</h3>
+      <p class="study-desc">Linha de comando, permissões, usuários, processos e logs para investigar um servidor Linux</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Que comandos revelam, em poucos minutos, se um servidor Linux foi comprometido?
+      </div>
+
+      <ul class="study-facts">
+          <li>Permissões octais, SUID/SGID e sudoers</li>
+          <li>Investigação de auth.log e journalctl</li>
+          <li>Processos, portas e persistência em cron</li>
+          <li>Terminal simulado com missões de investigação</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Linux-para-Seguranca" onchange="toggleDone('Linux-para-Seguranca', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Python-para-Seguranca"
+      data-slug="Python-para-Seguranca"
+      data-trilha="8"
+      data-nist="Detect"
+      data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,AppSec &amp; DevSecOps,Analista de Segurança da Informação"
+      data-search="python-para-seguranca python para segurança: automação, regex e parsing scripts para ler logs, extrair indicadores com regex e consultar apis de reputação como transformar uma triagem manual de logs em um script repetível? montador de detector detect blue team &amp; defesa,operações soc &amp; resposta,appsec &amp; devsecops,analista de segurança da informação regex aplicada a logs reais agregação com counter e limiares de alerta consulta a apis de reputação com requests montador visual de detector com código python gerado">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t8" title="Trilha 8: Ferramentas & Automação do Analista">
+            8
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Detect</span>
+            <span class="badge badge-time">⏱️ 50 min</span>
+            <span class="badge badge-sim">🧪 Montador de Detector</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Python para Segurança: Automação, Regex e Parsing</h3>
+      <p class="study-desc">Scripts para ler logs, extrair indicadores com regex e consultar APIs de reputação</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como transformar uma triagem manual de logs em um script repetível?
+      </div>
+
+      <ul class="study-facts">
+          <li>Regex aplicada a logs reais</li>
+          <li>Agregação com Counter e limiares de alerta</li>
+          <li>Consulta a APIs de reputação com requests</li>
+          <li>Montador visual de detector com código Python gerado</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Python-para-Seguranca" onchange="toggleDone('Python-para-Seguranca', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-PowerShell-e-Windows-Interno"
+      data-slug="PowerShell-e-Windows-Interno"
+      data-trilha="8"
+      data-nist="Detect"
+      data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,Analista de Segurança da Informação"
+      data-search="powershell-e-windows-interno powershell, event log e registro do windows pipeline de objetos, eventos de segurança, sysmon e chaves de persistência no registro que eventos do windows contam a história de uma intrusão? visualizador de eventos detect blue team &amp; defesa,operações soc &amp; resposta,perícia forense &amp; malware,analista de segurança da informação pipeline de objetos e get-winevent event ids essenciais e tipos de logon sysmon e scriptblock logging linha do tempo de intrusão para investigar">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t8" title="Trilha 8: Ferramentas & Automação do Analista">
+            8
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Detect</span>
+            <span class="badge badge-time">⏱️ 50 min</span>
+            <span class="badge badge-sim">🧪 Visualizador de Eventos</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">PowerShell, Event Log e Registro do Windows</h3>
+      <p class="study-desc">Pipeline de objetos, eventos de segurança, Sysmon e chaves de persistência no Registro</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Que eventos do Windows contam a história de uma intrusão?
+      </div>
+
+      <ul class="study-facts">
+          <li>Pipeline de objetos e Get-WinEvent</li>
+          <li>Event IDs essenciais e tipos de logon</li>
+          <li>Sysmon e ScriptBlock Logging</li>
+          <li>Linha do tempo de intrusão para investigar</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="PowerShell-e-Windows-Interno" onchange="toggleDone('PowerShell-e-Windows-Interno', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Laboratorio-Domestico-e-Portfolio"
+      data-slug="Laboratorio-Domestico-e-Portfolio"
+      data-trilha="8"
+      data-nist="Protect"
+      data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,AppSec &amp; DevSecOps,Operações SOC &amp; Resposta,GRC &amp; Auditoria,Perícia Forense &amp; Malware,Analista de Segurança da Informação"
+      data-search="laboratorio-domestico-e-portfolio laboratório doméstico, ctfs e portfólio montar um laboratório isolado, praticar em ctfs e transformar a prática em portfólio como provar numa entrevista o que você sabe fazer? planejador de homelab protect blue team &amp; defesa,red team &amp; pentest,appsec &amp; devsecops,operações soc &amp; resposta,grc &amp; auditoria,perícia forense &amp; malware,analista de segurança da informação topologia mínima de laboratório isolado orçamento de ram e cpu por vm ctfs, write-ups e portfólio no github planejador de homelab com checklist de isolamento">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t8" title="Trilha 8: Ferramentas & Automação do Analista">
+            8
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 35 min</span>
+            <span class="badge badge-sim">🧪 Planejador de Homelab</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Laboratório Doméstico, CTFs e Portfólio</h3>
+      <p class="study-desc">Montar um laboratório isolado, praticar em CTFs e transformar a prática em portfólio</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como provar numa entrevista o que você sabe fazer?
+      </div>
+
+      <ul class="study-facts">
+          <li>Topologia mínima de laboratório isolado</li>
+          <li>Orçamento de RAM e CPU por VM</li>
+          <li>CTFs, write-ups e portfólio no GitHub</li>
+          <li>Planejador de homelab com checklist de isolamento</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Laboratorio-Domestico-e-Portfolio" onchange="toggleDone('Laboratorio-Domestico-e-Portfolio', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Active-Directory-Fundamentos"
+      data-slug="Active-Directory-Fundamentos"
+      data-trilha="9"
+      data-nist="Protect"
+      data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,Operações SOC &amp; Resposta,Analista de Segurança da Informação"
+      data-search="active-directory-fundamentos active directory: domínios, gpo e kerberos estrutura do ad, precedência de gpo, kerberos e ntlm e o modelo de camadas de administração como o ad decide quem é você e o que você pode fazer em cada máquina? kerberos passo a passo protect blue team &amp; defesa,red team &amp; pentest,operações soc &amp; resposta,analista de segurança da informação floresta, domínio, ou e controladores de domínio precedência de gpo (lsdou) kerberos (as, tgs, ap) e ntlm simulador da troca kerberos e calculadora de gpo">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t9" title="Trilha 9: Identidade Corporativa & Active Directory">
+            9
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 50 min</span>
+            <span class="badge badge-sim">🧪 Kerberos Passo a Passo</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Active Directory: Domínios, GPO e Kerberos</h3>
+      <p class="study-desc">Estrutura do AD, precedência de GPO, Kerberos e NTLM e o modelo de camadas de administração</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como o AD decide quem é você e o que você pode fazer em cada máquina?
+      </div>
+
+      <ul class="study-facts">
+          <li>Floresta, domínio, OU e controladores de domínio</li>
+          <li>Precedência de GPO (LSDOU)</li>
+          <li>Kerberos (AS, TGS, AP) e NTLM</li>
+          <li>Simulador da troca Kerberos e calculadora de GPO</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Active-Directory-Fundamentos" onchange="toggleDone('Active-Directory-Fundamentos', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Ataques-e-Defesa-no-AD"
+      data-slug="Ataques-e-Defesa-no-AD"
+      data-trilha="9"
+      data-nist="Protect / Detect"
+      data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,Operações SOC &amp; Resposta"
+      data-search="ataques-e-defesa-no-ad ataques ao ad e detecção: kerberoasting, pass-the-hash e dcsync caminhos de ataque no ad, sinais de detecção e mitigações que quebram cada caminho qual é o caminho mais curto de um usuário comum até domain admin, e como fechá-lo? mapa de caminhos de ataque protect / detect blue team &amp; defesa,red team &amp; pentest,operações soc &amp; resposta caminhos de ataque em grafo kerberoasting, pass-the-hash e dcsync sinais de detecção nos eventos do windows mapa interativo para quebrar caminhos de ataque">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t9" title="Trilha 9: Identidade Corporativa & Active Directory">
+            9
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect / Detect</span>
+            <span class="badge badge-time">⏱️ 55 min</span>
+            <span class="badge badge-sim">🧪 Mapa de Caminhos de Ataque</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Ataques ao AD e Detecção: Kerberoasting, Pass-the-Hash e DCSync</h3>
+      <p class="study-desc">Caminhos de ataque no AD, sinais de detecção e mitigações que quebram cada caminho</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Qual é o caminho mais curto de um usuário comum até Domain Admin, e como fechá-lo?
+      </div>
+
+      <ul class="study-facts">
+          <li>Caminhos de ataque em grafo</li>
+          <li>Kerberoasting, Pass-the-Hash e DCSync</li>
+          <li>Sinais de detecção nos eventos do Windows</li>
+          <li>Mapa interativo para quebrar caminhos de ataque</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Ataques-e-Defesa-no-AD" onchange="toggleDone('Ataques-e-Defesa-no-AD', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-PAM-e-Acessos-Privilegiados"
+      data-slug="PAM-e-Acessos-Privilegiados"
+      data-trilha="9"
+      data-nist="Protect"
+      data-carreiras="Blue Team &amp; Defesa,GRC &amp; Auditoria,Analista de Segurança da Informação"
+      data-search="pam-e-acessos-privilegiados gestão de acessos privilegiados (pam) inventário, cofre, rotação, gravação de sessão e acesso just-in-time a contas privilegiadas quem tem poder de administrador hoje, e por quanto tempo deveria ter? auditor de contas privilegiadas protect blue team &amp; defesa,grc &amp; auditoria,analista de segurança da informação inventário de contas privilegiadas cofre, rotação e gravação de sessão just-in-time, jea e break-glass auditor interativo de contas privilegiadas">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t9" title="Trilha 9: Identidade Corporativa & Active Directory">
+            9
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 40 min</span>
+            <span class="badge badge-sim">🧪 Auditor de Contas Privilegiadas</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Gestão de Acessos Privilegiados (PAM)</h3>
+      <p class="study-desc">Inventário, cofre, rotação, gravação de sessão e acesso just-in-time a contas privilegiadas</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Quem tem poder de administrador hoje, e por quanto tempo deveria ter?
+      </div>
+
+      <ul class="study-facts">
+          <li>Inventário de contas privilegiadas</li>
+          <li>Cofre, rotação e gravação de sessão</li>
+          <li>Just-in-time, JEA e break-glass</li>
+          <li>Auditor interativo de contas privilegiadas</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="PAM-e-Acessos-Privilegiados" onchange="toggleDone('PAM-e-Acessos-Privilegiados', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Identidade-Hibrida-e-Nuvem"
+      data-slug="Identidade-Hibrida-e-Nuvem"
+      data-trilha="9"
+      data-nist="Protect"
+      data-carreiras="Blue Team &amp; Defesa,AppSec &amp; DevSecOps,Analista de Segurança da Informação"
+      data-search="identidade-hibrida-e-nuvem entra id, identidade híbrida e acesso condicional sincronização híbrida, acesso condicional, mfa resistente a phishing e pim que política de acesso bloqueia o atacante sem travar o usuário legítimo? avaliador de acesso condicional protect blue team &amp; defesa,appsec &amp; devsecops,analista de segurança da informação phs, pta e federação acesso condicional por risco e dispositivo mfa resistente a phishing e pim avaliador de políticas com logins simulados">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t9" title="Trilha 9: Identidade Corporativa & Active Directory">
+            9
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Avaliador de Acesso Condicional</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Entra ID, Identidade Híbrida e Acesso Condicional</h3>
+      <p class="study-desc">Sincronização híbrida, acesso condicional, MFA resistente a phishing e PIM</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Que política de acesso bloqueia o atacante sem travar o usuário legítimo?
+      </div>
+
+      <ul class="study-facts">
+          <li>PHS, PTA e federação</li>
+          <li>Acesso condicional por risco e dispositivo</li>
+          <li>MFA resistente a phishing e PIM</li>
+          <li>Avaliador de políticas com logins simulados</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Identidade-Hibrida-e-Nuvem" onchange="toggleDone('Identidade-Hibrida-e-Nuvem', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Ransomware-Prevencao-a-Recuperacao"
+      data-slug="Ransomware-Prevencao-a-Recuperacao"
+      data-trilha="10"
+      data-nist="Respond / Recover"
+      data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,Analista de Segurança da Informação"
+      data-search="ransomware-prevencao-a-recuperacao ransomware: prevenção, contenção e recuperação anatomia do ataque, dupla extorsão, decisões de contenção e retomada da operação nas primeiras horas de um ransomware, que decisões reduzem o estrago e quais o pioram? linha do tempo do ransomware respond / recover blue team &amp; defesa,operações soc &amp; resposta,perícia forense &amp; malware,analista de segurança da informação anatomia do ataque e dupla extorsão decisões de contenção e seus custos ordem de recuperação e descriptografadores públicos linha do tempo interativa com pontos de decisão">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t10" title="Trilha 10: Resiliência, Crise & Ransomware">
+            10
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Respond / Recover</span>
+            <span class="badge badge-time">⏱️ 50 min</span>
+            <span class="badge badge-sim">🧪 Linha do Tempo do Ransomware</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Ransomware: Prevenção, Contenção e Recuperação</h3>
+      <p class="study-desc">Anatomia do ataque, dupla extorsão, decisões de contenção e retomada da operação</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Nas primeiras horas de um ransomware, que decisões reduzem o estrago e quais o pioram?
+      </div>
+
+      <ul class="study-facts">
+          <li>Anatomia do ataque e dupla extorsão</li>
+          <li>Decisões de contenção e seus custos</li>
+          <li>Ordem de recuperação e descriptografadores públicos</li>
+          <li>Linha do tempo interativa com pontos de decisão</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Ransomware-Prevencao-a-Recuperacao" onchange="toggleDone('Ransomware-Prevencao-a-Recuperacao', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Gestao-de-Crise-e-Comunicacao"
+      data-slug="Gestao-de-Crise-e-Comunicacao"
+      data-trilha="10"
+      data-nist="Respond"
+      data-carreiras="GRC &amp; Auditoria,Operações SOC &amp; Resposta,Analista de Segurança da Informação"
+      data-search="gestao-de-crise-e-comunicacao gestão de crise cibernética e comunicação de incidentes comitê de crise, registro de decisões e comunicação a público interno, clientes, imprensa e anpd quem precisa saber do incidente, quando e com que mensagem? relógio da crise respond grc &amp; auditoria,operações soc &amp; resposta,analista de segurança da informação comitê de crise e matriz raci registro de decisões e porta-voz único comunicação à anpd em 3 dias úteis relógio da crise com notificações e prazos">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t10" title="Trilha 10: Resiliência, Crise & Ransomware">
+            10
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Respond</span>
+            <span class="badge badge-time">⏱️ 40 min</span>
+            <span class="badge badge-sim">🧪 Relógio da Crise</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Gestão de Crise Cibernética e Comunicação de Incidentes</h3>
+      <p class="study-desc">Comitê de crise, registro de decisões e comunicação a público interno, clientes, imprensa e ANPD</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Quem precisa saber do incidente, quando e com que mensagem?
+      </div>
+
+      <ul class="study-facts">
+          <li>Comitê de crise e matriz RACI</li>
+          <li>Registro de decisões e porta-voz único</li>
+          <li>Comunicação à ANPD em 3 dias úteis</li>
+          <li>Relógio da crise com notificações e prazos</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Gestao-de-Crise-e-Comunicacao" onchange="toggleDone('Gestao-de-Crise-e-Comunicacao', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Exercicios-Tabletop"
+      data-slug="Exercicios-Tabletop"
+      data-trilha="10"
+      data-nist="Respond / Recover"
+      data-carreiras="GRC &amp; Auditoria,Operações SOC &amp; Resposta,Analista de Segurança da Informação"
+      data-search="exercicios-tabletop exercícios tabletop: planejar, conduzir e avaliar tipos de exercício, injects, facilitação e relatório pós-ação com plano de melhorias como descobrir as falhas do plano de resposta antes de um incidente real? gerador de tabletop respond / recover grc &amp; auditoria,operações soc &amp; resposta,analista de segurança da informação tipos de exercício (nist sp 800-84) injects e papel do facilitador relatório pós-ação e plano de melhorias gerador de tabletop com cronômetro e relatório">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t10" title="Trilha 10: Resiliência, Crise & Ransomware">
+            10
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Respond / Recover</span>
+            <span class="badge badge-time">⏱️ 35 min</span>
+            <span class="badge badge-sim">🧪 Gerador de Tabletop</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Exercícios Tabletop: Planejar, Conduzir e Avaliar</h3>
+      <p class="study-desc">Tipos de exercício, injects, facilitação e relatório pós-ação com plano de melhorias</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como descobrir as falhas do plano de resposta antes de um incidente real?
+      </div>
+
+      <ul class="study-facts">
+          <li>Tipos de exercício (NIST SP 800-84)</li>
+          <li>Injects e papel do facilitador</li>
+          <li>Relatório pós-ação e plano de melhorias</li>
+          <li>Gerador de tabletop com cronômetro e relatório</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Exercicios-Tabletop" onchange="toggleDone('Exercicios-Tabletop', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Backup-Imutavel-e-Recuperacao"
+      data-slug="Backup-Imutavel-e-Recuperacao"
+      data-trilha="10"
+      data-nist="Recover"
+      data-carreiras="Blue Team &amp; Defesa,GRC &amp; Auditoria,Analista de Segurança da Informação"
+      data-search="backup-imutavel-e-recuperacao backup imutável e recuperação de identidade regra 3-2-1-1-0, imutabilidade, air gap e recuperação do active directory seu backup sobrevive a um atacante que já é administrador do domínio? teste de sobrevivência do backup recover blue team &amp; defesa,grc &amp; auditoria,analista de segurança da informação regra 3-2-1-1-0 imutabilidade, object lock e air gap recuperação do active directory teste de sobrevivência do backup a um admin de domínio">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t10" title="Trilha 10: Resiliência, Crise & Ransomware">
+            10
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Recover</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Teste de Sobrevivência do Backup</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Backup Imutável e Recuperação de Identidade</h3>
+      <p class="study-desc">Regra 3-2-1-1-0, imutabilidade, air gap e recuperação do Active Directory</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Seu backup sobrevive a um atacante que já é administrador do domínio?
+      </div>
+
+      <ul class="study-facts">
+          <li>Regra 3-2-1-1-0</li>
+          <li>Imutabilidade, object lock e air gap</li>
+          <li>Recuperação do Active Directory</li>
+          <li>Teste de sobrevivência do backup a um admin de domínio</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Backup-Imutavel-e-Recuperacao" onchange="toggleDone('Backup-Imutavel-e-Recuperacao', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
         <div class="no-results" id="no-results-msg" style="display: none;">
           <p>Nenhum estudo encontrado com os critérios de busca aplicados.</p>
           <button class="btn-open-study" onclick="clearSearch(); switchTab('todas');">Limpar Filtros e Busca</button>
@@ -3157,7 +3715,7 @@ a.vaga-chip:hover {
   // --------------------------------------------------------------------------
   // 3. Gerenciador de Progresso Global do Estudante
   // --------------------------------------------------------------------------
-  const TOTAL_ESTUDOS = 33;
+  const TOTAL_ESTUDOS = 45;
 
   function initProgress() {
     let concluidos = 0;

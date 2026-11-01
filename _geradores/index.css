@@ -21,6 +21,9 @@
   --t5-cyan: #0891B2;
   --t6-amber: #D97706;
   --t7-rose: #DB2777;
+  --t8-slate: #475569;
+  --t9-indigo: #4F46E5;
+  --t10-orange: #C2410C;
 
   /* Estados de Sucesso / Conclusão */
   --good: #059669;
@@ -56,6 +59,9 @@
     --t5-cyan: #22D3EE;
     --t6-amber: #FBBF24;
     --t7-rose: #F472B6;
+    --t8-slate: #94A3B8;
+    --t9-indigo: #818CF8;
+    --t10-orange: #FB923C;
 
     --good: #34D399;
     --good-tint: #064E3B;
@@ -85,6 +91,9 @@
   --t5-cyan: #22D3EE;
   --t6-amber: #FBBF24;
   --t7-rose: #F472B6;
+  --t8-slate: #94A3B8;
+  --t9-indigo: #818CF8;
+  --t10-orange: #FB923C;
 
   --good: #34D399;
   --good-tint: #064E3B;
@@ -109,6 +118,9 @@
   --t5-cyan: #0891B2;
   --t6-amber: #D97706;
   --t7-rose: #DB2777;
+  --t8-slate: #475569;
+  --t9-indigo: #4F46E5;
+  --t10-orange: #C2410C;
 
   --good: #059669;
   --good-tint: #D1FAE5;
@@ -689,6 +701,9 @@ h1 {
 .track-tile.t5 { background: var(--t5-cyan); }
 .track-tile.t6 { background: var(--t6-amber); }
 .track-tile.t7 { background: var(--t7-rose); }
+.track-tile.t8 { background: var(--t8-slate); }
+.track-tile.t9 { background: var(--t9-indigo); }
+.track-tile.t10 { background: var(--t10-orange); }
 
 .card-badges {
   display: flex;

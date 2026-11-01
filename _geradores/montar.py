@@ -250,7 +250,7 @@ def main(argv=None):
     parser.add_argument(
         "--trilha",
         default=None,
-        help="Número da trilha (1 a 7) para sobrescrever o valor do catálogo.",
+        help="Número da trilha, conforme o catálogo (estudos.txt), para sobrescrever o valor do catálogo.",
     )
     parser.add_argument(
         "--recompilar-diagramas",

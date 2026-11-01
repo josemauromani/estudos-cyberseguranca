@@ -1,4 +1,4 @@
-# Catálogo Canônico de Estudos em Cibersegurança (33 Módulos)
+# Catálogo Canônico de Estudos em Cibersegurança (45 Módulos)
 # Formato: slug|titulo_curto|pasta|arquivo_html|trilha_num|cor_tema|nist_fn
 #
 # Trilhas:
@@ -9,6 +9,9 @@
 # 5 = Especialidades (#0891B2)
 # 6 = Governança & Riscos (#D97706)
 # 7 = Carreira & Formação (#DB2777)
+# 8 = Ferramentas & Automação (#475569)
+# 9 = Identidade & AD (#4F46E5)
+# 10 = Resiliência & Ransomware (#C2410C)
 
 Fundamentos-Ciber|Tríade CIA, Ameaças e Modelagem STRIDE|Fundamentos-Ciber|treinamento-fundamentos-ciber.html|1|#2563EB|Identify
 Redes-e-Protocolos|TCP/IP, DNS, Roteamento e Inspeção de Tráfego|Redes-e-Protocolos|treinamento-redes-e-protocolos.html|1|#2563EB|Protect / Detect
@@ -43,3 +46,15 @@ Seguranca-de-Bancos-de-Dados|Bancos de Dados Relacionais: SQL, Privilégios e Au
 PCI-DSS|PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos|PCI-DSS|treinamento-pci-dss.html|6|#D97706|Govern / Protect
 Ingles-Tecnico-Ciber|Inglês Técnico para Segurança da Informação|Ingles-Tecnico-Ciber|treinamento-ingles-tecnico-ciber.html|7|#DB2777|Protect
 Certificacoes-e-Carreira|Formação, Certificações e Carreira|Certificacoes-e-Carreira|treinamento-certificacoes-e-carreira.html|7|#DB2777|Protect
+Linux-para-Seguranca|Linux para Segurança: Shell, Permissões e Logs|Linux-para-Seguranca|treinamento-linux-para-seguranca.html|8|#475569|Protect / Detect
+Python-para-Seguranca|Python para Segurança: Automação, Regex e Parsing|Python-para-Seguranca|treinamento-python-para-seguranca.html|8|#475569|Detect
+PowerShell-e-Windows-Interno|PowerShell, Event Log e Registro do Windows|PowerShell-e-Windows-Interno|treinamento-powershell-e-windows-interno.html|8|#475569|Detect
+Laboratorio-Domestico-e-Portfolio|Laboratório Doméstico, CTFs e Portfólio|Laboratorio-Domestico-e-Portfolio|treinamento-laboratorio-domestico-e-portfolio.html|8|#475569|Protect
+Active-Directory-Fundamentos|Active Directory: Domínios, GPO e Kerberos|Active-Directory-Fundamentos|treinamento-active-directory-fundamentos.html|9|#4F46E5|Protect
+Ataques-e-Defesa-no-AD|Ataques ao AD e Detecção: Kerberoasting, Pass-the-Hash e DCSync|Ataques-e-Defesa-no-AD|treinamento-ataques-e-defesa-no-ad.html|9|#4F46E5|Protect / Detect
+PAM-e-Acessos-Privilegiados|Gestão de Acessos Privilegiados (PAM)|PAM-e-Acessos-Privilegiados|treinamento-pam-e-acessos-privilegiados.html|9|#4F46E5|Protect
+Identidade-Hibrida-e-Nuvem|Entra ID, Identidade Híbrida e Acesso Condicional|Identidade-Hibrida-e-Nuvem|treinamento-identidade-hibrida-e-nuvem.html|9|#4F46E5|Protect
+Ransomware-Prevencao-a-Recuperacao|Ransomware: Prevenção, Contenção e Recuperação|Ransomware-Prevencao-a-Recuperacao|treinamento-ransomware-prevencao-a-recuperacao.html|10|#C2410C|Respond / Recover
+Gestao-de-Crise-e-Comunicacao|Gestão de Crise Cibernética e Comunicação de Incidentes|Gestao-de-Crise-e-Comunicacao|treinamento-gestao-de-crise-e-comunicacao.html|10|#C2410C|Respond
+Exercicios-Tabletop|Exercícios Tabletop: Planejar, Conduzir e Avaliar|Exercicios-Tabletop|treinamento-exercicios-tabletop.html|10|#C2410C|Respond / Recover
+Backup-Imutavel-e-Recuperacao|Backup Imutável e Recuperação de Identidade|Backup-Imutavel-e-Recuperacao|treinamento-backup-imutavel-e-recuperacao.html|10|#C2410C|Recover

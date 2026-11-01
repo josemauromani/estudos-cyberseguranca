@@ -404,6 +404,144 @@ flowchart LR
 
 ---
 
+### Trilha 8: Ferramentas & Automação do Analista (`#475569`)
+
+#### 34. Linux-para-Seguranca
+- **Título:** Linux para Segurança: Shell, Permissões e Logs
+- **Função NIST CSF 2.0:** *Protect (PR) / Detect (DE)*
+- **Tempo Estimado:** 50 minutos | **Carreiras:** Blue Team, SOC, Red Team, Analista de Segurança da Informação
+- **MITRE ATT&CK:** T1548.001 Setuid and Setgid / T1053.003 Cron / T1110 Brute Force
+- **Objetivos de Aprendizagem:** Navegar e filtrar com pipes (`grep`, `awk`, `sort`, `uniq`); ler e corrigir permissões (rwx, SUID/SGID, umask) e regras do `sudoers`; investigar `auth.log` e `journalctl`, processos (`ps`) e portas (`ss`); encontrar persistência em `cron` e em serviços `systemd`.
+- **Pré-requisitos:** Fundamentos-Ciber.
+- **Conceitos-Chave:** FHS; permissões octais; SUID/SGID e *sticky bit*; `/etc/passwd` vs `/etc/shadow`; `sudoers`; `auth.log`, `journalctl`; `ps`, `ss`, `lsof`; `crontab` e *timers* do systemd.
+- **Simulador Interativo em JS:** *Terminal de Investigação Linux* — Terminal simulado sobre um sistema de arquivos fictício, no mesmo padrão do terminal do módulo 11. Missões pontuadas: achar binários SUID fora do padrão, identificar força bruta no `auth.log`, corrigir um diretório com permissão 777 e localizar persistência em `cron`.
+
+#### 35. Python-para-Seguranca
+- **Título:** Python para Segurança: Automação, Regex e Parsing
+- **Função NIST CSF 2.0:** *Detect (DE)*
+- **Tempo Estimado:** 50 minutos | **Carreiras:** Blue Team, SOC, AppSec, Analista de Segurança da Informação
+- **MITRE ATT&CK:** T1059.006 Python (uso defensivo e reconhecimento do vetor)
+- **Objetivos de Aprendizagem:** Ler arquivos de log e extrair campos com o módulo `re`; agregar eventos com `collections.Counter` e aplicar limiares; consultar APIs de reputação (VirusTotal, AbuseIPDB) com `requests` e tratar JSON/CSV; aplicar boas práticas: segredos fora do código, tratamento de erros e limites de taxa.
+- **Pré-requisitos:** Linux-para-Seguranca.
+- **Conceitos-Chave:** expressões regulares (grupos, quantificadores, âncoras); `re.finditer` vs `re.search`; `Counter`; `requests` e códigos HTTP; JSON e CSV; variáveis de ambiente para chaves de API; *rate limiting*.
+- **Simulador Interativo em JS:** *Montador de Detector* — O aluno encaixa blocos prontos (ler log → aplicar regex → contar por IP → aplicar limiar → gerar alerta). O JavaScript mostra o código Python equivalente e executa a mesma lógica sobre um log de exemplo. Inclui um testador de regex ao vivo com destaque das correspondências.
+
+#### 36. PowerShell-e-Windows-Interno
+- **Título:** PowerShell, Event Log e Registro do Windows
+- **Função NIST CSF 2.0:** *Detect (DE)*
+- **Tempo Estimado:** 50 minutos | **Carreiras:** Blue Team, SOC, Forense, Analista de Segurança da Informação
+- **MITRE ATT&CK:** T1059.001 PowerShell / T1547.001 Registry Run Keys / T1136 Create Account
+- **Objetivos de Aprendizagem:** Usar cmdlets e o pipeline de objetos do PowerShell; consultar eventos com `Get-WinEvent` e reconhecer os Event IDs essenciais; interpretar eventos do Sysmon (1 e 3) e o log de *ScriptBlock*; encontrar persistência em chaves Run do Registro e em serviços.
+- **Pré-requisitos:** Hardening-Sistemas.
+- **Conceitos-Chave:** cmdlets Verbo-Substantivo; pipeline de objetos; `Get-WinEvent` com `FilterHashtable`; Event IDs 4624, 4625, 4688, 4720, 7045; tipos de logon; Sysmon 1 e 3; *ScriptBlock Logging* (4104); HKLM/HKCU `...\Run`.
+- **Simulador Interativo em JS:** *Visualizador de Eventos* — Linha do tempo fictícia de intrusão em um host Windows. O aluno filtra por Event ID e responde perguntas sobre acesso inicial, conta criada e persistência, com correção comentada.
+
+#### 37. Laboratorio-Domestico-e-Portfolio
+- **Título:** Laboratório Doméstico, CTFs e Portfólio
+- **Função NIST CSF 2.0:** *Protect (PR)* (categoria PR.AT, Awareness and Training)
+- **Tempo Estimado:** 35 minutos | **Carreiras:** Todas (Fundação Universal), Analista de Segurança da Informação
+- **MITRE ATT&CK:** N/A (módulo de carreira)
+- **Objetivos de Aprendizagem:** Planejar um laboratório virtual com redes isoladas (host-only, NAT); montar uma topologia mínima: firewall, controlador de domínio, SIEM e máquina atacante; escolher plataformas de CTF e de laboratório guiado conforme a carreira; documentar a prática em *write-ups* e em um portfólio no GitHub; respeitar limites éticos e legais (só testar o que é seu ou autorizado; Lei 12.737/2012).
+- **Pré-requisitos:** Nenhum.
+- **Conceitos-Chave:** hipervisores tipo 1 vs tipo 2; *snapshots*; redes host-only, NAT e interna; requisitos de RAM por VM; CTF *jeopardy* vs *attack-defense*; *write-up*; README de portfólio; autorização por escrito.
+- **Simulador Interativo em JS:** *Planejador de Homelab* — O aluno informa RAM e CPU da máquina e escolhe VMs de um catálogo (OPNsense, Windows Server com AD, Wazuh, Kali, Ubuntu). O planejador mostra se tudo cabe, desenha a topologia e gera um checklist de isolamento e um roteiro de portfólio.
+
+---
+
+### Trilha 9: Identidade Corporativa & Active Directory (`#4F46E5`)
+
+#### 38. Active-Directory-Fundamentos
+- **Título:** Active Directory: Domínios, GPO e Kerberos
+- **Função NIST CSF 2.0:** *Protect (PR)*
+- **Tempo Estimado:** 50 minutos | **Carreiras:** Blue Team, Red Team, SOC, Analista de Segurança da Informação
+- **MITRE ATT&CK:** TA0006 Credential Access / TA0008 Lateral Movement (contexto)
+- **Objetivos de Aprendizagem:** Descrever floresta, domínio, OU, controladores de domínio e relações de confiança; calcular a configuração efetiva de GPOs pela ordem LSDOU; explicar a troca Kerberos (AS, TGS, AP) e quando o NTLM entra em cena; aplicar o modelo de camadas (*tiering*) às contas administrativas.
+- **Pré-requisitos:** Autenticacao-e-IAM.
+- **Conceitos-Chave:** floresta, árvore, domínio, OU; DC e FSMO; LDAP; GPO e LSDOU (*Enforced*, *Block Inheritance*); Kerberos (KDC, TGT, TGS, SPN); NTLM; contas de serviço e gMSA; *tiering* 0/1/2.
+- **Simulador Interativo em JS:** *Kerberos Passo a Passo* — Percorre a troca AS → TGS → AP; cada mensagem é clicável e mostra seus campos e o que pode dar errado. Inclui uma calculadora de precedência de GPO: o aluno empilha políticas e vê a configuração efetiva.
+
+#### 39. Ataques-e-Defesa-no-AD
+- **Título:** Ataques ao AD e Detecção: Kerberoasting, Pass-the-Hash e DCSync
+- **Função NIST CSF 2.0:** *Protect (PR) / Detect (DE)*
+- **Tempo Estimado:** 55 minutos | **Carreiras:** Blue Team, Red Team, SOC
+- **MITRE ATT&CK:** T1558.003 Kerberoasting / T1550.002 Pass the Hash / T1003.006 DCSync
+- **Objetivos de Aprendizagem:** Ler caminhos de ataque como grafo (a ideia por trás do BloodHound); explicar Kerberoasting, Pass-the-Hash e DCSync no nível conceitual; associar cada técnica aos sinais de detecção nos logs; escolher mitigações: gMSA, AES obrigatório, LAPS, grupo Protected Users, *tiering*.
+- **Pré-requisitos:** Active-Directory-Fundamentos, PowerShell-e-Windows-Interno.
+- **Conceitos-Chave:** grafo de permissões (MemberOf, AdminTo, HasSession); evento 4769 com cifra RC4; logons anômalos (4624 tipo 3 e 9); evento 4662 para replicação de diretório; senhas de contas de serviço; LAPS; Protected Users.
+- **Escopo do conteúdo:** conceitual e defensivo. O módulo não traz comandos de ataque prontos para uso.
+- **Simulador Interativo em JS:** *Mapa de Caminhos de Ataque* — Domínio fictício em grafo. Fase 1: o aluno encontra o caminho de um usuário comum até Domain Admin e aplica mitigações até quebrar todos os caminhos. Fase 2: o aluno associa eventos de log à técnica correspondente.
+
+#### 40. PAM-e-Acessos-Privilegiados
+- **Título:** Gestão de Acessos Privilegiados (PAM)
+- **Função NIST CSF 2.0:** *Protect (PR)*
+- **Tempo Estimado:** 40 minutos | **Carreiras:** Blue Team, GRC, Analista de Segurança da Informação
+- **MITRE ATT&CK:** T1078.002 Domain Accounts / T1098 Account Manipulation
+- **Objetivos de Aprendizagem:** Inventariar contas privilegiadas (humanas, de serviço e de emergência); aplicar cofre de senhas, rotação automática e gravação de sessão; reduzir privilégio permanente com JIT e JEA; ligar os controles à ISO/IEC 27002 (controle 8.2) e ao PCI DSS (requisitos 7 e 8).
+- **Pré-requisitos:** Active-Directory-Fundamentos.
+- **Conceitos-Chave:** privilégio permanente vs *just-in-time*; cofre de credenciais; rotação; *session recording*; JEA; contas *break-glass*; contas órfãs; recertificação de acessos.
+- **Simulador Interativo em JS:** *Auditor de Contas Privilegiadas* — Inventário fictício com problemas (conta compartilhada, senha sem rotação, administrador permanente, conta órfã). O aluno sinaliza cada problema, aplica controles e vê o risco residual cair.
+
+#### 41. Identidade-Hibrida-e-Nuvem
+- **Título:** Entra ID, Identidade Híbrida e Acesso Condicional
+- **Função NIST CSF 2.0:** *Protect (PR)*
+- **Tempo Estimado:** 45 minutos | **Carreiras:** Blue Team, AppSec, Analista de Segurança da Informação
+- **MITRE ATT&CK:** T1110.003 Password Spraying / T1528 Steal Application Access Token / T1566 Phishing
+- **Objetivos de Aprendizagem:** Comparar os modos de sincronização híbrida (PHS, PTA, federação); escrever políticas de acesso condicional por usuário, local, dispositivo e risco; escolher MFA resistente a phishing (FIDO2, passkeys); reconhecer *password spraying*, *consent phishing* e roubo de token, e as defesas de cada um.
+- **Pré-requisitos:** Active-Directory-Fundamentos, Arquitetura-Zero-Trust.
+- **Conceitos-Chave:** Entra Connect; PHS, PTA, federação; acesso condicional (atribuições, condições, controles); dispositivo em conformidade; risco de entrada; FIDO2; PIM; consentimento de aplicativos OAuth.
+- **Diferença para o módulo 08:** o motor PDP/PEP do 08 trata Zero Trust de forma genérica; aqui as políticas são concretas, no estilo de produto.
+- **Simulador Interativo em JS:** *Avaliador de Acesso Condicional* — O aluno escreve políticas e dispara tentativas de login fictícias (local, dispositivo, risco). O avaliador mostra, para cada tentativa, se o acesso foi concedido, bloqueado ou condicionado a MFA, e qual política decidiu.
+
+---
+
+### Trilha 10: Resiliência, Crise & Ransomware (`#C2410C`)
+
+#### 42. Ransomware-Prevencao-a-Recuperacao
+- **Título:** Ransomware: Prevenção, Contenção e Recuperação
+- **Função NIST CSF 2.0:** *Respond (RS) / Recover (RC)*
+- **Tempo Estimado:** 50 minutos | **Carreiras:** Blue Team, SOC, Forense, Analista de Segurança da Informação
+- **MITRE ATT&CK:** T1486 Data Encrypted for Impact / T1490 Inhibit System Recovery / T1567 Exfiltration Over Web Service
+- **Objetivos de Aprendizagem:** Descrever a anatomia de um ataque: acesso inicial → movimentação → exfiltração → criptografia; explicar dupla extorsão e o modelo RaaS; tomar decisões de contenção (isolar ou desligar o host, reset de credenciais em massa) e entender o custo de cada uma; conhecer os descriptografadores públicos (No More Ransom) e a ordem de recuperação; discutir o dilema do pagamento só do ponto de vista jurídico e de risco.
+- **Pré-requisitos:** Resposta-a-Incidentes, Continuidade-e-Disaster-Recovery.
+- **Conceitos-Chave:** vetores de acesso inicial (phishing, RDP exposto, VPN sem MFA); RaaS e afiliados; dupla e tripla extorsão; exclusão de *shadow copies*; isolamento de rede vs desligamento (perda de evidência em RAM); reset de krbtgt; *No More Ransom*; prioridade de restauração.
+- **Simulador Interativo em JS:** *Linha do Tempo do Ransomware* — Um incidente fictício avança hora a hora. Em cada ponto de decisão o aluno escolhe uma ação e vê a consequência: evidência perdida, propagação contida, tempo de parada.
+
+#### 43. Gestao-de-Crise-e-Comunicacao
+- **Título:** Gestão de Crise Cibernética e Comunicação de Incidentes
+- **Função NIST CSF 2.0:** *Respond (RS)*
+- **Tempo Estimado:** 40 minutos | **Carreiras:** GRC, SOC, Analista de Segurança da Informação
+- **MITRE ATT&CK:** N/A (gestão e comunicação)
+- **Objetivos de Aprendizagem:** Montar um comitê de crise com papéis definidos (matriz RACI); manter sala de guerra e registro de decisões; planejar a comunicação interna, com clientes e com a imprensa; cumprir a comunicação obrigatória à ANPD e aos titulares.
+- **Pré-requisitos:** Resposta-a-Incidentes, LGPD-e-Privacidade.
+- **Conceitos-Chave:** incidente vs crise; RACI; porta-voz único; registro de decisões; comunicação à ANPD (Resolução CD/ANPD nº 15/2024: prazo de **3 dias úteis** contados do conhecimento de que o incidente afetou dados pessoais; complementação em até 20 dias úteis; prazos em dobro para agentes de pequeno porte); comunicação aos titulares.
+- **Pendências de verificação (resolver antes de construir o módulo):**
+  - O prazo de comunicação aos **titulares**: fontes secundárias divergem entre "3 dias úteis" e "sem demora injustificada". Conferir no texto oficial da Resolução CD/ANPD nº 15/2024 no DOU.
+  - Obrigações do **setor financeiro**: a Resolução CMN nº 4.893/2021 exige comunicar incidentes relevantes ao Banco Central e foi alterada pela Resolução CMN nº 5.274/2025. O prazo não foi confirmado. Por isso, o cenário do simulador é uma empresa **não financeira**, e o módulo só cita a existência dessas regras.
+- **Simulador Interativo em JS:** *Relógio da Crise* — Dado um cenário fictício (empresa não financeira), o aluno decide quem notificar, quando e com que conteúdo. O simulador confere prazos e elementos obrigatórios e comenta cada escolha.
+
+#### 44. Exercicios-Tabletop
+- **Título:** Exercícios Tabletop: Planejar, Conduzir e Avaliar
+- **Função NIST CSF 2.0:** *Respond (RS) / Recover (RC)*
+- **Tempo Estimado:** 35 minutos | **Carreiras:** GRC, SOC, Analista de Segurança da Informação
+- **MITRE ATT&CK:** N/A (preparação e exercício)
+- **Objetivos de Aprendizagem:** Diferenciar exercícios tabletop, funcionais e completos (NIST SP 800-84); escrever *injects* e conduzir a sessão como facilitador; produzir um relatório pós-ação (*after-action report*) com plano de melhorias.
+- **Pré-requisitos:** Resposta-a-Incidentes.
+- **Conceitos-Chave:** objetivos do exercício; cenário e *injects*; papéis (facilitador, participantes, observadores); *hot wash*; relatório pós-ação; plano de melhorias com responsável e prazo.
+- **Simulador Interativo em JS:** *Gerador de Tabletop* — O aluno escolhe um cenário (ransomware, vazamento de dados ou queda de fornecedor) e recebe os *injects* em sequência, com cronômetro. Registra as respostas e, ao fim, recebe um relatório pós-ação pronto para copiar, que serve também como peça de portfólio.
+
+#### 45. Backup-Imutavel-e-Recuperacao
+- **Título:** Backup Imutável e Recuperação de Identidade
+- **Função NIST CSF 2.0:** *Recover (RC)*
+- **Tempo Estimado:** 45 minutos | **Carreiras:** Blue Team, GRC, Analista de Segurança da Informação
+- **MITRE ATT&CK:** T1490 Inhibit System Recovery / T1485 Data Destruction (mitigação)
+- **Objetivos de Aprendizagem:** Aplicar a regra 3-2-1-1-0 (cópia imutável ou offline e zero erros nos testes de restauração); diferenciar imutabilidade (WORM, *object lock*) de *air gap*; separar as credenciais do backup do domínio de produção; planejar a recuperação do AD (ordem de restauração, DSRM).
+- **Pré-requisitos:** Continuidade-e-Disaster-Recovery, Active-Directory-Fundamentos.
+- **Conceitos-Chave:** 3-2-1 vs 3-2-1-1-0; WORM e *object lock*; *air gap* lógico vs físico; console de backup fora do domínio; MFA no console; testes de restauração; recuperação de floresta; DSRM.
+- **Diferença para o módulo 28:** o 28 ensina RTO/RPO e a regra 3-2-1 básica; este trata de como o backup sobrevive a um atacante com privilégio de administrador do domínio.
+- **Simulador Interativo em JS:** *Teste de Sobrevivência do Backup* — O aluno monta a arquitetura de backup de uma empresa fictícia e roda um ataque com credencial de administrador do domínio. O simulador mostra quais cópias sobrevivem e por quê.
+
+---
+
 ## 4. Matriz de Mapeamento com Frameworks Globais
 
 ### Distribuição por Função do NIST CSF 2.0

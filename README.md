@@ -1,6 +1,6 @@
 # Estudos de Cibersegurança
 
-> Plataforma autoinstrucional, prática e enciclopédica sobre segurança da informação, defesa cibernética e governança corporativa, estruturada em **33 módulos temáticos** organizados em **7 trilhas estruturantes**.
+> Plataforma autoinstrucional, prática e enciclopédica sobre segurança da informação, defesa cibernética e governança corporativa, estruturada em **45 módulos temáticos** organizados em **10 trilhas estruturantes**.
 
 ---
 
@@ -43,7 +43,7 @@ O portal `index.html` conta com:
 
 ---
 
-## 📚 Grade Curricular dos 33 Módulos
+## 📚 Grade Curricular dos 45 Módulos
 
 ### Estrutura das Trilhas e Percurso Formativo
 
@@ -124,6 +124,18 @@ flowchart TD
 | **31** | `PCI-DSS` | PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos | Trilha 6: Governança & Riscos | Govern / Protect | Delimitador de Escopo CDE |
 | **32** | `Ingles-Tecnico-Ciber` | Inglês Técnico para Segurança da Informação | Trilha 7: Carreira & Formação | Protect | Leitor de Advisory |
 | **33** | `Certificacoes-e-Carreira` | Formação, Certificações e Carreira | Trilha 7: Carreira & Formação | Protect | Planejador de Certificações |
+| **34** | `Linux-para-Seguranca` | Linux para Segurança: Shell, Permissões e Logs | Trilha 8: Ferramentas & Automação | Protect / Detect | Terminal de Investigação Linux |
+| **35** | `Python-para-Seguranca` | Python para Segurança: Automação, Regex e Parsing | Trilha 8: Ferramentas & Automação | Detect | Montador de Detector |
+| **36** | `PowerShell-e-Windows-Interno` | PowerShell, Event Log e Registro do Windows | Trilha 8: Ferramentas & Automação | Detect | Visualizador de Eventos |
+| **37** | `Laboratorio-Domestico-e-Portfolio` | Laboratório Doméstico, CTFs e Portfólio | Trilha 8: Ferramentas & Automação | Protect | Planejador de Homelab |
+| **38** | `Active-Directory-Fundamentos` | Active Directory: Domínios, GPO e Kerberos | Trilha 9: Identidade & AD | Protect | Kerberos Passo a Passo |
+| **39** | `Ataques-e-Defesa-no-AD` | Ataques ao AD e Detecção: Kerberoasting, Pass-the-Hash e DCSync | Trilha 9: Identidade & AD | Protect / Detect | Mapa de Caminhos de Ataque |
+| **40** | `PAM-e-Acessos-Privilegiados` | Gestão de Acessos Privilegiados (PAM) | Trilha 9: Identidade & AD | Protect | Auditor de Contas Privilegiadas |
+| **41** | `Identidade-Hibrida-e-Nuvem` | Entra ID, Identidade Híbrida e Acesso Condicional | Trilha 9: Identidade & AD | Protect | Avaliador de Acesso Condicional |
+| **42** | `Ransomware-Prevencao-a-Recuperacao` | Ransomware: Prevenção, Contenção e Recuperação | Trilha 10: Resiliência & Ransomware | Respond / Recover | Linha do Tempo do Ransomware |
+| **43** | `Gestao-de-Crise-e-Comunicacao` | Gestão de Crise Cibernética e Comunicação de Incidentes | Trilha 10: Resiliência & Ransomware | Respond | Relógio da Crise |
+| **44** | `Exercicios-Tabletop` | Exercícios Tabletop: Planejar, Conduzir e Avaliar | Trilha 10: Resiliência & Ransomware | Respond / Recover | Gerador de Tabletop |
+| **45** | `Backup-Imutavel-e-Recuperacao` | Backup Imutável e Recuperação de Identidade | Trilha 10: Resiliência & Ransomware | Recover | Teste de Sobrevivência do Backup |
 
 ---
 
@@ -169,7 +181,7 @@ flowchart LR
 
     subgraph Saida["Entrega Offline Standalone"]
         direction TB
-        H["treinamento-*.html<br>(33 Módulos 100% Offline)"]
+        H["treinamento-*.html<br>(45 Módulos 100% Offline)"]
         I["index.html<br>(Portal Central Dinâmico)"]
     end
 
@@ -182,7 +194,7 @@ flowchart LR
 
 ### Estrutura do Pipeline
 
-- `_geradores/estudos.txt`: Catálogo canônico dos 33 estudos com metadados estruturais (slug, título, pasta, arquivo HTML, número da trilha, cor do tema e função NIST CSF 2.0).
+- `_geradores/estudos.txt`: Catálogo canônico dos 45 estudos com metadados estruturais (slug, título, pasta, arquivo HTML, número da trilha, cor do tema e função NIST CSF 2.0).
 - `_geradores/CURRICULO.md`: Matriz pedagógica detalhada com competências, pré-requisitos e especificações de cada simulador interativo.
 - `_geradores/GUIA-DO-AUTOR.md`: Manual editorial e técnico para criação de novos módulos ou expansão de conteúdo.
 - `_geradores/base.css` e `_geradores/base.js`: Design System responsivo com suporte a temas claro e escuro, além de controladores de quizzes, checklists e utilitários de simulação.
