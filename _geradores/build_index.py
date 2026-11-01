@@ -91,7 +91,7 @@ def render_necessidades_grid(necessidades: List[dict]) -> str:
         estudo_info = ESTUDOS_DADOS.get(slug, {})
         titulo_estudo = escape(estudo_info.get("titulo", slug))
 
-        card = f"""      <a href="#estudo-{slug}" class="need-card" onclick="focarEstudo('{slug}')">
+        card = f"""      <a href="#estudo-{slug}" class="need-card" data-slug="{slug}" onclick="focarEstudo('{slug}')">
         <span class="need-category">{icone} {cat}</span>
         <span class="need-title">{desafio}</span>
         <span class="need-target">→ Ver módulo: {titulo_estudo}</span>
@@ -221,10 +221,11 @@ def render_chip_modulo(slug: str, status_map: Dict[str, dict], apoio: bool = Fal
     if not info["disponivel"]:
         texto = f"⏳ {texto}"
     extra = " apoio" if apoio else ""
+    data_slug = f'data-slug="{escape(slug, quote=True)}"'
     if info["disponivel"]:
         href = escape(info["caminho_relativo"], quote=True)
-        return f'<a href="{href}" class="vaga-chip{extra}">{texto}</a>'
-    return f'<span class="vaga-chip pendente{extra}" aria-disabled="true" title="Em construção">{texto}</span>'
+        return f'<a href="{href}" class="vaga-chip{extra}" {data_slug}>{texto}</a>'
+    return f'<span class="vaga-chip pendente{extra}" {data_slug} aria-disabled="true" title="Em construção">{texto}</span>'
 
 
 def render_rota_vaga(rota: List[dict], status_map: Dict[str, dict]) -> str:
@@ -504,6 +505,7 @@ def gerar_index_html(
 
     const cards = document.querySelectorAll('.study-card');
     let visibleCount = 0;
+    const slugsVisiveis = new Set();
 
     cards.forEach(card => {
       const cardSearchRaw = card.getAttribute('data-search') || '';
@@ -526,10 +528,14 @@ def gerar_index_html(
       if (matchSearch && matchFacet) {
         card.style.display = 'flex';
         visibleCount++;
+        slugsVisiveis.add(card.getAttribute('data-slug'));
       } else {
         card.style.display = 'none';
       }
     });
+
+    const filtroAtivo = query.length > 0 || (currentFacet !== 'todas' && currentFilterValue !== 'all');
+    filtrarSecoesRelacionadas(slugsVisiveis, filtroAtivo);
 
     const info = document.getElementById('visible-count');
     if (info) {
@@ -540,6 +546,34 @@ def gerar_index_html(
     if (noResults) {
       noResults.style.display = visibleCount === 0 ? 'block' : 'none';
     }
+  }
+
+  // Necessidades, Rota da Vaga e Certificações seguem o mesmo filtro dos cards:
+  // com filtro ativo, só ficam os itens cujo data-slug está entre os módulos visíveis.
+  // Grupos (competência, linha de certificação) e seções que ficam vazios somem.
+  function filtrarSecoesRelacionadas(slugsVisiveis, filtroAtivo) {
+    const mostra = el => !filtroAtivo || slugsVisiveis.has(el.getAttribute('data-slug'));
+
+    const secaoComItens = (secaoId, grupoSel) => {
+      const secao = document.getElementById(secaoId);
+      if (!secao) return;
+      let secaoTemItem = false;
+      secao.querySelectorAll(grupoSel).forEach(grupo => {
+        let grupoTemItem = false;
+        grupo.querySelectorAll('[data-slug]').forEach(item => {
+          const ok = mostra(item);
+          item.style.display = ok ? '' : 'none';
+          grupoTemItem = grupoTemItem || ok;
+        });
+        if (grupo !== secao) grupo.style.display = grupoTemItem ? '' : 'none';
+        secaoTemItem = secaoTemItem || grupoTemItem;
+      });
+      secao.style.display = secaoTemItem ? '' : 'none';
+    };
+
+    secaoComItens('secao-necessidades', '.needs-grid');
+    secaoComItens('secao-rota-vaga', '.vaga-competencia');
+    secaoComItens('secao-certificacoes', '.cert-row');
   }
 
   function clearSearch() {
