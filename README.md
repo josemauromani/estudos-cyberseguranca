@@ -65,7 +65,13 @@ flowchart TD
         T7["Trilha 7: Carreira & Formação<br><small>Módulos 32 e 33 | Inglês Técnico e Planejamento Profissional</small>"]
     end
 
-    subgraph Conexoes["4. Rota Profissional e Certificações"]
+    subgraph Empregabilidade["4. Empregabilidade"]
+        T8["Trilha 8: Ferramentas & Automação<br><small>Módulos 34 a 37 | Linux, Python, PowerShell e Homelab</small>"]
+        T9["Trilha 9: Identidade & AD<br><small>Módulos 38 a 41 | Active Directory, Ataques ao AD, PAM e Entra ID</small>"]
+        T10["Trilha 10: Resiliência & Ransomware<br><small>Módulos 42 a 45 | Ransomware, Crise, Tabletop e Backup Imutável</small>"]
+    end
+
+    subgraph Conexoes["5. Rota Profissional e Certificações"]
         ROTA["🎯 Rota Analista de Segurança da Informação<br><small>Firewall, EDR, DLP, SQL, Normas, Incidentes e Controles</small>"]
         CERTS["🏆 Certificações Internacionais & Concursos<br><small>CompTIA Security+, CySA+, CEH, CISSP, CISM e Provas de TI</small>"]
     end
@@ -78,7 +84,14 @@ flowchart TD
     T3 --> T4
     T2 --> T5
 
+    T1 --> T8
+    T1 --> T9
+    T4 --> T10
+
     T2 --> ROTA
+    T8 --> ROTA
+    T9 --> ROTA
+    T10 --> ROTA
     T4 --> ROTA
     T6 --> ROTA
     T7 --> ROTA
@@ -145,13 +158,13 @@ O portal (`index.html`) traz a seção **Rota por Vaga**, que liga cada requisit
 
 | Competência da vaga | Módulos principais | Módulos de apoio |
 |---|---|---|
-| Soluções de Cyber Security (Firewalls, Antivírus, DLP, AntiSpam, WAF, Filtro de conteúdo) | 05, 07, 10, 29 | 15 |
+| Soluções de Cyber Security (Firewalls, Antivírus, DLP, AntiSpam, WAF, Filtro de conteúdo) | 05, 07, 10, 29 | 15, 34, 36 |
 | Banco de dados relacionais | 30 | 12 |
 | Inglês | 32 | — |
 | PCI-DSS, ISO 27001/27002, ISO 31000 e NIST | 25, 26, 31 | 18 |
-| Resposta a incidentes | 18 | 16, 19 |
-| Controles de segurança da informação | 26 | 06, 08 |
-| Formação e certificações | 33 | — |
+| Resposta a incidentes | 18 | 16, 19, 42, 43 |
+| Controles de segurança da informação | 26 | 06, 08, 38, 40 |
+| Formação e certificações | 33 | 37 |
 
 O portal também exibe a **Matriz de Certificações** (CEH, CISM, CISSP, CCSP, GSEC e Security+), com os módulos que cobrem cada uma.
 
@@ -237,11 +250,11 @@ python3 -m unittest discover -s _geradores/testes -v
 
 O currículo é estruturado de forma a atender diferentes objetivos e momentos de carreira:
 
-- **Blue Team & Defesa Ativa:** Módulos de redes, bastionamento Linux/Windows, firewalls, Zero Trust, EDR e detecção de ameaças.
-- **Red Team & Testes de Invasão:** Técnicas de reconhecimento OSINT, OWASP Top 10 Web, segurança de APIs e metodologias de pentest.
+- **Blue Team & Defesa Ativa:** Módulos de redes, bastionamento Linux/Windows, firewalls, Zero Trust, EDR e detecção de ameaças; Linux e PowerShell para investigação (Trilha 8), Active Directory e detecção de ataques ao AD (Trilha 9) e ransomware (Trilha 10).
+- **Red Team & Testes de Invasão:** Técnicas de reconhecimento OSINT, OWASP Top 10 Web, segurança de APIs e metodologias de pentest; Linux e caminhos de ataque no Active Directory (Trilhas 8 e 9).
 - **Operações, SOC & Forense:** Análise de logs SIEM, regras Sigma, inteligência de ameaças (CTI), resposta a incidentes e análise básica de malware.
 - **Engenharia de Nuvem & DevSecOps:** Segurança em provedores cloud (AWS/Azure/GCP), pipelines CI/CD seguros, conteinerização e IoT/TO.
-- **Governança, Riscos e Conformidade (GRC):** Metodologias de avaliação de risco (ALE/SLE), ISO/IEC 27001/27002:2022, LGPD e planos de continuidade/DRP.
+- **Governança, Riscos e Conformidade (GRC):** Metodologias de avaliação de risco (ALE/SLE), ISO/IEC 27001/27002:2022, LGPD e planos de continuidade/DRP; acessos privilegiados (PAM), gestão de crise e exercícios tabletop (Trilhas 9 e 10).
 - **Analista de Segurança da Informação:** Perfil generalista de vaga corporativa: soluções de segurança (firewall, EDR, DLP), bancos de dados, normas (PCI-DSS, ISO 27001/27002/31000, NIST), controles, resposta a incidentes, inglês técnico e certificações.
 
 ---

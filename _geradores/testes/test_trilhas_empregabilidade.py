@@ -137,5 +137,21 @@ class TestLigacoesNovas(unittest.TestCase):
         self.assertIn('data-slug="PAM-e-Acessos-Privilegiados"', artigo)
 
 
+class TestDocumentacao(unittest.TestCase):
+    def test_rotas_por_perfil_no_curriculo(self):
+        txt = (GERADORES_DIR / "CURRICULO.md").read_text(encoding="utf-8")
+        rotas = [
+            "01 -> 02 -> 34 -> 36 -> 05 -> 06 -> 07 -> 10 -> 39 -> 16 -> 17 -> 18 -> 42",
+            "01 -> 02 -> 34 -> 04 -> 11 -> 12 -> 13 -> 38 -> 39 -> 14 -> 15",
+            "01 -> 03 -> 04 -> 35 -> 06 -> 12 -> 13 -> 21 -> 41 -> 22 -> 24",
+            "01 -> 08 -> 40 -> 09 -> 25 -> 26 -> 27 -> 28 -> 43 -> 44",
+            "01 -> 02 -> 06 -> 36 -> 10 -> 16 -> 18 -> 42 -> 45 -> 19 -> 20",
+            "01 -> 34 -> 36 -> 05 -> 06 -> 07 -> 10 -> 29 -> 30 -> 38 -> 40 -> 25 -> 26 -> 31 -> 18 -> 42 -> 43 -> 32 -> 37 -> 33",
+        ]
+        for rota in rotas:
+            with self.subTest(rota=rota):
+                self.assertIn(f"`{rota}`", txt)
+
+
 if __name__ == "__main__":
     unittest.main()

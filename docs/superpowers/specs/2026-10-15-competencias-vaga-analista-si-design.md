@@ -6,6 +6,8 @@
 **Spec de origem:** [`2026-10-06-estudos-cyberseguranca-design.md`](2026-10-06-estudos-cyberseguranca-design.md)
 **Referência Metodológica:** Superpowers Spec-Driven Development (SDD)
 
+> **Atualização 2026-11-01:** grade ampliada para 45 módulos / 10 trilhas — ver [2026-11-01-trilhas-empregabilidade-design.md](2026-11-01-trilhas-empregabilidade-design.md).
+
 ---
 
 ## 1. Propósito e Entendimento
