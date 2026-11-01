@@ -1,0 +1,2707 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="study-slug" content="Gestao-de-Riscos-TI">
+  <title>ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE) — Estudos de Cibersegurança</title>
+
+  <!-- Google Fonts: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+/* ==========================================================================
+   ESTUDOS DE CIBERSEGURANÇA — DESIGN SYSTEM BASE (base.css)
+   Compatível com temas Claro / Escuro, responsivo e 100% offline-ready.
+   Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0. Importação de Fontes Web (Google Fonts com Fallbacks Locais Nativos)
+   -------------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+/* --------------------------------------------------------------------------
+   1. Design Tokens & Variáveis CSS (Tema Claro - Padrão)
+   -------------------------------------------------------------------------- */
+:root {
+  /* Paleta Base */
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+
+  /* Cores Temáticas das 10 Trilhas */
+  --t1-blue: #2563EB;     /* Trilha 1: Fundamentos & Princípios */
+  --t2-green: #059669;    /* Trilha 2: Defesa & Operações Blue Team */
+  --t3-red: #DC2626;      /* Trilha 3: Segurança Ofensiva & Red Team */
+  --t4-purple: #7C3AED;   /* Trilha 4: Engenharia, Cloud & AppSec */
+  --t5-cyan: #0891B2;     /* Trilha 5: Criptografia & Identidade */
+  --t6-amber: #D97706;    /* Trilha 6: Governança, Risco & Regulação */
+  --t7-rose: #DB2777;
+  --t8-slate: #475569;
+  --t9-indigo: #4F46E5;
+  --t10-orange: #C2410C;
+
+  /* Cores de Alerta / Callouts */
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+
+  --warning-color: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #F59E0B;
+
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+
+  --law-color: #7C3AED;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+
+  /* Tipografia */
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+
+  /* Espaçamento e Bordas */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+  --radius: var(--radius-md);
+  --accent: var(--t1-blue);
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 28, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 28, 0.08), 0 2px 4px -2px rgba(15, 23, 28, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 28, 0.1), 0 4px 6px -4px rgba(15, 23, 28, 0.05);
+
+  /* Transição */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.25s ease-in-out;
+}
+
+/* --------------------------------------------------------------------------
+   2. Suporte a Tema Escuro (Modo Noturno / Dark Mode)
+   -------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0F171C;
+    --surface: #172229;
+    --sunk: #1E2B33;
+    --ink: #E4EAED;
+    --muted: #9BABB6;
+    --rule: #2B3A44;
+
+    /* Trilhas no Dark Mode (ajuste de saturação e contraste) */
+    --t1-blue: #60A5FA;
+    --t2-green: #34D399;
+    --t3-red: #F87171;
+    --t4-purple: #A78BFA;
+    --t5-cyan: #22D3EE;
+    --t6-amber: #FBBF24;
+    --t7-rose: #F472B6;
+    --t8-slate: #94A3B8;
+    --t9-indigo: #818CF8;
+    --t10-orange: #FB923C;
+
+    /* Alertas no Dark Mode */
+    --tip-color: #34D399;
+    --tip-bg: rgba(5, 150, 105, 0.18);
+    --tip-border: #059669;
+
+    --warning-color: #FBBF24;
+    --warning-bg: rgba(217, 119, 6, 0.18);
+    --warning-border: #D97706;
+
+    --danger-color: #F87171;
+    --danger-bg: rgba(220, 38, 38, 0.20);
+    --danger-border: #DC2626;
+
+    --law-color: #A78BFA;
+    --law-bg: rgba(124, 58, 237, 0.18);
+    --law-border: #7C3AED;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #0F171C;
+  --surface: #172229;
+  --sunk: #1E2B33;
+  --ink: #E4EAED;
+  --muted: #9BABB6;
+  --rule: #2B3A44;
+
+  --t1-blue: #60A5FA;
+  --t2-green: #34D399;
+  --t3-red: #F87171;
+  --t4-purple: #A78BFA;
+  --t5-cyan: #22D3EE;
+  --t6-amber: #FBBF24;
+  --t7-rose: #F472B6;
+  --t8-slate: #94A3B8;
+  --t9-indigo: #818CF8;
+  --t10-orange: #FB923C;
+
+  --tip-color: #34D399;
+  --tip-bg: rgba(5, 150, 105, 0.18);
+  --tip-border: #059669;
+
+  --warning-color: #FBBF24;
+  --warning-bg: rgba(217, 119, 6, 0.18);
+  --warning-border: #D97706;
+
+  --danger-color: #F87171;
+  --danger-bg: rgba(220, 38, 38, 0.20);
+  --danger-border: #DC2626;
+
+  --law-color: #A78BFA;
+  --law-bg: rgba(124, 58, 237, 0.18);
+  --law-border: #7C3AED;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="light"] {
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+
+  --t1-blue: #2563EB;
+  --t2-green: #059669;
+  --t3-red: #DC2626;
+  --t4-purple: #7C3AED;
+  --t5-cyan: #0891B2;
+  --t6-amber: #D97706;
+  --t7-rose: #DB2777;
+  --t8-slate: #475569;
+  --t9-indigo: #4F46E5;
+  --t10-orange: #C2410C;
+
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+
+  --warning-color: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #F59E0B;
+
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+
+  --law-color: #7C3AED;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+}
+
+/* --------------------------------------------------------------------------
+   3. Reset e Estilos Globais
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+img, select, input, textarea {
+  max-width: 100%;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  color-scheme: light dark;
+}
+
+body {
+  background-color: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  margin: 0;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* Tipografia Estrutural */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.75rem; margin-top: 2rem; border-bottom: 2px solid var(--rule); padding-bottom: 0.5rem; }
+h3 { font-size: 1.35rem; margin-top: 1.5rem; }
+h4 { font-size: 1.15rem; }
+
+p {
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--t1-blue);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity var(--transition-fast);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code, kbd, samp {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background-color: var(--sunk);
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--rule);
+}
+
+:not(pre) > code {
+  overflow-wrap: anywhere;
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  background-color: #0D1418;
+  color: #E2E8F0;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  border: none;
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   4. Layout do Documento & Barra de Navegação Superior
+   -------------------------------------------------------------------------- */
+.top-nav {
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.top-nav-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.nav-back:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.theme-toggle-btn {
+  background: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+  background: var(--surface);
+  border-color: var(--muted);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 4rem 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   5. Cabeçalho de Destaque (.hero-header) e Metadados
+   -------------------------------------------------------------------------- */
+.hero-header {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-color: var(--track-color, var(--t1-blue));
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  background-color: var(--sunk);
+  color: var(--ink);
+}
+
+.badge-t1 { background-color: rgba(37, 99, 235, 0.15); color: var(--t1-blue); }
+.badge-t2 { background-color: rgba(5, 150, 105, 0.15); color: var(--t2-green); }
+.badge-t3 { background-color: rgba(220, 38, 38, 0.15); color: var(--t3-red); }
+.badge-t4 { background-color: rgba(124, 58, 237, 0.15); color: var(--t4-purple); }
+.badge-t5 { background-color: rgba(8, 145, 178, 0.15); color: var(--t5-cyan); }
+.badge-t6 { background-color: rgba(217, 119, 6, 0.15); color: var(--t6-amber); }
+.badge-t7 { background-color: rgba(219, 39, 119, 0.15); color: var(--t7-rose); }
+.badge-t8 { background-color: rgba(71, 85, 105, 0.15); color: var(--t8-slate); }
+.badge-t9 { background-color: rgba(79, 70, 229, 0.15); color: var(--t9-indigo); }
+.badge-t10 { background-color: rgba(194, 65, 12, 0.15); color: var(--t10-orange); }
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+}
+
+.meta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.meta-item strong {
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   6. Caixas de Destaque (.callout)
+   -------------------------------------------------------------------------- */
+.callout {
+  padding: 1.1rem 1.35rem;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  border-left: 5px solid var(--muted);
+  background-color: var(--sunk);
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+}
+
+.callout strong {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+}
+
+.callout-tip, .callout.tip {
+  border-left-color: var(--tip-color);
+  background-color: var(--tip-bg);
+}
+
+.callout-warning, .callout.warning {
+  border-left-color: var(--warning-color);
+  background-color: var(--warning-bg);
+}
+
+.callout-danger, .callout.danger {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg);
+}
+
+.callout-law, .callout.law {
+  border-left-color: var(--law-color);
+  background-color: var(--law-bg);
+}
+
+/* --------------------------------------------------------------------------
+   7. Bloco Terminal / Comandos (.terminal-box)
+   -------------------------------------------------------------------------- */
+.terminal-box {
+  background-color: #0A0F13;
+  color: #E2E8F0;
+  border: 1px solid #1E293B;
+  border-radius: var(--radius-md);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.terminal-header {
+  background-color: #151E27;
+  padding: 0.5rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1E2B37;
+}
+
+.terminal-title {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #94A3B8;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.terminal-title::before {
+  content: "● ● ●";
+  letter-spacing: 0.15rem;
+  color: #475569;
+  font-size: 0.65rem;
+}
+
+.btn-copy {
+  background-color: #243242;
+  color: #CBD5E1;
+  border: 1px solid #334155;
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-copy:hover {
+  background-color: #334155;
+  color: #FFFFFF;
+}
+
+.terminal-box pre {
+  margin: 0;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 1rem;
+  color: #E2E8F0;
+}
+
+/* --------------------------------------------------------------------------
+   8. Simulador / Painel de Laboratório (.lab-box)
+   -------------------------------------------------------------------------- */
+.lab-box {
+  background-color: var(--surface);
+  border: 2px solid var(--rule);
+  border-radius: var(--radius-lg);
+  margin: 2rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.lab-header {
+  background-color: var(--sunk);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.lab-header h3 {
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+  font-size: 1.3rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lab-header p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+.lab-body {
+  padding: 1.5rem;
+}
+
+.lab-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  background-color: var(--ground);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+}
+
+.lab-controls > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.lab-controls label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.lab-controls input[type="text"],
+.lab-controls input[type="number"],
+.lab-controls select,
+.lab-controls textarea {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.lab-controls input:focus,
+.lab-controls select:focus,
+.lab-controls textarea:focus {
+  outline: none;
+  border-color: var(--t1-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.lab-output {
+  background-color: #0B1116;
+  color: #38BDF8;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid #1E293B;
+  min-height: 100px;
+  max-height: 400px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.55;
+}
+
+/* Controles e Grid do Laboratório Interativo */
+.lab-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background-color: var(--ground);
+  border-bottom: 1px solid var(--rule);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.form-control {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--t1-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.form-range {
+  width: 100%;
+  accent-color: var(--t1-blue);
+  cursor: pointer;
+}
+
+.flags-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.flag-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.flag-toggle:hover {
+  border-color: var(--t1-blue);
+}
+
+.flag-toggle input[type="checkbox"] {
+  accent-color: var(--t1-blue);
+  cursor: pointer;
+}
+
+.lab-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--rule);
+}
+
+.packet-display-wrap {
+  padding: 1.5rem;
+  background-color: var(--surface);
+}
+
+.packet-display-wrap h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.packet-header-grid {
+  display: grid;
+  grid-template-columns: repeat(32, 1fr);
+  gap: 4px;
+  background-color: var(--ground);
+  padding: 0.75rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.header-field-cell {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-width: 75px;
+}
+
+.header-field-cell.span-8 {
+  grid-column: span 8;
+}
+
+.header-field-cell.span-16 {
+  grid-column: span 16;
+}
+
+.header-field-cell.span-32 {
+  grid-column: span 32;
+}
+
+.header-field-cell .field-title {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.2rem;
+}
+
+.header-field-cell .field-val {
+  font-size: 0.88rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.header-field-cell .field-val.highlight {
+  color: var(--t1-blue);
+}
+
+.header-field-cell .field-val.flag-badge {
+  background-color: var(--sunk);
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+  .packet-header-grid {
+    grid-template-columns: repeat(16, 1fr);
+  }
+  .header-field-cell.span-8 {
+    grid-column: span 16;
+  }
+}
+
+.edr-grid-container {
+  grid-template-columns: 1fr 1fr;
+}
+
+
+/* --------------------------------------------------------------------------
+   9. Botões e Controles Padrão
+   -------------------------------------------------------------------------- */
+.btn-primary {
+  background-color: var(--t1-blue);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface);
+  border-color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   10. Lista de Verificação Interativa (.checklist)
+   -------------------------------------------------------------------------- */
+.checklist {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin: 1.75rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.checklist h4 {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.checklist-progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: var(--sunk);
+  border-radius: var(--radius-pill);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.checklist-progress-fill {
+  height: 100%;
+  background-color: var(--t2-green);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  margin: 0.25rem 0;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast);
+}
+
+.check-item:hover {
+  background-color: var(--sunk);
+}
+
+.check-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--muted);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.check-item input[type="checkbox"]:checked {
+  background-color: var(--t2-green);
+  border-color: var(--t2-green);
+}
+
+.check-item input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.check-item span {
+  font-size: 0.95rem;
+  color: var(--ink);
+  line-height: 1.45;
+  transition: color var(--transition-fast);
+}
+
+.check-item.completed span {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   11. Quiz de Fixação (.quiz, .quiz-item, .quiz-section)
+   -------------------------------------------------------------------------- */
+.quiz-section {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  margin: 2rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.quiz-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.quiz-item {
+  background-color: var(--sunk);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.quiz-question {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 0.85rem;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.quiz-btn {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1.4;
+}
+
+.quiz-btn:hover:not(:disabled) {
+  border-color: var(--t1-blue);
+  background-color: var(--ground);
+}
+
+.quiz-btn.correct {
+  background-color: var(--tip-bg) !important;
+  border-color: var(--t2-green) !important;
+  color: var(--t2-green) !important;
+  font-weight: 600;
+}
+
+.quiz-btn.incorrect {
+  background-color: var(--danger-bg) !important;
+  border-color: var(--danger-color) !important;
+  color: var(--danger-color) !important;
+}
+
+.quiz-feedback {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-top: 0.75rem;
+  border-left: 4px solid var(--rule);
+  background-color: var(--surface);
+}
+
+.quiz-feedback.correct {
+  border-left-color: var(--t2-green);
+  background-color: var(--tip-bg);
+  color: var(--ink);
+}
+
+.quiz-feedback.incorrect {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg);
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   12. Grade de Fatos / Cards Comparativos (.facts-grid, .facts-card)
+   -------------------------------------------------------------------------- */
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.facts-card {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.facts-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.facts-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+}
+
+.facts-card p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   13. Tabelas Técnicas Comparativas
+   -------------------------------------------------------------------------- */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  background-color: var(--surface);
+  text-align: left;
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+th {
+  background-color: var(--sunk);
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: var(--ground);
+}
+
+/* --------------------------------------------------------------------------
+   14. Diagramas de Arquitetura e Fluxo (Mermaid pré-compilado em SVG)
+   -------------------------------------------------------------------------- */
+.diagram-box {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.diagram-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 1rem;
+  background: var(--ground);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.diagram-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.diagram-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.725rem;
+  font-family: var(--font-mono);
+}
+
+.diagram-svg-wrap {
+  padding: 1.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  text-align: center;
+  background: var(--surface);
+}
+
+.diagram-svg-wrap svg {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+  margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   15. Rodapé e Referências
+   -------------------------------------------------------------------------- */
+.study-footer {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   16. Responsividade & Impressão (@media)
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  h1 { font-size: 1.85rem; }
+  h2 { font-size: 1.45rem; }
+  .hero-header { padding: 1.25rem; }
+  .lab-body { padding: 1rem; }
+  .lab-controls { flex-direction: column; align-items: stretch; }
+  .top-nav-inner { padding: 0.5rem 1rem; }
+  .nav-title { display: none; }
+  .nav-actions .badge { display: none; }
+  .btn { overflow-wrap: anywhere; }
+  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media print {
+  body {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  .top-nav, .theme-toggle-btn, .btn-copy, .lab-controls button {
+    display: none !important;
+  }
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+  .hero-header, .lab-box, .checklist, .quiz-section {
+    border: 1px solid #CCC !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+}
+
+  </style>
+</head>
+<body data-slug="Gestao-de-Riscos-TI">
+
+  <!-- Barra de Navegação Superior e Breadcrumbs -->
+  <header class="top-nav">
+    <div class="top-nav-inner">
+      <a href="../index.html" class="nav-back">← Painel de Estudos</a>
+      <span class="nav-title">ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)</span>
+      <div class="nav-actions">
+        <span class="badge badge-t6">Trilha 6</span>
+        <button class="theme-toggle-btn" aria-label="Alternar tema" onclick="toggleTheme()">
+          <span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal do Treinamento -->
+  <main class="container">
+<!-- Estudo 25: Gestao-de-Riscos-TI Body Fragment -->
+<article class="study-container" data-slug="gestao-riscos-ti">
+
+    <!-- SEÇÃO 1: INTRODUÇÃO -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: Risco Precisa Caber numa Decisão</h2>
+        </div>
+
+        <p class="lead-text">
+            A diretoria não aprova "mais segurança". Ela aprova uma troca: gastar R$ 420 mil por ano para que um ransomware deixe de custar, em média, R$ 3 milhões por ano. Gestão de riscos é o processo que transforma ameaças técnicas nessa troca, com premissas que alguém pode questionar e revisar. Neste estudo você vai conduzir o processo da ISO 31000:2018, posicionar riscos numa matriz 5×5, calcular a perda esperada em reais e escolher o tratamento com melhor retorno, tudo para a <strong>Ipê Store</strong>, uma loja online fictícia que processa pagamentos com cartão.
+        </p>
+
+        <h3>O Vocabulário Mínimo</h3>
+        <p>
+            A ISO 31000:2018 define risco como o <strong>efeito da incerteza nos objetivos</strong>. Em segurança da informação, o risco aparece quando uma <strong>ameaça</strong> explora uma <strong>vulnerabilidade</strong> de um <strong>ativo</strong> e produz um <strong>impacto</strong> com alguma <strong>probabilidade</strong>.
+        </p>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Termo</th><th>Significado</th><th>Exemplo na Ipê Store</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Ativo</strong></td><td>O que tem valor para o negócio</td><td>Base de clientes e dados de pagamento</td></tr>
+                    <tr><td><strong>Ameaça</strong></td><td>Quem ou o que pode causar dano</td><td>Grupo criminoso que vende cartões</td></tr>
+                    <tr><td><strong>Vulnerabilidade</strong></td><td>A fraqueza que a ameaça explora</td><td>SQL injection no checkout</td></tr>
+                    <tr><td><strong>Probabilidade</strong></td><td>Chance de o evento ocorrer num período</td><td>Uma vez a cada quatro anos</td></tr>
+                    <tr><td><strong>Impacto</strong></td><td>Consequência quando o evento ocorre</td><td>Multas das bandeiras, chargebacks e perda de clientes</td></tr>
+                    <tr><td><strong>Controle</strong></td><td>Medida que modifica o risco</td><td>Tokenização no gateway de pagamento</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">💡</span>
+                <strong>Escreva o risco como uma frase</strong>
+            </div>
+            <p>
+                "Um grupo criminoso explora SQL injection no checkout e copia os dados de cartão armazenados, gerando multas, chargebacks e perda de clientes." Um risco escrito assim tem ativo, ameaça, vulnerabilidade e impacto explícitos, e por isso pode ser analisado. "Risco de hacker" não pode.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: PROCESSO E ANÁLISE -->
+    <section class="study-section" id="processo">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>ISO 31000, Matriz 5×5 e Cálculo Financeiro</h2>
+        </div>
+
+        <h3>ISO 31000:2018: Princípios, Estrutura e Processo</h3>
+        <p>
+            A norma tem três partes. Os <strong>princípios</strong> dizem como uma boa gestão de riscos se comporta: cria e protege valor, é integrada aos processos, estruturada e abrangente, personalizada ao contexto, inclusiva, dinâmica, usa a melhor informação disponível, considera fatores humanos e culturais e melhora continuamente. A <strong>estrutura</strong> coloca liderança e comprometimento no centro, cercados por integração, concepção, implementação, avaliação e melhoria. O <strong>processo</strong> é o ciclo que o analista executa no dia a dia:
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Processo de Gestão de Riscos (ISO 31000:2018)</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <div class="diagram-box">
+  <div class="diagram-header">
+    <span class="diagram-title">Processo de Gestão de Riscos (ISO 31000:2018)</span>
+    <span class="diagram-badge">Mermaid Arquitetura</span>
+  </div>
+  <div class="diagram-svg-wrap" role="img" aria-label="Processo de Gestão de Riscos (ISO 31000:2018)">
+    <svg id="my-svg" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 370.062px; background-color: transparent;" viewBox="0 4 370.0625 1199" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#my-svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#ccc;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#a44141;}#my-svg .error-text{fill:#ddd;stroke:#ddd;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:lightgrey;stroke:lightgrey;}#my-svg .marker.cross{stroke:lightgrey;}#my-svg svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#my-svg p{margin:0;}#my-svg .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#ccc;}#my-svg .cluster-label text{fill:#F9FFFE;}#my-svg .cluster-label span{color:#F9FFFE;}#my-svg .cluster-label span p{background-color:transparent;}#my-svg .label text,#my-svg span{fill:#ccc;color:#ccc;}#my-svg .node rect,#my-svg .node circle,#my-svg .node ellipse,#my-svg .node polygon,#my-svg .node path{fill:#1f2020;stroke:#ccc;stroke-width:1px;}#my-svg .rough-node .label text,#my-svg .node .label text,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-anchor:middle;}#my-svg .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#my-svg .rough-node .label,#my-svg .node .label,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-align:center;}#my-svg .node.clickable{cursor:pointer;}#my-svg .root .anchor path{fill:lightgrey!important;stroke-width:0;stroke:lightgrey;}#my-svg .arrowheadPath{fill:lightgrey;}#my-svg .edgePaths .path{stroke:lightgrey;stroke-width:1px;}#my-svg .flowchart-link{stroke:lightgrey;fill:none;}#my-svg .edgeLabel{background-color:hsl(0, 0%, 34.4117647059%);text-align:center;}#my-svg .edgeLabel p{background-color:hsl(0, 0%, 34.4117647059%);}#my-svg .edgeLabel rect{opacity:0.5;background-color:hsl(0, 0%, 34.4117647059%);fill:hsl(0, 0%, 34.4117647059%);}#my-svg .labelBkg{background-color:rgba(87.75, 87.75, 87.75, 0.5);}#my-svg .cluster rect{fill:hsl(180, 1.5873015873%, 28.3529411765%);stroke:rgba(255, 255, 255, 0.25);stroke-width:1px;}#my-svg .cluster text{fill:#F9FFFE;}#my-svg .cluster span{color:#F9FFFE;}#my-svg .node .collapsed-indicator{fill:rgba(255, 255, 255, 0.25);stroke:none;opacity:0.6;}#my-svg .node .collapsed-separator{stroke:rgba(255, 255, 255, 0.25);stroke-width:0.75px;}#my-svg div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(20, 1.5873015873%, 12.3529411765%);border:1px solid rgba(255, 255, 255, 0.25);border-radius:2px;pointer-events:none;z-index:100;}#my-svg .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#ccc;}#my-svg rect.text{fill:none;stroke-width:0;}#my-svg .icon-shape,#my-svg .image-shape{background-color:hsl(0, 0%, 34.4117647059%);text-align:center;}#my-svg .icon-shape p,#my-svg .image-shape p{background-color:hsl(0, 0%, 34.4117647059%);padding:2px;}#my-svg .icon-shape .label rect,#my-svg .image-shape .label rect{opacity:0.5;background-color:hsl(0, 0%, 34.4117647059%);fill:hsl(0, 0%, 34.4117647059%);}#my-svg .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#my-svg .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#my-svg .node .neo-node{stroke:#ccc;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#my-svg [data-look="neo"].node path{stroke:url(#my-svg-gradient);stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#ccc;filter:none;}#my-svg [data-look="neo"].node circle{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node circle .state-start{fill:#000000;}#my-svg [data-look="neo"].icon-shape .icon{fill:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="my-svg_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"/></marker><marker id="my-svg_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"/></marker><g class="root"><g class="clusters"><g class="cluster" id="my-svg-PA" data-look="neo"><rect style="" x="8" y="390" width="231.21875" height="435"/><g class="cluster-label" transform="translate(12, 390)"><foreignObject width="223.21875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel"><p>Processo de avaliação de riscos</p></span></div></foreignObject></g></g></g><g class="edges edgePaths"><path d="M212.359375,156L212.359375,192" id="my-svg-L_CC_E_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_CC_E_0" data-points="W3sieCI6MjEyLjM1OTM3NSwieSI6MTU2fSx7IngiOjIxMi4zNTkzNzUsInkiOjE5Nn1d" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M190.359375,340L190.359375,352.9289321881345Q190.359375,360 183.28830718813452,360L130.68044281186548,360Q123.60937499999999,360 123.60937499999999,367.0710678118655L123.60937499999999,380L123.60937499999999,437" id="my-svg-L_E_I_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 154.42172241210938 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_E_I_0" data-points="W3sieCI6MTkwLjM1OTM3NSwieSI6MzQwfSx7IngiOjE5MC4zNTkzNzUsInkiOjM2MH0seyJ4IjoxMjMuNjA5Mzc0OTk5OTk5OTksInkiOjM2MH0seyJ4IjoxMjMuNjA5Mzc0OTk5OTk5OTksInkiOjM4MH0seyJ4IjoxMjMuNjA5Mzc0OTk5OTk5OTksInkiOjQ0MX1d" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M123.60937499999999,537L123.60937499999999,557" id="my-svg-L_I_A_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 16 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_I_A_0" data-points="W3sieCI6MTIzLjYwOTM3NDk5OTk5OTk5LCJ5Ijo1Mzd9LHsieCI6MTIzLjYwOTM3NDk5OTk5OTk5LCJ5Ijo1NjF9XQ==" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M123.60937499999999,681L123.60937499999999,701" id="my-svg-L_A_AV_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 16 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_A_AV_0" data-points="W3sieCI6MTIzLjYwOTM3NDk5OTk5OTk5LCJ5Ijo2ODF9LHsieCI6MTIzLjYwOTM3NDk5OTk5OTk5LCJ5Ijo3MDV9XQ==" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M123.60937499999999,801L123.60937499999999,835L123.609375,871" id="my-svg-L_AV_T_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 66 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_AV_T_0" data-points="W3sieCI6MTIzLjYwOTM3NDk5OTk5OTk5LCJ5Ijo4MDF9LHsieCI6MTIzLjYwOTM3NDk5OTk5OTk5LCJ5Ijo4MzV9LHsieCI6MTIzLjYwOTM3NSwieSI6ODc1fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M123.609375,971L123.609375,1007" id="my-svg-L_T_M_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_T_M_0" data-points="W3sieCI6MTIzLjYwOTM3NSwieSI6OTcxfSx7IngiOjEyMy42MDkzNzUsInkiOjEwMTF9XQ==" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M123.609375,1083L123.609375,1095.9289321881345Q123.609375,1103 130.68044281186548,1103L183.28830718813452,1103Q190.359375,1103 190.359375,1110.0710678118655L190.359375,1119" id="my-svg-L_M_R_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 93.42169189453125 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_M_R_0" data-points="W3sieCI6MTIzLjYwOTM3NSwieSI6MTA4M30seyJ4IjoxMjMuNjA5Mzc1LCJ5IjoxMTAzfSx7IngiOjE5MC4zNTkzNzUsInkiOjExMDN9LHsieCI6MTkwLjM1OTM3NSwieSI6MTEyM31d" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M234.359375,1123L234.359375,1110.0710678118655Q234.359375,1103 241.43044281186548,1103L294.0383071881345,1103Q301.109375,1103 301.109375,1095.9289321881345L301.109375,1047L301.109375,607.5L301.109375,367.0710678118655Q301.109375,360 294.0383071881345,360L241.43044281186548,360Q234.359375,360 234.359375,352.9289321881345L234.359375,344" id="my-svg-L_R_E_0" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_R_E_0" data-points="W3sieCI6MjM0LjM1OTM3NSwieSI6MTEyM30seyJ4IjoyMzQuMzU5Mzc1LCJ5IjoxMTAzfSx7IngiOjMwMS4xMDkzNzUsInkiOjExMDN9LHsieCI6MzAxLjEwOTM3NSwieSI6MTA0N30seyJ4IjozMDEuMTA5Mzc1LCJ5Ijo2MDcuNX0seyJ4IjozMDEuMTA5Mzc1LCJ5IjozNjB9LHsieCI6MjM0LjM1OTM3NSwieSI6MzYwfSx7IngiOjIzNC4zNTkzNzUsInkiOjM0MH1d" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/></g><g class="edgeLabels"><g class="edgeLabel" transform="translate(300.8359375, 923)"><g class="label" data-id="L_R_E_0" transform="translate(-61.2265625, -12)"><foreignObject width="122.453125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>revisão periódica</p></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default" id="my-svg-flowchart-CC-0" data-look="neo" transform="translate(212.359375, 84)"><rect class="basic label-container" style="" x="-76" y="-72" width="152" height="144"/><g class="label" style="" transform="translate(-60, -60)"><rect/><foreignObject width="120" height="120"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Comunicação e consulta<br /><small>com as partes interessadas, em todas as etapas</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-E-1" data-look="neo" transform="translate(212.359375, 268)"><rect class="basic label-container" style="" x="-76" y="-72" width="152" height="144"/><g class="label" style="" transform="translate(-60, -60)"><rect/><foreignObject width="120" height="120"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Escopo, contexto e critérios<br /><small>escalas, apetite e tolerância</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-I-2" data-look="neo" transform="translate(123.609375, 489)"><rect class="basic label-container" style="" x="-76" y="-48" width="152" height="96"/><g class="label" style="" transform="translate(-60, -36)"><rect/><foreignObject width="120" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Identificação<br /><small>ativo, ameaça, vulnerabilidade</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-A-3" data-look="neo" transform="translate(123.609375, 621)"><rect class="basic label-container" style="" x="-76" y="-60" width="152" height="120"/><g class="label" style="" transform="translate(-60, -48)"><rect/><foreignObject width="120" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Análise<br /><small>probabilidade e impacto, nível de risco</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-AV-4" data-look="neo" transform="translate(123.609375, 753)"><rect class="basic label-container" style="" x="-76" y="-48" width="152" height="96"/><g class="label" style="" transform="translate(-60, -36)"><rect/><foreignObject width="120" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Avaliação<br /><small>comparação com os critérios</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-T-5" data-look="neo" transform="translate(123.609375, 923)"><rect class="basic label-container" style="" x="-76" y="-48" width="152" height="96"/><g class="label" style="" transform="translate(-60, -36)"><rect/><foreignObject width="120" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Tratamento<br /><small>mitigar, transferir, evitar ou aceitar</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-M-6" data-look="neo" transform="translate(123.609375, 1047)"><rect class="basic label-container" style="" x="-76" y="-36" width="152" height="72"/><g class="label" style="" transform="translate(-60, -24)"><rect/><foreignObject width="120" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Monitoramento e análise crítica</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-R-7" data-look="neo" transform="translate(212.359375, 1159)"><rect class="basic label-container" style="" x="-76" y="-36" width="152" height="72"/><g class="label" style="" transform="translate(-60, -24)"><rect/><foreignObject width="120" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: nowrap; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Registro e relato<br /><small>registro de riscos</small></p></span></div></foreignObject></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#FFFFFF"/></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#FFFFFF"/></filter></defs><linearGradient id="my-svg-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#cccccc" stop-opacity="1"/><stop offset="100%" stop-color="hsl(180, 0%, 18.3529411765%)" stop-opacity="1"/></linearGradient></svg>
+  </div>
+</div>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">📝</span>
+                <strong>Análise não é avaliação</strong>
+            </div>
+            <p>
+                Na ISO 31000, <strong>análise</strong> determina o nível do risco (probabilidade e impacto). <strong>Avaliação</strong> compara esse nível com os critérios definidos no contexto para decidir se o risco precisa de tratamento. As três etapas juntas (identificação, análise e avaliação) formam o "processo de avaliação de riscos". Bancas de concurso exploram essa distinção.
+            </p>
+        </div>
+
+        <h3>Onde as Outras Referências se Encaixam</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Referência</th><th>Papel</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>ISO 31000:2018</strong></td><td>Gestão de riscos de qualquer natureza: financeira, operacional, de segurança. É o "guarda-chuva".</td></tr>
+                    <tr><td><strong>ISO/IEC 27005:2022</strong></td><td>Aplica o processo à segurança da informação, alinhada à ISO/IEC 27001:2022, com abordagens baseadas em ativos ou em eventos (cenários).</td></tr>
+                    <tr><td><strong>ISO/IEC 27001:2022, cláusulas 6.1.2 e 6.1.3</strong></td><td>Exige o processo de avaliação de riscos e o de tratamento. O tratamento escolhe os controles do Anexo A e alimenta a Declaração de Aplicabilidade (Estudo 26).</td></tr>
+                    <tr><td><strong>NIST SP 800-30 Rev. 1</strong></td><td>Guia prático para conduzir avaliações de risco: preparar, conduzir, comunicar e manter.</td></tr>
+                    <tr><td><strong>NIST CSF 2.0 (GV.RM e ID.RA)</strong></td><td>GV.RM define a estratégia de gestão de riscos (apetite, tolerância, responsabilidades); ID.RA cobre a avaliação de riscos.</td></tr>
+                    <tr><td><strong>NIST IR 8286</strong></td><td>Liga o risco cibernético à gestão de riscos corporativos (ERM) por meio de registros de risco consolidados.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Análise Qualitativa: a Matriz 5×5</h3>
+        <p>
+            A análise qualitativa atribui um nível de 1 a 5 à probabilidade e ao impacto. A pontuação é o produto dos dois (1 a 25), e uma faixa de cor traduz a pontuação para quem decide. As escalas precisam ser definidas <em>antes</em> da análise, na etapa de contexto. A Ipê Store ancorou cada nível em números para que duas pessoas cheguem à mesma nota:
+        </p>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Nível</th><th>Probabilidade (ARO)</th><th>Impacto por evento (SLE)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>1</strong></td><td>Rara: menos de 0,1 vez por ano</td><td>Insignificante: até R$ 50 mil</td></tr>
+                    <tr><td><strong>2</strong></td><td>Improvável: de 0,1 a 0,25</td><td>Menor: de R$ 50 mil a R$ 200 mil</td></tr>
+                    <tr><td><strong>3</strong></td><td>Possível: de 0,25 a 0,5</td><td>Moderado: de R$ 200 mil a R$ 1 milhão</td></tr>
+                    <tr><td><strong>4</strong></td><td>Provável: de 0,5 a 1</td><td>Maior: de R$ 1 milhão a R$ 5 milhões</td></tr>
+                    <tr><td><strong>5</strong></td><td>Quase certa: 1 vez por ano ou mais</td><td>Catastrófico: R$ 5 milhões ou mais</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Faixas da pontuação: <strong>Baixo</strong> (1 a 4), <strong>Médio</strong> (5 a 9), <strong>Alto</strong> (10 a 15) e <strong>Crítico</strong> (16 a 25). O limite inferior de cada nível pertence a ele: ARO de exatamente 0,25 já é "Possível".
+        </p>
+
+        <h3>Risco Inerente, Risco Residual, Apetite e Tolerância</h3>
+        <ul>
+            <li><strong>risco inerente:</strong> o nível do risco sem considerar os controles que você está propondo.</li>
+            <li><strong>risco residual:</strong> o nível que sobra depois do tratamento. Ele nunca é zero, e precisa ser aceito formalmente pelo dono do risco.</li>
+            <li><strong>apetite</strong> a risco: quanto risco a organização está disposta a assumir para atingir seus objetivos. Na Ipê Store, a diretoria aceita riscos até a faixa Médio (pontuação 9).</li>
+            <li><strong>tolerância</strong> a risco: o desvio aceitável em torno do apetite para um objetivo específico, por exemplo "no máximo 4 horas de checkout fora do ar por ano".</li>
+            <li><strong>registro de riscos:</strong> a planilha viva com cada risco, seu dono, nível inerente, tratamento, nível residual, prazo e data da próxima revisão.</li>
+        </ul>
+
+        <h3>Análise Quantitativa: Risco em Reais</h3>
+        <p>
+            A análise quantitativa usa cinco grandezas, cobradas em CISSP, Security+ e concursos:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Sigla</th><th>Nome</th><th>Como obter</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>AV</strong></td><td>Valor do Ativo (<em>Asset Value</em>)</td><td>Tudo o que o evento pode custar: receita perdida, multas, recuperação, notificação, clientes perdidos.</td></tr>
+                    <tr><td><strong>EF</strong></td><td>Fator de Exposição (<em>Exposure Factor</em>)</td><td>Percentual do AV perdido num evento (0% a 100%).</td></tr>
+                    <tr><td><strong>SLE</strong></td><td>Expectativa de Perda Única (<em>Single Loss Expectancy</em>)</td><td><strong>SLE = AV × EF</strong></td></tr>
+                    <tr><td><strong>ARO</strong></td><td>Taxa Anualizada de Ocorrência (<em>Annualized Rate of Occurrence</em>)</td><td>Ocorrências esperadas por ano. Uma vez a cada 4 anos = 0,25.</td></tr>
+                    <tr><td><strong>ALE</strong></td><td>Expectativa de Perda Anualizada (<em>Annualized Loss Expectancy</em>)</td><td><strong>ALE = SLE × ARO</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Para comparar um controle com o prejuízo que ele evita, calcule o <strong>ROSI</strong> (<em>Return on Security Investment</em>):
+        </p>
+        <p style="font-family: var(--font-mono); font-size: 0.95rem; background: var(--sunk); padding: 0.75rem 1rem; border-radius: var(--radius-sm);">
+            ROSI = (ALE antes − ALE depois − custo anual do controle) ÷ custo anual do controle
+        </p>
+
+        <h3>Exemplo Resolvido: Vazamento de Cartões</h3>
+        <p>
+            O checkout da Ipê Store armazena o número do cartão. Um vazamento custaria R$ 12 milhões no total (multas das bandeiras, investigação forense, chargebacks, notificação à ANPD e clientes perdidos), e a análise estima que 60% desse valor se perde num evento. O histórico do setor indica um vazamento a cada quatro anos.
+        </p>
+        <ol>
+            <li>SLE = R$ 12.000.000 × 0,60 = <strong>R$ 7.200.000</strong> (impacto 5).</li>
+            <li>ALE = R$ 7.200.000 × 0,25 = <strong>R$ 1.800.000 por ano</strong> (probabilidade 3, pontuação 15, faixa Alto).</li>
+            <li>A tokenização no gateway custa R$ 180 mil por ano. A loja deixa de guardar o cartão e o EF cai para 5% (sobram os dados pessoais). ALE depois = R$ 12.000.000 × 0,05 × 0,25 = <strong>R$ 150.000</strong>.</li>
+            <li>ROSI = (1.800.000 − 150.000 − 180.000) ÷ 180.000 = <strong>8,17, ou 817%</strong>. Cada real investido evita R$ 8,17 de perda esperada além do próprio custo.</li>
+        </ol>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">python3 — cálculo de SLE, ALE e ROSI</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-risco-ale')">Copiar</button>
+            </div>
+            <pre><code id="code-risco-ale">av, ef, aro = 12_000_000, 0.60, 0.25
+sle = av * ef                    # 7.200.000
+ale = sle * aro                  # 1.800.000
+
+custo = 180_000                  # tokenização no gateway, por ano
+ale_depois = av * 0.05 * aro     # 150.000
+rosi = (ale - ale_depois - custo) / custo
+
+print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
+# SLE=7,200,000  ALE=1,800,000  ROSI=817%</code></pre>
+        </div>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>ROSI mede eficiência, não tamanho</strong>
+            </div>
+            <p>
+                Um backup imutável de R$ 120 mil pode ter ROSI de 1.233% e ainda assim evitar menos prejuízo do que um pacote de EDR com backup de R$ 420 mil, com ROSI de 519%. Entre opções que se excluem, escolha a de maior <strong>benefício líquido anual</strong> (redução da ALE menos o custo) que caiba no orçamento. Use o ROSI para descartar o que dá prejuízo (ROSI negativo) e para comunicar o retorno.
+            </p>
+        </div>
+
+        <h3>As Quatro Estratégias de Tratamento</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Estratégia</th><th>O que faz</th><th>Exemplo na Ipê Store</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Mitigar</strong></td><td>Reduz probabilidade, impacto ou ambos com controles</td><td>EDR com resposta 24×7 e backup imutável contra ransomware</td></tr>
+                    <tr><td><strong>Transferir</strong></td><td>Passa parte da perda financeira a um terceiro</td><td>Seguro cibernético; garantia de chargeback do antifraude</td></tr>
+                    <tr><td><strong>Evitar</strong></td><td>Deixa de realizar a atividade que gera o risco</td><td>Parar de armazenar o número do cartão (tokenização)</td></tr>
+                    <tr><td><strong>Aceitar</strong></td><td>Assume o risco de forma consciente e registrada</td><td>Quedas curtas do gateway: o controle custa mais do que a perda esperada</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Transferir o custo não transfere a responsabilidade</strong>
+            </div>
+            <p>
+                O seguro paga parte do prejuízo, mas a Ipê Store continua sendo a controladora dos dados perante a LGPD e a responsável pela conformidade com o PCI DSS perante as bandeiras. A comunicação à ANPD e aos titulares continua sendo obrigação dela.
+            </p>
+        </div>
+
+        <h3>Quando a Conta Simples Não Basta: FAIR</h3>
+        <p>
+            AV, EF e ARO são estimativas pontuais e escondem a incerteza. O <strong>FAIR</strong> (<em>Factor Analysis of Information Risk</em>, padronizado pelo The Open Group como Open FAIR) decompõe o risco em frequência de eventos de perda e magnitude da perda, usa faixas (mínimo, mais provável, máximo) e simulação de Monte Carlo, e responde com uma distribuição: "há 10% de chance de perder mais de R$ 5 milhões neste ano". Comece com a conta simples; adote FAIR quando a decisão for grande o bastante para justificar o esforço.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Calculadora de Matriz 5×5 e Risco Financeiro</h2>
+        </div>
+
+        <p class="lead-text">
+            Escolha um dos seis cenários da Ipê Store. Clique na célula da matriz onde você acha que o risco está e compare com o que os números dizem. Ajuste AV, EF e ARO, escolha um tratamento e acompanhe o registro de riscos: o plano precisa caber no orçamento anual e deixar cada risco residual dentro do apetite.
+        </p>
+
+        <div class="lab-box risco-lab" id="risco-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Laboratório de Gestão de Riscos</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Registro de Riscos da Ipê Store</h3>
+                    <p id="risco-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">1. Cenário</h4>
+                <div id="risco-cenarios" role="group" aria-label="Cenários de risco" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+                <dl id="risco-ficha" style="font-size: 0.9rem; margin: 1rem 0; display: grid; grid-template-columns: minmax(0, max-content) minmax(0, 1fr); gap: 0.25rem 0.75rem;"></dl>
+
+                <h4>2. Matriz qualitativa 5×5</h4>
+                <p style="font-size: 0.85rem; color: var(--muted); margin-top: 0;">Clique numa célula para registrar a sua estimativa (V). I = risco inerente pelos números; R = risco residual do tratamento escolhido.</p>
+                <div class="table-responsive">
+                    <table id="risco-matriz" style="border-collapse: collapse; margin: 0 auto; font-size: 0.8rem;">
+                        <caption style="caption-side: bottom; font-size: 0.8rem; color: var(--muted); padding-top: 0.4rem; text-align: left;">Linhas: probabilidade (1 Rara, 2 Improvável, 3 Possível, 4 Provável, 5 Quase certa). Colunas: impacto (1 Insignificante, 2 Menor, 3 Moderado, 4 Maior, 5 Catastrófico).</caption>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div id="risco-matriz-feedback" style="margin: 0.75rem 0 1.5rem 0; font-size: 0.9rem;" aria-live="polite"></div>
+
+                <h4>3. Análise quantitativa e tratamento</h4>
+                <div id="risco-quantitativo">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem;">
+                        <label style="display: flex; flex-direction: column; font-size: 0.85rem; gap: 0.25rem;">Valor do Ativo (AV, R$)
+                            <input class="form-control" type="text" inputmode="decimal" id="risco-av">
+                        </label>
+                        <label style="display: flex; flex-direction: column; font-size: 0.85rem; gap: 0.25rem;">Fator de Exposição (EF, %)
+                            <input class="form-control" type="text" inputmode="decimal" id="risco-ef">
+                        </label>
+                        <label style="display: flex; flex-direction: column; font-size: 0.85rem; gap: 0.25rem;">Ocorrências por ano (ARO)
+                            <input class="form-control" type="text" inputmode="decimal" id="risco-aro">
+                        </label>
+                    </div>
+                    <div id="risco-erro" style="color: var(--danger-color); font-size: 0.85rem; margin-top: 0.4rem;" aria-live="polite"></div>
+                    <ul id="risco-calculo" style="font-family: var(--font-mono); font-size: 0.85rem; padding-left: 1.25rem;"></ul>
+
+                    <div class="table-responsive">
+                        <table class="data-table" id="risco-opcoes" style="font-size: 0.85rem;">
+                            <thead><tr><th>Escolha</th><th>Opção</th><th>Custo anual</th><th>ALE depois</th><th>Benefício líquido</th><th>ROSI</th><th>Residual</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div id="risco-recomendacao" style="margin: 0.75rem 0 1.5rem 0; font-size: 0.9rem;" aria-live="polite"></div>
+                </div>
+
+                <h4>4. Registro de riscos e orçamento</h4>
+                <div class="table-responsive">
+                    <table class="data-table" id="risco-registro" style="font-size: 0.85rem;">
+                        <thead><tr><th>Cenário</th><th>Inerente</th><th>Tratamento</th><th>Custo anual</th><th>ALE antes</th><th>ALE residual</th><th>Residual</th></tr></thead>
+                        <tbody></tbody>
+                        <tfoot></tfoot>
+                    </table>
+                </div>
+                <div id="risco-orcamento" style="margin-top: 0.75rem; font-size: 0.9rem;"></div>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                    <button class="btn-primary" type="button" onclick="verificarPlanoRisco()">Verificar plano de tratamento</button>
+                    <button class="btn-secondary" type="button" onclick="restaurarRisco()">Restaurar valores iniciais</button>
+                </div>
+                <div id="risco-verificacao" style="margin-top: 1rem; font-size: 0.9rem;" aria-live="polite"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist do Processo de Gestão de Riscos</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para revisar o processo de riscos de uma organização ou preparar uma auditoria da ISO/IEC 27001. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="gestao-riscos-ti">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-risco-1">
+                <label for="chk-risco-1"><strong>Critérios aprovados:</strong> escalas de probabilidade e impacto, faixas da matriz, apetite e tolerância foram aprovados pela alta direção antes da análise.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-risco-2">
+                <label for="chk-risco-2"><strong>Riscos escritos como cenários:</strong> cada risco tem ativo, ameaça, vulnerabilidade e impacto explícitos, não apenas "risco de ataque".</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-risco-3">
+                <label for="chk-risco-3"><strong>Dono do risco definido:</strong> cada linha do registro tem um responsável de negócio com autoridade para decidir o tratamento.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-risco-4">
+                <label for="chk-risco-4"><strong>Premissas documentadas:</strong> a origem de AV, EF e ARO (histórico de incidentes, relatórios do setor, seguradora) está registrada e pode ser contestada.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-risco-5">
+                <label for="chk-risco-5"><strong>Plano de tratamento:</strong> cada risco acima do apetite tem tratamento, controles do Anexo A associados, prazo e responsável pela implementação.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-risco-6">
+                <label for="chk-risco-6"><strong>Aceitação formal do residual:</strong> o dono do risco assinou a aceitação do risco residual, inclusive dos riscos aceitos sem tratamento.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-risco-7">
+                <label for="chk-risco-7"><strong>Revisão periódica:</strong> o registro é revisto ao menos uma vez por ano e após incidentes ou mudanças relevantes, com indicadores de risco (KRIs) acompanhados.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Concursos</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (SLE e ALE):</strong> Um servidor de comércio eletrônico vale R$ 500.000. Um ataque destrói 40% do seu valor e deve ocorrer uma vez a cada dois anos. Quais são a SLE e a ALE?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> SLE = R$ 200.000 e ALE = R$ 100.000.</p>
+                    <p>SLE = AV × EF = 500.000 × 0,40 = 200.000. Uma vez a cada dois anos significa ARO = 0,5, então ALE = 200.000 × 0,5 = 100.000. Um erro comum é usar ARO = 2, invertendo a frequência.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (ROSI):</strong> A ALE de um risco é R$ 300.000. Um controle que custa R$ 50.000 por ano reduz a ALE para R$ 100.000. Qual é o ROSI?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> 3, ou 300%.</p>
+                    <p>ROSI = (300.000 − 100.000 − 50.000) ÷ 50.000 = 150.000 ÷ 50.000 = 3. Quem esquece de descontar o custo do controle chega a 400%. Um ROSI negativo indicaria que o controle custa mais do que a perda que evita.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Comparação de opções):</strong> Para o mesmo risco, a opção A custa R$ 20.000 e tem ROSI de 400%. A opção B custa R$ 200.000 e tem ROSI de 150%. As opções se excluem e as duas cabem no orçamento. Qual gera mais valor?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A opção B.</p>
+                    <p>O benefício líquido é ROSI × custo: A gera 4 × 20.000 = R$ 80.000 por ano; B gera 1,5 × 200.000 = R$ 300.000. O ROSI compara eficiência por real investido, mas não o tamanho da perda evitada. Entre opções que se excluem, vence o maior benefício líquido que cabe no orçamento.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Tratamento):</strong> A empresa contrata um seguro cibernético que cobre custos de resposta e notificação em caso de vazamento. Qual estratégia foi aplicada, e o que continua com a empresa?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Transferir. A responsabilidade legal e a obrigação de comunicar o incidente continuam com a empresa.</p>
+                    <p>O seguro move parte da perda financeira para a seguradora. Perante a LGPD, a empresa segue como controladora e precisa comunicar a ANPD e os titulares; a franquia, os danos à reputação e o que a apólice exclui também ficam com ela.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (ISO 31000):</strong> Segundo a ISO 31000:2018, em qual etapa o nível de risco encontrado é comparado com os critérios de risco para decidir se é preciso tratá-lo?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Avaliação de riscos.</p>
+                    <p>A identificação encontra e descreve os riscos; a análise determina o nível (probabilidade e impacto); a avaliação compara o nível com os critérios definidos no contexto e apoia a decisão. As três formam o processo de avaliação de riscos.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Risco residual):</strong> Depois de implementar todos os controles planejados, o risco residual de um cenário continua acima do apetite definido pela diretoria. O que o analista deve fazer?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Levar o caso ao dono do risco para tratamento adicional ou aceitação formal e registrada.</p>
+                    <p>O analista não aceita risco em nome do negócio. As saídas são novos controles, transferência, evitar a atividade ou a aceitação explícita pela autoridade adequada, registrada no registro de riscos e revista no próximo ciclo.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Processo da ISO 31000</h4>
+                <p>Contexto e critérios, identificação, análise, avaliação, tratamento, monitoramento e registro, com comunicação em todas as etapas.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Fórmulas</h4>
+                <p>SLE = AV × EF; ALE = SLE × ARO; ROSI = (ALE antes − ALE depois − custo) ÷ custo.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Quatro tratamentos</h4>
+                <p>Mitigar, transferir, evitar ou aceitar. Transferir passa o custo, não a responsabilidade.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Escolha de controles</h4>
+                <p>Entre opções que se excluem, vence o maior benefício líquido dentro do orçamento, com residual dentro do apetite.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>ABNT NBR ISO 31000:2018 — Gestão de riscos: diretrizes.</li>
+            <li>ISO/IEC 27005:2022 — Orientações para gestão de riscos de segurança da informação.</li>
+            <li>ISO/IEC 27001:2022, cláusulas 6.1.2 (avaliação de riscos) e 6.1.3 (tratamento de riscos).</li>
+            <li>NIST SP 800-30 Rev. 1 — Guide for Conducting Risk Assessments.</li>
+            <li>NIST Cybersecurity Framework 2.0 — categorias GV.RM (estratégia de gestão de riscos) e ID.RA (avaliação de riscos).</li>
+            <li>NIST IR 8286 — Integrating Cybersecurity and Enterprise Risk Management (ERM).</li>
+            <li>The Open Group — Open FAIR Risk Taxonomy (O-RT) e Risk Analysis (O-RA).</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 26 — ISO-27001-e-27002 e 31 — PCI-DSS</strong>
+            </div>
+            <p>
+                O tratamento de riscos escolhe os controles do Anexo A e justifica cada linha da Declaração de Aplicabilidade. No PCI DSS v4.0.1, a análise de risco direcionada define a frequência de vários controles, e a tokenização que você viu aqui é a principal forma de reduzir o escopo do ambiente de dados de cartão.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="risco-dados">
+{
+ "empresa": "Ipê Store",
+ "contexto": "Loja online fictícia que processa pagamentos com cartão. Valores inventados para o laboratório, em reais por ano.",
+ "orcamento_anual": 1100000,
+ "apetite": 9,
+ "escala_probabilidade": [
+  {"nivel": 1, "rotulo": "Rara", "min": 0},
+  {"nivel": 2, "rotulo": "Improvável", "min": 0.1},
+  {"nivel": 3, "rotulo": "Possível", "min": 0.25},
+  {"nivel": 4, "rotulo": "Provável", "min": 0.5},
+  {"nivel": 5, "rotulo": "Quase certa", "min": 1}
+ ],
+ "escala_impacto": [
+  {"nivel": 1, "rotulo": "Insignificante", "min": 0},
+  {"nivel": 2, "rotulo": "Menor", "min": 50000},
+  {"nivel": 3, "rotulo": "Moderado", "min": 200000},
+  {"nivel": 4, "rotulo": "Maior", "min": 1000000},
+  {"nivel": 5, "rotulo": "Catastrófico", "min": 5000000}
+ ],
+ "faixas": [
+  {"nome": "Baixo", "min": 1, "max": 4, "cor": "rgba(22, 163, 74, 0.28)"},
+  {"nome": "Médio", "min": 5, "max": 9, "cor": "rgba(202, 138, 4, 0.30)"},
+  {"nome": "Alto", "min": 10, "max": 15, "cor": "rgba(234, 88, 12, 0.32)"},
+  {"nome": "Crítico", "min": 16, "max": 25, "cor": "rgba(220, 38, 38, 0.38)"}
+ ],
+ "cenarios": [
+  {
+   "id": "vazamento-cartoes",
+   "titulo": "Vazamento de cartões",
+   "ativo": "Dados de pagamento armazenados pelo checkout",
+   "ameaca": "Grupo criminoso que revende cartões",
+   "vulnerabilidade": "SQL injection no checkout e número do cartão guardado no banco",
+   "composicao_av": "Multas das bandeiras, investigação forense, chargebacks, notificação à ANPD e clientes perdidos",
+   "av": 12000000,
+   "ef": 0.6,
+   "aro": 0.25,
+   "recomendado": "tokenizacao",
+   "controles": [
+    {"id": "tokenizacao", "nome": "Tokenização no gateway: a loja deixa de guardar o cartão", "tratamento": "evitar", "custo_anual": 180000, "ef": 0.05, "aro": 0.25},
+    {"id": "waf-revisao", "nome": "WAF e revisão de código do checkout", "tratamento": "mitigar", "custo_anual": 240000, "ef": 0.6, "aro": 0.1},
+    {"id": "seguro-vazamento", "nome": "Seguro cibernético com cobertura de vazamento", "tratamento": "transferir", "custo_anual": 300000, "ef": 0.15, "aro": 0.25}
+   ]
+  },
+  {
+   "id": "ransomware-erp",
+   "titulo": "Ransomware no ERP",
+   "ativo": "ERP de pedidos, estoque e faturamento",
+   "ameaca": "Afiliado de ransomware como serviço",
+   "vulnerabilidade": "VPN sem MFA e backups acessíveis pelo domínio",
+   "composicao_av": "Pedidos parados, recuperação dos sistemas, horas extras, multas contratuais e extorsão por vazamento",
+   "av": 8000000,
+   "ef": 0.75,
+   "aro": 0.5,
+   "recomendado": "edr-backup",
+   "controles": [
+    {"id": "edr-backup", "nome": "EDR com resposta 24x7, MFA na VPN e backup imutável testado", "tratamento": "mitigar", "custo_anual": 420000, "ef": 0.25, "aro": 0.2},
+    {"id": "backup-imutavel", "nome": "Somente backup imutável testado", "tratamento": "mitigar", "custo_anual": 120000, "ef": 0.35, "aro": 0.5},
+    {"id": "seguro-ransomware", "nome": "Seguro cibernético com cobertura de interrupção", "tratamento": "transferir", "custo_anual": 350000, "ef": 0.3, "aro": 0.5}
+   ]
+  },
+  {
+   "id": "ddos-black-friday",
+   "titulo": "DDoS na Black Friday",
+   "ativo": "Site e API de vendas no pico do ano",
+   "ameaca": "Extorsionista com botnet de aluguel",
+   "vulnerabilidade": "Origem exposta e sem proteção volumétrica",
+   "composicao_av": "Faturamento de 24 horas da Black Friday",
+   "av": 3000000,
+   "ef": 0.4,
+   "aro": 0.5,
+   "recomendado": "cdn-anti-ddos",
+   "controles": [
+    {"id": "cdn-anti-ddos", "nome": "CDN com mitigação de DDoS e origem oculta", "tratamento": "mitigar", "custo_anual": 150000, "ef": 0.05, "aro": 0.5},
+    {"id": "datacenter-proprio", "nome": "Segundo data center próprio com links redundantes", "tratamento": "mitigar", "custo_anual": 600000, "ef": 0.2, "aro": 0.5}
+   ]
+  },
+  {
+   "id": "fraude-api",
+   "titulo": "Fraude na API de pagamento",
+   "ativo": "API de checkout e contas de clientes",
+   "ameaca": "Fraudadores com listas de senhas vazadas",
+   "vulnerabilidade": "Login sem limite de tentativas e sem MFA",
+   "composicao_av": "Chargebacks e taxas de uma campanha de fraude",
+   "av": 400000,
+   "ef": 0.5,
+   "aro": 4,
+   "recomendado": "garantia-chargeback",
+   "controles": [
+    {"id": "rate-limit-mfa", "nome": "Limite de tentativas, MFA no login e regras antifraude próprias", "tratamento": "mitigar", "custo_anual": 200000, "ef": 0.2, "aro": 2},
+    {"id": "garantia-chargeback", "nome": "Antifraude com garantia de chargeback", "tratamento": "transferir", "custo_anual": 260000, "ef": 0.05, "aro": 4}
+   ]
+  },
+  {
+   "id": "bec-financeiro",
+   "titulo": "BEC no financeiro",
+   "ativo": "Pagamentos a fornecedores",
+   "ameaca": "Golpista que se passa por fornecedor (Business Email Compromise)",
+   "vulnerabilidade": "Troca de conta bancária aceita por e-mail",
+   "composicao_av": "Lote mensal de pagamentos a fornecedores desviado",
+   "av": 1500000,
+   "ef": 0.6,
+   "aro": 0.3,
+   "recomendado": "callback-dmarc",
+   "controles": [
+    {"id": "callback-dmarc", "nome": "Confirmação por telefone de troca de conta e DMARC em p=reject", "tratamento": "mitigar", "custo_anual": 30000, "ef": 0.6, "aro": 0.05},
+    {"id": "seguro-crime", "nome": "Seguro contra crime cibernético", "tratamento": "transferir", "custo_anual": 90000, "ef": 0.15, "aro": 0.3}
+   ]
+  },
+  {
+   "id": "queda-gateway",
+   "titulo": "Queda do gateway de pagamento",
+   "ativo": "Integração com o gateway de pagamento",
+   "ameaca": "Indisponibilidade do fornecedor",
+   "vulnerabilidade": "Um único gateway contratado",
+   "composicao_av": "Vendas de 4 horas de checkout fora do ar",
+   "av": 250000,
+   "ef": 0.4,
+   "aro": 0.5,
+   "recomendado": "aceitar",
+   "controles": [
+    {"id": "segundo-gateway", "nome": "Segundo gateway com troca automática", "tratamento": "mitigar", "custo_anual": 120000, "ef": 0.1, "aro": 0.5},
+    {"id": "sla-credito", "nome": "SLA com crédito contratual por indisponibilidade", "tratamento": "transferir", "custo_anual": 20000, "ef": 0.3, "aro": 0.5}
+   ]
+  }
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var RISCO = JSON.parse(document.getElementById("risco-dados").textContent);
+    var BRL = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+    var NUM = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
+    var ROTULO_TRATAMENTO = { mitigar: "Mitigar", transferir: "Transferir", evitar: "Evitar", aceitar: "Aceitar" };
+    var estado = {};
+    var atual = null;
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function nivel(escala, valor) {
+        var n = 0;
+        escala.forEach(function(item) { if (valor >= item.min) n = item.nivel; });
+        return n;
+    }
+    function faixa(pontuacao) {
+        for (var i = 0; i < RISCO.faixas.length; i++) {
+            var f = RISCO.faixas[i];
+            if (pontuacao >= f.min && pontuacao <= f.max) return f;
+        }
+        return RISCO.faixas[0];
+    }
+    function rotuloNivel(p, i) {
+        var s = p * i;
+        return s + " (" + faixa(s).nome + ")";
+    }
+    function cenario(id) {
+        return RISCO.cenarios.filter(function(c) { return c.id === id; })[0];
+    }
+    function pct(x) {
+        return Math.round(x * 100) + "%";
+    }
+
+    // Calcula o cenário com os valores atuais. Um controle nunca piora o cenário:
+    // usa o menor EF e o menor ARO entre o controle e os valores digitados.
+    function avaliar(c) {
+        var s = estado[c.id];
+        var sle = s.av * s.ef;
+        var ale = sle * s.aro;
+        var r = {
+            sle: sle, ale: ale,
+            p: nivel(RISCO.escala_probabilidade, s.aro),
+            i: nivel(RISCO.escala_impacto, sle),
+            opcoes: [], melhor: null
+        };
+        c.controles.forEach(function(ctl) {
+            var ef = Math.min(ctl.ef, s.ef);
+            var aro = Math.min(ctl.aro, s.aro);
+            var sleR = s.av * ef;
+            var aleR = sleR * aro;
+            var beneficio = ale - aleR - ctl.custo_anual;
+            r.opcoes.push({
+                id: ctl.id, nome: ctl.nome, tratamento: ctl.tratamento, custo: ctl.custo_anual,
+                ale: aleR, beneficio: beneficio, rosi: beneficio / ctl.custo_anual,
+                p: nivel(RISCO.escala_probabilidade, aro), i: nivel(RISCO.escala_impacto, sleR)
+            });
+        });
+        r.opcoes.forEach(function(o) {
+            if (o.beneficio > 0 && (!r.melhor || o.beneficio > r.melhor.beneficio)) r.melhor = o;
+        });
+        r.aceitar = { id: "aceitar", nome: "Aceitar o risco (sem novo controle)", tratamento: "aceitar", custo: 0,
+                      ale: ale, beneficio: 0, rosi: null, p: r.p, i: r.i };
+        return r;
+    }
+    function escolhido(c, r) {
+        var id = estado[c.id].controle;
+        if (id === "aceitar") return r.aceitar;
+        return r.opcoes.filter(function(o) { return o.id === id; })[0] || r.aceitar;
+    }
+
+    function celulaCor(td, pontuacao) {
+        td.style.background = faixa(pontuacao).cor;
+    }
+
+    function renderizarCenarios() {
+        var box = document.getElementById("risco-cenarios");
+        box.replaceChildren();
+        RISCO.cenarios.forEach(function(c) {
+            var b = el("button", c.titulo);
+            b.type = "button";
+            b.className = c.id === atual ? "btn-primary" : "btn-secondary";
+            b.setAttribute("aria-pressed", c.id === atual ? "true" : "false");
+            b.style.fontSize = "0.85rem";
+            b.addEventListener("click", function() { selecionarCenarioRisco(c.id); });
+            box.appendChild(b);
+        });
+    }
+
+    function renderizarFicha(c) {
+        var dl = document.getElementById("risco-ficha");
+        dl.replaceChildren();
+        [["Ativo", c.ativo], ["Ameaça", c.ameaca], ["Vulnerabilidade", c.vulnerabilidade], ["O que compõe o AV", c.composicao_av]]
+            .forEach(function(par) {
+                dl.appendChild(el("dt", par[0], "font-weight: 600;"));
+                dl.appendChild(el("dd", par[1], "margin: 0;"));
+            });
+    }
+
+    function renderizarMatriz(c, r) {
+        var s = estado[c.id];
+        var esc = escolhido(c, r);
+        var tbody = document.querySelector("#risco-matriz tbody");
+        tbody.replaceChildren();
+        for (var p = 5; p >= 1; p--) {
+            var tr = el("tr");
+            var thP = el("th", String(p), "text-align: center; padding: 0.25rem 0.5rem; font-weight: 600;");
+            thP.setAttribute("scope", "row");
+            thP.title = "Probabilidade " + p + ": " + RISCO.escala_probabilidade[p - 1].rotulo;
+            tr.appendChild(thP);
+            for (var i = 1; i <= 5; i++) {
+                var td = el("td", null, "padding: 0; border: 1px solid var(--rule);");
+                celulaCor(td, p * i);
+                var marcas = [];
+                if (p === r.p && i === r.i) marcas.push("I");
+                if (esc.id !== "aceitar" && p === esc.p && i === esc.i) marcas.push("R");
+                if (s.estimativa && p === s.estimativa.p && i === s.estimativa.i) marcas.push("V");
+                var b = el("button", marcas.length ? marcas.join(" ") : String(p * i),
+                    "width: min(3rem, 12vw); height: 2.6rem; border: none; background: transparent; color: var(--ink); cursor: pointer; font-family: var(--font-mono); " +
+                    (marcas.length ? "font-weight: 700; font-size: 0.9rem;" : "font-size: 0.75rem; opacity: 0.7;"));
+                b.type = "button";
+                b.setAttribute("aria-label", "Probabilidade " + p + ", impacto " + i + ", pontuação " + rotuloNivel(p, i) +
+                    (marcas.length ? ", marcas: " + marcas.join(", ") : ""));
+                (function(pp, ii) {
+                    b.addEventListener("click", function() { estimarRisco(pp, ii); });
+                })(p, i);
+                td.appendChild(b);
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        }
+        var trI = el("tr");
+        trI.appendChild(el("th", ""));
+        for (var j = 1; j <= 5; j++) {
+            var thI = el("th", String(j), "font-weight: 600; padding: 0.25rem 0; text-align: center;");
+            thI.setAttribute("scope", "col");
+            thI.title = "Impacto " + j + ": " + RISCO.escala_impacto[j - 1].rotulo;
+            trI.appendChild(thI);
+        }
+        tbody.appendChild(trI);
+
+        var fb = document.getElementById("risco-matriz-feedback");
+        fb.replaceChildren();
+        if (!s.estimativa) {
+            fb.appendChild(el("span", "Onde você posiciona este risco? Clique numa célula antes de olhar os números.", "color: var(--muted);"));
+            return;
+        }
+        var pe = s.estimativa.p, ie = s.estimativa.i;
+        var fe = faixa(pe * ie).nome, fq = faixa(r.p * r.i).nome;
+        var msg;
+        if (pe === r.p && ie === r.i) {
+            msg = "Sua estimativa coincide com a análise quantitativa: " + rotuloNivel(r.p, r.i) + ".";
+        } else if (fe === fq) {
+            msg = "Você estimou " + rotuloNivel(pe, ie) + "; os números indicam " + rotuloNivel(r.p, r.i) +
+                ". A célula difere, mas a faixa e a decisão são as mesmas.";
+        } else {
+            msg = "Você estimou " + rotuloNivel(pe, ie) + "; os números indicam " + rotuloNivel(r.p, r.i) +
+                ". Faixas diferentes levam a decisões diferentes: revise as premissas ou a leitura da escala.";
+        }
+        fb.appendChild(el("span", msg));
+    }
+
+    function renderizarQuantitativo(c, r) {
+        var s = estado[c.id];
+        var esc = escolhido(c, r);
+        var ul = document.getElementById("risco-calculo");
+        ul.replaceChildren();
+        ul.appendChild(el("li", "SLE = AV × EF = " + BRL.format(s.av) + " × " + NUM.format(s.ef * 100) + "% = " + BRL.format(r.sle)));
+        ul.appendChild(el("li", "ALE = SLE × ARO = " + BRL.format(r.sle) + " × " + NUM.format(s.aro) + " = " + BRL.format(r.ale) + " por ano"));
+        ul.appendChild(el("li", "Probabilidade " + r.p + " × impacto " + r.i + " = risco inerente " + rotuloNivel(r.p, r.i)));
+
+        var tbody = document.querySelector("#risco-opcoes tbody");
+        tbody.replaceChildren();
+        [r.aceitar].concat(r.opcoes).forEach(function(o) {
+            var tr = el("tr");
+            var tdR = el("td");
+            var radio = el("input");
+            radio.type = "radio";
+            radio.name = "risco-controle";
+            radio.value = o.id;
+            radio.checked = o.id === esc.id;
+            radio.setAttribute("aria-label", "Escolher: " + o.nome);
+            radio.addEventListener("change", function() { escolherControleRisco(o.id); });
+            tdR.appendChild(radio);
+            tr.appendChild(tdR);
+            var tdN = el("td");
+            tdN.appendChild(el("strong", ROTULO_TRATAMENTO[o.tratamento] + ": "));
+            tdN.appendChild(document.createTextNode(o.nome));
+            if (r.melhor && o.id === r.melhor.id) tdN.appendChild(el("span", " ★ maior benefício líquido", "color: var(--tip-color); font-weight: 600;"));
+            if (!r.melhor && o.id === "aceitar") tdN.appendChild(el("span", " ★ nenhum controle se paga", "color: var(--tip-color); font-weight: 600;"));
+            tr.appendChild(tdN);
+            tr.appendChild(el("td", BRL.format(o.custo)));
+            tr.appendChild(el("td", BRL.format(o.ale)));
+            tr.appendChild(el("td", BRL.format(o.beneficio), o.beneficio < 0 ? "color: var(--danger-color);" : null));
+            tr.appendChild(el("td", o.rosi === null ? "—" : pct(o.rosi), o.rosi !== null && o.rosi < 0 ? "color: var(--danger-color);" : null));
+            var tdF = el("td", rotuloNivel(o.p, o.i));
+            celulaCor(tdF, o.p * o.i);
+            tr.appendChild(tdF);
+            tbody.appendChild(tr);
+        });
+
+        var rec = document.getElementById("risco-recomendacao");
+        rec.replaceChildren();
+        var resid = esc.p * esc.i;
+        var texto = "Escolha atual: " + ROTULO_TRATAMENTO[esc.tratamento] + ". Residual " + rotuloNivel(esc.p, esc.i) + ", " +
+            (resid <= RISCO.apetite ? "dentro" : "acima") + " do apetite (até " + RISCO.apetite + ").";
+        if (esc.rosi !== null && esc.rosi < 0) texto += " Atenção: este controle custa mais do que a perda que evita.";
+        if (r.melhor && esc.id !== r.melhor.id && esc.id !== "aceitar" && esc.rosi > r.melhor.rosi) {
+            texto += " O ROSI desta opção é maior, mas ela evita menos prejuízo do que a opção marcada com ★.";
+        }
+        rec.appendChild(el("span", texto, resid > RISCO.apetite ? "color: var(--danger-color);" : null));
+    }
+
+    function renderizarRegistro() {
+        var tbody = document.querySelector("#risco-registro tbody");
+        var tfoot = document.querySelector("#risco-registro tfoot");
+        tbody.replaceChildren();
+        tfoot.replaceChildren();
+        var custo = 0, aleAntes = 0, aleDepois = 0;
+        RISCO.cenarios.forEach(function(c) {
+            var r = avaliar(c);
+            var esc = escolhido(c, r);
+            custo += esc.custo; aleAntes += r.ale; aleDepois += esc.ale;
+            var tr = el("tr", null, c.id === atual ? "outline: 2px solid var(--accent); outline-offset: -2px;" : null);
+            tr.appendChild(el("td", c.titulo));
+            var tdI = el("td", rotuloNivel(r.p, r.i));
+            celulaCor(tdI, r.p * r.i);
+            tr.appendChild(tdI);
+            tr.appendChild(el("td", ROTULO_TRATAMENTO[esc.tratamento]));
+            tr.appendChild(el("td", BRL.format(esc.custo)));
+            tr.appendChild(el("td", BRL.format(r.ale)));
+            tr.appendChild(el("td", BRL.format(esc.ale)));
+            var tdR = el("td", rotuloNivel(esc.p, esc.i));
+            celulaCor(tdR, esc.p * esc.i);
+            tr.appendChild(tdR);
+            tbody.appendChild(tr);
+        });
+        var tr = el("tr", null, "font-weight: 700;");
+        tr.appendChild(el("td", "Total"));
+        tr.appendChild(el("td", ""));
+        tr.appendChild(el("td", ""));
+        tr.appendChild(el("td", BRL.format(custo)));
+        tr.appendChild(el("td", BRL.format(aleAntes)));
+        tr.appendChild(el("td", BRL.format(aleDepois)));
+        tr.appendChild(el("td", ""));
+        tfoot.appendChild(tr);
+
+        var box = document.getElementById("risco-orcamento");
+        box.replaceChildren();
+        var uso = custo / RISCO.orcamento_anual;
+        box.appendChild(el("div", "Orçamento usado: " + BRL.format(custo) + " de " + BRL.format(RISCO.orcamento_anual) + " (" + pct(uso) + ")",
+            uso > 1 ? "color: var(--danger-color); font-weight: 600;" : null));
+        var barra = el("div", null, "height: 0.6rem; background: var(--sunk); border-radius: var(--radius-pill); overflow: hidden; margin-top: 0.3rem;");
+        barra.setAttribute("role", "progressbar");
+        barra.setAttribute("aria-label", "Uso do orçamento anual");
+        barra.setAttribute("aria-valuemin", "0");
+        barra.setAttribute("aria-valuemax", "100");
+        barra.setAttribute("aria-valuenow", String(Math.min(100, Math.round(uso * 100))));
+        barra.appendChild(el("div", null, "height: 100%; width: " + Math.min(100, uso * 100) + "%; background: " +
+            (uso > 1 ? "var(--danger-color)" : "var(--accent)") + ";"));
+        box.appendChild(barra);
+    }
+
+    function renderizarTudo() {
+        var c = cenario(atual);
+        var r = avaliar(c);
+        renderizarCenarios();
+        renderizarMatriz(c, r);
+        renderizarQuantitativo(c, r);
+        renderizarRegistro();
+    }
+
+    function lerNumero(id) {
+        // Aceita "12.000.000", "0,25" e "0.25": vírgula é decimal; ponto só é milhar em grupos de 3 dígitos.
+        var bruto = document.getElementById(id).value.trim().replace(/\s/g, "");
+        if (bruto.indexOf(",") !== -1) {
+            bruto = bruto.replace(/\./g, "").replace(",", ".");
+        } else if (/^\d{1,3}(\.\d{3})+$/.test(bruto)) {
+            bruto = bruto.replace(/\./g, "");
+        }
+        if (bruto === "" || isNaN(Number(bruto))) return NaN;
+        return Number(bruto);
+    }
+    function preencherEntradas() {
+        var s = estado[atual];
+        document.getElementById("risco-av").value = NUM.format(s.av);
+        document.getElementById("risco-ef").value = NUM.format(s.ef * 100);
+        document.getElementById("risco-aro").value = NUM.format(s.aro);
+        document.getElementById("risco-erro").textContent = "";
+    }
+    function atualizarEntradas() {
+        var av = lerNumero("risco-av"), ef = lerNumero("risco-ef"), aro = lerNumero("risco-aro");
+        var erro = document.getElementById("risco-erro");
+        if (!(av > 0)) { erro.textContent = "Informe um AV maior que zero."; return; }
+        if (!(ef > 0 && ef <= 100)) { erro.textContent = "O EF deve estar entre 0 e 100%."; return; }
+        if (!(aro > 0)) { erro.textContent = "Informe um ARO maior que zero (ex.: 0,25 para uma vez a cada 4 anos)."; return; }
+        erro.textContent = "";
+        var s = estado[atual];
+        s.av = av; s.ef = ef / 100; s.aro = aro;
+        renderizarTudo();
+    }
+
+    function estimarRisco(p, i) {
+        estado[atual].estimativa = { p: p, i: i };
+        renderizarTudo();
+    }
+
+    window.selecionarCenarioRisco = function(id) {
+        if (!cenario(id)) return;
+        atual = id;
+        renderizarFicha(cenario(id));
+        preencherEntradas();
+        renderizarTudo();
+    };
+
+    window.escolherControleRisco = function(id) {
+        estado[atual].controle = id;
+        renderizarTudo();
+    };
+
+    window.verificarPlanoRisco = function() {
+        var box = document.getElementById("risco-verificacao");
+        box.replaceChildren();
+        var custo = 0, beneficio = 0, beneficioMelhor = 0;
+        var problemas = [];
+        RISCO.cenarios.forEach(function(c) {
+            var r = avaliar(c);
+            var esc = escolhido(c, r);
+            custo += esc.custo;
+            beneficio += esc.beneficio;
+            beneficioMelhor += r.melhor ? r.melhor.beneficio : 0;
+            if (esc.p * esc.i > RISCO.apetite) {
+                problemas.push(c.titulo + ": residual " + rotuloNivel(esc.p, esc.i) + " acima do apetite. Trate o risco ou leve a aceitação ao dono do risco.");
+            }
+            if (esc.beneficio < 0) {
+                problemas.push(c.titulo + ": o controle escolhido custa mais do que a perda que evita (ROSI " + pct(esc.rosi) + ").");
+            }
+        });
+        if (custo > RISCO.orcamento_anual) {
+            problemas.push("O plano custa " + BRL.format(custo) + " e estoura o orçamento de " + BRL.format(RISCO.orcamento_anual) + ".");
+        }
+        var ul = el("ul", null, "padding-left: 1.25rem; margin: 0.5rem 0;");
+        problemas.forEach(function(p) { ul.appendChild(el("li", p, "color: var(--danger-color);")); });
+        if (problemas.length) {
+            box.appendChild(el("strong", "O plano ainda tem " + problemas.length + " ponto(s) a resolver:"));
+            box.appendChild(ul);
+        } else {
+            box.appendChild(el("strong", "Plano aprovado: cabe no orçamento e todos os residuais estão dentro do apetite.", "color: var(--tip-color);"));
+        }
+        box.appendChild(el("p", "Benefício líquido do seu plano: " + BRL.format(beneficio) + " por ano. Melhor plano possível com estes valores: " +
+            BRL.format(beneficioMelhor) + " por ano.", "margin: 0.5rem 0 0 0;"));
+    };
+
+    window.restaurarRisco = function() {
+        estado = {};
+        RISCO.cenarios.forEach(function(c) {
+            estado[c.id] = { av: c.av, ef: c.ef, aro: c.aro, controle: "aceitar", estimativa: null };
+        });
+        document.getElementById("risco-verificacao").replaceChildren();
+        selecionarCenarioRisco(RISCO.cenarios[0].id);
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("risco-contexto").textContent = RISCO.contexto +
+            " Apetite: até " + RISCO.apetite + " (" + faixa(RISCO.apetite).nome + "). Orçamento anual: " + BRL.format(RISCO.orcamento_anual) + ".";
+        ["risco-av", "risco-ef", "risco-aro"].forEach(function(id) {
+            document.getElementById(id).addEventListener("change", atualizarEntradas);
+        });
+        restaurarRisco();
+        if (typeof initChecklist === "function") {
+            initChecklist("gestao-riscos-ti");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
+    <footer class="study-footer">
+      <p>&copy; 2026 Estudos em Cibersegurança &bull; Material Autoinstrucional e Prático 100% Offline</p>
+      <p><a href="../index.html">← Painel de Estudos</a> &bull; Curadoria e Desenvolvimento por José Mauro da Silva Brandão</p>
+    </footer>
+  </main>
+
+  <!-- Scripts Interativos Embutidos -->
+  <script>
+/**
+ * ============================================================================
+ * ESTUDOS DE CIBERSEGURANÇA — BIBLIOTECA BASE COMPARTILHADA (base.js)
+ * Utilitários reativos, persistência local segura, acessibilidade e interatividade.
+ * Vanilla JavaScript (Zero dependências externas, 100% offline-ready).
+ * ============================================================================
+ */
+
+(function (window, document) {
+  'use strict';
+
+  // --------------------------------------------------------------------------
+  // 0. Utilitários Seguros de Armazenamento Local (localStorage)
+  // --------------------------------------------------------------------------
+  function safeStorageGet(key) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.localStorage.getItem(key);
+      }
+    } catch (e) {
+      console.warn(`[CS] Falha ao ler localStorage chave "${key}":`, e);
+    }
+    return null;
+  }
+
+  function safeStorageSet(key, value) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, String(value));
+        return true;
+      }
+    } catch (e) {
+      console.warn(`[CS] Falha ao gravar localStorage chave "${key}":`, e);
+    }
+    return false;
+  }
+
+  // --------------------------------------------------------------------------
+  // 1. Gerenciamento de Tema (Claro / Escuro)
+  // --------------------------------------------------------------------------
+  const THEME_STORAGE_KEY = 'cs_theme';
+
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    updateThemeButtons(theme);
+  }
+
+  function getSystemTheme() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  }
+
+  function getCurrentTheme() {
+    const saved = safeStorageGet(THEME_STORAGE_KEY);
+    return saved || getSystemTheme();
+  }
+
+  function updateThemeButtons(currentTheme) {
+    const effectiveTheme = currentTheme === 'dark' || (!currentTheme && getSystemTheme() === 'dark') ? 'dark' : 'light';
+    const buttons = document.querySelectorAll('.theme-toggle-btn, [data-theme-toggle]');
+    buttons.forEach((btn) => {
+      btn.setAttribute('aria-label', effectiveTheme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro');
+      btn.innerHTML = effectiveTheme === 'dark'
+        ? '<span class="theme-icon">☀️</span> <span class="theme-label">Claro</span>'
+        : '<span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>';
+    });
+  }
+
+  function toggleTheme() {
+    const current = getCurrentTheme();
+    const next = current === 'dark' ? 'light' : 'dark';
+    safeStorageSet(THEME_STORAGE_KEY, next);
+    applyTheme(next);
+    return next;
+  }
+
+  function initTheme() {
+    const saved = safeStorageGet(THEME_STORAGE_KEY);
+    if (saved) {
+      applyTheme(saved);
+    } else {
+      updateThemeButtons(getSystemTheme());
+    }
+
+    // Monitora preferência do sistema operacional caso usuário não tenha fixado
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!safeStorageGet(THEME_STORAGE_KEY)) {
+          updateThemeButtons(e.matches ? 'dark' : 'light');
+        }
+      });
+    }
+
+    // Vincula cliques em botões de tema
+    document.querySelectorAll('.theme-toggle-btn, [data-theme-toggle]').forEach((btn) => {
+      btn.onclick = toggleTheme;
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 2. Checklist Operacional Interativo & Status de Conclusão de Estudo
+  // --------------------------------------------------------------------------
+  function extractSlug() {
+    if (document.body && document.body.dataset && document.body.dataset.slug) {
+      return document.body.dataset.slug;
+    }
+    const metaSlug = document.querySelector('meta[name="study-slug"]');
+    if (metaSlug && metaSlug.content) {
+      return metaSlug.content;
+    }
+    // Fallback: tenta obter do pathname
+    const match = window.location.pathname.match(/treinamento-([^.]+)\.html/);
+    if (match) {
+      return match[1];
+    }
+    return 'default';
+  }
+
+  function updateChecklistProgress(checklistEl) {
+    const checkboxes = checklistEl.querySelectorAll('input[type="checkbox"]');
+    if (!checkboxes.length) return;
+
+    let checkedCount = 0;
+    checkboxes.forEach((cb) => {
+      if (cb.checked) checkedCount++;
+    });
+
+    const progressFill = checklistEl.querySelector('.checklist-progress-fill');
+    if (progressFill) {
+      const pct = Math.round((checkedCount / checkboxes.length) * 100);
+      progressFill.style.width = `${pct}%`;
+    }
+
+    const counterEl = checklistEl.querySelector('.checklist-counter');
+    if (counterEl) {
+      counterEl.textContent = `${checkedCount} de ${checkboxes.length} itens auditados`;
+    }
+  }
+
+  function initChecklist(slug) {
+    const activeSlug = slug || extractSlug();
+    const checklists = document.querySelectorAll('.checklist');
+
+    checklists.forEach((checklist, listIdx) => {
+      const listId = checklist.dataset.checklistId || `list_${listIdx}`;
+      const items = checklist.querySelectorAll('.check-item');
+
+      items.forEach((item, itemIdx) => {
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        if (!checkbox) return;
+
+        const itemId = checkbox.id || checkbox.getAttribute('data-id') || `${listId}_${itemIdx}`;
+        const storageKey = `cs_check_${activeSlug}_${itemId}`;
+
+        // Restaura estado
+        const savedState = safeStorageGet(storageKey);
+        if (savedState === 'true') {
+          checkbox.checked = true;
+          item.classList.add('completed');
+        } else {
+          checkbox.checked = false;
+          item.classList.remove('completed');
+        }
+
+        // Event listener
+        checkbox.onchange = function () {
+          safeStorageSet(storageKey, checkbox.checked ? 'true' : 'false');
+          if (checkbox.checked) {
+            item.classList.add('completed');
+          } else {
+            item.classList.remove('completed');
+          }
+          updateChecklistProgress(checklist);
+        };
+      });
+
+      updateChecklistProgress(checklist);
+    });
+  }
+
+  function isStudyDone(slug) {
+    const activeSlug = slug || extractSlug();
+    return safeStorageGet(`cs_done_${activeSlug}`) === 'true';
+  }
+
+  function setStudyDone(slug, isDone) {
+    const activeSlug = slug || extractSlug();
+    const doneValue = isDone !== false;
+    return safeStorageSet(`cs_done_${activeSlug}`, doneValue ? 'true' : 'false');
+  }
+
+  // --------------------------------------------------------------------------
+  // 3. Sistema de Quiz com Feedback Explicativo
+  // --------------------------------------------------------------------------
+  function checkQuiz(btn, isCorrect, explanation) {
+    const quizItem = btn.closest('.quiz-item');
+    if (!quizItem) return;
+
+    // Desabilita botões para registrar a tentativa
+    const buttons = quizItem.querySelectorAll('.quiz-btn');
+    buttons.forEach((b) => {
+      b.disabled = true;
+      b.classList.remove('selected');
+    });
+
+    // Destaca o botão clicado
+    btn.classList.add('selected');
+    if (isCorrect) {
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('incorrect');
+    }
+
+    // Exibe ou atualiza o painel de feedback
+    let feedbackEl = quizItem.querySelector('.quiz-feedback');
+    if (!feedbackEl) {
+      feedbackEl = document.createElement('div');
+      feedbackEl.className = 'quiz-feedback';
+      quizItem.appendChild(feedbackEl);
+    }
+
+    feedbackEl.className = `quiz-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+    const icon = isCorrect ? '✅' : '❌';
+    const statusText = isCorrect ? 'Correto!' : 'Incorreto.';
+    feedbackEl.innerHTML = `<strong>${icon} ${statusText}</strong> ${escapeHtml(explanation || '')}`;
+    feedbackEl.style.display = 'block';
+  }
+
+  function initQuiz() {
+    const quizItems = document.querySelectorAll('.quiz-item');
+    quizItems.forEach((quiz, idx) => {
+      const qId = quiz.dataset.quizId || `quiz_${idx}`;
+      quiz.setAttribute('data-initialized', 'true');
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 4. Copiar Código para Área de Transferência
+  // --------------------------------------------------------------------------
+  function copyCode(button, targetId) {
+    let textToCopy = '';
+
+    if (targetId) {
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        textToCopy = targetEl.innerText || targetEl.textContent;
+      }
+    } else if (button) {
+      const terminalBox = button.closest('.terminal-box') || button.parentElement;
+      const codeEl = terminalBox ? terminalBox.querySelector('pre code, pre, code') : null;
+      if (codeEl) {
+        textToCopy = codeEl.innerText || codeEl.textContent;
+      }
+    }
+
+    if (!textToCopy) return;
+
+    const originalText = button ? button.innerText : 'Copiar';
+
+    function setSuccess() {
+      if (button) {
+        button.innerText = '✓ Copiado!';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.innerText = originalText;
+          button.classList.remove('copied');
+        }, 2000);
+      }
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textToCopy.trim()).then(setSuccess).catch(() => {
+        fallbackCopy(textToCopy.trim(), setSuccess);
+      });
+    } else {
+      fallbackCopy(textToCopy.trim(), setSuccess);
+    }
+  }
+
+  function fallbackCopy(text, callback) {
+    if (!document.body) {
+      console.warn('document.body não está pronto para cópia via textarea.');
+      return;
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const successful = document.execCommand('copy');
+      if (successful && callback) {
+        callback();
+      }
+    } catch (e) {
+      console.warn('Falha ao copiar texto:', e);
+    } finally {
+      if (textarea.parentNode) {
+        textarea.parentNode.removeChild(textarea);
+      }
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 5. Utilitários Reutilizáveis para Simuladores e Laboratórios
+  // --------------------------------------------------------------------------
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function formatBytes(bytes, decimals = 2) {
+    if (!+bytes || bytes < 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  }
+
+  function formatNumber(num) {
+    if (isNaN(num)) return '0';
+    return new Intl.NumberFormat('pt-BR').format(num);
+  }
+
+  function bytesToHex(uint8Array) {
+    return Array.from(uint8Array)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  function hexToBytes(hexString) {
+    let cleaned = String(hexString || '').replace(/\s+/g, '');
+    if (cleaned.length % 2 !== 0) {
+      cleaned = '0' + cleaned;
+    }
+    const bytes = new Uint8Array(cleaned.length / 2);
+    for (let i = 0; i < cleaned.length; i += 2) {
+      bytes[i / 2] = parseInt(cleaned.substring(i, i + 2), 16);
+    }
+    return bytes;
+  }
+
+  async function sha256Hex(message) {
+    if (!window.crypto || !window.crypto.subtle) {
+      throw new Error('Web Cryptography API não suportada neste ambiente.');
+    }
+    const msgUint8 = new TextEncoder().encode(message);
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // --------------------------------------------------------------------------
+  // 6. Exposição Global de Funções & Inicialização Automática
+  // --------------------------------------------------------------------------
+  window.safeStorageGet = safeStorageGet;
+  window.safeStorageSet = safeStorageSet;
+  window.initTheme = initTheme;
+  window.toggleTheme = toggleTheme;
+  window.initChecklist = initChecklist;
+  window.isStudyDone = isStudyDone;
+  window.setStudyDone = setStudyDone;
+  window.initQuiz = initQuiz;
+  window.checkQuiz = checkQuiz;
+  window.copyCode = copyCode;
+  window.escapeHtml = escapeHtml;
+  window.formatBytes = formatBytes;
+  window.formatNumber = formatNumber;
+  window.bytesToHex = bytesToHex;
+  window.hexToBytes = hexToBytes;
+  window.sha256Hex = sha256Hex;
+
+  // Namespace unificado
+  window.CS = {
+    safeStorageGet,
+    safeStorageSet,
+    initTheme,
+    toggleTheme,
+    initChecklist,
+    isStudyDone,
+    setStudyDone,
+    initQuiz,
+    checkQuiz,
+    copyCode,
+    escapeHtml,
+    formatBytes,
+    formatNumber,
+    bytesToHex,
+    hexToBytes,
+    sha256Hex,
+  };
+
+  // Auto-inicialização na carga do DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      initChecklist();
+      initQuiz();
+    });
+  } else {
+    initTheme();
+    initChecklist();
+    initQuiz();
+  }
+})(window, document);
+
+  </script>
+</body>
+</html>

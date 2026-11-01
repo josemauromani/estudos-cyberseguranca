@@ -1,0 +1,1009 @@
+<!-- Estudo 25: Gestao-de-Riscos-TI Body Fragment -->
+<article class="study-container" data-slug="gestao-riscos-ti">
+
+    <!-- SEÇÃO 1: INTRODUÇÃO -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: Risco Precisa Caber numa Decisão</h2>
+        </div>
+
+        <p class="lead-text">
+            A diretoria não aprova "mais segurança". Ela aprova uma troca: gastar R$ 420 mil por ano para que um ransomware deixe de custar, em média, R$ 3 milhões por ano. Gestão de riscos é o processo que transforma ameaças técnicas nessa troca, com premissas que alguém pode questionar e revisar. Neste estudo você vai conduzir o processo da ISO 31000:2018, posicionar riscos numa matriz 5×5, calcular a perda esperada em reais e escolher o tratamento com melhor retorno, tudo para a <strong>Ipê Store</strong>, uma loja online fictícia que processa pagamentos com cartão.
+        </p>
+
+        <h3>O Vocabulário Mínimo</h3>
+        <p>
+            A ISO 31000:2018 define risco como o <strong>efeito da incerteza nos objetivos</strong>. Em segurança da informação, o risco aparece quando uma <strong>ameaça</strong> explora uma <strong>vulnerabilidade</strong> de um <strong>ativo</strong> e produz um <strong>impacto</strong> com alguma <strong>probabilidade</strong>.
+        </p>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Termo</th><th>Significado</th><th>Exemplo na Ipê Store</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Ativo</strong></td><td>O que tem valor para o negócio</td><td>Base de clientes e dados de pagamento</td></tr>
+                    <tr><td><strong>Ameaça</strong></td><td>Quem ou o que pode causar dano</td><td>Grupo criminoso que vende cartões</td></tr>
+                    <tr><td><strong>Vulnerabilidade</strong></td><td>A fraqueza que a ameaça explora</td><td>SQL injection no checkout</td></tr>
+                    <tr><td><strong>Probabilidade</strong></td><td>Chance de o evento ocorrer num período</td><td>Uma vez a cada quatro anos</td></tr>
+                    <tr><td><strong>Impacto</strong></td><td>Consequência quando o evento ocorre</td><td>Multas das bandeiras, chargebacks e perda de clientes</td></tr>
+                    <tr><td><strong>Controle</strong></td><td>Medida que modifica o risco</td><td>Tokenização no gateway de pagamento</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">💡</span>
+                <strong>Escreva o risco como uma frase</strong>
+            </div>
+            <p>
+                "Um grupo criminoso explora SQL injection no checkout e copia os dados de cartão armazenados, gerando multas, chargebacks e perda de clientes." Um risco escrito assim tem ativo, ameaça, vulnerabilidade e impacto explícitos, e por isso pode ser analisado. "Risco de hacker" não pode.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: PROCESSO E ANÁLISE -->
+    <section class="study-section" id="processo">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>ISO 31000, Matriz 5×5 e Cálculo Financeiro</h2>
+        </div>
+
+        <h3>ISO 31000:2018: Princípios, Estrutura e Processo</h3>
+        <p>
+            A norma tem três partes. Os <strong>princípios</strong> dizem como uma boa gestão de riscos se comporta: cria e protege valor, é integrada aos processos, estruturada e abrangente, personalizada ao contexto, inclusiva, dinâmica, usa a melhor informação disponível, considera fatores humanos e culturais e melhora continuamente. A <strong>estrutura</strong> coloca liderança e comprometimento no centro, cercados por integração, concepção, implementação, avaliação e melhoria. O <strong>processo</strong> é o ciclo que o analista executa no dia a dia:
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Processo de Gestão de Riscos (ISO 31000:2018)</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Processo de Gestão de Riscos (ISO 31000:2018)">
+flowchart TD
+    CC["Comunicação e consulta<br><small>com as partes interessadas, em todas as etapas</small>"]
+    E["Escopo, contexto e critérios<br><small>escalas, apetite e tolerância</small>"]
+    subgraph PA["Processo de avaliação de riscos"]
+        I["Identificação<br><small>ativo, ameaça, vulnerabilidade</small>"]
+        A["Análise<br><small>probabilidade e impacto, nível de risco</small>"]
+        AV["Avaliação<br><small>comparação com os critérios</small>"]
+    end
+    T["Tratamento<br><small>mitigar, transferir, evitar ou aceitar</small>"]
+    M["Monitoramento e análise crítica"]
+    R["Registro e relato<br><small>registro de riscos</small>"]
+    CC --> E
+    E --> I
+    I --> A
+    A --> AV
+    AV --> T
+    T --> M
+    M --> R
+    R -.->|"revisão periódica"| E
+            </pre>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">📝</span>
+                <strong>Análise não é avaliação</strong>
+            </div>
+            <p>
+                Na ISO 31000, <strong>análise</strong> determina o nível do risco (probabilidade e impacto). <strong>Avaliação</strong> compara esse nível com os critérios definidos no contexto para decidir se o risco precisa de tratamento. As três etapas juntas (identificação, análise e avaliação) formam o "processo de avaliação de riscos". Bancas de concurso exploram essa distinção.
+            </p>
+        </div>
+
+        <h3>Onde as Outras Referências se Encaixam</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Referência</th><th>Papel</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>ISO 31000:2018</strong></td><td>Gestão de riscos de qualquer natureza: financeira, operacional, de segurança. É o "guarda-chuva".</td></tr>
+                    <tr><td><strong>ISO/IEC 27005:2022</strong></td><td>Aplica o processo à segurança da informação, alinhada à ISO/IEC 27001:2022, com abordagens baseadas em ativos ou em eventos (cenários).</td></tr>
+                    <tr><td><strong>ISO/IEC 27001:2022, cláusulas 6.1.2 e 6.1.3</strong></td><td>Exige o processo de avaliação de riscos e o de tratamento. O tratamento escolhe os controles do Anexo A e alimenta a Declaração de Aplicabilidade (Estudo 26).</td></tr>
+                    <tr><td><strong>NIST SP 800-30 Rev. 1</strong></td><td>Guia prático para conduzir avaliações de risco: preparar, conduzir, comunicar e manter.</td></tr>
+                    <tr><td><strong>NIST CSF 2.0 (GV.RM e ID.RA)</strong></td><td>GV.RM define a estratégia de gestão de riscos (apetite, tolerância, responsabilidades); ID.RA cobre a avaliação de riscos.</td></tr>
+                    <tr><td><strong>NIST IR 8286</strong></td><td>Liga o risco cibernético à gestão de riscos corporativos (ERM) por meio de registros de risco consolidados.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Análise Qualitativa: a Matriz 5×5</h3>
+        <p>
+            A análise qualitativa atribui um nível de 1 a 5 à probabilidade e ao impacto. A pontuação é o produto dos dois (1 a 25), e uma faixa de cor traduz a pontuação para quem decide. As escalas precisam ser definidas <em>antes</em> da análise, na etapa de contexto. A Ipê Store ancorou cada nível em números para que duas pessoas cheguem à mesma nota:
+        </p>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Nível</th><th>Probabilidade (ARO)</th><th>Impacto por evento (SLE)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>1</strong></td><td>Rara: menos de 0,1 vez por ano</td><td>Insignificante: até R$ 50 mil</td></tr>
+                    <tr><td><strong>2</strong></td><td>Improvável: de 0,1 a 0,25</td><td>Menor: de R$ 50 mil a R$ 200 mil</td></tr>
+                    <tr><td><strong>3</strong></td><td>Possível: de 0,25 a 0,5</td><td>Moderado: de R$ 200 mil a R$ 1 milhão</td></tr>
+                    <tr><td><strong>4</strong></td><td>Provável: de 0,5 a 1</td><td>Maior: de R$ 1 milhão a R$ 5 milhões</td></tr>
+                    <tr><td><strong>5</strong></td><td>Quase certa: 1 vez por ano ou mais</td><td>Catastrófico: R$ 5 milhões ou mais</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Faixas da pontuação: <strong>Baixo</strong> (1 a 4), <strong>Médio</strong> (5 a 9), <strong>Alto</strong> (10 a 15) e <strong>Crítico</strong> (16 a 25). O limite inferior de cada nível pertence a ele: ARO de exatamente 0,25 já é "Possível".
+        </p>
+
+        <h3>Risco Inerente, Risco Residual, Apetite e Tolerância</h3>
+        <ul>
+            <li><strong>risco inerente:</strong> o nível do risco sem considerar os controles que você está propondo.</li>
+            <li><strong>risco residual:</strong> o nível que sobra depois do tratamento. Ele nunca é zero, e precisa ser aceito formalmente pelo dono do risco.</li>
+            <li><strong>apetite</strong> a risco: quanto risco a organização está disposta a assumir para atingir seus objetivos. Na Ipê Store, a diretoria aceita riscos até a faixa Médio (pontuação 9).</li>
+            <li><strong>tolerância</strong> a risco: o desvio aceitável em torno do apetite para um objetivo específico, por exemplo "no máximo 4 horas de checkout fora do ar por ano".</li>
+            <li><strong>registro de riscos:</strong> a planilha viva com cada risco, seu dono, nível inerente, tratamento, nível residual, prazo e data da próxima revisão.</li>
+        </ul>
+
+        <h3>Análise Quantitativa: Risco em Reais</h3>
+        <p>
+            A análise quantitativa usa cinco grandezas, cobradas em CISSP, Security+ e concursos:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Sigla</th><th>Nome</th><th>Como obter</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>AV</strong></td><td>Valor do Ativo (<em>Asset Value</em>)</td><td>Tudo o que o evento pode custar: receita perdida, multas, recuperação, notificação, clientes perdidos.</td></tr>
+                    <tr><td><strong>EF</strong></td><td>Fator de Exposição (<em>Exposure Factor</em>)</td><td>Percentual do AV perdido num evento (0% a 100%).</td></tr>
+                    <tr><td><strong>SLE</strong></td><td>Expectativa de Perda Única (<em>Single Loss Expectancy</em>)</td><td><strong>SLE = AV × EF</strong></td></tr>
+                    <tr><td><strong>ARO</strong></td><td>Taxa Anualizada de Ocorrência (<em>Annualized Rate of Occurrence</em>)</td><td>Ocorrências esperadas por ano. Uma vez a cada 4 anos = 0,25.</td></tr>
+                    <tr><td><strong>ALE</strong></td><td>Expectativa de Perda Anualizada (<em>Annualized Loss Expectancy</em>)</td><td><strong>ALE = SLE × ARO</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Para comparar um controle com o prejuízo que ele evita, calcule o <strong>ROSI</strong> (<em>Return on Security Investment</em>):
+        </p>
+        <p style="font-family: var(--font-mono); font-size: 0.95rem; background: var(--sunk); padding: 0.75rem 1rem; border-radius: var(--radius-sm);">
+            ROSI = (ALE antes − ALE depois − custo anual do controle) ÷ custo anual do controle
+        </p>
+
+        <h3>Exemplo Resolvido: Vazamento de Cartões</h3>
+        <p>
+            O checkout da Ipê Store armazena o número do cartão. Um vazamento custaria R$ 12 milhões no total (multas das bandeiras, investigação forense, chargebacks, notificação à ANPD e clientes perdidos), e a análise estima que 60% desse valor se perde num evento. O histórico do setor indica um vazamento a cada quatro anos.
+        </p>
+        <ol>
+            <li>SLE = R$ 12.000.000 × 0,60 = <strong>R$ 7.200.000</strong> (impacto 5).</li>
+            <li>ALE = R$ 7.200.000 × 0,25 = <strong>R$ 1.800.000 por ano</strong> (probabilidade 3, pontuação 15, faixa Alto).</li>
+            <li>A tokenização no gateway custa R$ 180 mil por ano. A loja deixa de guardar o cartão e o EF cai para 5% (sobram os dados pessoais). ALE depois = R$ 12.000.000 × 0,05 × 0,25 = <strong>R$ 150.000</strong>.</li>
+            <li>ROSI = (1.800.000 − 150.000 − 180.000) ÷ 180.000 = <strong>8,17, ou 817%</strong>. Cada real investido evita R$ 8,17 de perda esperada além do próprio custo.</li>
+        </ol>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">python3 — cálculo de SLE, ALE e ROSI</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-risco-ale')">Copiar</button>
+            </div>
+            <pre><code id="code-risco-ale">av, ef, aro = 12_000_000, 0.60, 0.25
+sle = av * ef                    # 7.200.000
+ale = sle * aro                  # 1.800.000
+
+custo = 180_000                  # tokenização no gateway, por ano
+ale_depois = av * 0.05 * aro     # 150.000
+rosi = (ale - ale_depois - custo) / custo
+
+print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
+# SLE=7,200,000  ALE=1,800,000  ROSI=817%</code></pre>
+        </div>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>ROSI mede eficiência, não tamanho</strong>
+            </div>
+            <p>
+                Um backup imutável de R$ 120 mil pode ter ROSI de 1.233% e ainda assim evitar menos prejuízo do que um pacote de EDR com backup de R$ 420 mil, com ROSI de 519%. Entre opções que se excluem, escolha a de maior <strong>benefício líquido anual</strong> (redução da ALE menos o custo) que caiba no orçamento. Use o ROSI para descartar o que dá prejuízo (ROSI negativo) e para comunicar o retorno.
+            </p>
+        </div>
+
+        <h3>As Quatro Estratégias de Tratamento</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Estratégia</th><th>O que faz</th><th>Exemplo na Ipê Store</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Mitigar</strong></td><td>Reduz probabilidade, impacto ou ambos com controles</td><td>EDR com resposta 24×7 e backup imutável contra ransomware</td></tr>
+                    <tr><td><strong>Transferir</strong></td><td>Passa parte da perda financeira a um terceiro</td><td>Seguro cibernético; garantia de chargeback do antifraude</td></tr>
+                    <tr><td><strong>Evitar</strong></td><td>Deixa de realizar a atividade que gera o risco</td><td>Parar de armazenar o número do cartão (tokenização)</td></tr>
+                    <tr><td><strong>Aceitar</strong></td><td>Assume o risco de forma consciente e registrada</td><td>Quedas curtas do gateway: o controle custa mais do que a perda esperada</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Transferir o custo não transfere a responsabilidade</strong>
+            </div>
+            <p>
+                O seguro paga parte do prejuízo, mas a Ipê Store continua sendo a controladora dos dados perante a LGPD e a responsável pela conformidade com o PCI DSS perante as bandeiras. A comunicação à ANPD e aos titulares continua sendo obrigação dela.
+            </p>
+        </div>
+
+        <h3>Quando a Conta Simples Não Basta: FAIR</h3>
+        <p>
+            AV, EF e ARO são estimativas pontuais e escondem a incerteza. O <strong>FAIR</strong> (<em>Factor Analysis of Information Risk</em>, padronizado pelo The Open Group como Open FAIR) decompõe o risco em frequência de eventos de perda e magnitude da perda, usa faixas (mínimo, mais provável, máximo) e simulação de Monte Carlo, e responde com uma distribuição: "há 10% de chance de perder mais de R$ 5 milhões neste ano". Comece com a conta simples; adote FAIR quando a decisão for grande o bastante para justificar o esforço.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Calculadora de Matriz 5×5 e Risco Financeiro</h2>
+        </div>
+
+        <p class="lead-text">
+            Escolha um dos seis cenários da Ipê Store. Clique na célula da matriz onde você acha que o risco está e compare com o que os números dizem. Ajuste AV, EF e ARO, escolha um tratamento e acompanhe o registro de riscos: o plano precisa caber no orçamento anual e deixar cada risco residual dentro do apetite.
+        </p>
+
+        <div class="lab-box risco-lab" id="risco-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Laboratório de Gestão de Riscos</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Registro de Riscos da Ipê Store</h3>
+                    <p id="risco-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">1. Cenário</h4>
+                <div id="risco-cenarios" role="group" aria-label="Cenários de risco" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+                <dl id="risco-ficha" style="font-size: 0.9rem; margin: 1rem 0; display: grid; grid-template-columns: minmax(0, max-content) minmax(0, 1fr); gap: 0.25rem 0.75rem;"></dl>
+
+                <h4>2. Matriz qualitativa 5×5</h4>
+                <p style="font-size: 0.85rem; color: var(--muted); margin-top: 0;">Clique numa célula para registrar a sua estimativa (V). I = risco inerente pelos números; R = risco residual do tratamento escolhido.</p>
+                <div class="table-responsive">
+                    <table id="risco-matriz" style="border-collapse: collapse; margin: 0 auto; font-size: 0.8rem;">
+                        <caption style="caption-side: bottom; font-size: 0.8rem; color: var(--muted); padding-top: 0.4rem; text-align: left;">Linhas: probabilidade (1 Rara, 2 Improvável, 3 Possível, 4 Provável, 5 Quase certa). Colunas: impacto (1 Insignificante, 2 Menor, 3 Moderado, 4 Maior, 5 Catastrófico).</caption>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div id="risco-matriz-feedback" style="margin: 0.75rem 0 1.5rem 0; font-size: 0.9rem;" aria-live="polite"></div>
+
+                <h4>3. Análise quantitativa e tratamento</h4>
+                <div id="risco-quantitativo">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem;">
+                        <label style="display: flex; flex-direction: column; font-size: 0.85rem; gap: 0.25rem;">Valor do Ativo (AV, R$)
+                            <input class="form-control" type="text" inputmode="decimal" id="risco-av">
+                        </label>
+                        <label style="display: flex; flex-direction: column; font-size: 0.85rem; gap: 0.25rem;">Fator de Exposição (EF, %)
+                            <input class="form-control" type="text" inputmode="decimal" id="risco-ef">
+                        </label>
+                        <label style="display: flex; flex-direction: column; font-size: 0.85rem; gap: 0.25rem;">Ocorrências por ano (ARO)
+                            <input class="form-control" type="text" inputmode="decimal" id="risco-aro">
+                        </label>
+                    </div>
+                    <div id="risco-erro" style="color: var(--danger-color); font-size: 0.85rem; margin-top: 0.4rem;" aria-live="polite"></div>
+                    <ul id="risco-calculo" style="font-family: var(--font-mono); font-size: 0.85rem; padding-left: 1.25rem;"></ul>
+
+                    <div class="table-responsive">
+                        <table class="data-table" id="risco-opcoes" style="font-size: 0.85rem;">
+                            <thead><tr><th>Escolha</th><th>Opção</th><th>Custo anual</th><th>ALE depois</th><th>Benefício líquido</th><th>ROSI</th><th>Residual</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div id="risco-recomendacao" style="margin: 0.75rem 0 1.5rem 0; font-size: 0.9rem;" aria-live="polite"></div>
+                </div>
+
+                <h4>4. Registro de riscos e orçamento</h4>
+                <div class="table-responsive">
+                    <table class="data-table" id="risco-registro" style="font-size: 0.85rem;">
+                        <thead><tr><th>Cenário</th><th>Inerente</th><th>Tratamento</th><th>Custo anual</th><th>ALE antes</th><th>ALE residual</th><th>Residual</th></tr></thead>
+                        <tbody></tbody>
+                        <tfoot></tfoot>
+                    </table>
+                </div>
+                <div id="risco-orcamento" style="margin-top: 0.75rem; font-size: 0.9rem;"></div>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                    <button class="btn-primary" type="button" onclick="verificarPlanoRisco()">Verificar plano de tratamento</button>
+                    <button class="btn-secondary" type="button" onclick="restaurarRisco()">Restaurar valores iniciais</button>
+                </div>
+                <div id="risco-verificacao" style="margin-top: 1rem; font-size: 0.9rem;" aria-live="polite"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist do Processo de Gestão de Riscos</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para revisar o processo de riscos de uma organização ou preparar uma auditoria da ISO/IEC 27001. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="gestao-riscos-ti">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-risco-1">
+                <label for="chk-risco-1"><strong>Critérios aprovados:</strong> escalas de probabilidade e impacto, faixas da matriz, apetite e tolerância foram aprovados pela alta direção antes da análise.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-risco-2">
+                <label for="chk-risco-2"><strong>Riscos escritos como cenários:</strong> cada risco tem ativo, ameaça, vulnerabilidade e impacto explícitos, não apenas "risco de ataque".</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-risco-3">
+                <label for="chk-risco-3"><strong>Dono do risco definido:</strong> cada linha do registro tem um responsável de negócio com autoridade para decidir o tratamento.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-risco-4">
+                <label for="chk-risco-4"><strong>Premissas documentadas:</strong> a origem de AV, EF e ARO (histórico de incidentes, relatórios do setor, seguradora) está registrada e pode ser contestada.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-risco-5">
+                <label for="chk-risco-5"><strong>Plano de tratamento:</strong> cada risco acima do apetite tem tratamento, controles do Anexo A associados, prazo e responsável pela implementação.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-risco-6">
+                <label for="chk-risco-6"><strong>Aceitação formal do residual:</strong> o dono do risco assinou a aceitação do risco residual, inclusive dos riscos aceitos sem tratamento.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-risco-7">
+                <label for="chk-risco-7"><strong>Revisão periódica:</strong> o registro é revisto ao menos uma vez por ano e após incidentes ou mudanças relevantes, com indicadores de risco (KRIs) acompanhados.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Concursos</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (SLE e ALE):</strong> Um servidor de comércio eletrônico vale R$ 500.000. Um ataque destrói 40% do seu valor e deve ocorrer uma vez a cada dois anos. Quais são a SLE e a ALE?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> SLE = R$ 200.000 e ALE = R$ 100.000.</p>
+                    <p>SLE = AV × EF = 500.000 × 0,40 = 200.000. Uma vez a cada dois anos significa ARO = 0,5, então ALE = 200.000 × 0,5 = 100.000. Um erro comum é usar ARO = 2, invertendo a frequência.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (ROSI):</strong> A ALE de um risco é R$ 300.000. Um controle que custa R$ 50.000 por ano reduz a ALE para R$ 100.000. Qual é o ROSI?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> 3, ou 300%.</p>
+                    <p>ROSI = (300.000 − 100.000 − 50.000) ÷ 50.000 = 150.000 ÷ 50.000 = 3. Quem esquece de descontar o custo do controle chega a 400%. Um ROSI negativo indicaria que o controle custa mais do que a perda que evita.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Comparação de opções):</strong> Para o mesmo risco, a opção A custa R$ 20.000 e tem ROSI de 400%. A opção B custa R$ 200.000 e tem ROSI de 150%. As opções se excluem e as duas cabem no orçamento. Qual gera mais valor?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A opção B.</p>
+                    <p>O benefício líquido é ROSI × custo: A gera 4 × 20.000 = R$ 80.000 por ano; B gera 1,5 × 200.000 = R$ 300.000. O ROSI compara eficiência por real investido, mas não o tamanho da perda evitada. Entre opções que se excluem, vence o maior benefício líquido que cabe no orçamento.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Tratamento):</strong> A empresa contrata um seguro cibernético que cobre custos de resposta e notificação em caso de vazamento. Qual estratégia foi aplicada, e o que continua com a empresa?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Transferir. A responsabilidade legal e a obrigação de comunicar o incidente continuam com a empresa.</p>
+                    <p>O seguro move parte da perda financeira para a seguradora. Perante a LGPD, a empresa segue como controladora e precisa comunicar a ANPD e os titulares; a franquia, os danos à reputação e o que a apólice exclui também ficam com ela.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (ISO 31000):</strong> Segundo a ISO 31000:2018, em qual etapa o nível de risco encontrado é comparado com os critérios de risco para decidir se é preciso tratá-lo?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Avaliação de riscos.</p>
+                    <p>A identificação encontra e descreve os riscos; a análise determina o nível (probabilidade e impacto); a avaliação compara o nível com os critérios definidos no contexto e apoia a decisão. As três formam o processo de avaliação de riscos.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Risco residual):</strong> Depois de implementar todos os controles planejados, o risco residual de um cenário continua acima do apetite definido pela diretoria. O que o analista deve fazer?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Levar o caso ao dono do risco para tratamento adicional ou aceitação formal e registrada.</p>
+                    <p>O analista não aceita risco em nome do negócio. As saídas são novos controles, transferência, evitar a atividade ou a aceitação explícita pela autoridade adequada, registrada no registro de riscos e revista no próximo ciclo.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Processo da ISO 31000</h4>
+                <p>Contexto e critérios, identificação, análise, avaliação, tratamento, monitoramento e registro, com comunicação em todas as etapas.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Fórmulas</h4>
+                <p>SLE = AV × EF; ALE = SLE × ARO; ROSI = (ALE antes − ALE depois − custo) ÷ custo.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Quatro tratamentos</h4>
+                <p>Mitigar, transferir, evitar ou aceitar. Transferir passa o custo, não a responsabilidade.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Escolha de controles</h4>
+                <p>Entre opções que se excluem, vence o maior benefício líquido dentro do orçamento, com residual dentro do apetite.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>ABNT NBR ISO 31000:2018 — Gestão de riscos: diretrizes.</li>
+            <li>ISO/IEC 27005:2022 — Orientações para gestão de riscos de segurança da informação.</li>
+            <li>ISO/IEC 27001:2022, cláusulas 6.1.2 (avaliação de riscos) e 6.1.3 (tratamento de riscos).</li>
+            <li>NIST SP 800-30 Rev. 1 — Guide for Conducting Risk Assessments.</li>
+            <li>NIST Cybersecurity Framework 2.0 — categorias GV.RM (estratégia de gestão de riscos) e ID.RA (avaliação de riscos).</li>
+            <li>NIST IR 8286 — Integrating Cybersecurity and Enterprise Risk Management (ERM).</li>
+            <li>The Open Group — Open FAIR Risk Taxonomy (O-RT) e Risk Analysis (O-RA).</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 26 — ISO-27001-e-27002 e 31 — PCI-DSS</strong>
+            </div>
+            <p>
+                O tratamento de riscos escolhe os controles do Anexo A e justifica cada linha da Declaração de Aplicabilidade. No PCI DSS v4.0.1, a análise de risco direcionada define a frequência de vários controles, e a tokenização que você viu aqui é a principal forma de reduzir o escopo do ambiente de dados de cartão.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="risco-dados">
+{
+ "empresa": "Ipê Store",
+ "contexto": "Loja online fictícia que processa pagamentos com cartão. Valores inventados para o laboratório, em reais por ano.",
+ "orcamento_anual": 1100000,
+ "apetite": 9,
+ "escala_probabilidade": [
+  {"nivel": 1, "rotulo": "Rara", "min": 0},
+  {"nivel": 2, "rotulo": "Improvável", "min": 0.1},
+  {"nivel": 3, "rotulo": "Possível", "min": 0.25},
+  {"nivel": 4, "rotulo": "Provável", "min": 0.5},
+  {"nivel": 5, "rotulo": "Quase certa", "min": 1}
+ ],
+ "escala_impacto": [
+  {"nivel": 1, "rotulo": "Insignificante", "min": 0},
+  {"nivel": 2, "rotulo": "Menor", "min": 50000},
+  {"nivel": 3, "rotulo": "Moderado", "min": 200000},
+  {"nivel": 4, "rotulo": "Maior", "min": 1000000},
+  {"nivel": 5, "rotulo": "Catastrófico", "min": 5000000}
+ ],
+ "faixas": [
+  {"nome": "Baixo", "min": 1, "max": 4, "cor": "rgba(22, 163, 74, 0.28)"},
+  {"nome": "Médio", "min": 5, "max": 9, "cor": "rgba(202, 138, 4, 0.30)"},
+  {"nome": "Alto", "min": 10, "max": 15, "cor": "rgba(234, 88, 12, 0.32)"},
+  {"nome": "Crítico", "min": 16, "max": 25, "cor": "rgba(220, 38, 38, 0.38)"}
+ ],
+ "cenarios": [
+  {
+   "id": "vazamento-cartoes",
+   "titulo": "Vazamento de cartões",
+   "ativo": "Dados de pagamento armazenados pelo checkout",
+   "ameaca": "Grupo criminoso que revende cartões",
+   "vulnerabilidade": "SQL injection no checkout e número do cartão guardado no banco",
+   "composicao_av": "Multas das bandeiras, investigação forense, chargebacks, notificação à ANPD e clientes perdidos",
+   "av": 12000000,
+   "ef": 0.6,
+   "aro": 0.25,
+   "recomendado": "tokenizacao",
+   "controles": [
+    {"id": "tokenizacao", "nome": "Tokenização no gateway: a loja deixa de guardar o cartão", "tratamento": "evitar", "custo_anual": 180000, "ef": 0.05, "aro": 0.25},
+    {"id": "waf-revisao", "nome": "WAF e revisão de código do checkout", "tratamento": "mitigar", "custo_anual": 240000, "ef": 0.6, "aro": 0.1},
+    {"id": "seguro-vazamento", "nome": "Seguro cibernético com cobertura de vazamento", "tratamento": "transferir", "custo_anual": 300000, "ef": 0.15, "aro": 0.25}
+   ]
+  },
+  {
+   "id": "ransomware-erp",
+   "titulo": "Ransomware no ERP",
+   "ativo": "ERP de pedidos, estoque e faturamento",
+   "ameaca": "Afiliado de ransomware como serviço",
+   "vulnerabilidade": "VPN sem MFA e backups acessíveis pelo domínio",
+   "composicao_av": "Pedidos parados, recuperação dos sistemas, horas extras, multas contratuais e extorsão por vazamento",
+   "av": 8000000,
+   "ef": 0.75,
+   "aro": 0.5,
+   "recomendado": "edr-backup",
+   "controles": [
+    {"id": "edr-backup", "nome": "EDR com resposta 24x7, MFA na VPN e backup imutável testado", "tratamento": "mitigar", "custo_anual": 420000, "ef": 0.25, "aro": 0.2},
+    {"id": "backup-imutavel", "nome": "Somente backup imutável testado", "tratamento": "mitigar", "custo_anual": 120000, "ef": 0.35, "aro": 0.5},
+    {"id": "seguro-ransomware", "nome": "Seguro cibernético com cobertura de interrupção", "tratamento": "transferir", "custo_anual": 350000, "ef": 0.3, "aro": 0.5}
+   ]
+  },
+  {
+   "id": "ddos-black-friday",
+   "titulo": "DDoS na Black Friday",
+   "ativo": "Site e API de vendas no pico do ano",
+   "ameaca": "Extorsionista com botnet de aluguel",
+   "vulnerabilidade": "Origem exposta e sem proteção volumétrica",
+   "composicao_av": "Faturamento de 24 horas da Black Friday",
+   "av": 3000000,
+   "ef": 0.4,
+   "aro": 0.5,
+   "recomendado": "cdn-anti-ddos",
+   "controles": [
+    {"id": "cdn-anti-ddos", "nome": "CDN com mitigação de DDoS e origem oculta", "tratamento": "mitigar", "custo_anual": 150000, "ef": 0.05, "aro": 0.5},
+    {"id": "datacenter-proprio", "nome": "Segundo data center próprio com links redundantes", "tratamento": "mitigar", "custo_anual": 600000, "ef": 0.2, "aro": 0.5}
+   ]
+  },
+  {
+   "id": "fraude-api",
+   "titulo": "Fraude na API de pagamento",
+   "ativo": "API de checkout e contas de clientes",
+   "ameaca": "Fraudadores com listas de senhas vazadas",
+   "vulnerabilidade": "Login sem limite de tentativas e sem MFA",
+   "composicao_av": "Chargebacks e taxas de uma campanha de fraude",
+   "av": 400000,
+   "ef": 0.5,
+   "aro": 4,
+   "recomendado": "garantia-chargeback",
+   "controles": [
+    {"id": "rate-limit-mfa", "nome": "Limite de tentativas, MFA no login e regras antifraude próprias", "tratamento": "mitigar", "custo_anual": 200000, "ef": 0.2, "aro": 2},
+    {"id": "garantia-chargeback", "nome": "Antifraude com garantia de chargeback", "tratamento": "transferir", "custo_anual": 260000, "ef": 0.05, "aro": 4}
+   ]
+  },
+  {
+   "id": "bec-financeiro",
+   "titulo": "BEC no financeiro",
+   "ativo": "Pagamentos a fornecedores",
+   "ameaca": "Golpista que se passa por fornecedor (Business Email Compromise)",
+   "vulnerabilidade": "Troca de conta bancária aceita por e-mail",
+   "composicao_av": "Lote mensal de pagamentos a fornecedores desviado",
+   "av": 1500000,
+   "ef": 0.6,
+   "aro": 0.3,
+   "recomendado": "callback-dmarc",
+   "controles": [
+    {"id": "callback-dmarc", "nome": "Confirmação por telefone de troca de conta e DMARC em p=reject", "tratamento": "mitigar", "custo_anual": 30000, "ef": 0.6, "aro": 0.05},
+    {"id": "seguro-crime", "nome": "Seguro contra crime cibernético", "tratamento": "transferir", "custo_anual": 90000, "ef": 0.15, "aro": 0.3}
+   ]
+  },
+  {
+   "id": "queda-gateway",
+   "titulo": "Queda do gateway de pagamento",
+   "ativo": "Integração com o gateway de pagamento",
+   "ameaca": "Indisponibilidade do fornecedor",
+   "vulnerabilidade": "Um único gateway contratado",
+   "composicao_av": "Vendas de 4 horas de checkout fora do ar",
+   "av": 250000,
+   "ef": 0.4,
+   "aro": 0.5,
+   "recomendado": "aceitar",
+   "controles": [
+    {"id": "segundo-gateway", "nome": "Segundo gateway com troca automática", "tratamento": "mitigar", "custo_anual": 120000, "ef": 0.1, "aro": 0.5},
+    {"id": "sla-credito", "nome": "SLA com crédito contratual por indisponibilidade", "tratamento": "transferir", "custo_anual": 20000, "ef": 0.3, "aro": 0.5}
+   ]
+  }
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var RISCO = JSON.parse(document.getElementById("risco-dados").textContent);
+    var BRL = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+    var NUM = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
+    var ROTULO_TRATAMENTO = { mitigar: "Mitigar", transferir: "Transferir", evitar: "Evitar", aceitar: "Aceitar" };
+    var estado = {};
+    var atual = null;
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function nivel(escala, valor) {
+        var n = 0;
+        escala.forEach(function(item) { if (valor >= item.min) n = item.nivel; });
+        return n;
+    }
+    function faixa(pontuacao) {
+        for (var i = 0; i < RISCO.faixas.length; i++) {
+            var f = RISCO.faixas[i];
+            if (pontuacao >= f.min && pontuacao <= f.max) return f;
+        }
+        return RISCO.faixas[0];
+    }
+    function rotuloNivel(p, i) {
+        var s = p * i;
+        return s + " (" + faixa(s).nome + ")";
+    }
+    function cenario(id) {
+        return RISCO.cenarios.filter(function(c) { return c.id === id; })[0];
+    }
+    function pct(x) {
+        return Math.round(x * 100) + "%";
+    }
+
+    // Calcula o cenário com os valores atuais. Um controle nunca piora o cenário:
+    // usa o menor EF e o menor ARO entre o controle e os valores digitados.
+    function avaliar(c) {
+        var s = estado[c.id];
+        var sle = s.av * s.ef;
+        var ale = sle * s.aro;
+        var r = {
+            sle: sle, ale: ale,
+            p: nivel(RISCO.escala_probabilidade, s.aro),
+            i: nivel(RISCO.escala_impacto, sle),
+            opcoes: [], melhor: null
+        };
+        c.controles.forEach(function(ctl) {
+            var ef = Math.min(ctl.ef, s.ef);
+            var aro = Math.min(ctl.aro, s.aro);
+            var sleR = s.av * ef;
+            var aleR = sleR * aro;
+            var beneficio = ale - aleR - ctl.custo_anual;
+            r.opcoes.push({
+                id: ctl.id, nome: ctl.nome, tratamento: ctl.tratamento, custo: ctl.custo_anual,
+                ale: aleR, beneficio: beneficio, rosi: beneficio / ctl.custo_anual,
+                p: nivel(RISCO.escala_probabilidade, aro), i: nivel(RISCO.escala_impacto, sleR)
+            });
+        });
+        r.opcoes.forEach(function(o) {
+            if (o.beneficio > 0 && (!r.melhor || o.beneficio > r.melhor.beneficio)) r.melhor = o;
+        });
+        r.aceitar = { id: "aceitar", nome: "Aceitar o risco (sem novo controle)", tratamento: "aceitar", custo: 0,
+                      ale: ale, beneficio: 0, rosi: null, p: r.p, i: r.i };
+        return r;
+    }
+    function escolhido(c, r) {
+        var id = estado[c.id].controle;
+        if (id === "aceitar") return r.aceitar;
+        return r.opcoes.filter(function(o) { return o.id === id; })[0] || r.aceitar;
+    }
+
+    function celulaCor(td, pontuacao) {
+        td.style.background = faixa(pontuacao).cor;
+    }
+
+    function renderizarCenarios() {
+        var box = document.getElementById("risco-cenarios");
+        box.replaceChildren();
+        RISCO.cenarios.forEach(function(c) {
+            var b = el("button", c.titulo);
+            b.type = "button";
+            b.className = c.id === atual ? "btn-primary" : "btn-secondary";
+            b.setAttribute("aria-pressed", c.id === atual ? "true" : "false");
+            b.style.fontSize = "0.85rem";
+            b.addEventListener("click", function() { selecionarCenarioRisco(c.id); });
+            box.appendChild(b);
+        });
+    }
+
+    function renderizarFicha(c) {
+        var dl = document.getElementById("risco-ficha");
+        dl.replaceChildren();
+        [["Ativo", c.ativo], ["Ameaça", c.ameaca], ["Vulnerabilidade", c.vulnerabilidade], ["O que compõe o AV", c.composicao_av]]
+            .forEach(function(par) {
+                dl.appendChild(el("dt", par[0], "font-weight: 600;"));
+                dl.appendChild(el("dd", par[1], "margin: 0;"));
+            });
+    }
+
+    function renderizarMatriz(c, r) {
+        var s = estado[c.id];
+        var esc = escolhido(c, r);
+        var tbody = document.querySelector("#risco-matriz tbody");
+        tbody.replaceChildren();
+        for (var p = 5; p >= 1; p--) {
+            var tr = el("tr");
+            var thP = el("th", String(p), "text-align: center; padding: 0.25rem 0.5rem; font-weight: 600;");
+            thP.setAttribute("scope", "row");
+            thP.title = "Probabilidade " + p + ": " + RISCO.escala_probabilidade[p - 1].rotulo;
+            tr.appendChild(thP);
+            for (var i = 1; i <= 5; i++) {
+                var td = el("td", null, "padding: 0; border: 1px solid var(--rule);");
+                celulaCor(td, p * i);
+                var marcas = [];
+                if (p === r.p && i === r.i) marcas.push("I");
+                if (esc.id !== "aceitar" && p === esc.p && i === esc.i) marcas.push("R");
+                if (s.estimativa && p === s.estimativa.p && i === s.estimativa.i) marcas.push("V");
+                var b = el("button", marcas.length ? marcas.join(" ") : String(p * i),
+                    "width: min(3rem, 12vw); height: 2.6rem; border: none; background: transparent; color: var(--ink); cursor: pointer; font-family: var(--font-mono); " +
+                    (marcas.length ? "font-weight: 700; font-size: 0.9rem;" : "font-size: 0.75rem; opacity: 0.7;"));
+                b.type = "button";
+                b.setAttribute("aria-label", "Probabilidade " + p + ", impacto " + i + ", pontuação " + rotuloNivel(p, i) +
+                    (marcas.length ? ", marcas: " + marcas.join(", ") : ""));
+                (function(pp, ii) {
+                    b.addEventListener("click", function() { estimarRisco(pp, ii); });
+                })(p, i);
+                td.appendChild(b);
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        }
+        var trI = el("tr");
+        trI.appendChild(el("th", ""));
+        for (var j = 1; j <= 5; j++) {
+            var thI = el("th", String(j), "font-weight: 600; padding: 0.25rem 0; text-align: center;");
+            thI.setAttribute("scope", "col");
+            thI.title = "Impacto " + j + ": " + RISCO.escala_impacto[j - 1].rotulo;
+            trI.appendChild(thI);
+        }
+        tbody.appendChild(trI);
+
+        var fb = document.getElementById("risco-matriz-feedback");
+        fb.replaceChildren();
+        if (!s.estimativa) {
+            fb.appendChild(el("span", "Onde você posiciona este risco? Clique numa célula antes de olhar os números.", "color: var(--muted);"));
+            return;
+        }
+        var pe = s.estimativa.p, ie = s.estimativa.i;
+        var fe = faixa(pe * ie).nome, fq = faixa(r.p * r.i).nome;
+        var msg;
+        if (pe === r.p && ie === r.i) {
+            msg = "Sua estimativa coincide com a análise quantitativa: " + rotuloNivel(r.p, r.i) + ".";
+        } else if (fe === fq) {
+            msg = "Você estimou " + rotuloNivel(pe, ie) + "; os números indicam " + rotuloNivel(r.p, r.i) +
+                ". A célula difere, mas a faixa e a decisão são as mesmas.";
+        } else {
+            msg = "Você estimou " + rotuloNivel(pe, ie) + "; os números indicam " + rotuloNivel(r.p, r.i) +
+                ". Faixas diferentes levam a decisões diferentes: revise as premissas ou a leitura da escala.";
+        }
+        fb.appendChild(el("span", msg));
+    }
+
+    function renderizarQuantitativo(c, r) {
+        var s = estado[c.id];
+        var esc = escolhido(c, r);
+        var ul = document.getElementById("risco-calculo");
+        ul.replaceChildren();
+        ul.appendChild(el("li", "SLE = AV × EF = " + BRL.format(s.av) + " × " + NUM.format(s.ef * 100) + "% = " + BRL.format(r.sle)));
+        ul.appendChild(el("li", "ALE = SLE × ARO = " + BRL.format(r.sle) + " × " + NUM.format(s.aro) + " = " + BRL.format(r.ale) + " por ano"));
+        ul.appendChild(el("li", "Probabilidade " + r.p + " × impacto " + r.i + " = risco inerente " + rotuloNivel(r.p, r.i)));
+
+        var tbody = document.querySelector("#risco-opcoes tbody");
+        tbody.replaceChildren();
+        [r.aceitar].concat(r.opcoes).forEach(function(o) {
+            var tr = el("tr");
+            var tdR = el("td");
+            var radio = el("input");
+            radio.type = "radio";
+            radio.name = "risco-controle";
+            radio.value = o.id;
+            radio.checked = o.id === esc.id;
+            radio.setAttribute("aria-label", "Escolher: " + o.nome);
+            radio.addEventListener("change", function() { escolherControleRisco(o.id); });
+            tdR.appendChild(radio);
+            tr.appendChild(tdR);
+            var tdN = el("td");
+            tdN.appendChild(el("strong", ROTULO_TRATAMENTO[o.tratamento] + ": "));
+            tdN.appendChild(document.createTextNode(o.nome));
+            if (r.melhor && o.id === r.melhor.id) tdN.appendChild(el("span", " ★ maior benefício líquido", "color: var(--tip-color); font-weight: 600;"));
+            if (!r.melhor && o.id === "aceitar") tdN.appendChild(el("span", " ★ nenhum controle se paga", "color: var(--tip-color); font-weight: 600;"));
+            tr.appendChild(tdN);
+            tr.appendChild(el("td", BRL.format(o.custo)));
+            tr.appendChild(el("td", BRL.format(o.ale)));
+            tr.appendChild(el("td", BRL.format(o.beneficio), o.beneficio < 0 ? "color: var(--danger-color);" : null));
+            tr.appendChild(el("td", o.rosi === null ? "—" : pct(o.rosi), o.rosi !== null && o.rosi < 0 ? "color: var(--danger-color);" : null));
+            var tdF = el("td", rotuloNivel(o.p, o.i));
+            celulaCor(tdF, o.p * o.i);
+            tr.appendChild(tdF);
+            tbody.appendChild(tr);
+        });
+
+        var rec = document.getElementById("risco-recomendacao");
+        rec.replaceChildren();
+        var resid = esc.p * esc.i;
+        var texto = "Escolha atual: " + ROTULO_TRATAMENTO[esc.tratamento] + ". Residual " + rotuloNivel(esc.p, esc.i) + ", " +
+            (resid <= RISCO.apetite ? "dentro" : "acima") + " do apetite (até " + RISCO.apetite + ").";
+        if (esc.rosi !== null && esc.rosi < 0) texto += " Atenção: este controle custa mais do que a perda que evita.";
+        if (r.melhor && esc.id !== r.melhor.id && esc.id !== "aceitar" && esc.rosi > r.melhor.rosi) {
+            texto += " O ROSI desta opção é maior, mas ela evita menos prejuízo do que a opção marcada com ★.";
+        }
+        rec.appendChild(el("span", texto, resid > RISCO.apetite ? "color: var(--danger-color);" : null));
+    }
+
+    function renderizarRegistro() {
+        var tbody = document.querySelector("#risco-registro tbody");
+        var tfoot = document.querySelector("#risco-registro tfoot");
+        tbody.replaceChildren();
+        tfoot.replaceChildren();
+        var custo = 0, aleAntes = 0, aleDepois = 0;
+        RISCO.cenarios.forEach(function(c) {
+            var r = avaliar(c);
+            var esc = escolhido(c, r);
+            custo += esc.custo; aleAntes += r.ale; aleDepois += esc.ale;
+            var tr = el("tr", null, c.id === atual ? "outline: 2px solid var(--accent); outline-offset: -2px;" : null);
+            tr.appendChild(el("td", c.titulo));
+            var tdI = el("td", rotuloNivel(r.p, r.i));
+            celulaCor(tdI, r.p * r.i);
+            tr.appendChild(tdI);
+            tr.appendChild(el("td", ROTULO_TRATAMENTO[esc.tratamento]));
+            tr.appendChild(el("td", BRL.format(esc.custo)));
+            tr.appendChild(el("td", BRL.format(r.ale)));
+            tr.appendChild(el("td", BRL.format(esc.ale)));
+            var tdR = el("td", rotuloNivel(esc.p, esc.i));
+            celulaCor(tdR, esc.p * esc.i);
+            tr.appendChild(tdR);
+            tbody.appendChild(tr);
+        });
+        var tr = el("tr", null, "font-weight: 700;");
+        tr.appendChild(el("td", "Total"));
+        tr.appendChild(el("td", ""));
+        tr.appendChild(el("td", ""));
+        tr.appendChild(el("td", BRL.format(custo)));
+        tr.appendChild(el("td", BRL.format(aleAntes)));
+        tr.appendChild(el("td", BRL.format(aleDepois)));
+        tr.appendChild(el("td", ""));
+        tfoot.appendChild(tr);
+
+        var box = document.getElementById("risco-orcamento");
+        box.replaceChildren();
+        var uso = custo / RISCO.orcamento_anual;
+        box.appendChild(el("div", "Orçamento usado: " + BRL.format(custo) + " de " + BRL.format(RISCO.orcamento_anual) + " (" + pct(uso) + ")",
+            uso > 1 ? "color: var(--danger-color); font-weight: 600;" : null));
+        var barra = el("div", null, "height: 0.6rem; background: var(--sunk); border-radius: var(--radius-pill); overflow: hidden; margin-top: 0.3rem;");
+        barra.setAttribute("role", "progressbar");
+        barra.setAttribute("aria-label", "Uso do orçamento anual");
+        barra.setAttribute("aria-valuemin", "0");
+        barra.setAttribute("aria-valuemax", "100");
+        barra.setAttribute("aria-valuenow", String(Math.min(100, Math.round(uso * 100))));
+        barra.appendChild(el("div", null, "height: 100%; width: " + Math.min(100, uso * 100) + "%; background: " +
+            (uso > 1 ? "var(--danger-color)" : "var(--accent)") + ";"));
+        box.appendChild(barra);
+    }
+
+    function renderizarTudo() {
+        var c = cenario(atual);
+        var r = avaliar(c);
+        renderizarCenarios();
+        renderizarMatriz(c, r);
+        renderizarQuantitativo(c, r);
+        renderizarRegistro();
+    }
+
+    function lerNumero(id) {
+        // Aceita "12.000.000", "0,25" e "0.25": vírgula é decimal; ponto só é milhar em grupos de 3 dígitos.
+        var bruto = document.getElementById(id).value.trim().replace(/\s/g, "");
+        if (bruto.indexOf(",") !== -1) {
+            bruto = bruto.replace(/\./g, "").replace(",", ".");
+        } else if (/^\d{1,3}(\.\d{3})+$/.test(bruto)) {
+            bruto = bruto.replace(/\./g, "");
+        }
+        if (bruto === "" || isNaN(Number(bruto))) return NaN;
+        return Number(bruto);
+    }
+    function preencherEntradas() {
+        var s = estado[atual];
+        document.getElementById("risco-av").value = NUM.format(s.av);
+        document.getElementById("risco-ef").value = NUM.format(s.ef * 100);
+        document.getElementById("risco-aro").value = NUM.format(s.aro);
+        document.getElementById("risco-erro").textContent = "";
+    }
+    function atualizarEntradas() {
+        var av = lerNumero("risco-av"), ef = lerNumero("risco-ef"), aro = lerNumero("risco-aro");
+        var erro = document.getElementById("risco-erro");
+        if (!(av > 0)) { erro.textContent = "Informe um AV maior que zero."; return; }
+        if (!(ef > 0 && ef <= 100)) { erro.textContent = "O EF deve estar entre 0 e 100%."; return; }
+        if (!(aro > 0)) { erro.textContent = "Informe um ARO maior que zero (ex.: 0,25 para uma vez a cada 4 anos)."; return; }
+        erro.textContent = "";
+        var s = estado[atual];
+        s.av = av; s.ef = ef / 100; s.aro = aro;
+        renderizarTudo();
+    }
+
+    function estimarRisco(p, i) {
+        estado[atual].estimativa = { p: p, i: i };
+        renderizarTudo();
+    }
+
+    window.selecionarCenarioRisco = function(id) {
+        if (!cenario(id)) return;
+        atual = id;
+        renderizarFicha(cenario(id));
+        preencherEntradas();
+        renderizarTudo();
+    };
+
+    window.escolherControleRisco = function(id) {
+        estado[atual].controle = id;
+        renderizarTudo();
+    };
+
+    window.verificarPlanoRisco = function() {
+        var box = document.getElementById("risco-verificacao");
+        box.replaceChildren();
+        var custo = 0, beneficio = 0, beneficioMelhor = 0;
+        var problemas = [];
+        RISCO.cenarios.forEach(function(c) {
+            var r = avaliar(c);
+            var esc = escolhido(c, r);
+            custo += esc.custo;
+            beneficio += esc.beneficio;
+            beneficioMelhor += r.melhor ? r.melhor.beneficio : 0;
+            if (esc.p * esc.i > RISCO.apetite) {
+                problemas.push(c.titulo + ": residual " + rotuloNivel(esc.p, esc.i) + " acima do apetite. Trate o risco ou leve a aceitação ao dono do risco.");
+            }
+            if (esc.beneficio < 0) {
+                problemas.push(c.titulo + ": o controle escolhido custa mais do que a perda que evita (ROSI " + pct(esc.rosi) + ").");
+            }
+        });
+        if (custo > RISCO.orcamento_anual) {
+            problemas.push("O plano custa " + BRL.format(custo) + " e estoura o orçamento de " + BRL.format(RISCO.orcamento_anual) + ".");
+        }
+        var ul = el("ul", null, "padding-left: 1.25rem; margin: 0.5rem 0;");
+        problemas.forEach(function(p) { ul.appendChild(el("li", p, "color: var(--danger-color);")); });
+        if (problemas.length) {
+            box.appendChild(el("strong", "O plano ainda tem " + problemas.length + " ponto(s) a resolver:"));
+            box.appendChild(ul);
+        } else {
+            box.appendChild(el("strong", "Plano aprovado: cabe no orçamento e todos os residuais estão dentro do apetite.", "color: var(--tip-color);"));
+        }
+        box.appendChild(el("p", "Benefício líquido do seu plano: " + BRL.format(beneficio) + " por ano. Melhor plano possível com estes valores: " +
+            BRL.format(beneficioMelhor) + " por ano.", "margin: 0.5rem 0 0 0;"));
+    };
+
+    window.restaurarRisco = function() {
+        estado = {};
+        RISCO.cenarios.forEach(function(c) {
+            estado[c.id] = { av: c.av, ef: c.ef, aro: c.aro, controle: "aceitar", estimativa: null };
+        });
+        document.getElementById("risco-verificacao").replaceChildren();
+        selecionarCenarioRisco(RISCO.cenarios[0].id);
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("risco-contexto").textContent = RISCO.contexto +
+            " Apetite: até " + RISCO.apetite + " (" + faixa(RISCO.apetite).nome + "). Orçamento anual: " + BRL.format(RISCO.orcamento_anual) + ".";
+        ["risco-av", "risco-ef", "risco-aro"].forEach(function(id) {
+            document.getElementById(id).addEventListener("change", atualizarEntradas);
+        });
+        restaurarRisco();
+        if (typeof initChecklist === "function") {
+            initChecklist("gestao-riscos-ti");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
