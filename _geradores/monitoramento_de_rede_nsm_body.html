@@ -1,0 +1,1468 @@
+<!-- Estudo 48: Monitoramento-de-Rede-NSM Body Fragment -->
+<article class="study-container" data-slug="monitoramento-de-rede-nsm">
+
+    <!-- SEÇÃO 1: NSM, FONTES E SENSORES -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: O Implante Precisa Falar com Alguém</h2>
+        </div>
+
+        <p class="lead-text">
+            A caçada do Estudo 47 achou o implante <code>OneDriveReport.exe</code> em duas estações da Ipê Store, WS-FIN-03 e WS-VEN-07. A resposta a incidentes quer saber três coisas antes de conter: com quem o implante fala, com que frequência e se algum dado já saiu. O EDR só enxerga as máquinas onde tem agente, e o canal de controle é HTTPS: nenhuma assinatura do IDS olha dentro dele. Mas todo implante precisa se comunicar, e a comunicação deixa metadados na rede, mesmo cifrada. Este módulo ensina a ler esses metadados com o Zeek, a decidir entre PCAP, logs do Zeek e NetFlow, e a achar beaconing e túnel DNS pelo comportamento.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">📡</span>
+                <strong>Pergunta-chave do módulo</strong>
+            </div>
+            <p>
+                Como achar um implante que fala com o atacante a cada 60 segundos, mesmo com o tráfego cifrado?
+            </p>
+        </div>
+
+        <h3>O que é NSM</h3>
+        <p>
+            <strong>NSM</strong> (<em>Network Security Monitoring</em>, monitoramento de segurança de rede) é a coleta, a detecção e a análise de dados de rede para achar e responder a intrusões. O termo foi popularizado por Richard Bejtlich, e a premissa é a mesma do Estudo 47: a prevenção vai falhar em algum momento, então é preciso ter os dados para investigar quando falhar. A diferença está na fonte. O endpoint mostra processos e arquivos; a rede mostra quem falou com quem, quando, por quanto tempo e quanto. E a rede vê tudo o que passa pelo sensor, inclusive impressoras, câmeras, caixas de loja e servidores sem agente.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🧭</span>
+                <strong>Diferença para o Estudo 07</strong>
+            </div>
+            <p>
+                No Estudo 07 você escreveu regras de IDS/IPS por <strong>assinatura</strong> no Snort e no Suricata: o motor compara o conteúdo do pacote com um padrão conhecido (um User-Agent, uma sequência de bytes). Isso falha quando o conteúdo é cifrado ou quando o padrão é novo. Aqui o foco é a análise de <strong>metadados</strong>: horários, tamanhos, destinos, nomes consultados e impressões do TLS. Ela acha o que as assinaturas não pegam, como um canal HTTPS que se repete a cada minuto. Os campos de IP, TCP, UDP e DNS que você vai ler foram dissecados no Estudo 02.
+            </p>
+        </div>
+
+        <h3>PCAP, Zeek e NetFlow: custo vs valor</h3>
+        <p>
+            Há três níveis de dado de rede, e cada um troca detalhe por custo de armazenamento. A conta abaixo é uma estimativa para um link de 1 Gbit/s com 30% de uso médio (cerca de 3,2 TB por dia de pacotes); os valores reais variam com o perfil do tráfego.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Fonte</th><th>O que guarda</th><th>Volume estimado por dia</th><th>Retenção típica</th><th>Responde</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>PCAP completo</strong> (<code>tcpdump</code>, Arkime)</td><td>Cada pacote, com o conteúdo</td><td>Cerca de 3 TB</td><td>Horas a poucos dias</td><td>"O que exatamente foi enviado?" (se não estiver cifrado)</td></tr>
+                    <tr><td><strong>Metadados do Zeek</strong></td><td>Uma linha por conexão, consulta DNS, sessão TLS, requisição HTTP, arquivo</td><td>Dezenas de GB</td><td>Semanas a meses</td><td>"Quem falou com quem, qual nome consultou, qual certificado e qual cliente TLS?"</td></tr>
+                    <tr><td><strong>NetFlow / IPFIX</strong></td><td>Registros de fluxo: 5-tupla, bytes, pacotes, início e fim</td><td>Poucos GB (menos com amostragem)</td><td>Meses a anos</td><td>"Este IP falou com aquele, quando e quanto?"</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            O desenho mais comum combina os três: NetFlow de todos os roteadores para a visão longa e barata, Zeek nos pontos de estrangulamento para a investigação do dia a dia, e PCAP rotativo de poucos dias para quando é preciso provar o conteúdo. O <strong>NetFlow</strong> (versão 9, RFC 3954) e seu sucessor padronizado <strong>IPFIX</strong> (RFC 7011) são exportados pelos próprios roteadores e firewalls, sem sensor dedicado.
+        </p>
+
+        <h3>Onde pôr o sensor: TAP ou SPAN</h3>
+        <p>
+            O sensor recebe uma cópia do tráfego de duas formas. O <strong>TAP</strong> (<em>Test Access Point</em>) é um equipamento passivo instalado no cabo ou na fibra: copia tudo, inclusive sob carga, e não depende da configuração do switch. A porta <strong>SPAN</strong> (<em>Switched Port Analyzer</em>, espelhamento de porta) é configurada no switch e não custa hardware novo, mas descarta pacotes quando a soma das portas espelhadas passa da capacidade da porta de destino e não entrega quadros com erro. Para ver os IPs internos de quem iniciou a conexão, o ponto de saída fica do lado de dentro do firewall, antes da tradução de endereços (NAT). Um segundo ponto no switch central mostra o tráfego leste-oeste, entre máquinas internas.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Onde o Sensor NSM Enxerga a Rede</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Onde o Sensor NSM Enxerga a Rede">
+flowchart TD
+    INET["Internet"]
+    FW["Firewall de borda<br><small>NAT para o IP público</small>"]
+    subgraph REDE["Rede da Ipê Store"]
+        RT["Roteador interno<br><small>exporta NetFlow / IPFIX</small>"]
+        TAP["TAP na saída<br><small>cópia passiva, IPs internos visíveis</small>"]
+        CORE["Switch central<br><small>porta SPAN: tráfego leste-oeste</small>"]
+    end
+    subgraph SENSOR["Sensor NSM"]
+        ZEEK["Zeek<br><small>conn.log, dns.log, ssl.log</small>"]
+        PCAP["PCAP rotativo<br><small>poucos dias</small>"]
+    end
+    COL["Coletor de fluxos<br><small>nfdump, meses de retenção</small>"]
+    SIEM["SIEM e analista<br><small>beaconing, túnel DNS, caça</small>"]
+    INET --- FW
+    FW --- RT
+    RT --- TAP
+    TAP --- CORE
+    TAP --> ZEEK
+    TAP --> PCAP
+    CORE --> ZEEK
+    RT --> COL
+    ZEEK --> SIEM
+    COL --> SIEM
+    PCAP -.-> SIEM
+            </pre>
+        </div>
+
+        <h3>Tráfego cifrado e o que ainda se vê</h3>
+        <p>
+            Mais de 90% das páginas carregadas no Chrome usam HTTPS, segundo o relatório de transparência do Google. Sem quebrar a criptografia, o analista ainda vê bastante coisa:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Metadado</th><th>Visível?</th><th>Para que serve</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>IPs, portas, horários, duração, bytes</td><td>Sempre</td><td>Beaconing, volume de saída, conexões longas</td></tr>
+                    <tr><td><strong>SNI</strong> (<em>Server Name Indication</em>, o nome do servidor no ClientHello)</td><td>Sim, inclusive no <strong>TLS 1.3</strong>, salvo com ECH (<em>Encrypted Client Hello</em>)</td><td>Saber o domínio sem ver o conteúdo</td></tr>
+                    <tr><td>Certificado do servidor</td><td>No TLS 1.2 sim; no TLS 1.3 vai cifrado</td><td>Certificados autoassinados ou emitidos há poucos dias</td></tr>
+                    <tr><td>Impressão do cliente TLS (JA3/JA4)</td><td>Sim</td><td>Agrupar clientes iguais; indício de ferramenta</td></tr>
+                    <tr><td>Consultas DNS</td><td>Sim, se usam o resolvedor interno; não com DNS over HTTPS (DoH) direto</td><td>Nomes de C2, túnel DNS, domínios recém-registrados</td></tr>
+                    <tr><td>Conteúdo (URL, corpo, comandos)</td><td>Não, sem inspeção TLS</td><td>É aqui que a assinatura do Estudo 07 deixa de ver</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: ZEEK, BEACONING, TÚNEL DNS, JA3/JA4 E NETFLOW -->
+    <section class="study-section" id="analise">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Lendo o Zeek: Beaconing, Túnel DNS e Fingerprints TLS</h2>
+        </div>
+
+        <h3>Os logs do Zeek</h3>
+        <p>
+            O <strong>Zeek</strong> (antigo Bro) não procura assinaturas: ele interpreta os protocolos e escreve um log por tipo de atividade, em TSV ou JSON. Todos compartilham o campo <code>uid</code>, que liga a conexão do <strong>conn.log</strong> à consulta do <strong>dns.log</strong> e à sessão TLS do <strong>ssl.log</strong>.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Log</th><th>Campo</th><th>Significado</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td rowspan="7"><strong>conn.log</strong></td><td><code>ts</code>, <code>uid</code></td><td>Início da conexão (época Unix) e identificador único</td></tr>
+                    <tr><td><code>id.orig_h</code>, <code>id.orig_p</code></td><td>Quem iniciou: IP e porta de origem</td></tr>
+                    <tr><td><code>id.resp_h</code>, <code>id.resp_p</code></td><td>Quem respondeu: IP e porta de destino</td></tr>
+                    <tr><td><code>proto</code>, <code>service</code></td><td>Transporte (tcp, udp, icmp) e protocolo de aplicação detectado pelo conteúdo, não pela porta</td></tr>
+                    <tr><td><code>duration</code></td><td>Duração em segundos</td></tr>
+                    <tr><td><code>orig_bytes</code>, <code>resp_bytes</code></td><td>Bytes de carga útil enviados por cada lado</td></tr>
+                    <tr><td><code>conn_state</code></td><td>Como terminou: <code>SF</code> (normal), <code>S0</code> (sem resposta), <code>REJ</code> (rejeitada)</td></tr>
+                    <tr><td rowspan="2"><strong>dns.log</strong></td><td><code>query</code>, <code>qtype_name</code></td><td>Nome consultado e tipo do registro (A, AAAA, TXT, SRV, NULL)</td></tr>
+                    <tr><td><code>rcode_name</code>, <code>answers</code></td><td>Resultado (NOERROR, NXDOMAIN) e respostas recebidas</td></tr>
+                    <tr><td rowspan="2"><strong>ssl.log</strong></td><td><code>version</code>, <code>server_name</code></td><td>Versão do TLS e SNI pedido pelo cliente</td></tr>
+                    <tr><td><code>ja3</code>, <code>ja4</code></td><td>Impressões do ClientHello, gravadas pelos pacotes ja3 e ja4 do Zeek (não vêm na instalação padrão)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Zeek — a mesma conexão do implante em três logs (campos selecionados)</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-nsm-logs')">Copiar</button>
+            </div>
+            <pre><code id="code-nsm-logs"># conn.log
+#fields ts                uid                id.orig_h   id.orig_p id.resp_h     id.resp_p proto service duration orig_bytes resp_bytes conn_state
+1793620807.310000 CgT4mB2Hq7XkLp1sa  10.20.3.13  52114     203.0.113.47  443       tcp   ssl     0.31     312        247        SF
+
+# dns.log (alguns segundos antes)
+#fields ts                uid                id.orig_h   query                             qtype_name rcode_name answers
+1793620806.950000 Dk2n8YfQx0RtVb6We  10.20.3.13  sync.onedrive-relatorios.example  A          NOERROR    203.0.113.47
+
+# ssl.log (com os pacotes ja3 e ja4)
+#fields ts                uid                id.orig_h   id.resp_h     version server_name                       ja3                              ja4
+1793620807.310000 CgT4mB2Hq7XkLp1sa  10.20.3.13  203.0.113.47  TLSv12  sync.onedrive-relatorios.example  5d8a1c3e9b0f47a2c61e8d93b7f0a412 t12d1909h1_c7886603b240_4e1a92d07c3f</code></pre>
+        </div>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">bash — PCAP rotativo, Zeek offline e consultas com zeek-cut</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-nsm-cli')">Copiar</button>
+            </div>
+            <pre><code id="code-nsm-cli"># PCAP rotativo: um arquivo por hora, guarda as últimas 48 horas
+sudo tcpdump -i eth1 -G 3600 -W 48 -w '/pcap/saida-%Y%m%d%H.pcap'
+
+# Zeek sobre uma captura (gera conn.log, dns.log, ssl.log... no diretório atual)
+zeek -C -r /pcap/saida-2026110209.pcap
+
+# Pares origem -> destino:porta com mais conexões
+zeek-cut id.orig_h id.resp_h id.resp_p &lt; conn.log | sort | uniq -c | sort -rn | head
+
+# Intervalos entre as conexões de um par (a matéria-prima do beaconing)
+zeek-cut ts id.orig_h id.resp_h id.resp_p &lt; conn.log \
+  | awk '$2=="10.20.3.13" &amp;&amp; $3=="203.0.113.47" &amp;&amp; $4==443 { if (p) printf "%.1f\n", $1-p; p=$1 }'
+
+# Nomes distintos por domínio base (muitos nomes num domínio só chama atenção)
+zeek-cut query &lt; dns.log | awk -F. 'NF&gt;2 {print $(NF-1)"."$NF" "$0}' | sort -u \
+  | awk '{print $1}' | uniq -c | sort -rn | head
+
+# NetFlow: os 10 destinos com mais bytes na porta 53 nas últimas capturas do nfdump
+nfdump -R /var/cache/nfdump -s dstip/bytes -n 10 'dst port 53'</code></pre>
+        </div>
+
+        <h3>Beaconing: a regularidade denuncia</h3>
+        <p>
+            Um implante não mantém uma conexão aberta o tempo todo: ele "dorme" e, a cada intervalo, faz um <strong>check-in</strong> perguntando se há tarefa nova. Isso é o <strong>beaconing</strong> (técnica T1071, <em>Application Layer Protocol</em>, quando usa HTTPS ou DNS). Visto pelo conn.log, o beacon tem três marcas: conexões do mesmo par origem–destino em intervalos parecidos, check-ins de tamanho quase igual quando não há tarefa e persistência ao longo de horas, inclusive fora do expediente. Para medir a regularidade, agrupe por <strong>par origem → destino:porta</strong> (misturar origens ou destinos embaralha os intervalos), calcule os intervalos entre conexões consecutivas e o <strong>jitter</strong>.
+        </p>
+        <p>
+            Os <em>frameworks</em> de comando e controle oferecem o jitter como opção (Cobalt Strike, Sliver, Mythic): o intervalo de 60 s vira um sorteio entre, por exemplo, 33 e 87 s, justamente para não parecer um relógio. Uma forma simples de medir o jitter é o <strong>coeficiente de variação</strong> (CV) dos intervalos: o desvio-padrão dividido pela média. CV perto de 0% é um relógio; navegação humana passa de 70%. Ferramentas como o <strong>RITA</strong> (<em>Real Intelligence Threat Analytics</em>, da Active Countermeasures) fazem a mesma coisa com mais critérios sobre os logs do Zeek: assimetria e dispersão dos intervalos e dos tamanhos, número de conexões e cobertura ao longo do dia.
+        </p>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Python — intervalo médio, jitter (CV) e estabilidade do tamanho por par</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-nsm-py')">Copiar</button>
+            </div>
+            <pre><code id="code-nsm-py"># uso: zeek-cut ts id.orig_h id.resp_h id.resp_p orig_bytes &lt; conn.log | python3 beacons.py
+import sys, statistics
+from collections import defaultdict
+
+pares = defaultdict(list)
+for linha in sys.stdin:
+    ts, orig, resp, porta, enviados = linha.split("\t")
+    pares[(orig, resp, porta)].append((float(ts), int(enviados) if enviados.strip() != "-" else 0))
+
+for (orig, resp, porta), conns in pares.items():
+    if len(conns) &lt; 10:
+        continue                      # poucas conexões não medem regularidade
+    conns.sort()
+    ivs = [b[0] - a[0] for a, b in zip(conns, conns[1:])]
+    media = statistics.mean(ivs)
+    cv = 100 * statistics.pstdev(ivs) / media
+    med = statistics.median(c[1] for c in conns)
+    estavel = 100 * sum(abs(c[1] - med) &lt;= 0.1 * med for c in conns) / len(conns)
+    if media &lt;= 900 and cv &lt;= 30 and estavel &gt;= 80:
+        print(f"{orig} -&gt; {resp}:{porta}  n={len(conns)}  média={media:.0f}s  jitter={cv:.0f}%  tamanho estável={estavel:.0f}%")</code></pre>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Periódico não é malicioso</strong>
+            </div>
+            <p>
+                Muita coisa legítima é periódica: NTP (sem jitter nenhum, 48 bytes fixos), o heartbeat do agente do EDR, o monitoramento (Zabbix, SNMP), a verificação de atualizações, o lote de vendas que os caixas mandam ao gateway de pagamento. Cada uma some com um ajuste diferente: só destinos externos, intervalo máximo, estabilidade do tamanho. O que nenhum limiar separa vira <strong>exceção documentada</strong>, com origem, destino, dono, justificativa e data de revisão. Afrouxar o limiar até o alerta sumir cria um ponto cego que o atacante pode imitar.
+            </p>
+        </div>
+
+        <h3>Túnel DNS: dados escondidos nos nomes</h3>
+        <p>
+            Quase toda rede deixa o DNS sair, nem que seja pelo resolvedor interno. O <strong>túnel DNS</strong> abusa disso (técnica T1071.004 quando é canal de controle; T1048, <em>Exfiltration Over Alternative Protocol</em>, quando leva dados para fora): o atacante registra um domínio, é o servidor autoritativo dele e codifica os dados no subdomínio de cada consulta, como <code>mzxw6ytb...q.0007.dados-cdn.example</code>. O resolvedor da empresa repassa a pergunta para a internet, o servidor do atacante decodifica e responde em registros TXT, NULL ou CNAME. Ferramentas conhecidas: iodine e dnscat2. Os sinais:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Sinal</th><th>Por quê</th><th>Falso positivo comum</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Subdomínio longo</strong></td><td>Cada consulta carrega o máximo de dados: rótulos de até 63 caracteres, nome de até 253 (RFC 1035)</td><td>Registros SRV do Active Directory, CDNs</td></tr>
+                    <tr><td><strong>Alta entropia</strong></td><td>Dados codificados em base32 ou base64 parecem aleatórios</td><td>Consultas de reputação de antivírus (hash no nome), IDs de anúncios</td></tr>
+                    <tr><td><strong>Muitos nomes distintos</strong> num só domínio</td><td>Cada pedaço de dado é um nome novo, e o cache nunca acerta</td><td>Serviços que geram um nome por visita</td></tr>
+                    <tr><td><strong>Tipo TXT ou NULL</strong> e volume</td><td>Respostas maiores para trazer comandos</td><td>SPF, DKIM e verificações de domínio (poucas consultas)</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            A <strong>entropia de Shannon</strong> mede a imprevisibilidade dos caracteres: <code>H = -Σ p(c) × log2 p(c)</code>, em bits por caractere, onde <code>p(c)</code> é a frequência de cada caractere no subdomínio. "intranet" dá 2,5 bits; um texto em <strong>base32</strong> (32 símbolos, no máximo 5 bits) com 50 caracteres ou mais costuma passar de 4,2; um hash hexadecimal nunca passa de 4 bits, porque só tem 16 símbolos. Combine os três sinais, nunca um só, e decodifique uma amostra antes de concluir: se o rótulo vira texto legível em base32, não há dúvida.
+        </p>
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🛡️</span>
+                <strong>Prevenir também é do NSM</strong>
+            </div>
+            <p>
+                Bloqueie a porta 53 de saída para tudo que não seja o resolvedor interno, registre as consultas do resolvedor (sem elas, o Estudo 46 marcou T1071.004 como débito de detecção) e trate o DoH direto para provedores externos como tráfego a controlar. Assim o túnel fica obrigado a passar por onde você enxerga.
+            </p>
+        </div>
+
+        <h3>JA3 e JA4: impressões do cliente TLS</h3>
+        <p>
+            O <strong>JA3</strong> (Salesforce, 2017) calcula o MD5 de campos do ClientHello: versão, lista de cifras, extensões, curvas elípticas e formatos de ponto. Clientes montados com a mesma biblioteca e configuração geram o mesmo hash. Em 2023 o Chrome (versão 110) passou a embaralhar a ordem das extensões a cada conexão, e o JA3 de um mesmo navegador começou a variar. O <strong>JA4</strong> (FoxIO, 2023) ordena as extensões antes do hash e tem formato legível em três partes, <code>a_b_c</code>: em <code>t13d1517h2_...</code>, <code>t</code> é TCP, <code>13</code> é TLS 1.3, <code>d</code> indica que há SNI, <code>15</code> e <code>17</code> contam cifras e extensões e <code>h2</code> é o ALPN. A família JA4+ inclui impressões do servidor (JA4S), do HTTP (JA4H) e do certificado (JA4X).
+        </p>
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">🔍</span>
+                <strong>JA3/JA4 ajudam, mas não provam sozinhos</strong>
+            </div>
+            <p>
+                Um implante que usa a pilha TLS do Windows (SChannel) tem a mesma impressão do agente do EDR, do atualizador e de dezenas de programas legítimos. Frameworks de C2 permitem imitar o ClientHello de um navegador. E uma lista de impressões "maliciosas" envelhece rápido. Use JA3/JA4 para agrupar e correlacionar ("quais outras máquinas têm este cliente TLS falando com destinos raros?"), sempre junto com o comportamento, nunca como veredito.
+            </p>
+        </div>
+
+        <h3>NetFlow e IPFIX: a visão longa e barata</h3>
+        <p>
+            Um registro de fluxo resume uma conversa: origem, destino, portas, protocolo, bytes, pacotes, início e fim. Dois cuidados. Primeiro, a <strong>amostragem</strong>: para aliviar o roteador, muitos exportam 1 a cada N pacotes (por exemplo, 1:1000), e check-ins de poucos pacotes podem nunca aparecer; prefira fluxos sem amostragem nos pontos onde vai caçar beacons. Segundo, os <em>timeouts</em>: uma conexão longa é cortada em vários registros pelo <em>active timeout</em>, e a contagem de "conexões" fica inflada se você não juntar os pedaços. Mesmo assim, meses de fluxo respondem a perguntas que o PCAP de dois dias não alcança: "desde quando este IP fala com aquele destino?"
+        </p>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Metadados de rede são dados pessoais</strong>
+            </div>
+            <p>
+                Os nomes que cada estação consulta e os destinos que acessa revelam hábitos de pessoas identificáveis. Pela LGPD (Lei 13.709/2018), o monitoramento precisa de base legal (em geral, legítimo interesse ou cumprimento de obrigação, com teste de balanceamento), de transparência na política de uso aceitável, de retenção definida para PCAP, logs e fluxos, e de acesso restrito a quem investiga. Guardar PCAP completo por mais tempo do que o necessário aumenta o risco sem aumentar o valor.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Analisador de Conexões</h2>
+        </div>
+
+        <p class="lead-text">
+            Você recebeu uma hora de conn.log e de dns.log do sensor Zeek da Ipê Store. Na parte 1, agrupe as conexões e ajuste os limiares de intervalo, jitter e tamanho até destacar os dois beacons do implante sem falsos positivos. Na parte 2, ajuste os limiares de comprimento, entropia e volume do DNS até sobrar só o túnel. A cada mudança o analisador recalcula e conta acertos, falsos positivos e beacons perdidos. Os limiares iniciais são de propósito ruins.
+        </p>
+
+        <div class="lab-box nsm-lab" id="nsm-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Metadados de rede</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Analisador de Conexões do sensor Zeek</h3>
+                    <p id="nsm-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body" style="min-width: 0;">
+                <h4 style="margin-top: 0;">Os logs brutos</h4>
+                <details style="margin-bottom: 0.5rem;">
+                    <summary style="cursor: pointer; font-size: 0.88rem;">conn.log (<span id="nsm-total-conn"></span> conexões; as consultas udp/53 estão no dns.log)</summary>
+                    <pre id="nsm-connlog" role="region" aria-label="conn.log bruto" tabindex="0" style="max-height: 18rem; overflow: auto; max-width: 100%; font-size: 0.72rem; tab-size: 2; background: var(--sunk); border-radius: var(--radius-sm); padding: 0.5rem; margin: 0.4rem 0 0 0;"></pre>
+                </details>
+                <details>
+                    <summary style="cursor: pointer; font-size: 0.88rem;">dns.log (<span id="nsm-total-dns"></span> consultas ao resolvedor 10.20.0.10)</summary>
+                    <pre id="nsm-dnslog" role="region" aria-label="dns.log bruto" tabindex="0" style="max-height: 18rem; overflow: auto; max-width: 100%; font-size: 0.72rem; tab-size: 2; background: var(--sunk); border-radius: var(--radius-sm); padding: 0.5rem; margin: 0.4rem 0 0 0;"></pre>
+                </details>
+
+                <h4 style="margin-top: 1.5rem;">Parte 1. Beaconing no conn.log</h4>
+                <fieldset id="nsm-conn-controles" style="border: 0; padding: 0; margin: 0; min-width: 0;">
+                    <legend style="font-size: 0.88rem; margin-bottom: 0.5rem;">Agrupamento e limiares do alerta de beacon</legend>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 0.6rem 0.9rem; font-size: 0.85rem;">
+                        <div style="min-width: 0;">
+                            <label for="nsm-agrupar" style="display: block; margin-bottom: 0.2rem;">Agrupar por</label>
+                            <select class="form-control" id="nsm-agrupar" style="width: 100%; min-width: 0;">
+                                <option value="par">Par origem → destino:porta</option>
+                                <option value="destino">Só destino:porta</option>
+                                <option value="origem">Só origem</option>
+                            </select>
+                        </div>
+                        <div style="min-width: 0;">
+                            <label for="nsm-min-conexoes" style="display: block; margin-bottom: 0.2rem;">Mínimo de conexões no grupo</label>
+                            <input class="form-control" type="number" id="nsm-min-conexoes" min="2" max="200" step="1" style="width: 100%;">
+                        </div>
+                        <div style="min-width: 0;">
+                            <label for="nsm-max-intervalo" style="display: block; margin-bottom: 0.2rem;">Intervalo médio máximo (s)</label>
+                            <input class="form-control" type="number" id="nsm-max-intervalo" min="10" max="3600" step="10" style="width: 100%;">
+                        </div>
+                        <div style="min-width: 0;">
+                            <label for="nsm-max-jitter" style="display: block; margin-bottom: 0.2rem;">Jitter máximo (CV dos intervalos, %)</label>
+                            <input class="form-control" type="number" id="nsm-max-jitter" min="0" max="100" step="1" style="width: 100%;">
+                        </div>
+                        <div style="min-width: 0;">
+                            <label for="nsm-min-estab" style="display: block; margin-bottom: 0.2rem;">Tamanho estável mínimo (% das conexões a ±10% da mediana de orig_bytes)</label>
+                            <input class="form-control" type="number" id="nsm-min-estab" min="0" max="100" step="5" style="width: 100%;">
+                        </div>
+                        <div style="min-width: 0; display: flex; align-items: center; gap: 0.4rem;">
+                            <input type="checkbox" id="nsm-externos">
+                            <label for="nsm-externos">Analisar só destinos externos (fora de 10/8, 172.16/12 e 192.168/16)</label>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.85rem; margin: 0.9rem 0 0.3rem 0;"><strong>Exceções documentadas</strong> (conexões que casam com a exceção saem da análise):</p>
+                    <div id="nsm-excecoes" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.3rem; font-size: 0.82rem;"></div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem;">
+                        <button class="btn-primary" type="button" onclick="analisarConexoesNsm()">Analisar conexões</button>
+                        <button class="btn-secondary" type="button" onclick="restaurarPadraoNsm()">Restaurar limiares iniciais</button>
+                    </div>
+                </fieldset>
+                <div id="nsm-placar-conn" aria-live="polite" style="margin-top: 0.9rem; font-size: 0.85rem;"></div>
+                <div id="nsm-grupos" role="region" aria-label="Grupos de conexões" tabindex="0" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.4rem; max-height: 34rem; overflow-y: auto; font-size: 0.8rem; margin-top: 0.6rem;"></div>
+
+                <h4 style="margin-top: 1.5rem;">Parte 2. Túnel DNS no dns.log</h4>
+                <fieldset id="nsm-dns-controles" style="border: 0; padding: 0; margin: 0; min-width: 0;">
+                    <legend style="font-size: 0.88rem; margin-bottom: 0.5rem;">Consultas agrupadas pelo domínio base (os dois últimos rótulos)</legend>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 0.6rem 0.9rem; font-size: 0.85rem;">
+                        <div style="min-width: 0;">
+                            <label for="nsm-dns-min-distintos" style="display: block; margin-bottom: 0.2rem;">Mínimo de nomes distintos</label>
+                            <input class="form-control" type="number" id="nsm-dns-min-distintos" min="1" max="500" step="1" style="width: 100%;">
+                        </div>
+                        <div style="min-width: 0;">
+                            <label for="nsm-dns-min-comp" style="display: block; margin-bottom: 0.2rem;">Comprimento médio mínimo do subdomínio (caracteres)</label>
+                            <input class="form-control" type="number" id="nsm-dns-min-comp" min="0" max="200" step="1" style="width: 100%;">
+                        </div>
+                        <div style="min-width: 0;">
+                            <label for="nsm-dns-min-ent" style="display: block; margin-bottom: 0.2rem;">Entropia média mínima (bits por caractere)</label>
+                            <input class="form-control" type="number" id="nsm-dns-min-ent" min="0" max="6" step="0.1" style="width: 100%;">
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem;">
+                        <button class="btn-primary" type="button" onclick="analisarDnsNsm()">Analisar DNS</button>
+                    </div>
+                </fieldset>
+                <div id="nsm-placar-dns" aria-live="polite" style="margin-top: 0.9rem; font-size: 0.85rem;"></div>
+                <div id="nsm-dominios" role="region" aria-label="Domínios consultados" tabindex="0" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.4rem; max-height: 30rem; overflow-y: auto; font-size: 0.8rem; margin-top: 0.6rem;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Monitoramento de Rede</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para avaliar a visibilidade de rede de um ambiente ou antes de promover uma detecção de beaconing ou de túnel DNS. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="monitoramento-de-rede-nsm">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-nsm-1">
+                <label for="chk-nsm-1"><strong>Sensores:</strong> TAP ou SPAN na saída, do lado de dentro do NAT, e no núcleo para o tráfego leste-oeste; perda de pacotes do sensor medida.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-nsm-2">
+                <label for="chk-nsm-2"><strong>Retenção:</strong> prazos definidos para PCAP, logs do Zeek e fluxos, coerentes com o custo, com a investigação e com a LGPD.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-nsm-3">
+                <label for="chk-nsm-3"><strong>DNS:</strong> saída na porta 53 só pelo resolvedor interno, consultas do resolvedor registradas e DoH externo controlado.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-nsm-4">
+                <label for="chk-nsm-4"><strong>Beaconing:</strong> conexões agrupadas por par origem → destino:porta, com intervalo médio, jitter e estabilidade do tamanho medidos numa janela de horas.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-nsm-5">
+                <label for="chk-nsm-5"><strong>Exceções:</strong> tráfego periódico legítimo (NTP, EDR, monitoramento, atualizações) documentado com dono, justificativa e revisão, em vez de limiar afrouxado.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-nsm-6">
+                <label for="chk-nsm-6"><strong>Túnel DNS:</strong> comprimento, entropia e nomes distintos por domínio base combinados, com amostra decodificada antes de concluir.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-nsm-7">
+                <label for="chk-nsm-7"><strong>Correlação:</strong> JA3/JA4, SNI e dns.log usados como pivô para achar outras máquinas, nunca como prova isolada.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Custo vs valor):</strong> O diretor quer guardar PCAP completo da saída de internet por um ano "para garantir". O link tem 1 Gbit/s com 30% de uso médio. O que você responde?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> São cerca de 3 TB por dia, mais de 1 PB por ano, quase tudo conteúdo cifrado que não se consegue ler. O desenho com melhor custo-benefício é NetFlow/IPFIX por meses ou anos, logs do Zeek por semanas ou meses e PCAP rotativo de poucos dias para provar o conteúdo quando for preciso. Guardar mais PCAP do que o necessário também aumenta o risco perante a LGPD.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Assinatura vs metadado):</strong> O Suricata do Estudo 07 não disparou nenhum alerta para o implante, que fala por HTTPS com um domínio novo. O IDS está quebrado?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não necessariamente. A assinatura compara conteúdo com um padrão conhecido; com TLS e um domínio que nenhuma lista conhece, não há o que comparar. O que denuncia o implante é o comportamento visível nos metadados: o mesmo par origem–destino a cada 60 s, check-ins do mesmo tamanho, SNI de um domínio sem histórico. NSM e IDS se complementam.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Jitter):</strong> Com jitter máximo de 20%, o alerta pegou o beacon de WS-FIN-03 (CV de 6%) mas não o de WS-VEN-07, que tem média de 62 s e CV de 25%. O que isso ensina?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Que o jitter é configurado pelo atacante justamente para escapar de limiares apertados, e que o mesmo implante pode vir com jitter diferente em cada vítima. Subir o limiar para 30% ou 35% recupera o beacon sem trazer a navegação, que fica acima de 70%. A média de 60 s e o tamanho constante dos check-ins continuam lá: combine os critérios em vez de depender de um só.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Agrupamento):</strong> Um colega agrupou o conn.log só pelo destino 203.0.113.47 e concluiu que não há beacon: o CV deu 54% e a média, 30 s. Onde está o erro?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Duas estações infectadas falam com o mesmo destino. Juntas, as duas séries de 60 s se intercalam: os intervalos ficam curtos e irregulares, a média cai pela metade e o jitter dispara. A regularidade é uma propriedade de cada par origem → destino:porta. Agrupar por origem tem o mesmo problema: mistura o beacon com a navegação da própria estação.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Falso positivo):</strong> O alerta de beacon aponta o SRV-LNX-01 consultando 192.0.2.123:123/udp a cada 64 s, com jitter 0% e 48 bytes. Qual o tratamento certo?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> É o NTP (chrony com intervalo de 64 s) consultando o servidor de hora aprovado: periódico por definição. Nenhum limiar o separa do beacon sem cegar a detecção: o implante também pode rodar sem jitter, e exigir um jitter mínimo o deixaria passar. O certo é uma exceção documentada, restrita a esse par e porta, com dono e data de revisão. Um NTP para um IP que não está na lista aprovada continua alertando.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Túnel DNS):</strong> Dois domínios têm subdomínios longos e muitos nomes distintos: <code>antivirus-nuvem.example</code> (hash MD5 no nome, entropia 3,8) e <code>dados-cdn.example</code> (consultas TXT, entropia 4,4). Como decidir?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O hash hexadecimal tem só 16 símbolos e nunca passa de 4 bits por caractere; as respostas são 127.0.0.x, padrão de serviços de reputação, e o fornecedor está documentado. Em <code>dados-cdn.example</code> os rótulos têm 56 caracteres em base32, só uma estação consulta, o tipo é TXT e, decodificada, a amostra vira texto legível. Combine comprimento, entropia e volume, e decodifique antes de concluir.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 7 (JA3):</strong> O JA3 do beacon é idêntico ao do agente do EDR, instalado em todas as estações. Dá para descartar o alerta?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não, e o contrário também vale: um JA3 "malicioso" não condena sozinho. Os dois usam a pilha TLS do Windows (SChannel), então geram o mesmo ClientHello. A impressão do cliente TLS é indício para agrupar e correlacionar; quem decide é o comportamento (intervalo, tamanho, destino sem histórico, SNI imitando um serviço conhecido) somado ao que o EDR mostra no processo.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Fontes</h4>
+                <p>PCAP, Zeek e NetFlow: custo vs valor. Fluxos por meses, metadados por semanas, pacotes por poucos dias.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Beaconing</h4>
+                <p>Beaconing pela regularidade dos intervalos, medida por par origem → destino:porta, com o tamanho dos check-ins.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. DNS</h4>
+                <p>Túnel DNS por entropia e volume de subdomínios, combinados com o comprimento e uma amostra decodificada.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. TLS</h4>
+                <p>JA3/JA4 ajudam, mas não provam sozinhos: a mesma biblioteca TLS gera a mesma impressão.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>Richard Bejtlich — <em>The Practice of Network Security Monitoring</em> (No Starch Press, 2013).</li>
+            <li>Zeek — documentação dos logs <code>conn.log</code>, <code>dns.log</code> e <code>ssl.log</code> e da ferramenta <code>zeek-cut</code> (docs.zeek.org).</li>
+            <li>IETF — RFC 7011 (IPFIX), RFC 3954 (NetFlow v9), RFC 1035 (DNS) e RFC 5737 (endereços de documentação).</li>
+            <li>FoxIO — JA4+ Network Fingerprinting; Salesforce — JA3 (2017).</li>
+            <li>Active Countermeasures — RITA (Real Intelligence Threat Analytics) e o material sobre análise de beacons.</li>
+            <li>MITRE ATT&amp;CK — T1071 Application Layer Protocol, T1071.004 DNS e T1048 Exfiltration Over Alternative Protocol.</li>
+            <li>Security Onion — documentação de arquitetura de sensores (TAP, SPAN, Zeek, Suricata e PCAP).</li>
+            <li>NIST CSWP 29 — Cybersecurity Framework (CSF) 2.0, função Detect (DE.CM, monitoramento contínuo).</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Do Estudo 47 até aqui, e adiante para o Estudo 49</strong>
+            </div>
+            <p>
+                A caçada do Estudo 47 achou o implante no endpoint; a rede mostrou com quem ele fala, que outra estação tem o mesmo canal e que as notas fiscais saíram por DNS. Os limiares que você ajustou viram regras na bancada do Estudo 46, com os beacons como testes positivos e o NTP, o EDR e o PDV como testes negativos. No Estudo 49 o alerta de beacon dispara um playbook de SOAR: enriquecer o destino, pedir aprovação e isolar a estação sem derrubar o servidor de produção que fala com o mesmo intervalo.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="nsm-dados">
+{
+ "contexto": "Ipê Store, domínio corp.ipestore.example. Sensor Zeek fictício na porta SPAN do switch central e na saída para a internet; uma hora de conn.log e dns.log de 02/11/2026, das 09:00 às 10:00 (UTC-3). IPs privados e da faixa de documentação (RFC 5737), domínios .example. Nada sai do seu navegador.",
+ "inicio_ts": 1793620800,
+ "janela_s": 3600,
+ "padrao": {"agrupar": "par", "min_conexoes": 10, "max_intervalo": 900, "max_jitter": 20, "min_estabilidade": 0, "so_externos": false, "dns_min_distintos": 10, "dns_min_comprimento": 20, "dns_min_entropia": 3.0},
+ "hosts": {
+  "10.20.0.10": "DC-01 (controlador de domínio e resolvedor DNS interno)",
+  "10.20.0.30": "SRV-ZBX-01 (Zabbix)",
+  "10.20.1.10": "SRV-ERP-01",
+  "10.20.1.20": "SRV-PDV-01 (concentrador dos caixas)",
+  "10.20.1.30": "SRV-LNX-01 (servidor Linux)",
+  "10.20.3.11": "WS-FIN-01",
+  "10.20.3.13": "WS-FIN-03",
+  "10.20.7.12": "WS-VEN-02",
+  "10.20.7.17": "WS-VEN-07",
+  "10.20.5.11": "WS-TI-01",
+  "10.20.9.11": "NB-DIR-01"
+ },
+ "excecoes": [
+  {"id": "exc-ntp", "rotulo": "NTP aprovado: SRV-LNX-01 → 192.0.2.123:123/udp (chamado TI-2291)", "orig_h": "10.20.1.30", "resp_h": "192.0.2.123", "resp_p": 123},
+  {"id": "exc-edr", "rotulo": "Nuvem do EDR: qualquer origem → 198.51.100.20:443 (contrato do fabricante)", "resp_h": "198.51.100.20", "resp_p": 443},
+  {"id": "exc-zabbix", "rotulo": "Monitoramento: SRV-ZBX-01 → agentes Zabbix na porta 10050", "orig_h": "10.20.0.30", "resp_p": 10050}
+ ],
+ "series": [
+  {"id": "beacon-fin03", "orig_h": "10.20.3.13", "resp_h": "203.0.113.47", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "beacon", "nota": "Implante OneDriveReport.exe achado na caçada TH-2026-047 (Estudo 47): sleep de 60 s com jitter de 10%. Check-ins pequenos e quase do mesmo tamanho; nas conexões maiores o operador mandou uma tarefa e recebeu o resultado.", "t0": 7.31, "intervalos": [58.71, 65.27, 63.53, 59.83, 56.04, 65.71, 63.02, 55.05, 63.66, 56.37, 65.89, 59.79, 64.62, 60.09, 58.21, 61.62, 61.04, 59.77, 63.38, 59.0, 64.1, 60.49, 61.24, 57.97, 64.43, 59.89, 64.66, 65.08, 56.08, 59.57, 57.68, 54.98, 59.85, 54.63, 63.56, 57.92, 65.49, 65.53, 56.51, 56.54, 62.04, 54.65, 60.01, 56.86, 60.61, 60.55, 64.3, 54.05, 65.91, 65.56, 62.39, 64.52, 63.08, 57.52, 55.02, 58.2, 54.02, 56.2, 65.02], "orig_bytes": [309, 314, 307, 311, 313, 313, 314, 315, 314, 306, 306, 314, 317, 313, 309, 308, 313, 306, 9381, 307, 307, 306, 316, 313, 306, 311, 315, 316, 313, 316, 308, 311, 306, 310, 313, 307, 317, 311, 308, 315, 316, 310, 316, 318, 312, 314, 312, 309, 306, 317, 313, 318, 307, 315, 312, 310, 306, 307, 315, 307], "resp_bytes": [249, 249, 245, 244, 251, 252, 249, 242, 245, 248, 253, 241, 239, 246, 248, 244, 239, 48211, 249, 244, 239, 247, 239, 242, 241, 255, 245, 247, 244, 241, 240, 251, 252, 253, 255, 250, 246, 244, 246, 249, 254, 242, 249, 255, 245, 247, 239, 250, 245, 246, 249, 255, 241, 243, 250, 250, 242, 242, 246, 246], "duracao": [0.3, 0.35, 0.36, 0.29, 0.4, 0.31, 0.37, 0.37, 0.4, 0.26, 0.4, 0.27, 0.27, 0.39, 0.39, 0.27, 0.26, 2.87, 1.12, 0.22, 0.27, 0.32, 0.39, 0.27, 0.34, 0.37, 0.41, 0.29, 0.34, 0.23, 0.33, 0.41, 0.31, 0.2, 0.41, 0.24, 0.26, 0.4, 0.39, 0.29, 0.37, 0.41, 0.35, 0.36, 0.25, 0.2, 0.34, 0.26, 0.38, 0.31, 0.33, 0.42, 0.33, 0.36, 0.26, 0.28, 0.35, 0.21, 0.4, 0.19], "ssl": {"version": "TLSv12", "ja3": "5d8a1c3e9b0f47a2c61e8d93b7f0a412", "ja4": "t12d1909h1_c7886603b240_4e1a92d07c3f", "server_name": "sync.onedrive-relatorios.example"}},
+  {"id": "beacon-ven07", "orig_h": "10.20.7.17", "resp_h": "203.0.113.47", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "beacon", "nota": "O mesmo implante, recompilado para esta vítima com jitter de 45%: os intervalos variam mais, mas a média continua em 60 s e o tamanho dos check-ins não muda.", "t0": 12.84, "intervalos": [38.1, 69.68, 54.03, 57.87, 60.85, 49.14, 76.66, 59.42, 52.99, 54.57, 60.24, 68.4, 38.27, 66.15, 75.54, 46.81, 78.09, 44.55, 54.36, 49.5, 85.27, 79.99, 45.83, 76.84, 45.04, 63.05, 33.44, 68.71, 68.46, 76.25, 36.04, 80.07, 41.3, 35.45, 79.68, 81.68, 76.29, 77.29, 65.25, 43.32, 55.21, 50.06, 84.95, 43.52, 73.33, 41.77, 66.91, 84.25, 86.97, 86.86, 50.11, 60.19, 72.33, 77.84, 56.26, 61.54, 61.33], "orig_bytes": [312, 314, 313, 316, 315, 312, 320, 317, 323, 324, 320, 323, 313, 323, 316, 324, 315, 317, 316, 313, 312, 323, 320, 315, 324, 318, 319, 319, 315, 317, 323, 318, 315, 314, 320, 323, 313, 317, 315, 314, 314, 316, 313, 322, 312, 319, 320, 322, 317, 313, 313, 318, 315, 315, 322, 321, 318, 320], "resp_bytes": [257, 246, 256, 254, 256, 257, 249, 254, 259, 247, 253, 252, 256, 256, 249, 249, 258, 258, 259, 245, 246, 247, 257, 251, 245, 247, 247, 249, 258, 250, 51907, 245, 248, 257, 257, 251, 243, 255, 244, 257, 252, 249, 244, 253, 245, 256, 254, 254, 255, 258, 252, 259, 249, 258, 251, 247, 258, 247], "duracao": [0.37, 0.23, 0.24, 0.43, 0.4, 0.34, 0.38, 0.29, 0.38, 0.35, 0.22, 0.29, 0.2, 0.22, 0.19, 0.3, 0.19, 0.24, 0.35, 0.18, 0.21, 0.45, 0.4, 0.38, 0.24, 0.39, 0.33, 0.21, 0.19, 0.36, 3.04, 0.34, 0.38, 0.3, 0.28, 0.24, 0.29, 0.21, 0.38, 0.22, 0.35, 0.19, 0.24, 0.25, 0.42, 0.38, 0.29, 0.31, 0.28, 0.44, 0.28, 0.44, 0.2, 0.23, 0.33, 0.22, 0.22, 0.44], "ssl": {"version": "TLSv12", "ja3": "5d8a1c3e9b0f47a2c61e8d93b7f0a412", "ja4": "t12d1909h1_c7886603b240_4e1a92d07c3f", "server_name": "sync.onedrive-relatorios.example"}},
+  {"id": "ntp-lnx01", "orig_h": "10.20.1.30", "resp_h": "192.0.2.123", "resp_p": 123, "proto": "udp", "service": "ntp", "rotulo": "benigno", "nota": "Falso positivo: o chrony do SRV-LNX-01 consulta o servidor de hora aprovado a cada 64 s (poll 6). NTP é periódico por definição, sem jitter e com 48 bytes fixos. Trate com exceção documentada, não afrouxando o limiar.", "t0": 3.02, "intervalos": [63.99, 64.0, 64.02, 63.98, 64.01, 64.0, 64.01, 64.01, 64.0, 64.01, 64.0, 63.98, 64.02, 64.0, 64.01, 64.02, 63.99, 63.98, 63.98, 64.01, 64.02, 64.01, 64.01, 64.0, 64.01, 64.0, 64.01, 63.99, 64.0, 64.01, 63.99, 64.0, 64.01, 64.0, 64.02, 63.98, 63.99, 63.98, 63.99, 63.98, 63.98, 63.99, 64.02, 63.99, 64.01, 64.01, 64.0, 63.99, 64.0, 64.0, 64.02, 64.02, 64.01, 64.0, 64.02, 64.01], "orig_bytes": [48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48], "resp_bytes": [48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48], "duracao": [0.04, 0.02, 0.04, 0.02, 0.03, 0.04, 0.02, 0.02, 0.05, 0.05, 0.03, 0.03, 0.03, 0.04, 0.04, 0.04, 0.05, 0.03, 0.02, 0.02, 0.04, 0.03, 0.03, 0.02, 0.03, 0.05, 0.02, 0.04, 0.02, 0.03, 0.03, 0.02, 0.04, 0.04, 0.02, 0.03, 0.05, 0.02, 0.03, 0.03, 0.04, 0.03, 0.05, 0.02, 0.04, 0.02, 0.04, 0.04, 0.02, 0.03, 0.04, 0.04, 0.03, 0.02, 0.03, 0.02, 0.03]},
+  {"id": "edr-ws-fin-01", "orig_h": "10.20.3.11", "resp_h": "198.51.100.20", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "Falso positivo: heartbeat do agente do EDR para a nuvem do fabricante a cada 300 s em todas as estações. Periódico e legítimo; some com um intervalo máximo menor que 300 s ou com a exceção do destino do fabricante.", "t0": 20, "intervalos": [299.98, 299.89, 299.12, 298.65, 299.24, 298.86, 300.01, 298.96, 299.31, 300.32, 300.78], "orig_bytes": [1195, 1187, 1193, 1197, 1195, 1166, 1160, 1160, 1189, 1162, 1195, 1186], "resp_bytes": [629, 630, 635, 646, 643, 630, 634, 640, 636, 626, 632, 655], "duracao": [0.36, 0.35, 0.4, 0.5, 0.42, 0.42, 0.5, 0.52, 0.34, 0.33, 0.34, 0.44], "ssl": {"version": "TLSv12", "ja3": "5d8a1c3e9b0f47a2c61e8d93b7f0a412", "ja4": "t12d1909h1_c7886603b240_4e1a92d07c3f", "server_name": "telemetria.edr-fornecedor.example"}},
+  {"id": "edr-ws-fin-03", "orig_h": "10.20.3.13", "resp_h": "198.51.100.20", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "Falso positivo: heartbeat do agente do EDR para a nuvem do fabricante a cada 300 s em todas as estações. Periódico e legítimo; some com um intervalo máximo menor que 300 s ou com a exceção do destino do fabricante.", "t0": 57, "intervalos": [299.74, 299.36, 299.89, 299.3, 300.16, 301.09, 299.35, 301.46, 300.08, 301.12, 300.45], "orig_bytes": [1191, 1162, 1179, 1190, 1162, 1182, 1170, 1181, 1190, 1167, 1161, 1197], "resp_bytes": [647, 629, 648, 633, 655, 654, 627, 638, 639, 641, 633, 636], "duracao": [0.45, 0.55, 0.57, 0.39, 0.57, 0.57, 0.41, 0.32, 0.53, 0.38, 0.5, 0.51], "ssl": {"version": "TLSv12", "ja3": "5d8a1c3e9b0f47a2c61e8d93b7f0a412", "ja4": "t12d1909h1_c7886603b240_4e1a92d07c3f", "server_name": "telemetria.edr-fornecedor.example"}},
+  {"id": "edr-ws-ven-02", "orig_h": "10.20.7.12", "resp_h": "198.51.100.20", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "Falso positivo: heartbeat do agente do EDR para a nuvem do fabricante a cada 300 s em todas as estações. Periódico e legítimo; some com um intervalo máximo menor que 300 s ou com a exceção do destino do fabricante.", "t0": 94, "intervalos": [299.06, 300.05, 300.33, 301.31, 300.95, 300.16, 300.19, 301.17, 301.41, 299.65, 301.17], "orig_bytes": [1169, 1161, 1194, 1171, 1200, 1161, 1196, 1191, 1177, 1195, 1160, 1181], "resp_bytes": [640, 637, 645, 625, 626, 655, 626, 625, 643, 631, 632, 655], "duracao": [0.52, 0.36, 0.46, 0.51, 0.31, 0.34, 0.45, 0.49, 0.42, 0.42, 0.43, 0.4], "ssl": {"version": "TLSv12", "ja3": "5d8a1c3e9b0f47a2c61e8d93b7f0a412", "ja4": "t12d1909h1_c7886603b240_4e1a92d07c3f", "server_name": "telemetria.edr-fornecedor.example"}},
+  {"id": "edr-ws-ven-07", "orig_h": "10.20.7.17", "resp_h": "198.51.100.20", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "Falso positivo: heartbeat do agente do EDR para a nuvem do fabricante a cada 300 s em todas as estações. Periódico e legítimo; some com um intervalo máximo menor que 300 s ou com a exceção do destino do fabricante.", "t0": 131, "intervalos": [299.23, 301.5, 298.87, 300.91, 300.16, 300.58, 300.13, 300.8, 299.04, 300.08, 300.72], "orig_bytes": [1197, 1169, 1197, 1195, 1180, 1199, 1175, 1182, 1166, 1197, 1194, 1184], "resp_bytes": [633, 627, 651, 640, 645, 645, 625, 633, 630, 625, 649, 655], "duracao": [0.38, 0.42, 0.52, 0.52, 0.45, 0.32, 0.39, 0.31, 0.42, 0.42, 0.41, 0.59], "ssl": {"version": "TLSv12", "ja3": "5d8a1c3e9b0f47a2c61e8d93b7f0a412", "ja4": "t12d1909h1_c7886603b240_4e1a92d07c3f", "server_name": "telemetria.edr-fornecedor.example"}},
+  {"id": "edr-ws-ti-01", "orig_h": "10.20.5.11", "resp_h": "198.51.100.20", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "Falso positivo: heartbeat do agente do EDR para a nuvem do fabricante a cada 300 s em todas as estações. Periódico e legítimo; some com um intervalo máximo menor que 300 s ou com a exceção do destino do fabricante.", "t0": 168, "intervalos": [301.1, 300.32, 300.61, 300.48, 300.63, 299.61, 299.68, 300.08, 300.63, 299.53, 299.06], "orig_bytes": [1167, 1176, 1165, 1195, 1192, 1186, 1199, 1194, 1165, 1162, 1182, 1179], "resp_bytes": [655, 634, 625, 635, 637, 642, 651, 633, 631, 637, 643, 651], "duracao": [0.43, 0.4, 0.56, 0.4, 0.57, 0.32, 0.57, 0.55, 0.41, 0.46, 0.46, 0.35], "ssl": {"version": "TLSv12", "ja3": "5d8a1c3e9b0f47a2c61e8d93b7f0a412", "ja4": "t12d1909h1_c7886603b240_4e1a92d07c3f", "server_name": "telemetria.edr-fornecedor.example"}},
+  {"id": "edr-nb-dir-01", "orig_h": "10.20.9.11", "resp_h": "198.51.100.20", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "Falso positivo: heartbeat do agente do EDR para a nuvem do fabricante a cada 300 s em todas as estações. Periódico e legítimo; some com um intervalo máximo menor que 300 s ou com a exceção do destino do fabricante.", "t0": 205, "intervalos": [300.4, 299.08, 301.06, 298.79, 298.61, 300.71, 299.92, 300.97, 300.69, 300.3, 299.5], "orig_bytes": [1172, 1173, 1185, 1162, 1160, 1182, 1192, 1181, 1184, 1174, 1171, 1181], "resp_bytes": [642, 629, 641, 631, 643, 655, 654, 647, 650, 653, 638, 654], "duracao": [0.35, 0.53, 0.43, 0.44, 0.42, 0.59, 0.45, 0.59, 0.55, 0.54, 0.39, 0.35], "ssl": {"version": "TLSv12", "ja3": "5d8a1c3e9b0f47a2c61e8d93b7f0a412", "ja4": "t12d1909h1_c7886603b240_4e1a92d07c3f", "server_name": "telemetria.edr-fornecedor.example"}},
+  {"id": "pdv-gateway", "orig_h": "10.20.1.20", "resp_h": "198.51.100.60", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "Falso positivo: o concentrador dos caixas envia o lote de vendas ao gateway de pagamento a cada 60 s, o mesmo intervalo do implante. O que o separa é o tamanho: cada lote tem um volume diferente de vendas.", "t0": 1.5, "intervalos": [59.92, 60.02, 60.04, 59.55, 59.87, 59.54, 59.73, 59.41, 59.42, 60.48, 59.76, 59.94, 59.44, 60.06, 60.5, 60.36, 60.45, 59.63, 60.11, 59.67, 60.05, 60.43, 59.71, 60.54, 60.52, 60.26, 60.41, 60.25, 59.58, 60.4, 60.06, 60.43, 60.28, 60.59, 60.09, 60.3, 60.29, 59.72, 59.96, 59.54, 59.64, 59.88, 60.55, 59.46, 59.61, 59.75, 59.9, 59.51, 59.91, 60.14, 59.45, 60.2, 59.49, 59.83, 59.98, 60.08, 59.96, 60.22, 60.34], "orig_bytes": [4040, 11563, 25106, 6656, 2547, 2167, 35606, 8187, 30937, 12145, 14684, 13180, 4420, 18130, 5912, 34850, 6857, 33269, 21672, 2844, 8770, 20177, 28607, 40927, 26402, 22431, 16020, 10819, 21428, 27496, 29584, 9908, 21082, 11304, 38168, 5041, 9584, 31992, 13447, 38817, 2238, 21380, 9842, 40226, 23242, 27290, 15141, 31487, 30244, 31194, 19794, 5223, 14305, 32523, 25588, 35563, 39449, 20866, 24327, 15736], "resp_bytes": [1005, 1310, 1186, 1229, 1265, 794, 1277, 1158, 813, 1062, 1119, 894, 889, 806, 777, 703, 792, 1071, 866, 1098, 1024, 813, 844, 1092, 924, 1128, 974, 1088, 864, 1188, 827, 878, 1239, 1253, 1024, 1152, 968, 846, 1163, 922, 885, 1035, 1338, 728, 1115, 863, 1218, 742, 941, 1153, 893, 910, 767, 1143, 793, 1014, 1194, 1186, 1363, 910], "duracao": [0.76, 0.41, 0.63, 0.58, 0.59, 0.45, 1.28, 0.43, 1.11, 1.01, 1.4, 0.72, 1.42, 1.22, 1.78, 1.66, 1.16, 0.81, 0.93, 1.63, 0.85, 1.66, 1.16, 0.81, 0.9, 1.77, 0.55, 0.48, 1.08, 1.37, 1.63, 1.44, 0.6, 0.45, 0.64, 1.55, 0.85, 0.95, 0.55, 0.66, 1.24, 1.09, 0.61, 1.63, 0.61, 1.47, 0.73, 1.72, 0.64, 1.71, 1.54, 1.46, 0.97, 1.05, 0.96, 1.27, 0.49, 1.53, 1.2, 1.15], "ssl": {"version": "TLSv13", "ja3": "b3f20c94d17e5a68f0e2c1d4a9b7e356", "ja4": "t13d3112h2_e8f1e7e78f70_9b2c4d61a0e8", "server_name": "api.gateway-pagamento.example"}},
+  {"id": "zabbix-10", "orig_h": "10.20.0.30", "resp_h": "10.20.1.10", "resp_p": 10050, "proto": "tcp", "service": "-", "rotulo": "benigno", "nota": "Falso positivo: o servidor Zabbix consulta o agente de SRV-ERP-01 a cada 60 s. Tráfego interno: some ao analisar só as conexões para destinos externos.", "t0": 4, "intervalos": [60.23, 59.85, 60.15, 60.13, 60.05, 60.1, 59.92, 59.82, 60.2, 60.23, 59.93, 59.92, 59.8, 59.88, 60.03, 60.17, 59.94, 59.78, 59.81, 60.22, 59.84, 60.19, 59.9, 59.84, 59.96, 59.91, 59.85, 59.82, 59.78, 60.21, 59.9, 60.13, 59.97, 59.97, 60.15, 59.8, 59.85, 60.07, 60.14, 59.82, 59.94, 60.03, 60.13, 59.85, 60.24, 60.18, 59.89, 59.96, 59.8, 60.15, 59.95, 60.16, 60.07, 60.0, 60.19, 60.18, 60.09, 59.86, 60.15], "orig_bytes": [70, 73, 73, 71, 73, 74, 71, 74, 74, 73, 70, 71, 70, 72, 70, 73, 70, 73, 71, 72, 72, 72, 73, 72, 70, 72, 73, 71, 72, 70, 71, 72, 74, 71, 71, 73, 72, 74, 70, 72, 70, 70, 71, 73, 71, 70, 73, 73, 73, 71, 73, 73, 70, 72, 70, 70, 70, 72, 70, 71], "resp_bytes": [185, 175, 181, 178, 175, 177, 175, 182, 180, 178, 184, 176, 180, 178, 178, 183, 174, 186, 174, 184, 182, 182, 174, 185, 182, 183, 181, 178, 174, 186, 180, 183, 186, 177, 176, 183, 179, 175, 176, 183, 175, 181, 185, 179, 185, 186, 180, 183, 179, 185, 179, 183, 182, 181, 181, 178, 186, 181, 183, 176], "duracao": [0.01, 0.01, 0.01, 0.01, 0.0, 0.0, 0.0, 0.01, 0.01, 0.01, 0.01, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.01, 0.01, 0.01, 0.0, 0.01, 0.01, 0.01, 0.0, 0.01, 0.0, 0.01, 0.0, 0.0, 0.01, 0.01, 0.0, 0.01, 0.01, 0.0, 0.01, 0.01, 0.0, 0.0, 0.01, 0.01, 0.0, 0.01, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0]},
+  {"id": "zabbix-20", "orig_h": "10.20.0.30", "resp_h": "10.20.1.20", "resp_p": 10050, "proto": "tcp", "service": "-", "rotulo": "benigno", "nota": "Falso positivo: o servidor Zabbix consulta o agente de SRV-PDV-01 a cada 60 s. Tráfego interno: some ao analisar só as conexões para destinos externos.", "t0": 15, "intervalos": [60.06, 59.8, 60.06, 60.01, 60.22, 60.12, 59.77, 60.0, 60.21, 59.87, 60.13, 59.83, 59.83, 60.18, 59.94, 59.8, 60.18, 59.88, 60.14, 59.99, 60.2, 59.88, 59.85, 60.02, 59.88, 59.82, 59.97, 59.94, 59.85, 60.05, 60.19, 60.14, 60.19, 60.16, 60.05, 60.14, 60.09, 60.14, 59.78, 59.92, 59.93, 59.94, 60.22, 60.09, 59.98, 59.79, 60.18, 59.87, 59.88, 59.81, 59.91, 60.19, 60.01, 60.07, 59.88, 59.97, 59.97, 59.88, 59.77], "orig_bytes": [73, 72, 74, 74, 74, 71, 70, 74, 73, 74, 73, 71, 70, 74, 73, 73, 70, 70, 73, 72, 73, 73, 72, 74, 71, 74, 73, 72, 70, 73, 74, 70, 74, 72, 73, 73, 72, 72, 70, 73, 71, 71, 73, 73, 74, 72, 74, 71, 70, 70, 72, 73, 74, 71, 74, 72, 72, 71, 74, 71], "resp_bytes": [186, 176, 185, 179, 186, 177, 180, 185, 180, 185, 178, 184, 182, 184, 184, 184, 184, 185, 178, 180, 184, 184, 182, 174, 186, 178, 174, 181, 183, 183, 175, 179, 176, 184, 184, 186, 174, 180, 183, 180, 175, 177, 178, 182, 179, 185, 175, 177, 186, 178, 177, 183, 183, 185, 179, 177, 184, 174, 176, 174], "duracao": [0.0, 0.01, 0.0, 0.01, 0.01, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.0, 0.01, 0.01, 0.0, 0.0, 0.0, 0.0, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.0, 0.0, 0.0, 0.01, 0.01, 0.01, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.01, 0.01, 0.0, 0.01, 0.01, 0.01, 0.01, 0.0]},
+  {"id": "zabbix-30", "orig_h": "10.20.0.30", "resp_h": "10.20.1.30", "resp_p": 10050, "proto": "tcp", "service": "-", "rotulo": "benigno", "nota": "Falso positivo: o servidor Zabbix consulta o agente de SRV-LNX-01 a cada 60 s. Tráfego interno: some ao analisar só as conexões para destinos externos.", "t0": 26, "intervalos": [59.82, 60.05, 60.06, 60.1, 60.0, 59.9, 59.84, 59.86, 60.03, 60.21, 59.79, 59.99, 60.14, 60.2, 59.81, 60.12, 60.02, 59.81, 59.8, 60.16, 60.14, 60.02, 60.15, 59.77, 60.04, 59.95, 60.08, 60.19, 60.21, 60.12, 59.91, 60.21, 60.06, 59.98, 59.84, 60.2, 60.1, 60.15, 60.17, 59.98, 59.93, 59.78, 59.76, 59.77, 59.77, 60.04, 59.77, 59.82, 60.05, 59.95, 59.88, 59.97, 60.22, 59.88, 59.87, 59.93, 60.09, 60.04, 59.94], "orig_bytes": [71, 74, 71, 70, 74, 70, 70, 72, 74, 70, 70, 73, 70, 72, 70, 72, 74, 73, 72, 72, 72, 74, 72, 72, 74, 70, 72, 73, 74, 73, 74, 70, 74, 73, 74, 71, 70, 71, 71, 70, 70, 72, 73, 72, 72, 73, 72, 71, 71, 74, 73, 71, 72, 74, 73, 73, 71, 74, 71, 71], "resp_bytes": [175, 174, 186, 179, 180, 177, 184, 174, 186, 185, 181, 180, 184, 183, 185, 174, 175, 180, 175, 181, 182, 175, 186, 178, 181, 185, 186, 175, 182, 174, 183, 184, 185, 184, 179, 179, 178, 178, 181, 176, 181, 174, 185, 184, 174, 182, 175, 175, 176, 182, 184, 175, 183, 185, 175, 182, 177, 175, 180, 183], "duracao": [0.01, 0.01, 0.01, 0.0, 0.01, 0.01, 0.01, 0.01, 0.0, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.0, 0.01, 0.0, 0.0, 0.01, 0.01, 0.01, 0.0, 0.01, 0.01, 0.0, 0.01, 0.01, 0.01, 0.0, 0.01, 0.01, 0.01, 0.01, 0.0, 0.01, 0.01, 0.01, 0.01, 0.0, 0.01, 0.0, 0.01, 0.01, 0.01, 0.0, 0.0, 0.01, 0.0, 0.01, 0.01, 0.01, 0.01, 0.01, 0.0]},
+  {"id": "nav-fin01-noticias", "orig_h": "10.20.3.11", "resp_h": "203.0.113.80", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "Navegação de WS-FIN-01 no portal de notícias: intervalos irregulares, ditados pela pessoa, e tamanhos variados.", "t0": 27.48, "intervalos": [121.05, 30.43, 225.0, 111.41, 61.33, 16.16, 65.34, 333.05, 23.14, 82.23, 105.04, 22.3, 54.1, 265.17, 122.18, 105.34, 0.4, 58.51, 89.73, 26.08, 78.97, 224.99, 3.43, 243.34, 44.76, 50.1, 86.32, 3.11, 70.17, 106.98], "orig_bytes": [2700, 2451, 1531, 975, 3426, 2011, 3309, 2791, 2795, 1244, 1810, 2024, 1988, 3361, 2791, 1315, 3256, 2166, 3155, 2813, 1552, 3162, 2719, 608, 3228, 860, 3361, 1453, 1567, 886, 1853], "resp_bytes": [34381, 15867, 144600, 54700, 168536, 40096, 57254, 129678, 129255, 133959, 174399, 70102, 52125, 120140, 73508, 66497, 3425, 3631, 93933, 151841, 146398, 171456, 136490, 17952, 32660, 28217, 92443, 23090, 86949, 19307, 26515], "duracao": [24.06, 23.95, 18.84, 16.36, 15.59, 15.37, 23.43, 21.1, 3.54, 16.01, 11.58, 24.07, 6.06, 3.12, 17.71, 16.33, 15.29, 1.03, 23.01, 19.45, 13.72, 9.38, 4.36, 9.69, 1.63, 23.76, 6.0, 2.92, 3.79, 1.19, 13.64], "ssl": {"version": "TLSv13", "ja3": "(varia a cada conexão)", "ja4": "t13d1517h2_5b57614c22b0_3cbfd9057e0d", "server_name": "www.noticias-portal.example"}},
+  {"id": "nav-fin03-webmail", "orig_h": "10.20.3.13", "resp_h": "198.51.100.143", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "Navegação de WS-FIN-03 no webmail corporativo: intervalos irregulares, ditados pela pessoa, e tamanhos variados.", "t0": 39.78, "intervalos": [47.1, 152.03, 94.08, 191.44, 102.21, 85.3, 168.39, 569.24, 7.36, 366.83, 364.06, 35.19, 23.96, 15.02, 18.92, 19.71, 124.99, 7.55, 125.29, 439.1, 41.56, 72.4], "orig_bytes": [2769, 982, 2198, 1397, 2489, 1048, 3567, 2950, 3522, 2227, 1445, 3176, 1137, 2764, 732, 2427, 3431, 1946, 937, 515, 2414, 659, 1276], "resp_bytes": [134290, 21406, 40688, 38068, 68587, 142860, 56921, 110838, 131086, 167344, 53286, 24006, 81578, 4106, 146393, 73246, 3456, 11648, 2951, 27590, 154055, 154599, 81771], "duracao": [5.56, 7.88, 9.67, 17.54, 15.05, 12.4, 4.24, 2.68, 18.15, 5.43, 12.14, 17.46, 20.18, 0.72, 5.47, 13.94, 7.72, 11.21, 0.52, 12.1, 9.92, 1.86, 9.29], "ssl": {"version": "TLSv13", "ja3": "(varia a cada conexão)", "ja4": "t13d1517h2_5b57614c22b0_3cbfd9057e0d", "server_name": "webmail.correio-nuvem.example"}},
+  {"id": "nav-ven02-marketplace", "orig_h": "10.20.7.12", "resp_h": "203.0.113.120", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "Navegação de WS-VEN-02 no marketplace parceiro: intervalos irregulares, ditados pela pessoa, e tamanhos variados.", "t0": 84.67, "intervalos": [83.88, 31.71, 161.26, 124.96, 310.41, 46.51, 152.41, 36.68, 2.75, 63.45, 36.99, 90.44, 146.36, 35.26, 53.53, 0.46, 82.42, 144.72, 117.78, 43.41, 59.33, 206.14, 56.76, 26.05, 53.26, 44.32, 26.06, 20.68, 81.8, 164.47, 48.67, 9.2, 155.68, 17.9], "orig_bytes": [924, 3419, 1682, 3821, 1431, 894, 595, 732, 1847, 2903, 1390, 1837, 1293, 2379, 591, 1341, 1226, 2428, 3837, 3438, 1896, 950, 938, 1304, 3510, 1509, 2602, 1384, 866, 3824, 1523, 2198, 1860, 2531, 1382], "resp_bytes": [21588, 118101, 55080, 146393, 34648, 13044, 66176, 133552, 88144, 59438, 178143, 135491, 79528, 112586, 173490, 161619, 20495, 64625, 75845, 9754, 75983, 50079, 163304, 172347, 32914, 32741, 171072, 140275, 176079, 47009, 150016, 28290, 75929, 178102, 21095], "duracao": [18.46, 5.24, 8.51, 24.44, 22.23, 15.36, 8.05, 9.13, 18.69, 5.26, 9.32, 13.92, 9.88, 2.78, 9.78, 13.7, 0.5, 2.24, 13.16, 17.69, 1.16, 18.48, 21.99, 1.47, 1.91, 20.52, 12.62, 7.99, 16.45, 12.01, 9.7, 0.52, 19.9, 8.25, 12.16], "ssl": {"version": "TLSv13", "ja3": "(varia a cada conexão)", "ja4": "t13d1517h2_5b57614c22b0_3cbfd9057e0d", "server_name": "vendedor.marketplace-parceiro.example"}},
+  {"id": "nav-ven07-busca", "orig_h": "10.20.7.17", "resp_h": "198.51.100.200", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "Navegação de WS-VEN-07 no buscador: intervalos irregulares, ditados pela pessoa, e tamanhos variados.", "t0": 58.41, "intervalos": [104.82, 150.93, 293.92, 147.79, 83.33, 15.76, 396.22, 49.08, 97.43, 346.22, 54.64, 113.29, 61.13, 279.57, 24.59, 14.43, 131.29, 94.45, 411.66, 164.68], "orig_bytes": [665, 1215, 3396, 1401, 1688, 657, 2588, 2170, 1917, 3717, 772, 2337, 3793, 3679, 502, 3184, 2128, 2446, 3011, 2127, 546], "resp_bytes": [169765, 7564, 151627, 79086, 86052, 80780, 126825, 39148, 2077, 97034, 179598, 41347, 89939, 41409, 131715, 79338, 61177, 57132, 151116, 132449, 146604], "duracao": [3.15, 20.9, 11.11, 22.16, 4.93, 16.03, 18.65, 15.57, 20.97, 18.91, 19.8, 4.96, 8.88, 0.64, 22.16, 9.48, 11.18, 11.56, 23.65, 16.07, 16.62], "ssl": {"version": "TLSv13", "ja3": "(varia a cada conexão)", "ja4": "t13d1517h2_5b57614c22b0_3cbfd9057e0d", "server_name": "www.busca-web.example"}},
+  {"id": "nav-ti01-pacotes", "orig_h": "10.20.5.11", "resp_h": "203.0.113.15", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "Navegação de WS-TI-01 no repositório de pacotes: intervalos irregulares, ditados pela pessoa, e tamanhos variados.", "t0": 88.14, "intervalos": [338.86, 40.81, 276.11, 142.11, 309.83, 0.61, 46.37, 80.2, 276.24, 6.88, 185.4, 76.27, 12.41, 46.26, 432.6, 390.06, 815.44, 16.33], "orig_bytes": [1897, 897, 3936, 3525, 3202, 1435, 2857, 502, 3349, 1375, 1074, 1663, 3145, 3278, 739, 3546, 2443, 1916, 3137], "resp_bytes": [9536, 8683, 114551, 138827, 35082, 165925, 55262, 86575, 150780, 19929, 32640, 167416, 95023, 159325, 142875, 34146, 20827, 3364, 59653], "duracao": [0.71, 20.89, 13.56, 22.48, 1.55, 15.34, 3.44, 9.19, 11.3, 4.72, 13.18, 15.91, 21.82, 6.81, 23.01, 5.91, 14.34, 12.09, 2.62], "ssl": {"version": "TLSv13", "ja3": "(varia a cada conexão)", "ja4": "t13d1517h2_5b57614c22b0_3cbfd9057e0d", "server_name": "pacotes.repo-linux.example"}},
+  {"id": "nav-dir01-webmail", "orig_h": "10.20.9.11", "resp_h": "198.51.100.143", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "Navegação de NB-DIR-01 no webmail corporativo: intervalos irregulares, ditados pela pessoa, e tamanhos variados.", "t0": 57.34, "intervalos": [276.78, 91.13, 487.31, 173.06, 512.84, 93.38, 377.12, 259.92, 71.75, 35.68, 18.74, 3.37, 542.34, 307.0, 81.93], "orig_bytes": [1691, 3315, 3533, 2143, 2431, 649, 935, 1319, 904, 930, 3805, 1651, 2786, 505, 3142, 3465], "resp_bytes": [166915, 126243, 134328, 101471, 41371, 177035, 136307, 90438, 159621, 58236, 52158, 85856, 50397, 130190, 31571, 2270], "duracao": [23.46, 18.83, 21.93, 18.14, 15.47, 2.77, 9.15, 17.07, 15.06, 16.79, 6.71, 20.95, 14.12, 23.57, 17.92, 11.16], "ssl": {"version": "TLSv13", "ja3": "(varia a cada conexão)", "ja4": "t13d1517h2_5b57614c22b0_3cbfd9057e0d", "server_name": "webmail.correio-nuvem.example"}},
+  {"id": "nav-dir01-anuncios", "orig_h": "10.20.9.11", "resp_h": "203.0.113.200", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "Navegação de NB-DIR-01 no rede de anúncios: intervalos irregulares, ditados pela pessoa, e tamanhos variados.", "t0": 36.09, "intervalos": [590.26, 5.95, 28.72, 66.95, 610.24, 77.83, 276.14, 111.08, 267.69, 216.55, 45.9, 118.71, 197.5, 149.08, 163.83, 197.55, 244.98, 60.47], "orig_bytes": [1608, 3976, 1859, 3001, 2601, 2633, 3521, 3687, 2014, 1470, 735, 3696, 1107, 3716, 3108, 2052, 1663, 2263, 3333], "resp_bytes": [82637, 76587, 79323, 131772, 11697, 165889, 152834, 84813, 161694, 68304, 79489, 73291, 171826, 149295, 27607, 121331, 130657, 16806, 108433], "duracao": [3.26, 1.3, 6.88, 10.87, 16.69, 21.8, 8.67, 12.87, 0.54, 16.07, 23.93, 17.39, 19.82, 23.23, 10.04, 7.79, 19.14, 6.83, 22.44], "ssl": {"version": "TLSv13", "ja3": "(varia a cada conexão)", "ja4": "t13d1517h2_5b57614c22b0_3cbfd9057e0d", "server_name": "px.anuncios-rastreio.example"}},
+  {"id": "erp-marketplace-api", "orig_h": "10.20.1.10", "resp_h": "198.51.100.77", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "O ERP chama a API do marketplace quando chegam pedidos: irregular, com tamanhos que acompanham o pedido.", "t0": 5.2, "intervalos": [151.16, 33.56, 3.24, 193.78, 320.53, 22.44, 219.15, 62.09, 84.2, 27.99, 301.9, 15.32, 52.43, 264.85, 169.35, 3.67, 195.62, 51.7, 324.81, 270.63, 23.42, 124.18, 87.83, 126.85, 108.36, 27.23, 129.18], "orig_bytes": [4556, 4295, 6801, 5615, 6599, 8890, 5264, 2848, 7269, 7501, 6854, 1432, 3743, 6347, 2737, 2464, 6648, 5226, 5542, 7010, 3946, 4182, 6684, 5134, 1706, 4574, 4439, 3053], "resp_bytes": [10732, 21701, 19725, 10995, 25593, 15420, 5738, 25344, 10367, 29458, 8965, 16746, 5811, 9426, 9210, 19583, 28218, 4909, 28612, 8191, 3871, 8088, 15616, 27731, 25330, 18826, 16492, 19221], "duracao": [0.34, 0.22, 0.75, 0.49, 1.26, 1.81, 2.37, 2.46, 0.45, 1.48, 1.98, 1.43, 1.07, 0.86, 0.29, 1.3, 0.28, 0.99, 0.36, 0.19, 1.69, 1.66, 1.89, 0.41, 0.48, 2.08, 0.73, 0.51], "ssl": {"version": "TLSv13", "ja3": "b3f20c94d17e5a68f0e2c1d4a9b7e356", "ja4": "t13d3112h2_e8f1e7e78f70_9b2c4d61a0e8", "server_name": "api.marketplace-parceiro.example"}},
+  {"id": "upd-ti01", "orig_h": "10.20.5.11", "resp_h": "192.0.2.80", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "Atualização do sistema operacional: poucas conexões na janela, abaixo do mínimo para medir regularidade.", "t0": 733.32, "intervalos": [218.85, 233.81], "orig_bytes": [1752, 1119, 1377], "resp_bytes": [5558980, 4016674, 2901023], "duracao": [28.66, 34.48, 15.63], "ssl": {"version": "TLSv12", "ja3": "5d8a1c3e9b0f47a2c61e8d93b7f0a412", "ja4": "t12d1909h1_c7886603b240_4e1a92d07c3f", "server_name": "atualizacoes.so-fornecedor.example"}},
+  {"id": "upd-ven02", "orig_h": "10.20.7.12", "resp_h": "192.0.2.80", "resp_p": 443, "proto": "tcp", "service": "ssl", "rotulo": "benigno", "nota": "Atualização do sistema operacional: poucas conexões na janela, abaixo do mínimo para medir regularidade.", "t0": 385.4, "intervalos": [24.33], "orig_bytes": [1808, 1276], "resp_bytes": [3634634, 8020748], "duracao": [48.96, 29.12], "ssl": {"version": "TLSv12", "ja3": "5d8a1c3e9b0f47a2c61e8d93b7f0a412", "ja4": "t12d1909h1_c7886603b240_4e1a92d07c3f", "server_name": "atualizacoes.so-fornecedor.example"}}
+ ],
+ "dominios": {
+  "dados-cdn.example": {"rotulo": "tunel", "nota": "Túnel DNS: cada consulta TXT leva 35 bytes de dados em base32 no subdomínio e um contador hexadecimal. Decodificados, os rótulos remontam as notas fiscais fictícias exportadas de WS-FIN-03 (T1048 / T1071.004)."},
+  "antivirus-nuvem.example": {"rotulo": "benigno", "nota": "Falso positivo: o antivírus consulta a reputação de arquivos pondo o hash MD5 no subdomínio. Longo e aleatório, mas hexadecimal (16 símbolos, no máximo 4 bits por caractere), respostas 127.0.0.x e fornecedor documentado."},
+  "anuncios-rastreio.example": {"rotulo": "benigno", "nota": "Falso positivo: a rede de anúncios usa um UUID por visita como subdomínio. Parece aleatório, mas é hexadecimal com hífens e não carrega dados de dentro da empresa."},
+  "ipestore.example": {"rotulo": "benigno", "nota": "Nomes internos do Active Directory (registros SRV do _msdcs) e dos servidores: longos, mas legíveis e repetidos."},
+  "cdn-imagens.example": {"rotulo": "benigno", "nota": "CDN de imagens com nomes de borda curtos e aleatórios: poucos nomes distintos e subdomínio curto."},
+  "onedrive-relatorios.example": {"rotulo": "c2", "nota": "Não é túnel: são as resoluções A do domínio de comando e controle do beacon (203.0.113.47), a cada 300 s (TTL). O dns.log é o pivô que liga o IP do beacon a um nome."}
+ },
+ "dns": [
+  [45.65, "10.20.5.11", "4be9925635e359b45e2fbbd47f2c17a6.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [56.54, "10.20.9.11", "86728835-a61d-4830-98b7-1fd7631f613e.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [68.6, "10.20.9.11", "50d78209-e23f-4caa-bf4e-9df9e681e5e0.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [108.31, "10.20.7.17", "a15afcb1047e5bd560cd0872a6a69efa.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [111.0, "10.20.3.11", "www.noticias-portal.example", "A", "203.0.113.80"],
+  [127.22, "10.20.5.11", "pacotes.repo-linux.example", "A", "203.0.113.15"],
+  [150.38, "10.20.1.10", "_kerberos._tcp.corp.ipestore.example", "SRV", "0 100 389 dc-01.corp.ipestore.example"],
+  [185.5, "10.20.9.11", "6bbda054-2c43-4eff-b31b-aeea24d7898b.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [189.05, "10.20.7.17", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [223.34, "10.20.7.12", "83af519898c910b960828474027b9b03.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [224.63, "10.20.7.12", "www.ipestore.example", "A", "10.20.1.13"],
+  [250.65, "10.20.5.11", "d9cu2uicpss5v.cdn-imagens.example", "A", "198.51.100.40"],
+  [251.27, "10.20.3.13", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [278.7, "10.20.9.11", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [290.19, "10.20.7.12", "cf551575-b373-46f4-b319-c1603e4ecd44.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [304.08, "10.20.9.11", "dd3nbys5b6ob1.cdn-imagens.example", "A", "198.51.100.33"],
+  [345.64, "10.20.7.12", "fad8e418f58bf0abcf35517c2ca52b77.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [382.8, "10.20.7.12", "fef76b8c8edc614097323e4dddc9ddb1.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [401.77, "10.20.9.11", "webmail.correio-nuvem.example", "A", "198.51.100.143"],
+  [414.59, "10.20.9.11", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [417.76, "10.20.3.13", "wpad.corp.ipestore.example", "A", "10.20.2.33"],
+  [464.42, "10.20.9.11", "d7jcwzs1z6ol7.cdn-imagens.example", "A", "198.51.100.30"],
+  [471.33, "10.20.7.17", "50693f720eb9e2307f6bce96844fe1b1.rep.antivirus-nuvem.example", "A", "127.0.0.2"],
+  [476.05, "10.20.7.12", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [485.27, "10.20.9.11", "webmail.correio-nuvem.example", "A", "198.51.100.143"],
+  [489.05, "10.20.7.17", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [511.28, "10.20.1.10", "_kerberos._tcp.corp.ipestore.example", "SRV", "0 100 389 dc-01.corp.ipestore.example"],
+  [530.92, "10.20.3.13", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [535.01, "10.20.1.10", "api.marketplace-parceiro.example", "A", "198.51.100.77"],
+  [551.27, "10.20.3.13", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [582.24, "10.20.5.11", "pacotes.repo-linux.example", "A", "203.0.113.15"],
+  [584.14, "10.20.7.12", "740d61e4-5220-419c-8919-dc6b821cce16.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [642.01, "10.20.1.10", "_ldap._tcp.default-first-site-name._sites.corp.ipestore.example", "SRV", "0 100 389 dc-01.corp.ipestore.example"],
+  [647.95, "10.20.7.17", "intranet.corp.ipestore.example", "A", "10.20.0.33"],
+  [675.68, "10.20.7.17", "c6e04d8b95d35b657567d0e3646169fc.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [685.77, "10.20.7.12", "_kerberos._tcp.corp.ipestore.example", "SRV", "0 100 389 dc-01.corp.ipestore.example"],
+  [694.3, "10.20.3.11", "www.noticias-portal.example", "A", "203.0.113.80"],
+  [705.5, "10.20.5.11", "dc-01.corp.ipestore.example", "A", "10.20.2.23"],
+  [719.76, "10.20.1.20", "api.gateway-pagamento.example", "A", "198.51.100.60"],
+  [740.11, "10.20.9.11", "dc-01.corp.ipestore.example", "A", "10.20.2.38"],
+  [743.04, "10.20.5.11", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [746.52, "10.20.7.12", "d9cu2uicpss5v.cdn-imagens.example", "A", "198.51.100.37"],
+  [749.58, "10.20.3.11", "_gc._tcp.corp.ipestore.example", "SRV", "0 100 389 dc-01.corp.ipestore.example"],
+  [762.34, "10.20.9.11", "www.ipestore.example", "A", "10.20.1.23"],
+  [789.05, "10.20.7.17", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [801.72, "10.20.7.12", "1465cd89-c475-4f99-98e9-ab129d295c32.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [802.02, "10.20.9.11", "webmail.correio-nuvem.example", "A", "198.51.100.143"],
+  [805.54, "10.20.7.12", "5b6e0b19-32d1-47a0-b035-e9d69e25fd8b.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [821.41, "10.20.3.13", "srv-erp-01.corp.ipestore.example", "A", "10.20.1.12"],
+  [833.99, "10.20.7.12", "de652d88-8e58-4840-8850-d1b195a3f220.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [851.27, "10.20.3.13", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [865.01, "10.20.7.17", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [872.96, "10.20.7.17", "www.busca-web.example", "A", "198.51.100.200"],
+  [874.05, "10.20.9.11", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [907.14, "10.20.3.13", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [907.95, "10.20.3.13", "jzdc2zjaivmfat2skrauiqjafuqesucfebjvit2siuqcqrsjinkesq2j.0000.dados-cdn.example", "TXT", "TXT 16 5winy3livuawew3p"],
+  [912.87, "10.20.9.11", "loja.ipestore.example", "A", "10.20.0.59"],
+  [915.95, "10.20.5.11", "impressora-fin.corp.ipestore.example", "A", "10.20.1.59"],
+  [918.78, "10.20.3.13", "j4uqu3tgmu5tambuhaytcozsgazdmljrgawtamr3mnwgszloorssamjq.0001.dados-cdn.example", "TXT", "TXT 16 6x37cvmgtbzwbkd6"],
+  [929.06, "10.20.3.13", "gm3twureeaytamzmga3qu3tgmu5tambuhayteozsgazdmljrgawtamz3.0002.dados-cdn.example", "TXT", "TXT 16 q7flymmvyvkeamvp"],
+  [940.98, "10.20.3.13", "mnwgszloorssamjqg42dwureeaytknrmge2au3tgmu5tambuhaytgozs.0003.dados-cdn.example", "TXT", "TXT 16 4et2ra7xhedawu4l"],
+  [946.8, "10.20.1.10", "loja.ipestore.example", "A", "10.20.0.32"],
+  [953.78, "10.20.3.13", "webmail.correio-nuvem.example", "A", "198.51.100.143"],
+  [954.73, "10.20.3.13", "gazdmljrgawtanb3mnwgszloorssamjrgeytwureeazdaojmgiyqu3tg.0004.dados-cdn.example", "TXT", "TXT 16 cd6hdqlmcrkiazne"],
+  [963.12, "10.20.3.13", "mu5tambuhaytiozsgazdmljrgawtanj3mnwgszloorssamjrgq4dwure.0005.dados-cdn.example", "TXT", "TXT 16 6jpful64tnjbxczv"],
+  [970.0, "10.20.3.13", "eazdmmrmgi4au3tgmu5tambuhaytkozsgazdmljrgawtanr3mnwgszlo.0006.dados-cdn.example", "TXT", "TXT 16 nx32oba35xthjbvd"],
+  [982.68, "10.20.7.12", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [982.86, "10.20.3.13", "orssamjrha2twureeaztcnjmgm2qu3tgmu5tambuhaytmozsgazdmljr.0007.dados-cdn.example", "TXT", "TXT 16 osxjgapktacayjot"],
+  [990.59, "10.20.9.11", "9a4fc6bf-bc44-43e3-b025-f263f9e15487.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [996.23, "10.20.3.13", "gawtanz3mnwgszloorssamjsgizdwureeaztmobmgqzau3tgmu5tambu.0008.dados-cdn.example", "TXT", "TXT 16 z2annefrneobbfw6"],
+  [1009.49, "10.20.9.11", "979adb97c4c4adaf56e515adb209f093.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [1010.06, "10.20.3.13", "haytoozsgazdmljrgawtaob3mnwgszloorssamjsgu4twureea2demjm.0009.dados-cdn.example", "TXT", "TXT 16 vrtqs4jz5lngmktc"],
+  [1019.31, "10.20.3.13", "gq4qu3tgmu5tambuhaytqozsgazdmljrgawtaoj3mnwgszloorssamjs.000a.dados-cdn.example", "TXT", "TXT 16 awfipvygvg66edk5"],
+  [1025.09, "10.20.3.13", "he3dwureea2donbmgu3au3tgmu5tambuhaytsozsgazdmljrgawtcmb3.000b.dados-cdn.example", "TXT", "TXT 16 vv7mb62j5obockq4"],
+  [1028.43, "10.20.7.12", "db1e50dd-7840-4b4c-a8dc-2e6fef2958f7.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [1031.99, "10.20.3.13", "mnwgszloorssamjtgmztwureea2tenzmgyzqu3tgmu5tambuhazdaozs.000c.dados-cdn.example", "TXT", "TXT 16 jedg7v3jx4j5epsr"],
+  [1034.0, "10.20.5.11", "atualizacoes.so-fornecedor.example", "A", "192.0.2.80"],
+  [1040.21, "10.20.3.13", "gazdmljrgawtcmj3mnwgszloorssamjtg4ydwureea2tqmbmg4yau3tg.000d.dados-cdn.example", "TXT", "TXT 16 jvbte5kera6vi34d"],
+  [1043.4, "10.20.7.17", "2f66ef9b29e6e35b09e9e126eebf7329.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [1046.07, "10.20.7.12", "atualizacoes.so-fornecedor.example", "A", "192.0.2.80"],
+  [1050.44, "10.20.3.13", "mu5tambuhazdcozsgazdmljrgawtcmr3mnwgszloorssamjuga3twure.000e.dados-cdn.example", "TXT", "TXT 16 p3yxzymnnvlzq66q"],
+  [1058.72, "10.20.3.11", "5757a20bb211d38ac062287fbfa70038.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [1058.93, "10.20.3.13", "ea3dgmzmg43qu3tgmu5tambuhazdeozsgazdmljrgawtcmz3mnwgszlo.000f.dados-cdn.example", "TXT", "TXT 16 if5fgesasw2uavsn"],
+  [1064.07, "10.20.3.13", "impressora-fin.corp.ipestore.example", "A", "10.20.1.54"],
+  [1065.39, "10.20.3.13", "orssamjugq2dwureea3dqnrmha2au3tgmu5tambuhazdgozsgazdmljr.0010.dados-cdn.example", "TXT", "TXT 16 454onwikrsnsbnh4"],
+  [1074.81, "10.20.3.13", "gawtcnb3mnwgszloorssamjuhaytwureea3tgojmheyqu3tgmu5tambu.0011.dados-cdn.example", "TXT", "TXT 16 6yt7jvgqe5h6jdq6"],
+  [1079.77, "10.20.3.13", "hazdiozsgazdmljrgawtcnj3mnwgszloorssamjvge4dwureea3tsmrm.0012.dados-cdn.example", "TXT", "TXT 16 gd2wbwiv4jztcles"],
+  [1089.05, "10.20.7.17", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [1090.19, "10.20.3.13", "he4au3tgmu5tambuhazdkozsgazdmljrgawtcnr3mnwgszloorssamjv.0013.dados-cdn.example", "TXT", "TXT 16 bc2nupuw5j3kd5zc"],
+  [1102.6, "10.20.3.13", "gu2twureea4dinjmga2qu3tgmu5tambuhazdmozsgazdmljrgawtcnz3.0014.dados-cdn.example", "TXT", "TXT 16 5kvflcn3icyasc3o"],
+  [1111.14, "10.20.3.13", "mnwgszloorssamjvhezdwureea4dsobmgezau3tgmu5tambuhazdoozs.0015.dados-cdn.example", "TXT", "TXT 16 ts5whmryyrmlfqov"],
+  [1122.99, "10.20.3.13", "gazdmljrgawtcob3mnwgszloorssamjwgi4twureea4tkmjmge4qu3tg.0016.dados-cdn.example", "TXT", "TXT 16 gi4ezuakmvkg5hhf"],
+  [1125.01, "10.20.7.12", "e2c68e40-5ea7-4271-bcfa-593893a4d0eb.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [1134.36, "10.20.3.13", "mu5tambuhazdqozsgazdmljrgawtcoj3mnwgszloorssamjwgy3dwure.0017.dados-cdn.example", "TXT", "TXT 16 5je4ee2ishc4bqgy"],
+  [1141.21, "10.20.3.13", "eaytambufqzdmctomzstwmbqgq4deoj3giydenrngeyc2mrqhnrwy2lf.0018.dados-cdn.example", "TXT", "TXT 16 3xfmldenwjzgagsb"],
+  [1146.76, "10.20.9.11", "d2fycatp4m3tt.cdn-imagens.example", "A", "198.51.100.32"],
+  [1149.54, "10.20.3.13", "nz2gkibrg4ydgo2seqqdcmbvg4wdgmyknztgkozqga2dqmzqhmzdamrw.0019.dados-cdn.example", "TXT", "TXT 16 owuybzryzxjwo34z"],
+  [1151.27, "10.20.3.13", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [1154.91, "10.20.7.17", "intranet.corp.ipestore.example", "A", "10.20.1.15"],
+  [1161.02, "10.20.7.12", "f2b41d8990c8b7ca4bafbd154db0407a.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [1161.74, "10.20.3.13", "fuytaljsge5wg3djmvxhizjage3timb3kiscamjrgeycynbqbjxgmzj3.001a.dados-cdn.example", "TXT", "TXT 16 5ok5nalvhgbrmw6s"],
+  [1163.77, "10.20.7.12", "vendedor.marketplace-parceiro.example", "A", "203.0.113.120"],
+  [1166.65, "10.20.5.11", "impressora-fin.corp.ipestore.example", "A", "10.20.1.47"],
+  [1168.96, "10.20.3.13", "gaydiobtge5tembsgywtcmbngizdwy3mnfsw45dfeaytonzxhnjciibr.001b.dados-cdn.example", "TXT", "TXT 16 bjwnw3jilcram6qg"],
+  [1171.79, "10.20.1.10", "www.ipestore.example", "A", "10.20.0.13"],
+  [1176.61, "10.20.3.13", "ge3dglbug4fg4ztfhmydanbygmzdwmrqgi3c2mjqfuzdgo3dnruwk3tu.001c.dados-cdn.example", "TXT", "TXT 16 rhpkno7fsi2whv3w"],
+  [1179.8, "10.20.7.17", "_ldap._tcp.default-first-site-name._sites.corp.ipestore.example", "SRV", "0 100 389 dc-01.corp.ipestore.example"],
+  [1182.03, "10.20.3.13", "muqdcobrgq5vejbagezdcnrmgu2au3tgmu5tambuhaztgozsgazdmljr.001d.dados-cdn.example", "TXT", "TXT 16 rw42hp7vwtbmve74"],
+  [1193.71, "10.20.3.13", "gawtenb3mnwgszloorssamjyguytwureeaytenrzfq3dcctomzstwmbq.001e.dados-cdn.example", "TXT", "TXT 16 hkzlt2ljzcqierjr"],
+  [1205.53, "10.20.3.13", "gq4dgnb3giydenrngeyc2mrvhnrwy2lfnz2gkibrha4dqo2seqqdcmzs.001f.dados-cdn.example", "TXT", "TXT 16 6pbsksm2hqutzuij"],
+  [1210.73, "10.20.3.13", "giwdmoaknztgkozqga2dqmzvhmzdamrwfuytaljsgy5wg3djmvxhizja.0020.dados-cdn.example", "TXT", "TXT 16 jksm6xqdml7n3ht7"],
+  [1217.96, "10.20.3.13", "ge4tenj3kiscamjtg42synzvbjxgmzj3gaydiobtgy5tembsgywtcmbn.0021.dados-cdn.example", "TXT", "TXT 16 wfqlyg2or5npfr6a"],
+  [1221.1, "10.20.9.11", "srv-arquivos.corp.ipestore.example", "A", "10.20.2.38"],
+  [1222.26, "10.20.1.10", "intranet.corp.ipestore.example", "A", "10.20.1.48"],
+  [1226.36, "10.20.3.13", "gi3twy3mnfsw45dfeaytsnrshnjciibrgqzdqlbygifg4ztfhmydanby.0022.dados-cdn.example", "TXT", "TXT 16 k3hutmktaugslqps"],
+  [1235.66, "10.20.3.13", "gm3twmrqgi3c2mjqfuzdqo3dnruwk3tumuqdcojzhe5vejbage2dqmjm.0023.dados-cdn.example", "TXT", "TXT 16 z75d3wnfkxro746r"],
+  [1246.16, "10.20.3.13", "ha4qu3tgmu5tambuhaztqozsgazdmljrgawteoj3mnwgszloorssamrq.0024.dados-cdn.example", "TXT", "TXT 16 yyt6edbnmly65vwd"],
+  [1254.49, "10.20.3.13", "gm3dwureeaytkmzufq4tmctomzstwmbqgq4dgoj3giydenrngeyc2mzq.0025.dados-cdn.example", "TXT", "TXT 16 ufjoaenugisidxht"],
+  [1258.58, "10.20.3.13", "hnrwy2lfnz2gkibsga3tgo2seqqdcnjyg4wdamyknztgkozqga2dqnbq.0026.dados-cdn.example", "TXT", "TXT 16 qarmimjpa63btkai"],
+  [1258.69, "10.20.3.13", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [1266.76, "10.20.3.13", "hmzdamrwfuytaljqge5wg3djmvxhizjagiytcmb3kiscamjwgqycymjq.0027.dados-cdn.example", "TXT", "TXT 16 bos7tevf6nhbpwme"],
+  [1270.69, "10.20.7.17", "5105c56cbd636132baef4498d1115a59.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [1272.92, "10.20.3.13", "bjxgmzj3gaydiobuge5tembsgywtcmbngazdwy3mnfsw45dfeazdcnbx.0028.dados-cdn.example", "TXT", "TXT 16 bud2z7seljkj4whf"],
+  [1282.01, "10.20.3.13", "hnjciibrgy4tglbrg4fg4ztfhmydanbygqzdwmrqgi3c2mjqfuydgo3d.0029.dados-cdn.example", "TXT", "TXT 16 ppikclv7qwiprjnx"],
+  [1293.36, "10.20.3.13", "nruwk3tumuqdemjygq5vejbage3tinrmgi2au3tgmu5tambuha2dgozs.002a.dados-cdn.example", "TXT", "TXT 16 x6zwrdeaarriz3p2"],
+  [1303.57, "10.20.3.13", "gazdmljrgawtanb3mnwgszloorssamrsgiytwureeaytoojzfqztccto.002b.dados-cdn.example", "TXT", "TXT 16 bicxvtt2p2p6nxni"],
+  [1309.9, "10.20.3.13", "mzstwmbqgq4dinb3giydenrngeyc2mbvhnrwy2lfnz2gkibsgi2tqo2s.002c.dados-cdn.example", "TXT", "TXT 16 arztcmsqxjbu7clr"],
+  [1311.42, "10.20.7.17", "1152bce4cc393c96ac35cfbe7787232c.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [1319.63, "10.20.3.13", "eqqdcobvgiwdgoaknztgkozqga2dqnbvhmzdamrwfuytaljqgy5wg3dj.002d.dados-cdn.example", "TXT", "TXT 16 5bbi2xwvbp6u6ec2"],
+  [1332.57, "10.20.3.13", "mvxhizjagizdsnj3kiscamjzga2synbvbjxgmzj3gaydiobugy5tembs.002e.dados-cdn.example", "TXT", "TXT 16 ug5ksorc66ctfrhr"],
+  [1335.43, "10.20.5.11", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [1343.57, "10.20.3.13", "gywtcmbnga3twy3mnfsw45dfeazdgmzshnjciibrhe2tqlbvgifg4ztf.002f.dados-cdn.example", "TXT", "TXT 16 rktnc5fjn6ro2ka4"],
+  [1350.73, "10.20.3.13", "hmydanbygq3twmrqgi3c2mjqfuydqo3dnruwk3tumuqdemzwhe5vejba.0030.dados-cdn.example", "TXT", "TXT 16 4issfip3h65xsfqr"],
+  [1359.0, "10.20.7.12", "9523e199-35d2-44b5-9986-22fe2bb02858.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [1359.75, "10.20.7.17", "_ldap._tcp.default-first-site-name._sites.corp.ipestore.example", "SRV", "0 100 389 dc-01.corp.ipestore.example"],
+  [1363.17, "10.20.3.13", "giydcmjmgu4qu3tgmu5tambuha2dqozsgazdmljrgawtaoj3mnwgszlo.0031.dados-cdn.example", "TXT", "TXT 16 3lvjor6dwbzamzsd"],
+  [1372.81, "10.20.3.13", "orssamruga3dwureeazdanrufq3dmctomzstwmbqgq4dioj3giydenrn.0032.dados-cdn.example", "TXT", "TXT 16 j3lajbcbeauctyec"],
+  [1376.86, "10.20.3.13", "geyc2mjqhnrwy2lfnz2gkibsgq2dgo2seqqdemjrg4wdomyknztgkozq.0033.dados-cdn.example", "TXT", "TXT 16 lya2kpoa5x533q66"],
+  [1378.64, "10.20.7.12", "c6bbd7ca-39f6-4ff3-8008-aeb4d769ee1c.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [1383.7, "10.20.3.13", "ga2dqnjqhmzdamrwfuytaljrge5wg3djmvxhizjagi2dqmb3kiscamrr.0034.dados-cdn.example", "TXT", "TXT 16 jyw2scc7hap5q4ol"],
+  [1385.17, "10.20.1.10", "_ldap._tcp.dc._msdcs.corp.ipestore.example", "SRV", "0 100 389 dc-01.corp.ipestore.example"],
+  [1389.05, "10.20.7.17", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [1389.51, "10.20.7.17", "srv-arquivos.corp.ipestore.example", "A", "10.20.0.26"],
+  [1391.02, "10.20.3.13", "d2quba3jpf5xi.cdn-imagens.example", "A", "198.51.100.34"],
+  [1392.09, "10.20.9.11", "ad9ef0e2-2c3a-449a-b2db-f2db2c28ab1b.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [1395.77, "10.20.3.13", "g4ycyobqbjxgmzj3gaydiobvge5tembsgywtcmbngezdwy3mnfsw45df.0035.dados-cdn.example", "TXT", "TXT 16 vp7pkbahj23m3h7k"],
+  [1408.06, "10.20.3.13", "eazdkmjxhnjciibsgizdglbyg4fg4ztfhmydanbyguzdwmrqgi3c2mjq.0036.dados-cdn.example", "TXT", "TXT 16 5dma5uunzwr5475g"],
+  [1408.39, "10.20.7.17", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [1413.46, "10.20.3.13", "fuytgo3dnruwk3tumuqdenjvgq5vejbagizdonrmhe2au3tgmu5tambu.0037.dados-cdn.example", "TXT", "TXT 16 v5zsbwz5tnqpvzr5"],
+  [1417.78, "10.20.3.13", "ha2tgozsgazdmljrgawtcnb3mnwgszloorssamrvheytwureeazdgmrz.0038.dados-cdn.example", "TXT", "TXT 16 l5lbykbz6dwfku3c"],
+  [1422.31, "10.20.7.17", "dbe67reu1g0bw.cdn-imagens.example", "A", "198.51.100.37"],
+  [1425.66, "10.20.5.11", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [1431.33, "10.20.3.13", "fqydcctomzstwmbqgq4dknb3giydenrngeyc2mjvhnrwy2lfnz2gkibs.0039.dados-cdn.example", "TXT", "TXT 16 uvakiil3257fmvzg"],
+  [1434.4, "10.20.9.11", "daf940756bffd36bc218b1ee9ea6c48d.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [1436.65, "10.20.7.12", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [1439.75, "10.20.3.13", "gyzdqo2seqqdemzygiwdaoaknztgkozqga2dqnjvhmzdamrwfuytaljr.003a.dados-cdn.example", "TXT", "TXT 16 stqldeolcinaizjr"],
+  [1448.91, "10.20.3.13", "gy5wg3djmvxhizjagi3dmnj3kiscamrugm2symjvbjxgmzj3gaydiobv.003b.dados-cdn.example", "TXT", "TXT 16 eabxqsxmpvgnw3gf"],
+  [1451.27, "10.20.3.13", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [1456.72, "10.20.3.13", "gy5tembsgywtcmbnge3twy3mnfsw45dfeazdombshnjciibsgq4dqlbs.003c.dados-cdn.example", "TXT", "TXT 16 hdxdueffdlkchcsm"],
+  [1464.65, "10.20.3.13", "gifg4ztfhmydanbygu3twmrqgi3c2mjqfuytqo3dnruwk3tumuqdenzt.003d.dados-cdn.example", "TXT", "TXT 16 x7kamjrapsri7rh5"],
+  [1478.49, "10.20.3.13", "he5vejbagi2timjmgi4qu3tgmu5tambuha2tqozsgazdmljrgawtcoj3.003e.dados-cdn.example", "TXT", "TXT 16 x3waujnrjibdrqko"],
+  [1481.33, "10.20.5.11", "pacotes.repo-linux.example", "A", "203.0.113.15"],
+  [1485.34, "10.20.5.11", "d2quba3jpf5xi.cdn-imagens.example", "A", "198.51.100.40"],
+  [1488.97, "10.20.3.13", "mnwgszloorssamrxg43dwureeazdkojufqztmctomzstwmbqgq4dkoj3.003f.dados-cdn.example", "TXT", "TXT 16 3rik3hu2oyeuxbf4"],
+  [1494.56, "10.20.7.12", "dptbijtrn8gk5.cdn-imagens.example", "A", "198.51.100.39"],
+  [1495.68, "10.20.3.13", "giydenrngeyc2mrqhnrwy2lfnz2gkibshaytgo2seqqdenrug4wdimyk.0040.dados-cdn.example", "TXT", "TXT 16 qcjb2fg7bwkyyolf"],
+  [1502.86, "10.20.3.13", "nztgkozqga2dqnrqhmzdamrwfuytaljsge5wg3djmvxhizjagi4dkmb3.0041.dados-cdn.example", "TXT", "TXT 16 br75ppztoy4bstba"],
+  [1513.06, "10.20.3.13", "kiscamrxgaycynjqbjxgmzj3gaydiobwge5tembsgywtcmbngizdwy3m.0042.dados-cdn.example", "TXT", "TXT 16 766ugcxy2jaxl5dn"],
+  [1525.45, "10.20.3.13", "nfsw45dfeazdqobxhnjciibsg42tglbvg4fg4ztfhmydanbygyzdwmrq.0043.dados-cdn.example", "TXT", "TXT 16 6ezbmryh4sedrqzp"],
+  [1527.97, "10.20.3.11", "4b7eb86e9e1b905f2e18146f7e8cb213.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [1532.49, "10.20.7.12", "vendedor.marketplace-parceiro.example", "A", "203.0.113.120"],
+  [1533.06, "10.20.3.13", "gi3c2mjqfuzdgo3dnruwk3tumuqdeojsgq5vejbagi4danrmgy2au3tg.0044.dados-cdn.example", "TXT", "TXT 16 s4avzcygnvhxobh7"],
+  [1537.41, "10.20.3.13", "mu5tambuha3dgozsgazdmljrgawtenb3mnwgszloorssamrzgyytwure.0045.dados-cdn.example", "TXT", "TXT 16 jkjmnwhwmw5fdef5"],
+  [1547.69, "10.20.3.13", "eazdqnjzfq3tcctomzstwmbqgq4dmnb3giydenrngeyc2mrvhnrwy2lf.0046.dados-cdn.example", "TXT", "TXT 16 bdxvxkzyteutqut5"],
+  [1552.26, "10.20.5.11", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [1558.12, "10.20.9.11", "px.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [1558.54, "10.20.3.13", "nz2gkibshe4tqo2seqqdeojrgiwdooaknztgkozqga2dqnrvhmzdamrw.0047.dados-cdn.example", "TXT", "TXT 16 7lfmzyoemlul2wtm"],
+  [1565.79, "10.20.3.13", "fuytaljsgy5wg3djmvxhizjagmydgnj3kiscamrzgy2syobvbjxgmzj3.0048.dados-cdn.example", "TXT", "TXT 16 ymv6qlqkair7uxbl"],
+  [1571.38, "10.20.3.13", "gaydiobwgy5tembsgywtcmbngi3twy3mnfsw45dfeaztanzshnjciibt.0049.dados-cdn.example", "TXT", "TXT 16 22uugqtvuwldkqtq"],
+  [1577.52, "10.20.3.13", "gaytqlbzgifg4ztfhmydanbygy3twmrqgi3c2mjqfuzdqo3dnruwk3tu.004a.dados-cdn.example", "TXT", "TXT 16 qmcmqrn3d2vaczoq"],
+  [1583.93, "10.20.3.13", "muqdgmjqhe5vejbagmydomjmhe4qu3tgmu5tambuha3dqozsgazdmljr.004b.dados-cdn.example", "TXT", "TXT 16 n7xvrkxqggmosygr"],
+  [1593.13, "10.20.3.13", "gawteoj3mnwgszloorssamzrgq3dwureeaztcmrufqydmctomzstwmbq.004c.dados-cdn.example", "TXT", "TXT 16 3akwx4npinswpj7d"],
+  [1594.7, "10.20.3.13", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [1597.34, "10.20.3.13", "gq4dmoj3giydenrngeyc2mzqhnrwy2lfnz2gkibtge4dgo2seqqdgmjx.004d.dados-cdn.example", "TXT", "TXT 16 qr42gurz4dnv3ygs"],
+  [1601.33, "10.20.5.11", "loja.ipestore.example", "A", "10.20.2.43"],
+  [1605.96, "10.20.9.11", "webmail.correio-nuvem.example", "A", "198.51.100.143"],
+  [1610.45, "10.20.3.13", "g4wdcmyknztgkozqga2dqnzqhmzdamrwfuytaljqge5wg3djmvxhizja.004e.dados-cdn.example", "TXT", "TXT 16 hudtszs66xf7aek2"],
+  [1619.3, "10.20.3.13", "gmzdemb3kiscamzsgmycymrqbjxgmzj3gaydiobxge5tembsgywtcmbn.004f.dados-cdn.example", "TXT", "TXT 16 pmit33nbq4qtv3mm"],
+  [1630.14, "10.20.3.13", "gazdwy3mnfsw45dfeaztenjxhnjciibtgi4dglbsg4fg4ztfhmydanby.0050.dados-cdn.example", "TXT", "TXT 16 bksk7yxcfngksgbc"],
+  [1631.43, "10.20.3.11", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [1634.6, "10.20.1.30", "ntp.pool-hora.example", "A", "192.0.2.123"],
+  [1635.68, "10.20.7.12", "7b85d7f9-cb21-4455-a237-edc091f3c283.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [1637.28, "10.20.3.13", "g4zdwmrqgi3c2mjqfuydgo3dnruwk3tumuqdgmrzgq5vejbagmztgnrm.0051.dados-cdn.example", "TXT", "TXT 16 mqnoc7awgggjbbof"],
+  [1645.64, "10.20.3.13", "gm2au3tgmu5tambuha3tgozsgazdmljrgawtanb3mnwgszloorssamzt.0052.dados-cdn.example", "TXT", "TXT 16 4kxgjdrczlabz6ox"],
+  [1654.21, "10.20.3.13", "gmytwureeaztgobzfq2dcctomzstwmbqgq4donb3giydenrngeyc2mbv.0053.dados-cdn.example", "TXT", "TXT 16 edi5cucnxwosqxu5"],
+  [1661.35, "10.20.3.13", "hnrwy2lfnz2gkibtgm3dqo2seqqdgnbugiwdioaknztgkozqga2dqnzv.0054.dados-cdn.example", "TXT", "TXT 16 v2xeznapwmpqo4ok"],
+  [1662.53, "10.20.7.17", "wpad.corp.ipestore.example", "A", "10.20.1.31"],
+  [1675.1, "10.20.3.13", "hmzdamrwfuytaljqgy5wg3djmvxhizjagm2danj3kiscamzuhe2synjv.0055.dados-cdn.example", "TXT", "TXT 16 gblv3mhq3sdmfqbe"],
+  [1679.99, "10.20.7.12", "srv-erp-01.corp.ipestore.example", "A", "10.20.0.17"],
+  [1686.7, "10.20.3.13", "bjxgmzj3gaydiobxgy5tembsgywtcmbnga3twy3mnfsw45dfeaztinbs.0056.dados-cdn.example", "TXT", "TXT 16 gjs6cuinxxzbafzu"],
+  [1689.05, "10.20.7.17", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [1699.32, "10.20.3.13", "hnjciibtgu2dqlbwgifg4ztfhmydanbyg43twmrqgi3c2mjqfuydqo3d.0057.dados-cdn.example", "TXT", "TXT 16 jtrzyafegtpwahaz"],
+  [1705.62, "10.20.3.13", "nruwk3tumuqdgnbxhe5vejbagm3damjmgy4qu3tgmu5tambuha3tqozs.0058.dados-cdn.example", "TXT", "TXT 16 55axelbxrsmidm3e"],
+  [1711.41, "10.20.3.13", "gazdmljrgawtaoj3mnwgszloorssamzvge3dwureeaztmnjufq3tmcto.0059.dados-cdn.example", "TXT", "TXT 16 db3oyfpju6ukl3ai"],
+  [1717.23, "10.20.3.13", "mzstwmbqgq4dooj3giydenrngeyc2mjqhnrwy2lfnz2gkibtgu2tgo2s.005a.dados-cdn.example", "TXT", "TXT 16 dukqlm3pufutxhe2"],
+  [1723.03, "10.20.3.13", "eqqdgnzqg4wdqmyknztgkozqga2dqobqhmzdamrwfuytaljrge5wg3dj.005b.dados-cdn.example", "TXT", "TXT 16 xn7jyawmvhglk6s4"],
+  [1736.11, "10.20.3.13", "mvxhizjagm2tsmb3kiscamzxgyycyojqbjxgmzj3gaydiobyge5tembs.005c.dados-cdn.example", "TXT", "TXT 16 qqppuowc3gt4m3k4"],
+  [1740.21, "10.20.3.13", "gywtcmbngezdwy3mnfsw45dfeaztmmrxhnjciibthaytglbzg4fg4ztf.005d.dados-cdn.example", "TXT", "TXT 16 hve4b6zw2klqgzjo"],
+  [1741.67, "10.20.3.11", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [1747.43, "10.20.3.13", "dd3nbys5b6ob1.cdn-imagens.example", "A", "198.51.100.39"],
+  [1748.09, "10.20.3.13", "hmydanbyhazdwmrqgi3c2mjqfuytgo3dnruwk3tumuqdgnrwgq5vejba.005e.dados-cdn.example", "TXT", "TXT 16 lq3c52inffyqeiwa"],
+  [1751.27, "10.20.3.13", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [1757.35, "10.20.3.13", "gm4dmnrmga2au3tgmu5tambuha4dgozsgazdmljrgawtcnb3mnwgszlo.005f.dados-cdn.example", "TXT", "TXT 16 nlk2jew7qca65ybe"],
+  [1762.43, "10.20.3.13", "orssamzxgaytwureeaztsmjzfqytcctomzstwmbqgq4dqnb3giydenrn.0060.dados-cdn.example", "TXT", "TXT 16 s4taofnu6akx22vf"],
+  [1766.63, "10.20.3.13", "geyc2mjvhnrwy2lfnz2gkibtg4ztqo2seqqdgojxgiwdcoaknztgkozq.0061.dados-cdn.example", "TXT", "TXT 16 2hfq4u7737ylbqtc"],
+  [1770.88, "10.20.3.11", "_ldap._tcp.dc._msdcs.corp.ipestore.example", "SRV", "0 100 389 dc-01.corp.ipestore.example"],
+  [1775.95, "10.20.3.13", "ga2dqobvhmzdamrwfuytaljrgy5wg3djmvxhizjagm3tonj3kiscanbq.0062.dados-cdn.example", "TXT", "TXT 16 7p7kpfx5vu2fwbug"],
+  [1776.35, "10.20.9.11", "wpad.corp.ipestore.example", "A", "10.20.2.19"],
+  [1788.01, "10.20.3.13", "gi2symrvbjxgmzj3gaydiobygy5tembsgywtcmbnge3twy3mnfsw45df.0063.dados-cdn.example", "TXT", "TXT 16 hggv6ecizjq2rxen"],
+  [1788.18, "10.20.7.12", "85f0f0a6-c014-4b8c-b289-032c2ad2f3f7.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [1789.41, "10.20.3.11", "64977e26dfa4647d95c61ae3218ac571.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [1794.45, "10.20.3.13", "eaztqmjshnjciibxhawdgmqknztgkozqga2dqobxhmzdamrwfuytaljr.0064.dados-cdn.example", "TXT", "TXT 16 5fesafgnwlwqffbm"],
+  [1798.76, "10.20.5.11", "_gc._tcp.corp.ipestore.example", "SRV", "0 100 389 dc-01.corp.ipestore.example"],
+  [1807.09, "10.20.3.13", "ha5wg3djmvxhizjagm4dioj3kiscamjtgewdgoiknztgkozqga2dqoby.0065.dados-cdn.example", "TXT", "TXT 16 u47j5gqfsnduepj6"],
+  [1814.61, "10.20.3.13", "hmzdamrwfuytaljrhe5wg3djmvxhizjagm4dqnr3kiscamjygqwdinqk.0066.dados-cdn.example", "TXT", "TXT 16 6s7ez6s3nyjxjudb"],
+  [1816.12, "10.20.1.30", "ntp.pool-hora.example", "A", "192.0.2.123"],
+  [1820.22, "10.20.3.13", "nztgkozqga2dqobzhmzdamrwfuytaljsga5wg3djmvxhizjagm4temz3.0067.dados-cdn.example", "TXT", "TXT 16 j5ge7btdaqbrdhqt"],
+  [1824.91, "10.20.3.13", "kiscamrtg4wdkmyknztgkozqga2dqojqhmzdamrwfuytaljsge5wg3dj.0068.dados-cdn.example", "TXT", "TXT 16 kl7xtnzwm2e6rvqs"],
+  [1828.94, "10.20.9.11", "3eb8facb-c8c4-4156-8802-6ec7bf3d5d17.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [1836.44, "10.20.3.13", "mvxhizjagm4tmmb3kiscamrzgawdmmaknztgkozqga2dqojrhmzdamrw.0069.dados-cdn.example", "TXT", "TXT 16 xabsxh2xprpaeln6"],
+  [1841.67, "10.20.5.11", "e16e02d078999cb144d36a39ac7afe32.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [1845.34, "10.20.3.13", "fuytaljsgi5wg3djmvxhizjagm4tsnz3kiscamzugmwdmnyknztgkozq.006a.dados-cdn.example", "TXT", "TXT 16 67v3kerbik6zpoyu"],
+  [1845.37, "10.20.7.12", "atualizacoes.so-fornecedor.example", "A", "192.0.2.80"],
+  [1856.97, "10.20.3.13", "ga2dqojshmzdamrwfuytaljsgm5wg3djmvxhizjagqydgnb3kiscamzz.006b.dados-cdn.example", "TXT", "TXT 16 dmevkvjryzko5bff"],
+  [1857.12, "10.20.3.11", "e2dc579c1b533156ef827a8620a5507d.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [1858.89, "10.20.3.11", "_ldap._tcp.dc._msdcs.corp.ipestore.example", "SRV", "0 100 389 dc-01.corp.ipestore.example"],
+  [1863.56, "10.20.3.13", "gywdonaknztgkozqga2dqojthmzdamrwfuytaljsgq5wg3djmvxhizja.006c.dados-cdn.example", "TXT", "TXT 16 63oirhcfoiotyxpr"],
+  [1868.98, "10.20.7.17", "_kerberos._tcp.corp.ipestore.example", "SRV", "0 100 389 dc-01.corp.ipestore.example"],
+  [1870.96, "10.20.7.17", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [1876.01, "10.20.3.13", "gqydomj3kiscanbuhewdqmiknztgkozqga2dqojuhmzdamrwfuytaljs.006d.dados-cdn.example", "TXT", "TXT 16 2n6mp75gzy6a4gax"],
+  [1883.23, "10.20.3.13", "gu5wg3djmvxhizjagqytaob3kiscanjqgiwdqoaknztgkozqga2dqojv.006e.dados-cdn.example", "TXT", "TXT 16 bprwtsm3fhmptr3j"],
+  [1887.32, "10.20.3.13", "hmzdamrwfuytaljsgy5wg3djmvxhizjagqytinj3kiscanjvguwdsnik.006f.dados-cdn.example", "TXT", "TXT 16 roypgfxyujfbijc6"],
+  [1900.09, "10.20.3.13", "nztgkozqga2dqojwhmzdamrwfuytaljsg45wg3djmvxhizjagqytqmr3.0070.dados-cdn.example", "TXT", "TXT 16 o3xkbxlxviknnicm"],
+  [1906.14, "10.20.3.13", "kiscanrqhawdamqknztgkozqga2dqojxhmzdamrwfuytaljsha5wg3dj.0071.dados-cdn.example", "TXT", "TXT 16 kcuhhiteuuqockk2"],
+  [1910.72, "10.20.5.11", "pacotes.repo-linux.example", "A", "203.0.113.15"],
+  [1911.03, "10.20.3.13", "mvxhizjagqzdcoj3kiscanrwgewdaoiknztgkozqga2dqojyhmzdamrw.0072.dados-cdn.example", "TXT", "TXT 16 gyokxyjdpjtori5b"],
+  [1921.04, "10.20.3.13", "fuytaljshe5wg3djmvxhizjagqzdknr3kiscanzrgqwdcnqknztgkozq.0073.dados-cdn.example", "TXT", "TXT 16 cucnnfs5vjvi6cen"],
+  [1923.88, "10.20.9.11", "webmail.correio-nuvem.example", "A", "198.51.100.143"],
+  [1934.81, "10.20.3.13", "ga2dqojzhmzdamrwfuytaljtga5wg3djmvxhizjagqzdsmz3kiscanzw.0074.dados-cdn.example", "TXT", "TXT 16 2kypdpd6z7ckur5s"],
+  [1945.08, "10.20.3.13", "g4wdemyknztgkozqga2dsmbqhmzdamrwfuytaljqge5wg3djmvxhizja.0075.dados-cdn.example", "TXT", "TXT 16 bzweny7kzfbwly2z"],
+  [1953.03, "10.20.3.13", "gqztgmb3kiscaobsgawdgmaknztgkozqga2dsmbrhmzdamrwfuytaljq.0076.dados-cdn.example", "TXT", "TXT 16 eksbs6eliq5dybbd"],
+  [1957.33, "10.20.3.13", "gi5wg3djmvxhizjagqztmnz3kiscaobxgmwdgnyknztgkozqga2dsmbs.0077.dados-cdn.example", "TXT", "TXT 16 zbuvbkfco5t4kyta"],
+  [1961.51, "10.20.5.11", "0714f2f0692b3e42700e665fb70cb9b1.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [1984.73, "10.20.5.11", "srv-arquivos.corp.ipestore.example", "A", "10.20.2.18"],
+  [1989.05, "10.20.7.17", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [2014.42, "10.20.7.12", "8b3442495211f34a29653ee4dc07dfe4.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [2023.16, "10.20.7.17", "d6kxhe0lbin51.cdn-imagens.example", "A", "198.51.100.40"],
+  [2024.48, "10.20.3.13", "dc-01.corp.ipestore.example", "A", "10.20.1.23"],
+  [2045.2, "10.20.7.17", "www.busca-web.example", "A", "198.51.100.200"],
+  [2051.27, "10.20.3.13", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [2051.34, "10.20.3.11", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [2057.44, "10.20.3.11", "dbe67reu1g0bw.cdn-imagens.example", "A", "198.51.100.39"],
+  [2070.5, "10.20.3.13", "www.ipestore.example", "A", "10.20.1.57"],
+  [2075.96, "10.20.1.20", "api.gateway-pagamento.example", "A", "198.51.100.60"],
+  [2080.72, "10.20.7.12", "c9a520f5195fd8ad101d8a8180be9fa8.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [2084.36, "10.20.7.12", "29d464f494598512b818846ac7a57474.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [2099.19, "10.20.5.11", "atualizacoes.so-fornecedor.example", "A", "192.0.2.80"],
+  [2100.63, "10.20.1.10", "api.marketplace-parceiro.example", "A", "198.51.100.77"],
+  [2139.3, "10.20.9.11", "21c281bf-6715-431d-ac7a-9e20452751bf.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [2159.88, "10.20.7.12", "3fb6ffcd-33d4-49be-ac75-88302f5a9c54.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [2163.71, "10.20.3.11", "d2fycatp4m3tt.cdn-imagens.example", "A", "198.51.100.30"],
+  [2182.49, "10.20.3.13", "9243e14709c2cb4a46ead639558c6765.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [2184.35, "10.20.7.12", "9f9ae5560bef412c0871c8f42057ed90.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [2197.65, "10.20.5.11", "dbe67reu1g0bw.cdn-imagens.example", "A", "198.51.100.34"],
+  [2220.42, "10.20.7.12", "srv-erp-01.corp.ipestore.example", "A", "10.20.0.11"],
+  [2277.3, "10.20.5.11", "d7jcwzs1z6ol7.cdn-imagens.example", "A", "198.51.100.30"],
+  [2278.19, "10.20.9.11", "a7a95c6a-6910-4b76-8afc-2e3c576cc58c.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [2279.46, "10.20.3.13", "webmail.correio-nuvem.example", "A", "198.51.100.143"],
+  [2289.05, "10.20.7.17", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [2292.9, "10.20.3.11", "www.noticias-portal.example", "A", "203.0.113.80"],
+  [2312.83, "10.20.7.12", "atualizacoes.so-fornecedor.example", "A", "192.0.2.80"],
+  [2333.92, "10.20.3.13", "_ldap._tcp.default-first-site-name._sites.corp.ipestore.example", "SRV", "0 100 389 dc-01.corp.ipestore.example"],
+  [2351.27, "10.20.3.13", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [2355.12, "10.20.5.11", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [2357.28, "10.20.3.11", "www.noticias-portal.example", "A", "203.0.113.80"],
+  [2364.75, "10.20.9.11", "cd3a743c6ba4ed3b5bd15029475108b5.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [2380.34, "10.20.7.17", "37158798ce1cae7150165ab5fe247b85.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [2390.84, "10.20.5.11", "21681ea8a92ad88841be0f76fac1f068.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [2430.48, "10.20.5.11", "_gc._tcp.corp.ipestore.example", "SRV", "0 100 389 dc-01.corp.ipestore.example"],
+  [2445.32, "10.20.3.13", "dc-01.corp.ipestore.example", "A", "10.20.1.43"],
+  [2462.93, "10.20.1.10", "api.marketplace-parceiro.example", "A", "198.51.100.77"],
+  [2485.84, "10.20.3.11", "f727b4f2ca3205d3c20aa90122efb940.rep.antivirus-nuvem.example", "A", "127.0.0.2"],
+  [2486.42, "10.20.5.11", "atualizacoes.so-fornecedor.example", "A", "192.0.2.80"],
+  [2523.01, "10.20.9.11", "e8f3c48e-d91c-4fb7-95f2-b3b4fa08b4c3.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [2535.15, "10.20.1.30", "ntp.pool-hora.example", "A", "192.0.2.123"],
+  [2554.06, "10.20.5.11", "b2ec853ac5f4dc20cacd46de1020ae28.rep.antivirus-nuvem.example", "A", "127.0.0.2"],
+  [2577.11, "10.20.7.12", "atualizacoes.so-fornecedor.example", "A", "192.0.2.80"],
+  [2589.05, "10.20.7.17", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [2591.7, "10.20.9.11", "b97d07c9db486778578a5cc30e2de1bb.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [2598.74, "10.20.3.11", "d6kxhe0lbin51.cdn-imagens.example", "A", "198.51.100.36"],
+  [2616.7, "10.20.9.11", "1b27d23e-031f-4438-a62c-b4f57ea13add.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [2620.54, "10.20.7.12", "96c19db99743d410806c6597b542ee25.rep.antivirus-nuvem.example", "A", "127.0.0.2"],
+  [2636.41, "10.20.1.30", "ntp.pool-hora.example", "A", "192.0.2.123"],
+  [2649.88, "10.20.9.11", "85fc64ac-71fd-4306-be62-8fccc66ab09a.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [2651.27, "10.20.3.13", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [2665.03, "10.20.7.12", "7514a2c6-be60-48f0-9b0d-309b0ee15399.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [2677.39, "10.20.7.12", "1d665c77-83fa-4bcd-8d07-4feae0c6ebaf.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [2693.01, "10.20.5.11", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [2720.09, "10.20.7.17", "dd3nbys5b6ob1.cdn-imagens.example", "A", "198.51.100.40"],
+  [2757.34, "10.20.7.17", "d2quba3jpf5xi.cdn-imagens.example", "A", "198.51.100.32"],
+  [2774.41, "10.20.9.11", "7b986ce2aa5ccd3715aa069d94376fc9.rep.antivirus-nuvem.example", "A", "127.0.0.2"],
+  [2775.57, "10.20.9.11", "4474971e-9516-4bfb-bae4-914c850ce551.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [2778.77, "10.20.3.11", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [2812.91, "10.20.7.12", "0ff4c2884a7637fe2d0c76537d55e0f4.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [2815.59, "10.20.7.12", "997c08543660377744316b0d6efc6674.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [2841.21, "10.20.3.11", "www.noticias-portal.example", "A", "203.0.113.80"],
+  [2851.66, "10.20.3.11", "srv-erp-01.corp.ipestore.example", "A", "10.20.2.42"],
+  [2853.56, "10.20.3.13", "srv-arquivos.corp.ipestore.example", "A", "10.20.2.56"],
+  [2861.0, "10.20.9.11", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [2874.98, "10.20.7.12", "dptbijtrn8gk5.cdn-imagens.example", "A", "198.51.100.33"],
+  [2885.68, "10.20.9.11", "px.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [2889.05, "10.20.7.17", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [2897.36, "10.20.1.10", "_gc._tcp.corp.ipestore.example", "SRV", "0 100 389 dc-01.corp.ipestore.example"],
+  [2951.27, "10.20.3.13", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [2966.75, "10.20.1.20", "api.gateway-pagamento.example", "A", "198.51.100.60"],
+  [2980.92, "10.20.3.13", "_ldap._tcp.dc._msdcs.corp.ipestore.example", "SRV", "0 100 389 dc-01.corp.ipestore.example"],
+  [2987.76, "10.20.7.17", "impressora-fin.corp.ipestore.example", "A", "10.20.1.17"],
+  [2992.33, "10.20.1.20", "api.gateway-pagamento.example", "A", "198.51.100.60"],
+  [3026.02, "10.20.9.11", "px.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [3028.97, "10.20.7.12", "dptbijtrn8gk5.cdn-imagens.example", "A", "198.51.100.40"],
+  [3038.62, "10.20.7.12", "atualizacoes.so-fornecedor.example", "A", "192.0.2.80"],
+  [3060.46, "10.20.3.11", "a06003eaf998703fd90e63e6031f8c3f.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [3075.8, "10.20.3.11", "www.noticias-portal.example", "A", "203.0.113.80"],
+  [3094.37, "10.20.7.12", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [3135.79, "10.20.5.11", "intranet.corp.ipestore.example", "A", "10.20.0.57"],
+  [3140.7, "10.20.5.11", "d2fycatp4m3tt.cdn-imagens.example", "A", "198.51.100.40"],
+  [3177.76, "10.20.9.11", "4c46209e-dbd7-442e-b47e-be88db851d11.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [3183.18, "10.20.7.12", "3a2325ad48f624d87db031e6342fb0f9.rep.antivirus-nuvem.example", "A", "127.0.0.2"],
+  [3189.05, "10.20.7.17", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [3198.83, "10.20.7.12", "atualizacoes.so-fornecedor.example", "A", "192.0.2.80"],
+  [3225.36, "10.20.7.12", "3efb6089-f6d3-44cd-a23e-3b350227efec.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [3251.27, "10.20.3.13", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [3278.38, "10.20.9.11", "7560bbb0-c3fb-42bb-9d33-29032e03c040.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [3311.24, "10.20.9.11", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [3322.88, "10.20.3.11", "wpad.corp.ipestore.example", "A", "10.20.0.40"],
+  [3337.56, "10.20.7.12", "d7jcwzs1z6ol7.cdn-imagens.example", "A", "198.51.100.37"],
+  [3340.59, "10.20.5.11", "fe3c26265e266d530e6faa1f6eca9fc5.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [3372.11, "10.20.3.13", "loja.ipestore.example", "A", "10.20.0.58"],
+  [3373.32, "10.20.9.11", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [3375.99, "10.20.1.30", "ntp.pool-hora.example", "A", "192.0.2.123"],
+  [3382.41, "10.20.3.13", "d55896ac12b4d6ee59fddacf17051036.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [3384.71, "10.20.7.17", "telemetria.edr-fornecedor.example", "A", "198.51.100.20"],
+  [3410.68, "10.20.3.13", "d6kxhe0lbin51.cdn-imagens.example", "A", "198.51.100.32"],
+  [3412.43, "10.20.7.12", "d9cu2uicpss5v.cdn-imagens.example", "A", "198.51.100.36"],
+  [3421.8, "10.20.1.20", "api.gateway-pagamento.example", "A", "198.51.100.60"],
+  [3430.03, "10.20.9.11", "webmail.correio-nuvem.example", "A", "198.51.100.143"],
+  [3431.89, "10.20.9.11", "4c7d80df-89f3-449c-b6b0-63b3e1e67ac5.anuncios-rastreio.example", "A", "203.0.113.200"],
+  [3436.76, "10.20.5.11", "3ff23fa3cd74ebcf8ea6e32d1d7bbf96.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [3489.05, "10.20.7.17", "sync.onedrive-relatorios.example", "A", "203.0.113.47"],
+  [3496.67, "10.20.1.20", "api.gateway-pagamento.example", "A", "198.51.100.60"],
+  [3519.85, "10.20.3.11", "63477e15e76a9a6a34f58784f62a6895.rep.antivirus-nuvem.example", "A", "127.0.0.1"],
+  [3551.27, "10.20.3.13", "sync.onedrive-relatorios.example", "A", "203.0.113.47"]
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var NSM = JSON.parse(document.getElementById("nsm-dados").textContent);
+    var B32 = "abcdefghijklmnopqrstuvwxyz234567";
+
+    function $(id) { return document.getElementById(id); }
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function fmt(x, casas) { return Number(x).toFixed(casas).replace(".", ","); }
+    function nomeHost(ip) { return NSM.hosts[ip] ? NSM.hosts[ip].split(" ")[0] : ip; }
+
+    // ===================================================== motor (espelhado nos testes)
+    function privado(ip) {
+        var o = ip.split(".").map(Number);
+        return o[0] === 10 || (o[0] === 172 && o[1] >= 16 && o[1] <= 31) || (o[0] === 192 && o[1] === 168);
+    }
+    window.expandirConexoes = function() {
+        var conns = [];
+        NSM.series.forEach(function(s) {
+            var t = s.t0, offs = [t];
+            s.intervalos.forEach(function(iv) { t += iv; offs.push(t); });
+            offs.forEach(function(off, k) {
+                conns.push({ serie: s.id, k: k, off: off, orig_h: s.orig_h, resp_h: s.resp_h, resp_p: s.resp_p,
+                             proto: s.proto, service: s.service, orig_bytes: s.orig_bytes[k], resp_bytes: s.resp_bytes[k],
+                             duracao: s.duracao[k], beacon: s.rotulo === "beacon" });
+            });
+        });
+        conns.sort(function(a, b) {
+            if (a.off !== b.off) return a.off - b.off;
+            return a.serie < b.serie ? -1 : a.serie > b.serie ? 1 : 0;
+        });
+        return conns;
+    };
+    function casaExcecao(c, e) {
+        return ["orig_h", "resp_h", "resp_p"].every(function(k) { return !(k in e) || c[k] === e[k]; });
+    }
+    function chave(c, agrupar) {
+        if (agrupar === "par") return c.orig_h + " → " + c.resp_h + ":" + c.resp_p + "/" + c.proto;
+        if (agrupar === "destino") return "* → " + c.resp_h + ":" + c.resp_p + "/" + c.proto;
+        return c.orig_h + " → *";
+    }
+    function mediana(v) {
+        var s = v.slice().sort(function(a, b) { return a - b; }), n = s.length;
+        return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2;
+    }
+    window.agruparConexoes = function(cfg) {
+        var exc = NSM.excecoes.filter(function(e) { return (cfg.excecoes || []).indexOf(e.id) !== -1; });
+        var mapa = {}, ordem = [], ignoradas = 0;
+        window.expandirConexoes().forEach(function(c) {
+            if ((cfg.so_externos && privado(c.resp_h)) || exc.some(function(e) { return casaExcecao(c, e); })) { ignoradas++; return; }
+            var k = chave(c, cfg.agrupar);
+            if (!Object.prototype.hasOwnProperty.call(mapa, k)) { mapa[k] = []; ordem.push(k); }
+            mapa[k].push(c);
+        });
+        var grupos = ordem.map(function(k) {
+            var cs = mapa[k], n = cs.length, ivs = [], i;
+            for (i = 0; i < n - 1; i++) ivs.push(cs[i + 1].off - cs[i].off);
+            var media = ivs.length ? ivs.reduce(function(a, b) { return a + b; }, 0) / ivs.length : 0;
+            var jitter = 0;
+            if (ivs.length && media > 0) {
+                var v = ivs.reduce(function(a, x) { return a + (x - media) * (x - media); }, 0) / ivs.length;
+                jitter = 100 * Math.sqrt(v) / media;
+            }
+            var med = mediana(cs.map(function(c) { return c.orig_bytes; }));
+            var estab = 100 * cs.filter(function(c) { return Math.abs(c.orig_bytes - med) <= 0.10 * med; }).length / n;
+            var series = [], beacons = [];
+            cs.forEach(function(c) {
+                if (series.indexOf(c.serie) === -1) series.push(c.serie);
+                if (c.beacon && beacons.indexOf(c.serie) === -1) beacons.push(c.serie);
+            });
+            series.sort(); beacons.sort();
+            var falhas = [];
+            if (n < cfg.min_conexoes) falhas.push("só " + n + " conexões (mínimo " + cfg.min_conexoes + ")");
+            if (!ivs.length) falhas.push("sem intervalos para medir");
+            if (ivs.length && media > cfg.max_intervalo) falhas.push("intervalo médio de " + fmt(media, 1) + " s acima do máximo de " + cfg.max_intervalo + " s");
+            if (jitter > cfg.max_jitter) falhas.push("jitter de " + fmt(jitter, 1) + "% acima do máximo de " + cfg.max_jitter + "%");
+            if (estab < cfg.min_estabilidade) falhas.push("tamanho estável em " + fmt(estab, 0) + "% das conexões, abaixo do mínimo de " + cfg.min_estabilidade + "%");
+            return { chave: k, conns: cs, n: n, media: media, jitter: jitter, estab: estab, series: series, beacons: beacons,
+                     alerta: falhas.length === 0, falhas: falhas,
+                     bytes: cs.reduce(function(a, c) { return a + c.orig_bytes + c.resp_bytes; }, 0) };
+        });
+        grupos.sort(function(a, b) {
+            if (a.alerta !== b.alerta) return a.alerta ? -1 : 1;
+            if (a.jitter !== b.jitter) return a.jitter - b.jitter;
+            return a.chave < b.chave ? -1 : a.chave > b.chave ? 1 : 0;
+        });
+        return { grupos: grupos, ignoradas: ignoradas };
+    };
+    window.placarConexoes = function(grupos) {
+        var todos = NSM.series.filter(function(s) { return s.rotulo === "beacon"; }).map(function(s) { return s.id; });
+        var alertas = grupos.filter(function(g) { return g.alerta; });
+        var vp = alertas.filter(function(g) { return g.beacons.length; });
+        var fp = alertas.filter(function(g) { return !g.beacons.length; });
+        var vistos = [];
+        vp.forEach(function(g) { g.beacons.forEach(function(b) { if (vistos.indexOf(b) === -1) vistos.push(b); }); });
+        var perdidos = todos.filter(function(b) { return vistos.indexOf(b) === -1; });
+        return { vp: vp.length, fp: fp.length, fn: perdidos.length, perdidos: perdidos };
+    };
+    function baseDominio(q) { return q.split(".").slice(-2).join("."); }
+    function subdominio(q) { return q.split(".").slice(0, -2).join("."); }
+    window.entropiaShannon = function(s) {
+        s = s.split(".").join("");
+        if (!s.length) return 0;
+        var cont = new Map(), h = 0;
+        for (var i = 0; i < s.length; i++) cont.set(s[i], (cont.get(s[i]) || 0) + 1);
+        cont.forEach(function(c) { var p = c / s.length; h -= p * Math.log2(p); });
+        return h;
+    };
+    window.decodificarBase32 = function(rotulo) {
+        if (!rotulo || rotulo.length < 16 || [1, 3, 6].indexOf(rotulo.length % 8) !== -1) return null;
+        var bits = 0, valor = 0, bytes = [];
+        for (var i = 0; i < rotulo.length; i++) {
+            var idx = B32.indexOf(rotulo[i]);
+            if (idx === -1) return null;
+            valor = (valor << 5) | idx;
+            bits += 5;
+            if (bits >= 8) { bytes.push((valor >>> (bits - 8)) & 255); bits -= 8; }
+            valor &= (1 << bits) - 1;
+        }
+        if (!bytes.length) return null;
+        var legiveis = bytes.filter(function(b) { return b === 9 || b === 10 || b === 13 || (b >= 32 && b < 127); }).length;
+        if (legiveis / bytes.length < 0.9) return null;
+        return bytes.map(function(b) { return String.fromCharCode(b); }).join("");
+    };
+    window.agruparDns = function(cfg) {
+        var mapa = {}, ordem = [];
+        NSM.dns.forEach(function(r) {
+            var b = baseDominio(r[2]);
+            if (!Object.prototype.hasOwnProperty.call(mapa, b)) { mapa[b] = []; ordem.push(b); }
+            mapa[b].push(r);
+        });
+        var grupos = ordem.map(function(b) {
+            var rs = mapa[b], n = rs.length, nomes = [], origens = [], qtypes = {};
+            var comp = 0, ent = 0;
+            rs.forEach(function(r) {
+                var s = subdominio(r[2]);
+                comp += s.length;
+                ent += window.entropiaShannon(s);
+                if (nomes.indexOf(r[2]) === -1) nomes.push(r[2]);
+                if (origens.indexOf(r[1]) === -1) origens.push(r[1]);
+                qtypes[r[3]] = (qtypes[r[3]] || 0) + 1;
+            });
+            comp /= n; ent /= n;
+            origens.sort();
+            var info = NSM.dominios[b] || { rotulo: "benigno", nota: "" };
+            var falhas = [];
+            if (nomes.length < cfg.dns_min_distintos) falhas.push(nomes.length + " nomes distintos (mínimo " + cfg.dns_min_distintos + ")");
+            if (comp < cfg.dns_min_comprimento) falhas.push("subdomínio médio de " + fmt(comp, 1) + " caracteres (mínimo " + cfg.dns_min_comprimento + ")");
+            if (ent < cfg.dns_min_entropia) falhas.push("entropia de " + fmt(ent, 2) + " bits (mínimo " + fmt(cfg.dns_min_entropia, 1) + ")");
+            return { base: b, registros: rs, n: n, distintos: nomes.length, nomes: nomes, comp: comp, ent: ent, origens: origens,
+                     qtypes: qtypes, rotulo: info.rotulo, nota: info.nota, alerta: falhas.length === 0, falhas: falhas };
+        });
+        grupos.sort(function(a, b) {
+            if (a.alerta !== b.alerta) return a.alerta ? -1 : 1;
+            if (a.ent !== b.ent) return b.ent - a.ent;
+            return a.base < b.base ? -1 : a.base > b.base ? 1 : 0;
+        });
+        return grupos;
+    };
+    window.placarDns = function(grupos) {
+        return {
+            vp: grupos.filter(function(g) { return g.alerta && g.rotulo === "tunel"; }).length,
+            fp: grupos.filter(function(g) { return g.alerta && g.rotulo !== "tunel"; }).length,
+            fn: grupos.filter(function(g) { return !g.alerta && g.rotulo === "tunel"; }).length
+        };
+    };
+
+    // ===================================================== formato Zeek
+    function hash32(texto, semente) {
+        var h = semente >>> 0;
+        for (var i = 0; i < texto.length; i++) { h ^= texto.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+        return h;
+    }
+    function uid(prefixo, texto) {
+        var alfa = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", s = prefixo, h = hash32(texto, 2166136261);
+        for (var i = 0; i < 17; i++) { h = Math.imul(h ^ (h >>> 15), 2246822519) >>> 0; h = (h + i * 2654435761) >>> 0; s += alfa[h % 62]; }
+        return s;
+    }
+    function tsZeek(off) { return (NSM.inicio_ts + off).toFixed(6); }
+    function portaOrig(texto) { return 49152 + (hash32(texto, 40503) % 16383); }
+    function linhaConn(c) {
+        var id = c.serie + "#" + c.k;
+        return [tsZeek(c.off), uid("C", id), c.orig_h, portaOrig(id), c.resp_h, c.resp_p, c.proto, c.service,
+                c.duracao.toFixed(2), c.orig_bytes, c.resp_bytes, "SF"].join("\t");
+    }
+    function linhaDns(r, i) {
+        var id = "dns#" + i;
+        return [tsZeek(r[0]), uid("C", id), r[1], portaOrig(id), "10.20.0.10", 53, "udp", r[2], r[3], "NOERROR", r[4]].join("\t");
+    }
+    function cabecalho(path, campos, tipos) {
+        return ["#separator \\x09", "#set_separator\t,", "#empty_field\t(empty)", "#unset_field\t-", "#path\t" + path,
+                "#open\t2026-11-02-12-00-00", "#fields\t" + campos.join("\t"), "#types\t" + tipos.join("\t")].join("\n");
+    }
+    var CONN = null;
+
+    // ===================================================== leitura dos controles
+    function num(id, padrao, min, max) {
+        var v = parseFloat($(id).value);
+        if (isNaN(v)) v = padrao;
+        v = Math.min(max, Math.max(min, v));
+        $(id).value = v;
+        return v;
+    }
+    function lerCfg() {
+        var p = NSM.padrao;
+        return {
+            agrupar: $("nsm-agrupar").value,
+            min_conexoes: num("nsm-min-conexoes", p.min_conexoes, 2, 200),
+            max_intervalo: num("nsm-max-intervalo", p.max_intervalo, 10, 3600),
+            max_jitter: num("nsm-max-jitter", p.max_jitter, 0, 100),
+            min_estabilidade: num("nsm-min-estab", p.min_estabilidade, 0, 100),
+            so_externos: $("nsm-externos").checked,
+            excecoes: NSM.excecoes.filter(function(e) { return $("nsm-exc-" + e.id).checked; }).map(function(e) { return e.id; }),
+            dns_min_distintos: num("nsm-dns-min-distintos", p.dns_min_distintos, 1, 500),
+            dns_min_comprimento: num("nsm-dns-min-comp", p.dns_min_comprimento, 0, 200),
+            dns_min_entropia: num("nsm-dns-min-ent", p.dns_min_entropia, 0, 6)
+        };
+    }
+
+    // ===================================================== renderização
+    function placar(box, itens, mensagem, ok) {
+        box.replaceChildren();
+        var grade = el("div", null, "display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr)); gap: 0.4rem;");
+        itens.forEach(function(it) {
+            var d = el("div", null, "border: 1px solid " + it[2] + "; border-radius: var(--radius-sm); padding: 0.4rem 0.55rem; background: var(--surface); min-width: 0;");
+            d.appendChild(el("div", it[0], "font-size: 0.75rem; color: var(--muted);"));
+            d.appendChild(el("strong", String(it[1]), "font-size: 1.15rem; color: " + it[2] + ";"));
+            grade.appendChild(d);
+        });
+        box.appendChild(grade);
+        box.appendChild(el("p", (ok ? "✓ " : "") + mensagem, "margin: 0.5rem 0 0 0; overflow-wrap: anywhere; color: " + (ok ? "var(--tip-color)" : "var(--ink)") + ";"));
+    }
+    function linhaInfo(box, rotulo, texto, estilo) {
+        var p = el("div", null, "overflow-wrap: anywhere;" + (estilo || ""));
+        p.appendChild(el("strong", rotulo + ": "));
+        p.appendChild(document.createTextNode(texto));
+        box.appendChild(p);
+    }
+    function preLog(texto) {
+        return el("pre", texto, "max-height: 14rem; overflow: auto; max-width: 100%; font-size: 0.7rem; tab-size: 2; background: var(--surface); border-radius: var(--radius-sm); padding: 0.4rem; margin: 0.3rem 0 0 0;");
+    }
+    function serie(id) { return NSM.series.filter(function(s) { return s.id === id; })[0]; }
+
+    function cartaoConexao(g) {
+        var temBeacon = g.beacons.length > 0;
+        var cor = g.alerta ? (temBeacon ? "var(--danger-color)" : "var(--warning-color)") : "var(--rule)";
+        var d = el("div", null, "border-left: 4px solid " + cor + "; background: var(--sunk); border-radius: var(--radius-sm); padding: 0.4rem 0.55rem; min-width: 0;");
+        d.setAttribute("data-grupo", g.chave);
+        d.setAttribute("data-alerta", g.alerta ? "sim" : "nao");
+        var cab = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.2rem 0.7rem; align-items: baseline;");
+        cab.appendChild(el("strong", g.chave, "font-family: var(--font-mono); font-size: 0.78rem; overflow-wrap: anywhere;"));
+        if (g.alerta) cab.appendChild(el("span", temBeacon ? "ALERTA: beacon do implante" : "ALERTA: falso positivo", "color: " + cor + "; font-weight: 700;"));
+        d.appendChild(cab);
+        var hosts = [];
+        g.series.forEach(function(sid) { var s = serie(sid); [s.orig_h, s.resp_h].forEach(function(ip) { if (NSM.hosts[ip] && hosts.indexOf(ip) === -1) hosts.push(ip); }); });
+        if (hosts.length && hosts.length <= 3) d.appendChild(el("div", hosts.map(function(ip) { return ip + " = " + NSM.hosts[ip]; }).join("; "), "font-size: 0.74rem; color: var(--muted); overflow-wrap: anywhere;"));
+        d.appendChild(el("div", g.n + " conexões · intervalo médio " + fmt(g.media, 1) + " s · jitter " + fmt(g.jitter, 1) + "% · tamanho estável " + fmt(g.estab, 0) + "% · " + Math.round(g.bytes / 1024) + " KiB", "margin-top: 0.15rem;"));
+        if (g.alerta) {
+            var notas = [];
+            g.series.forEach(function(sid) { var n = serie(sid).nota; if (notas.indexOf(n) === -1) notas.push(n); });
+            d.appendChild(el("div", notas.slice(0, 2).join(" ") + (notas.length > 2 ? " (+" + (notas.length - 2) + " séries)" : ""), "margin-top: 0.2rem; font-size: 0.76rem; color: " + (temBeacon ? "var(--danger-color)" : "var(--ink)") + ";"));
+        } else {
+            d.appendChild(el("div", "Fora do alerta: " + g.falhas.join("; ") + ".", "margin-top: 0.2rem; font-size: 0.74rem; color: var(--muted);"));
+        }
+        var det = el("details", null, "margin-top: 0.25rem;");
+        det.appendChild(el("summary", "conn.log, ssl.log e dns.log deste grupo", "cursor: pointer; font-size: 0.76rem;"));
+        det.addEventListener("toggle", function() {
+            if (!det.open || det.getAttribute("data-pronto")) return;
+            det.setAttribute("data-pronto", "1");
+            var linhas = g.conns.slice(0, 12).map(linhaConn).join("\n");
+            det.appendChild(preLog("# conn.log (" + Math.min(12, g.n) + " de " + g.n + ")\n" + linhas));
+            var vistos = [];
+            g.series.forEach(function(sid) {
+                var s = serie(sid);
+                if (!s.ssl) return;
+                var k = s.ssl.server_name + s.ssl.ja3;
+                if (vistos.indexOf(k) !== -1) return;
+                vistos.push(k);
+                var iguais = NSM.series.filter(function(o) { return o.ssl && o.ssl.ja3 === s.ssl.ja3 && g.series.indexOf(o.id) === -1; }).length;
+                var info = el("div", null, "font-size: 0.74rem; margin-top: 0.3rem;");
+                linhaInfo(info, "ssl.log", s.ssl.version + " · SNI " + s.ssl.server_name);
+                linhaInfo(info, "JA3", s.ssl.ja3 + (iguais && s.ssl.ja3.indexOf("varia") === -1 ? " (o mesmo JA3 aparece em " + iguais + " outras séries do log)" : ""));
+                linhaInfo(info, "JA4", s.ssl.ja4);
+                det.appendChild(info);
+            });
+            var destinos = [];
+            g.conns.forEach(function(c) { if (destinos.indexOf(c.resp_h) === -1) destinos.push(c.resp_h); });
+            var nomes = [];
+            NSM.dns.forEach(function(r) { if (destinos.indexOf(r[4]) !== -1 && nomes.indexOf(r[2]) === -1) nomes.push(r[2]); });
+            var piv = el("div", null, "font-size: 0.74rem; margin-top: 0.3rem;");
+            linhaInfo(piv, "Pivô no dns.log", nomes.length ? nomes.slice(0, 4).join(", ") + " resolve(m) para " + (destinos.length > 1 ? "estes destinos" : destinos[0]) : "nenhuma consulta resolveu para " + (destinos.length > 1 ? "estes destinos" : destinos[0]) + " na janela");
+            det.appendChild(piv);
+        });
+        d.appendChild(det);
+        return d;
+    }
+
+    window.analisarConexoesNsm = function() {
+        var cfg = lerCfg(), r = window.agruparConexoes(cfg), p = window.placarConexoes(r.grupos);
+        var box = $("nsm-placar-conn");
+        box.setAttribute("data-vp", p.vp);
+        box.setAttribute("data-fp", p.fp);
+        box.setAttribute("data-fn", p.fn);
+        var alertas = r.grupos.filter(function(g) { return g.alerta; }).length;
+        var precisao = alertas ? Math.round(100 * p.vp / alertas) + "%" : "—";
+        var msg, ok = false;
+        if (p.vp === 2 && p.fp === 0 && p.fn === 0) {
+            ok = true;
+            msg = "Limiar ajustado: os dois beacons do implante e nenhum falso positivo. Abra o grupo de cada beacon: o dns.log liga 203.0.113.47 a sync.onedrive-relatorios.example, e o JA3 é o mesmo do agente do EDR (indício, não prova). Leve a regra para a bancada do Estudo 46.";
+        } else {
+            var partes = [];
+            if (cfg.agrupar !== "par" && p.fn) partes.push("Agrupar por " + (cfg.agrupar === "destino" ? "destino" : "origem") + " mistura séries independentes: os intervalos se embaralham e o jitter dispara. A regularidade é do par origem → destino:porta.");
+            else if (p.fn) {
+                p.perdidos.forEach(function(b) {
+                    var g = r.grupos.filter(function(x) { return x.beacons.indexOf(b) !== -1; })[0];
+                    partes.push("Um beacon ficou fora do alerta: " + (g ? g.falhas.join("; ") : "conexões excluídas pelos filtros") + ". O atacante configura o jitter justamente para escapar de limiares apertados.");
+                });
+            }
+            if (p.fp) partes.push(p.fp + " grupo(s) periódico(s) legítimo(s) disparam. Leia a nota de cada um: cada tipo some com um ajuste diferente (destino externo, intervalo máximo, estabilidade do tamanho) e o que nenhum limiar separa vira exceção documentada.");
+            msg = partes.join(" ") || "Ajuste os limiares e analise de novo.";
+        }
+        placar(box, [["Alertas", alertas, "var(--accent)"], ["Beacons detectados", p.vp + " de 2", p.fn ? "var(--warning-color)" : "var(--tip-color)"],
+                     ["Falsos positivos", p.fp, p.fp ? "var(--danger-color)" : "var(--tip-color)"], ["Beacons perdidos", p.fn, p.fn ? "var(--danger-color)" : "var(--tip-color)"],
+                     ["Precisão", precisao, "var(--accent)"]], msg, ok);
+        if (r.ignoradas) box.appendChild(el("p", r.ignoradas + " conexões saíram da análise pelos filtros (destinos internos ou exceções documentadas).", "margin: 0.3rem 0 0 0; font-size: 0.78rem; color: var(--muted);"));
+        var lista = $("nsm-grupos");
+        lista.replaceChildren();
+        r.grupos.forEach(function(g) { lista.appendChild(cartaoConexao(g)); });
+        return { grupos: r.grupos, placar: p, ignoradas: r.ignoradas };
+    };
+
+    function cartaoDns(g) {
+        var tunel = g.rotulo === "tunel";
+        var cor = g.alerta ? (tunel ? "var(--danger-color)" : "var(--warning-color)") : "var(--rule)";
+        var d = el("div", null, "border-left: 4px solid " + cor + "; background: var(--sunk); border-radius: var(--radius-sm); padding: 0.4rem 0.55rem; min-width: 0;");
+        d.setAttribute("data-dominio", g.base);
+        d.setAttribute("data-alerta", g.alerta ? "sim" : "nao");
+        var cab = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.2rem 0.7rem; align-items: baseline;");
+        cab.appendChild(el("strong", g.base, "font-family: var(--font-mono); font-size: 0.78rem; overflow-wrap: anywhere;"));
+        if (g.alerta) cab.appendChild(el("span", tunel ? "ALERTA: túnel DNS" : "ALERTA: falso positivo", "color: " + cor + "; font-weight: 700;"));
+        d.appendChild(cab);
+        var tipos = Object.keys(g.qtypes).map(function(t) { return t + " " + g.qtypes[t]; }).join(", ");
+        d.appendChild(el("div", g.n + " consultas · " + g.distintos + " nomes distintos · subdomínio médio " + fmt(g.comp, 1) + " caracteres · entropia " + fmt(g.ent, 2) + " bits · " + tipos, "margin-top: 0.15rem;"));
+        d.appendChild(el("div", "Origens: " + g.origens.map(function(ip) { return nomeHost(ip); }).join(", "), "font-size: 0.74rem; color: var(--muted); overflow-wrap: anywhere;"));
+        if (g.alerta) d.appendChild(el("div", g.nota, "margin-top: 0.2rem; font-size: 0.76rem; color: " + (tunel ? "var(--danger-color)" : "var(--ink)") + ";"));
+        else d.appendChild(el("div", "Fora do alerta: " + g.falhas.join("; ") + "." + (g.rotulo === "c2" ? " " + g.nota : ""), "margin-top: 0.2rem; font-size: 0.74rem; color: var(--muted);"));
+        var det = el("details", null, "margin-top: 0.25rem;");
+        det.appendChild(el("summary", "Amostra do dns.log e decodificação base32", "cursor: pointer; font-size: 0.76rem;"));
+        det.addEventListener("toggle", function() {
+            if (!det.open || det.getAttribute("data-pronto")) return;
+            det.setAttribute("data-pronto", "1");
+            det.appendChild(preLog(g.registros.slice(0, 6).map(function(r) { return linhaDns(r, NSM.dns.indexOf(r)); }).join("\n")));
+            var rotulo = g.registros[0][2].split(".")[0];
+            var txt = window.decodificarBase32(rotulo);
+            var info = el("div", null, "font-size: 0.74rem; margin-top: 0.3rem;");
+            if (txt) {
+                var juntos = g.registros.slice(0, 4).map(function(r) { return window.decodificarBase32(r[2].split(".")[0]) || ""; }).join("");
+                linhaInfo(info, "Base32 decodificado (4 primeiras consultas)", juntos.split("\n").join(" ⏎ "), " color: var(--danger-color);");
+            } else {
+                linhaInfo(info, "Base32", "o primeiro rótulo (" + rotulo + ") não decodifica para texto legível");
+            }
+            det.appendChild(info);
+        });
+        d.appendChild(det);
+        return d;
+    }
+
+    window.analisarDnsNsm = function() {
+        var cfg = lerCfg(), grupos = window.agruparDns(cfg), p = window.placarDns(grupos);
+        var box = $("nsm-placar-dns");
+        box.setAttribute("data-vp", p.vp);
+        box.setAttribute("data-fp", p.fp);
+        box.setAttribute("data-fn", p.fn);
+        var msg, ok = false;
+        if (p.vp === 1 && p.fp === 0) {
+            ok = true;
+            msg = "Só o túnel ficou no alerta. Abra dados-cdn.example e decodifique a amostra: são as notas fiscais saindo de WS-FIN-03 em consultas TXT (T1048). O domínio de C2 do beacon aparece no dns.log com subdomínio curto: é pivô, não túnel.";
+        } else if (p.fn) {
+            msg = "O túnel ficou fora do alerta. Um limiar alto demais em qualquer critério deixa passar o canal; volte os valores e suba um de cada vez.";
+        } else {
+            msg = p.fp + " domínio(s) legítimo(s) com nomes longos ou aleatórios disparam. Um hash hexadecimal nunca passa de 4 bits por caractere, e base32 passa de 4,2: suba a entropia mínima ou o comprimento mínimo e veja o que sobra.";
+        }
+        placar(box, [["Domínios no alerta", p.vp + p.fp, "var(--accent)"], ["Túnel detectado", p.vp + " de 1", p.vp ? "var(--tip-color)" : "var(--danger-color)"],
+                     ["Falsos positivos", p.fp, p.fp ? "var(--danger-color)" : "var(--tip-color)"]], msg, ok);
+        var lista = $("nsm-dominios");
+        lista.replaceChildren();
+        grupos.forEach(function(g) { lista.appendChild(cartaoDns(g)); });
+        return { grupos: grupos, placar: p };
+    };
+
+    window.restaurarPadraoNsm = function() {
+        var p = NSM.padrao;
+        $("nsm-agrupar").value = p.agrupar;
+        $("nsm-min-conexoes").value = p.min_conexoes;
+        $("nsm-max-intervalo").value = p.max_intervalo;
+        $("nsm-max-jitter").value = p.max_jitter;
+        $("nsm-min-estab").value = p.min_estabilidade;
+        $("nsm-externos").checked = p.so_externos;
+        NSM.excecoes.forEach(function(e) { $("nsm-exc-" + e.id).checked = false; });
+        $("nsm-dns-min-distintos").value = p.dns_min_distintos;
+        $("nsm-dns-min-comp").value = p.dns_min_comprimento;
+        $("nsm-dns-min-ent").value = p.dns_min_entropia;
+        window.analisarConexoesNsm();
+        window.analisarDnsNsm();
+    };
+
+    function montarLogs() {
+        CONN = window.expandirConexoes();
+        $("nsm-total-conn").textContent = CONN.length;
+        $("nsm-total-dns").textContent = NSM.dns.length;
+        $("nsm-connlog").textContent = cabecalho("conn",
+            ["ts", "uid", "id.orig_h", "id.orig_p", "id.resp_h", "id.resp_p", "proto", "service", "duration", "orig_bytes", "resp_bytes", "conn_state"],
+            ["time", "string", "addr", "port", "addr", "port", "enum", "string", "interval", "count", "count", "string"]) + "\n" + CONN.map(linhaConn).join("\n");
+        $("nsm-dnslog").textContent = cabecalho("dns",
+            ["ts", "uid", "id.orig_h", "id.orig_p", "id.resp_h", "id.resp_p", "proto", "query", "qtype_name", "rcode_name", "answers"],
+            ["time", "string", "addr", "port", "addr", "port", "enum", "string", "string", "string", "vector[string]"]) + "\n" + NSM.dns.map(linhaDns).join("\n");
+    }
+    function montarExcecoes() {
+        var box = $("nsm-excecoes");
+        box.replaceChildren();
+        NSM.excecoes.forEach(function(e) {
+            var lab = el("label", null, "display: flex; gap: 0.45rem; align-items: flex-start; min-width: 0; overflow-wrap: anywhere;");
+            var inp = el("input");
+            inp.type = "checkbox";
+            inp.id = "nsm-exc-" + e.id;
+            inp.style.marginTop = "0.2rem";
+            inp.addEventListener("change", window.analisarConexoesNsm);
+            lab.appendChild(inp);
+            lab.appendChild(el("span", e.rotulo));
+            box.appendChild(lab);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        $("nsm-contexto").textContent = NSM.contexto;
+        montarLogs();
+        montarExcecoes();
+        ["nsm-agrupar", "nsm-min-conexoes", "nsm-max-intervalo", "nsm-max-jitter", "nsm-min-estab", "nsm-externos"].forEach(function(id) {
+            $(id).addEventListener("change", window.analisarConexoesNsm);
+        });
+        ["nsm-dns-min-distintos", "nsm-dns-min-comp", "nsm-dns-min-ent"].forEach(function(id) {
+            $(id).addEventListener("change", window.analisarDnsNsm);
+        });
+        window.restaurarPadraoNsm();
+        if (typeof initChecklist === "function") {
+            initChecklist("monitoramento-de-rede-nsm");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
