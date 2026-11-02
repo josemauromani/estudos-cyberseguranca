@@ -1,0 +1,2197 @@
+<!-- Estudo 52: Infraestrutura-como-Codigo-Segura Body Fragment -->
+<article class="study-container" data-slug="infraestrutura-como-codigo-segura">
+
+    <!-- SEÇÃO 1: DO ACHADO À PREVENÇÃO -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: O Bucket Que Passou na Revisão</h2>
+        </div>
+
+        <p class="lead-text">
+            A Ipê Store descreve toda a sua conta AWS em Terraform: buckets, redes, bancos, balanceadores e a trilha de auditoria. No pull request #318, o time fiscal criou o bucket das notas fiscais. A revisora leu o diff do HCL, viu um bloco de Block Public Access e aprovou. Ninguém reparou que duas das quatro chaves estavam em <code>false</code> "provisoriamente". Três dias depois, o CSPM do Estudo 21 apontou o bucket como exposto. Nada vazou, mas por sorte. A pergunta deste módulo é outra: por que uma configuração proibida conseguiu ser criada? Aqui você aprende a ler o plano do Terraform em vez do diff, a escrever políticas como código que barram o plano antes do <code>apply</code>, a proteger o <em>state</em> e a descobrir quando o ambiente real deixou de ser o que o código diz.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🏗️</span>
+                <strong>Pergunta-chave do módulo</strong>
+            </div>
+            <p>Como impedir que um bucket público chegue à produção, em vez de achá-lo depois?</p>
+        </div>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🧭</span>
+                <strong>O que vem dos Estudos 21, 22 e 51</strong>
+            </div>
+            <p>
+                O Estudo 21 audita o que <em>já existe</em>: CSPM, Block Public Access, IMDSv2 e políticas IAM lidas depois de criadas. Este módulo atua antes: a mesma regra do bucket público vira uma política que reprova o pull request. O Estudo 22 montou o pipeline com SAST, SCA, segredos e imagem; aqui entra um gate que faltava nele, a varredura de IaC e a avaliação do plano. O Estudo 51 barrou pods perigosos no controle de admissão do cluster; o raciocínio é o mesmo, só que a "admissão" acontece no pipeline, contra o plano do Terraform, e vale para a conta de nuvem inteira.
+            </p>
+        </div>
+
+        <h3>IaC em uma tabela</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Conceito</th><th>O que é</th><th>Por que importa para a segurança</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>IaC declarativa</strong></td><td>O HCL do Terraform (ou do OpenTofu, o fork aberto) descreve o estado desejado; a ferramenta calcula o que criar, mudar ou apagar</td><td>A infraestrutura passa por pull request, revisão e histórico como qualquer código: dá para barrar antes de existir.</td></tr>
+                    <tr><td><strong><code>terraform plan</code></strong></td><td>Compara código, state e ambiente e lista as mudanças, sem executar nada</td><td>É o que vai acontecer de fato, com os valores dos módulos e das variáveis resolvidos. É ele que a política deve ler.</td></tr>
+                    <tr><td><strong><code>terraform apply</code></strong></td><td>Executa o plano na nuvem com as credenciais do pipeline</td><td>Depois do apply, o recurso inseguro existe e o problema passa a ser do CSPM e da resposta a incidentes.</td></tr>
+                    <tr><td><strong>State</strong></td><td>O <code>terraform.tfstate</code>, mapa entre o código e os IDs reais, com todos os atributos de cada recurso</td><td>Guarda senhas e chaves em claro. Quem lê o state lê os segredos; quem altera o state engana o próximo plano.</td></tr>
+                    <tr><td><strong>Módulos aprovados</strong></td><td>Blocos reutilizáveis (bucket, banco, rede) mantidos pela equipe de plataforma, com versão fixada</td><td>O padrão seguro vem pronto: o time pede "um bucket" e recebe criptografia, bloqueio público e log ligados.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Do Pull Request ao Apply: Onde a Política Barra o Risco</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Do Pull Request ao Apply: Onde a Política Barra o Risco">
+flowchart TD
+    PR["Pull request<br><small>HCL alterado</small>"]
+    subgraph CI["Pipeline (credencial OIDC, só leitura)"]
+        SC["Varredura de IaC<br><small>Checkov, Trivy</small>"]
+        PL["terraform plan -out<br><small>show -json</small>"]
+        PO["Políticas como código<br><small>OPA/Rego, Conftest</small>"]
+    end
+    EX["Exceção registrada<br><small>prazo e responsável</small>"]
+    AP["terraform apply<br><small>role de apply, após aprovação</small>"]
+    ST["State no backend remoto<br><small>criptografia, bloqueio, acesso restrito</small>"]
+    NV["Conta de nuvem<br><small>recursos reais</small>"]
+    PR --> SC --> PL --> PO
+    PO -->|"violação"| BL["Plano reprovado<br><small>volta ao autor</small>"]
+    EX -.->|"suspende a regra até vencer"| PO
+    PO -->|"aprovado"| AP --> NV
+    AP --> ST
+    CO["Mudança pelo console"] -.->|"drift"| NV
+    NV -.->|"plan -refresh-only agendado"| DR["Alerta de drift"]
+            </pre>
+        </div>
+
+        <p>
+            No MITRE ATT&amp;CK, este módulo é prevenção para duas técnicas. <strong>T1578 Modify Cloud Compute Infrastructure</strong>: o atacante cria, altera ou apaga instâncias, snapshots e volumes para se esconder ou chegar aos dados; com IaC, toda mudança legítima passa pelo pipeline, e o que muda por fora aparece como <em>drift</em>. <strong>T1530 Data from Cloud Storage</strong>: dados lidos de buckets mal configurados; a política que reprova o bucket público impede que a porta seja aberta pelo próprio time.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 2: PLANO, POLÍTICAS, STATE E DRIFT -->
+    <section class="study-section" id="plano-politica-state">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Plano, Políticas como Código, State e Drift</h2>
+        </div>
+
+        <h3>Ler o plano, não só o diff</h3>
+        <p>
+            O diff do HCL mostra o que o autor escreveu; o plano mostra o que vai acontecer. Um módulo com padrão inseguro, uma variável vinda de outro arquivo ou um <code>count</code> que multiplica recursos não aparecem no diff. Por isso a revisão automatizada lê o plano em JSON: <code>terraform plan -out=plano.tfplan</code> grava o plano, e <code>terraform show -json plano.tfplan</code> o converte. Nele, a lista <code>resource_changes</code> traz cada recurso com <code>address</code>, <code>type</code>, <code>change.actions</code> (<code>create</code>, <code>update</code>, <code>delete</code>; uma substituição aparece como <code>delete</code> e <code>create</code>), <code>change.before</code>, <code>change.after</code> e <code>after_unknown</code> (o que só será conhecido no apply). O bloco <code>configuration</code> mostra as expressões do código: se um atributo veio de um literal (<code>constant_value</code>) ou de uma referência.
+        </p>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">bash — gerar o plano e ler as mudanças de risco (saída ilustrativa)</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-iac-plan')">Copiar</button>
+            </div>
+            <pre><code id="code-iac-plan">$ terraform plan -out=plano.tfplan
+$ terraform show -json plano.tfplan &gt; plano.json
+
+# Quais recursos o plano cria, muda ou substitui?
+$ jq -r '.resource_changes[] | select(.change.actions != ["no-op"])
+         | "\(.change.actions | join("/"))  \(.address)"' plano.json
+create  aws_s3_bucket.notas_fiscais
+create  aws_s3_bucket_public_access_block.notas_fiscais
+update  aws_cloudtrail.principal
+delete  aws_security_group.legado_ftp
+
+# O que muda na trilha de auditoria?
+$ jq '.resource_changes[] | select(.address=="aws_cloudtrail.principal")
+      | {antes: .change.before.enable_logging, depois: .change.after.enable_logging}' plano.json
+{ "antes": true, "depois": false }</code></pre>
+        </div>
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">⚠️</span>
+                <strong>O plano em JSON também é segredo</strong>
+            </div>
+            <p>
+                Valores marcados como <code>sensitive</code> aparecem como <code>(sensitive value)</code> na tela, mas o <code>terraform show -json</code> os traz em claro, apenas sinalizados em <code>after_sensitive</code>. O arquivo do plano guardado como artefato do pipeline precisa da mesma proteção do state: retenção curta e acesso restrito.
+            </p>
+        </div>
+
+        <h3>Varredura de IaC e policy-as-code</h3>
+        <p>
+            Há duas camadas complementares. A <strong>varredura de IaC</strong> roda regras prontas sobre o código ou o plano e cobre o básico em minutos. As <strong>políticas como código</strong> (<em>policy-as-code</em>) traduzem as regras da própria empresa ("todo bucket confidencial usa a nossa chave KMS", "nenhuma porta administrativa para a internet") em código versionado, testado e revisado como qualquer outro.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Ferramenta</th><th>O que lê</th><th>Uso típico</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Checkov</strong></td><td>HCL, plano em JSON, CloudFormation, Kubernetes, Dockerfile</td><td>Centenas de regras prontas (CKV_AWS_*) mapeadas para o CIS Benchmark; regras próprias em Python ou YAML</td></tr>
+                    <tr><td><strong>tfsec / Trivy</strong></td><td>HCL e plano</td><td>O tfsec foi incorporado ao Trivy (<code>trivy config</code>), que também varre imagens e segredos</td></tr>
+                    <tr><td><strong>OPA com Rego</strong></td><td>Qualquer JSON: o plano, manifestos, configurações</td><td>Políticas da empresa escritas em Rego; o <strong>Conftest</strong> roda essas políticas no pipeline contra o <code>plano.json</code></td></tr>
+                    <tr><td>Sentinel e similares</td><td>Plano, dentro da plataforma de execução</td><td>Política aplicada na própria plataforma de Terraform gerenciada, entre o plan e o apply</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Rego — política que reprova porta administrativa aberta (policy/rede.rego)</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-iac-rego')">Copiar</button>
+            </div>
+            <pre><code id="code-iac-rego">package terraform.rede
+
+portas_admin := [22, 3389]
+
+deny contains msg if {
+  rc := input.resource_changes[_]
+  rc.type == "aws_security_group"
+  some acao in rc.change.actions
+  acao in {"create", "update"}          # apagar recurso inseguro não é bloqueado
+  regra := rc.change.after.ingress[_]
+  regra.cidr_blocks[_] == "0.0.0.0/0"
+  some porta in portas_admin
+  regra.from_port &lt;= porta             # faixas como 20-25 também contam
+  porta &lt;= regra.to_port
+  msg := sprintf("%s: porta %d aberta para a internet", [rc.address, porta])
+}
+
+# No pipeline:
+#   conftest test plano.json --policy policy/
+#   checkov -f plano.json --framework terraform_plan</code></pre>
+        </div>
+
+        <h3>Módulos aprovados: o caminho seguro é o mais curto</h3>
+        <p>
+            Política que só reprova gera atrito; módulos aprovados reduzem o atrito. A equipe de plataforma publica módulos internos com versão fixada (<code>source</code> apontando para o registro interno e <code>version = "~&gt; 3.2"</code>) em que a criptografia, o Block Public Access, o log e as tags de dono já vêm ligados e não são parâmetros. O time do produto pede um bucket e recebe um bucket seguro. A política continua lá para pegar quem cria o recurso "na mão", fora do módulo.
+        </p>
+
+        <h3>Exceções com prazo e responsável</h3>
+        <p>
+            Sempre haverá um caso legítimo que viola uma regra: um bucket público de imagens até a migração para CDN, uma regra provisória durante uma migração. O erro é resolver com um comentário de supressão no código (<code>#checkov:skip=...</code>) que nunca mais sai. Uma exceção bem feita é um registro central, fora do código do produto, com quatro campos: qual política, qual recurso, <strong>quem é o responsável</strong> pelo risco e <strong>até quando vale</strong>. Ao vencer o prazo, a regra volta a reprovar sozinha, e alguém precisa decidir de novo. Um teto de prazo (90 dias, por exemplo) impede a exceção "até 2099".
+        </p>
+
+        <h3>State: o arquivo mais sensível do repositório</h3>
+        <p>
+            O state guarda todos os atributos de cada recurso, inclusive os sensíveis, em texto claro: a senha do banco, o <code>result</code> de um <code>random_password</code>, o <code>secret</code> de uma chave de acesso. Marcar uma variável ou saída como <code>sensitive = true</code> só a esconde da tela e dos logs; no state ela continua em claro. O OpenTofu oferece criptografia do state no cliente; no Terraform, a proteção vem do backend e do acesso a ele:
+        </p>
+        <ul>
+            <li><strong>Backend remoto</strong> (bucket S3 dedicado, numa conta separada de preferência), nunca o <code>terraform.tfstate</code> no notebook nem no Git.</li>
+            <li><strong>Criptografia</strong> com <code>encrypt = true</code> e chave KMS própria (<code>kms_key_id</code>), cuja política de chave restringe quem decifra.</li>
+            <li><strong>Bloqueio</strong>: <code>use_lockfile = true</code> no backend S3 (Terraform 1.10 em diante); versões anteriores usavam uma tabela DynamoDB, hoje em descontinuação. Sem bloqueio, dois applies simultâneos corrompem o state.</li>
+            <li><strong>Versionamento</strong> do bucket, para voltar a um state anterior, e <strong>acesso</strong> só para a role do pipeline e o acesso de emergência.</li>
+            <li><strong>Tirar o segredo do state</strong> quando possível: <code>manage_master_user_password = true</code> faz o RDS guardar a senha no Secrets Manager; chaves de acesso de longa duração dão lugar a roles e OIDC.</li>
+        </ul>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">HCL — backend remoto com criptografia e bloqueio</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-iac-backend')">Copiar</button>
+            </div>
+            <pre><code id="code-iac-backend">terraform {
+  backend "s3" {
+    bucket       = "ipe-terraform-state-prod"      # conta dedicada, versionamento ligado
+    key          = "loja/prod/terraform.tfstate"
+    region       = "sa-east-1"
+    encrypt      = true
+    kms_key_id   = "alias/ipe-terraform-state"
+    use_lockfile = true                            # bloqueio nativo no S3
+  }
+}
+
+resource "aws_db_instance" "pedidos" {
+  # ...
+  username                    = "app_pedidos"
+  manage_master_user_password = true   # a senha fica no Secrets Manager, fora do state
+}</code></pre>
+        </div>
+
+        <h3>Drift: quando o ambiente diverge do código</h3>
+        <p>
+            <em>Drift</em> é a diferença entre o que o código declara e o que existe na conta. Ele nasce de mudanças feitas pelo console ou pela CLI durante um incidente, de um fornecedor com acesso, de automações fora do Terraform. O comando <code>terraform plan -refresh-only</code> mostra o que mudou nos recursos que o Terraform gerencia, sem propor alterações; agendado no pipeline (diariamente, por exemplo), vira um detector de drift. Para cada divergência há duas saídas: <strong>reverter</strong> (o próximo apply devolve o valor do código) ou <strong>incorporar</strong> (atualizar o HCL para refletir a mudança, e o novo código passa pelas mesmas políticas). Recursos criados inteiramente fora do Terraform não aparecem no plan: precisam ser trazidos com um bloco <code>import</code> ou o comando <code>terraform import</code>, ou apagados, e só um inventário ou o CSPM do Estudo 21 os encontra.
+        </p>
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🚨</span>
+                <strong>Política no pipeline não adianta se o apply sai do notebook</strong>
+            </div>
+            <p>
+                Se cada engenheiro tem credencial de administrador e roda <code>terraform apply</code> do próprio terminal, nenhuma política é obrigatória. O desenho seguro: o pipeline obtém credenciais temporárias por OIDC (sem chave de longa duração guardada no CI); a role de plan só lê; a role de apply só é assumida pelo pipeline, a partir do branch principal e após aprovação; o console de produção fica só leitura, com acesso de emergência registrado. É a mesma separação de deveres do Estudo 22, aplicada à infraestrutura.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Revisor de Plano Terraform</h2>
+        </div>
+
+        <p class="lead-text">
+            O pull request #318 da Ipê Store, descrito em dados dentro da página. Na fase 1 você lê cada mudança do plano (o trecho de HCL e o JSON de <code>terraform show -json</code>) e marca as que acha arriscadas. Na fase 2 ativa políticas, vê quais mudanças são reprovadas e por quê, aplica correções e registra exceções com prazo e responsável. Na fase 3 olha o state de produção e configura o backend. Na fase 4 compara o código com o ambiente real e decide o que fazer com cada drift.
+        </p>
+
+        <div class="lab-box iac-lab" id="iac-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Plano, políticas, state e drift</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Revisor de Plano Terraform da Ipê Store</h3>
+                    <p id="iac-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body" style="min-width: 0;">
+                <!-- FASE 1 -->
+                <h4 style="margin-top: 0.4rem;">Fase 1. Leia o plano: quais mudanças são arriscadas?</h4>
+                <p style="font-size: 0.85rem; margin: 0;">Clique em uma mudança para ver o HCL e o plano em JSON. Marque a caixa das que você reprovaria. Legenda: + criar, ~ alterar, − apagar.</p>
+                <div id="iac-recursos" role="group" aria-label="Mudanças do plano" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 0.4rem; font-size: 0.8rem; margin-top: 0.6rem;"></div>
+                <p id="iac-selecionado" style="font-size: 0.85rem; margin: 0.8rem 0 0.3rem 0; font-weight: 600; overflow-wrap: anywhere;"></p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 0.6rem;">
+                    <div style="min-width: 0;">
+                        <p style="font-size: 0.78rem; margin: 0 0 0.2rem 0; color: var(--muted);">Trecho de HCL</p>
+                        <pre id="iac-hcl" role="region" aria-label="Trecho de HCL do recurso" tabindex="0" style="max-width: 100%; box-sizing: border-box; overflow-x: auto; font-family: var(--font-mono, monospace); font-size: 0.74rem; background: var(--sunk); color: var(--ink); border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.6rem; margin: 0;"></pre>
+                    </div>
+                    <div style="min-width: 0;">
+                        <p style="font-size: 0.78rem; margin: 0 0 0.2rem 0; color: var(--muted);">resource_changes[] em terraform show -json</p>
+                        <pre id="iac-json" role="region" aria-label="Mudança do plano em JSON" tabindex="0" style="max-width: 100%; max-height: 22rem; box-sizing: border-box; overflow: auto; font-family: var(--font-mono, monospace); font-size: 0.72rem; background: var(--sunk); color: var(--ink); border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.6rem; margin: 0;"></pre>
+                    </div>
+                </div>
+                <div id="iac-correcoes-aplicadas" style="font-size: 0.8rem; margin-top: 0.4rem; overflow-wrap: anywhere;"></div>
+
+                <!-- FASE 2 -->
+                <h4 style="margin-top: 1.6rem;">Fase 2. Ative as políticas e veja o que é reprovado</h4>
+                <div id="iac-politicas" role="group" aria-label="Catálogo de políticas" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: 0.5rem 0.9rem; font-size: 0.8rem;"></div>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem;">
+                    <button class="btn-secondary" type="button" onclick="ativarTodasIac()">Ativar todas</button>
+                    <button class="btn-primary" type="button" onclick="conferirPalpitesIac()">Conferir meus palpites da fase 1</button>
+                    <button class="btn-secondary" type="button" onclick="restaurarPlanoIac()">Restaurar plano original</button>
+                </div>
+                <div id="iac-palpites-resultado" aria-live="polite" style="font-size: 0.85rem; margin-top: 0.6rem; overflow-wrap: anywhere;"></div>
+                <div id="iac-veredito" aria-live="polite" style="font-size: 0.9rem; margin-top: 0.7rem;"></div>
+                <div id="iac-resultado" role="region" aria-label="Resultado da avaliação do plano" tabindex="0" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.4rem; font-size: 0.8rem; margin-top: 0.5rem;"></div>
+
+                <p style="font-size: 0.85rem; margin: 1rem 0 0.3rem 0; font-weight: 600;">Exceções registradas (data da revisão: <span id="iac-data"></span>; prazo máximo: <span id="iac-prazo-max"></span> dias)</p>
+                <div id="iac-excecoes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 0.4rem; font-size: 0.78rem;"></div>
+                <p style="font-size: 0.85rem; margin: 0.9rem 0 0.3rem 0; font-weight: 600;">Pedir uma exceção</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; font-size: 0.85rem;">
+                    <label for="iac-exc-recurso">Violação</label>
+                    <select class="form-control" id="iac-exc-recurso" style="min-width: 0; max-width: 100%; flex: 1 1 16rem;"></select>
+                    <label for="iac-exc-responsavel">Responsável</label>
+                    <input class="form-control" type="text" id="iac-exc-responsavel" maxlength="60" placeholder="nome e time" style="min-width: 0; max-width: 100%; flex: 1 1 10rem;">
+                    <label for="iac-exc-prazo">Prazo</label>
+                    <select class="form-control" id="iac-exc-prazo" style="min-width: 0; max-width: 100%; flex: 0 1 8rem;">
+                        <option value="30">30 dias</option>
+                        <option value="90" selected>90 dias</option>
+                        <option value="180">180 dias</option>
+                    </select>
+                    <button class="btn-primary" type="button" onclick="registrarExcecaoIac()">Registrar exceção</button>
+                </div>
+                <div id="iac-exc-resultado" aria-live="polite" style="font-size: 0.85rem; margin-top: 0.5rem; overflow-wrap: anywhere;"></div>
+
+                <!-- FASE 3 -->
+                <h4 style="margin-top: 1.6rem;">Fase 3. O state contém segredos: proteja o backend</h4>
+                <div id="iac-backend" role="group" aria-label="Opções do backend do state" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: 0.4rem 0.9rem; font-size: 0.8rem;"></div>
+                <div id="iac-backend-riscos" aria-live="polite" style="font-size: 0.82rem; margin-top: 0.6rem; overflow-wrap: anywhere;"></div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 0.6rem; margin-top: 0.5rem;">
+                    <div style="min-width: 0;">
+                        <p style="font-size: 0.78rem; margin: 0 0 0.2rem 0; color: var(--muted);">Configuração resultante</p>
+                        <pre id="iac-backend-hcl" role="region" aria-label="Configuração do backend em HCL" tabindex="0" style="max-width: 100%; box-sizing: border-box; overflow-x: auto; font-family: var(--font-mono, monospace); font-size: 0.72rem; background: var(--sunk); color: var(--ink); border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.6rem; margin: 0;"></pre>
+                    </div>
+                    <div style="min-width: 0;">
+                        <p style="font-size: 0.78rem; margin: 0 0 0.2rem 0; color: var(--muted);">terraform state pull (trecho) e segredos em claro</p>
+                        <div id="iac-state-segredos" aria-live="polite" style="font-size: 0.78rem; margin-bottom: 0.3rem; overflow-wrap: anywhere;"></div>
+                        <pre id="iac-state" role="region" aria-label="Conteúdo do state" tabindex="0" style="max-width: 100%; max-height: 20rem; box-sizing: border-box; overflow: auto; font-family: var(--font-mono, monospace); font-size: 0.7rem; background: var(--sunk); color: var(--ink); border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.6rem; margin: 0;"></pre>
+                    </div>
+                </div>
+
+                <!-- FASE 4 -->
+                <h4 style="margin-top: 1.6rem;">Fase 4. Drift: o ambiente diverge do código</h4>
+                <p id="iac-drift-intro" style="font-size: 0.85rem; margin: 0;"></p>
+                <div id="iac-drift" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: 0.5rem; font-size: 0.8rem; margin-top: 0.6rem;"></div>
+                <div id="iac-drift-resultado" aria-live="polite" style="font-size: 0.85rem; margin-top: 0.7rem; overflow-wrap: anywhere;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de IaC Segura</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista ao revisar um repositório de Terraform ou o pipeline que o aplica. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="infraestrutura-como-codigo-segura">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-iac-1">
+                <label for="chk-iac-1"><strong>Pipeline:</strong> todo pull request roda <code>terraform plan</code>, varredura de IaC (Checkov ou Trivy) e políticas da empresa (OPA/Conftest) contra o plano em JSON; violação reprova o merge.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-iac-2">
+                <label for="chk-iac-2"><strong>Políticas mínimas:</strong> bucket público, porta 22/3389 aberta para <code>0.0.0.0/0</code> ou <code>::/0</code>, disco, banco ou bucket sem criptografia, CloudTrail e logs desligados, segredo literal no código.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-iac-3">
+                <label for="chk-iac-3"><strong>Exceções:</strong> registro central com política, recurso, responsável e data de expiração (teto de 90 dias); nenhuma supressão permanente em comentário no código.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-iac-4">
+                <label for="chk-iac-4"><strong>State:</strong> backend remoto com <code>encrypt</code> e chave KMS própria, bloqueio (<code>use_lockfile</code>), versionamento, acesso só da role do pipeline; <code>*.tfstate</code> e <code>*.tfplan</code> no <code>.gitignore</code>.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-iac-5">
+                <label for="chk-iac-5"><strong>Segredos:</strong> nenhuma senha ou chave literal no HCL; senha de banco gerida pelo provedor ou lida de cofre; nenhuma chave de acesso de longa duração criada pelo Terraform sem necessidade.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-iac-6">
+                <label for="chk-iac-6"><strong>Credenciais e apply:</strong> pipeline com OIDC e credencial temporária; role de plan só leitura; apply só pelo pipeline, a partir do branch principal e com aprovação; console de produção só leitura.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-iac-7">
+                <label for="chk-iac-7"><strong>Drift e módulos:</strong> <code>terraform plan -refresh-only</code> agendado com alerta; recursos fora do Terraform importados ou removidos; módulos aprovados com versão fixada e padrões seguros embutidos.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Plano x diff):</strong> O pull request só muda a versão de um módulo interno de bucket, de 3.1 para 3.2. O diff tem uma linha. Por que a política deve ler o plano, e não o diff?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque a mudança real está dentro do módulo. Se a versão 3.2 mudou um padrão (por exemplo, desligou o Block Public Access), o diff de uma linha não mostra nada, mas o plano mostra o <code>aws_s3_bucket_public_access_block</code> com <code>false</code> em <code>change.after</code>. O plano resolve módulos, variáveis e <code>count</code>; é o que vai acontecer de fato no apply.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (State):</strong> O time usa <code>random_password</code> para a senha do banco e marcou a saída como <code>sensitive = true</code>. Um colega diz que, assim, a senha não está em lugar nenhum em claro. Está certo?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. <code>sensitive</code> só esconde o valor da saída do terminal e dos logs. O <code>result</code> do <code>random_password</code> e o <code>password</code> do banco ficam em claro no state, e também no plano em JSON. A proteção é tratar o state como cofre (backend remoto criptografado com KMS, acesso restrito, versionamento) e, quando possível, tirar o segredo dele com <code>manage_master_user_password = true</code>.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Exceção):</strong> O time da vitrine precisa servir imagens direto de um bucket público por dois meses, até migrar para CDN. A política de bucket público reprova o plano. Qual é a forma correta de seguir?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Registrar uma exceção para aquele recurso e aquela política, com responsável nomeado, justificativa e expiração dentro do teto (por exemplo, 60 dias). Desligar a política para todos ou pôr um <code>#checkov:skip</code> sem prazo no código são as respostas erradas: a primeira libera qualquer bucket; a segunda vira permanente. Quando a exceção vence, o plano volta a ser reprovado e força a decisão.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Drift):</strong> O <code>terraform plan -refresh-only</code> da madrugada mostra uma regra de entrada 3389 a partir de <code>0.0.0.0/0</code> num security group, criada pelo console por um fornecedor. O fornecedor pede para "colocar no código para não dar mais alerta". O que fazer?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Reverter, não incorporar. A mudança viola a política de porta administrativa; incorporá-la ao HCL faria o próximo plano ser reprovado, como deve ser. Reverta com um apply do código (ou remova a regra), trate o caso como incidente até saber quem usou o acesso e ofereça ao fornecedor um caminho controlado (Session Manager ou VPN). Depois, revise por que alguém de fora tinha permissão de escrita no console.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Recurso fora do Terraform):</strong> O CSPM achou um security group com RDP aberto que não aparece em nenhum plano, nem no de drift. Por quê, e como resolver?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O Terraform só compara o que está no state; um recurso criado inteiramente pelo console não é gerenciado e, portanto, não gera drift. É exatamente o papel do CSPM do Estudo 21 complementar a IaC. A solução é decidir: apagar o recurso, ou trazê-lo para o código com um bloco <code>import</code> (ou <code>terraform import</code>), quando ele passa a ser avaliado pelas políticas, e corrigido.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Credenciais do pipeline):</strong> As políticas rodam no pipeline, mas três engenheiros têm chave de administrador e às vezes rodam <code>terraform apply</code> do notebook "para ir mais rápido". Qual é o problema e a correção?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A política vira opcional: quem aplica do notebook passa por fora dela, sem revisão, e ainda arrisca dois applies simultâneos no mesmo state. A correção é tornar o pipeline o único caminho: credencial por OIDC, role de apply assumível só pelo pipeline a partir do branch principal, chaves pessoais de administrador removidas e acesso de emergência registrado e revisado.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 7 (Apagar é bloqueado?):</strong> O plano apaga um security group antigo que tinha FTP aberto para a internet. A política de rede deveria reprovar esse plano?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. A política avalia o estado depois da mudança (<code>change.after</code>) para ações <code>create</code> e <code>update</code>; num <code>delete</code>, o <code>after</code> é nulo, e remover algo inseguro é uma melhoria. O cuidado é o inverso: uma substituição aparece como <code>delete</code> e <code>create</code>, e o recurso novo precisa ser avaliado como qualquer criação.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Ordem</h4>
+                <p>Plano antes do apply, política antes do plano: o pipeline lê o plano em JSON e reprova o que a empresa proíbe antes que exista.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Segredos</h4>
+                <p>State do Terraform contém segredos em claro: backend remoto, criptografia com KMS, bloqueio, versionamento e acesso restrito.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Exceções</h4>
+                <p>Policy-as-code com exceções com prazo e responsável: ao vencer, a regra volta a reprovar sozinha.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Drift</h4>
+                <p>Drift: o ambiente diverge do código. Detecte com plan -refresh-only agendado; reverta o que viola política, incorpore o resto.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>Documentação do Terraform (HashiCorp): Command plan, Command show e JSON Output Format, Sensitive Data in State, Backend Type: s3 (<code>use_lockfile</code>), Import, Refresh-only mode.</li>
+            <li>Documentação do OpenTofu: State and Plan Encryption.</li>
+            <li>Checkov (Prisma Cloud / Bridgecrew) e Trivy (Aqua Security), que incorporou o tfsec.</li>
+            <li>Open Policy Agent: Rego e Terraform; Conftest.</li>
+            <li>CIS Amazon Web Services Foundations Benchmark.</li>
+            <li>NIST SP 800-218 (SSDF) e NIST SP 800-204D, sobre segurança da cadeia de software em pipelines de CI/CD.</li>
+            <li>MITRE ATT&amp;CK: T1578 Modify Cloud Compute Infrastructure e T1530 Data from Cloud Storage.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Seguindo na Trilha 12</strong>
+            </div>
+            <p>
+                Este é o terceiro estudo da Trilha 12 (Nuvem, Containers e Kubernetes). A prevenção nunca é completa: alguém com acesso ao console, uma chave vazada ou um recurso fora do Terraform passa por fora do pipeline. O Estudo 53 trata desse outro lado: os logs de auditoria que este módulo exige ligados (CloudTrail, logs de dados e de fluxo), a linha do tempo de uma credencial vazada e a contenção na nuvem.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="iac-dados">
+{
+ "contexto": "Conta AWS fictícia prod.ipe.example da Ipê Store. Pull request #318, \"infra do serviço de notas fiscais\": o plano abaixo foi gerado pelo pipeline com terraform plan -out e terraform show -json. Nada aqui executa Terraform nem fala com a nuvem.",
+ "data_revisao": "2026-11-02",
+ "prazo_max_dias": 90,
+ "portas_admin": [
+  22,
+  3389
+ ],
+ "atributos_secretos": [
+  "password",
+  "master_password",
+  "secret_key",
+  "access_key",
+  "token"
+ ],
+ "cidr_vpn": "10.8.0.0/24",
+ "chave_kms": "arn:aws:kms:sa-east-1:111122223333:alias/ipe-dados",
+ "bucket_logs": "ipe-logs-acesso",
+ "politicas": {
+  "ordem": [
+   "bucket_publico",
+   "porta_admin_aberta",
+   "sem_criptografia",
+   "log_desligado",
+   "segredo_no_codigo"
+  ],
+  "regras": {
+   "bucket_publico": {
+    "titulo": "Bucket público",
+    "checkov": "CKV_AWS_53 a CKV_AWS_56 (Block Public Access)",
+    "porque": "Uma das quatro chaves do Block Public Access desligada deixa uma política ou ACL tornar o bucket público: é o caminho do T1530 Data from Cloud Storage.",
+    "correcao": "As quatro chaves do Block Public Access em true; quem precisa ler recebe acesso por role ou por URL pré-assinada, e conteúdo público vai por CDN com acesso de origem controlado.",
+    "rego": "deny contains msg if {\n  rc := input.resource_changes[_]\n  rc.type == \"aws_s3_bucket_public_access_block\"\n  some acao in rc.change.actions\n  acao in {\"create\", \"update\"}\n  some chave in [\"block_public_acls\", \"block_public_policy\",\n                 \"ignore_public_acls\", \"restrict_public_buckets\"]\n  rc.change.after[chave] != true\n  msg := sprintf(\"%s: %s precisa ser true\", [rc.address, chave])\n}"
+   },
+   "porta_admin_aberta": {
+    "titulo": "Porta administrativa (22/3389) aberta para 0.0.0.0/0",
+    "checkov": "CKV_AWS_24 (22) e CKV_AWS_25 (3389)",
+    "porque": "SSH e RDP expostos à internet recebem varredura e força bruta em minutos; uma faixa de portas ou o protocolo -1 também abrem a porta sem citá-la.",
+    "correcao": "Remover a regra; acesso administrativo pelo Session Manager ou pela VPN corporativa (10.8.0.0/24), nunca de 0.0.0.0/0 ou ::/0.",
+    "rego": "deny contains msg if {\n  rc := input.resource_changes[_]\n  rc.type == \"aws_security_group\"\n  some acao in rc.change.actions\n  acao in {\"create\", \"update\"}\n  regra := rc.change.after.ingress[_]\n  regra.cidr_blocks[_] == \"0.0.0.0/0\"\n  some porta in [22, 3389]\n  regra.from_port <= porta\n  porta <= regra.to_port\n  msg := sprintf(\"%s: porta %d aberta para a internet\", [rc.address, porta])\n}"
+   },
+   "sem_criptografia": {
+    "titulo": "Disco, banco ou bucket sem criptografia (bucket: exige SSE-KMS)",
+    "checkov": "CKV_AWS_3 (EBS), CKV_AWS_8 (disco da EC2), CKV_AWS_16 (RDS), CKV_AWS_145 (S3 com KMS)",
+    "porque": "Disco e banco sem criptografia não podem ser criptografados depois sem recriar; snapshot copiado ou compartilhado sai legível. Para dado confidencial, a empresa exige a própria chave KMS, que tem política de acesso e trilha de uso.",
+    "correcao": "encrypted / storage_encrypted = true e, no bucket, sse_algorithm = \"aws:kms\" com a chave alias/ipe-dados.",
+    "rego": "deny contains msg if {\n  rc := input.resource_changes[_]\n  rc.type == \"aws_db_instance\"\n  some acao in rc.change.actions\n  acao in {\"create\", \"update\"}\n  not rc.change.after.storage_encrypted\n  msg := sprintf(\"%s: storage_encrypted precisa ser true\", [rc.address])\n}"
+   },
+   "log_desligado": {
+    "titulo": "Log ou trilha de auditoria desligado",
+    "checkov": "CKV_AWS_36 (validação do CloudTrail) e CKV_AWS_91 (logs do balanceador)",
+    "porque": "Sem CloudTrail e sem log de acesso não há como responder quem fez o quê (Estudo 53). Desligar a trilha é também um passo típico de quem quer agir sem deixar rastro.",
+    "correcao": "enable_logging e enable_log_file_validation = true na trilha; access_logs habilitado no balanceador, gravando no bucket ipe-logs-acesso.",
+    "rego": "deny contains msg if {\n  rc := input.resource_changes[_]\n  rc.type == \"aws_cloudtrail\"\n  \"update\" in rc.change.actions\n  rc.change.after.enable_logging == false\n  msg := sprintf(\"%s: a trilha de auditoria não pode ser desligada\", [rc.address])\n}"
+   },
+   "segredo_no_codigo": {
+    "titulo": "Segredo escrito no código",
+    "checkov": "Varredura de segredos do Checkov (CKV_SECRET_*) e do Trivy",
+    "porque": "Senha literal no HCL vai para o histórico do Git, para o plano em JSON e para o state; quem lê qualquer um dos três tem a senha do banco.",
+    "correcao": "Tirar o literal: manage_master_user_password = true (o RDS guarda a senha no Secrets Manager e ela não entra no state) ou leitura de um cofre no momento do deploy.",
+    "rego": "deny contains msg if {\n  r := input.configuration.root_module.resources[_]\n  some attr in [\"password\", \"master_password\", \"secret_key\", \"access_key\", \"token\"]\n  r.expressions[attr].constant_value\n  msg := sprintf(\"%s: %s com valor literal no código\", [r.address, attr])\n}"
+   }
+  }
+ },
+ "plano": {
+  "format_version": "1.2",
+  "terraform_version": "1.9.5",
+  "resource_changes": [
+   {
+    "address": "aws_s3_bucket.notas_fiscais",
+    "mode": "managed",
+    "type": "aws_s3_bucket",
+    "name": "notas_fiscais",
+    "provider_name": "registry.terraform.io/hashicorp/aws",
+    "change": {
+     "actions": [
+      "create"
+     ],
+     "before": null,
+     "after": {
+      "bucket": "ipe-notas-fiscais-prod",
+      "force_destroy": false,
+      "tags": {
+       "dados": "confidencial",
+       "dono": "fiscal"
+      }
+     },
+     "after_unknown": {
+      "id": true,
+      "arn": true
+     },
+     "after_sensitive": {}
+    },
+    "esperado": [],
+    "status_esperado": "aprovado"
+   },
+   {
+    "address": "aws_s3_bucket_public_access_block.notas_fiscais",
+    "mode": "managed",
+    "type": "aws_s3_bucket_public_access_block",
+    "name": "notas_fiscais",
+    "provider_name": "registry.terraform.io/hashicorp/aws",
+    "change": {
+     "actions": [
+      "create"
+     ],
+     "before": null,
+     "after": {
+      "block_public_acls": true,
+      "block_public_policy": false,
+      "ignore_public_acls": true,
+      "restrict_public_buckets": false
+     },
+     "after_unknown": {
+      "id": true,
+      "bucket": true
+     },
+     "after_sensitive": {}
+    },
+    "esperado": [
+     "bucket_publico"
+    ],
+    "status_esperado": "bloqueado"
+   },
+   {
+    "address": "aws_s3_bucket_server_side_encryption_configuration.notas_fiscais",
+    "mode": "managed",
+    "type": "aws_s3_bucket_server_side_encryption_configuration",
+    "name": "notas_fiscais",
+    "provider_name": "registry.terraform.io/hashicorp/aws",
+    "change": {
+     "actions": [
+      "create"
+     ],
+     "before": null,
+     "after": {
+      "rule": [
+       {
+        "apply_server_side_encryption_by_default": [
+         {
+          "sse_algorithm": "AES256",
+          "kms_master_key_id": null
+         }
+        ],
+        "bucket_key_enabled": false
+       }
+      ]
+     },
+     "after_unknown": {
+      "id": true,
+      "bucket": true
+     },
+     "after_sensitive": {}
+    },
+    "esperado": [
+     "sem_criptografia"
+    ],
+    "status_esperado": "bloqueado"
+   },
+   {
+    "address": "aws_s3_bucket_public_access_block.vitrine_imagens",
+    "mode": "managed",
+    "type": "aws_s3_bucket_public_access_block",
+    "name": "vitrine_imagens",
+    "provider_name": "registry.terraform.io/hashicorp/aws",
+    "change": {
+     "actions": [
+      "update"
+     ],
+     "before": {
+      "block_public_acls": true,
+      "block_public_policy": true,
+      "ignore_public_acls": true,
+      "restrict_public_buckets": true,
+      "bucket": "ipe-vitrine-imagens"
+     },
+     "after": {
+      "bucket": "ipe-vitrine-imagens",
+      "block_public_acls": false,
+      "block_public_policy": false,
+      "ignore_public_acls": false,
+      "restrict_public_buckets": false
+     },
+     "after_unknown": {},
+     "after_sensitive": {}
+    },
+    "esperado": [
+     "bucket_publico"
+    ],
+    "status_esperado": "excecao"
+   },
+   {
+    "address": "aws_security_group.app_notas",
+    "mode": "managed",
+    "type": "aws_security_group",
+    "name": "app_notas",
+    "provider_name": "registry.terraform.io/hashicorp/aws",
+    "change": {
+     "actions": [
+      "create"
+     ],
+     "before": null,
+     "after": {
+      "name": "app-notas",
+      "vpc_id": "vpc-0a12b34c",
+      "ingress": [
+       {
+        "description": "HTTPS do balanceador",
+        "from_port": 443,
+        "to_port": 443,
+        "protocol": "tcp",
+        "cidr_blocks": [
+         "10.20.0.0/16"
+        ],
+        "ipv6_cidr_blocks": []
+       },
+       {
+        "description": "SSH temporario para depurar o deploy",
+        "from_port": 22,
+        "to_port": 22,
+        "protocol": "tcp",
+        "cidr_blocks": [
+         "0.0.0.0/0"
+        ],
+        "ipv6_cidr_blocks": []
+       }
+      ],
+      "egress": [
+       {
+        "description": "saida",
+        "from_port": 0,
+        "to_port": 0,
+        "protocol": "-1",
+        "cidr_blocks": [
+         "0.0.0.0/0"
+        ],
+        "ipv6_cidr_blocks": []
+       }
+      ]
+     },
+     "after_unknown": {
+      "id": true,
+      "arn": true
+     },
+     "after_sensitive": {}
+    },
+    "esperado": [
+     "porta_admin_aberta"
+    ],
+    "status_esperado": "bloqueado"
+   },
+   {
+    "address": "aws_security_group_rule.lb_https",
+    "mode": "managed",
+    "type": "aws_security_group_rule",
+    "name": "lb_https",
+    "provider_name": "registry.terraform.io/hashicorp/aws",
+    "change": {
+     "actions": [
+      "create"
+     ],
+     "before": null,
+     "after": {
+      "type": "ingress",
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "tcp",
+      "cidr_blocks": [
+       "0.0.0.0/0"
+      ],
+      "ipv6_cidr_blocks": [],
+      "description": "HTTPS publico do balanceador"
+     },
+     "after_unknown": {
+      "id": true,
+      "security_group_id": true
+     },
+     "after_sensitive": {}
+    },
+    "esperado": [],
+    "status_esperado": "aprovado"
+   },
+   {
+    "address": "aws_instance.app_notas",
+    "mode": "managed",
+    "type": "aws_instance",
+    "name": "app_notas",
+    "provider_name": "registry.terraform.io/hashicorp/aws",
+    "change": {
+     "actions": [
+      "create"
+     ],
+     "before": null,
+     "after": {
+      "ami": "ami-0abc1234def567890",
+      "instance_type": "t3.medium",
+      "metadata_options": [
+       {
+        "http_tokens": "required"
+       }
+      ],
+      "root_block_device": [
+       {
+        "encrypted": false,
+        "volume_size": 30,
+        "volume_type": "gp3"
+       }
+      ],
+      "tags": {
+       "Name": "app-notas",
+       "dono": "fiscal"
+      }
+     },
+     "after_unknown": {
+      "id": true,
+      "arn": true
+     },
+     "after_sensitive": {}
+    },
+    "esperado": [
+     "sem_criptografia"
+    ],
+    "status_esperado": "bloqueado"
+   },
+   {
+    "address": "aws_db_instance.notas",
+    "mode": "managed",
+    "type": "aws_db_instance",
+    "name": "notas",
+    "provider_name": "registry.terraform.io/hashicorp/aws",
+    "change": {
+     "actions": [
+      "create"
+     ],
+     "before": null,
+     "after": {
+      "identifier": "ipe-notas-prod",
+      "engine": "postgres",
+      "engine_version": "16.4",
+      "instance_class": "db.t4g.medium",
+      "username": "app_notas",
+      "password": "Notas@2026!",
+      "storage_encrypted": false,
+      "publicly_accessible": false,
+      "backup_retention_period": 7
+     },
+     "after_unknown": {
+      "id": true,
+      "arn": true
+     },
+     "after_sensitive": {
+      "password": true
+     }
+    },
+    "esperado": [
+     "sem_criptografia",
+     "segredo_no_codigo"
+    ],
+    "status_esperado": "bloqueado"
+   },
+   {
+    "address": "aws_cloudtrail.principal",
+    "mode": "managed",
+    "type": "aws_cloudtrail",
+    "name": "principal",
+    "provider_name": "registry.terraform.io/hashicorp/aws",
+    "change": {
+     "actions": [
+      "update"
+     ],
+     "before": {
+      "name": "ipe-trilha-principal",
+      "s3_bucket_name": "ipe-trilha-auditoria",
+      "is_multi_region_trail": true,
+      "enable_logging": true,
+      "enable_log_file_validation": true
+     },
+     "after": {
+      "name": "ipe-trilha-principal",
+      "s3_bucket_name": "ipe-trilha-auditoria",
+      "is_multi_region_trail": true,
+      "enable_logging": false,
+      "enable_log_file_validation": true
+     },
+     "after_unknown": {},
+     "after_sensitive": {}
+    },
+    "esperado": [
+     "log_desligado"
+    ],
+    "status_esperado": "bloqueado"
+   },
+   {
+    "address": "aws_lb.notas",
+    "mode": "managed",
+    "type": "aws_lb",
+    "name": "notas",
+    "provider_name": "registry.terraform.io/hashicorp/aws",
+    "change": {
+     "actions": [
+      "create"
+     ],
+     "before": null,
+     "after": {
+      "name": "lb-notas",
+      "internal": false,
+      "load_balancer_type": "application",
+      "drop_invalid_header_fields": true,
+      "access_logs": [
+       {
+        "enabled": false,
+        "bucket": "",
+        "prefix": ""
+       }
+      ]
+     },
+     "after_unknown": {
+      "id": true,
+      "arn": true
+     },
+     "after_sensitive": {}
+    },
+    "esperado": [
+     "log_desligado"
+    ],
+    "status_esperado": "bloqueado"
+   },
+   {
+    "address": "aws_ebs_volume.backup_notas",
+    "mode": "managed",
+    "type": "aws_ebs_volume",
+    "name": "backup_notas",
+    "provider_name": "registry.terraform.io/hashicorp/aws",
+    "change": {
+     "actions": [
+      "create"
+     ],
+     "before": null,
+     "after": {
+      "availability_zone": "sa-east-1a",
+      "size": 100,
+      "type": "gp3",
+      "encrypted": true,
+      "kms_key_id": "arn:aws:kms:sa-east-1:111122223333:alias/ipe-dados"
+     },
+     "after_unknown": {
+      "id": true,
+      "arn": true
+     },
+     "after_sensitive": {}
+    },
+    "esperado": [],
+    "status_esperado": "aprovado"
+   },
+   {
+    "address": "aws_security_group.legado_ftp",
+    "mode": "managed",
+    "type": "aws_security_group",
+    "name": "legado_ftp",
+    "provider_name": "registry.terraform.io/hashicorp/aws",
+    "change": {
+     "actions": [
+      "delete"
+     ],
+     "before": {
+      "name": "legado-ftp",
+      "vpc_id": "vpc-0a12b34c",
+      "ingress": [
+       {
+        "description": "FTP de fornecedor antigo",
+        "from_port": 21,
+        "to_port": 21,
+        "protocol": "tcp",
+        "cidr_blocks": [
+         "0.0.0.0/0"
+        ],
+        "ipv6_cidr_blocks": []
+       }
+      ]
+     },
+     "after": null,
+     "after_unknown": {},
+     "after_sensitive": {}
+    },
+    "esperado": [],
+    "status_esperado": "aprovado"
+   }
+  ],
+  "configuration": {
+   "root_module": {
+    "resources": [
+     {
+      "address": "aws_s3_bucket_public_access_block.notas_fiscais",
+      "mode": "managed",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "notas_fiscais",
+      "expressions": {
+       "bucket": {
+        "references": [
+         "aws_s3_bucket.notas_fiscais.id",
+         "aws_s3_bucket.notas_fiscais"
+        ]
+       },
+       "block_public_policy": {
+        "constant_value": false
+       }
+      }
+     },
+     {
+      "address": "aws_db_instance.notas",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "name": "notas",
+      "expressions": {
+       "username": {
+        "constant_value": "app_notas"
+       },
+       "password": {
+        "constant_value": "Notas@2026!"
+       },
+       "storage_encrypted": {
+        "constant_value": false
+       }
+      }
+     },
+     {
+      "address": "aws_ebs_volume.backup_notas",
+      "mode": "managed",
+      "type": "aws_ebs_volume",
+      "name": "backup_notas",
+      "expressions": {
+       "kms_key_id": {
+        "references": [
+         "data.aws_kms_alias.ipe_dados.target_key_arn",
+         "data.aws_kms_alias.ipe_dados"
+        ]
+       }
+      }
+     }
+    ]
+   }
+  }
+ },
+ "hcl": {
+  "aws_s3_bucket.notas_fiscais": "resource \"aws_s3_bucket\" \"notas_fiscais\" {\n  bucket = \"ipe-notas-fiscais-prod\"\n  tags = {\n    dados = \"confidencial\"\n    dono  = \"fiscal\"\n  }\n}",
+  "aws_s3_bucket_public_access_block.notas_fiscais": "resource \"aws_s3_bucket_public_access_block\" \"notas_fiscais\" {\n  bucket                  = aws_s3_bucket.notas_fiscais.id\n  block_public_acls       = true\n  block_public_policy     = false  # o app de conciliação lê por URL pública (provisório)\n  ignore_public_acls      = true\n  restrict_public_buckets = false\n}",
+  "aws_s3_bucket_server_side_encryption_configuration.notas_fiscais": "resource \"aws_s3_bucket_server_side_encryption_configuration\" \"notas_fiscais\" {\n  bucket = aws_s3_bucket.notas_fiscais.id\n  rule {\n    apply_server_side_encryption_by_default {\n      sse_algorithm = \"AES256\"   # chave do provedor, não a chave KMS da empresa\n    }\n  }\n}",
+  "aws_s3_bucket_public_access_block.vitrine_imagens": "resource \"aws_s3_bucket_public_access_block\" \"vitrine_imagens\" {\n  bucket                  = aws_s3_bucket.vitrine.id\n  block_public_acls       = false  # era true: imagens de produto servidas direto do bucket\n  block_public_policy     = false  # era true\n  ignore_public_acls      = false  # era true\n  restrict_public_buckets = false  # era true\n}",
+  "aws_security_group.app_notas": "resource \"aws_security_group\" \"app_notas\" {\n  name   = \"app-notas\"\n  vpc_id = module.rede.vpc_id\n\n  ingress {\n    description = \"HTTPS do balanceador\"\n    from_port   = 443\n    to_port     = 443\n    protocol    = \"tcp\"\n    cidr_blocks = [\"10.20.0.0/16\"]\n  }\n  ingress {\n    description = \"SSH temporario para depurar o deploy\"\n    from_port   = 22\n    to_port     = 22\n    protocol    = \"tcp\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n  egress {\n    from_port   = 0\n    to_port     = 0\n    protocol    = \"-1\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n}",
+  "aws_security_group_rule.lb_https": "resource \"aws_security_group_rule\" \"lb_https\" {\n  type              = \"ingress\"\n  description       = \"HTTPS publico do balanceador\"\n  from_port         = 443\n  to_port           = 443\n  protocol          = \"tcp\"\n  cidr_blocks       = [\"0.0.0.0/0\"]\n  security_group_id = aws_security_group.lb_notas.id\n}",
+  "aws_instance.app_notas": "resource \"aws_instance\" \"app_notas\" {\n  ami           = data.aws_ami.base_ipe.id\n  instance_type = \"t3.medium\"\n\n  metadata_options {\n    http_tokens = \"required\"   # IMDSv2, como no Estudo 21\n  }\n  root_block_device {\n    volume_size = 30\n    volume_type = \"gp3\"\n    encrypted   = false\n  }\n  tags = { Name = \"app-notas\", dono = \"fiscal\" }\n}",
+  "aws_db_instance.notas": "resource \"aws_db_instance\" \"notas\" {\n  identifier          = \"ipe-notas-prod\"\n  engine              = \"postgres\"\n  engine_version      = \"16.4\"\n  instance_class      = \"db.t4g.medium\"\n  username            = \"app_notas\"\n  password            = \"Notas@2026!\"   # \"depois a gente troca\"\n  storage_encrypted   = false\n  publicly_accessible = false\n  backup_retention_period = 7\n}",
+  "aws_cloudtrail.principal": "resource \"aws_cloudtrail\" \"principal\" {\n  name                       = \"ipe-trilha-principal\"\n  s3_bucket_name             = \"ipe-trilha-auditoria\"\n  is_multi_region_trail      = true\n  enable_logging             = false   # era true: \"reduzir custo no fim do mês\"\n  enable_log_file_validation = true\n}",
+  "aws_lb.notas": "resource \"aws_lb\" \"notas\" {\n  name                       = \"lb-notas\"\n  internal                   = false\n  load_balancer_type         = \"application\"\n  drop_invalid_header_fields = true\n\n  access_logs {\n    bucket  = \"\"\n    enabled = false\n  }\n}",
+  "aws_ebs_volume.backup_notas": "resource \"aws_ebs_volume\" \"backup_notas\" {\n  availability_zone = \"sa-east-1a\"\n  size              = 100\n  type              = \"gp3\"\n  encrypted         = true\n  kms_key_id        = data.aws_kms_alias.ipe_dados.target_key_arn\n}",
+  "aws_security_group.legado_ftp": "# bloco APAGADO do código neste pull request:\n- resource \"aws_security_group\" \"legado_ftp\" {\n-   name = \"legado-ftp\"\n-   ingress {\n-     from_port   = 21\n-     to_port     = 21\n-     protocol    = \"tcp\"\n-     cidr_blocks = [\"0.0.0.0/0\"]\n-   }\n- }"
+ },
+ "excecoes": [
+  {
+   "id": "EXC-014",
+   "politica": "bucket_publico",
+   "address": "aws_s3_bucket_public_access_block.vitrine_imagens",
+   "responsavel": "Marina Costa (time Vitrine)",
+   "criada": "2026-10-01",
+   "expira": "2026-12-15",
+   "motivo": "Imagens de produto servidas direto do bucket até a migração para CDN com acesso de origem controlado.",
+   "motivos_esperados": []
+  },
+  {
+   "id": "EXC-009",
+   "politica": "log_desligado",
+   "address": "aws_lb.notas",
+   "responsavel": "Rafael Lima (Plataforma)",
+   "criada": "2026-08-01",
+   "expira": "2026-10-15",
+   "motivo": "Logs do balanceador desligados enquanto o bucket de logs não tinha regra de ciclo de vida.",
+   "motivos_esperados": [
+    "vencida"
+   ]
+  },
+  {
+   "id": "EXC-021",
+   "politica": "porta_admin_aberta",
+   "address": "aws_security_group.app_notas",
+   "responsavel": "",
+   "criada": "2026-11-01",
+   "expira": "2027-03-01",
+   "motivo": "SSH para depurar o deploy.",
+   "motivos_esperados": [
+    "sem responsável",
+    "prazo acima do máximo"
+   ]
+  }
+ ],
+ "casos": [
+  {
+   "nome": "Todas as portas (protocolo -1) para a internet",
+   "type": "aws_security_group",
+   "after": {
+    "ingress": [
+     {
+      "description": "tudo",
+      "from_port": 0,
+      "to_port": 0,
+      "protocol": "-1",
+      "cidr_blocks": [
+       "0.0.0.0/0"
+      ],
+      "ipv6_cidr_blocks": []
+     }
+    ]
+   },
+   "esperado": [
+    "porta_admin_aberta"
+   ]
+  },
+  {
+   "nome": "Faixa 20-25 inclui o SSH sem citá-lo",
+   "type": "aws_security_group_rule",
+   "after": {
+    "type": "ingress",
+    "from_port": 20,
+    "to_port": 25,
+    "protocol": "tcp",
+    "cidr_blocks": [
+     "0.0.0.0/0"
+    ]
+   },
+   "esperado": [
+    "porta_admin_aberta"
+   ]
+  },
+  {
+   "nome": "RDP aberto por IPv6 (::/0)",
+   "type": "aws_security_group",
+   "after": {
+    "ingress": [
+     {
+      "description": "rdp",
+      "from_port": 3389,
+      "to_port": 3389,
+      "protocol": "tcp",
+      "cidr_blocks": [],
+      "ipv6_cidr_blocks": [
+       "::/0"
+      ]
+     }
+    ]
+   },
+   "esperado": [
+    "porta_admin_aberta"
+   ]
+  },
+  {
+   "nome": "SSH só da rede interna",
+   "type": "aws_security_group",
+   "after": {
+    "ingress": [
+     {
+      "description": "ssh interno",
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "tcp",
+      "cidr_blocks": [
+       "10.0.0.0/8"
+      ],
+      "ipv6_cidr_blocks": []
+     }
+    ]
+   },
+   "esperado": []
+  },
+  {
+   "nome": "Regra de saída não é entrada",
+   "type": "aws_security_group_rule",
+   "after": {
+    "type": "egress",
+    "from_port": 22,
+    "to_port": 22,
+    "protocol": "tcp",
+    "cidr_blocks": [
+     "0.0.0.0/0"
+    ]
+   },
+   "esperado": []
+  },
+  {
+   "nome": "Volume sem o campo encrypted",
+   "type": "aws_ebs_volume",
+   "after": {
+    "size": 20
+   },
+   "esperado": [
+    "sem_criptografia"
+   ]
+  },
+  {
+   "nome": "Substituição (delete e create) também é avaliada",
+   "type": "aws_ebs_volume",
+   "actions": [
+    "delete",
+    "create"
+   ],
+   "after": {
+    "size": 20,
+    "encrypted": false
+   },
+   "esperado": [
+    "sem_criptografia"
+   ]
+  },
+  {
+   "nome": "Trilha ligada, mas sem validação de integridade",
+   "type": "aws_cloudtrail",
+   "after": {
+    "enable_logging": true
+   },
+   "esperado": [
+    "log_desligado"
+   ]
+  },
+  {
+   "nome": "Balanceador sem bloco access_logs",
+   "type": "aws_lb",
+   "after": {
+    "name": "lb"
+   },
+   "esperado": [
+    "log_desligado"
+   ]
+  },
+  {
+   "nome": "ACL public-read",
+   "type": "aws_s3_bucket_acl",
+   "after": {
+    "acl": "public-read"
+   },
+   "esperado": [
+    "bucket_publico"
+   ]
+  },
+  {
+   "nome": "Apagar uma ACL pública não é bloqueado",
+   "type": "aws_s3_bucket_acl",
+   "actions": [
+    "delete"
+   ],
+   "after": null,
+   "esperado": []
+  },
+  {
+   "nome": "Senha vinda de random_password: não é literal (mas vai para o state)",
+   "type": "aws_db_instance",
+   "after": {
+    "storage_encrypted": true
+   },
+   "expressions": {
+    "password": {
+     "references": [
+      "random_password.pedidos.result",
+      "random_password.pedidos"
+     ]
+    }
+   },
+   "esperado": []
+  },
+  {
+   "nome": "Senha literal e banco sem criptografia",
+   "type": "aws_db_instance",
+   "after": {
+    "storage_encrypted": false
+   },
+   "expressions": {
+    "password": {
+     "constant_value": "trocar123"
+    }
+   },
+   "esperado": [
+    "sem_criptografia",
+    "segredo_no_codigo"
+   ]
+  }
+ ],
+ "state": {
+  "version": 4,
+  "terraform_version": "1.9.5",
+  "serial": 212,
+  "lineage": "3f6b1c9e-0d2a-4b7e-9c1f-5a8e2d4b6c70",
+  "resources": [
+   {
+    "mode": "managed",
+    "type": "random_password",
+    "name": "pedidos",
+    "provider": "provider[\"registry.terraform.io/hashicorp/random\"]",
+    "instances": [
+     {
+      "attributes": {
+       "length": 24,
+       "special": true,
+       "result": "q7#Lm2!vR9zT4wXp8@Kd3sNe"
+      },
+      "sensitive_attributes": [
+       [
+        {
+         "type": "get_attr",
+         "value": "result"
+        }
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "mode": "managed",
+    "type": "aws_db_instance",
+    "name": "pedidos",
+    "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+    "instances": [
+     {
+      "attributes": {
+       "identifier": "ipe-pedidos-prod",
+       "engine": "postgres",
+       "username": "app_pedidos",
+       "password": "q7#Lm2!vR9zT4wXp8@Kd3sNe",
+       "storage_encrypted": true,
+       "manage_master_user_password": null
+      },
+      "sensitive_attributes": [
+       [
+        {
+         "type": "get_attr",
+         "value": "password"
+        }
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "mode": "managed",
+    "type": "aws_iam_access_key",
+    "name": "integracao_sefaz",
+    "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+    "instances": [
+     {
+      "attributes": {
+       "id": "CHAVE-FICTICIA-SEFAZ-01",
+       "user": "svc-integracao-sefaz",
+       "secret": "exemplo-ficticio/nao-e-chave-real/7Hq2",
+       "status": "Active"
+      },
+      "sensitive_attributes": [
+       [
+        {
+         "type": "get_attr",
+         "value": "secret"
+        }
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "mode": "managed",
+    "type": "aws_s3_bucket",
+    "name": "vitrine",
+    "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+    "instances": [
+     {
+      "attributes": {
+       "bucket": "ipe-vitrine-imagens",
+       "tags": {
+        "centro_custo": "CC-110",
+        "dono": "vitrine"
+       }
+      },
+      "sensitive_attributes": []
+     }
+    ]
+   }
+  ]
+ },
+ "backend": {
+  "inicial": [
+   "remoto"
+  ],
+  "remove_do_state": [
+   "random_password.pedidos",
+   "aws_db_instance.pedidos:password"
+  ],
+  "acrescenta": {
+   "aws_db_instance.pedidos": {
+    "manage_master_user_password": true,
+    "master_user_secret": [
+     {
+      "secret_arn": "arn:aws:secretsmanager:sa-east-1:111122223333:secret:rds-ipe-pedidos-exemplo",
+      "secret_status": "active"
+     }
+    ]
+   }
+  },
+  "opcoes": [
+   {
+    "id": "remoto",
+    "rotulo": "State em backend remoto (bucket S3 dedicado), não no notebook de quem rodou o apply",
+    "risco": "State local: some com o notebook, cada pessoa tem uma versão diferente e a cópia vai parar em backup pessoal e em anexo de chamado."
+   },
+   {
+    "id": "criptografia",
+    "depende": "remoto",
+    "rotulo": "encrypt = true com chave KMS própria (kms_key_id)",
+    "risco": "State sem criptografia com chave da empresa: quem copia o objeto lê senhas e chaves em claro, sem trilha de uso da chave."
+   },
+   {
+    "id": "bloqueio",
+    "depende": "remoto",
+    "rotulo": "Bloqueio do state (use_lockfile no S3; antes, tabela DynamoDB)",
+    "risco": "Sem bloqueio, dois applies ao mesmo tempo (pipeline e alguém no terminal) gravam por cima um do outro e corrompem o state."
+   },
+   {
+    "id": "versionamento",
+    "depende": "remoto",
+    "rotulo": "Versionamento ligado no bucket do state",
+    "risco": "Sem versionamento, um state corrompido ou apagado não volta; reconstruir com terraform import recurso a recurso leva dias."
+   },
+   {
+    "id": "acesso",
+    "depende": "remoto",
+    "rotulo": "Bucket do state acessível só à role do pipeline e ao acesso de emergência",
+    "risco": "Qualquer desenvolvedor com leitura no bucket lê os segredos do state; ler o state equivale a ler o cofre."
+   },
+   {
+    "id": "gitignore",
+    "rotulo": "*.tfstate, *.tfplan e .terraform/ no .gitignore e barrados pela varredura de segredos",
+    "risco": "Um terraform.tfstate commitado por engano fica no histórico do Git para sempre, mesmo apagado depois."
+   },
+   {
+    "id": "segredo_fora",
+    "rotulo": "Senha do banco gerida pelo provedor (manage_master_user_password = true)",
+    "risco": "Senha do banco em random_password ou literal: o valor fica em claro no state, e sensitive = true só esconde da tela."
+   }
+  ]
+ },
+ "drift": {
+  "comando": "terraform plan -refresh-only",
+  "recursos": [
+   {
+    "address": "aws_security_group.app_pedidos",
+    "type": "aws_security_group",
+    "origem": "Console AWS, 28/10 22:14, usuário suporte.fornecedor: \"liberar acesso remoto para o suporte\"",
+    "codigo": {
+     "name": "app-pedidos",
+     "ingress": [
+      {
+       "description": "HTTPS do balanceador",
+       "from_port": 443,
+       "to_port": 443,
+       "protocol": "tcp",
+       "cidr_blocks": [
+        "10.20.0.0/16"
+       ],
+       "ipv6_cidr_blocks": []
+      }
+     ]
+    },
+    "real": {
+     "name": "app-pedidos",
+     "ingress": [
+      {
+       "description": "HTTPS do balanceador",
+       "from_port": 443,
+       "to_port": 443,
+       "protocol": "tcp",
+       "cidr_blocks": [
+        "10.20.0.0/16"
+       ],
+       "ipv6_cidr_blocks": []
+      },
+      {
+       "description": "suporte remoto",
+       "from_port": 3389,
+       "to_port": 3389,
+       "protocol": "tcp",
+       "cidr_blocks": [
+        "0.0.0.0/0"
+       ],
+       "ipv6_cidr_blocks": []
+      }
+     ]
+    },
+    "recomendado": "reverter",
+    "esperado": {
+     "atributos": [
+      "ingress"
+     ],
+     "risco": [
+      "porta_admin_aberta"
+     ]
+    }
+   },
+   {
+    "address": "aws_s3_bucket_public_access_block.relatorios",
+    "type": "aws_s3_bucket_public_access_block",
+    "origem": "Console AWS, 30/10 09:02, analista de BI: \"compartilhar um relatório com o parceiro\"",
+    "codigo": {
+     "bucket": "ipe-relatorios-bi",
+     "block_public_acls": true,
+     "block_public_policy": true,
+     "ignore_public_acls": true,
+     "restrict_public_buckets": true
+    },
+    "real": {
+     "bucket": "ipe-relatorios-bi",
+     "block_public_acls": true,
+     "block_public_policy": false,
+     "ignore_public_acls": true,
+     "restrict_public_buckets": false
+    },
+    "recomendado": "reverter",
+    "esperado": {
+     "atributos": [
+      "block_public_policy",
+      "restrict_public_buckets"
+     ],
+     "risco": [
+      "bucket_publico"
+     ]
+    }
+   },
+   {
+    "address": "aws_instance.app_pedidos",
+    "type": "aws_instance",
+    "origem": "Console AWS, 31/10 18:40, plantão da Black Friday: instância aumentada por falta de CPU",
+    "codigo": {
+     "instance_type": "t3.medium",
+     "root_block_device": [
+      {
+       "encrypted": true,
+       "volume_size": 30
+      }
+     ]
+    },
+    "real": {
+     "instance_type": "t3.large",
+     "root_block_device": [
+      {
+       "encrypted": true,
+       "volume_size": 30
+      }
+     ]
+    },
+    "recomendado": "incorporar",
+    "esperado": {
+     "atributos": [
+      "instance_type"
+     ],
+     "risco": []
+    }
+   },
+   {
+    "address": "aws_s3_bucket.vitrine",
+    "type": "aws_s3_bucket",
+    "origem": "Console AWS, 20/10, financeiro reclassificou o centro de custo",
+    "codigo": {
+     "bucket": "ipe-vitrine-imagens",
+     "tags": {
+      "centro_custo": "CC-110",
+      "dono": "vitrine"
+     }
+    },
+    "real": {
+     "bucket": "ipe-vitrine-imagens",
+     "tags": {
+      "centro_custo": "CC-145",
+      "dono": "vitrine"
+     }
+    },
+    "recomendado": "incorporar",
+    "esperado": {
+     "atributos": [
+      "tags"
+     ],
+     "risco": []
+    }
+   }
+  ],
+  "nao_gerenciados": [
+   {
+    "nome": "sg-0f1e2d3c4b5a69788 (teste-rdp-rapido)",
+    "tipo": "aws_security_group",
+    "detalhe": "3389 aberto para 0.0.0.0/0, criado no console e fora do state. O plan não o vê, porque o Terraform só compara o que ele gerencia; quem acha é o inventário ou o CSPM do Estudo 21."
+   }
+  ]
+ }
+}
+</script>
+
+<script>
+(function() {
+    var D = JSON.parse(document.getElementById("iac-dados").textContent);
+    var FLAGS_PAB = ["block_public_acls", "block_public_policy", "ignore_public_acls", "restrict_public_buckets"];
+    var ABERTOS = ["0.0.0.0/0", "::/0"];
+    var ACOES = { create: "+", update: "~", "delete": "−", "no-op": "·" };
+    var estado = { plano: null, ativas: {}, excecoes: [], selecionado: null, corrigidos: [], backend: [], drift: {} };
+
+    function $(id) { return document.getElementById(id); }
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function has(o, k) { return o !== null && typeof o === "object" && Object.prototype.hasOwnProperty.call(o, k); }
+    function copia(o) { return JSON.parse(JSON.stringify(o)); }
+    function igual(a, b) {
+        if (a === b) return true;
+        if (a === null || b === null || typeof a !== "object" || typeof b !== "object") return false;
+        if (Array.isArray(a) !== Array.isArray(b)) return false;
+        var ka = Object.keys(a), kb = Object.keys(b);
+        if (ka.length !== kb.length) return false;
+        return ka.every(function(k) { return has(b, k) && igual(a[k], b[k]); });
+    }
+    function titulo(pid) { return D.politicas.regras[pid].titulo; }
+
+    // ================================================ políticas (espelhadas nos testes)
+    function expressoes(plano, address) {
+        var rs = ((plano.configuration || {}).root_module || {}).resources || [];
+        for (var i = 0; i < rs.length; i++) if (rs[i].address === address) return rs[i].expressions || {};
+        return {};
+    }
+
+    window.portaAdminAberta = function(r) {
+        var abertos = (r.cidr_blocks || []).concat(r.ipv6_cidr_blocks || []).filter(function(c) { return ABERTOS.indexOf(c) !== -1; });
+        if (!abertos.length) return null;
+        var todas = r.protocol === "-1" || r.protocol === "all";
+        var portas = D.portas_admin.filter(function(p) { return todas || (r.from_port <= p && p <= r.to_port); });
+        if (!portas.length) return null;
+        return "ingress " + portas.join("/") + " de " + abertos[0];
+    };
+
+    window.violacoesRecurso = function(rc, expr) {
+        var ev = {};
+        function add(pid, texto) { (ev[pid] = ev[pid] || []).push(texto); }
+        var acoes = rc.change.actions;
+        if (!acoes.some(function(a) { return a === "create" || a === "update"; })) return {};
+        var a = rc.change.after || {}, t = rc.type;
+        if (t === "aws_s3_bucket_public_access_block") {
+            FLAGS_PAB.forEach(function(k) { if (a[k] !== true) add("bucket_publico", k + " = false"); });
+        }
+        if (t === "aws_s3_bucket_acl" && (a.acl === "public-read" || a.acl === "public-read-write")) add("bucket_publico", "acl = " + a.acl);
+        var regras = [];
+        if (t === "aws_security_group") regras = a.ingress || [];
+        else if (t === "aws_security_group_rule" && a.type === "ingress") regras = [a];
+        regras.forEach(function(r) { var x = window.portaAdminAberta(r); if (x) add("porta_admin_aberta", x); });
+        if (t === "aws_ebs_volume" && a.encrypted !== true) add("sem_criptografia", "encrypted = false");
+        if (t === "aws_instance") (a.root_block_device || []).forEach(function(b) { if (b.encrypted !== true) add("sem_criptografia", "root_block_device.encrypted = false"); });
+        if (t === "aws_db_instance" && a.storage_encrypted !== true) add("sem_criptografia", "storage_encrypted = false");
+        if (t === "aws_s3_bucket_server_side_encryption_configuration") {
+            (a.rule || []).forEach(function(r) {
+                (r.apply_server_side_encryption_by_default || []).forEach(function(x) {
+                    if (x.sse_algorithm !== "aws:kms") add("sem_criptografia", "sse_algorithm = " + x.sse_algorithm + " (exige aws:kms)");
+                });
+            });
+        }
+        if (t === "aws_cloudtrail") {
+            if (a.enable_logging === false) add("log_desligado", "enable_logging = false");
+            if (a.enable_log_file_validation !== true) add("log_desligado", "enable_log_file_validation = false");
+        }
+        if (t === "aws_lb") {
+            var logs = a.access_logs || [];
+            if (!logs.length || logs[0].enabled !== true) add("log_desligado", "access_logs.enabled = false");
+        }
+        D.atributos_secretos.forEach(function(attr) {
+            if (has(expr[attr], "constant_value")) add("segredo_no_codigo", attr + " com valor literal no HCL");
+        });
+        var out = {};
+        D.politicas.ordem.forEach(function(pid) { if (has(ev, pid)) out[pid] = ev[pid]; });
+        return out;
+    };
+
+    function msDia(iso) { var p = iso.split("-"); return Date.UTC(+p[0], +p[1] - 1, +p[2]); }
+    function dias(a, b) { return Math.round((msDia(b) - msDia(a)) / 86400000); }
+    function somarDias(iso, n) { return new Date(msDia(iso) + n * 86400000).toISOString().slice(0, 10); }
+
+    window.motivosExcecao = function(exc) {
+        var m = [];
+        if (!(exc.responsavel || "").trim()) m.push("sem responsável");
+        if (dias(D.data_revisao, exc.expira) < 0) m.push("vencida");
+        if (dias(exc.criada, exc.expira) > D.prazo_max_dias) m.push("prazo acima do máximo");
+        return m;
+    };
+
+    window.avaliarPlano = function(plano, ativas, excecoes) {
+        var out = plano.resource_changes.map(function(rc) {
+            var v = window.violacoesRecurso(rc, expressoes(plano, rc.address)), itens = [];
+            D.politicas.ordem.forEach(function(pid) {
+                if (!has(v, pid) || ativas.indexOf(pid) === -1) return;
+                var exc = null;
+                excecoes.forEach(function(e) { if (!exc && e.politica === pid && e.address === rc.address) exc = e; });
+                itens.push({ politica: pid, evidencias: v[pid], excecao: exc ? exc.id : null, valida: !!exc && !window.motivosExcecao(exc).length });
+            });
+            var bloq = itens.filter(function(i) { return !i.valida; }).map(function(i) { return i.politica; });
+            return { address: rc.address, status: bloq.length ? "bloqueado" : (itens.length ? "excecao" : "aprovado"), bloqueios: bloq, itens: itens };
+        });
+        return { mudancas: out, aprovado: !out.some(function(m) { return m.status === "bloqueado"; }) };
+    };
+
+    window.corrigirPlano = function(plano, address, pid) {
+        var p = copia(plano), rc = null;
+        p.resource_changes.forEach(function(r) { if (r.address === address) rc = r; });
+        var a = rc.change.after || {}, t = rc.type;
+        if (pid === "bucket_publico") {
+            if (t === "aws_s3_bucket_public_access_block") FLAGS_PAB.forEach(function(k) { a[k] = true; });
+            if (t === "aws_s3_bucket_acl") a.acl = "private";
+        } else if (pid === "porta_admin_aberta") {
+            if (t === "aws_security_group") a.ingress = (a.ingress || []).filter(function(r) { return !window.portaAdminAberta(r); });
+            else if (t === "aws_security_group_rule") { a.cidr_blocks = [D.cidr_vpn]; a.ipv6_cidr_blocks = []; }
+        } else if (pid === "sem_criptografia") {
+            if (t === "aws_ebs_volume") a.encrypted = true;
+            if (t === "aws_instance") (a.root_block_device || []).forEach(function(b) { b.encrypted = true; });
+            if (t === "aws_db_instance") a.storage_encrypted = true;
+            if (t === "aws_s3_bucket_server_side_encryption_configuration") {
+                (a.rule || []).forEach(function(r) {
+                    (r.apply_server_side_encryption_by_default || []).forEach(function(x) { x.sse_algorithm = "aws:kms"; x.kms_master_key_id = D.chave_kms; });
+                });
+            }
+        } else if (pid === "log_desligado") {
+            if (t === "aws_cloudtrail") { a.enable_logging = true; a.enable_log_file_validation = true; }
+            if (t === "aws_lb") a.access_logs = [{ enabled: true, bucket: D.bucket_logs, prefix: "lb" }];
+        } else if (pid === "segredo_no_codigo") {
+            (((p.configuration || {}).root_module || {}).resources || []).forEach(function(r) {
+                if (r.address !== address) return;
+                D.atributos_secretos.forEach(function(attr) { if (r.expressions) delete r.expressions[attr]; });
+                if (t === "aws_db_instance") r.expressions.manage_master_user_password = { constant_value: true };
+            });
+            D.atributos_secretos.forEach(function(attr) { delete a[attr]; });
+            if (t === "aws_db_instance") a.manage_master_user_password = true;
+        }
+        return p;
+    };
+
+    // ================================================ state e backend (espelhados nos testes)
+    window.segredosNoState = function(state) {
+        var out = [];
+        state.resources.forEach(function(r) {
+            var addr = r.type + "." + r.name;
+            r.instances.forEach(function(inst) {
+                (inst.sensitive_attributes || []).forEach(function(c) {
+                    var attr = c[0].value;
+                    if (has(inst.attributes, attr)) out.push([addr, attr]);
+                });
+            });
+        });
+        return out;
+    };
+    window.stateVisivel = function(sel) {
+        var s = copia(D.state);
+        if (sel.indexOf("segredo_fora") === -1) return s;
+        var tira = D.backend.remove_do_state, acres = D.backend.acrescenta || {};
+        s.resources = s.resources.filter(function(r) { return tira.indexOf(r.type + "." + r.name) === -1; });
+        s.resources.forEach(function(r) {
+            var addr = r.type + "." + r.name;
+            r.instances.forEach(function(inst) {
+                tira.forEach(function(item) {
+                    if (item.indexOf(addr + ":") !== 0) return;
+                    var attr = item.slice(addr.length + 1);
+                    delete inst.attributes[attr];
+                    inst.sensitive_attributes = inst.sensitive_attributes.filter(function(c) { return c[0].value !== attr; });
+                });
+                if (has(acres, addr)) Object.keys(acres[addr]).forEach(function(k) { inst.attributes[k] = acres[addr][k]; });
+            });
+        });
+        return s;
+    };
+    window.riscosBackend = function(sel) {
+        return D.backend.opcoes.filter(function(o) {
+            return !(sel.indexOf(o.id) !== -1 && (!o.depende || sel.indexOf(o.depende) !== -1));
+        }).map(function(o) { return o.id; });
+    };
+
+    // ================================================ drift (espelhado nos testes)
+    window.detectarDrift = function(item) {
+        var chaves = Object.keys(item.codigo).concat(Object.keys(item.real).filter(function(k) { return !has(item.codigo, k); }));
+        return chaves.filter(function(k) { return !igual(has(item.codigo, k) ? item.codigo[k] : null, has(item.real, k) ? item.real[k] : null); });
+    };
+    window.riscoDrift = function(item) {
+        function v(after) { return window.violacoesRecurso({ address: item.address, type: item.type, change: { actions: ["update"], after: after } }, {}); }
+        var antes = v(item.codigo), depois = v(item.real);
+        return Object.keys(depois).filter(function(pid) { return !has(antes, pid); });
+    };
+    window.decidirDrift = function(item, escolha) {
+        if (escolha === "incorporar" && window.riscoDrift(item).length) return "bloqueado";
+        return escolha === item.recomendado ? "ok" : "aceitavel";
+    };
+
+    // ================================================ interface: fases 1 e 2
+    function rcPorEndereco(plano, address) {
+        var x = null;
+        plano.resource_changes.forEach(function(r) { if (r.address === address) x = r; });
+        return x;
+    }
+    function simboloAcoes(acoes) { return acoes.map(function(a) { return ACOES[a] || a; }).join(""); }
+    function ativasLista() { return D.politicas.ordem.filter(function(pid) { return estado.ativas[pid]; }); }
+
+    function montarRecursos() {
+        var box = $("iac-recursos");
+        box.replaceChildren();
+        D.plano.resource_changes.forEach(function(rc) {
+            var card = el("div", null, "display: flex; gap: 0.4rem; align-items: flex-start; min-width: 0; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.35rem 0.45rem;");
+            card.setAttribute("data-address", rc.address);
+            var cb = el("input");
+            cb.type = "checkbox";
+            cb.id = "iac-palpite-" + rc.address.replace(/[^\w-]/g, "-");
+            cb.setAttribute("aria-label", "Reprovaria " + rc.address);
+            cb.setAttribute("style", "margin-top: 0.2rem;");
+            var bt = el("button", null, "flex: 1 1 auto; min-width: 0; text-align: left; background: none; border: none; padding: 0; color: var(--ink); cursor: pointer; font: inherit; overflow-wrap: anywhere;");
+            bt.type = "button";
+            bt.setAttribute("aria-label", "Ver HCL e JSON de " + rc.address);
+            bt.appendChild(el("strong", simboloAcoes(rc.change.actions) + " ", "font-family: var(--font-mono, monospace); color: " + (rc.change.actions.indexOf("delete") !== -1 ? "var(--danger-color)" : (rc.change.actions.indexOf("update") !== -1 ? "var(--warning-color)" : "var(--tip-color)")) + ";"));
+            bt.appendChild(el("span", rc.address, "font-family: var(--font-mono, monospace); font-size: 0.74rem;"));
+            bt.addEventListener("click", function() { selecionar(rc.address); });
+            card.appendChild(cb);
+            card.appendChild(bt);
+            box.appendChild(card);
+        });
+    }
+
+    function selecionar(address) {
+        estado.selecionado = address;
+        var rc = rcPorEndereco(estado.plano, address);
+        $("iac-selecionado").textContent = "Selecionado: " + address + " (" + rc.change.actions.join(" e ") + ")";
+        $("iac-hcl").textContent = D.hcl[address];
+        var mostra = { address: rc.address, type: rc.type, change: rc.change };
+        $("iac-json").textContent = JSON.stringify(mostra, null, 2);
+        var box = $("iac-correcoes-aplicadas");
+        box.replaceChildren();
+        estado.corrigidos.filter(function(c) { return c[0] === address; }).forEach(function(c) {
+            box.appendChild(el("p", "✓ Correção aplicada ao plano (" + titulo(c[1]) + "): " + D.politicas.regras[c[1]].correcao, "margin: 0.2rem 0 0 0; color: var(--tip-color);"));
+        });
+        document.querySelectorAll("#iac-recursos [data-address]").forEach(function(c) {
+            c.style.borderColor = c.getAttribute("data-address") === address ? "var(--accent)" : "var(--rule)";
+        });
+    }
+
+    function montarPoliticas() {
+        var box = $("iac-politicas");
+        box.replaceChildren();
+        D.politicas.ordem.forEach(function(pid) {
+            var r = D.politicas.regras[pid];
+            var linha = el("div", null, "display: flex; gap: 0.4rem; align-items: flex-start; min-width: 0;");
+            var cb = el("input");
+            cb.type = "checkbox";
+            cb.id = "iac-pol-" + pid;
+            cb.setAttribute("style", "margin-top: 0.2rem;");
+            cb.addEventListener("change", function() { estado.ativas[pid] = cb.checked; atualizar(); });
+            var col = el("div", null, "min-width: 0; flex: 1 1 auto;");
+            var lb = el("label", null, "overflow-wrap: anywhere;");
+            lb.htmlFor = cb.id;
+            lb.appendChild(el("strong", r.titulo));
+            lb.appendChild(el("span", " — " + r.porque));
+            col.appendChild(lb);
+            col.appendChild(el("span", r.checkov, "display: block; font-size: 0.72rem; color: var(--muted);"));
+            var det = el("details", null, "margin-top: 0.2rem;");
+            det.appendChild(el("summary", "Ver a regra em Rego", "cursor: pointer; font-size: 0.74rem;"));
+            var pre = el("pre", r.rego, "max-width: 100%; box-sizing: border-box; overflow-x: auto; font-family: var(--font-mono, monospace); font-size: 0.68rem; background: var(--sunk); border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.4rem; margin: 0.3rem 0 0 0;");
+            pre.setAttribute("tabindex", "0");
+            pre.setAttribute("aria-label", "Regra Rego: " + r.titulo);
+            det.appendChild(pre);
+            col.appendChild(det);
+            linha.appendChild(cb);
+            linha.appendChild(col);
+            box.appendChild(linha);
+        });
+    }
+
+    function corDoStatus(s) { return s === "bloqueado" ? "var(--danger-color)" : (s === "excecao" ? "var(--warning-color)" : "var(--tip-color)"); }
+    function rotuloStatus(s) { return s === "bloqueado" ? "✗ reprovado" : (s === "excecao" ? "! aceito por exceção" : "✓ aprovado"); }
+
+    function atualizar() {
+        var ativas = ativasLista();
+        var r = window.avaliarPlano(estado.plano, ativas, estado.excecoes);
+        var ver = $("iac-veredito");
+        ver.replaceChildren();
+        var nb = r.mudancas.filter(function(m) { return m.status === "bloqueado"; }).length;
+        var ne = r.mudancas.filter(function(m) { return m.status === "excecao"; }).length;
+        ver.setAttribute("data-aprovado", r.aprovado ? "sim" : "nao");
+        ver.setAttribute("data-bloqueados", nb);
+        var txt = !ativas.length ? "Nenhuma política ativa: o plano passaria inteiro para o apply, com tudo o que tem dentro."
+            : (r.aprovado ? "✓ Plano aprovado com " + ativas.length + " política(s) ativa(s)" + (ne ? " (" + ne + " mudança(s) aceita(s) por exceção válida)." : ".")
+                : "✗ Plano reprovado: " + nb + " de " + r.mudancas.length + " mudanças violam política sem exceção válida. O merge fica bloqueado até corrigir.");
+        ver.appendChild(el("p", txt, "margin: 0; font-weight: 600; color: " + (!ativas.length ? "var(--warning-color)" : (r.aprovado ? "var(--tip-color)" : "var(--danger-color)")) + "; overflow-wrap: anywhere;"));
+
+        var box = $("iac-resultado");
+        box.replaceChildren();
+        r.mudancas.forEach(function(m) {
+            var rc = rcPorEndereco(estado.plano, m.address);
+            var card = el("div", null, "border: 1px solid var(--rule); border-left: 4px solid " + corDoStatus(m.status) + "; border-radius: var(--radius-sm); padding: 0.35rem 0.5rem; min-width: 0; overflow-wrap: anywhere;");
+            card.setAttribute("data-address", m.address);
+            card.setAttribute("data-status", m.status);
+            var cab = el("p", null, "margin: 0;");
+            cab.appendChild(el("strong", rotuloStatus(m.status) + " ", "color: " + corDoStatus(m.status) + ";"));
+            cab.appendChild(el("span", simboloAcoes(rc.change.actions) + " " + m.address, "font-family: var(--font-mono, monospace); font-size: 0.74rem;"));
+            card.appendChild(cab);
+            if (rc.change.actions.indexOf("delete") !== -1 && rc.change.actions.indexOf("create") === -1) {
+                card.appendChild(el("p", "Apagar não é avaliado: o change.after é nulo, e remover o que era inseguro é melhoria.", "margin: 0.2rem 0 0 0; color: var(--muted);"));
+            }
+            m.itens.forEach(function(i) {
+                var lin = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-top: 0.25rem;");
+                var t = titulo(i.politica) + ": " + i.evidencias.join("; ");
+                if (i.excecao) t += i.valida ? " — exceção " + i.excecao + " válida." : " — exceção " + i.excecao + " não vale (" + window.motivosExcecao(excecaoPorId(i.excecao)).join(", ") + ").";
+                lin.appendChild(el("span", t, "min-width: 0; flex: 1 1 14rem;"));
+                if (!i.valida) {
+                    var bt = el("button", "Corrigir");
+                    bt.className = "btn-secondary";
+                    bt.type = "button";
+                    bt.setAttribute("aria-label", "Corrigir " + titulo(i.politica) + " em " + m.address);
+                    bt.addEventListener("click", function() { window.corrigirIac(m.address, i.politica); });
+                    lin.appendChild(bt);
+                }
+                card.appendChild(lin);
+            });
+            box.appendChild(card);
+        });
+        montarExcecoes();
+        montarSelectExcecao(r);
+        return r;
+    }
+
+    function excecaoPorId(id) {
+        var x = null;
+        estado.excecoes.forEach(function(e) { if (e.id === id) x = e; });
+        return x;
+    }
+
+    function montarExcecoes() {
+        var box = $("iac-excecoes");
+        box.replaceChildren();
+        estado.excecoes.forEach(function(e) {
+            var mot = window.motivosExcecao(e), ok = !mot.length;
+            var card = el("div", null, "border: 1px solid var(--rule); border-left: 4px solid " + (ok ? "var(--warning-color)" : "var(--danger-color)") + "; border-radius: var(--radius-sm); padding: 0.35rem 0.5rem; min-width: 0; overflow-wrap: anywhere;");
+            card.setAttribute("data-excecao", e.id);
+            card.setAttribute("data-valida", ok ? "sim" : "nao");
+            card.appendChild(el("strong", e.id + " · " + (ok ? "válida" : "inválida: " + mot.join(", "))));
+            card.appendChild(el("p", titulo(e.politica) + " em " + e.address, "margin: 0.15rem 0 0 0; font-family: var(--font-mono, monospace); font-size: 0.7rem;"));
+            card.appendChild(el("p", "Responsável: " + (e.responsavel || "(ninguém)") + " · de " + e.criada + " a " + e.expira + " (" + dias(e.criada, e.expira) + " dias)", "margin: 0.15rem 0 0 0;"));
+            if (e.motivo) card.appendChild(el("p", e.motivo, "margin: 0.15rem 0 0 0; color: var(--muted);"));
+            box.appendChild(card);
+        });
+    }
+
+    function montarSelectExcecao(r) {
+        var sel = $("iac-exc-recurso"), antes = sel.value;
+        sel.replaceChildren();
+        r.mudancas.forEach(function(m) {
+            m.itens.forEach(function(i) {
+                if (i.valida) return;
+                var o = el("option", m.address + " — " + titulo(i.politica));
+                o.value = m.address + "|" + i.politica;
+                sel.appendChild(o);
+            });
+        });
+        if (!sel.options.length) { var o = el("option", "(nenhuma violação reprovando o plano)"); o.value = ""; sel.appendChild(o); }
+        if (antes) sel.value = antes;
+        if (sel.selectedIndex < 0) sel.selectedIndex = 0;
+    }
+
+    window.corrigirIac = function(address, pid) {
+        estado.plano = window.corrigirPlano(estado.plano, address, pid);
+        if (!estado.corrigidos.some(function(c) { return c[0] === address && c[1] === pid; })) estado.corrigidos.push([address, pid]);
+        selecionar(address);
+        return atualizar();
+    };
+    window.ativarTodasIac = function() {
+        D.politicas.ordem.forEach(function(pid) { estado.ativas[pid] = true; $("iac-pol-" + pid).checked = true; });
+        return atualizar();
+    };
+    window.restaurarPlanoIac = function() {
+        estado.plano = copia(D.plano);
+        estado.corrigidos = [];
+        estado.excecoes = copia(D.excecoes);
+        $("iac-exc-resultado").replaceChildren();
+        selecionar(estado.selecionado || D.plano.resource_changes[0].address);
+        return atualizar();
+    };
+    window.conferirPalpitesIac = function() {
+        var arriscados = D.plano.resource_changes.filter(function(rc) {
+            return Object.keys(window.violacoesRecurso(rc, expressoes(D.plano, rc.address))).length > 0;
+        }).map(function(rc) { return rc.address; });
+        var marcados = D.plano.resource_changes.filter(function(rc) {
+            return $("iac-palpite-" + rc.address.replace(/[^\w-]/g, "-")).checked;
+        }).map(function(rc) { return rc.address; });
+        var acertos = marcados.filter(function(a) { return arriscados.indexOf(a) !== -1; });
+        var faltaram = arriscados.filter(function(a) { return marcados.indexOf(a) === -1; });
+        var aToa = marcados.filter(function(a) { return arriscados.indexOf(a) === -1; });
+        var box = $("iac-palpites-resultado");
+        box.replaceChildren();
+        var ok = !faltaram.length && !aToa.length;
+        box.setAttribute("data-acertos", acertos.length);
+        box.appendChild(el("p", (ok ? "✓ " : "") + "Você marcou " + acertos.length + " de " + arriscados.length + " mudanças que violam alguma política." + (aToa.length ? " Marcou " + aToa.length + " que nenhuma política reprova." : ""), "margin: 0; font-weight: 600; color: " + (ok ? "var(--tip-color)" : "var(--ink)") + ";"));
+        if (faltaram.length) box.appendChild(el("p", "Faltaram: " + faltaram.join(", "), "margin: 0.2rem 0 0 0; color: var(--danger-color);"));
+        if (aToa.length) box.appendChild(el("p", "Sem violação: " + aToa.join(", ") + ". Porta 443 aberta para a internet num balanceador é esperado; volume com KMS está certo; e apagar o grupo de FTP é melhoria.", "margin: 0.2rem 0 0 0; color: var(--warning-color);"));
+        return { acertos: acertos, faltaram: faltaram, aToa: aToa };
+    };
+    window.registrarExcecaoIac = function() {
+        var box = $("iac-exc-resultado");
+        box.replaceChildren();
+        var v = $("iac-exc-recurso").value;
+        if (!v) { box.appendChild(el("p", "Não há violação reprovando o plano agora.", "margin: 0;")); return null; }
+        var partes = v.split("|"), prazo = parseInt($("iac-exc-prazo").value, 10);
+        var exc = { id: "EXC-" + (100 + estado.excecoes.length), politica: partes[1], address: partes[0],
+            responsavel: $("iac-exc-responsavel").value, criada: D.data_revisao, expira: somarDias(D.data_revisao, prazo),
+            motivo: "Pedida no laboratório." };
+        var mot = window.motivosExcecao(exc);
+        if (mot.length) {
+            box.appendChild(el("p", "✗ Exceção recusada: " + mot.join(", ") + ". Toda exceção precisa de um responsável pelo risco e de prazo de no máximo " + D.prazo_max_dias + " dias.", "margin: 0; color: var(--danger-color); font-weight: 600;"));
+            return { registrada: false, motivos: mot };
+        }
+        estado.excecoes = estado.excecoes.filter(function(e) { return !(e.politica === exc.politica && e.address === exc.address); });
+        estado.excecoes.push(exc);
+        box.appendChild(el("p", "✓ " + exc.id + " registrada até " + exc.expira + " para " + exc.responsavel.trim() + ". A mudança passa, mas o risco continua existindo: ao vencer, o plano volta a ser reprovado.", "margin: 0; color: var(--warning-color); font-weight: 600;"));
+        atualizar();
+        return { registrada: true, motivos: [] };
+    };
+
+    // ================================================ interface: fase 3
+    function hclBackend(sel) {
+        var tem = function(id) { return window.riscosBackend(sel).indexOf(id) === -1; };
+        var l = ["terraform {"];
+        if (sel.indexOf("remoto") === -1) {
+            l.push("  backend \"local\" {", "    path = \"terraform.tfstate\"   # no notebook de quem rodou o apply", "  }");
+        } else {
+            l.push("  backend \"s3\" {", "    bucket       = \"ipe-terraform-state-prod\"", "    key          = \"loja/prod/terraform.tfstate\"", "    region       = \"sa-east-1\"");
+            if (tem("criptografia")) l.push("    encrypt      = true", "    kms_key_id   = \"alias/ipe-terraform-state\"");
+            if (tem("bloqueio")) l.push("    use_lockfile = true");
+            l.push("  }");
+        }
+        l.push("}");
+        if (tem("versionamento")) l.push("# bucket do state: versionamento ligado");
+        if (tem("acesso")) l.push("# política do bucket: só a role ipe-terraform-apply e o acesso de emergência");
+        if (tem("gitignore")) l.push("# .gitignore: *.tfstate  *.tfstate.*  *.tfplan  .terraform/");
+        if (tem("segredo_fora")) l.push("", "resource \"aws_db_instance\" \"pedidos\" {", "  manage_master_user_password = true", "}");
+        else l.push("", "resource \"random_password\" \"pedidos\" { length = 24 }", "resource \"aws_db_instance\" \"pedidos\" {", "  password = random_password.pedidos.result", "}");
+        return l.join("\n");
+    }
+
+    function montarBackend() {
+        var box = $("iac-backend");
+        box.replaceChildren();
+        D.backend.opcoes.forEach(function(o) {
+            var linha = el("div", null, "display: flex; gap: 0.4rem; align-items: flex-start; min-width: 0;");
+            var cb = el("input");
+            cb.type = "checkbox";
+            cb.id = "iac-be-" + o.id;
+            cb.checked = estado.backend.indexOf(o.id) !== -1;
+            cb.setAttribute("style", "margin-top: 0.2rem;");
+            cb.addEventListener("change", function() {
+                estado.backend = D.backend.opcoes.filter(function(x) { return $("iac-be-" + x.id).checked; }).map(function(x) { return x.id; });
+                atualizarState();
+            });
+            var lb = el("label", o.rotulo + (o.depende ? " (exige backend remoto)" : ""), "overflow-wrap: anywhere; min-width: 0;");
+            lb.htmlFor = cb.id;
+            linha.appendChild(cb);
+            linha.appendChild(lb);
+            box.appendChild(linha);
+        });
+    }
+
+    function atualizarState() {
+        var sel = estado.backend, riscos = window.riscosBackend(sel);
+        $("iac-backend-hcl").textContent = hclBackend(sel);
+        var rb = $("iac-backend-riscos");
+        rb.replaceChildren();
+        rb.setAttribute("data-riscos", riscos.length);
+        rb.appendChild(el("p", riscos.length ? riscos.length + " risco(s) no tratamento do state:" : "✓ State tratado como cofre: remoto, criptografado, com bloqueio, versão, acesso restrito, fora do Git e sem a senha do banco.",
+            "margin: 0; font-weight: 600; color: " + (riscos.length ? "var(--danger-color)" : "var(--tip-color)") + ";"));
+        if (riscos.length) {
+            var ul = el("ul", null, "margin: 0.3rem 0 0 0; padding-left: 1.1rem;");
+            D.backend.opcoes.forEach(function(o) { if (riscos.indexOf(o.id) !== -1) ul.appendChild(el("li", o.risco)); });
+            rb.appendChild(ul);
+        }
+        var st = window.stateVisivel(sel), seg = window.segredosNoState(st);
+        $("iac-state").textContent = JSON.stringify(st, null, 2);
+        var sb = $("iac-state-segredos");
+        sb.replaceChildren();
+        sb.setAttribute("data-segredos", seg.length);
+        sb.appendChild(el("p", seg.length + " valor(es) sensível(is) em claro no state: " + seg.map(function(s) { return s[0] + "." + s[1]; }).join(", ") + ".", "margin: 0; font-weight: 600; color: var(--danger-color);"));
+        if (sel.indexOf("segredo_fora") !== -1) sb.appendChild(el("p", "A senha do banco saiu do state (agora há só o ARN do segredo no Secrets Manager). A chave de acesso da integração continua: o caminho é trocá-la por uma role.", "margin: 0.2rem 0 0 0; color: var(--warning-color);"));
+        else sb.appendChild(el("p", "sensitive = true não muda nada aqui: o random_password e a senha do banco estão em claro.", "margin: 0.2rem 0 0 0; color: var(--muted);"));
+    }
+
+    // ================================================ interface: fase 4
+    function compacto(v) { return v === undefined ? "(ausente)" : JSON.stringify(v); }
+
+    function montarDrift() {
+        var box = $("iac-drift");
+        box.replaceChildren();
+        D.drift.recursos.forEach(function(item) {
+            var risco = window.riscoDrift(item), attrs = window.detectarDrift(item);
+            var card = el("div", null, "border: 1px solid var(--rule); border-left: 4px solid " + (risco.length ? "var(--danger-color)" : "var(--warning-color)") + "; border-radius: var(--radius-sm); padding: 0.45rem 0.55rem; min-width: 0; overflow-wrap: anywhere;");
+            card.setAttribute("data-address", item.address);
+            card.appendChild(el("strong", item.address, "font-family: var(--font-mono, monospace); font-size: 0.74rem;"));
+            card.appendChild(el("p", item.origem, "margin: 0.2rem 0 0 0; color: var(--muted);"));
+            attrs.forEach(function(k) {
+                var d = el("div", null, "margin-top: 0.3rem; font-family: var(--font-mono, monospace); font-size: 0.7rem;");
+                d.appendChild(el("div", k + ":"));
+                d.appendChild(el("div", "  código: " + compacto(item.codigo[k]), "color: var(--tip-color);"));
+                d.appendChild(el("div", "  real:   " + compacto(item.real[k]), "color: var(--danger-color);"));
+                card.appendChild(d);
+            });
+            card.appendChild(el("p", risco.length ? "O valor real viola: " + risco.map(titulo).join(", ") + "." : "Nenhuma política violada pelo valor real.",
+                "margin: 0.3rem 0 0 0; font-weight: 600; color: " + (risco.length ? "var(--danger-color)" : "var(--ink)") + ";"));
+            var bts = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.35rem;");
+            [["reverter", "Reverter para o código"], ["incorporar", "Incorporar ao código"]].forEach(function(par) {
+                var b = el("button", par[1]);
+                b.className = "btn-secondary";
+                b.type = "button";
+                b.setAttribute("aria-label", par[1] + ": " + item.address);
+                b.addEventListener("click", function() { window.decidirDriftIac(item.address, par[0]); });
+                bts.appendChild(b);
+            });
+            card.appendChild(bts);
+            var res = el("p", null, "margin: 0.3rem 0 0 0;");
+            res.id = "iac-drift-res-" + item.address.replace(/[^\w-]/g, "-");
+            res.setAttribute("aria-live", "polite");
+            card.appendChild(res);
+            box.appendChild(card);
+        });
+        D.drift.nao_gerenciados.forEach(function(x) {
+            var card = el("div", null, "border: 1px dashed var(--danger-color); border-radius: var(--radius-sm); padding: 0.45rem 0.55rem; min-width: 0; overflow-wrap: anywhere;");
+            card.appendChild(el("strong", "Fora do Terraform: " + x.nome, "font-size: 0.78rem;"));
+            card.appendChild(el("p", x.detalhe, "margin: 0.2rem 0 0 0;"));
+            box.appendChild(card);
+        });
+    }
+
+    var TEXTO_DRIFT = {
+        ok: { reverter: "✓ Certo: o próximo apply devolve o valor do código e fecha a exposição. Trate como incidente até saber quem usou o acesso.",
+              incorporar: "✓ Certo: a mudança foi intencional e não viola política; atualize o HCL no pull request para o código voltar a ser a verdade." },
+        aceitavel: { reverter: "Aceitável, mas a mudança era intencional: reverter desfaz uma decisão operacional. Combine com quem mudou e prefira incorporar.",
+                     incorporar: "Aceitável." },
+        bloqueado: { incorporar: "✗ Bloqueado: com o valor real no HCL, a política reprova o próximo plano. Incorporar um drift de risco só move o problema para o código." }
+    };
+
+    window.decidirDriftIac = function(address, escolha) {
+        var item = null;
+        D.drift.recursos.forEach(function(i) { if (i.address === address) item = i; });
+        var r = window.decidirDrift(item, escolha);
+        estado.drift[address] = r;
+        var p = $("iac-drift-res-" + address.replace(/[^\w-]/g, "-"));
+        p.textContent = TEXTO_DRIFT[r][escolha];
+        p.style.color = r === "ok" ? "var(--tip-color)" : (r === "bloqueado" ? "var(--danger-color)" : "var(--warning-color)");
+        resumoDrift();
+        return r;
+    };
+
+    function resumoDrift() {
+        var box = $("iac-drift-resultado");
+        box.replaceChildren();
+        var total = D.drift.recursos.length, feitos = Object.keys(estado.drift).length;
+        var oks = Object.keys(estado.drift).filter(function(a) { return estado.drift[a] === "ok"; }).length;
+        box.setAttribute("data-ok", oks);
+        box.appendChild(el("p", feitos ? oks + " de " + total + " drifts tratados da melhor forma (" + feitos + " decidido(s))." + (oks === total ? " ✓ O código voltou a descrever o ambiente, sem abrir exceção à política." : "")
+            : "Decida cada drift: reverter o que viola política, incorporar o que foi mudança intencional e segura. O recurso fora do Terraform não tem botão: ele precisa ser importado ou apagado.",
+            "margin: 0; font-weight: 600; color: " + (oks === total ? "var(--tip-color)" : "var(--ink)") + ";"));
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        estado.plano = copia(D.plano);
+        estado.excecoes = copia(D.excecoes);
+        estado.backend = D.backend.inicial.slice();
+        $("iac-contexto").textContent = D.contexto;
+        $("iac-data").textContent = D.data_revisao;
+        $("iac-prazo-max").textContent = D.prazo_max_dias;
+        montarRecursos();
+        selecionar(D.plano.resource_changes[1].address);
+        montarPoliticas();
+        atualizar();
+        montarBackend();
+        atualizarState();
+        $("iac-drift-intro").textContent = "Saída resumida de " + D.drift.comando + " na madrugada de " + D.data_revisao + ": quatro recursos gerenciados mudaram fora do pipeline, e o inventário achou um recurso que o Terraform não conhece.";
+        montarDrift();
+        resumoDrift();
+
+        if (typeof initChecklist === "function") {
+            initChecklist("infraestrutura-como-codigo-segura");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
