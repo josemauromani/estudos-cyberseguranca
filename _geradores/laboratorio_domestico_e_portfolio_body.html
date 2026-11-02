@@ -1,0 +1,664 @@
+<!-- Estudo 37: Laboratorio-Domestico-e-Portfolio Body Fragment -->
+<article class="study-container" data-slug="laboratorio-portfolio">
+
+    <!-- SEÇÃO 1: O LABORATÓRIO -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: Mostrar em Vez de Dizer</h2>
+        </div>
+
+        <p class="lead-text">
+            Numa entrevista, "sei investigar um ataque ao AD" vale pouco; um repositório com a regra que detecta Kerberoasting, o print do alerta e o passo a passo de como você testou vale muito. Um laboratório em casa é onde essa prova é produzida sem risco para ninguém. Este estudo mostra como montar um laboratório que cabe na sua máquina, isolado da sua rede, e como transformar o que você praticou neste currículo num portfólio.
+        </p>
+
+        <h3>Hipervisores</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Tipo</th><th>Exemplos</th><th>Quando usar</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>tipo 1</strong> (direto no hardware)</td><td>Proxmox VE, VMware ESXi, Microsoft Hyper-V, XCP-ng</td><td>Um computador dedicado ao laboratório, ligado o tempo todo</td></tr>
+                    <tr><td><strong>tipo 2</strong> (sobre o sistema do seu computador)</td><td>VirtualBox, VMware Workstation (gratuito para uso pessoal desde 2024)</td><td>O notebook ou desktop do dia a dia</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            O recurso mais importante de qualquer hipervisor para quem estuda segurança é o <strong>snapshot</strong>: uma foto da VM antes do exercício. Atacou, quebrou, infectou? Volte ao snapshot em segundos.
+        </p>
+
+        <h3>Redes Virtuais</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Modo</th><th>O que a VM alcança</th><th>Uso no laboratório</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>NAT</strong></td><td>A internet, através do host; ninguém de fora a alcança</td><td>Baixar atualizações, só para o firewall do laboratório</td></tr>
+                    <tr><td><strong>host-only</strong></td><td>Só o host e outras VMs do mesmo segmento</td><td>Acessar as VMs a partir do seu computador</td></tr>
+                    <tr><td><strong>rede interna</strong></td><td>Só outras VMs do mesmo segmento</td><td>A rede do laboratório, atrás do firewall</td></tr>
+                    <tr><td><strong>bridge</strong></td><td>A rede da sua casa, como se fosse outro computador</td><td><strong>Evitar</strong>: uma VM vulnerável em bridge fica exposta para todos da sua rede</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Topologia Mínima de um Homelab de Segurança</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Topologia Mínima de um Homelab de Segurança">
+flowchart TD
+    I["Internet<br><small>via NAT do host</small>"]
+    F["OPNsense<br><small>firewall do laboratório</small>"]
+    subgraph LAB["Rede interna do laboratório"]
+        DC["Windows Server<br><small>controlador de domínio</small>"]
+        W["Windows 11<br><small>estação no domínio</small>"]
+        S["Wazuh<br><small>SIEM</small>"]
+        K["Kali<br><small>atacante</small>"]
+        A["Alvos vulneráveis<br><small>DVWA, Metasploitable</small>"]
+    end
+    I --> F
+    F --> DC
+    F --> W
+    F --> S
+    F --> K
+    F --> A
+    DC -.->|"logs"| S
+    W -.->|"logs"| S
+            </pre>
+        </div>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">VirtualBox — VM na rede interna do laboratório e snapshot</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-hl-vbox')">Copiar</button>
+            </div>
+            <pre><code id="code-hl-vbox"># Coloca a placa 1 da VM Kali na rede interna "lab" (sem acesso à rede de casa)
+VBoxManage modifyvm "Kali" --nic1 intnet --intnet1 "lab"
+
+# Desliga a área de transferência e o arrastar-e-soltar com o host
+VBoxManage modifyvm "Kali" --clipboard-mode disabled --drag-and-drop disabled
+
+# Snapshot antes do exercício e volta ao estado limpo depois
+VBoxManage snapshot "Kali" take "limpa-antes-do-lab"
+VBoxManage snapshot "Kali" restore "limpa-antes-do-lab"</code></pre>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: PRÁTICA, PORTFÓLIO E LIMITES -->
+    <section class="study-section" id="pratica">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>CTFs, Write-ups, Portfólio e Limites Legais</h2>
+        </div>
+
+        <h3>CTFs e Plataformas</h3>
+        <p>
+            Num CTF <strong>jeopardy</strong>, você resolve desafios independentes por categoria (web, cripto, forense, reversa). No <strong>attack-defense</strong>, cada time defende os próprios serviços enquanto ataca os dos outros, o que treina as duas pontas. Variações como King of the Hill premiam quem mantém o controle de uma máquina.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Foco</th><th>Exemplos de plataformas</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Base (Linux, lógica, CTF iniciante)</td><td>OverTheWire, picoCTF</td></tr>
+                    <tr><td>Ofensivo e máquinas</td><td>Hack The Box, TryHackMe</td></tr>
+                    <tr><td>Aplicações web</td><td>PortSwigger Web Security Academy</td></tr>
+                    <tr><td>Defensivo, SOC e forense</td><td>CyberDefenders, LetsDefend, Blue Team Labs Online</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Do Exercício ao Portfólio</h3>
+        <p>
+            Um <strong>write-up</strong> conta o que você fez: objetivo, ambiente, passo a passo com comandos, o que deu errado, a correção ou a detecção, e o que aprendeu. As plataformas costumam proibir a publicação de soluções de máquinas e desafios ainda ativos; publique só os aposentados ou os do seu próprio laboratório. O portfólio reúne tudo num repositório do <strong>GitHub</strong> com um <strong>README</strong> que um recrutador entende em dois minutos.
+        </p>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">README.md — modelo de portfólio</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-hl-readme')">Copiar</button>
+            </div>
+            <pre><code id="code-hl-readme"># Homelab de Segurança — Seu Nome
+
+## Topologia
+OPNsense → rede interna 10.10.0.0/24: DC01 (AD), EST01 (Windows 11), Wazuh, Kali
+
+## Projetos
+| Projeto | O que mostra | Pasta |
+|---|---|---|
+| Detecção de Kerberoasting | Ataque, regra Sigma e alerta no Wazuh | /deteccoes/kerberoasting |
+| Linha de base por GPO | Configuração efetiva documentada com gpresult | /ad/gpo-baseline |
+| SQLi corrigida | Payload, correção com consulta parametrizada e teste | /web/sqli |
+
+## Write-ups
+- PortSwigger: SQL injection com UNION
+- CyberDefenders: investigação de phishing
+
+## Ética
+Tudo foi feito no meu laboratório ou em plataformas que autorizam os testes.</code></pre>
+        </div>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Só teste o que é seu ou o que você foi autorizado a testar</strong>
+            </div>
+            <p>
+                A <strong>Lei 12.737/2012</strong> incluiu no Código Penal o crime de invasão de dispositivo informático (art. <strong>154-A</strong>), e a <strong>Lei 14.155/2021</strong> aumentou as penas. "Só estava estudando" não é defesa. Fora do seu laboratório e das plataformas feitas para isso, você precisa de <strong>autorização por escrito</strong> com escopo, datas e responsável. Programas de <strong>bug bounty</strong> autorizam testes, mas só dentro do escopo e das regras publicadas.
+            </p>
+        </div>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🧩</span>
+                <strong>O currículo já é o seu roteiro</strong>
+            </div>
+            <p>
+                Cada laboratório deste currículo vira um projeto real: regras Sigma (Estudo 16), Kerberos e GPO (Estudo 38), investigação Linux (Estudo 34), PowerShell (Estudo 36), injeção e correção web (Estudo 12), resposta a ransomware (Estudo 42). O planejador abaixo monta o roteiro a partir das VMs que você consegue rodar.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Planejador de Homelab</h2>
+        </div>
+
+        <p class="lead-text">
+            Informe a configuração do seu computador, escolha as VMs (ou um perfil pronto) e veja se tudo cabe. O planejador desenha a topologia, gera o checklist de isolamento e sugere projetos de portfólio ligados aos estudos deste currículo.
+        </p>
+
+        <div class="lab-box hl-lab" id="hl-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Planejador de Laboratório</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Meu homelab</h3>
+                    <p id="hl-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">1. Seu computador</h4>
+                <div id="hl-host" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: 0.6rem; font-size: 0.85rem;">
+                    <label style="display: flex; flex-direction: column; gap: 0.25rem;">RAM total (GB)
+                        <input class="form-control" type="number" min="4" max="512" step="1" id="hl-ram">
+                    </label>
+                    <label style="display: flex; flex-direction: column; gap: 0.25rem;">Núcleos lógicos
+                        <input class="form-control" type="number" min="2" max="128" step="1" id="hl-nucleos">
+                    </label>
+                    <label style="display: flex; flex-direction: column; gap: 0.25rem;">Disco livre (GB)
+                        <input class="form-control" type="number" min="20" max="10000" step="10" id="hl-disco">
+                    </label>
+                    <label style="display: flex; flex-direction: column; gap: 0.25rem;">Processador
+                        <select class="form-control" id="hl-arquitetura">
+                            <option value="x86">x86 (Intel ou AMD)</option>
+                            <option value="arm">Mac com Apple Silicon (ARM)</option>
+                        </select>
+                    </label>
+                </div>
+
+                <h4 style="margin-top: 1.25rem;">2. VMs do laboratório</h4>
+                <div id="hl-perfis" style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem;"></div>
+                <div id="hl-catalogo" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 0.5rem;"></div>
+
+                <h4 style="margin-top: 1.25rem;">3. Recursos</h4>
+                <div id="hl-recursos" aria-live="polite" style="font-size: 0.88rem;"></div>
+
+                <h4 style="margin-top: 1.25rem;">4. Topologia</h4>
+                <div id="hl-topologia" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.4rem; font-size: 0.85rem;"></div>
+
+                <h4 style="margin-top: 1.25rem;">5. Checklist de isolamento</h4>
+                <ul id="hl-checklist" style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem;"></ul>
+
+                <h4 style="margin-top: 1.25rem;">6. Roteiro de portfólio</h4>
+                <ol id="hl-portfolio" style="margin: 0; padding-left: 1.4rem; font-size: 0.85rem; display: grid; gap: 0.4rem;"></ol>
+
+                <div style="margin-top: 1.25rem;">
+                    <button class="btn-secondary" type="button" onclick="restaurarHomelab()">Restaurar laboratório</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist do Laboratório e do Portfólio</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para montar o laboratório com segurança e manter o portfólio vivo. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="laboratorio-portfolio">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-hl-1">
+                <label for="chk-hl-1"><strong>Laboratório isolado:</strong> as VMs ficam em rede interna atrás de um firewall, sem bridge com a rede de casa.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-hl-2">
+                <label for="chk-hl-2"><strong>Snapshots:</strong> cada VM tem um snapshot limpo, e eu volto a ele depois de cada exercício.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-hl-3">
+                <label for="chk-hl-3"><strong>Host protegido:</strong> hipervisor e sistema atualizados, sem pasta compartilhada ou área de transferência com VMs de ataque e de alvo.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-hl-4">
+                <label for="chk-hl-4"><strong>Rotina de prática:</strong> tenho uma meta semanal em uma plataforma ligada à carreira que quero seguir.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-hl-5">
+                <label for="chk-hl-5"><strong>Write-ups publicados:</strong> escrevo sobre os exercícios do meu laboratório e de desafios já aposentados, nunca de desafios ativos.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-hl-6">
+                <label for="chk-hl-6"><strong>Portfólio legível:</strong> o README explica a topologia, os projetos e o que cada um demonstra, em linguagem que um recrutador entende.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-hl-7">
+                <label for="chk-hl-7"><strong>Limites claros:</strong> nunca testo fora do laboratório sem autorização por escrito, e nada no portfólio expõe dados do meu empregador.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Rede):</strong> Em que modo de rede uma VM vulnerável como a Metasploitable 2 nunca deve ficar, e por quê?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Em bridge, porque ela passa a fazer parte da rede da sua casa, exposta a qualquer dispositivo nela.</p>
+                    <p>Use rede interna ou host-only. Se algo na rede de casa estiver comprometido, a VM vulnerável vira uma porta de entrada.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Hipervisor):</strong> Qual a diferença prática entre um hipervisor tipo 1 e um tipo 2 para um homelab?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O tipo 1 roda direto no hardware de uma máquina dedicada (Proxmox, ESXi); o tipo 2 roda sobre o sistema do seu computador do dia a dia (VirtualBox, VMware Workstation).</p>
+                    <p>O tipo 1 aproveita melhor os recursos e fica ligado o tempo todo; o tipo 2 é o caminho mais simples para começar.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Snapshot):</strong> Por que tirar um snapshot antes de cada exercício de ataque?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Para voltar a um estado limpo e conhecido depois do exercício, sem reinstalar nada.</p>
+                    <p>Também permite repetir o mesmo cenário várias vezes, por exemplo para testar uma regra de detecção antes e depois de um ajuste.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (CTF):</strong> Qual formato de CTF treina defesa e ataque ao mesmo tempo?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Attack-defense: cada time protege os próprios serviços enquanto ataca os dos outros.</p>
+                    <p>No jeopardy, os desafios são independentes e focados em uma categoria por vez.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Write-up):</strong> Você resolveu uma máquina ainda ativa numa plataforma. Pode publicar o write-up?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Em geral não: as plataformas costumam proibir soluções de máquinas e desafios ativos. Publique quando ela for aposentada.</p>
+                    <p>Exercícios do seu próprio laboratório podem ser publicados quando você quiser.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Legal):</strong> Para treinar, você quer rodar um scanner de vulnerabilidades contra o site da empresa onde trabalha. O que precisa?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Autorização por escrito de quem responde pelo sistema, com escopo, datas e contatos. Sem isso, não faça.</p>
+                    <p>Ser funcionário não autoriza testes. A invasão de dispositivo informático é crime (art. 154-A do Código Penal), e um scanner pode derrubar serviços.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Isolar primeiro</h4>
+                <p>Rede interna atrás de firewall; bridge nunca com VM vulnerável.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Caber na máquina</h4>
+                <p>RAM das VMs mais a do host; ligue só o que o exercício usa.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Praticar com método</h4>
+                <p>Jeopardy para técnica, attack-defense para as duas pontas; snapshot antes de cada exercício.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Mostrar o trabalho</h4>
+                <p>Write-ups e README no GitHub; sempre com autorização e sem dados de terceiros.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>Documentação do Proxmox VE, do VirtualBox e do Hyper-V.</li>
+            <li>Documentação do OPNsense, do Wazuh (instalação rápida) e do Kali Linux.</li>
+            <li>Microsoft Evaluation Center — Windows Server e Windows 11 Enterprise em avaliação.</li>
+            <li>Lei nº 12.737/2012 e Lei nº 14.155/2021 (art. 154-A do Código Penal).</li>
+            <li>Regras de publicação de write-ups das plataformas de CTF utilizadas.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 33 — Certificações e Carreira e 32 — Inglês Técnico</strong>
+            </div>
+            <p>
+                O Estudo 33 cruza as certificações da vaga com os módulos que você praticou aqui. O Estudo 32 ajuda a escrever o portfólio e os write-ups também em inglês.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="hl-dados">
+{
+ "contexto": "Recursos recomendados pela documentação de cada sistema, arredondados para laboratório. O planejador reserva 4 GB de RAM para o sistema do seu computador.",
+ "reserva_host_gb": 4,
+ "limite_apertado": 0.85,
+ "vcpu_por_nucleo": 2,
+ "funcoes": {"firewall": "Firewall", "dc": "Controlador de domínio", "estacao": "Estação de trabalho", "siem": "SIEM", "atacante": "Atacante", "alvo": "Alvo vulnerável"},
+ "catalogo": [
+  {"id": "opnsense", "nome": "OPNsense", "funcao": "firewall", "ram": 2, "vcpu": 1, "disco": 20, "arm": false, "nota": "Firewall do laboratório; só existe para x86."},
+  {"id": "winserver", "nome": "Windows Server 2022 com AD DS", "funcao": "dc", "ram": 4, "vcpu": 2, "disco": 60, "arm": false, "nota": "Versão de avaliação de 180 dias; controlador de domínio."},
+  {"id": "win11", "nome": "Windows 11 Enterprise", "funcao": "estacao", "ram": 4, "vcpu": 2, "disco": 64, "arm": true, "nota": "Versão de avaliação; estação ingressada no domínio. Há versão ARM."},
+  {"id": "wazuh", "nome": "Wazuh (all-in-one)", "funcao": "siem", "ram": 8, "vcpu": 4, "disco": 50, "arm": true, "nota": "Indexador, servidor e painel numa VM; a instalação rápida pede 4 vCPU e 8 GB."},
+  {"id": "kali", "nome": "Kali Linux", "funcao": "atacante", "ram": 2, "vcpu": 2, "disco": 40, "arm": true, "nota": "Máquina de ataque; há imagem ARM64."},
+  {"id": "ubuntu-web", "nome": "Ubuntu Server com DVWA e Juice Shop", "funcao": "alvo", "ram": 2, "vcpu": 1, "disco": 25, "arm": true, "nota": "Aplicações web vulneráveis para treinar OWASP."},
+  {"id": "metasploitable", "nome": "Metasploitable 2", "funcao": "alvo", "ram": 1, "vcpu": 1, "disco": 8, "arm": false, "nota": "Linux propositalmente vulnerável, só x86; jamais exposto à rede."}
+ ],
+ "perfis": [
+  {"id": "soc", "nome": "SOC / Blue Team", "vms": ["opnsense", "winserver", "win11", "wazuh", "kali"]},
+  {"id": "red", "nome": "Red Team / Web", "vms": ["opnsense", "kali", "ubuntu-web", "metasploitable"]},
+  {"id": "ad", "nome": "AD completo", "vms": ["opnsense", "winserver", "win11", "kali"]}
+ ],
+ "exemplos": [
+  {"nome": "Notebook 16 GB com perfil SOC", "perfil": "soc", "host": {"ram": 16, "nucleos": 8, "disco": 256, "arm": false}, "esperado": "nao_cabe"},
+  {"nome": "Desktop 32 GB com perfil SOC", "perfil": "soc", "host": {"ram": 32, "nucleos": 12, "disco": 500, "arm": false}, "esperado": "cabe"},
+  {"nome": "Notebook 16 GB com AD completo", "perfil": "ad", "host": {"ram": 16, "nucleos": 8, "disco": 256, "arm": false}, "esperado": "apertado"},
+  {"nome": "Notebook 16 GB com Red Team", "perfil": "red", "host": {"ram": 16, "nucleos": 8, "disco": 256, "arm": false}, "esperado": "cabe"},
+  {"nome": "Mac Apple Silicon com Red Team", "perfil": "red", "host": {"ram": 16, "nucleos": 8, "disco": 256, "arm": true}, "esperado": "incompativel"},
+  {"nome": "Desktop 32 GB com pouco disco e perfil SOC", "perfil": "soc", "host": {"ram": 32, "nucleos": 12, "disco": 120, "arm": false}, "esperado": "nao_cabe"},
+  {"nome": "Notebook 16 GB só com Wazuh e Kali", "vms": ["wazuh", "kali"], "host": {"ram": 16, "nucleos": 8, "disco": 256, "arm": false}, "esperado": "apertado"},
+  {"nome": "Mac Apple Silicon com Kali e Metasploitable", "vms": ["kali", "metasploitable"], "host": {"ram": 16, "nucleos": 8, "disco": 256, "arm": true}, "esperado": "incompativel"},
+  {"nome": "Mac Apple Silicon com Kali e aplicação web", "vms": ["kali", "ubuntu-web"], "host": {"ram": 16, "nucleos": 8, "disco": 256, "arm": true}, "esperado": "cabe"},
+  {"nome": "Notebook 16 GB de 2 núcleos lógicos com Red Team", "perfil": "red", "host": {"ram": 16, "nucleos": 2, "disco": 256, "arm": false}, "esperado": "apertado"}
+ ],
+ "isolamento": [
+  {"com": [], "sem": [], "texto": "Coloque as VMs numa rede interna ou host-only; nunca em bridge com a rede de casa."},
+  {"com": [], "sem": [], "texto": "Tire um snapshot limpo de cada VM antes do primeiro exercício e volte a ele depois de cada um."},
+  {"com": [], "sem": [], "texto": "Mantenha o hipervisor e o sistema do seu computador atualizados: uma fuga de VM afeta a máquina real."},
+  {"com": ["kali", "ubuntu-web", "metasploitable"], "sem": [], "texto": "Desative pasta compartilhada, área de transferência e arrastar-e-soltar nas VMs de ataque e de alvo."},
+  {"com": ["metasploitable"], "sem": [], "texto": "A Metasploitable 2 tem dezenas de falhas conhecidas: ela nunca pode ser alcançável da rede de casa nem da internet."},
+  {"com": ["kali"], "sem": [], "texto": "Ferramentas de ataque só contra VMs do laboratório; nunca contra a rede de casa, do vizinho ou do trabalho."},
+  {"com": ["winserver", "win11"], "sem": [], "texto": "Use as avaliações oficiais da Microsoft e senhas exclusivas do laboratório, diferentes de qualquer conta real."},
+  {"com": [], "sem": ["opnsense"], "texto": "Sem firewall no laboratório: deixe as VMs só na rede interna, sem NAT, e ligue o acesso à internet apenas para atualizar."}
+ ],
+ "portfolio": [
+  {"requer": ["winserver", "kali", "wazuh"], "projeto": "Execute Kerberoasting no laboratório e publique a regra Sigma que detecta o pedido de tickets com RC4, com o print do alerta no Wazuh.", "modulos": ["Active-Directory-Fundamentos", "Ataques-e-Defesa-no-AD", "Operacoes-SOC-e-SIEM"]},
+  {"requer": ["winserver", "win11"], "projeto": "Monte o domínio com uma GPO de linha de base (firewall, log de ScriptBlock) e documente a configuração efetiva com gpresult.", "modulos": ["Active-Directory-Fundamentos", "PowerShell-e-Windows-Interno", "Hardening-Sistemas"]},
+  {"requer": ["wazuh"], "projeto": "Crie uma regra de força bruta com correlação, gere falsos positivos de propósito e documente o ajuste.", "modulos": ["Operacoes-SOC-e-SIEM", "Linux-para-Seguranca"]},
+  {"requer": ["opnsense"], "projeto": "Documente a segmentação do laboratório: regras do firewall, diagrama e o teste que prova que os alvos não alcançam sua rede.", "modulos": ["Segmentacao-e-Firewall", "Seguranca-de-Redes-Defesa"]},
+  {"requer": ["ubuntu-web", "kali"], "projeto": "Explore SQL injection e XSS na aplicação vulnerável, corrija o código e publique o antes e o depois.", "modulos": ["OWASP-Top-10-Web", "Seguranca-de-Bancos-de-Dados"]},
+  {"requer": ["metasploitable", "kali"], "projeto": "Escreva um mini relatório de pentest da Metasploitable 2: escopo, achados com CVSS e recomendações.", "modulos": ["Pentest-Metodologias", "Gestao-de-Vulnerabilidades"]},
+  {"requer": [], "projeto": "Publique um script Python que resume o auth.log (IPs com falhas, logins aceitos), com README e exemplo de saída.", "modulos": ["Python-para-Seguranca", "Linux-para-Seguranca"]}
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var HL = JSON.parse(document.getElementById("hl-dados").textContent);
+    var ROTULO = { cabe: "Cabe com folga", apertado: "Cabe, mas apertado", nao_cabe: "Não cabe", incompativel: "Incompatível com o processador" };
+    var COR = { cabe: "var(--tip-color)", apertado: "rgb(202, 138, 4)", nao_cabe: "var(--danger-color)", incompativel: "var(--danger-color)" };
+    var MODULOS = { "Active-Directory-Fundamentos": 38, "Ataques-e-Defesa-no-AD": 39, "Operacoes-SOC-e-SIEM": 16, "PowerShell-e-Windows-Interno": 36,
+        "Hardening-Sistemas": 6, "Linux-para-Seguranca": 34, "Segmentacao-e-Firewall": 5, "Seguranca-de-Redes-Defesa": 7, "OWASP-Top-10-Web": 12,
+        "Seguranca-de-Bancos-de-Dados": 30, "Pentest-Metodologias": 14, "Gestao-de-Vulnerabilidades": 9, "Python-para-Seguranca": 35 };
+    var selecionadas = [];
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function vm(id) { return HL.catalogo.filter(function(v) { return v.id === id; })[0]; }
+    function host() {
+        return {
+            ram: Number(document.getElementById("hl-ram").value) || 0,
+            nucleos: Number(document.getElementById("hl-nucleos").value) || 0,
+            disco: Number(document.getElementById("hl-disco").value) || 0,
+            arm: document.getElementById("hl-arquitetura").value === "arm"
+        };
+    }
+
+    // Regra espelhada nos testes em Python.
+    function veredito(h, vms) {
+        if (h.arm && vms.some(function(id) { return !vm(id).arm; })) return "incompativel";
+        var ram = vms.reduce(function(s, id) { return s + vm(id).ram; }, 0) + HL.reserva_host_gb;
+        var vcpu = vms.reduce(function(s, id) { return s + vm(id).vcpu; }, 0);
+        var disco = vms.reduce(function(s, id) { return s + vm(id).disco; }, 0);
+        if (ram > h.ram || disco > h.disco) return "nao_cabe";
+        if (ram > HL.limite_apertado * h.ram || vcpu > HL.vcpu_por_nucleo * h.nucleos) return "apertado";
+        return "cabe";
+    }
+    window.vereditoHomelab = function(h, vms) { return veredito(h, vms); };
+
+    function barra(rotulo, usado, total, unidade) {
+        var pct = total > 0 ? usado / total : 1;
+        var cor = pct > 1 ? "var(--danger-color)" : pct > HL.limite_apertado ? "rgb(202, 138, 4)" : "var(--tip-color)";
+        var d = el("div", null, "margin-bottom: 0.45rem;");
+        d.appendChild(el("div", rotulo + ": " + usado + " de " + total + " " + unidade + " (" + Math.round(pct * 100) + "%)", "font-size: 0.82rem;"));
+        var b = el("div", null, "height: 0.55rem; background: var(--sunk); border-radius: var(--radius-pill); overflow: hidden;");
+        b.setAttribute("role", "img");
+        b.setAttribute("aria-label", rotulo + ": " + Math.round(pct * 100) + "% usado");
+        b.appendChild(el("div", null, "height: 100%; width: " + Math.min(100, pct * 100) + "%; background: " + cor + ";"));
+        d.appendChild(b);
+        return d;
+    }
+
+    function renderizarCatalogo() {
+        var box = document.getElementById("hl-catalogo");
+        box.replaceChildren();
+        var h = host();
+        HL.catalogo.forEach(function(v) {
+            var on = selecionadas.indexOf(v.id) !== -1, incompat = h.arm && !v.arm;
+            var rot = el("label", null, "display: flex; gap: 0.5rem; align-items: flex-start; border: 1px solid " + (incompat && on ? "var(--danger-color)" : "var(--rule)") + "; border-radius: var(--radius-sm); padding: 0.45rem 0.6rem; font-size: 0.84rem; min-width: 0;");
+            var cb = el("input");
+            cb.type = "checkbox";
+            cb.checked = on;
+            cb.setAttribute("data-vm", v.id);
+            cb.addEventListener("change", function() { alternarVmHomelab(v.id); });
+            rot.appendChild(cb);
+            var t = el("span", null, "min-width: 0;");
+            t.appendChild(el("strong", v.nome, "display: block;"));
+            t.appendChild(el("span", HL.funcoes[v.funcao] + " · " + v.ram + " GB · " + v.vcpu + " vCPU · " + v.disco + " GB" + (incompat ? " · só x86" : ""),
+                "display: block; font-family: var(--font-mono); font-size: 0.72rem; color: " + (incompat ? "var(--danger-color)" : "var(--muted)") + ";"));
+            t.appendChild(el("span", v.nota, "display: block; font-size: 0.75rem; color: var(--muted);"));
+            rot.appendChild(t);
+            box.appendChild(rot);
+        });
+    }
+
+    function renderizarRecursos() {
+        var box = document.getElementById("hl-recursos");
+        box.replaceChildren();
+        var h = host();
+        var ram = selecionadas.reduce(function(s, id) { return s + vm(id).ram; }, 0) + HL.reserva_host_gb;
+        var vcpu = selecionadas.reduce(function(s, id) { return s + vm(id).vcpu; }, 0);
+        var disco = selecionadas.reduce(function(s, id) { return s + vm(id).disco; }, 0);
+        if (!selecionadas.length) {
+            box.setAttribute("data-veredito", "vazio");
+            box.appendChild(el("p", "Nenhuma VM escolhida. Marque as VMs ou use um perfil pronto.", "margin: 0;"));
+            return;
+        }
+        var v = veredito(h, selecionadas);
+        box.setAttribute("data-veredito", v);
+        box.appendChild(barra("RAM (VMs + " + HL.reserva_host_gb + " GB do host)", ram, h.ram, "GB"));
+        box.appendChild(barra("vCPU (até " + HL.vcpu_por_nucleo + " por núcleo lógico)", vcpu, HL.vcpu_por_nucleo * h.nucleos, "vCPU"));
+        box.appendChild(barra("Disco", disco, h.disco, "GB"));
+        box.appendChild(el("p", ROTULO[v] + ".", "margin: 0.4rem 0 0.2rem 0; font-weight: 700; color: " + COR[v] + ";"));
+        var dicas = [];
+        if (v === "incompativel") dicas.push("Imagens só x86 (" + selecionadas.filter(function(id) { return !vm(id).arm; }).map(function(id) { return vm(id).nome; }).join(", ") + ") não rodam num Mac com Apple Silicon. Troque por alternativas ARM, use um computador x86 de segunda mão como servidor do laboratório ou um laboratório em nuvem.");
+        if (v === "nao_cabe" && ram > h.ram) dicas.push("Faltam " + (ram - h.ram) + " GB de RAM. Ligue só as VMs do exercício do dia: o Wazuh e o Windows 11 são os mais pesados.");
+        if (v === "nao_cabe" && disco > h.disco) dicas.push("Faltam " + (disco - h.disco) + " GB de disco. Use discos dinâmicos e apague snapshots antigos, ou um SSD externo.");
+        if (v === "apertado") dicas.push("Funciona, mas o computador vai ficar lento com tudo ligado. Desligue as VMs que o exercício não usa.");
+        if (v === "cabe") dicas.push("Sobra espaço para snapshots e para ligar tudo ao mesmo tempo.");
+        dicas.forEach(function(d) { box.appendChild(el("p", d, "margin: 0.2rem 0 0 0;")); });
+    }
+
+    function renderizarTopologia() {
+        var box = document.getElementById("hl-topologia");
+        box.replaceChildren();
+        var bloco = function(texto, estilo) { return el("div", texto, "padding: 0.45rem 0.6rem; border-radius: var(--radius-sm); text-align: center; overflow-wrap: anywhere; " + estilo); };
+        var temFw = selecionadas.indexOf("opnsense") !== -1;
+        box.appendChild(bloco("Internet", "background: var(--sunk);"));
+        box.appendChild(el("div", temFw ? "↓ NAT do seu computador" : "✕ sem saída: rede interna isolada", "text-align: center; font-size: 0.75rem; color: " + (temFw ? "var(--muted)" : "var(--danger-color)") + ";"));
+        if (temFw) {
+            box.appendChild(bloco("OPNsense (firewall do laboratório)", "border: 2px solid var(--accent); font-weight: 600;"));
+            box.appendChild(el("div", "↓", "text-align: center; color: var(--muted);"));
+        }
+        var rede = el("div", null, "border: 2px dashed var(--rule); border-radius: var(--radius-md); padding: 0.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr)); gap: 0.4rem;");
+        rede.setAttribute("data-topologia", selecionadas.filter(function(id) { return id !== "opnsense"; }).join(","));
+        var titulo = el("div", "Rede interna do laboratório", "grid-column: 1 / -1; font-size: 0.75rem; color: var(--muted);");
+        rede.appendChild(titulo);
+        var outros = selecionadas.filter(function(id) { return id !== "opnsense"; });
+        if (!outros.length) rede.appendChild(el("div", "Nenhuma VM na rede ainda.", "grid-column: 1 / -1; font-size: 0.8rem;"));
+        outros.forEach(function(id) {
+            var v = vm(id);
+            var cor = v.funcao === "atacante" ? "rgba(220, 38, 38, 0.18)" : v.funcao === "alvo" ? "rgba(202, 138, 4, 0.22)" : v.funcao === "siem" ? "rgba(37, 99, 235, 0.2)" : "rgba(22, 163, 74, 0.18)";
+            var b = bloco(v.nome, "background: " + cor + ";");
+            b.appendChild(el("div", HL.funcoes[v.funcao], "font-size: 0.7rem; color: var(--muted);"));
+            rede.appendChild(b);
+        });
+        if (selecionadas.indexOf("wazuh") !== -1 && outros.length > 1) rede.appendChild(el("div", "As demais VMs enviam logs ao Wazuh.", "grid-column: 1 / -1; font-size: 0.75rem; color: var(--muted);"));
+        box.appendChild(rede);
+        if (!temFw && selecionadas.length) box.appendChild(el("p", "Sem firewall: mantenha tudo na rede interna, sem NAT.", "margin: 0; font-size: 0.8rem; color: var(--danger-color);"));
+    }
+
+    function renderizarChecklist() {
+        var ul = document.getElementById("hl-checklist");
+        ul.replaceChildren();
+        HL.isolamento.filter(function(i) {
+            var com = !i.com.length || i.com.some(function(id) { return selecionadas.indexOf(id) !== -1; });
+            var sem = !i.sem.length || i.sem.every(function(id) { return selecionadas.indexOf(id) === -1; });
+            return com && sem && (selecionadas.length || (!i.com.length && !i.sem.length));
+        }).forEach(function(i) { ul.appendChild(el("li", i.texto, "margin-bottom: 0.25rem;")); });
+        ul.setAttribute("data-itens", String(ul.childNodes.length));
+    }
+
+    function renderizarPortfolio() {
+        var ol = document.getElementById("hl-portfolio");
+        ol.replaceChildren();
+        var possiveis = HL.portfolio.filter(function(p) { return p.requer.every(function(id) { return selecionadas.indexOf(id) !== -1; }); });
+        possiveis.forEach(function(p) {
+            var li = el("li");
+            li.appendChild(el("span", p.projeto));
+            li.appendChild(el("span", " Base: " + p.modulos.map(function(m) { return "Estudo " + MODULOS[m]; }).join(", ") + ".", "color: var(--muted);"));
+            ol.appendChild(li);
+        });
+        ol.setAttribute("data-projetos", String(possiveis.length));
+    }
+
+    window.calcularHomelab = function() {
+        renderizarCatalogo();
+        renderizarRecursos();
+        renderizarTopologia();
+        renderizarChecklist();
+        renderizarPortfolio();
+    };
+    window.alternarVmHomelab = function(id) {
+        if (!vm(id)) return;
+        var i = selecionadas.indexOf(id);
+        if (i === -1) selecionadas.push(id); else selecionadas.splice(i, 1);
+        selecionadas.sort(function(a, b) { return HL.catalogo.indexOf(vm(a)) - HL.catalogo.indexOf(vm(b)); });
+        calcularHomelab();
+    };
+    window.aplicarPerfilHomelab = function(id) {
+        var p = HL.perfis.filter(function(x) { return x.id === id; })[0];
+        if (!p) return;
+        selecionadas = p.vms.slice();
+        selecionadas.sort(function(a, b) { return HL.catalogo.indexOf(vm(a)) - HL.catalogo.indexOf(vm(b)); });
+        calcularHomelab();
+    };
+    window.restaurarHomelab = function() {
+        document.getElementById("hl-ram").value = "16";
+        document.getElementById("hl-nucleos").value = "8";
+        document.getElementById("hl-disco").value = "256";
+        document.getElementById("hl-arquitetura").value = "x86";
+        aplicarPerfilHomelab("ad");
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("hl-contexto").textContent = HL.contexto;
+        var pb = document.getElementById("hl-perfis");
+        HL.perfis.forEach(function(p) {
+            var b = el("button", "Perfil: " + p.nome, "font-size: 0.8rem;");
+            b.type = "button"; b.className = "btn-secondary";
+            b.addEventListener("click", function() { aplicarPerfilHomelab(p.id); });
+            pb.appendChild(b);
+        });
+        ["hl-ram", "hl-nucleos", "hl-disco"].forEach(function(id) { document.getElementById(id).addEventListener("input", calcularHomelab); });
+        document.getElementById("hl-arquitetura").addEventListener("change", calcularHomelab);
+        restaurarHomelab();
+        if (typeof initChecklist === "function") {
+            initChecklist("laboratorio-portfolio");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
