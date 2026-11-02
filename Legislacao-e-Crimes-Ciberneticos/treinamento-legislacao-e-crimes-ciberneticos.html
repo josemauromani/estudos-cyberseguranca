@@ -1703,7 +1703,7 @@ sha256sum analise/copia-trabalho.jsonl
    "explicacao_tipo": "Entrar sem autorização no dispositivo de uso alheio para obter dados é o núcleo do art. 154-A. Ninguém obteve dinheiro da vítima, então não é furto nem fraude eletrônica. A cópia das planilhas pode também ser incidente de segurança (Estudo 27), mas essa é outra esfera.",
    "explicacao_registros": "Os logs do proxy e do EDR são da própria Ipê Store. A conta de armazenamento em nuvem é de um provedor de aplicação: os registros de acesso (6 meses, art. 15) mostram de que IP o invasor a usou. Com IP, data e hora, o provedor de conexão (1 ano, art. 13) identifica o assinante. Os dois pedidos externos dependem de ordem judicial."},
   {"id": "C2", "empresa": "Ipê Pay", "titulo": "Falsa central: o Pix de Antônio", "dias_desde_fato": 10, "tipo": "fraude_eletronica",
-   "relato": "Há 10 dias, Antônio, 66 anos, cliente da Ipê Pay, recebeu mensagens e uma chamada por um aplicativo de mensagens de uma suposta central de segurança. Convencido de que a conta tinha sido invadida, fez ele mesmo um Pix de R$ 15.000 para uma \"conta segura\". Por orientação do golpista, apagou a conversa logo depois.",
+   "relato": "Há 10 dias, Antônio, cliente da Ipê Pay, recebeu mensagens e uma chamada por um aplicativo de mensagens de uma suposta central de segurança. Convencido de que a conta tinha sido invadida, fez ele mesmo um Pix de R$ 15.000 para uma \"conta segura\". Por orientação do golpista, apagou a conversa logo depois.",
    "vestigio": "Celular da vítima (comprovante e o que restou da conversa) e registros da transação na Ipê Pay.",
    "registros": ["logs_internos", "aplicacao", "conteudo", "conexao"],
    "ordem_correta": ["fixar", "coletar_hash", "registrar", "comunicar"],
@@ -2041,7 +2041,7 @@ sha256sum analise/copia-trabalho.jsonl
         return st.resultado;
     };
 
-    // atalho usado nos testes de navegador: escolhe o caso e preenche as respostas
+    // atalho para conferência manual no navegador: escolhe o caso e preenche as respostas
     window.responderCasoLcc = function(id, tipo, escolhas, ordem) {
         if (!casoPorId(id)) return null;
         estado.atual = id;

@@ -147,16 +147,18 @@ decidir(["valor_atipico", "em_ligacao", "primeiro_pix"])   # (50, 'segurar')</co
             <pre class="mermaid" data-title="Fluxo do MED 2.0 Depois de um Pix Fraudulento">
 flowchart TD
     P["Pix fraudulento liquidado<br><small>golpe que a mesa deixou passar</small>"]
-    V["Vítima contesta no autoatendimento<br><small>até 80 dias corridos da transação</small>"]
-    BC["Bloqueio cautelar<br><small>recursos retidos durante a análise</small>"]
-    A{"Análise pelas instituições<br><small>fluxo de fraude: até 7 dias</small>"}
-    E["Contestação recusada<br><small>sem indício de golpe</small>"]
-    R["Rastreio do dinheiro<br><small>conta laranja e contas diferentes</small>"]
-    D["Devolução até 11 dias após a contestação<br><small>limitada ao saldo: total ou parcial</small>"]
-    C["Recebedor pode contestar a devolução<br><small>80 dias da devolução, IN BCB 766</small>"]
+    BC["Bloqueio cautelar: medida à parte do MED<br><small>a instituição retém recursos suspeitos enquanto analisa; tratado aqui sem prazo</small>"]
+    subgraph MED["MED 2.0: começa na contestação"]
+        V["Vítima contesta no autoatendimento<br><small>até 80 dias corridos da transação</small>"]
+        A{"Análise pelas instituições<br><small>fluxo de fraude: até 7 dias</small>"}
+        E["Contestação recusada<br><small>sem indício de golpe</small>"]
+        R["Rastreio do dinheiro<br><small>conta laranja e contas diferentes</small>"]
+        D["Devolução até 11 dias após a contestação<br><small>limitada ao saldo: total ou parcial</small>"]
+        C["Recebedor pode contestar a devolução<br><small>80 dias da devolução, IN BCB 766</small>"]
+    end
+    P -.->|"Fora do MED"| BC
     P --> V
-    V --> BC
-    BC --> A
+    V --> A
     A -->|"Golpe não caracterizado"| E
     A -->|"Golpe caracterizado"| R
     R --> D

@@ -429,6 +429,14 @@ class TestSoarAutomacao(unittest.TestCase):
         self.assertEqual([r for r in res if res[r]["fn"]], ["A04", "A05"])
         self.assertEqual(s["custo"], 140000)
 
+    def test_tabela_de_faixas_igual_ao_motor(self):
+        body = self.body_path.read_text(encoding="utf-8")
+        m = re.search(r"<tr><td><strong>Automatizar com condição</strong></td><td>(.*?)</td><td>(.*?)</td></tr>", body)
+        self.assertIsNotNone(m, "linha 'Automatizar com condição' ausente")
+        self.assertIn("maliciosa, suspeita ou desconhecida", m.group(1),
+                      "a tabela isola nas mesmas reputações que rep_nao_limpa")
+        self.assertIn("nunca visto", m.group(1) + m.group(2), "explica por que o hash desconhecido entra")
+
     def test_fonte_de_reputacao_fora_do_ar(self):
         d = self._dados()
         falhas = {"reputacao": True}

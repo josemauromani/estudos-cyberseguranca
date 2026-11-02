@@ -1422,7 +1422,7 @@ pip install sigma-cli
 sigma plugin install splunk
 sigma check rules/
 python3 testar_regras.py --regras rules/ --testes tests/   # falha se houver FN ou FP
-sigma convert -t splunk -p splunk_windows rules/windows/ -o saida/deteccoes.conf</code></pre>
+sigma convert -t splunk -p splunk_windows -f savedsearches rules/windows/ -o saida/savedsearches.conf</code></pre>
         </div>
 
         <h3>Emulação de adversário: Atomic Red Team</h3>

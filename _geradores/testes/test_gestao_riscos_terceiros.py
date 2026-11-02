@@ -472,6 +472,12 @@ class TestGestaoRiscosTerceiros(unittest.TestCase):
             self.assertEqual(titulo.strip(), data_title.strip())
 
     # ------------------------------------------------------------ simulador
+    def test_atalho_do_simulador_sem_citar_teste_inexistente(self):
+        """A suíte não tem teste de navegador: o atalho serve à conferência manual."""
+        body = self._body()
+        self.assertNotIn("testes de navegador", body)
+        self.assertIn("atalho para conferência manual no navegador", body)
+
     def test_simulador_sem_apis_inseguras(self):
         content = self.compiled_path.read_text(encoding="utf-8")
         self.assertIn('id="grt-dados"', content)

@@ -295,6 +295,14 @@ class TestLegislacaoCrimesCiberneticos(unittest.TestCase):
         self.assertEqual(res["pontos"], 0)
         self.assertIn("induzid", c2["explicacao_tipo"])
 
+    def test_falsa_central_sem_idade_da_vitima(self):
+        """A idade de Antônio sugeria um aumento que o C2 não ensina; o aumento por vítima idosa é lição do C3."""
+        c2 = next(c for c in self._dados()["casos"] if c["id"] == "C2")
+        texto = json.dumps(c2, ensure_ascii=False)
+        self.assertIsNone(re.search(r"\d+\s*anos|idos[oa]", texto), "C2 não cita idade da vítima")
+        c3 = next(c for c in self._dados()["casos"] if c["id"] == "C3")
+        self.assertIn("idosa", c3["explicacao_tipo"])
+
     def test_registro_de_aplicacao_vencido(self):
         d = self._dados()
         c5 = self._caso(d, "C5")
@@ -343,6 +351,12 @@ class TestLegislacaoCrimesCiberneticos(unittest.TestCase):
             self.assertEqual(titulo.strip(), data_title.strip())
 
     # ------------------------------------------------------------ simulador
+    def test_atalho_do_simulador_sem_citar_teste_inexistente(self):
+        """A suíte não tem teste de navegador: o atalho serve à conferência manual."""
+        body = self._body()
+        self.assertNotIn("testes de navegador", body)
+        self.assertIn("atalho para conferência manual no navegador", body)
+
     def test_simulador_sem_apis_inseguras(self):
         content = self.compiled_path.read_text(encoding="utf-8")
         self.assertIn('id="lcc-dados"', content)

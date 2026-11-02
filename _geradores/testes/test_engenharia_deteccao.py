@@ -375,6 +375,15 @@ class TestEngenhariaDeteccao(unittest.TestCase):
         for termo in termos:
             self.assertIn(termo, content, f"Termo obrigatório ausente: {termo}")
 
+    def test_sigma_convert_grava_saved_searches_no_conf(self):
+        """Um .conf do Splunk recebe o formato savedsearches do backend, não a lista padrão de consultas."""
+        body = self.body_path.read_text(encoding="utf-8")
+        linhas = [l for l in body.splitlines() if "sigma convert -t splunk" in l]
+        self.assertTrue(linhas, "comando sigma convert ausente")
+        for linha in linhas:
+            if ".conf" in linha:
+                self.assertIn("-f savedsearches", linha, linha)
+
     def test_coerencia_com_o_catalogo(self):
         content = self.compiled_path.read_text(encoding="utf-8")
         info = ESTUDOS_DADOS["Engenharia-de-Deteccao"]

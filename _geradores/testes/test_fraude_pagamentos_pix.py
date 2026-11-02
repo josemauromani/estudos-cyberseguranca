@@ -206,6 +206,25 @@ class TestFraudePagamentosPix(unittest.TestCase):
         self.assertIn("comunicados do Banco Central", body)
         self.assertIn("IN BCB 766", body)
 
+    def test_diagrama_poe_o_bloqueio_cautelar_fora_do_med(self):
+        """O texto diz 'Além do MED…': o bloqueio cautelar é medida à parte, não etapa da contestação."""
+        body = self._body()
+        m = re.search(r'<pre class="mermaid" data-title="Fluxo do MED 2.0[^"]*">(.*?)</pre>', body, re.S)
+        self.assertIsNotNone(m, "diagrama do MED ausente")
+        codigo = m.group(1)
+        sub = re.search(r'subgraph MED\b[^\n]*\n(.*?)\n\s*end\b', codigo, re.S)
+        self.assertIsNotNone(sub, "as etapas do MED ficam num subgraph MED")
+        self.assertIn("Vítima contesta", sub.group(1))
+        self.assertIn("Devolução", sub.group(1))
+        self.assertNotIn("Bloqueio cautelar", sub.group(1), "o bloqueio cautelar fica fora do MED")
+        no = re.search(r'(\w+)\["Bloqueio cautelar[^\]]*\]', codigo)
+        self.assertIsNotNone(no)
+        self.assertRegex(no.group(0), r"à parte do MED")
+        self.assertIn("sem prazo", no.group(0))
+        bc = no.group(1)
+        self.assertIsNone(re.search(r"\b%s\s*-->" % bc, codigo), "o bloqueio cautelar não leva à análise do MED")
+        self.assertIsNone(re.search(r"-->\s*%s\b" % bc, codigo), "a contestação não leva ao bloqueio cautelar")
+
     def test_med_nao_cobre_pix_por_engano(self):
         body = self._body()
         self.assertIn("por engano", body)
