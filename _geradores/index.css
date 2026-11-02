@@ -263,9 +263,10 @@ h1, h2, h3 {
   background: var(--sunk);
 }
 
+/* Texto do item ativo misturado com --ink: contraste AA sobre --accent-soft no claro. */
 .menu-lateral a[aria-current="page"] {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: color-mix(in srgb, var(--accent) 85%, var(--ink));
   font-weight: 600;
 }
 
@@ -766,15 +767,16 @@ a.rota-passo-link:hover {
   font-weight: 600;
 }
 
+/* Passo concluído: texto --ok misturado com --ink para contraste AA sobre o tom verde. */
 .rota-passo.feito {
   background: color-mix(in srgb, var(--ok) 12%, transparent);
   border-color: transparent;
+  color: color-mix(in srgb, var(--ok) 85%, var(--ink));
 }
 
-.rota-passo.feito,
 .rota-passo.feito .rota-passo-link,
 .rota-passo.feito .rota-passo-num {
-  color: var(--ok);
+  color: inherit;
 }
 
 .rota-passo.feito .rota-passo-check {
@@ -784,13 +786,13 @@ a.rota-passo-link:hover {
 .rota-passo.proximo {
   background: var(--accent);
   border-color: var(--accent);
+  color: var(--surface);
   font-weight: 600;
 }
 
-.rota-passo.proximo,
 .rota-passo.proximo .rota-passo-link,
 .rota-passo.proximo .rota-passo-num {
-  color: var(--surface);
+  color: inherit;
 }
 
 /* --------------------------------------------------------------------------

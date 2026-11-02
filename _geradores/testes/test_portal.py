@@ -21,6 +21,59 @@ from contrato import extrair_secoes  # noqa: E402
 INDEX_CSS = GERADORES_DIR / "index.css"
 
 
+TOKENS_CSS = GERADORES_DIR / "tokens.css"
+
+# Blocos de tema de tokens.css (claro, escuro por preferência, escuro e claro explícitos).
+BLOCOS_DE_TEMA = {
+    "claro": r"^:root \{(.*?)^\}",
+    "escuro (preferência)": r"^  :root:not\(\[data-theme=\"light\"\]\) \{(.*?)^  \}",
+    "escuro": r"^:root\[data-theme=\"dark\"\] \{(.*?)^\}",
+    "claro (forçado)": r"^:root\[data-theme=\"light\"\] \{(.*?)^\}",
+}
+
+
+def _regra_css(css, seletor):
+    """Declarações da regra cujo seletor é exatamente o informado (fora de @media)."""
+    m = re.search(r"(?:^|\}|\*/)\s*" + re.escape(seletor) + r"\s*\{([^}]*)\}", css)
+    return m.group(1) if m else ""
+
+
+def _cor(valor, tokens):
+    """Resolve var(), #hex, rgba(), transparent e color-mix(in srgb, A p%, B) para (r, g, b, alfa)."""
+    valor = valor.strip()
+    m = re.fullmatch(r"var\((--[\w-]+)\)", valor)
+    if m:
+        return _cor(tokens[m.group(1)], tokens)
+    if valor == "transparent":
+        return (0.0, 0.0, 0.0, 0.0)
+    if valor.startswith("#"):
+        return tuple(float(int(valor[i:i + 2], 16)) for i in (1, 3, 5)) + (1.0,)
+    m = re.fullmatch(r"rgba\(([^)]*)\)", valor)
+    if m:
+        return tuple(float(x) for x in m.group(1).split(","))
+    m = re.fullmatch(r"color-mix\(in srgb, (.+?) (\d+)%, (.+)\)", valor)
+    if m:
+        a, p, b = _cor(m.group(1), tokens), int(m.group(2)) / 100, _cor(m.group(3), tokens)
+        alfa = a[3] * p + b[3] * (1 - p)
+        if alfa == 0:
+            return (0.0, 0.0, 0.0, 0.0)
+        return tuple((a[i] * a[3] * p + b[i] * b[3] * (1 - p)) / alfa for i in range(3)) + (alfa,)
+    raise ValueError(valor)
+
+
+def _sobre(cor, fundo):
+    return tuple(cor[i] * cor[3] + fundo[i] * (1 - cor[3]) for i in range(3))
+
+
+def _contraste(a, b):
+    def lum(c):
+        c = [x / 255 for x in c]
+        c = [x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+    la, lb = sorted([lum(a), lum(b)], reverse=True)
+    return (la + 0.05) / (lb + 0.05)
+
+
 def _cartao(html, slug):
     """Tag de abertura do cartão do catálogo do módulo."""
     m = re.search(rf'<a class="mc[^"]*" id="estudo-{re.escape(slug)}"[^>]*>', html)
@@ -191,6 +244,44 @@ class TestPortalCss(unittest.TestCase):
     def test_views_ocultas_respeitam_hidden(self):
         self.assertRegex(self.css, r"\.view\[hidden\]\s*\{[^}]*display:\s*none")
 
+
+    def test_texto_pequeno_colorido_tem_contraste_aa_nos_temas(self):
+        """Texto pequeno colorido sobre fundo tingido (ou na cor de destaque) do portal:
+        >= 4.5:1 em todos os blocos de tema de tokens.css.
+
+        Cada par: (seletor da cor, cor, seletor do fundo, fundo, superfícies onde o fundo pousa).
+        """
+        pares = [
+            ('.menu-lateral a[aria-current="page"]', "color-mix(in srgb, var(--accent) 85%, var(--ink))",
+             '.menu-lateral a[aria-current="page"]', "var(--accent-soft)", ["var(--ground)", "var(--surface)"]),
+            (".rota-passo.feito", "color-mix(in srgb, var(--ok) 85%, var(--ink))",
+             ".rota-passo.feito", "color-mix(in srgb, var(--ok) 12%, transparent)", ["var(--surface)"]),
+            (".rota-passo.proximo", "var(--surface)", ".rota-passo.proximo", "var(--accent)", ["var(--surface)"]),
+            (".mc-status.concluido", "var(--ok)", ".mc", "var(--surface)", ["var(--surface)"]),
+            (".mc-status.andamento", "color-mix(in srgb, var(--tipo-checklist) 85%, var(--ink))",
+             ".mc", "var(--surface)", ["var(--surface)"]),
+            (".mc-status.novo", "var(--muted)", ".mc", "var(--surface)", ["var(--surface)"]),
+            (".mc .tag.lab", "color-mix(in srgb, var(--tipo-laboratorio) 75%, var(--ink))",
+             ".mc .tag", "var(--sunk)", ["var(--surface)"]),
+            (".progresso-disp", "var(--muted)", ".progresso-disp", "var(--sunk)", ["var(--surface)"]),
+            ('.seg button[aria-pressed="true"]', "var(--surface)",
+             '.seg button[aria-pressed="true"]', "var(--ink)", ["var(--surface)"]),
+            (".btn-primary", "var(--surface)", ".btn-primary", "var(--accent)", ["var(--surface)"]),
+            (".need-target", "var(--accent)", ".need-card", "var(--surface)", ["var(--ground)"]),
+        ]
+        tokens_css = TOKENS_CSS.read_text(encoding="utf-8")
+        for sel_cor, cor, sel_fundo, fundo, bases in pares:
+            with self.subTest(seletor=sel_cor):
+                self.assertIn(f"color: {cor};", _regra_css(self.css, sel_cor))
+                self.assertIn(f"background: {fundo};", _regra_css(self.css, sel_fundo))
+            for tema, padrao in BLOCOS_DE_TEMA.items():
+                tokens = dict(re.findall(r"(--[\w-]+):\s*([^;]+);", re.search(padrao, tokens_css, re.S | re.M).group(1)))
+                for base in bases:
+                    chao = _sobre(_cor(base, tokens), (255.0, 255.0, 255.0))
+                    atras = _sobre(_cor(fundo, tokens), chao)
+                    frente = _sobre(_cor(cor, tokens), atras)
+                    with self.subTest(seletor=sel_cor, tema=tema, base=base):
+                        self.assertGreaterEqual(_contraste(frente, atras), 4.5)
 
 if __name__ == "__main__":
     unittest.main()
