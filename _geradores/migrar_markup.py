@@ -38,6 +38,8 @@ CLASSES_SECAO = ("study-section", "content-section")
 CLASSES_WRAPPER_TITULO = ("section-header", "section-title-wrap")
 CLASSES_MARCADOR = ("section-tag", "section-num")
 CLASSES_CABECALHO = ("study-header", "hero-header")
+# Parágrafo introdutório do cabeçalho legado (texto didático): vai para a 1ª seção (R11).
+CLASSES_LEAD_LEGADO = ("study-lead", "hero-subtitle")
 # Widgets do checklist legado substituídos pelo cabeçalho "N de M" do base.js.
 CLASSES_WIDGET_CHECKLIST = ("checklist-counter", "checklist-progress-bar")
 CALLOUT_LEGADO = {
@@ -219,15 +221,36 @@ def _secoes_raiz(raiz):
 # --------------------------------------------------------------------------
 # Passos da normalização (spec §3.5.3)
 # --------------------------------------------------------------------------
+def _insercao_lead(html, raiz, lead):
+    """p.lead-text com o miolo do lead legado, logo após o h2 da 1ª seção."""
+    secoes = _secoes_raiz(raiz)
+    if not secoes:
+        raise ValueError("lead do cabeçalho legado sem seção para recebê-lo")
+    h2 = next((d for d in secoes[0].descendentes() if d.tag == "h2"), None)
+    if h2 is None:
+        raise ValueError(f"section#{secoes[0].get('id')} sem h2 para receber o lead")
+    # Com invólucro de título (G2), o lead entra depois dele, que o passo seguinte reduz ao h2.
+    ancora = h2.pai if any(h2.pai.tem_classe(c) for c in CLASSES_WRAPPER_TITULO) else h2
+    pos = _fim(html, ancora)
+    miolo = html[lead.fim_abertura:lead.ini_fechamento]
+    return (pos, pos, f'\n\n{_indentacao(html, ancora.ini)}<p class="lead-text">{miolo}</p>')
+
+
 def _passo_estrutura(html, chave):
-    """Remove cabeçalhos legados e garante um article.study-container na raiz."""
+    """Remove cabeçalhos legados (o lead vai para a 1ª seção) e garante o article na raiz."""
     raiz = _Arvore(html).raiz
     ed = []
+    lead_movido = False
     for no in raiz.descendentes():
         if no.tag == "header" and any(no.tem_classe(c) for c in CLASSES_CABECALHO):
             a, b, _ = _remocao(html, no.ini, _fim(html, no))
             # O comentário que anuncia o cabeçalho sai junto com ele.
             ed.append((_comentarios_acima(html, a) if a == _inicio_linha(html, a) else a, b, ""))
+            lead = next((d for d in no.descendentes() if d.tag == "p"
+                         and any(d.tem_classe(c) for c in CLASSES_LEAD_LEGADO)), None)
+            if lead is not None and not lead_movido:
+                ed.append(_insercao_lead(html, raiz, lead))
+                lead_movido = True
     tem_article = any(n.tag == "article" and n.tem_classe("study-container") for n in raiz.descendentes())
     if not tem_article:
         abertura = f'<article class="study-container" data-slug="{escape(chave.replace("_", "-"))}">'
@@ -533,8 +556,21 @@ def _texto(no, pular=_fora_do_texto):
     return " ".join(" ".join(partes).split())
 
 
+def _lead_legado(raiz):
+    """Texto normalizado do lead do cabeçalho legado, ou ""."""
+    for cab in _descendentes(raiz):
+        if cab.tag == "header" and cab.classes & set(CLASSES_CABECALHO):
+            for d in _descendentes(cab):
+                if d.tag == "p" and d.classes & set(CLASSES_LEAD_LEGADO):
+                    return _texto(d)
+    return ""
+
+
 def texto_visivel(html: str) -> list:
+    """Texto de cada seção. Num corpo legado, o lead do cabeçalho conta como o texto logo
+    após o h2 da 1ª seção, que é onde a migração o põe (R11)."""
     raiz = _ArvoreTexto(html).raiz
+    lead = _lead_legado(raiz)
     saida = []
 
     def achar(no):
@@ -542,7 +578,13 @@ def texto_visivel(html: str) -> list:
             if isinstance(f, str):
                 continue
             if f.tag == "section" and f.classes & set(CLASSES_SECAO):
-                saida.append(_texto(f))
+                if lead and not saida:
+                    h2 = next((d for d in _descendentes(f) if d.tag == "h2"), None)
+                    titulo = _texto(h2) if h2 is not None else ""
+                    resto = _texto(f, pular=lambda n: n is h2 or _fora_do_texto(n))
+                    saida.append(" ".join(t for t in (titulo, lead, resto) if t))
+                else:
+                    saida.append(_texto(f))
             else:
                 achar(f)
 
@@ -625,6 +667,13 @@ def _problemas(antes, depois, chave):
     problemas = []
     if texto_visivel(antes) != texto_visivel(depois):
         problemas.append(f"{chave}: texto visível das seções mudaria")
+    lead = cabecalho_legado(antes).get("subtitulo")
+    if lead:
+        secoes = extrair_secoes(depois)
+        textos = texto_visivel(depois)
+        titulo = _texto(_ArvoreTexto(secoes[0].titulo_html).raiz) if secoes else ""
+        if not textos or not textos[0].startswith(f"{titulo} {lead}"):
+            problemas.append(f"{chave}: lead do cabeçalho legado ausente logo após o h2 da 1ª seção")
     problemas.extend(validar_corpo(depois, chave))
     return problemas
 

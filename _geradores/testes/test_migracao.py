@@ -606,6 +606,47 @@ class TestMigracaoDetalhes(unittest.TestCase):
 
 
 
+class TestLeadLegado(unittest.TestCase):
+    """R11: o parágrafo introdutório do cabeçalho legado vai para a 1ª seção."""
+
+    def test_g2_lead_logo_apos_o_primeiro_h2(self):
+        out = migrar(G2, "x")
+        self.assertIn('<section class="study-section" id="modelos-rede" data-tipo="teoria">\n'
+                      '  <h2>Modelos de Rede, Camadas e Encapsulamento</h2>\n\n'
+                      '  <p class="lead-text">\n'
+                      '    A cibersegurança operacional começa na camada de transporte e roteamento.\n'
+                      '  </p>\n\n'
+                      '  <p>\n', out)
+        self.assertNotIn("study-header", out); self.assertNotIn("study-lead", out)
+        self.assertEqual(out.count("A cibersegurança operacional começa"), 1)
+
+    def test_g1_lead_logo_apos_o_primeiro_h2(self):
+        out = migrar(G1, "x")
+        self.assertIn('    <h2>1. Introdução e Contexto Prático da Cibersegurança</h2>\n\n'
+                      '    <p class="lead-text">Pilares da segurança da informação e metodologia STRIDE.</p>\n'
+                      '    <p>\n', out)
+        self.assertNotIn("hero-header", out); self.assertNotIn("hero-subtitle", out)
+
+    def test_lead_idempotente_e_valido(self):
+        for g in (G1, G2, G2B):
+            uma = migrar(g, "x")
+            self.assertEqual(migrar(uma, "x"), uma)
+            self.assertEqual(uma.count('class="lead-text"'), 1)
+            self.assertEqual(validar_corpo(uma, "x"), [])
+
+    def test_texto_visivel_conta_o_lead_na_primeira_secao(self):
+        primeira = texto_visivel(G2)[0]
+        self.assertTrue(primeira.startswith(
+            "Modelos de Rede, Camadas e Encapsulamento A cibersegurança operacional começa"))
+        self.assertEqual(texto_visivel(G2), texto_visivel(migrar(G2, "x")))
+        self.assertEqual(texto_visivel(G1), texto_visivel(migrar(G1, "x")))
+
+    def test_texto_visivel_acusa_lead_perdido(self):
+        sem_lead = migrar(G2, "x").replace(
+            "    A cibersegurança operacional começa na camada de transporte e roteamento.\n", "")
+        self.assertNotEqual(texto_visivel(G2), texto_visivel(sem_lead))
+
+
 class TestCli(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -656,6 +697,17 @@ class TestCli(unittest.TestCase):
         self.assertEqual(rc, 1)
         self.assertIn("x: texto visível das seções mudaria", err)
         self.assertEqual(corpo.read_text(encoding="utf-8"), G3)
+
+    def test_aplicar_aborta_se_o_lead_sumir(self):
+        corpo = self.dir / "x_body.html"
+        corpo.write_text(G2, encoding="utf-8")
+        estragado = migrar(G2, "x").replace(
+            "    A cibersegurança operacional começa na camada de transporte e roteamento.\n", "")
+        with mock.patch.object(migrar_markup, "migrar", return_value=estragado):
+            rc, _, err = self._rodar("--aplicar")
+        self.assertEqual(rc, 1)
+        self.assertIn("x: lead do cabeçalho legado ausente logo após o h2 da 1ª seção", err)
+        self.assertEqual(corpo.read_text(encoding="utf-8"), G2)
 
 
 if __name__ == "__main__":
