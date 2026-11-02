@@ -1,0 +1,1034 @@
+<!-- Estudo 19: Forense-Digital Body Fragment -->
+<article class="study-container" data-slug="forense-digital">
+
+    <!-- SEÇÃO 1: PRESERVAR A PROVA -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: Evidência Que Resiste a Perguntas</h2>
+        </div>
+
+        <p class="lead-text">
+            Depois do incidente, alguém vai perguntar o que exatamente aconteceu: a diretoria, a seguradora, a ANPD, a polícia, talvez um juiz. A forense digital responde com fatos reconstruídos a partir de artefatos, e esses fatos só valem se a evidência foi coletada sem alteração e se for possível provar isso. Neste estudo você vai preservar e analisar as evidências do SRV-ERP01 da Ipê Store, o servidor invadido no Estudo 16 e criptografado no Estudo 42.
+        </p>
+
+        <h3>As Regras do Jogo</h3>
+        <ul>
+            <li><strong>ISO/IEC 27037</strong>: orienta a identificação, a coleta, a aquisição e a preservação de evidência digital, com os papéis do primeiro respondente e do especialista. As normas 27041 a 27043 cobrem a validação dos métodos, a análise e a investigação.</li>
+            <li><strong>RFC 3227</strong>: define a <strong>ordem de volatilidade</strong>. Colete primeiro o que se perde mais rápido: registradores e cache; memória e estado do sistema (processos, conexões, tabela ARP); sistemas de arquivos temporários; disco; logs remotos e de monitoramento; configuração física e topologia; por último, mídias de arquivo.</li>
+            <li><strong>Código de Processo Penal, arts. 158-A a 158-F</strong>, incluídos pela <strong>Lei 13.964/2019</strong>: a <strong>cadeia de custódia</strong> é o conjunto de procedimentos que documenta a história cronológica do vestígio, da coleta ao descarte, em dez etapas (reconhecimento, isolamento, fixação, coleta, acondicionamento, transporte, recebimento, processamento, armazenamento e descarte).</li>
+        </ul>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Processo Forense, da Coleta ao Relatório</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Processo Forense, da Coleta ao Relatório">
+flowchart TD
+    I["Identificação<br><small>o que pode conter evidência</small>"]
+    C["Coleta e aquisição<br><small>memória primeiro, depois imagem do disco</small>"]
+    H["Hash SHA-256 na coleta<br><small>registrado no formulário de custódia</small>"]
+    P["Preservação<br><small>original lacrado, análise sobre cópia de trabalho</small>"]
+    A["Análise<br><small>artefatos e super-timeline em UTC</small>"]
+    R["Relatório<br><small>fatos, método e conclusões reproduzíveis</small>"]
+    I --> C
+    C --> H
+    H --> P
+    P --> A
+    A --> R
+            </pre>
+        </div>
+
+        <h3>Aquisição Sem Contaminar</h3>
+        <ul>
+            <li><strong>Máquina ligada:</strong> se ela já está isolada da rede (Estudo 42), colete a memória antes de qualquer outra coisa. A RAM guarda processos, conexões, comandos e, com frequência, a chave do <strong>BitLocker</strong>; desligar um disco cifrado sem a chave pode tornar a imagem ilegível.</li>
+            <li><strong>Imagem bit a bit</strong> do disco, em formato bruto (raw/dd) ou <strong>E01</strong> (Expert Witness, que guarda metadados e hash), feita através de um <strong>bloqueador de escrita</strong> físico ou lógico para que o sistema de análise não altere o original.</li>
+            <li><strong>Hash</strong> <strong>SHA-256</strong> calculado na coleta e anotado no formulário de custódia; a cada etapa, o hash é recalculado e comparado. MD5 e SHA-1 ainda aparecem em laudos antigos, mas têm colisões conhecidas.</li>
+            <li><strong>Análise sempre sobre cópia de trabalho</strong>; o original fica lacrado, com cada transferência registrada (quem, quando, por quê).</li>
+        </ul>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">aquisição e análise — memória, disco e timeline</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-fd-comandos')">Copiar</button>
+            </div>
+            <pre><code id="code-fd-comandos"># Memória do servidor ligado e isolado (Windows)
+C:\&gt; winpmem_mini_x64.exe E:\SRV-ERP01-ram.raw
+
+# Imagem do disco, já atrás do bloqueador de escrita (Linux)
+$ dc3dd if=/dev/sdb of=SRV-ERP01-disco0.raw hash=sha256 log=coleta.log
+$ sha256sum SRV-ERP01-disco0.raw
+
+# Memória com Volatility 3: processos e conexões
+$ vol -f SRV-ERP01-ram.raw windows.pslist
+$ vol -f SRV-ERP01-ram.raw windows.netscan
+
+# Super-timeline com Plaso
+$ log2timeline.py --storage-file srv-erp01.plaso SRV-ERP01-disco0.raw
+$ psort.py -o l2tcsv -w timeline.csv srv-erp01.plaso</code></pre>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: ARTEFATOS E TIMELINE -->
+    <section class="study-section" id="artefatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Artefatos do Windows e Super-Timeline</h2>
+        </div>
+
+        <h3>O Que Cada Artefato Prova</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Artefato</th><th>Onde fica</th><th>O que prova (e o que não prova)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Prefetch</strong></td><td><code>C:\Windows\Prefetch\*.pf</code></td><td>Execução de um programa, contagem e até 8 últimas execuções. Vem desabilitado por padrão no Windows Server.</td></tr>
+                    <tr><td><strong>Amcache</strong></td><td><code>Amcache.hve</code></td><td>Programa presente, com caminho e hash SHA-1. Sozinho, não prova execução.</td></tr>
+                    <tr><td><strong>Shimcache</strong> (AppCompatCache)</td><td>Hive SYSTEM</td><td>Arquivo visto pelo sistema. Nas versões recentes do Windows não prova execução, e o horário é o da última modificação do arquivo.</td></tr>
+                    <tr><td><strong>LNK</strong> e Jump Lists</td><td>Pasta Recent do perfil</td><td>Arquivos e pastas que o usuário abriu, inclusive em compartilhamentos de rede.</td></tr>
+                    <tr><td><strong>$MFT</strong></td><td>Tabela mestra do NTFS</td><td>Metadados de cada arquivo, com dois conjuntos de datas: <strong>$STANDARD_INFORMATION</strong> e <strong>$FILE_NAME</strong>.</td></tr>
+                    <tr><td><strong>$UsnJrnl</strong></td><td>Diário de alterações do NTFS</td><td>Criações, renomeações e exclusões recentes, inclusive de arquivos já apagados.</td></tr>
+                    <tr><td><strong>Registro</strong></td><td>Hives SYSTEM, SOFTWARE, NTUSER.DAT</td><td>Persistência (chaves Run, T1547.001; serviços), UserAssist, ShellBags, dispositivos USB.</td></tr>
+                    <tr><td><strong>EVTX</strong></td><td><code>C:\Windows\System32\winevt\Logs</code></td><td>Logons (4624), processos (4688), serviços instalados (7045), log apagado (1102).</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">🕰️</span>
+                <strong>Timestomping deixa rastro</strong>
+            </div>
+            <p>
+                O <strong>timestomping</strong> (T1070.006) muda as datas de um arquivo para ele parecer antigo e legítimo. As ferramentas comuns alteram o <code>$STANDARD_INFORMATION</code>, que é o que o Explorer mostra, mas o <code>$FILE_NAME</code> é mantido pelo kernel e é bem mais difícil de alterar. Um arquivo "criado em 2023" pelo $SI e em 2025 pelo $FN foi adulterado.
+            </p>
+        </div>
+
+        <h3>Super-Timeline: Tudo na Mesma Régua</h3>
+        <p>
+            Uma super-timeline junta os eventos de todos os artefatos numa única linha do tempo. O <strong>Plaso</strong> (log2timeline) extrai os eventos da imagem, e o <strong>Timesketch</strong> permite filtrar, marcar e colaborar na análise; o <strong>Volatility</strong> faz o mesmo papel para a memória. A regra de ouro é normalizar tudo para <strong>UTC</strong>: o EVTX e o NTFS gravam em UTC, mas exportações de firewall, consoles de EDR e logs de aplicação muitas vezes vêm em horário local. Misturar os dois inverte a ordem dos fatos.
+        </p>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Relatório reproduzível</strong>
+            </div>
+            <p>
+                O relatório separa fatos (o que o artefato mostra), interpretação (o que isso indica) e limitações (o que não dá para afirmar). Cada conclusão cita o artefato, a ferramenta, a versão e o hash da evidência, para que outro perito chegue ao mesmo resultado.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Analisador de Timeline de Evidências</h2>
+        </div>
+
+        <p class="lead-text">
+            Primeiro, confira a integridade de uma evidência pelo hash registrado na coleta. Depois, carregue os artefatos do SRV-ERP01 numa super-timeline, marque o que é do invasor e responda às perguntas da investigação.
+        </p>
+
+        <div class="lab-box fd-lab" id="fd-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Laboratório de Forense Digital</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Caso INC-2025-031 — SRV-ERP01</h3>
+                    <p id="fd-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">1. Cadeia de custódia e integridade</h4>
+                <dl id="fd-custodia" style="display: grid; grid-template-columns: minmax(0, 8rem) minmax(0, 1fr); gap: 0.25rem 0.75rem; font-size: 0.85rem; margin: 0 0 0.75rem 0; overflow-wrap: anywhere;"></dl>
+                <label for="fd-evidencia" style="font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">Conteúdo da evidência (edite um caractere para ver o efeito)</label>
+                <textarea class="form-control" id="fd-evidencia" rows="4" spellcheck="false" style="width: 100%; box-sizing: border-box; font-size: 0.75rem; resize: vertical;"></textarea>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                    <button class="btn-primary" type="button" onclick="verificarIntegridadeForense()">Calcular SHA-256 e comparar</button>
+                    <button class="btn-secondary" type="button" id="fd-restaurar-evidencia">Restaurar evidência original</button>
+                </div>
+                <div id="fd-integridade" aria-live="polite" style="margin-top: 0.6rem; font-size: 0.85rem; overflow-wrap: anywhere;"></div>
+
+                <h4 style="margin-top: 1.75rem;">2. Super-timeline</h4>
+                <p style="font-size: 0.85rem; margin: 0 0 0.4rem 0;">Carregue os artefatos (um a um ou todos):</p>
+                <div id="fd-fontes" style="display: flex; flex-wrap: wrap; gap: 0.35rem;"></div>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: center; margin-top: 0.75rem; font-size: 0.85rem;">
+                    <span role="radiogroup" aria-label="Horário exibido" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <label style="display: flex; gap: 0.3rem; align-items: center;"><input type="radio" name="fd-fuso" value="utc" checked> UTC normalizado</label>
+                        <label style="display: flex; gap: 0.3rem; align-items: center;"><input type="radio" name="fd-fuso" value="bruto"> Como armazenado</label>
+                    </span>
+                    <input class="form-control" type="text" id="fd-filtro" placeholder="Filtrar (ex.: rclone, 4624, IpeUpdate)" aria-label="Filtrar eventos" style="flex: 1 1 200px; min-width: 0;">
+                </div>
+                <p id="fd-aviso-fuso" style="font-size: 0.8rem; margin: 0.5rem 0 0 0;"></p>
+                <ol id="fd-timeline" style="list-style: none; margin: 0.6rem 0 0 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem; max-height: 30rem; overflow-y: auto;"></ol>
+                <div style="margin-top: 0.75rem;">
+                    <button class="btn-primary" type="button" onclick="conferirMarcacoesForense()">Conferir marcações</button>
+                </div>
+                <div id="fd-resultado-marcacoes" aria-live="polite" style="margin-top: 0.6rem; font-size: 0.88rem;"></div>
+
+                <h4 style="margin-top: 1.75rem;">3. Perguntas da investigação</h4>
+                <div id="fd-perguntas" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.75rem; font-size: 0.88rem;"></div>
+                <div style="margin-top: 0.75rem;">
+                    <button class="btn-primary" type="button" onclick="verificarRespostasForense()">Verificar respostas</button>
+                </div>
+                <div id="fd-resultado-perguntas" aria-live="polite" style="margin-top: 0.6rem; font-size: 0.88rem;"></div>
+
+                <div style="margin-top: 1.25rem;">
+                    <button class="btn-secondary" type="button" onclick="restaurarForense()">Restaurar laboratório</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Coleta e Análise Forense</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para preparar e conduzir uma coleta. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="forense-digital">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-fd-1">
+                <label for="chk-fd-1"><strong>Kit pronto:</strong> há bloqueador de escrita, mídias de destino limpas e ferramentas de coleta de memória e de disco testadas, com versões registradas.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-fd-2">
+                <label for="chk-fd-2"><strong>Ordem de volatilidade:</strong> a memória é coletada antes de desligar, e a chave de recuperação do BitLocker é obtida antes de qualquer reinício.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-fd-3">
+                <label for="chk-fd-3"><strong>Hash na coleta:</strong> cada evidência tem SHA-256 calculado na hora da aquisição e anotado no formulário de custódia.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-fd-4">
+                <label for="chk-fd-4"><strong>Custódia documentada:</strong> cada transferência registra quem entregou, quem recebeu, quando, onde e por quê.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-fd-5">
+                <label for="chk-fd-5"><strong>Cópia de trabalho:</strong> a análise é feita sobre cópia, com o hash conferido antes de começar; o original fica lacrado.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-fd-6">
+                <label for="chk-fd-6"><strong>Tudo em UTC:</strong> o fuso de cada fonte foi identificado e a timeline foi normalizada antes das conclusões.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-fd-7">
+                <label for="chk-fd-7"><strong>Relatório reproduzível:</strong> fatos, interpretações e limitações estão separados, com artefato, ferramenta, versão e hash citados.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Volatilidade):</strong> Um servidor comprometido está ligado, isolado da rede e com o disco cifrado pelo BitLocker. Qual é o primeiro passo da coleta?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Coletar a memória RAM, e garantir a chave de recuperação do BitLocker, antes de desligar.</p>
+                    <p>A memória é a evidência mais volátil (RFC 3227) e pode conter a chave do disco. Desligar primeiro perde os processos e pode deixar a imagem do disco ilegível.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Integridade):</strong> O hash SHA-256 da imagem calculado hoje é diferente do anotado na coleta. O que isso significa?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Que a imagem foi alterada ou corrompida depois da coleta, e a integridade não pode ser demonstrada.</p>
+                    <p>Volte ao original lacrado, gere nova cópia e confira o hash. Registre a divergência; esconder o fato compromete a cadeia de custódia.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Artefatos):</strong> O Shimcache mostra <code>rclone.exe</code> num servidor Windows Server 2022. Isso prova que ele foi executado?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. Nas versões recentes, o Shimcache indica presença, e o horário é o da última modificação do arquivo.</p>
+                    <p>A execução precisa ser confirmada por outro artefato: Prefetch, evento 4688 ou Sysmon, registros do EDR, ou o próprio tráfego gerado.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Timestomping):</strong> Como identificar que um arquivo teve a data de criação alterada para parecer antigo?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Comparando as datas do $STANDARD_INFORMATION com as do $FILE_NAME na $MFT.</p>
+                    <p>As ferramentas comuns alteram só o $SI. Se o $SI é muito anterior ao $FN, ou tem frações de segundo zeradas, há indício de adulteração (T1070.006).</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Fusos):</strong> O log do firewall mostra a saída de dados às 01:02 e o Prefetch mostra o rclone executado às 04:02. A saída aconteceu antes da ferramenta existir?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Provavelmente não: as fontes estão em fusos diferentes. Se o firewall exporta em UTC-3, 01:02 local são 04:02 UTC.</p>
+                    <p>Identifique o fuso de cada fonte e normalize para UTC antes de concluir qualquer coisa sobre a ordem dos eventos.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Custódia):</strong> O que o art. 158-A do Código de Processo Penal define, e por que importa para uma empresa privada?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A cadeia de custódia: os procedimentos que documentam a história cronológica do vestígio, da coleta ao descarte.</p>
+                    <p>Se o caso chegar à Justiça, a evidência coletada pela empresa será examinada com esse critério. Uma falha na custódia permite questionar a prova.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Volátil primeiro</h4>
+                <p>RFC 3227: memória antes de disco; chave do BitLocker antes de desligar.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Hash e custódia</h4>
+                <p>SHA-256 na coleta, bloqueador de escrita, cópia de trabalho e CPP 158-A a 158-F.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Artefato certo</h4>
+                <p>Prefetch prova execução; Amcache e Shimcache, presença; $FN denuncia timestomping.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Tudo em UTC</h4>
+                <p>Super-timeline com Plaso; fuso de cada fonte identificado antes de concluir.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>ISO/IEC 27037:2012 — Guidelines for identification, collection, acquisition and preservation of digital evidence.</li>
+            <li>RFC 3227 — Guidelines for Evidence Collection and Archiving.</li>
+            <li>Decreto-Lei nº 3.689/1941 (Código de Processo Penal), arts. 158-A a 158-F, incluídos pela Lei nº 13.964/2019.</li>
+            <li>NIST SP 800-86 — Guide to Integrating Forensic Techniques into Incident Response.</li>
+            <li>Documentação do Plaso, do Timesketch e do Volatility 3.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 20 — Análise Básica de Malware e 18 — Resposta a Incidentes</strong>
+            </div>
+            <p>
+                O updater.exe encontrado aqui é o ponto de partida do Estudo 20, sobre análise estática e dinâmica. O Estudo 18 mostra onde a forense entra no ciclo de resposta.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="fd-dados">
+{
+ "contexto": "Evidências fictícias do SRV-ERP01 (incidente dos Estudos 16 e 42). Horários em UTC, salvo as fontes exportadas em horário local (UTC-3).",
+ "custodia": {
+  "item": "EV-2025-031-03: trecho do log do firewall de borda (exportação)",
+  "coletado_por": "Marina Costa, analista de resposta a incidentes",
+  "data_coleta": "08/11/2025 09:20 UTC",
+  "ferramenta": "Exportação do console do firewall; hash calculado com sha256sum no momento da coleta",
+  "texto_evidencia": "2025-11-05 01:02:15 ALLOW TCP 10.20.1.15:51544 -> 198.51.100.77:443 TLS sessao iniciada\n2025-11-05 03:41:02 ALLOW TCP 10.20.1.15:51544 -> 198.51.100.77:443 TLS sessao encerrada bytes_out=126701535232\nOrigem: firewall de borda da Ipê Store, exportado em horário local (UTC-3)",
+  "sha256": "3dbbcf404ef0c107abebb517a332071a6c9aaacc63086976de976e5f9cadc888"
+ },
+ "fontes": {
+  "EVTX": "Logs de eventos do Windows (horário em UTC)",
+  "Prefetch": "Prefetch (execuções; habilitado nos servidores pela linha de base da Ipê)",
+  "Amcache": "Amcache.hve (programas presentes, com hash SHA-1)",
+  "Shimcache": "Shimcache / AppCompatCache (presença; não prova execução)",
+  "MFT": "$MFT (metadados de arquivos)",
+  "LNK": "Arquivos LNK da pasta Recent",
+  "Registro": "Registro do Windows",
+  "Firewall": "Log do firewall de borda (exportado em horário local, UTC-3)",
+  "EDR": "Console do EDR (exportado em horário local, UTC-3)"
+ },
+ "eventos": [
+  {
+   "id": "f01",
+   "fonte": "MFT",
+   "ts_armazenado": "2024-02-10 12:59:50",
+   "fuso": "UTC",
+   "descricao": "Arquivo criado: C:\\Program Files\\GestorTI\\agent.exe",
+   "tipo": "arquivo",
+   "invasor": false,
+   "detalhes": {
+    "$STANDARD_INFORMATION criado": "2024-02-10 12:59:50",
+    "$FILE_NAME criado": "2024-02-10 12:59:50"
+   },
+   "mft": {
+    "si_criado": "2024-02-10 12:59:50",
+    "fn_criado": "2024-02-10 12:59:50"
+   }
+  },
+  {
+   "id": "f02",
+   "fonte": "Registro",
+   "ts_armazenado": "2024-02-10 13:00:00",
+   "fuso": "UTC",
+   "descricao": "Chave Run \"GestorTI\" aponta para C:\\Program Files\\GestorTI\\agent.exe",
+   "tipo": "persistencia",
+   "invasor": false,
+   "detalhes": {
+    "Chave": "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+    "Valor": "GestorTI"
+   }
+  },
+  {
+   "id": "f03",
+   "fonte": "EVTX",
+   "ts_armazenado": "2025-11-03 04:55:00",
+   "fuso": "UTC",
+   "descricao": "4624: logon de rede (tipo 3) de svc_backup a partir de 10.20.1.10",
+   "tipo": "logon",
+   "invasor": false,
+   "detalhes": {
+    "EventID": 4624,
+    "Conta": "svc_backup",
+    "IP": "10.20.1.10"
+   }
+  },
+  {
+   "id": "f04",
+   "fonte": "EVTX",
+   "ts_armazenado": "2025-11-03 05:14:40",
+   "fuso": "UTC",
+   "descricao": "4624: logon RDP (tipo 10) de erp_admin a partir de 203.0.113.45",
+   "tipo": "logon",
+   "invasor": true,
+   "detalhes": {
+    "EventID": 4624,
+    "Conta": "erp_admin",
+    "IP": "203.0.113.45",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "f05",
+   "fonte": "Prefetch",
+   "ts_armazenado": "2025-11-03 05:16:10",
+   "fuso": "UTC",
+   "descricao": "POWERSHELL.EXE executado (uma das últimas oito execuções registradas)",
+   "tipo": "execucao",
+   "invasor": true,
+   "detalhes": {
+    "Arquivo": "POWERSHELL.EXE-022A1004.pf"
+   }
+  },
+  {
+   "id": "f06",
+   "fonte": "MFT",
+   "ts_armazenado": "2025-11-03 05:17:28",
+   "fuso": "UTC",
+   "descricao": "Arquivo criado: C:\\ProgramData\\IpeUpdate\\updater.exe",
+   "tipo": "arquivo",
+   "invasor": true,
+   "detalhes": {
+    "$STANDARD_INFORMATION criado": "2023-06-14 10:00:00",
+    "$FILE_NAME criado": "2025-11-03 05:17:28"
+   },
+   "mft": {
+    "si_criado": "2023-06-14 10:00:00",
+    "fn_criado": "2025-11-03 05:17:28"
+   }
+  },
+  {
+   "id": "f07",
+   "fonte": "Amcache",
+   "ts_armazenado": "2025-11-03 05:17:30",
+   "fuso": "UTC",
+   "descricao": "updater.exe registrado em C:\\ProgramData\\IpeUpdate",
+   "tipo": "presenca",
+   "invasor": true,
+   "detalhes": {
+    "SHA-1": "3f1c9a5e7b2d4f60a8c1e9b7d3a5f2c4e6b8d0a1"
+   }
+  },
+  {
+   "id": "f08",
+   "fonte": "EVTX",
+   "ts_armazenado": "2025-11-03 05:18:00",
+   "fuso": "UTC",
+   "descricao": "4720: conta suporte_ti criada por erp_admin",
+   "tipo": "conta",
+   "invasor": true,
+   "detalhes": {
+    "EventID": 4720,
+    "Conta criada": "suporte_ti",
+    "Autor": "erp_admin"
+   }
+  },
+  {
+   "id": "f09",
+   "fonte": "Registro",
+   "ts_armazenado": "2025-11-03 05:18:05",
+   "fuso": "UTC",
+   "descricao": "Chave Run \"IpeUpdate\" aponta para C:\\ProgramData\\IpeUpdate\\updater.exe",
+   "tipo": "persistencia",
+   "invasor": true,
+   "detalhes": {
+    "Chave": "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+    "Valor": "IpeUpdate"
+   }
+  },
+  {
+   "id": "f10",
+   "fonte": "EVTX",
+   "ts_armazenado": "2025-11-03 05:18:20",
+   "fuso": "UTC",
+   "descricao": "4732: suporte_ti adicionada ao grupo Administradores",
+   "tipo": "conta",
+   "invasor": true,
+   "detalhes": {
+    "EventID": 4732,
+    "Grupo": "Administradores",
+    "Membro": "suporte_ti"
+   }
+  },
+  {
+   "id": "f11",
+   "fonte": "EVTX",
+   "ts_armazenado": "2025-11-03 05:21:00",
+   "fuso": "UTC",
+   "descricao": "1102: log de segurança apagado por erp_admin",
+   "tipo": "antiforense",
+   "invasor": true,
+   "detalhes": {
+    "EventID": 1102,
+    "Autor": "erp_admin"
+   }
+  },
+  {
+   "id": "f12",
+   "fonte": "Prefetch",
+   "ts_armazenado": "2025-11-03 10:30:00",
+   "fuso": "UTC",
+   "descricao": "POWERSHELL.EXE executado no horário da tarefa diária do agente GestorTI (07:30 local)",
+   "tipo": "execucao",
+   "invasor": false,
+   "detalhes": {
+    "Arquivo": "POWERSHELL.EXE-022A1004.pf"
+   }
+  },
+  {
+   "id": "f13",
+   "fonte": "EVTX",
+   "ts_armazenado": "2025-11-03 11:01:40",
+   "fuso": "UTC",
+   "descricao": "4624: logon RDP (tipo 10) de ana.souza a partir de 10.20.5.31",
+   "tipo": "logon",
+   "invasor": false,
+   "detalhes": {
+    "EventID": 4624,
+    "Conta": "ana.souza",
+    "IP": "10.20.5.31",
+    "LogonType": 10
+   }
+  },
+  {
+   "id": "f14",
+   "fonte": "Prefetch",
+   "ts_armazenado": "2025-11-03 11:05:00",
+   "fuso": "UTC",
+   "descricao": "EXCEL.EXE executado",
+   "tipo": "execucao",
+   "invasor": false,
+   "detalhes": {
+    "Arquivo": "EXCEL.EXE-A9C8F2D1.pf"
+   }
+  },
+  {
+   "id": "f15",
+   "fonte": "MFT",
+   "ts_armazenado": "2025-11-05 03:56:50",
+   "fuso": "UTC",
+   "descricao": "Arquivo criado: C:\\ProgramData\\IpeUpdate\\rclone.exe",
+   "tipo": "arquivo",
+   "invasor": true,
+   "detalhes": {
+    "$STANDARD_INFORMATION criado": "2025-11-05 03:56:50",
+    "$FILE_NAME criado": "2025-11-05 03:56:50"
+   },
+   "mft": {
+    "si_criado": "2025-11-05 03:56:50",
+    "fn_criado": "2025-11-05 03:56:50"
+   }
+  },
+  {
+   "id": "f16",
+   "fonte": "Shimcache",
+   "ts_armazenado": "2025-11-05 03:56:50",
+   "fuso": "UTC",
+   "descricao": "rclone.exe presente em C:\\ProgramData\\IpeUpdate (horário = última modificação do arquivo)",
+   "tipo": "presenca",
+   "invasor": true,
+   "detalhes": {}
+  },
+  {
+   "id": "f17",
+   "fonte": "LNK",
+   "ts_armazenado": "2025-11-05 03:58:40",
+   "fuso": "UTC",
+   "descricao": "financeiro.lnk na pasta Recent de erp_admin aponta para \\\\FS01\\financeiro",
+   "tipo": "descoberta",
+   "invasor": true,
+   "detalhes": {
+    "Alvo": "\\\\FS01\\financeiro",
+    "Perfil": "erp_admin"
+   }
+  },
+  {
+   "id": "f18",
+   "fonte": "Prefetch",
+   "ts_armazenado": "2025-11-05 04:02:11",
+   "fuso": "UTC",
+   "descricao": "RCLONE.EXE executado",
+   "tipo": "execucao",
+   "invasor": true,
+   "detalhes": {
+    "Arquivo": "RCLONE.EXE-6B1D7E30.pf"
+   }
+  },
+  {
+   "id": "f19",
+   "fonte": "Firewall",
+   "ts_armazenado": "2025-11-05 01:02:15",
+   "fuso": "UTC-3",
+   "descricao": "SRV-ERP01 abre sessão TLS para 198.51.100.77:443; 118 GB enviados até 03:41 (horário local)",
+   "tipo": "exfiltracao",
+   "invasor": true,
+   "detalhes": {
+    "Destino": "198.51.100.77:443",
+    "Volume": "118 GB"
+   }
+  },
+  {
+   "id": "f20",
+   "fonte": "EDR",
+   "ts_armazenado": "2025-11-07 22:39:50",
+   "fuso": "UTC-3",
+   "descricao": "Serviço IpeSync instalado (evento 7045) apontando para C:\\ProgramData\\IpeUpdate\\lock.exe",
+   "tipo": "impacto",
+   "invasor": true,
+   "detalhes": {
+    "Serviço": "IpeSync",
+    "Binário": "C:\\ProgramData\\IpeUpdate\\lock.exe"
+   }
+  },
+  {
+   "id": "f21",
+   "fonte": "EDR",
+   "ts_armazenado": "2025-11-07 22:40:03",
+   "fuso": "UTC-3",
+   "descricao": "vssadmin delete shadows /all /quiet",
+   "tipo": "antiforense",
+   "invasor": true,
+   "detalhes": {
+    "Linha de comando": "vssadmin delete shadows /all /quiet"
+   }
+  },
+  {
+   "id": "f22",
+   "fonte": "Prefetch",
+   "ts_armazenado": "2025-11-08 01:40:05",
+   "fuso": "UTC",
+   "descricao": "VSSADMIN.EXE executado",
+   "tipo": "execucao",
+   "invasor": true,
+   "detalhes": {
+    "Arquivo": "VSSADMIN.EXE-4F7A2C11.pf"
+   }
+  },
+  {
+   "id": "f23",
+   "fonte": "MFT",
+   "ts_armazenado": "2025-11-08 01:40:31",
+   "fuso": "UTC",
+   "descricao": "Primeiro arquivo .lockipe criado em D:\\ERP\\dados",
+   "tipo": "impacto",
+   "invasor": true,
+   "detalhes": {
+    "Arquivo": "D:\\ERP\\dados\\pedidos-2025.mdf.lockipe"
+   }
+  }
+ ],
+ "perguntas": [
+  {
+   "id": "primeira_execucao",
+   "enunciado": "Qual foi o primeiro programa executado pelo invasor no servidor?",
+   "opcoes": [
+    {
+     "valor": "f05",
+     "texto": "POWERSHELL.EXE, às 05:16:10 UTC de 03/11"
+    },
+    {
+     "valor": "f07",
+     "texto": "updater.exe, registrado no Amcache às 05:17:30 UTC"
+    },
+    {
+     "valor": "f18",
+     "texto": "RCLONE.EXE, em 05/11"
+    },
+    {
+     "valor": "f14",
+     "texto": "EXCEL.EXE, às 11:05 UTC de 03/11"
+    }
+   ],
+   "correta": "f05",
+   "explicacao": "O PowerShell roda 1 minuto e meio depois do logon RDP do erp_admin. O Amcache mostra que o updater.exe esteve presente, o que não é o mesmo que ter sido executado primeiro, e o Excel é da Ana, às 08:05 local."
+  },
+  {
+   "id": "exfiltracao",
+   "enunciado": "Em que momento, em UTC, começou a saída dos 118 GB?",
+   "opcoes": [
+    {
+     "valor": "2025-11-05T01:02:15Z",
+     "texto": "05/11/2025 01:02:15 UTC"
+    },
+    {
+     "valor": "2025-11-05T04:02:15Z",
+     "texto": "05/11/2025 04:02:15 UTC"
+    },
+    {
+     "valor": "2025-11-03T05:14:40Z",
+     "texto": "03/11/2025 05:14:40 UTC"
+    },
+    {
+     "valor": "2025-11-08T01:40:03Z",
+     "texto": "08/11/2025 01:40:03 UTC"
+    }
+   ],
+   "correta": "2025-11-05T04:02:15Z",
+   "explicacao": "O firewall exporta em horário local (UTC-3): 01:02:15 local são 04:02:15 UTC, quatro segundos depois da execução do rclone. Ler o horário local como UTC coloca a saída antes de a ferramenta existir."
+  },
+  {
+   "id": "persistencia",
+   "enunciado": "Qual entrada do Registro faz o malware voltar depois de reiniciar o servidor?",
+   "opcoes": [
+    {
+     "valor": "f09",
+     "texto": "Run \\ IpeUpdate → updater.exe"
+    },
+    {
+     "valor": "f02",
+     "texto": "Run \\ GestorTI → agent.exe"
+    },
+    {
+     "valor": "f10",
+     "texto": "Inclusão de suporte_ti em Administradores"
+    }
+   ],
+   "correta": "f09",
+   "explicacao": "A chave IpeUpdate foi gravada às 05:18 de 03/11, dentro da sessão do invasor (T1547.001). A GestorTI existe desde 2024 e é o agente legítimo. A conta nova é persistência também, mas não está no Registro."
+  },
+  {
+   "id": "timestomping",
+   "enunciado": "Qual arquivo teve a data de criação adulterada (timestomping)?",
+   "opcoes": [
+    {
+     "valor": "f06",
+     "texto": "updater.exe"
+    },
+    {
+     "valor": "f15",
+     "texto": "rclone.exe"
+    },
+    {
+     "valor": "f01",
+     "texto": "agent.exe"
+    }
+   ],
+   "correta": "f06",
+   "explicacao": "No updater.exe, o $STANDARD_INFORMATION diz 2023, mas o $FILE_NAME diz 03/11/2025. Ferramentas comuns de timestomping alteram só o $SI (T1070.006); a divergência denuncia a adulteração."
+  }
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var FD = JSON.parse(document.getElementById("fd-dados").textContent);
+    var HORA = 3600000;
+    var carregadas = {};
+    var marcados = {};
+    var modo = "utc";
+    var conferido = false;
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    // Mesma normalização dos testes: horário armazenado + deslocamento do fuso = UTC.
+    function utc(e) {
+        var m = e.ts_armazenado.match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/);
+        var t = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
+        return new Date(t + (e.fuso === "UTC-3" ? 3 * HORA : 0));
+    }
+    function fmtUtc(d) {
+        var s = d.toISOString();
+        return s.slice(8, 10) + "/" + s.slice(5, 7) + "/" + s.slice(0, 4) + " " + s.slice(11, 19) + " UTC";
+    }
+    function fmtBruto(e) {
+        var s = e.ts_armazenado;
+        return s.slice(8, 10) + "/" + s.slice(5, 7) + "/" + s.slice(0, 4) + " " + s.slice(11) + (e.fuso === "UTC" ? " (UTC)" : " (local)");
+    }
+    function hex(buf) {
+        return Array.prototype.map.call(new Uint8Array(buf), function(b) { return ("0" + b.toString(16)).slice(-2); }).join("");
+    }
+
+    // ------------------------------------------------------------- custódia
+    function renderizarCustodia() {
+        var dl = document.getElementById("fd-custodia");
+        dl.replaceChildren();
+        var c = FD.custodia;
+        [["Item", c.item], ["Coletado por", c.coletado_por], ["Data da coleta", c.data_coleta], ["Ferramenta", c.ferramenta], ["SHA-256 registrado", c.sha256]]
+            .forEach(function(par) {
+                dl.appendChild(el("dt", par[0], "font-weight: 600;"));
+                dl.appendChild(el("dd", par[1], "margin: 0;" + (par[0].indexOf("SHA") === 0 ? " font-family: var(--font-mono); font-size: 0.75rem;" : "")));
+            });
+    }
+    window.verificarIntegridadeForense = function() {
+        var box = document.getElementById("fd-integridade");
+        box.replaceChildren();
+        if (!window.crypto || !window.crypto.subtle) {
+            box.appendChild(el("p", "Este navegador não oferece a Web Crypto API aqui; abra a página em um navegador atual.", "margin: 0; color: var(--danger-color);"));
+            return Promise.resolve();
+        }
+        var texto = document.getElementById("fd-evidencia").value;
+        return window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(texto)).then(function(buf) {
+            var h = hex(buf), ok = h === FD.custodia.sha256;
+            box.setAttribute("data-hash", h);
+            box.setAttribute("data-integra", ok ? "sim" : "nao");
+            box.appendChild(el("div", "SHA-256 calculado agora: " + h, "font-family: var(--font-mono); font-size: 0.75rem;"));
+            box.appendChild(el("strong", ok ? "✓ Igual ao registrado na coleta: a integridade está demonstrada." :
+                "✗ Diferente do registrado na coleta: a evidência foi alterada depois da aquisição e não pode ser usada como está.",
+                "display: block; margin-top: 0.3rem; color: " + (ok ? "var(--tip-color)" : "var(--danger-color)") + ";"));
+        });
+    };
+
+    // ------------------------------------------------------------- timeline
+    function renderizarFontes() {
+        var box = document.getElementById("fd-fontes");
+        box.replaceChildren();
+        Object.keys(FD.fontes).forEach(function(f) {
+            var b = el("button", (carregadas[f] ? "✓ " : "+ ") + f);
+            b.type = "button";
+            b.className = carregadas[f] ? "btn-primary" : "btn-secondary";
+            b.style.fontSize = "0.8rem";
+            b.title = FD.fontes[f];
+            b.setAttribute("aria-pressed", carregadas[f] ? "true" : "false");
+            b.addEventListener("click", function() { carregarFonteForense(f); });
+            box.appendChild(b);
+        });
+        var todas = el("button", "Carregar todas");
+        todas.type = "button";
+        todas.className = "btn-secondary";
+        todas.style.fontSize = "0.8rem";
+        todas.addEventListener("click", function() { Object.keys(FD.fontes).forEach(function(f) { carregadas[f] = true; }); renderizarFontes(); renderizarTimeline(); });
+        box.appendChild(todas);
+    }
+    window.carregarFonteForense = function(fonte) {
+        if (!FD.fontes[fonte]) return;
+        carregadas[fonte] = !carregadas[fonte];
+        renderizarFontes();
+        renderizarTimeline();
+    };
+    window.alternarFusoForense = function(m) {
+        if (m !== "utc" && m !== "bruto") return;
+        modo = m;
+        Array.prototype.forEach.call(document.querySelectorAll('input[name="fd-fuso"]'), function(r) { r.checked = r.value === m; });
+        renderizarTimeline();
+    };
+    window.marcarEventoForense = function(id) {
+        marcados[id] = !marcados[id];
+        renderizarTimeline();
+    };
+    function eventosVisiveis() {
+        var filtro = document.getElementById("fd-filtro").value.trim().toLowerCase();
+        return FD.eventos.filter(function(e) {
+            if (!carregadas[e.fonte]) return false;
+            if (!filtro) return true;
+            return (e.fonte + " " + e.descricao + " " + JSON.stringify(e.detalhes)).toLowerCase().indexOf(filtro) !== -1;
+        }).sort(function(a, b) {
+            return modo === "utc" ? utc(a) - utc(b) : (a.ts_armazenado < b.ts_armazenado ? -1 : a.ts_armazenado > b.ts_armazenado ? 1 : 0);
+        });
+    }
+    function renderizarTimeline() {
+        var ol = document.getElementById("fd-timeline");
+        ol.replaceChildren();
+        var aviso = document.getElementById("fd-aviso-fuso");
+        aviso.textContent = modo === "utc"
+            ? "Horários normalizados para UTC. Fontes em horário local (Firewall e EDR) foram ajustadas em +3 horas."
+            : "Horários como cada fonte gravou. Atenção: Firewall e EDR estão em horário local (UTC-3), as demais em UTC; a ordem abaixo pode estar errada.";
+        aviso.style.color = modo === "utc" ? "var(--muted)" : "var(--danger-color)";
+        var vis = eventosVisiveis();
+        if (!vis.length) {
+            ol.appendChild(el("li", Object.keys(carregadas).some(function(f) { return carregadas[f]; }) ? "Nenhum evento corresponde ao filtro." : "Nenhum artefato carregado ainda.", "color: var(--muted); font-size: 0.85rem;"));
+            return;
+        }
+        vis.forEach(function(e) {
+            var li = el("li", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.4rem 0.55rem; min-width: 0; font-size: 0.82rem;" +
+                (marcados[e.id] ? " background: rgba(220, 38, 38, 0.18);" : ""));
+            li.setAttribute("data-evento", e.id);
+            var topo = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.25rem 0.6rem; align-items: center; justify-content: space-between;");
+            var esq = el("span", null, "display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; align-items: center; min-width: 0;");
+            esq.appendChild(el("span", modo === "utc" ? fmtUtc(utc(e)) : fmtBruto(e), "font-family: var(--font-mono); font-weight: 600;"));
+            esq.appendChild(el("span", e.fonte, "font-size: 0.72rem; padding: 0.05rem 0.45rem; border: 1px solid var(--rule); border-radius: var(--radius-pill);"));
+            topo.appendChild(esq);
+            var rot = el("label", null, "display: flex; gap: 0.3rem; align-items: center; font-size: 0.78rem;");
+            var cb = el("input");
+            cb.type = "checkbox";
+            cb.checked = !!marcados[e.id];
+            cb.setAttribute("aria-label", "Marcar como atividade do invasor: " + e.descricao);
+            cb.addEventListener("change", function() { marcarEventoForense(e.id); });
+            rot.appendChild(cb);
+            rot.appendChild(document.createTextNode("invasor"));
+            topo.appendChild(rot);
+            li.appendChild(topo);
+            li.appendChild(el("div", e.descricao, "margin-top: 0.2rem; overflow-wrap: anywhere;"));
+            var det = Object.keys(e.detalhes || {});
+            if (det.length) {
+                li.appendChild(el("div", det.map(function(k) { return k + ": " + e.detalhes[k]; }).join(" · "),
+                    "margin-top: 0.15rem; font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); overflow-wrap: anywhere;"));
+            }
+            if (conferido && carregadas[e.fonte]) {
+                var certo = !!marcados[e.id] === e.invasor;
+                if (!certo) li.appendChild(el("div", e.invasor ? "✗ Atividade do invasor não marcada." : "✗ Evento legítimo marcado como do invasor.", "margin-top: 0.2rem; color: var(--danger-color); font-weight: 600;"));
+            }
+            ol.appendChild(li);
+        });
+    }
+    window.conferirMarcacoesForense = function() {
+        conferido = true;
+        var vistos = FD.eventos.filter(function(e) { return carregadas[e.fonte]; });
+        var box = document.getElementById("fd-resultado-marcacoes");
+        box.replaceChildren();
+        if (!vistos.length) { box.appendChild(el("p", "Carregue os artefatos primeiro.", "margin: 0;")); return; }
+        var acertos = vistos.filter(function(e) { return !!marcados[e.id] === e.invasor; }).length;
+        var faltou = vistos.filter(function(e) { return e.invasor && !marcados[e.id]; }).length;
+        var indevidos = vistos.filter(function(e) { return !e.invasor && marcados[e.id]; }).length;
+        box.setAttribute("data-acertos", String(acertos));
+        box.setAttribute("data-total", String(vistos.length));
+        box.appendChild(el("strong", "Classificação correta em " + acertos + " de " + vistos.length + " eventos carregados: " +
+            (faltou === 1 ? "1 do invasor sem marcar e " : faltou + " do invasor sem marcar e ") + (indevidos === 1 ? "1 legítimo marcado." : indevidos + " legítimos marcados."), "display: block;"));
+        if (vistos.length < FD.eventos.length) box.appendChild(el("p", "Há artefatos ainda não carregados.", "margin: 0.25rem 0 0 0; color: var(--muted);"));
+        renderizarTimeline();
+    };
+
+    // ------------------------------------------------------------- perguntas
+    function renderizarPerguntas() {
+        var box = document.getElementById("fd-perguntas");
+        box.replaceChildren();
+        FD.perguntas.forEach(function(p, i) {
+            var card = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.55rem 0.7rem; min-width: 0;");
+            card.setAttribute("data-pergunta", p.id);
+            var rot = el("label", (i + 1) + ". " + p.enunciado, "display: block; font-weight: 600; margin-bottom: 0.35rem;");
+            rot.setAttribute("for", "fd-p-" + p.id);
+            card.appendChild(rot);
+            var sel = el("select", null, "width: 100%;");
+            sel.className = "form-control";
+            sel.id = "fd-p-" + p.id;
+            var op0 = el("option", "Escolha…"); op0.value = ""; sel.appendChild(op0);
+            p.opcoes.forEach(function(o) { var op = el("option", o.texto); op.value = o.valor; sel.appendChild(op); });
+            card.appendChild(sel);
+            box.appendChild(card);
+        });
+    }
+    window.verificarRespostasForense = function() {
+        var acertos = 0;
+        FD.perguntas.forEach(function(p) {
+            var card = document.querySelector('[data-pergunta="' + p.id + '"]');
+            var v = document.getElementById("fd-p-" + p.id).value;
+            var ok = v === p.correta;
+            if (ok) acertos++;
+            var velho = card.querySelector(".fd-feedback");
+            if (velho) card.removeChild(velho);
+            var fb = el("p", (ok ? "✓ Correto. " : v ? "✗ Não. " : "Escolha uma opção. ") + (v ? p.explicacao : ""),
+                "margin: 0.4rem 0 0 0; color: " + (ok ? "var(--tip-color)" : "var(--danger-color)") + ";");
+            fb.className = "fd-feedback";
+            card.appendChild(fb);
+        });
+        var box = document.getElementById("fd-resultado-perguntas");
+        box.replaceChildren();
+        box.setAttribute("data-acertos", String(acertos));
+        box.appendChild(el("strong", "Acertos: " + acertos + " de " + FD.perguntas.length + "."));
+    };
+
+    window.restaurarForense = function() {
+        carregadas = {};
+        marcados = {};
+        conferido = false;
+        document.getElementById("fd-evidencia").value = FD.custodia.texto_evidencia;
+        document.getElementById("fd-integridade").replaceChildren();
+        document.getElementById("fd-filtro").value = "";
+        document.getElementById("fd-resultado-marcacoes").replaceChildren();
+        document.getElementById("fd-resultado-perguntas").replaceChildren();
+        alternarFusoForense("utc");
+        renderizarFontes();
+        renderizarPerguntas();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("fd-contexto").textContent = FD.contexto;
+        renderizarCustodia();
+        document.getElementById("fd-restaurar-evidencia").addEventListener("click", function() {
+            document.getElementById("fd-evidencia").value = FD.custodia.texto_evidencia;
+            document.getElementById("fd-integridade").replaceChildren();
+        });
+        document.getElementById("fd-filtro").addEventListener("input", renderizarTimeline);
+        Array.prototype.forEach.call(document.querySelectorAll('input[name="fd-fuso"]'), function(r) {
+            r.addEventListener("change", function() { alternarFusoForense(r.value); });
+        });
+        restaurarForense();
+        if (typeof initChecklist === "function") {
+            initChecklist("forense-digital");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
