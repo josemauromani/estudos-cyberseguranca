@@ -301,7 +301,7 @@ Cada módulo abaixo vira uma entrada em `ESTUDOS_DADOS` e uma seção no §3 do 
   - "BCB 85/2021 para instituições de pagamento"
   - "Responsabilidade não se transfere ao fornecedor de nuvem"
   - "Teste de intrusão anual e controles mínimos"
-- **Conferência na construção:** as fontes divergem sobre o número da resolução BCB de dezembro de 2025 que alterou a BCB 85 (538 ou 448), e há menção a uma alteração posterior (BCB 552/2026). O módulo cita o número só depois de conferir no site normativos.bcb.gov.br.
+- **Conferência na construção:** Resolvido (02/11/2026): a resolução de 18/12/2025 que alterou a BCB 85 é a Res. BCB 538 (número confirmado por várias fontes; a "BCB 448" citada antes estava errada), e a CMN 4.893 foi alterada pela Res. CMN 5.274, na mesma data. Os temas das alterações e o prazo de adequação de 01/03/2026 vêm de fontes secundárias concordantes. A contagem exata de controles mínimos não foi confirmada no texto oficial: o módulo descreve os requisitos por tema, sem número. A alteração posterior (BCB 552, de 03/03/2026) foi mencionada por uma fonte e não detalhada: o módulo não cita o conteúdo dela.
 
 #### 55 · `Fraude-em-Pagamentos-e-Pix`: Fraude em Pagamentos: Pix, Golpes e Antifraude
 
@@ -324,7 +324,7 @@ Cada módulo abaixo vira uma entrada em `ESTUDOS_DADOS` e uma seção no §3 do 
   - "Pontuação de risco com sinais combinados"
   - "Fraude evitada vs cliente bloqueado"
   - "MED 2.0 e bloqueio cautelar"
-- **Conferência na construção:** prazos do MED 2.0 (por exemplo, "até 11 dias") vêm de fontes secundárias; o módulo usa só prazos confirmados na Resolução BCB 493/2025 ou no guia do MED do Banco Central.
+- **Conferência na construção:** Resolvido (02/11/2026): MED 2.0 instituído pela Res. BCB 493, de 28/08/2025; contestação pelo autoatendimento desde 01/10/2025; devolução a partir de contas diferentes da usada na fraude, facultativa desde 23/11/2025 e obrigatória desde fevereiro de 2026; 80 dias corridos da transação para a vítima contestar; análise em até 7 dias no fluxo de fraude; devolução em até 11 dias após a contestação (BCB, via Agência Brasil; a fonte não diz se corridos ou úteis, e o módulo escreve só "até 11 dias"), dependente de saldo, total ou parcial; prazo de quem recebeu para contestar a devolução passou de 30 para 80 dias, contados da devolução, pela IN BCB 766, vigente desde 01/09/2026. Os prazos vêm de comunicados do Banco Central e da IN BCB 766; o módulo não afirma leitura do texto da Res. BCB 493. O bloqueio cautelar não foi confirmado nas fontes lidas e aparece só de forma genérica, sem prazo.
 
 #### 56 · `Legislacao-e-Crimes-Ciberneticos`: Legislação Brasileira e Crimes Cibernéticos
 
@@ -347,7 +347,7 @@ Cada módulo abaixo vira uma entrada em `ESTUDOS_DADOS` e uma seção no §3 do 
   - "Fraude eletrônica: art. 171 §2º-A (redação de 2026)"
   - "Marco Civil: conexão 1 ano, aplicações 6 meses"
   - "PNCiber (2023) e E-Ciber (2025)"
-- **Conferência na construção:** penas e redação dos artigos são conferidas no texto consolidado do Código Penal (planalto.gov.br) antes de entrar no módulo.
+- **Conferência na construção:** Resolvido (02/11/2026), no Código Penal compilado (planalto.gov.br): art. 154-A com reclusão de 1 a 4 anos e multa (redação da Lei 14.155/2021); art. 155, §4º-B com reclusão de 4 a 10 anos e multa (redação da Lei 15.397, de 30/04/2026); §4º-C (servidor fora do país, de 1/3 a 2/3; vítima idosa ou vulnerável, de 1/3 ao dobro) e art. 171, §2º-B (servidor fora do país) incluídos pela Lei 14.155/2021. O art. 171, §2º-A teve a redação dada pela Lei 15.397/2026, mas a pena não foi confirmada por transcrição: o módulo cita a qualificadora sem número de pena e orienta conferir o texto vigente.
 
 #### 57 · `Gestao-de-Riscos-de-Terceiros`: Gestão de Riscos de Terceiros e Fornecedores
 
@@ -500,19 +500,21 @@ Já cobertos pelos testes atuais, sem mudança: tokens `--t{id}-{cor_nome}` 4 ve
 
 ## 6. Referências Normativas Verificadas (2026-11-02)
 
-Conferidas por busca antes desta spec. As marcadas "conferir" precisam de checagem no texto oficial antes de entrar no HTML do módulo.
+Conferidas por busca antes desta spec. As pendências marcadas "conferir" foram resolvidas em 02/11/2026, na construção dos módulos 54–56; o detalhe está na linha "Verificações" de cada módulo no `CURRICULO.md` §3.
 
 | Referência | Situação | Módulo |
 |---|---|---|
 | Res. CMN 4.893/2021 | Em vigor, **alterada pela Res. CMN 5.274/2025** (18/12/2025): controles mínimos detalhados, teste de intrusão anual, segregação Pix/STR; adequação até 01/03/2026 | 54, 57 |
-| Res. BCB 85/2021 | Em vigor, alterada em 18/12/2025. **Conferir** o número da norma de alteração (fontes citam BCB 538 e BCB 448) e a alteração posterior citada (BCB 552/2026) | 54 |
-| Res. BCB 493/2025 (MED 2.0) | Publicada em 28/08/2025; devolução a partir de contas diferentes da usada na fraude; contestação pelo autoatendimento. **Conferir** prazos no texto oficial ou no guia do MED | 55 |
-| Lei 12.737/2012 e Lei 14.155/2021 | Art. 154-A com pena de reclusão; fraude eletrônica (art. 171 §2º-A) e furto mediante fraude eletrônica (art. 155 §4º-B). A Lei 15.397/2026 deu nova redação ao art. 155 §4º-B (reclusão de 4 a 10 anos e multa) e ao art. 171 §2º-A; **conferir** penas no Código Penal consolidado | 56 |
+| Res. BCB 85/2021 | Em vigor, alterada pela **Res. BCB 538, de 18/12/2025**. Resolvido (02/11/2026): número confirmado por várias fontes; a "BCB 448" citada antes estava errada. A alteração posterior (BCB 552, de 03/03/2026) foi mencionada por uma fonte e não detalhada: o módulo não cita o conteúdo | 54 |
+| Res. BCB 493/2025 (MED 2.0) | Publicada em 28/08/2025; devolução a partir de contas diferentes da usada na fraude; contestação pelo autoatendimento. Resolvido (02/11/2026): vítima contesta em até 80 dias corridos da transação; análise em até 7 dias no fluxo de fraude; devolução em até 11 dias após a contestação (sem qualificar como corridos ou úteis), limitada ao saldo; quem recebeu tem 80 dias, contados da devolução, para contestá-la (IN BCB 766, vigente desde 01/09/2026). Fontes: comunicados do Banco Central e a IN BCB 766 | 55 |
+| Lei 12.737/2012 e Lei 14.155/2021 | Art. 154-A com pena de reclusão; fraude eletrônica (art. 171 §2º-A) e furto mediante fraude eletrônica (art. 155 §4º-B). A Lei 15.397/2026 deu nova redação ao art. 155 §4º-B (reclusão de 4 a 10 anos e multa) e ao art. 171 §2º-A. Resolvido (02/11/2026), no Código Penal compilado: art. 154-A com reclusão de 1 a 4 anos e multa; art. 155 §4º-B com reclusão de 4 a 10 anos e multa; a pena do art. 171 §2º-A não foi confirmada por transcrição, e o módulo não cita número | 56 |
 | Lei 12.965/2014 (Marco Civil) | Guarda de registros de conexão por 1 ano (art. 13) e de acesso a aplicações por 6 meses (art. 15) | 56 |
 | Decreto 11.856/2023 (PNCiber) | Em vigor; institui a Política e o Comitê Nacional de Cibersegurança | 56 |
 | Decreto 12.573/2025 (E-Ciber) | Publicado em 05/08/2025; nova Estratégia Nacional de Cibersegurança, revoga o Decreto 10.222/2020 | 56 |
 
 Fontes da verificação: [LegisWeb: Res. CMN 5.274/2025](https://www.legisweb.com.br/legislacao/?id=488277), [Voto CMN 88/2025](https://normativos.bcb.gov.br/Votos/CMN/202588/Voto_do_CMN_88_2025.pdf), [GlobalSuite: Res. BCB 538](https://www.globalsuitesolutions.com/pt/?p=117773), [LegisWeb: Res. BCB 448/2025](https://www.legisweb.com.br/legislacao/?id=488304), [BCB: MED 2.0](https://www.bcb.gov.br/content/estabilidadefinanceira/pix/MED/MED_2-0_Circuito_Pix-Dia_1.pdf), [Agência Brasil: novas regras do Pix](https://agenciabrasil.ebc.com.br/economia/noticia/2026-02/novas-regras-de-seguranca-do-pix-entram-em-vigor-veja-mudancas), [Planalto: Lei 14.155/2021](https://planalto.gov.br/ccivil_03/_ato2019-2022/2021/Lei/L14155.htm), [Planalto: Decreto 11.856/2023](https://planalto.gov.br/ccivil_03/_ato2023-2026/2023/decreto/d11856.htm), [Planalto: Decreto 12.573/2025](https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2025/decreto/d12573.htm).
+
+Fontes da resolução das pendências (02/11/2026): [NDM Advogados: BCB 538 e CMN 5.274](https://ndmadvogados.com.br/artigo/seguranca-cibernetica-bcb-538-cmn-5274/), [Matera: Res. BCB 538 e CMN 5.274](https://www.matera.com/br/blog/resolucoes-bcb-538-cmn-5274-seguranca-cibernetica/), [Agência Brasil: MED 2.0 (ago/2025)](https://agenciabrasil.ebc.com.br/economia/noticia/2025-08/pix-novas-regras-vao-facilitar-devolucao-de-valores-em-casos-de-golpe), [Agência Brasil: prazo de contestação ampliado (set/2026)](https://agenciabrasil.ebc.com.br/economia/noticia/2026-09/nova-regra-do-pix-amplia-prazo-para-contestar-golpe), [Planalto: Código Penal compilado](https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848compilado.htm).
 
 ---
 

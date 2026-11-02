@@ -281,7 +281,7 @@ O currículo é estruturado de forma a atender diferentes objetivos e momentos d
 - **Operações, SOC & Forense:** Análise de logs SIEM, regras Sigma, inteligência de ameaças (CTI), resposta a incidentes e análise básica de malware; threat hunting, monitoramento de rede (Trilha 11) e investigação de incidentes em nuvem (Trilha 12).
 - **Engenharia de Nuvem & DevSecOps:** Segurança em provedores cloud (AWS/Azure/GCP), pipelines CI/CD seguros, conteinerização e IoT/TO; containers, Kubernetes, infraestrutura como código e resposta a incidentes em nuvem (Trilha 12).
 - **Governança, Riscos e Conformidade (GRC):** Metodologias de avaliação de risco (ALE/SLE), ISO/IEC 27001/27002:2022, LGPD e planos de continuidade/DRP; acessos privilegiados (PAM), gestão de crise e exercícios tabletop (Trilhas 9 e 10); regulação do setor financeiro, fraude em Pix, legislação penal e riscos de terceiros (Trilha 13).
-- **Analista de Segurança da Informação:** Perfil generalista de vaga corporativa: soluções de segurança (firewall, EDR, DLP), bancos de dados, normas (PCI-DSS, ISO 27001/27002/31000, NIST), controles, resposta a incidentes, inglês técnico e certificações.
+- **Analista de Segurança da Informação:** Perfil generalista de vaga corporativa: soluções de segurança (firewall, EDR, DLP), bancos de dados, normas (PCI-DSS, ISO 27001/27002/31000, NIST), controles, resposta a incidentes, inglês técnico e certificações; automação de resposta com SOAR (Trilha 11), regulação do setor financeiro e gestão de riscos de terceiros (Trilha 13).
 
 ---
 
