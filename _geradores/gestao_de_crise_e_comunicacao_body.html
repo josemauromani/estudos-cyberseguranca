@@ -1,0 +1,648 @@
+<!-- Estudo 43: Gestao-de-Crise-e-Comunicacao Body Fragment -->
+<article class="study-container" data-slug="gestao-crise">
+
+    <!-- SEÇÃO 1: CRISE E COMITÊ -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: Quando o Incidente Vira Crise</h2>
+        </div>
+
+        <p class="lead-text">
+            O time técnico contém o ataque; a empresa precisa decidir o que dizer, a quem e quando. Um <strong>incidente</strong> é resolvido pelo processo de resposta. Uma <strong>crise</strong> é quando o incidente ameaça a operação, a reputação ou as obrigações legais da empresa e exige decisões que só a direção pode tomar. O ransomware da Ipê Store (Estudo 42) virou crise no momento em que se confirmou que dados de clientes tinham saído. Este estudo trata do lado de fora da sala técnica: o comitê, o registro das decisões e a comunicação.
+        </p>
+
+        <h3>O Comitê de Crise</h3>
+        <p>
+            O <strong>comitê de crise</strong> reúne quem decide e quem precisa ser ouvido: a direção (que assume as decisões), o líder técnico ou CISO, o jurídico, o <strong>encarregado</strong> (DPO), a comunicação, o RH, o atendimento ao cliente e o financeiro, que cuida da seguradora. A <strong>matriz RACI</strong> evita duas falhas clássicas: tarefas que todos acham que outro está fazendo e decisões tomadas por quem não pode assumi-las.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Atividade</th><th>R (executa)</th><th>A (responde)</th><th>C (consultado)</th><th>I (informado)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Declarar a crise e convocar o comitê</td><td>CISO</td><td>Diretor-presidente</td><td>Jurídico</td><td>Diretoria</td></tr>
+                    <tr><td>Conter, erradicar e recuperar</td><td>Líder técnico</td><td>CISO</td><td>Fornecedores, seguradora</td><td>Comitê</td></tr>
+                    <tr><td>Comunicar ANPD e titulares</td><td>Encarregado (DPO)</td><td>Diretor-presidente</td><td>Jurídico, CISO</td><td>Comunicação, atendimento</td></tr>
+                    <tr><td>Falar com a imprensa</td><td>Porta-voz</td><td>Diretor-presidente</td><td>Jurídico, DPO</td><td>Funcionários</td></tr>
+                    <tr><td>Acionar a seguradora</td><td>Financeiro</td><td>Diretor financeiro</td><td>Jurídico, CISO</td><td>Comitê</td></tr>
+                    <tr><td>Comunicação interna</td><td>RH e comunicação</td><td>Diretor-presidente</td><td>Jurídico</td><td>Todos os funcionários</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Cada atividade tem exatamente um "A". O comitê mantém um <strong>registro de decisões</strong>: horário, decisão, quem decidiu, com base em quê e quais alternativas foram descartadas. Esse registro é o que a direção, a seguradora, a ANPD e eventualmente um juiz vão pedir depois.
+        </p>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">📡</span>
+                <strong>A sala de guerra não pode estar na rede invadida</strong>
+            </div>
+            <p>
+                Se o atacante tem acesso ao e-mail e ao chat corporativos, ele lê o plano de resposta em tempo real. A <strong>sala de guerra</strong>, física ou virtual, usa canais fora do ambiente comprometido (contas separadas, telefones, um espaço de colaboração preparado antes), com lista de contatos impressa.
+            </p>
+        </div>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Fluxo da Gestão de Crise</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Fluxo da Gestão de Crise">
+flowchart TD
+    D["Incidente detectado"]
+    Q{"Ameaça operação, reputação<br>ou obrigação legal?"}
+    I["Segue como incidente<br><small>processo de resposta</small>"]
+    C["Comitê de crise convocado<br><small>sala de guerra fora da rede afetada</small>"]
+    T["Trilha técnica<br><small>conter, erradicar, recuperar</small>"]
+    J["Trilha jurídica e regulatória<br><small>ANPD, titulares, contratos, seguradora</small>"]
+    M["Trilha de comunicação<br><small>interna, clientes, imprensa</small>"]
+    R["Registro de decisões"]
+    E["Encerramento e lições aprendidas"]
+    D --> Q
+    Q -->|"não"| I
+    Q -->|"sim"| C
+    C --> T
+    C --> J
+    C --> M
+    T --> R
+    J --> R
+    M --> R
+    R --> E
+            </pre>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: COMUNICAÇÃO E ANPD -->
+    <section class="study-section" id="comunicacao">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Comunicação: Públicos, Mensagens e a Resolução CD/ANPD nº 15/2024</h2>
+        </div>
+
+        <h3>Princípios da Mensagem</h3>
+        <ul>
+            <li><strong>Um porta-voz</strong>: uma única pessoa fala em nome da empresa, com as mensagens aprovadas pelo comitê. Funcionários são orientados a encaminhar perguntas.</li>
+            <li><strong>Fatos verificados</strong>: diga o que se sabe, o que ainda não se sabe e quando haverá nova atualização. Não especule sobre autoria nem minimize ("apenas alguns dados").</li>
+            <li><strong>O que a pessoa deve fazer</strong>: para clientes, a parte mais útil da mensagem é a orientação prática.</li>
+            <li><strong>Ordem</strong>: os funcionários ficam sabendo antes do público, e a <strong>declaração inicial</strong> (um texto curto, pronto antes de qualquer contato externo) está aprovada antes que a notícia vaze.</li>
+        </ul>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Público</th><th>Obrigação ou motivo</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>ANPD e titulares</td><td>LGPD (art. 48) e Resolução CD/ANPD nº 15/2024, quando houver risco ou dano relevante</td></tr>
+                    <tr><td>Seguradora</td><td>Contrato: a apólice costuma exigir aviso imediato e aprovação prévia de fornecedores de resposta</td></tr>
+                    <tr><td>Adquirente e bandeiras</td><td>PCI DSS e contrato, quando dados de cartão forem afetados</td></tr>
+                    <tr><td>Reguladores setoriais</td><td>Setor financeiro, saúde e outros têm regras próprias (por exemplo, a Resolução CMN nº 4.893/2021 para instituições financeiras)</td></tr>
+                    <tr><td>Polícia</td><td>Boletim de ocorrência: sem prazo legal, mas ajuda a investigação e é pedido pela seguradora</td></tr>
+                    <tr><td>Funcionários, fornecedores, imprensa</td><td>Reputação, contratos e continuidade</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>O Que a Resolução CD/ANPD nº 15/2024 Exige</h3>
+        <p>
+            O regulamento de comunicação de incidente da ANPD define quando e como comunicar. Os pontos abaixo foram conferidos no texto oficial:
+        </p>
+        <ul>
+            <li><strong>Quando comunicar (art. 5º):</strong> quando o incidente puder afetar significativamente interesses e direitos fundamentais dos titulares e, cumulativamente, envolver ao menos um destes: dados sensíveis; dados de crianças, adolescentes ou idosos; dados financeiros; dados de autenticação; dados protegidos por sigilo; ou dados em larga escala.</li>
+            <li><strong>ANPD (art. 6º):</strong> em <strong>três dias úteis</strong>, contados do conhecimento pelo controlador de que o incidente afetou dados pessoais, ressalvado prazo previsto em legislação específica. As informações podem ser complementadas, de forma fundamentada, em <strong>vinte dias úteis</strong> a contar da comunicação.</li>
+            <li><strong>Titulares (art. 9º):</strong> também em três dias úteis, em <strong>linguagem simples</strong>, de forma direta e individualizada quando possível (e-mail, telefone, mensagem, carta), com sete informações mínimas: natureza e categoria dos dados; medidas de proteção usadas; riscos e possíveis impactos; motivos da demora, se houver; medidas para reverter ou mitigar; data do conhecimento; e contato, inclusive do encarregado.</li>
+            <li><strong>Sem como avisar cada um (art. 9º, § 3º):</strong> divulgação ampla no site, aplicativos, redes sociais e canais de atendimento por no mínimo <strong>três meses</strong>. Em até três dias úteis depois do prazo, o controlador junta ao processo uma declaração com os meios usados.</li>
+            <li><strong>Pequeno porte:</strong> os prazos de comunicação e de complementação contam <strong>em dobro</strong> para agentes de tratamento de pequeno porte.</li>
+            <li><strong>Registro (art. 10):</strong> todo incidente, inclusive o não comunicado, fica registrado por no mínimo <strong>cinco anos</strong>, com data, circunstâncias, dados afetados, número de titulares, avaliação de risco, medidas e o motivo de não comunicar, quando for o caso.</li>
+        </ul>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Comunique no prazo, complemente depois</strong>
+            </div>
+            <p>
+                O prazo corre do conhecimento de que dados pessoais foram afetados, não do fim da investigação. A comunicação inicial pode ter lacunas, que a complementação em vinte dias úteis preenche. Esperar ter todas as respostas é a forma mais comum de perder o prazo.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Relógio da Crise</h2>
+        </div>
+
+        <p class="lead-text">
+            Sábado, 08/11/2025, 02:00: a Ipê Store confirma que dados de clientes foram copiados antes do ransomware. Calcule os prazos, decida quem notificar e quando, e monte a mensagem aos titulares.
+        </p>
+
+        <div class="lab-box crise-lab" id="crise-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Laboratório de Gestão de Crise</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Comitê de crise da Ipê Store</h3>
+                    <p id="crise-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">1. Relógio dos prazos</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; align-items: flex-end; font-size: 0.85rem;">
+                    <label style="display: flex; flex-direction: column; gap: 0.25rem;">Data do conhecimento
+                        <input class="form-control" type="date" id="crise-data" min="2025-01-01" max="2026-12-31">
+                    </label>
+                    <label style="display: flex; gap: 0.4rem; align-items: center;"><input type="checkbox" id="crise-pequeno"> Agente de pequeno porte</label>
+                </div>
+                <div id="crise-prazos" aria-live="polite" style="margin-top: 0.75rem; font-size: 0.88rem;"></div>
+
+                <h4 style="margin-top: 1.5rem;">2. Quem notificar e quando</h4>
+                <div id="crise-destinatarios" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem;"></div>
+                <div style="margin-top: 0.75rem;">
+                    <button class="btn-primary" type="button" onclick="conferirNotificacoesCrise()">Conferir notificações</button>
+                </div>
+                <div id="crise-resultado-notif" aria-live="polite" style="margin-top: 0.75rem; font-size: 0.88rem;"></div>
+
+                <h4 style="margin-top: 1.5rem;">3. Mensagem aos titulares</h4>
+                <p style="font-size: 0.85rem; margin: 0 0 0.5rem 0;">Marque o que entra na comunicação. A prévia mostra como o cliente vai ler.</p>
+                <div id="crise-mensagem" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem; font-size: 0.85rem;"></div>
+                <div id="crise-previa" style="margin-top: 0.75rem; border: 1px dashed var(--rule); border-radius: var(--radius-md); padding: 0.75rem; font-size: 0.85rem; background: var(--surface);"></div>
+                <div style="margin-top: 0.75rem;">
+                    <button class="btn-primary" type="button" onclick="conferirMensagemCrise()">Conferir mensagem</button>
+                </div>
+                <div id="crise-resultado-msg" aria-live="polite" style="margin-top: 0.75rem; font-size: 0.88rem;"></div>
+
+                <div style="margin-top: 1.25rem;">
+                    <button class="btn-secondary" type="button" onclick="restaurarCrise()">Restaurar laboratório</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Prontidão para Crise</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para preparar a empresa antes da crise. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="gestao-crise">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-crise-1">
+                <label for="chk-crise-1"><strong>Critérios de crise definidos:</strong> está escrito quando um incidente vira crise e quem convoca o comitê.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-crise-2">
+                <label for="chk-crise-2"><strong>Comitê e RACI:</strong> membros, substitutos e a matriz RACI das atividades de crise estão aprovados pela direção.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-crise-3">
+                <label for="chk-crise-3"><strong>Canais fora da rede:</strong> há sala de guerra e canais de comunicação que não dependem do ambiente corporativo, e a lista de contatos está impressa.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-crise-4">
+                <label for="chk-crise-4"><strong>Modelos prontos:</strong> declaração inicial, comunicado aos titulares e formulário da ANPD estão pré-redigidos e revisados pelo jurídico.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-crise-5">
+                <label for="chk-crise-5"><strong>Prazos mapeados:</strong> os prazos da ANPD, da apólice, dos contratos e de reguladores setoriais estão numa tabela única, com responsável por cada um.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-crise-6">
+                <label for="chk-crise-6"><strong>Porta-voz preparado:</strong> há um porta-voz e um substituto treinados, e os funcionários sabem para onde encaminhar perguntas.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-crise-7">
+                <label for="chk-crise-7"><strong>Registro de incidentes:</strong> todo incidente com dados pessoais é registrado, inclusive os não comunicados, e guardado por no mínimo cinco anos.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Incidente ou crise):</strong> Um notebook com disco cifrado é furtado e a equipe confirma que a chave não estava com ele. É crise?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Provavelmente não: é um incidente, tratado pelo processo normal e registrado.</p>
+                    <p>Vira crise quando ameaça operação, reputação ou obrigações legais e exige decisões da direção. Mesmo sem comunicação à ANPD, o incidente é registrado com o motivo de não comunicar.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Prazo da ANPD):</strong> A investigação começou na segunda-feira, e na quarta a empresa confirmou que dados de clientes foram copiados. A partir de quando contam os três dias úteis?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Da quarta-feira, quando a empresa soube que o incidente afetou dados pessoais.</p>
+                    <p>O art. 6º, § 1º conta o prazo do conhecimento de que o incidente afetou dados pessoais. As lacunas podem ser preenchidas na complementação, em vinte dias úteis.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Titulares sem contato):</strong> Parte dos clientes afetados não tem e-mail nem telefone atualizados. O que fazer?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Comunicar pelos meios de divulgação disponíveis (site, aplicativo, redes sociais, canais de atendimento) por no mínimo três meses, e juntar ao processo a declaração dos meios usados.</p>
+                    <p>É o art. 9º, §§ 3º e 4º. A comunicação ampla tem as mesmas informações mínimas da individual.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Pequeno porte):</strong> Uma loja enquadrada como agente de tratamento de pequeno porte tem quanto tempo para comunicar a ANPD?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Seis dias úteis, porque o prazo conta em dobro.</p>
+                    <p>O mesmo vale para a comunicação aos titulares e para a complementação (quarenta dias úteis). O enquadramento segue o regulamento de agentes de pequeno porte da ANPD.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Registro):</strong> O DPO concluiu que um incidente não traz risco relevante e não vai comunicar a ANPD. Ainda há alguma obrigação?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Sim: registrar o incidente, com a avaliação de risco e o motivo de não comunicar, e guardar o registro por no mínimo cinco anos.</p>
+                    <p>É o art. 10. Numa fiscalização, a ANPD pode pedir esse registro.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Porta-voz):</strong> Um jornalista liga para o gerente de TI e pergunta se a empresa sofreu ransomware. O que o gerente deve fazer?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não comentar e encaminhar ao porta-voz, conforme a orientação interna.</p>
+                    <p>Uma informação dada fora do plano pode estar errada, contrariar o comunicado oficial ou atrapalhar a investigação. Por isso a comunicação interna sai antes da externa.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Comitê com RACI</h4>
+                <p>Um "A" por atividade, porta-voz único e registro de decisões.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Três dias úteis</h4>
+                <p>ANPD e titulares, contados do conhecimento de que dados pessoais foram afetados.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Complementar depois</h4>
+                <p>Vinte dias úteis para completar; prazos em dobro para pequeno porte.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Registrar sempre</h4>
+                <p>Todo incidente, comunicado ou não, por no mínimo cinco anos.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>Resolução CD/ANPD nº 15, de 24 de abril de 2024 — Regulamento de Comunicação de Incidente de Segurança.</li>
+            <li>Lei nº 13.709/2018 (LGPD), art. 48.</li>
+            <li>ANPD — página de comunicação de incidente de segurança e formulário eletrônico.</li>
+            <li>NIST SP 800-61 Rev. 3 — Incident Response Recommendations and Considerations for Cybersecurity Risk Management.</li>
+            <li>Resolução CMN nº 4.893/2021 — política de segurança cibernética das instituições financeiras (citada como exemplo de regra setorial).</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 44 — Exercícios Tabletop e 27 — LGPD e Privacidade</strong>
+            </div>
+            <p>
+                O Estudo 44 mostra como ensaiar este comitê antes da crise real. O Estudo 27 aprofunda bases legais, direitos do titular e o papel do encarregado.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="crise-dados">
+{
+ "contexto": "Cenário fictício: a Ipê Store (empresa não financeira) teve 118 GB copiados antes do ransomware do Estudo 42. Os arquivos tinham nome, CPF, e-mail e endereço de clientes; nenhum dado de cartão, porque a loja usa tokenização.",
+ "conhecimento": "2025-11-08T02:00",
+ "regras": {"anpd_dias": 3, "titulares_dias": 3, "complementacao_dias": 20, "declaracao_dias": 3, "registro_anos": 5},
+ "feriados": [
+  "2025-01-01", "2025-04-18", "2025-04-21", "2025-05-01", "2025-09-07", "2025-10-12", "2025-11-02", "2025-11-15", "2025-11-20", "2025-12-25",
+  "2026-01-01", "2026-04-03", "2026-04-21", "2026-05-01", "2026-09-07", "2026-10-12", "2026-11-02", "2026-11-15", "2026-11-20", "2026-12-25",
+  "2027-01-01", "2027-03-26", "2027-04-21", "2027-05-01", "2027-09-07", "2027-10-12", "2027-11-02", "2027-11-15", "2027-11-20", "2027-12-25"
+ ],
+ "prazos_esperados": {
+  "normal": {"anpd": "2025-11-12", "titulares": "2025-11-12", "declaracao": "2025-11-17", "complementacao": "2025-12-11", "registro": "2030-11-08"},
+  "pequeno_porte": {"anpd": "2025-11-17", "titulares": "2025-11-17", "declaracao": "2025-11-21", "complementacao": "2026-01-15", "registro": "2030-11-08"}
+ },
+ "opcoes_prazo": {
+  "imediato": "Imediatamente, nas primeiras horas",
+  "antes_publico": "Antes de qualquer comunicação externa",
+  "3du": "Até 3 dias úteis do conhecimento",
+  "apolice": "No prazo da apólice",
+  "sob_demanda": "Declaração pronta; falar quando procurado ou junto com o comunicado público"
+ },
+ "destinatarios": [
+  {"id": "anpd", "nome": "ANPD", "correto": "notificar", "prazo_correto": "3du",
+   "explicacao": "Dados de identificação de clientes em larga escala, com risco de golpes: há risco relevante. Prazo de três dias úteis (art. 6º), complementação em vinte."},
+  {"id": "titulares", "nome": "Clientes afetados (titulares)", "correto": "notificar", "prazo_correto": "3du",
+   "explicacao": "Mesmo prazo de três dias úteis (art. 9º), de forma direta e individualizada, em linguagem simples."},
+  {"id": "seguradora", "nome": "Seguradora (apólice cyber)", "correto": "notificar", "prazo_correto": "apolice",
+   "explicacao": "A obrigação é contratual: a apólice costuma exigir aviso imediato e aprovação dos fornecedores de resposta. Atrasar pode comprometer a cobertura."},
+  {"id": "funcionarios", "nome": "Funcionários", "correto": "notificar", "prazo_correto": "antes_publico",
+   "explicacao": "Precisam saber antes do público: o que aconteceu, o que podem dizer e a quem encaminhar perguntas de clientes e da imprensa."},
+  {"id": "imprensa", "nome": "Imprensa", "correto": "notificar", "prazo_correto": "sob_demanda",
+   "explicacao": "A declaração inicial fica pronta antes de avisar os clientes, porque a notícia vai circular. Quem fala é o porta-voz."},
+  {"id": "policia", "nome": "Polícia (boletim de ocorrência)", "correto": "notificar", "prazo_correto": "imediato",
+   "explicacao": "Não há prazo legal, mas registrar cedo ajuda a investigação e costuma ser exigido pela seguradora."},
+  {"id": "fornecedor_erp", "nome": "Fornecedor do ERP", "correto": "notificar", "prazo_correto": "imediato",
+   "explicacao": "O acesso do fornecedor pode estar envolvido (conta órfã do Estudo 40) e ele é necessário para restaurar o sistema."},
+  {"id": "adquirente", "nome": "Adquirente e bandeiras de cartão", "correto": "nao_se_aplica", "prazo_correto": null,
+   "explicacao": "Nenhum dado de cartão foi afetado: a loja tokeniza (Estudo 31). Registre essa análise, porque o adquirente pode perguntar."},
+  {"id": "banco_central", "nome": "Banco Central do Brasil", "correto": "nao_se_aplica", "prazo_correto": null,
+   "explicacao": "As regras de comunicação ao Banco Central valem para instituições financeiras e de pagamento. A Ipê Store é uma loja, não uma instituição financeira."}
+ ],
+ "itens_mensagem": [
+  {"id": "natureza", "tipo": "obrigatorio", "inciso": "I", "texto": "Quais dados foram afetados: nome, CPF, e-mail e endereço de entrega. Nenhum dado de cartão foi exposto.",
+   "explicacao": "Art. 9º, I: natureza e categoria dos dados pessoais afetados."},
+  {"id": "medidas_protecao", "tipo": "obrigatorio", "inciso": "II", "texto": "Como os dados eram protegidos: acesso restrito, cópias de segurança e cartões tokenizados pelo meio de pagamento.",
+   "explicacao": "Art. 9º, II: medidas técnicas e de segurança usadas, sem expor segredo comercial."},
+  {"id": "riscos", "tipo": "obrigatorio", "inciso": "III", "texto": "Riscos para você: tentativas de golpe por e-mail, telefone ou mensagem usando seus dados.",
+   "explicacao": "Art. 9º, III: riscos e possíveis impactos aos titulares."},
+  {"id": "demora", "tipo": "condicional", "inciso": "IV", "texto": "Os motivos pelos quais esta comunicação atrasou.",
+   "explicacao": "Art. 9º, IV: só é exigido se a comunicação sair depois do prazo. Neste cenário, enviada no prazo, não é necessário."},
+  {"id": "mitigacao", "tipo": "obrigatorio", "inciso": "V", "texto": "O que estamos fazendo: o ataque foi contido, as senhas internas foram trocadas e o monitoramento foi reforçado.",
+   "explicacao": "Art. 9º, V: medidas adotadas ou a adotar para reverter ou mitigar os efeitos."},
+  {"id": "data", "tipo": "obrigatorio", "inciso": "VI", "texto": "Tomamos conhecimento do incidente em 08/11/2025.",
+   "explicacao": "Art. 9º, VI: data do conhecimento do incidente."},
+  {"id": "contato", "tipo": "obrigatorio", "inciso": "VII", "texto": "Dúvidas: central de atendimento e encarregado de dados pelo e-mail dpo@ipestore.example.",
+   "explicacao": "Art. 9º, VII: contato para informações e dados do encarregado."},
+  {"id": "recomendacoes", "tipo": "boa_pratica", "inciso": null, "texto": "Recomendações: desconfie de mensagens que peçam pagamento ou senha; a Ipê Store não pede dados por telefone.",
+   "explicacao": "Art. 9º, § 5º: recomendações para mitigar os efeitos podem ser consideradas boa prática."},
+  {"id": "grupo", "tipo": "distrator", "inciso": null, "texto": "O nome do grupo criminoso e o endereço do site onde ele ameaça publicar os dados.",
+   "explicacao": "Não ajuda o titular e leva curiosos ao site criminoso, ampliando a exposição."},
+  {"id": "tecnico", "tipo": "distrator", "inciso": null, "texto": "Detalhes técnicos da falha: VPN sem MFA e a conta erp_admin.",
+   "explicacao": "Expõe a empresa a novos ataques e não é o que o inciso II pede: medidas de proteção, observados os segredos comercial e industrial."},
+  {"id": "resgate", "tipo": "distrator", "inciso": null, "texto": "O valor do resgate pedido pelos criminosos.",
+   "explicacao": "Irrelevante para o titular e alimenta especulação; é assunto do comitê, não do comunicado."},
+  {"id": "garantia", "tipo": "distrator", "inciso": null, "texto": "Garantimos que nenhum dado será publicado.",
+   "explicacao": "A empresa não controla isso. Uma promessa falsa reduz a atenção do cliente aos golpes e expõe a empresa."},
+  {"id": "link", "tipo": "distrator", "inciso": null, "texto": "Clique no link e confirme seu CPF e senha para verificarmos sua conta.",
+   "explicacao": "É exatamente o padrão de phishing que os golpistas vão usar. Um comunicado legítimo nunca pede senha."}
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var CRISE = JSON.parse(document.getElementById("crise-dados").textContent);
+    var DIA = 86400000;
+    var SEMANA = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"];
+    var ROTULOS = {
+        anpd: "Comunicação à ANPD",
+        titulares: "Comunicação aos titulares",
+        declaracao: "Declaração da comunicação aos titulares",
+        complementacao: "Complementação à ANPD",
+        registro: "Guarda mínima do registro"
+    };
+    var marcados = {};
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function lerData(iso) {
+        var p = iso.split("-");
+        return new Date(Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2])));
+    }
+    function iso(d) { return d.toISOString().slice(0, 10); }
+    function formatar(d) {
+        var p = iso(d).split("-");
+        return SEMANA[d.getUTCDay()] + ", " + p[2] + "/" + p[1] + "/" + p[0];
+    }
+    // Mesma regra dos testes: exclui o dia de início, pula fins de semana e feriados nacionais.
+    function somarDiasUteis(inicio, n) {
+        var d = new Date(inicio.getTime());
+        while (n > 0) {
+            d = new Date(d.getTime() + DIA);
+            var dow = d.getUTCDay();
+            if (dow !== 0 && dow !== 6 && CRISE.feriados.indexOf(iso(d)) === -1) n--;
+        }
+        return d;
+    }
+    function prazos(conhecimento, pequeno) {
+        var r = CRISE.regras, f = pequeno ? 2 : 1;
+        var anpd = somarDiasUteis(conhecimento, r.anpd_dias * f);
+        var titulares = somarDiasUteis(conhecimento, r.titulares_dias * f);
+        var registro = new Date(Date.UTC(conhecimento.getUTCFullYear() + r.registro_anos, conhecimento.getUTCMonth(), conhecimento.getUTCDate()));
+        return {
+            anpd: anpd, titulares: titulares,
+            declaracao: somarDiasUteis(titulares, r.declaracao_dias),
+            complementacao: somarDiasUteis(anpd, r.complementacao_dias * f),
+            registro: registro
+        };
+    }
+
+    window.calcularPrazosCrise = function() {
+        var box = document.getElementById("crise-prazos");
+        box.replaceChildren();
+        var valor = document.getElementById("crise-data").value;
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(valor) || valor < "2025-01-01" || valor > "2026-12-31") {
+            box.appendChild(el("p", "Escolha uma data entre 2025 e 2026. O laboratório tem os feriados nacionais de 2025 a 2027, para que os prazos longos não passem do calendário cadastrado.", "margin: 0; color: var(--danger-color);"));
+            return;
+        }
+        var pequeno = document.getElementById("crise-pequeno").checked;
+        var conhecimento = lerData(valor);
+        var p = prazos(conhecimento, pequeno);
+        var f = pequeno ? 2 : 1;
+        var regras = {
+            anpd: CRISE.regras.anpd_dias * f + " dias úteis do conhecimento (art. 6º)",
+            titulares: CRISE.regras.titulares_dias * f + " dias úteis do conhecimento (art. 9º)",
+            declaracao: CRISE.regras.declaracao_dias + " dias úteis após o prazo dos titulares (art. 9º, § 4º)",
+            complementacao: CRISE.regras.complementacao_dias * f + " dias úteis da comunicação, supondo envio no último dia (art. 6º, § 3º)",
+            registro: CRISE.regras.registro_anos + " anos, no mínimo, a partir do registro (art. 10)"
+        };
+        var lista = el("div", null, "display: grid; gap: 0.4rem;");
+        Object.keys(ROTULOS).forEach(function(k) {
+            var linha = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.2rem 0.75rem; justify-content: space-between; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.4rem 0.6rem;");
+            linha.setAttribute("data-prazo", k);
+            linha.setAttribute("data-data", iso(p[k]));
+            var esq = el("div", null, "min-width: 0;");
+            esq.appendChild(el("strong", ROTULOS[k], "display: block;"));
+            esq.appendChild(el("span", regras[k], "font-size: 0.78rem; color: var(--muted);"));
+            linha.appendChild(esq);
+            linha.appendChild(el("span", (k === "registro" ? "até " : "") + formatar(p[k]), "font-family: var(--font-mono); font-weight: 600;"));
+            lista.appendChild(linha);
+        });
+        box.appendChild(lista);
+        box.appendChild(el("p", "Contagem usada: exclui o dia do conhecimento e não conta sábados, domingos e feriados nacionais. Feriados estaduais e municipais não estão incluídos; confirme a contagem com o jurídico.",
+            "margin: 0.5rem 0 0 0; font-size: 0.78rem; color: var(--muted);"));
+    };
+
+    function renderizarDestinatarios() {
+        var box = document.getElementById("crise-destinatarios");
+        box.replaceChildren();
+        CRISE.destinatarios.forEach(function(d) {
+            var card = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem 0.65rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem; min-width: 0;");
+            card.setAttribute("data-destinatario", d.id);
+            card.appendChild(el("strong", d.nome, "font-size: 0.9rem;"));
+            var linha = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.5rem;");
+            var dec = el("select", null, "flex: 1 1 140px; min-width: 0;");
+            dec.className = "form-control";
+            dec.setAttribute("aria-label", "Decisão para " + d.nome);
+            [["", "Decisão…"], ["notificar", "Notificar"], ["nao_se_aplica", "Não se aplica"]].forEach(function(o) {
+                var op = el("option", o[1]); op.value = o[0]; dec.appendChild(op);
+            });
+            var prz = el("select", null, "flex: 2 1 200px; min-width: 0;");
+            prz.className = "form-control";
+            prz.setAttribute("aria-label", "Prazo para " + d.nome);
+            var op0 = el("option", "Prazo…"); op0.value = ""; prz.appendChild(op0);
+            Object.keys(CRISE.opcoes_prazo).forEach(function(k) {
+                var op = el("option", CRISE.opcoes_prazo[k]); op.value = k; prz.appendChild(op);
+            });
+            dec.addEventListener("change", function() { prz.disabled = dec.value === "nao_se_aplica"; if (prz.disabled) prz.value = ""; });
+            linha.appendChild(dec);
+            linha.appendChild(prz);
+            card.appendChild(linha);
+            box.appendChild(card);
+        });
+    }
+
+    window.conferirNotificacoesCrise = function() {
+        var acertos = 0;
+        CRISE.destinatarios.forEach(function(d) {
+            var card = document.querySelector('[data-destinatario="' + d.id + '"]');
+            var sels = card.querySelectorAll("select");
+            var dec = sels[0].value, prz = sels[1].value;
+            var ok = dec === d.correto && (d.correto === "nao_se_aplica" || prz === d.prazo_correto);
+            if (ok) acertos++;
+            var velho = card.querySelector(".crise-feedback");
+            if (velho) card.removeChild(velho);
+            var msg = ok ? "✓ Correto. " : (dec === "" ? "Escolha uma decisão. " : dec !== d.correto ? "✗ A decisão certa é: " + (d.correto === "notificar" ? "notificar" : "não se aplica") + ". " : "✗ O prazo certo é: " + CRISE.opcoes_prazo[d.prazo_correto] + ". ");
+            var fb = el("p", msg + d.explicacao, "margin: 0; font-size: 0.82rem; color: " + (ok ? "var(--tip-color)" : "var(--danger-color)") + ";");
+            fb.className = "crise-feedback";
+            card.appendChild(fb);
+        });
+        var box = document.getElementById("crise-resultado-notif");
+        box.replaceChildren();
+        box.setAttribute("data-acertos", String(acertos));
+        box.appendChild(el("strong", "Acertos: " + acertos + " de " + CRISE.destinatarios.length + " destinatários."));
+    };
+
+    function renderizarMensagem() {
+        var box = document.getElementById("crise-mensagem");
+        box.replaceChildren();
+        CRISE.itens_mensagem.forEach(function(i) {
+            var rot = el("label", null, "display: flex; gap: 0.5rem; align-items: flex-start;");
+            var cb = el("input");
+            cb.type = "checkbox";
+            cb.checked = !!marcados[i.id];
+            cb.setAttribute("data-item", i.id);
+            cb.addEventListener("change", function() { marcados[i.id] = cb.checked; renderizarPrevia(); document.getElementById("crise-resultado-msg").replaceChildren(); });
+            rot.appendChild(cb);
+            rot.appendChild(el("span", i.texto));
+            box.appendChild(rot);
+        });
+    }
+
+    function renderizarPrevia() {
+        var box = document.getElementById("crise-previa");
+        box.replaceChildren();
+        box.appendChild(el("strong", "Assunto: Comunicado importante sobre seus dados na Ipê Store", "display: block; margin-bottom: 0.4rem;"));
+        var sel = CRISE.itens_mensagem.filter(function(i) { return marcados[i.id]; });
+        if (!sel.length) { box.appendChild(el("p", "(nada marcado ainda)", "margin: 0; color: var(--muted);")); return; }
+        box.appendChild(el("p", "Olá. Identificamos um incidente de segurança que envolveu dados de clientes, e você está entre as pessoas afetadas.", "margin: 0 0 0.4rem 0;"));
+        sel.forEach(function(i) { box.appendChild(el("p", i.texto, "margin: 0 0 0.4rem 0;")); });
+    }
+
+    window.conferirMensagemCrise = function() {
+        var faltam = [], indevidos = [], notas = [];
+        CRISE.itens_mensagem.forEach(function(i) {
+            var m = !!marcados[i.id];
+            if (i.tipo === "obrigatorio" && !m) faltam.push(i);
+            if (i.tipo === "distrator" && m) indevidos.push(i);
+            if (i.tipo === "condicional" && m) notas.push(i.explicacao);
+            if (i.tipo === "boa_pratica" && !m) notas.push("Considere incluir: " + i.texto + " (" + i.explicacao + ")");
+        });
+        var box = document.getElementById("crise-resultado-msg");
+        box.replaceChildren();
+        box.setAttribute("data-faltam", String(faltam.length));
+        box.setAttribute("data-indevidos", String(indevidos.length));
+        var ok = !faltam.length && !indevidos.length;
+        box.appendChild(el("strong", ok ? "✓ A mensagem tem tudo o que o art. 9º exige e nada que prejudique o titular." : "A mensagem precisa de ajustes.",
+            "display: block; color: " + (ok ? "var(--tip-color)" : "var(--danger-color)") + ";"));
+        var ul = el("ul", null, "margin: 0.4rem 0 0 0; padding-left: 1.2rem;");
+        faltam.forEach(function(i) { ul.appendChild(el("li", "Falta (inciso " + i.inciso + "): " + i.explicacao)); });
+        indevidos.forEach(function(i) { ul.appendChild(el("li", "Retire: \"" + i.texto + "\" — " + i.explicacao)); });
+        notas.forEach(function(n) { ul.appendChild(el("li", n, "color: var(--muted);")); });
+        if (ul.childNodes.length) box.appendChild(ul);
+    };
+
+    window.restaurarCrise = function() {
+        document.getElementById("crise-data").value = CRISE.conhecimento.slice(0, 10);
+        document.getElementById("crise-pequeno").checked = false;
+        marcados = {};
+        calcularPrazosCrise();
+        renderizarDestinatarios();
+        renderizarMensagem();
+        renderizarPrevia();
+        document.getElementById("crise-resultado-notif").replaceChildren();
+        document.getElementById("crise-resultado-msg").replaceChildren();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("crise-contexto").textContent = CRISE.contexto;
+        document.getElementById("crise-data").addEventListener("change", calcularPrazosCrise);
+        document.getElementById("crise-pequeno").addEventListener("change", calcularPrazosCrise);
+        restaurarCrise();
+        if (typeof initChecklist === "function") {
+            initChecklist("gestao-crise");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>

@@ -529,8 +529,8 @@ flowchart LR
 - **Objetivos de Aprendizagem:** Montar um comitê de crise com papéis definidos (matriz RACI); manter sala de guerra e registro de decisões; planejar a comunicação interna, com clientes e com a imprensa; cumprir a comunicação obrigatória à ANPD e aos titulares.
 - **Pré-requisitos:** Resposta-a-Incidentes, LGPD-e-Privacidade.
 - **Conceitos-Chave:** incidente vs crise; RACI; porta-voz único; registro de decisões; comunicação à ANPD (Resolução CD/ANPD nº 15/2024: prazo de **3 dias úteis** contados do conhecimento de que o incidente afetou dados pessoais; complementação em até 20 dias úteis; prazos em dobro para agentes de pequeno porte); comunicação aos titulares.
-- **Pendências de verificação (resolver antes de construir o módulo):**
-  - O prazo de comunicação aos **titulares**: fontes secundárias divergem entre "3 dias úteis" e "sem demora injustificada". Conferir no texto oficial da Resolução CD/ANPD nº 15/2024 no DOU.
+- **Verificações:**
+  - *Resolvido (01/11/2026):* o prazo de comunicação aos **titulares** também é de **3 dias úteis**, contados do conhecimento de que o incidente afetou dados pessoais (Resolução CD/ANPD nº 15/2024, art. 9º, conferido no texto oficial publicado pela Biblioteca Digital do MJ). O mesmo texto confirma a declaração em até 3 dias úteis após esse prazo (art. 9º, § 4º), a comunicação ampla por no mínimo 3 meses (art. 9º, § 3º) e o registro por no mínimo 5 anos (art. 10).
   - Obrigações do **setor financeiro**: a Resolução CMN nº 4.893/2021 exige comunicar incidentes relevantes ao Banco Central e foi alterada pela Resolução CMN nº 5.274/2025. O prazo não foi confirmado. Por isso, o cenário do simulador é uma empresa **não financeira**, e o módulo só cita a existência dessas regras.
 - **Simulador Interativo em JS:** *Relógio da Crise* — Dado um cenário fictício (empresa não financeira), o aluno decide quem notificar, quando e com que conteúdo. O simulador confere prazos e elementos obrigatórios e comenta cada escolha.
 
