@@ -2,7 +2,7 @@
 
 ## 1. Visão Geral e Filosofia Pedagógica
 
-O currículo de **Estudos de Cibersegurança** foi concebido como uma formação autoinstrucional, prática e modular, dividida em **45 módulos temáticos** organizados em **10 trilhas estruturantes**. 
+O currículo de **Estudos de Cibersegurança** foi concebido como uma formação autoinstrucional, prática e modular, dividida em **57 módulos temáticos** organizados em **13 trilhas estruturantes**. 
 
 O projeto segue quatro diretrizes fundamentais:
 1. **Teoria Pragmática e Direta ao Ponto:** Eliminação de floreios acadêmicos desnecessários; foco no que engenheiros, analistas e auditores de segurança executam na rotina corporativa e no que bancas de concursos e certificações (CompTIA Security+, CySA+, PenTest+, CEH, CISSP) cobram.
@@ -14,13 +14,13 @@ O projeto segue quatro diretrizes fundamentais:
 
 ---
 
-## 2. Mapa das 10 Trilhas Temáticas
+## 2. Mapa das 13 Trilhas Temáticas
 
-A matriz pedagógica conecta diretamente as 10 trilhas estruturantes aos 6 pilares de governança e operação técnica preconizados pelo **NIST CSF 2.0**:
+A matriz pedagógica conecta diretamente as 13 trilhas estruturantes aos 6 pilares de governança e operação técnica preconizados pelo **NIST CSF 2.0**:
 
 ```mermaid
 flowchart LR
-    subgraph Trilhas["10 Trilhas Temáticas"]
+    subgraph Trilhas["13 Trilhas Temáticas"]
         direction TB
         T1["Trilha 1: Fundamentos & Redes"]
         T2["Trilha 2: Segurança Defensiva"]
@@ -32,6 +32,9 @@ flowchart LR
         T8["Trilha 8: Ferramentas & Automação do Analista"]
         T9["Trilha 9: Identidade Corporativa & Active Directory"]
         T10["Trilha 10: Resiliência, Crise & Ransomware"]
+        T11["Trilha 11: Detecção Avançada & Threat Hunting"]
+        T12["Trilha 12: Nuvem, Containers & Kubernetes"]
+        T13["Trilha 13: Setor Regulado no Brasil"]
     end
 
     subgraph NIST["NIST CSF 2.0 (Funções Centrais)"]
@@ -77,6 +80,17 @@ flowchart LR
 
     T10 --> RS
     T10 --> RC
+
+    T11 --> DE
+    T11 --> RS
+
+    T12 --> PR
+    T12 --> DE
+    T12 --> RS
+
+    T13 --> GV
+    T13 --> DE
+    T13 --> PR
 ```
 
 | Trilha | Denominação | Cor do Tema | Foco Técnico | Módulos |
@@ -91,10 +105,13 @@ flowchart LR
 | **Trilha 8** | Ferramentas & Automação do Analista | `#475569` (Ardósia) | Base prática do analista: Linux e PowerShell para investigação, automação com Python e regex, laboratório doméstico e portfólio | 34 ao 37 |
 | **Trilha 9** | Identidade Corporativa & Active Directory | `#4F46E5` (Índigo) | Identidade no ambiente corporativo: Active Directory, Kerberos, ataques e detecção no AD, acessos privilegiados (PAM) e Entra ID | 38 ao 41 |
 | **Trilha 10** | Resiliência, Crise & Ransomware | `#C2410C` (Laranja) | Resiliência operacional: ransomware da prevenção à recuperação, gestão de crise, exercícios tabletop e backup imutável | 42 ao 45 |
+| **Trilha 11** | Detecção Avançada & Threat Hunting | `#A21CAF` (Fúcsia) | Detecção além da rotina do SOC: engenharia de detecção, threat hunting, monitoramento de rede e automação de resposta com SOAR. | 46 ao 49 |
+| **Trilha 12** | Nuvem, Containers & Kubernetes | `#0F766E` (Verde-azulado) | Segurança de nuvem nativa: containers, Kubernetes, infraestrutura como código e detecção e resposta a incidentes em nuvem. | 50 ao 53 |
+| **Trilha 13** | Setor Regulado no Brasil | `#4D7C0F` (Verde-oliva) | Segurança no contexto brasileiro: regulação do setor financeiro, fraude em pagamentos e Pix, legislação penal e riscos de terceiros. | 54 ao 57 |
 
 ---
 
-## 3. Detalhamento dos 45 Módulos de Aprendizagem
+## 3. Detalhamento dos 57 Módulos de Aprendizagem
 
 ### Trilha 1: Fundamentos & Redes (`#2563EB`)
 
@@ -700,11 +717,11 @@ flowchart LR
 
 | Função NIST CSF 2.0 | Quantidade de Módulos | Módulos Vinculados |
 |---|---|---|
-| **GOVERN (GV)** | 4 módulos | 25, 26, 27, 31 |
+| **GOVERN (GV)** | 7 módulos | 25, 26, 27, 31, 54, 56, 57 |
 | **IDENTIFY (ID)** | 6 módulos | 01, 09, 11, 14, 17, 25 |
-| **PROTECT (PR)** | 28 módulos | 02, 03, 04, 05, 06, 07, 08, 09, 10, 12, 13, 15, 21, 22, 23, 24, 27, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41 |
-| **DETECT (DE)** | 13 módulos | 02, 07, 10, 16, 17, 20, 24, 29, 30, 34, 35, 36, 39 |
-| **RESPOND (RS)** | 6 módulos | 18, 19, 20, 42, 43, 44 |
+| **PROTECT (PR)** | 32 módulos | 02, 03, 04, 05, 06, 07, 08, 09, 10, 12, 13, 15, 21, 22, 23, 24, 27, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 50, 51, 52, 55 |
+| **DETECT (DE)** | 18 módulos | 02, 07, 10, 16, 17, 20, 24, 29, 30, 34, 35, 36, 39, 46, 47, 48, 53, 55 |
+| **RESPOND (RS)** | 8 módulos | 18, 19, 20, 42, 43, 44, 49, 53 |
 | **RECOVER (RC)** | 4 módulos | 28, 42, 44, 45 |
 
 *(Nota: Alguns módulos cobrem mais de uma função normativa, como Detecção e Proteção conjugadas).*
@@ -716,15 +733,15 @@ flowchart LR
 Para orientar estudantes e profissionais com focos específicos, a matriz curricular recomenda as seguintes trilhas rápidas:
 
 1. **Rota Blue Team / Analista SOC:**  
-   `01 -> 02 -> 34 -> 36 -> 05 -> 06 -> 07 -> 10 -> 39 -> 16 -> 17 -> 18 -> 42`
+   `01 -> 02 -> 34 -> 36 -> 05 -> 06 -> 07 -> 48 -> 10 -> 39 -> 16 -> 46 -> 17 -> 47 -> 18 -> 49 -> 42`
 2. **Rota Red Team / Pentest:**  
-   `01 -> 02 -> 34 -> 04 -> 11 -> 12 -> 13 -> 38 -> 39 -> 14 -> 15`
+   `01 -> 02 -> 34 -> 04 -> 11 -> 12 -> 13 -> 38 -> 39 -> 51 -> 14 -> 15`
 3. **Rota DevSecOps & Cloud Security:**  
-   `01 -> 03 -> 04 -> 35 -> 06 -> 12 -> 13 -> 21 -> 41 -> 22 -> 24`
+   `01 -> 03 -> 04 -> 35 -> 06 -> 12 -> 13 -> 21 -> 41 -> 22 -> 50 -> 51 -> 52 -> 53 -> 24`
 4. **Rota GRC, Auditoria & Privacidade:**  
-   `01 -> 08 -> 40 -> 09 -> 25 -> 26 -> 27 -> 28 -> 43 -> 44`
+   `01 -> 08 -> 40 -> 09 -> 25 -> 26 -> 57 -> 27 -> 56 -> 54 -> 55 -> 28 -> 43 -> 44`
 5. **Rota Perícia & Resposta a Incidentes:**  
-   `01 -> 02 -> 06 -> 36 -> 10 -> 16 -> 18 -> 42 -> 45 -> 19 -> 20`
+   `01 -> 02 -> 06 -> 36 -> 10 -> 48 -> 16 -> 47 -> 18 -> 53 -> 42 -> 45 -> 19 -> 56 -> 20`
 6. **Rota 6: Analista de Segurança da Informação (vaga):**  
-   `01 -> 34 -> 36 -> 05 -> 06 -> 07 -> 10 -> 29 -> 30 -> 38 -> 40 -> 25 -> 26 -> 31 -> 18 -> 42 -> 43 -> 32 -> 37 -> 33`  
+   `01 -> 34 -> 36 -> 05 -> 06 -> 07 -> 10 -> 29 -> 30 -> 38 -> 40 -> 25 -> 26 -> 31 -> 54 -> 57 -> 18 -> 49 -> 42 -> 43 -> 32 -> 37 -> 33`  
    Cada competência da vaga também aparece, com os módulos principais e de apoio, na seção "Rota por Vaga" do portal (`index.html`).

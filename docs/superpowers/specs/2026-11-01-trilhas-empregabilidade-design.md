@@ -6,6 +6,8 @@
 **Specs anteriores:** [`2026-10-06-estudos-cyberseguranca-design.md`](2026-10-06-estudos-cyberseguranca-design.md), [`2026-10-15-competencias-vaga-analista-si-design.md`](2026-10-15-competencias-vaga-analista-si-design.md)
 **Referência Metodológica:** Superpowers Spec-Driven Development (SDD)
 
+> **Atualização 2026-11-02:** grade ampliada para 57 módulos / 13 trilhas — ver [2026-11-02-trilhas-especializacao-design.md](2026-11-02-trilhas-especializacao-design.md).
+
 ---
 
 ## 1. Propósito e Entendimento

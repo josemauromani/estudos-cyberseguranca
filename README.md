@@ -71,7 +71,13 @@ flowchart TD
         T10["Trilha 10: Resiliência & Ransomware<br><small>Módulos 42 a 45 | Ransomware, Crise, Tabletop e Backup Imutável</small>"]
     end
 
-    subgraph Conexoes["5. Rota Profissional e Certificações"]
+    subgraph Especializacao["5. Especialização"]
+        T11["Trilha 11: Detecção Avançada<br><small>Módulos 46 a 49 | Detecção como Código, Threat Hunting, NSM e SOAR</small>"]
+        T12["Trilha 12: Nuvem & Kubernetes<br><small>Módulos 50 a 53 | Containers, Kubernetes, IaC e Resposta em Nuvem</small>"]
+        T13["Trilha 13: Setor Regulado BR<br><small>Módulos 54 a 57 | Regulação Financeira, Fraude Pix, Legislação e Terceiros</small>"]
+    end
+
+    subgraph Conexoes["6. Rota Profissional e Certificações"]
         ROTA["🎯 Rota Analista de Segurança da Informação<br><small>Firewall, EDR, DLP, SQL, Normas, Incidentes e Controles</small>"]
         CERTS["🏆 Certificações Internacionais & Concursos<br><small>CompTIA Security+, CySA+, CEH, CISSP, CISM e Provas de TI</small>"]
     end
@@ -88,6 +94,10 @@ flowchart TD
     T1 --> T9
     T4 --> T10
 
+    T4 --> T11
+    T5 --> T12
+    T6 --> T13
+
     T2 --> ROTA
     T8 --> ROTA
     T9 --> ROTA
@@ -95,6 +105,8 @@ flowchart TD
     T4 --> ROTA
     T6 --> ROTA
     T7 --> ROTA
+    T11 --> ROTA
+    T13 --> ROTA
 
     T2 --> CERTS
     T4 --> CERTS
@@ -173,8 +185,8 @@ O portal (`index.html`) traz a seção **Rota por Vaga**, que liga cada requisit
 | Soluções de Cyber Security (Firewalls, Antivírus, DLP, AntiSpam, WAF, Filtro de conteúdo) | 05, 07, 10, 29 | 15, 34, 36 |
 | Banco de dados relacionais | 30 | 12 |
 | Inglês | 32 | — |
-| PCI-DSS, ISO 27001/27002, ISO 31000 e NIST | 25, 26, 31 | 18 |
-| Resposta a incidentes | 18 | 16, 19, 42, 43 |
+| PCI-DSS, ISO 27001/27002, ISO 31000 e NIST | 25, 26, 31 | 18, 54, 57 |
+| Resposta a incidentes | 18 | 16, 19, 42, 43, 49 |
 | Controles de segurança da informação | 26 | 06, 08, 38, 40 |
 | Formação e certificações | 33 | 37 |
 
@@ -262,11 +274,11 @@ python3 -m unittest discover -s _geradores/testes -v
 
 O currículo é estruturado de forma a atender diferentes objetivos e momentos de carreira:
 
-- **Blue Team & Defesa Ativa:** Módulos de redes, bastionamento Linux/Windows, firewalls, Zero Trust, EDR e detecção de ameaças; Linux e PowerShell para investigação (Trilha 8), Active Directory e detecção de ataques ao AD (Trilha 9) e ransomware (Trilha 10).
-- **Red Team & Testes de Invasão:** Técnicas de reconhecimento OSINT, OWASP Top 10 Web, segurança de APIs e metodologias de pentest; Linux e caminhos de ataque no Active Directory (Trilhas 8 e 9).
-- **Operações, SOC & Forense:** Análise de logs SIEM, regras Sigma, inteligência de ameaças (CTI), resposta a incidentes e análise básica de malware.
-- **Engenharia de Nuvem & DevSecOps:** Segurança em provedores cloud (AWS/Azure/GCP), pipelines CI/CD seguros, conteinerização e IoT/TO.
-- **Governança, Riscos e Conformidade (GRC):** Metodologias de avaliação de risco (ALE/SLE), ISO/IEC 27001/27002:2022, LGPD e planos de continuidade/DRP; acessos privilegiados (PAM), gestão de crise e exercícios tabletop (Trilhas 9 e 10).
+- **Blue Team & Defesa Ativa:** Módulos de redes, bastionamento Linux/Windows, firewalls, Zero Trust, EDR e detecção de ameaças; Linux e PowerShell para investigação (Trilha 8), Active Directory e detecção de ataques ao AD (Trilha 9) e ransomware (Trilha 10); engenharia de detecção, threat hunting, monitoramento de rede e SOAR (Trilha 11).
+- **Red Team & Testes de Invasão:** Técnicas de reconhecimento OSINT, OWASP Top 10 Web, segurança de APIs e metodologias de pentest; Linux e caminhos de ataque no Active Directory (Trilhas 8 e 9); escalação de privilégio em Kubernetes (Trilha 12).
+- **Operações, SOC & Forense:** Análise de logs SIEM, regras Sigma, inteligência de ameaças (CTI), resposta a incidentes e análise básica de malware; threat hunting, monitoramento de rede (Trilha 11) e investigação de incidentes em nuvem (Trilha 12).
+- **Engenharia de Nuvem & DevSecOps:** Segurança em provedores cloud (AWS/Azure/GCP), pipelines CI/CD seguros, conteinerização e IoT/TO; containers, Kubernetes, infraestrutura como código e resposta a incidentes em nuvem (Trilha 12).
+- **Governança, Riscos e Conformidade (GRC):** Metodologias de avaliação de risco (ALE/SLE), ISO/IEC 27001/27002:2022, LGPD e planos de continuidade/DRP; acessos privilegiados (PAM), gestão de crise e exercícios tabletop (Trilhas 9 e 10); regulação do setor financeiro, fraude em Pix, legislação penal e riscos de terceiros (Trilha 13).
 - **Analista de Segurança da Informação:** Perfil generalista de vaga corporativa: soluções de segurança (firewall, EDR, DLP), bancos de dados, normas (PCI-DSS, ISO 27001/27002/31000, NIST), controles, resposta a incidentes, inglês técnico e certificações.
 
 ---
