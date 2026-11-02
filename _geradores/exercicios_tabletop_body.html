@@ -1,0 +1,1134 @@
+<!-- Estudo 44: Exercicios-Tabletop Body Fragment -->
+<article class="study-container" data-slug="tabletop">
+
+    <!-- SEÇÃO 1: TIPOS E PLANEJAMENTO -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: Ensaiar Antes do Incidente</h2>
+        </div>
+
+        <p class="lead-text">
+            O plano de resposta da Ipê Store existe (Estudo 18), os contatos da ANPD estão anotados (Estudo 43) e o backup imutável está configurado (Estudo 45). Mas quem decide desligar a loja numa sexta às 23h? Quem fala com a imprensa? A senha do console de backup está onde? Um exercício tabletop responde a essas perguntas numa sala de reunião, com café, antes que um atacante as faça de verdade.
+        </p>
+
+        <h3>Tipos de exercício</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Tipo</th><th>Como funciona</th><th>Custo e risco</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>tabletop</strong></td><td>Discussão guiada de um cenário; ninguém mexe em sistemas</td><td>Baixo: algumas horas das pessoas certas</td></tr>
+                    <tr><td><strong>funcional</strong></td><td>As equipes executam funções reais num ambiente controlado (restaurar um backup, acionar a escala de plantão)</td><td>Médio: precisa de preparação técnica</td></tr>
+                    <tr><td><strong>completo</strong> (full-scale)</td><td>Simulação realista com várias áreas, sistemas e às vezes parceiros externos</td><td>Alto: semanas de preparação</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            O <strong>NIST SP 800-84</strong> (testes, treinamentos e exercícios para planos de TI) descreve os exercícios tabletop e funcionais; o exercício completo vem da metodologia HSEEP, da FEMA, que também popularizou termos como MSEL e relatório pós-ação. O caminho natural é começar pelo tabletop, corrigir o plano e só então testar funções.
+        </p>
+
+        <h3>Planejamento</h3>
+        <ul>
+            <li><strong>objetivos</strong> claros e verificáveis: "decidir o isolamento em até 30 minutos", "identificar o prazo de comunicação à ANPD";</li>
+            <li>um <strong>cenário</strong> plausível para a empresa, com uma sequência de <strong>inject</strong>s (novas informações que mudam a situação), organizados numa lista de eventos (<strong>MSEL</strong>, Master Scenario Events List);</li>
+            <li>para cada inject, os pontos que o facilitador espera ouvir, ligados a um objetivo.</li>
+        </ul>
+
+        <h3>Papéis na sala</h3>
+        <ul>
+            <li><strong>facilitador:</strong> apresenta os injects, controla o tempo e faz perguntas; não responde por ninguém.</li>
+            <li><strong>participantes:</strong> quem decidiria de verdade (TI, segurança, jurídico, comunicação, diretoria).</li>
+            <li><strong>observadores</strong> e avaliadores: anotam o que foi coberto e o que faltou, sem interferir.</li>
+            <li><strong>escriba:</strong> registra decisões e horários para o relatório.</li>
+        </ul>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🤝</span>
+                <strong>Regras da sessão</strong>
+            </div>
+            <p>
+                O exercício é <strong>sem culpa</strong>: o objetivo é achar falhas no plano, não em pessoas. Responda como faria hoje, com os recursos de hoje; "isso está no plano" sem saber onde está o plano conta como lacuna. O que acontece na sala serve para melhorar o processo.
+            </p>
+        </div>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Ciclo de um Exercício</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Ciclo de um Exercício">
+flowchart TD
+    P["Planejar<br><small>objetivos, cenário, MSEL</small>"]
+    C["Conduzir<br><small>injects e discussão</small>"]
+    H["Hot wash<br><small>logo ao final, a quente</small>"]
+    R["Relatório pós-ação"]
+    M["Plano de melhorias<br><small>responsável e prazo</small>"]
+    A["Ajustar o plano de resposta"]
+    P --> C
+    C --> H
+    H --> R
+    R --> M
+    M --> A
+    A -->|"próximo exercício"| P
+            </pre>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: DEPOIS DA SESSÃO -->
+    <section class="study-section" id="depois">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Hot Wash, Relatório Pós-Ação e Plano de Melhorias</h2>
+        </div>
+
+        <p>
+            O <strong>hot wash</strong> é a conversa rápida logo depois do exercício, enquanto tudo está fresco: o que funcionou, o que travou, o que surpreendeu. Em seguida, o facilitador consolida o <strong>relatório pós-ação</strong> (after-action report), com os objetivos e se foram atingidos, a linha do tempo das decisões e as lacunas encontradas.
+        </p>
+        <p>
+            O resultado que importa é o <strong>plano de melhorias</strong>: cada lacuna vira uma ação com <strong>responsável</strong> e <strong>prazo</strong>, acompanhada até o fim. Um relatório sem plano, ou um plano sem dono, faz o próximo exercício encontrar as mesmas falhas.
+        </p>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Modelo — inject e plano de melhorias</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-tt-modelo')">Copiar</button>
+            </div>
+            <pre><code id="code-tt-modelo">INJECT 2 — T+2h
+Situação: o EDR mostra que a conta svc_backup apagou as cópias de sombra.
+Pergunta: os backups estão seguros? O que fazer com a conta?
+Pontos esperados (facilitador):
+  - [O1] Desativar a conta e revisar contas privilegiadas
+  - [O2] Verificar a cópia imutável antes de restaurar
+  - [O2] Encontrar o vetor inicial antes de reconectar
+
+PLANO DE MELHORIAS
+| Nº | Melhoria                                         | Responsável       | Prazo      |
+|  1 | Teste trimestral de restauração da cópia imutável | Infraestrutura    | 10/12/2026 |
+|  2 | Critério de "pronto para reconectar" no plano     | Líder de incidentes | 09/01/2027 |</code></pre>
+        </div>
+
+        <h3>Boas práticas</h3>
+        <ul>
+            <li>Duração de duas a três horas; quatro a seis injects bastam.</li>
+            <li>Cenário com detalhes da própria empresa: nomes de sistemas, fornecedores, horários reais.</li>
+            <li>Pelo menos um inject que ninguém espera (imprensa, fornecedor, decisão sobre pagamento).</li>
+            <li>Repetir ao menos uma vez por ano e depois de mudanças grandes, e guardar os relatórios como evidência para auditorias (ISO 27001, PCI DSS).</li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Gerador de Tabletop</h2>
+        </div>
+
+        <p class="lead-text">
+            Escolha um cenário e conduza o exercício, sozinho ou com o seu time: para cada inject, discuta, registre a resposta e marque os pontos que foram cobertos. Ao final, o relatório pós-ação sai pronto para copiar. Ele também serve como peça de portfólio (Estudo 37).
+        </p>
+
+        <div class="lab-box tt-lab" id="tt-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Exercício de Mesa</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Ipê Store — sala de crise</h3>
+                    <p id="tt-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">Missões</h4>
+                <ul id="tt-missoes" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.25rem; font-size: 0.85rem;"></ul>
+
+                <h4 style="margin-top: 1.5rem;">1. Preparação</h4>
+                <div id="tt-cenario" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem; font-size: 0.84rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 0.5rem;">
+                        <label style="display: flex; flex-direction: column; gap: 0.2rem;">Cenário
+                            <select class="form-control" id="tt-escolha"></select>
+                        </label>
+                        <label style="display: flex; flex-direction: column; gap: 0.2rem;">Data do exercício
+                            <input class="form-control" type="date" id="tt-data">
+                        </label>
+                    </div>
+                    <div id="tt-resumo"></div>
+                    <div><button class="btn-primary" type="button" onclick="iniciarTabletop()">Iniciar exercício</button></div>
+                </div>
+
+                <h4 style="margin-top: 1.25rem;">2. Inject próprio (opcional)</h4>
+                <details id="tt-extra" style="font-size: 0.84rem;">
+                    <summary style="cursor: pointer;">Escrever um inject e incluí-lo no fim do cenário atual</summary>
+                    <div style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.4rem; margin-top: 0.5rem;">
+                        <input class="form-control" type="text" id="tt-extra-momento" placeholder="Momento (ex.: T+48h)" aria-label="Momento">
+                        <input class="form-control" type="text" id="tt-extra-titulo" placeholder="Título" aria-label="Título">
+                        <textarea class="form-control" id="tt-extra-texto" rows="2" placeholder="Situação" aria-label="Situação" style="width: 100%; box-sizing: border-box;"></textarea>
+                        <input class="form-control" type="text" id="tt-extra-pergunta" placeholder="Pergunta para a equipe" aria-label="Pergunta">
+                        <select class="form-control" id="tt-extra-objetivo" aria-label="Objetivo"></select>
+                        <textarea class="form-control" id="tt-extra-pontos" rows="3" placeholder="Pontos esperados, um por linha" aria-label="Pontos esperados" style="width: 100%; box-sizing: border-box;"></textarea>
+                        <div><button class="btn-secondary" type="button" onclick="adicionarInjectTabletop()">Adicionar inject</button></div>
+                        <div id="tt-extra-status" aria-live="polite"></div>
+                    </div>
+                </details>
+
+                <h4 style="margin-top: 1.25rem;">3. Condução</h4>
+                <div id="tt-inject" aria-live="polite" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem; font-size: 0.84rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.6rem;"></div>
+
+                <h4 style="margin-top: 1.25rem;">4. Relatório pós-ação</h4>
+                <div class="terminal-box">
+                    <div class="terminal-header">
+                        <span class="terminal-title">relatorio-pos-acao.md</span>
+                        <button class="terminal-copy-btn" onclick="copyCode(this, 'tt-relatorio')">Copiar</button>
+                    </div>
+                    <pre style="max-height: 26rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere;"><code id="tt-relatorio"></code></pre>
+                </div>
+
+                <div style="margin-top: 1.25rem;">
+                    <button class="btn-secondary" type="button" onclick="restaurarTabletop()">Restaurar laboratório</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist do Facilitador</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para preparar e fechar um exercício. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="tabletop">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-tt-1">
+                <label for="chk-tt-1"><strong>Objetivos:</strong> de três a cinco objetivos verificáveis, aprovados por quem patrocina o exercício.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-tt-2">
+                <label for="chk-tt-2"><strong>Cenário e MSEL:</strong> injects com momento, situação, pergunta e pontos esperados ligados aos objetivos.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-tt-3">
+                <label for="chk-tt-3"><strong>Pessoas certas:</strong> quem decide de verdade está na sala, incluindo jurídico e comunicação.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-tt-4">
+                <label for="chk-tt-4"><strong>Papéis:</strong> facilitador, observadores e escriba definidos antes de começar.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-tt-5">
+                <label for="chk-tt-5"><strong>Regras:</strong> exercício sem culpa, com as ferramentas e o plano que existem hoje.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-tt-6">
+                <label for="chk-tt-6"><strong>Hot wash e relatório:</strong> conversa ao final e relatório pós-ação em até duas semanas.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-tt-7">
+                <label for="chk-tt-7"><strong>Melhorias acompanhadas:</strong> cada lacuna com responsável e prazo, revisada no próximo exercício.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Tipos):</strong> Qual a diferença entre um exercício tabletop e um funcional?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> No tabletop, as pessoas discutem o que fariam; no funcional, executam funções de verdade num ambiente controlado, como restaurar um backup ou acionar o plantão.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Inject):</strong> O que é um inject e por que escrever os pontos esperados de cada um?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> É uma nova informação apresentada durante o exercício que muda a situação. Os pontos esperados, ligados aos objetivos, permitem avaliar de forma objetiva o que a equipe cobriu e o que ficou de fora.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Facilitador):</strong> A equipe travou numa decisão. O facilitador deve dar a resposta?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. Ele pode fazer perguntas que ajudem ("quem tem autoridade para decidir isso?") e registrar o travamento como lacuna. Dar a resposta esconde exatamente o que o exercício queria descobrir.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Hot wash):</strong> Por que fazer o hot wash logo ao final, e não dias depois?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque as impressões e os detalhes se perdem rápido. A conversa imediata captura o que travou e o que surpreendeu, e alimenta o relatório pós-ação.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Melhorias):</strong> O que precisa ter cada item do plano de melhorias?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Uma ação concreta, um responsável e um prazo. Sem dono e sem data, a lacuna reaparece no próximo exercício ou no próximo incidente.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Cenário):</strong> Por que incluir um inject sobre imprensa ou decisão de pagamento num exercício de ransomware?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque essas decisões não são técnicas e costumam travar: quem fala, quem autoriza, quem precisa ser consultado. O exercício revela se o plano cobre a diretoria, o jurídico e a comunicação, e não só a TI.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Tipos</h4>
+                <p>Tabletop discute, funcional executa, completo simula tudo.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Planejamento</h4>
+                <p>Objetivos verificáveis, MSEL com injects e pontos esperados.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Condução</h4>
+                <p>Sem culpa, com facilitador, observadores e escriba.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Resultado</h4>
+                <p>Hot wash, relatório pós-ação e melhorias com dono e prazo.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>NIST SP 800-84 — Guide to Test, Training, and Exercise Programs for IT Plans and Capabilities.</li>
+            <li>FEMA — Homeland Security Exercise and Evaluation Program (HSEEP).</li>
+            <li>CISA — Tabletop Exercise Packages (CTEP).</li>
+            <li>Resolução CD/ANPD nº 15/2024 (comunicação de incidentes, Estudo 43).</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 28 — Continuidade e Disaster Recovery e 45 — Backup Imutável e Recuperação</strong>
+            </div>
+            <p>
+                O Estudo 28 define os tempos de recuperação que o cenário de fornecedor testa. O Estudo 45 mostra a cópia que o cenário de ransomware assume que sobreviveu.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="tt-dados">
+{
+ "contexto": "Cenários fictícios da Ipê Store. Use sozinho para estudar ou projete na tela para conduzir com o seu time.",
+ "data_padrao": "2026-11-10",
+ "prazos": {
+  "alta": 30,
+  "media": 60,
+  "baixa": 90
+ },
+ "rotulos": {
+  "alta": "Alta",
+  "media": "Média",
+  "baixa": "Baixa"
+ },
+ "cenarios": [
+  {
+   "id": "ransomware",
+   "nome": "Ransomware na sexta à noite",
+   "descricao": "Sexta-feira, 23h. O servidor de arquivos começa a ter arquivos criptografados, e a loja tem uma campanha marcada para segunda.",
+   "participantes": [
+    "líder de incidentes",
+    "infraestrutura",
+    "segurança",
+    "jurídico",
+    "comunicação",
+    "diretoria"
+   ],
+   "objetivos": [
+    {
+     "id": "O1",
+     "texto": "Detectar, conter e registrar o incidente"
+    },
+    {
+     "id": "O2",
+     "texto": "Decidir com base em informação e recuperar com segurança"
+    },
+    {
+     "id": "O3",
+     "texto": "Cumprir obrigações legais e comunicar"
+    }
+   ],
+   "injects": [
+    {
+     "id": "r1",
+     "momento": "Sexta, 23h10 (T+0)",
+     "titulo": "Arquivos sendo renomeados",
+     "texto": "O plantão do SOC recebe um alerta: 40 arquivos por minuto renomeados para .ipelock no SRV-ARQ01. Um funcionário do Financeiro liga dizendo que uma nota de resgate abriu na pasta compartilhada.",
+     "pergunta": "Quem é acionado e qual é a primeira ação técnica?",
+     "pontos": [
+      {
+       "id": "r1a",
+       "texto": "Acionar o plano de resposta e o líder de incidentes",
+       "objetivo": "O1",
+       "prioridade": "alta",
+       "responsavel": "Líder de incidentes",
+       "melhoria": "Publicar a escala de plantão com o contato do líder de incidentes e testá-la mensalmente"
+      },
+      {
+       "id": "r1b",
+       "texto": "Isolar da rede o servidor e as estações afetadas, sem desligar",
+       "objetivo": "O1",
+       "prioridade": "alta",
+       "responsavel": "Infraestrutura",
+       "melhoria": "Documentar o isolamento por EDR e por switch no runbook de ransomware"
+      },
+      {
+       "id": "r1c",
+       "texto": "Preservar evidências (memória e logs) antes de limpar qualquer coisa",
+       "objetivo": "O1",
+       "prioridade": "media",
+       "responsavel": "Segurança",
+       "melhoria": "Incluir a coleta de evidências no runbook (Estudo 19)"
+      }
+     ]
+    },
+    {
+     "id": "r2",
+     "momento": "Sábado, 01h (T+2h)",
+     "titulo": "A conta de backup foi usada",
+     "texto": "O EDR mostra que a conta svc_backup apagou as cópias de sombra, e que o console de backup está acessível a partir do domínio.",
+     "pergunta": "Os backups estão seguros? O que fazer com a conta?",
+     "pontos": [
+      {
+       "id": "r2a",
+       "texto": "Desativar a conta comprometida e revisar as contas privilegiadas",
+       "objetivo": "O1",
+       "prioridade": "alta",
+       "responsavel": "Segurança",
+       "melhoria": "Rotacionar credenciais privilegiadas por cofre (Estudo 40)"
+      },
+      {
+       "id": "r2b",
+       "texto": "Verificar a integridade da cópia imutável antes de restaurar",
+       "objetivo": "O2",
+       "prioridade": "alta",
+       "responsavel": "Infraestrutura",
+       "melhoria": "Teste trimestral de restauração a partir da cópia imutável (Estudo 45)"
+      },
+      {
+       "id": "r2c",
+       "texto": "Encontrar o vetor inicial antes de reconectar sistemas",
+       "objetivo": "O2",
+       "prioridade": "media",
+       "responsavel": "Líder de incidentes",
+       "melhoria": "Definir no plano o critério de pronto para reconectar"
+      }
+     ]
+    },
+    {
+     "id": "r3",
+     "momento": "Sábado, 09h (T+10h)",
+     "titulo": "Vazamento e pedido de resgate",
+     "texto": "Os atacantes publicam numa página de vazamento uma amostra com notas fiscais de clientes e pedem US$ 400 mil até segunda-feira.",
+     "pergunta": "Pagar? Quem decide? Quem precisa ser comunicado?",
+     "pontos": [
+      {
+       "id": "r3a",
+       "texto": "Levar a decisão sobre pagamento à diretoria, com jurídico, e não ao time técnico",
+       "objetivo": "O2",
+       "prioridade": "media",
+       "responsavel": "Diretoria",
+       "melhoria": "Política sobre pagamento de resgate aprovada pela diretoria"
+      },
+      {
+       "id": "r3b",
+       "texto": "Avaliar a comunicação à ANPD e aos titulares em até 3 dias úteis (Estudo 43)",
+       "objetivo": "O3",
+       "prioridade": "alta",
+       "responsavel": "Encarregado (DPO)",
+       "melhoria": "Modelo de comunicação à ANPD e responsável definidos (Estudo 43)"
+      },
+      {
+       "id": "r3c",
+       "texto": "Acionar o seguro cibernético e registrar boletim de ocorrência",
+       "objetivo": "O3",
+       "prioridade": "baixa",
+       "responsavel": "Jurídico",
+       "melhoria": "Manter os contatos da seguradora e da polícia no plano"
+      }
+     ]
+    },
+    {
+     "id": "r4",
+     "momento": "Domingo, 07h (T+32h)",
+     "titulo": "Imprensa e clientes",
+     "texto": "Um jornalista liga pedindo confirmação do ataque, e clientes reclamam nas redes que a loja está fora do ar.",
+     "pergunta": "O que se diz, quem fala e quando?",
+     "pontos": [
+      {
+       "id": "r4a",
+       "texto": "Porta-voz único com mensagem aprovada",
+       "objetivo": "O3",
+       "prioridade": "media",
+       "responsavel": "Comunicação",
+       "melhoria": "Treinar o porta-voz e manter mensagens pré-aprovadas (Estudo 43)"
+      },
+      {
+       "id": "r4b",
+       "texto": "Informar os clientes por canal oficial, sem especular",
+       "objetivo": "O3",
+       "prioridade": "media",
+       "responsavel": "Comunicação",
+       "melhoria": "Criar uma página de status para clientes"
+      },
+      {
+       "id": "r4c",
+       "texto": "Manter a linha do tempo das decisões para o relatório pós-incidente",
+       "objetivo": "O1",
+       "prioridade": "baixa",
+       "responsavel": "Líder de incidentes",
+       "melhoria": "Designar um escriba em todo incidente"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "vazamento",
+   "nome": "Vazamento por bucket público",
+   "descricao": "Uma terça-feira comum. Um pesquisador avisa que o bucket de notas fiscais está aberto (o mesmo erro do Estudo 21).",
+   "participantes": [
+    "encarregado (DPO)",
+    "segurança",
+    "nuvem",
+    "jurídico",
+    "comunicação"
+   ],
+   "objetivos": [
+    {
+     "id": "O1",
+     "texto": "Conter a exposição e corrigir a causa"
+    },
+    {
+     "id": "O2",
+     "texto": "Avaliar o risco aos titulares"
+    },
+    {
+     "id": "O3",
+     "texto": "Comunicar no prazo e com clareza"
+    }
+   ],
+   "injects": [
+    {
+     "id": "v1",
+     "momento": "Terça, 10h (T+0)",
+     "titulo": "O aviso do pesquisador",
+     "texto": "Um pesquisador de segurança escreve para o contato do site: o bucket ipestore-notas-fiscais está público e ele baixou três notas como prova.",
+     "pergunta": "Quais são as primeiras ações?",
+     "pontos": [
+      {
+       "id": "v1a",
+       "texto": "Fechar o acesso público ao bucket preservando os logs de acesso",
+       "objetivo": "O1",
+       "prioridade": "alta",
+       "responsavel": "Nuvem",
+       "melhoria": "Block Public Access ligado na conta (Estudo 21)"
+      },
+      {
+       "id": "v1b",
+       "texto": "Acionar o encarregado (DPO) e o jurídico",
+       "objetivo": "O2",
+       "prioridade": "alta",
+       "responsavel": "Segurança",
+       "melhoria": "Fluxo de acionamento do encarregado no plano de resposta"
+      },
+      {
+       "id": "v1c",
+       "texto": "Responder ao pesquisador, agradecer e combinar a não divulgação",
+       "objetivo": "O3",
+       "prioridade": "baixa",
+       "responsavel": "Segurança",
+       "melhoria": "Publicar uma política de divulgação responsável (security.txt)"
+      }
+     ]
+    },
+    {
+     "id": "v2",
+     "momento": "Terça, 14h (T+4h)",
+     "titulo": "O tamanho do problema",
+     "texto": "Os logs mostram 1.200 downloads, de 14 IPs, nos últimos 20 dias. As notas têm nome, CPF e endereço dos clientes.",
+     "pergunta": "Qual o risco aos titulares? Quantos foram afetados?",
+     "pontos": [
+      {
+       "id": "v2a",
+       "texto": "Determinar quais titulares e quais dados foram expostos",
+       "objetivo": "O2",
+       "prioridade": "alta",
+       "responsavel": "Encarregado (DPO)",
+       "melhoria": "Inventário de dados pessoais por bucket"
+      },
+      {
+       "id": "v2b",
+       "texto": "Avaliar se há risco ou dano relevante (CPF e endereço juntos)",
+       "objetivo": "O2",
+       "prioridade": "media",
+       "responsavel": "Jurídico",
+       "melhoria": "Critérios de risco relevante documentados (Estudo 43)"
+      },
+      {
+       "id": "v2c",
+       "texto": "Verificar se os logs de acesso estão ativos em todos os buckets",
+       "objetivo": "O1",
+       "prioridade": "media",
+       "responsavel": "Nuvem",
+       "melhoria": "Logs de acesso obrigatórios, verificados pelo CSPM"
+      }
+     ]
+    },
+    {
+     "id": "v3",
+     "momento": "Quarta, 10h (T+1 dia útil)",
+     "titulo": "Prazo e conteúdo",
+     "texto": "O jurídico pergunta qual é o prazo e o que precisa constar na comunicação.",
+     "pergunta": "Qual o prazo e o que comunicar?",
+     "pontos": [
+      {
+       "id": "v3a",
+       "texto": "Comunicar a ANPD e os titulares em até 3 dias úteis, com as informações exigidas pela Resolução CD/ANPD 15/2024",
+       "objetivo": "O3",
+       "prioridade": "alta",
+       "responsavel": "Encarregado (DPO)",
+       "melhoria": "Modelo de comunicação revisado pelo jurídico (Estudo 43)"
+      },
+      {
+       "id": "v3b",
+       "texto": "Registrar a decisão e o incidente, mesmo que não haja comunicação",
+       "objetivo": "O2",
+       "prioridade": "media",
+       "responsavel": "Encarregado (DPO)",
+       "melhoria": "Registro de incidentes mantido por 5 anos (Estudo 43)"
+      },
+      {
+       "id": "v3c",
+       "texto": "Orientar os titulares sobre golpes com os dados vazados",
+       "objetivo": "O3",
+       "prioridade": "media",
+       "responsavel": "Comunicação",
+       "melhoria": "Texto de orientação a titulares pronto para uso"
+      }
+     ]
+    },
+    {
+     "id": "v4",
+     "momento": "Terça seguinte (T+1 semana)",
+     "titulo": "Para não repetir",
+     "texto": "A diretoria pergunta como garantir que isso não aconteça de novo.",
+     "pergunta": "Quais mudanças fazer?",
+     "pontos": [
+      {
+       "id": "v4a",
+       "texto": "Corrigir a causa: política do bucket e revisão de permissões",
+       "objetivo": "O1",
+       "prioridade": "alta",
+       "responsavel": "Nuvem",
+       "melhoria": "Revisão trimestral de políticas IAM e de buckets (Estudo 21)"
+      },
+      {
+       "id": "v4b",
+       "texto": "Agendar uma varredura de postura e um reteste",
+       "objetivo": "O1",
+       "prioridade": "media",
+       "responsavel": "Segurança",
+       "melhoria": "CSPM com alerta para buckets públicos"
+      },
+      {
+       "id": "v4c",
+       "texto": "Levar o caso ao treinamento dos times de desenvolvimento",
+       "objetivo": "O3",
+       "prioridade": "baixa",
+       "responsavel": "Segurança",
+       "melhoria": "Incluir o caso no treinamento anual"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fornecedor",
+   "nome": "Queda do gateway de pagamento na Black Friday",
+   "descricao": "Sexta de Black Friday, 10h. O gateway de pagamento do parceiro começa a falhar.",
+   "participantes": [
+    "e-commerce",
+    "TI",
+    "segurança",
+    "financeiro",
+    "comunicação",
+    "compras e contratos"
+   ],
+   "objetivos": [
+    {
+     "id": "O1",
+     "texto": "Manter as vendas dentro do tempo tolerado"
+    },
+    {
+     "id": "O2",
+     "texto": "Gerir o fornecedor e os riscos da alternativa"
+    },
+    {
+     "id": "O3",
+     "texto": "Comunicar clientes e equipes"
+    }
+   ],
+   "injects": [
+    {
+     "id": "f1",
+     "momento": "Sexta, 10h (T+0)",
+     "titulo": "O checkout falha",
+     "texto": "A taxa de erro no pagamento sobe para 90%. A página de status do gateway informa degradação.",
+     "pergunta": "Como confirmar e quem é acionado?",
+     "pontos": [
+      {
+       "id": "f1a",
+       "texto": "Confirmar o impacto com o monitoramento próprio do checkout",
+       "objetivo": "O1",
+       "prioridade": "media",
+       "responsavel": "TI",
+       "melhoria": "Monitoramento sintético do checkout"
+      },
+      {
+       "id": "f1b",
+       "texto": "Acionar o suporte do fornecedor pelo contato previsto em contrato",
+       "objetivo": "O2",
+       "prioridade": "alta",
+       "responsavel": "Compras e contratos",
+       "melhoria": "Contatos e SLA do fornecedor no plano de continuidade"
+      },
+      {
+       "id": "f1c",
+       "texto": "Abrir a sala de crise com negócio e TI",
+       "objetivo": "O3",
+       "prioridade": "media",
+       "responsavel": "E-commerce",
+       "melhoria": "Critério para abrir sala de crise documentado"
+      }
+     ]
+    },
+    {
+     "id": "f2",
+     "momento": "Sexta, 11h (T+1h)",
+     "titulo": "Seis horas de espera",
+     "texto": "O fornecedor estima seis horas para normalizar. A Black Friday representa 18% do faturamento do mês.",
+     "pergunta": "Esperar ou acionar uma alternativa?",
+     "pontos": [
+      {
+       "id": "f2a",
+       "texto": "Comparar a estimativa com o RTO do checkout definido na BIA (Estudo 28)",
+       "objetivo": "O1",
+       "prioridade": "alta",
+       "responsavel": "E-commerce",
+       "melhoria": "BIA com o RTO do checkout aprovada (Estudo 28)"
+      },
+      {
+       "id": "f2b",
+       "texto": "Ativar o gateway secundário ou outro meio de pagamento",
+       "objetivo": "O1",
+       "prioridade": "alta",
+       "responsavel": "TI",
+       "melhoria": "Gateway secundário contratado, integrado e testado"
+      },
+      {
+       "id": "f2c",
+       "texto": "Avaliar os riscos de segurança da alternativa (PCI DSS, Estudo 31)",
+       "objetivo": "O2",
+       "prioridade": "media",
+       "responsavel": "Segurança",
+       "melhoria": "Checklist PCI DSS para meios de pagamento alternativos (Estudo 31)"
+      }
+     ]
+    },
+    {
+     "id": "f3",
+     "momento": "Sexta, 13h (T+3h)",
+     "titulo": "Um e-mail oportunista",
+     "texto": "Chega um e-mail \"do fornecedor\" pedindo para atualizar a chave de API num link, por causa da instabilidade.",
+     "pergunta": "O que fazer?",
+     "pontos": [
+      {
+       "id": "f3a",
+       "texto": "Tratar como possível phishing e confirmar pelo canal conhecido (Estudo 15)",
+       "objetivo": "O2",
+       "prioridade": "alta",
+       "responsavel": "Segurança",
+       "melhoria": "Canal verificado para mudanças pedidas pelo fornecedor"
+      },
+      {
+       "id": "f3b",
+       "texto": "Alertar as equipes para não clicar",
+       "objetivo": "O3",
+       "prioridade": "media",
+       "responsavel": "Segurança",
+       "melhoria": "Comunicado interno pronto para golpes durante incidentes"
+      },
+      {
+       "id": "f3c",
+       "texto": "Reportar a tentativa ao fornecedor",
+       "objetivo": "O2",
+       "prioridade": "baixa",
+       "responsavel": "Compras e contratos",
+       "melhoria": "Contato de segurança do fornecedor registrado"
+      }
+     ]
+    },
+    {
+     "id": "f4",
+     "momento": "Sexta, 17h (T+7h)",
+     "titulo": "A volta e as cobranças duplicadas",
+     "texto": "O serviço volta. Clientes reclamam de cobranças em dobro.",
+     "pergunta": "Quais os próximos passos?",
+     "pontos": [
+      {
+       "id": "f4a",
+       "texto": "Conciliar as transações e estornar as duplicidades",
+       "objetivo": "O1",
+       "prioridade": "media",
+       "responsavel": "Financeiro",
+       "melhoria": "Procedimento de conciliação pós-incidente"
+      },
+      {
+       "id": "f4b",
+       "texto": "Comunicar os clientes afetados",
+       "objetivo": "O3",
+       "prioridade": "media",
+       "responsavel": "Comunicação",
+       "melhoria": "Mensagem pronta para cobranças indevidas"
+      },
+      {
+       "id": "f4c",
+       "texto": "Exigir do fornecedor o relatório de causa raiz e revisar o contrato",
+       "objetivo": "O2",
+       "prioridade": "media",
+       "responsavel": "Compras e contratos",
+       "melhoria": "Cláusulas de causa raiz e de penalidades no contrato"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "missoes": [
+  {
+   "id": "conduzir",
+   "texto": "Conduza um cenário completo, do primeiro inject ao hot wash."
+  },
+  {
+   "id": "relatorio",
+   "texto": "Gere o relatório pós-ação com o plano de melhorias."
+  },
+  {
+   "id": "inject",
+   "texto": "Escreva um inject próprio e conduza-o junto com o cenário."
+  }
+ ],
+ "exemplo": {
+  "estado": {
+   "cenario": "ransomware",
+   "data": "2026-11-10",
+   "respostas": {
+    "r1": {
+     "texto": "Plantão aciona o líder; servidor isolado pelo EDR.",
+     "segundos": 540,
+     "pontos": [
+      "r1a",
+      "r1b"
+     ]
+    },
+    "r2": {
+     "texto": "Conta desativada. Ninguém sabia onde fica a cópia imutável.",
+     "segundos": 720,
+     "pontos": [
+      "r2a"
+     ]
+    },
+    "r3": {
+     "texto": "Diretoria decide não pagar; jurídico avalia ANPD.",
+     "segundos": 600,
+     "pontos": [
+      "r3a",
+      "r3b"
+     ]
+    },
+    "r4": {
+     "texto": "",
+     "segundos": 300,
+     "pontos": [
+      "r4a"
+     ]
+    }
+   },
+   "hotwash": "Isolamento rápido; falta clareza sobre a cópia imutável e a comunicação com clientes."
+  },
+  "relatorio": "# Relatório pós-ação — Ransomware na sexta à noite\n\nData do exercício: 10/11/2026 · Tipo: tabletop (discussão, NIST SP 800-84) · Duração registrada: 36:00\n\n## Objetivos e resultado\n\n- O1 Detectar, conter e registrar o incidente: 3 de 5 pontos (60%) — Parcial\n- O2 Decidir com base em informação e recuperar com segurança: 1 de 3 pontos (33%) — Não atingido\n- O3 Cumprir obrigações legais e comunicar: 2 de 4 pontos (50%) — Parcial\n\n## Linha do tempo\n\n### Sexta, 23h10 (T+0) — Arquivos sendo renomeados\nSituação: O plantão do SOC recebe um alerta: 40 arquivos por minuto renomeados para .ipelock no SRV-ARQ01. Um funcionário do Financeiro liga dizendo que uma nota de resgate abriu na pasta compartilhada.\nResposta da equipe: Plantão aciona o líder; servidor isolado pelo EDR.\nTempo de discussão: 09:00\nPontos cobertos: Acionar o plano de resposta e o líder de incidentes; Isolar da rede o servidor e as estações afetadas, sem desligar\nLacunas: Preservar evidências (memória e logs) antes de limpar qualquer coisa\n\n### Sábado, 01h (T+2h) — A conta de backup foi usada\nSituação: O EDR mostra que a conta svc_backup apagou as cópias de sombra, e que o console de backup está acessível a partir do domínio.\nResposta da equipe: Conta desativada. Ninguém sabia onde fica a cópia imutável.\nTempo de discussão: 12:00\nPontos cobertos: Desativar a conta comprometida e revisar as contas privilegiadas\nLacunas: Verificar a integridade da cópia imutável antes de restaurar; Encontrar o vetor inicial antes de reconectar sistemas\n\n### Sábado, 09h (T+10h) — Vazamento e pedido de resgate\nSituação: Os atacantes publicam numa página de vazamento uma amostra com notas fiscais de clientes e pedem US$ 400 mil até segunda-feira.\nResposta da equipe: Diretoria decide não pagar; jurídico avalia ANPD.\nTempo de discussão: 10:00\nPontos cobertos: Levar a decisão sobre pagamento à diretoria, com jurídico, e não ao time técnico; Avaliar a comunicação à ANPD e aos titulares em até 3 dias úteis (Estudo 43)\nLacunas: Acionar o seguro cibernético e registrar boletim de ocorrência\n\n### Domingo, 07h (T+32h) — Imprensa e clientes\nSituação: Um jornalista liga pedindo confirmação do ataque, e clientes reclamam nas redes que a loja está fora do ar.\nResposta da equipe: (sem registro)\nTempo de discussão: 05:00\nPontos cobertos: Porta-voz único com mensagem aprovada\nLacunas: Informar os clientes por canal oficial, sem especular; Manter a linha do tempo das decisões para o relatório pós-incidente\n\n## Plano de melhorias\n\n| Nº | Melhoria | Objetivo | Prioridade | Responsável | Prazo |\n|---|---|---|---|---|---|\n| 1 | Teste trimestral de restauração a partir da cópia imutável (Estudo 45) | O2 | Alta | Infraestrutura | 10/12/2026 |\n| 2 | Incluir a coleta de evidências no runbook (Estudo 19) | O1 | Média | Segurança | 09/01/2027 |\n| 3 | Definir no plano o critério de pronto para reconectar | O2 | Média | Líder de incidentes | 09/01/2027 |\n| 4 | Criar uma página de status para clientes | O3 | Média | Comunicação | 09/01/2027 |\n| 5 | Manter os contatos da seguradora e da polícia no plano | O3 | Baixa | Jurídico | 08/02/2027 |\n| 6 | Designar um escriba em todo incidente | O1 | Baixa | Líder de incidentes | 08/02/2027 |\n\n## Hot wash\n\nIsolamento rápido; falta clareza sobre a cópia imutável e a comunicação com clientes.\n"
+ }
+}
+</script>
+
+<script>
+(function() {
+    var TT = JSON.parse(document.getElementById("tt-dados").textContent);
+    var PRIOR = ["alta", "media", "baixa"];
+    var estado = null, atual = -1, inicioInject = 0, relogio = null, feitas = {}, extrasPendentes = [];
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function cenario(id) { return TT.cenarios.filter(function(c) { return c.id === id; })[0]; }
+
+    // ===================================================== relatório (espelhado nos testes)
+    function dois(n) { return (n < 10 ? "0" : "") + n; }
+    function mmss(s) { return dois(Math.floor(s / 60)) + ":" + dois(s % 60); }
+    function br(iso) { var p = iso.split("-"); return p[2] + "/" + p[1] + "/" + p[0]; }
+    function statusObj(pct) { return pct >= 80 ? "Atingido" : pct >= 50 ? "Parcial" : "Não atingido"; }
+    function somaDias(iso, dias) {
+        var p = iso.split("-").map(Number), d = new Date(Date.UTC(p[0], p[1] - 1, p[2] + dias));
+        return d.toISOString().slice(0, 10);
+    }
+    window.gerarRelatorioTabletopPuro = function(est) {
+        var c = cenario(est.cenario), injects = c.injects.concat(est.extras || []), resp = est.respostas;
+        var r = function(id) { return resp[id] || {}; };
+        var total = injects.reduce(function(s, i) { return s + (r(i.id).segundos || 0); }, 0);
+        var L = ["# Relatório pós-ação — " + c.nome, "",
+            "Data do exercício: " + br(est.data) + " · Tipo: tabletop (discussão, NIST SP 800-84) · Duração registrada: " + mmss(total), "",
+            "## Objetivos e resultado", ""];
+        c.objetivos.forEach(function(o) {
+            var pts = [], cob = [];
+            injects.forEach(function(i) { i.pontos.forEach(function(p) { if (p.objetivo === o.id) { pts.push(p); if ((r(i.id).pontos || []).indexOf(p.id) !== -1) cob.push(p); } }); });
+            var pct = pts.length ? Math.floor(cob.length * 100 / pts.length) : 0;
+            L.push("- " + o.id + " " + o.texto + ": " + cob.length + " de " + pts.length + " pontos (" + pct + "%) — " + statusObj(pct));
+        });
+        L.push("", "## Linha do tempo", "");
+        var lacunas = [];
+        injects.forEach(function(i, ordem) {
+            var ri = r(i.id), marc = ri.pontos || [];
+            var cob = i.pontos.filter(function(p) { return marc.indexOf(p.id) !== -1; });
+            var fal = i.pontos.filter(function(p) { return marc.indexOf(p.id) === -1; });
+            L.push("### " + i.momento + " — " + i.titulo,
+                "Situação: " + i.texto,
+                "Resposta da equipe: " + ((ri.texto || "").trim() || "(sem registro)"),
+                "Tempo de discussão: " + mmss(ri.segundos || 0),
+                "Pontos cobertos: " + (cob.map(function(p) { return p.texto; }).join("; ") || "nenhum"),
+                "Lacunas: " + (fal.map(function(p) { return p.texto; }).join("; ") || "nenhuma"), "");
+            fal.forEach(function(p) { lacunas.push([PRIOR.indexOf(p.prioridade), ordem, p]); });
+        });
+        L.push("## Plano de melhorias", "");
+        if (!lacunas.length) L.push("Nenhuma lacuna registrada.");
+        else {
+            L.push("| Nº | Melhoria | Objetivo | Prioridade | Responsável | Prazo |", "|---|---|---|---|---|---|");
+            lacunas.sort(function(a, b) { return a[0] - b[0] || a[1] - b[1]; }).forEach(function(x, n) {
+                var p = x[2];
+                L.push("| " + (n + 1) + " | " + p.melhoria + " | " + p.objetivo + " | " + TT.rotulos[p.prioridade] + " | " + p.responsavel + " | " + br(somaDias(est.data, TT.prazos[p.prioridade])) + " |");
+            });
+        }
+        L.push("", "## Hot wash", "", (est.hotwash || "").trim() || "(sem registro)");
+        return L.join("\n") + "\n";
+    };
+
+    // ===================================================== missões
+    function concluir(id) { if (!feitas[id]) { feitas[id] = true; renderizarMissoes(); } }
+    function renderizarMissoes() {
+        var ul = document.getElementById("tt-missoes");
+        ul.replaceChildren();
+        TT.missoes.forEach(function(m) {
+            var li = el("li", (feitas[m.id] ? "✓ " : "○ ") + m.texto, "color: " + (feitas[m.id] ? "var(--tip-color)" : "var(--ink)") + ";");
+            li.setAttribute("data-missao", m.id);
+            li.setAttribute("data-feita", feitas[m.id] ? "sim" : "nao");
+            ul.appendChild(li);
+        });
+    }
+
+    // ===================================================== preparação
+    function renderizarResumo() {
+        var c = cenario(document.getElementById("tt-escolha").value), box = document.getElementById("tt-resumo");
+        box.replaceChildren();
+        box.appendChild(el("p", c.descricao, "margin: 0 0 0.3rem 0;"));
+        box.appendChild(el("strong", "Objetivos:"));
+        var ul = el("ul", null, "margin: 0.2rem 0 0.3rem 0; padding-left: 1.2rem;");
+        c.objetivos.forEach(function(o) { ul.appendChild(el("li", o.id + " — " + o.texto)); });
+        box.appendChild(ul);
+        box.appendChild(el("span", "Participantes sugeridos: " + c.participantes.join(", ") + ". " + (c.injects.length + extrasPendentes.length) + " injects.", "color: var(--muted);"));
+        var so = document.getElementById("tt-extra-objetivo");
+        so.replaceChildren();
+        c.objetivos.forEach(function(o) { var op = el("option", "Objetivo " + o.id + ": " + o.texto); op.value = o.id; so.appendChild(op); });
+    }
+    window.adicionarInjectTabletop = function() {
+        var v = function(id) { return document.getElementById(id).value.trim(); };
+        var st = document.getElementById("tt-extra-status");
+        st.replaceChildren();
+        var pontos = document.getElementById("tt-extra-pontos").value.split("\n").map(function(s) { return s.trim(); }).filter(Boolean);
+        if (!v("tt-extra-titulo") || !v("tt-extra-texto") || !pontos.length) { st.appendChild(el("span", "Preencha título, situação e pelo menos um ponto esperado.", "color: var(--danger-color);")); return null; }
+        var n = extrasPendentes.length + 1, id = "X" + n, obj = document.getElementById("tt-extra-objetivo").value;
+        var inj = { id: id, momento: v("tt-extra-momento") || "Inject extra " + n, titulo: v("tt-extra-titulo"), texto: v("tt-extra-texto"), pergunta: v("tt-extra-pergunta") || "Como a equipe responde?",
+            pontos: pontos.map(function(t, k) { return { id: id + "-" + (k + 1), texto: t, objetivo: obj, prioridade: "media", responsavel: "A definir no hot wash", melhoria: "Tratar a lacuna: " + t }; }) };
+        extrasPendentes.push(inj);
+        ["tt-extra-momento", "tt-extra-titulo", "tt-extra-texto", "tt-extra-pergunta", "tt-extra-pontos"].forEach(function(x) { document.getElementById(x).value = ""; });
+        st.appendChild(el("span", "Inject \"" + inj.titulo + "\" incluído no fim do cenário. Inicie (ou reinicie) o exercício para usá-lo.", "color: var(--tip-color);"));
+        renderizarResumo();
+        return inj;
+    };
+
+    // ===================================================== condução
+    function injects() { return estado ? cenario(estado.cenario).injects.concat(estado.extras) : []; }
+    function pararRelogio() { if (relogio) { clearInterval(relogio); relogio = null; } }
+    function segundosAgora() { return Math.max(0, Math.round((Date.now() - inicioInject) / 1000)); }
+    window.iniciarTabletop = function() {
+        pararRelogio();
+        estado = { cenario: document.getElementById("tt-escolha").value, data: document.getElementById("tt-data").value || TT.data_padrao, respostas: {}, extras: extrasPendentes.slice(), hotwash: "" };
+        atual = 0;
+        document.getElementById("tt-relatorio").textContent = "O relatório aparece ao final do exercício.";
+        mostrarInject();
+    };
+    function mostrarInject() {
+        var box = document.getElementById("tt-inject"), lista = injects();
+        box.replaceChildren();
+        pararRelogio();
+        if (!estado) { box.appendChild(el("p", "Escolha o cenário e clique em Iniciar exercício.", "margin: 0; color: var(--muted);")); return; }
+        if (atual >= lista.length) { mostrarHotwash(); return; }
+        var i = lista[atual];
+        box.setAttribute("data-inject", i.id);
+        var topo = el("div", null, "display: flex; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;");
+        topo.appendChild(el("strong", "Inject " + (atual + 1) + " de " + lista.length + " · " + i.momento));
+        var cron = el("span", "00:00", "font-family: var(--font-mono); font-weight: 700;"); cron.id = "tt-cronometro";
+        topo.appendChild(cron);
+        box.appendChild(topo);
+        box.appendChild(el("strong", i.titulo, "font-size: 0.95rem;"));
+        box.appendChild(el("p", i.texto, "margin: 0;"));
+        box.appendChild(el("p", "Pergunta: " + i.pergunta, "margin: 0; font-weight: 600;"));
+        var ta = el("textarea"); ta.className = "form-control"; ta.rows = 3; ta.id = "tt-resposta"; ta.placeholder = "Decisões e ações combinadas pela equipe";
+        ta.setAttribute("aria-label", "Resposta da equipe"); ta.style.width = "100%"; ta.style.boxSizing = "border-box";
+        box.appendChild(ta);
+        var det = el("details");
+        det.appendChild(el("summary", "Pontos esperados (para o facilitador marcar o que foi coberto)", "cursor: pointer;"));
+        i.pontos.forEach(function(p) {
+            var l = el("label", null, "display: flex; gap: 0.4rem; align-items: flex-start; margin-top: 0.25rem;");
+            var cb = el("input"); cb.type = "checkbox"; cb.setAttribute("data-ponto", p.id);
+            l.appendChild(cb); l.appendChild(el("span", "[" + p.objetivo + "] " + p.texto));
+            det.appendChild(l);
+        });
+        box.appendChild(det);
+        var b = el("button", atual + 1 < lista.length ? "Próximo inject" : "Encerrar e ir ao hot wash"); b.type = "button"; b.className = "btn-primary";
+        b.addEventListener("click", function() { proximoInjectTabletop(); });
+        var w = el("div"); w.appendChild(b); box.appendChild(w);
+        inicioInject = Date.now();
+        relogio = setInterval(function() { var c = document.getElementById("tt-cronometro"); if (c) c.textContent = mmss(segundosAgora()); }, 1000);
+    }
+    window.proximoInjectTabletop = function(segundos) {
+        var lista = injects();
+        if (!estado || atual >= lista.length) return;
+        var i = lista[atual];
+        estado.respostas[i.id] = {
+            texto: document.getElementById("tt-resposta").value,
+            segundos: typeof segundos === "number" ? segundos : segundosAgora(),
+            pontos: Array.prototype.map.call(document.querySelectorAll("#tt-inject [data-ponto]:checked"), function(c) { return c.getAttribute("data-ponto"); })
+        };
+        atual++;
+        mostrarInject();
+    };
+    function mostrarHotwash() {
+        var box = document.getElementById("tt-inject");
+        box.setAttribute("data-inject", "hotwash");
+        box.appendChild(el("strong", "Hot wash", "font-size: 0.95rem;"));
+        box.appendChild(el("p", "O que funcionou? O que travou? O que surpreendeu? Registre antes que se perca.", "margin: 0;"));
+        var ta = el("textarea"); ta.className = "form-control"; ta.rows = 3; ta.id = "tt-hotwash"; ta.setAttribute("aria-label", "Hot wash");
+        ta.style.width = "100%"; ta.style.boxSizing = "border-box";
+        box.appendChild(ta);
+        var b = el("button", "Gerar relatório pós-ação"); b.type = "button"; b.className = "btn-primary";
+        b.addEventListener("click", gerarRelatorioTabletop);
+        var w = el("div"); w.appendChild(b); box.appendChild(w);
+        concluir("conduzir");
+        if (estado.extras.length) concluir("inject");
+    }
+    window.gerarRelatorioTabletop = function() {
+        if (!estado) return "";
+        var hw = document.getElementById("tt-hotwash");
+        if (hw) estado.hotwash = hw.value;
+        var txt = window.gerarRelatorioTabletopPuro(estado);
+        var cod = document.getElementById("tt-relatorio");
+        cod.textContent = txt;
+        cod.setAttribute("data-gerado", "sim");
+        if (atual >= injects().length) concluir("relatorio");
+        return txt;
+    };
+    window.estadoTabletop = function() { return estado; };
+
+    window.restaurarTabletop = function() {
+        pararRelogio();
+        estado = null; atual = -1; feitas = {}; extrasPendentes = [];
+        document.getElementById("tt-escolha").value = TT.cenarios[0].id;
+        document.getElementById("tt-data").value = TT.data_padrao;
+        renderizarMissoes(); renderizarResumo(); mostrarInject();
+        document.getElementById("tt-relatorio").textContent = "O relatório aparece ao final do exercício.";
+        document.getElementById("tt-extra-status").replaceChildren();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("tt-contexto").textContent = TT.contexto;
+        var s = document.getElementById("tt-escolha");
+        TT.cenarios.forEach(function(c) { var o = el("option", c.nome); o.value = c.id; s.appendChild(o); });
+        s.addEventListener("change", function() { extrasPendentes = []; renderizarResumo(); });
+        restaurarTabletop();
+        if (typeof initChecklist === "function") {
+            initChecklist("tabletop");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
