@@ -1,0 +1,786 @@
+<!-- Estudo 38: Active-Directory-Fundamentos Body Fragment -->
+<article class="study-container" data-slug="active-directory">
+
+    <!-- SEÇÃO 1: ESTRUTURA -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: O Coração da Identidade Corporativa</h2>
+        </div>
+
+        <p class="lead-text">
+            Na maioria das empresas que usam Windows, o Active Directory (AD) decide quem é cada pessoa, em quais máquinas ela entra e quais configurações valem em cada computador. Por isso ele é o alvo preferido de quem invade: quem domina o AD domina a empresa. Antes de estudar os ataques (Estudo 39) e o controle de acessos privilegiados (Estudo 40), é preciso entender três coisas: como o AD se organiza, como as GPOs chegam a cada máquina e como o Kerberos autentica. O exemplo é o domínio <strong>corp.ipestore.example</strong> da Ipê Store.
+        </p>
+
+        <h3>Estrutura Lógica</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Elemento</th><th>O que é</th><th>Por que importa para segurança</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>floresta</strong></td><td>O conjunto de domínios que compartilham esquema, configuração e Global Catalog</td><td>É a verdadeira fronteira de segurança: um administrador de domínio comprometido ameaça a floresta inteira</td></tr>
+                    <tr><td><strong>Árvore</strong></td><td>Domínios com nomes DNS contíguos (<code>corp.ipestore.example</code>, <code>sp.corp.ipestore.example</code>)</td><td>Domínios pai e filho confiam um no outro de forma automática e transitiva</td></tr>
+                    <tr><td><strong>domínio</strong></td><td>Unidade de replicação e de administração, com seus próprios controladores</td><td>Concentra contas, grupos e políticas de senha</td></tr>
+                    <tr><td><strong>OU</strong> (unidade organizacional)</td><td>Contêiner para organizar objetos dentro do domínio</td><td>É onde se delega administração e se vinculam GPOs</td></tr>
+                    <tr><td><strong>DC</strong> (controlador de domínio)</td><td>Servidor que guarda o banco do AD e atende autenticação</td><td>Ativo Tier 0: quem tem administrador num DC tem o domínio</td></tr>
+                    <tr><td><strong>Global Catalog</strong></td><td>DC que guarda uma cópia parcial de todos os objetos da floresta</td><td>Usado em buscas e no logon em florestas com vários domínios</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🌐</span>
+                <strong>Nome do domínio: subdomínio de um domínio seu</strong>
+            </div>
+            <p>
+                Use um subdomínio de um domínio registrado pela empresa, como <code>corp.ipestore.example</code>. Nomes como <code>empresa.local</code> conflitam com mDNS, não podem receber certificados públicos e complicam a integração com a nuvem.
+            </p>
+        </div>
+
+        <h3>Papéis FSMO e Portas</h3>
+        <p>
+            Cinco operações só podem ser feitas por um DC de cada vez, os papéis <strong>FSMO</strong> (<em>Flexible Single Master Operations</em>). Na floresta: <em>Schema Master</em> e <em>Domain Naming Master</em>. Em cada domínio: <strong>RID Master</strong> (distribui blocos de identificadores para novos objetos), <strong>PDC Emulator</strong> (fonte de horário do domínio, recebe as trocas de senha com prioridade e controla bloqueios de conta) e <em>Infrastructure Master</em>. O PDC Emulator do domínio raiz da floresta deve sincronizar com uma fonte NTP confiável, porque o Kerberos depende do relógio.
+        </p>
+        <p>
+            Portas que aparecem em qualquer análise de tráfego de AD: 53 (DNS), 88 (Kerberos), 389 e 636 (LDAP e LDAPS), 3268 e 3269 (Global Catalog) e 445 (SMB, por onde as GPOs são lidas no SYSVOL). O <strong>LDAP</strong> (<em>Lightweight Directory Access Protocol</em>) é a forma de consultar o diretório; exija assinatura LDAP e <em>channel binding</em> para impedir ataques de retransmissão.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 2: GPO, KERBEROS E ADMINISTRAÇÃO -->
+    <section class="study-section" id="gpo-kerberos">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>GPO, Kerberos, NTLM e Camadas de Administração</h2>
+        </div>
+
+        <h3>Como as GPOs se Somam: LSDOU</h3>
+        <p>
+            Um computador recebe as GPOs na ordem <strong>LSDOU</strong>: Local, Site, Domínio e as OUs do pai para o filho. A última aplicada vence em caso de conflito, então a OU mais próxima do objeto tem a palavra final. Dentro do mesmo contêiner, vale a <strong>ordem de link</strong>: o link 1 tem a maior precedência e é aplicado por último.
+        </p>
+        <ul>
+            <li><strong>Enforced</strong> (imposto): a GPO vence as configurações conflitantes das OUs abaixo e atravessa bloqueios. Atenção: ela impõe <em>todas</em> as suas configurações, não só a que você queria proteger.</li>
+            <li><strong>Block Inheritance</strong> (bloquear herança): a OU deixa de receber as GPOs dos contêineres acima, exceto as marcadas como Enforced. A política local continua valendo.</li>
+            <li><strong>Filtros de segurança e WMI</strong> limitam a quem a GPO se aplica. O processamento de <strong>loopback</strong> faz as configurações de usuário seguirem o computador (útil em servidores de terminal).</li>
+            <li>Configurações de computador valem na inicialização e a cada atualização; as de usuário, no logon. A política de senha das contas de domínio só vale quando vinculada ao domínio; para exceções, use políticas de senha refinadas (FGPP).</li>
+        </ul>
+
+        <h3>Kerberos em Seis Mensagens</h3>
+        <p>
+            O Kerberos (RFC 4120) evita mandar a senha pela rede: o usuário prova quem é uma vez ao <strong>KDC</strong> (<em>Key Distribution Center</em>, que roda em cada DC) e recebe um <strong>TGT</strong> (<em>Ticket Granting Ticket</em>), cifrado com a chave da conta <strong>krbtgt</strong>. Com o TGT, pede tickets de serviço identificados pelo <strong>SPN</strong> (<em>Service Principal Name</em>). O ticket carrega o <strong>PAC</strong> (<em>Privilege Attribute Certificate</em>), com os grupos do usuário, que o serviço usa para decidir o acesso.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Troca Kerberos: AS, TGS e AP</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Troca Kerberos: AS, TGS e AP">
+sequenceDiagram
+    participant C as Cliente (ana.souza)
+    participant K as KDC no DC01
+    participant S as SRV-ERP01
+    C->>K: 1. AS-REQ (pré-autenticação)
+    K-->>C: 2. AS-REP (TGT e chave de sessão)
+    C->>K: 3. TGS-REQ (TGT e SPN do serviço)
+    K-->>C: 4. TGS-REP (ticket de serviço)
+    C->>S: 5. AP-REQ (ticket de serviço)
+    S-->>C: 6. AP-REP (autenticação mútua, opcional)
+            </pre>
+        </div>
+
+        <ul>
+            <li>O DC registra o pedido de TGT no evento <strong>4768</strong>, o de ticket de serviço no <strong>4769</strong> e a falha de pré-autenticação no <strong>4771</strong>.</li>
+            <li>O Kerberos tolera por padrão até <strong>5 minutos</strong> de diferença de relógio entre cliente e DC; acima disso, a autenticação falha.</li>
+            <li>Por padrão, o TGT vale 10 horas e pode ser renovado por até 7 dias.</li>
+        </ul>
+
+        <h3>Quando o NTLM Entra em Cena</h3>
+        <p>
+            O <strong>NTLM</strong> é o protocolo de desafio e resposta mais antigo. Ele é usado quando o Kerberos não é possível: acesso por endereço IP em vez de nome, SPN inexistente ou duplicado, máquina fora do domínio, aplicação antiga. O DC registra a validação NTLM no evento <strong>4776</strong>. O NTLM não tem autenticação mútua e permite <strong>pass-the-hash</strong> (T1550.002) e retransmissão (T1557.001). A Microsoft declarou o NTLM obsoleto: audite o uso, desative o NTLMv1 e restrinja o resto.
+        </p>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">PowerShell — inspeção de Kerberos, SPN, GPO e gMSA</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ad-comandos')">Copiar</button>
+            </div>
+            <pre><code id="code-ad-comandos">PS&gt; klist                           # tickets Kerberos da sessão atual
+PS&gt; setspn -L CORP\svc_sqlerp       # SPNs registrados na conta de serviço
+PS&gt; gpresult /r /scope computer     # GPOs aplicadas ao computador, em ordem
+
+# Conta de serviço gerenciada em grupo (exige a chave raiz do KDS)
+PS&gt; New-ADServiceAccount -Name gmsa-sqlerp `
+      -DNSHostName gmsa-sqlerp.corp.ipestore.example `
+      -PrincipalsAllowedToRetrieveManagedPassword "SRV-ERP01$"</code></pre>
+        </div>
+
+        <h3>Contas de Serviço e Camadas de Administração</h3>
+        <p>
+            Contas de serviço com SPN e senha fraca são o alvo do <strong>Kerberoasting</strong> (T1558.003): qualquer usuário do domínio pede o ticket do serviço e tenta descobrir a senha offline. A <strong>gMSA</strong> (<em>group Managed Service Account</em>) resolve isso com uma senha longa e aleatória, trocada pelo próprio AD (a cada 30 dias, por padrão) e que nenhum humano conhece.
+        </p>
+        <p>
+            O modelo de camadas separa as contas administrativas pelo que elas controlam: <strong>Tier 0</strong> (DCs, AD, PKI, sincronização com a nuvem e tudo que controla a identidade), Tier 1 (servidores e aplicações) e Tier 2 (estações e usuários). Uma conta de Tier 0 nunca faz logon numa máquina de Tier 1 ou 2, porque deixaria credenciais em memória para quem invadiu aquela máquina. A administração de Tier 0 é feita de uma <strong>PAW</strong> (<em>Privileged Access Workstation</em>). A Microsoft hoje descreve esse princípio no modelo de acesso corporativo (<em>enterprise access model</em>), que estende as camadas para nuvem e acesso remoto.
+        </p>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🎟️</span>
+                <strong>Os tickets forjados</strong>
+            </div>
+            <p>
+                Com o hash da conta krbtgt, o atacante forja TGTs de qualquer usuário: o <strong>Golden Ticket</strong> (T1558.001). Com o hash de uma conta de serviço, forja tickets só para aquele serviço, sem falar com o DC: o <strong>Silver Ticket</strong> (T1558.002). Contas sem pré-autenticação permitem o <strong>AS-REP roasting</strong> (T1558.004). Depois de um comprometimento do domínio, a senha da krbtgt precisa ser trocada duas vezes, com intervalo para a replicação.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Kerberos Passo a Passo e Calculadora de GPO</h2>
+        </div>
+
+        <p class="lead-text">
+            Na primeira parte, clique em cada mensagem Kerberos para ver os campos e o que pode dar errado, e execute a autenticação em cenários de falha. Na segunda, monte a cadeia de GPOs que chega ao SRV-ERP01 e veja qual configuração vence.
+        </p>
+
+        <div class="lab-box ad-lab" id="ad-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Laboratório de Active Directory</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">corp.ipestore.example</h3>
+                    <p id="ad-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">1. Kerberos passo a passo</h4>
+                <p id="ad-participantes" style="font-size: 0.85rem; margin: 0 0 0.5rem 0; color: var(--muted);"></p>
+                <div id="ad-kerberos" style="display: grid; gap: 0.4rem;"></div>
+                <div id="ad-mensagem" aria-live="polite" style="margin-top: 0.75rem; padding: 0.75rem; border-radius: var(--radius-md); background: var(--sunk); font-size: 0.88rem;"></div>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: flex-end; margin-top: 1rem;">
+                    <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.85rem; flex: 1 1 220px; min-width: 0;">Cenário
+                        <select class="form-control" id="ad-cenario"></select>
+                    </label>
+                    <button class="btn-primary" type="button" onclick="executarAutenticacaoKerberos()">Executar autenticação</button>
+                </div>
+                <div id="ad-resultado-kerberos" aria-live="polite" style="margin-top: 0.75rem; font-size: 0.88rem;"></div>
+
+                <h4 style="margin-top: 1.75rem;">2. Calculadora de GPO para o SRV-ERP01</h4>
+                <div id="ad-cenarios-gpo" style="display: flex; flex-wrap: wrap; gap: 0.4rem;"></div>
+                <p id="ad-cenario-gpo-descricao" style="font-size: 0.85rem; margin: 0.5rem 0 0 0;"></p>
+                <div id="ad-gpo" style="display: grid; gap: 0.5rem; margin-top: 0.75rem;"></div>
+                <h4 style="margin-top: 1.25rem;">Configuração efetiva</h4>
+                <div id="ad-gpo-resultado" aria-live="polite" style="font-size: 0.85rem;"></div>
+
+                <div style="margin-top: 1.25rem;">
+                    <button class="btn-secondary" type="button" onclick="restaurarAd()">Restaurar laboratório</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Higiene do Active Directory</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para uma primeira avaliação de um domínio. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="active-directory">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ad-1">
+                <label for="chk-ad-1"><strong>Tier 0 isolado:</strong> contas de administrador do domínio só fazem logon em DCs e PAWs, e são poucas e nominais.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ad-2">
+                <label for="chk-ad-2"><strong>Contas de serviço gerenciadas:</strong> serviços usam gMSA; as contas com SPN que restam têm senha longa e aleatória.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ad-3">
+                <label for="chk-ad-3"><strong>Pré-autenticação exigida:</strong> nenhuma conta tem "Não exigir pré-autenticação Kerberos" marcada.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ad-4">
+                <label for="chk-ad-4"><strong>Cifras e protocolos fortes:</strong> Kerberos usa AES, o RC4 está desativado onde possível, o NTLMv1 está desligado e o uso de NTLM é auditado.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ad-5">
+                <label for="chk-ad-5"><strong>GPOs sob controle:</strong> a linha de base de segurança está vinculada ao domínio, os usos de Block Inheritance e Enforced são documentados e revisados.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ad-6">
+                <label for="chk-ad-6"><strong>Relógio e logs:</strong> o PDC Emulator da raiz sincroniza com NTP confiável, e os eventos 4768, 4769, 4771 e 4776 dos DCs chegam ao SIEM.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ad-7">
+                <label for="chk-ad-7"><strong>Plano para a krbtgt:</strong> a troca de senha da krbtgt (duas vezes, com intervalo) está documentada e testada.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (LSDOU):</strong> A GPO do domínio liga o firewall e a GPO da OU do servidor o desliga, sem Enforced nem bloqueio. Como fica o firewall?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Desligado.</p>
+                    <p>Na ordem LSDOU, a OU é aplicada depois do domínio e vence o conflito. Para a linha de base do domínio prevalecer, ela precisaria estar marcada como Enforced.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Block Inheritance):</strong> Um administrador ativa Block Inheritance na OU de um servidor para escapar de uma GPO incômoda. Que efeito colateral isso pode ter?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O servidor perde todas as GPOs herdadas não impostas, inclusive a linha de base de segurança, e volta às configurações da política local.</p>
+                    <p>É assim que um firewall "ligado pelo domínio" aparece desligado. Por isso a linha de base costuma ser marcada como Enforced e os bloqueios são revisados.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Relógio):</strong> Um notebook voltou de viagem com o relógio 8 minutos adiantado e não consegue autenticar no domínio. Por quê, e qual papel FSMO é a referência de horário?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O Kerberos rejeita diferenças acima de 5 minutos (erro <code>KRB_AP_ERR_SKEW</code>). A referência é o PDC Emulator do domínio raiz da floresta.</p>
+                    <p>O carimbo de tempo da pré-autenticação protege contra a repetição de mensagens capturadas, e por isso o relógio precisa estar sincronizado.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Kerberoasting):</strong> Qual é a defesa mais eficaz contra Kerberoasting numa conta de serviço do SQL Server?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Trocar a conta por uma gMSA, com senha longa e aleatória trocada automaticamente, e exigir AES.</p>
+                    <p>O ataque não pode ser impedido no pedido do ticket, porque qualquer usuário autenticado pode pedir tickets de serviço. O que se impede é a quebra da senha. Monitorar 4769 com cifra RC4 ajuda a detectar.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (NTLM):</strong> Um usuário acessa <code>\\10.20.1.15\relatorios</code> em vez de <code>\\srv-arquivos\relatorios</code>. Qual protocolo de autenticação provavelmente será usado?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> NTLM.</p>
+                    <p>O Kerberos precisa de um SPN, que é baseado no nome. Pelo IP, o Windows cai para NTLM (a menos que haja SPN registrado para o IP e a configuração permita), o que gera o evento 4776 no DC.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Golden Ticket):</strong> O time de resposta confirmou que o hash da krbtgt foi roubado. Trocar a senha dela uma vez basta?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. A troca precisa ser feita duas vezes, com intervalo para a replicação.</p>
+                    <p>O AD guarda a senha atual e a anterior da krbtgt para não invalidar tickets em uso. Depois de uma única troca, o hash roubado ainda é a "senha anterior" e continua válido.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Floresta é a fronteira</h4>
+                <p>Domínio organiza; a floresta é a fronteira de segurança. DCs são Tier 0.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. LSDOU</h4>
+                <p>Local, Site, Domínio, OUs: a última vence. Link 1 vence no contêiner; Enforced vence tudo abaixo.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Kerberos</h4>
+                <p>AS (TGT), TGS (ticket de serviço) e AP (acesso). 5 minutos de tolerância de relógio.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. NTLM e contas de serviço</h4>
+                <p>NTLM em acesso por IP e sem SPN (4776). gMSA contra Kerberoasting.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>RFC 4120 — The Kerberos Network Authentication Service (V5).</li>
+            <li>Microsoft Learn — Active Directory Domain Services, papéis FSMO e processamento de Group Policy.</li>
+            <li>Microsoft Learn — Group Managed Service Accounts e Securing privileged access (enterprise access model).</li>
+            <li>Microsoft Learn — eventos de auditoria 4768, 4769, 4771 e 4776.</li>
+            <li>MITRE ATT&amp;CK — T1558 (Steal or Forge Kerberos Tickets) e T1550 (Use Alternate Authentication Material).</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 39 — Ataques e Defesa no AD e 40 — PAM</strong>
+            </div>
+            <p>
+                Com o funcionamento entendido, o Estudo 39 mostra como Kerberoasting, pass-the-hash e DCSync aparecem nos logs, e o Estudo 40 mostra como cofre, rotação e acesso just-in-time protegem as contas de Tier 0.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="ad-dados">
+{
+ "contexto": "Domínio fictício da Ipê Store. A usuária ana.souza acessa o banco do ERP no SRV-ERP01, que roda com a conta de serviço svc_sqlerp.",
+ "kerberos": {
+  "participantes": "Cliente: estação da ana.souza · KDC: DC01 (Authentication Service e Ticket Granting Service) · Serviço: SQL Server no SRV-ERP01",
+  "mensagens": [
+   {
+    "id": "AS-REQ", "de": "Cliente", "para": "KDC (AS)",
+    "resumo": "Pedido de TGT: a estação diz quem é a usuária e prova que conhece a senha.",
+    "campos": [
+     ["cname", "ana.souza"],
+     ["realm", "CORP.IPESTORE.EXAMPLE"],
+     ["sname", "krbtgt/CORP.IPESTORE.EXAMPLE"],
+     ["PA-ENC-TIMESTAMP", "Horário atual cifrado com a chave derivada da senha (pré-autenticação)"],
+     ["etype", "AES256 (preferido); RC4-HMAC só em sistemas legados"]
+    ],
+    "riscos": [
+     {"titulo": "AS-REP roasting", "tecnica": "T1558.004", "descricao": "Se a conta não exige pré-autenticação, qualquer pessoa pede o AS-REP sem saber a senha e tenta quebrá-la offline."},
+     {"titulo": "Password spraying", "tecnica": "T1110.003", "descricao": "Tentativas de senha em muitas contas geram falhas de pré-autenticação (evento 4771) e bloqueios."}
+    ]
+   },
+   {
+    "id": "AS-REP", "de": "KDC (AS)", "para": "Cliente",
+    "resumo": "O KDC devolve o TGT e uma chave de sessão para falar com o TGS.",
+    "campos": [
+     ["TGT", "Cifrado com a chave da conta krbtgt; o cliente não consegue lê-lo"],
+     ["PAC", "Dentro do TGT: SID da usuária e dos grupos dela"],
+     ["Chave de sessão", "Cifrada com a chave da usuária, para uso nas próximas mensagens"],
+     ["Validade", "10 horas por padrão, renovável por até 7 dias"],
+     ["Evento no DC", "4768 (TGT solicitado)"]
+    ],
+    "riscos": [
+     {"titulo": "Golden Ticket", "tecnica": "T1558.001", "descricao": "Quem rouba o hash da krbtgt forja TGTs de qualquer usuário, com qualquer grupo no PAC. A defesa é proteger o Tier 0 e trocar a senha da krbtgt duas vezes após um comprometimento."}
+    ]
+   },
+   {
+    "id": "TGS-REQ", "de": "Cliente", "para": "KDC (TGS)",
+    "resumo": "Com o TGT, a estação pede um ticket para o serviço que quer usar.",
+    "campos": [
+     ["TGT", "O mesmo recebido no AS-REP"],
+     ["Authenticator", "Nome e horário cifrados com a chave de sessão, para provar que o TGT não foi capturado"],
+     ["SPN", "MSSQLSvc/srv-erp01.corp.ipestore.example:1433"],
+     ["Evento no DC", "4769 (ticket de serviço solicitado)"]
+    ],
+    "riscos": [
+     {"titulo": "Kerberoasting", "tecnica": "T1558.003", "descricao": "Qualquer usuário autenticado pode pedir ticket de qualquer SPN. O pedido em massa, sobretudo com cifra RC4, é o primeiro passo do ataque."}
+    ]
+   },
+   {
+    "id": "TGS-REP", "de": "KDC (TGS)", "para": "Cliente",
+    "resumo": "O KDC entrega o ticket de serviço, cifrado com a chave da conta dona do SPN.",
+    "campos": [
+     ["Ticket de serviço", "Cifrado com a chave da conta svc_sqlerp, dona do SPN"],
+     ["PAC", "Copiado do TGT para o ticket de serviço"],
+     ["Nova chave de sessão", "Para a conversa entre a estação e o serviço"]
+    ],
+    "riscos": [
+     {"titulo": "Quebra offline da senha do serviço", "tecnica": "T1558.003", "descricao": "Como o ticket é cifrado com a chave da conta de serviço, uma senha fraca é descoberta offline. A defesa é usar gMSA e AES."}
+    ]
+   },
+   {
+    "id": "AP-REQ", "de": "Cliente", "para": "SRV-ERP01",
+    "resumo": "A estação apresenta o ticket ao serviço, que o decifra com a própria chave e lê o PAC.",
+    "campos": [
+     ["Ticket de serviço", "O serviço decifra com a chave da svc_sqlerp, sem consultar o DC"],
+     ["Authenticator", "Cifrado com a nova chave de sessão"],
+     ["Decisão de acesso", "Baseada nos grupos do PAC"]
+    ],
+    "riscos": [
+     {"titulo": "Silver Ticket", "tecnica": "T1558.002", "descricao": "Com o hash da conta de serviço, o atacante forja um ticket só para esse serviço, sem falar com o DC; não há evento 4769. Validação do PAC e gMSA reduzem o risco."},
+     {"titulo": "Pass-the-ticket", "tecnica": "T1550.003", "descricao": "Um ticket roubado da memória de uma máquina é reutilizado em outra até expirar."}
+    ]
+   },
+   {
+    "id": "AP-REP", "de": "SRV-ERP01", "para": "Cliente",
+    "resumo": "Opcional: o serviço prova a própria identidade (autenticação mútua).",
+    "campos": [
+     ["Resposta", "Horário do authenticator cifrado com a chave de sessão"],
+     ["Efeito", "A estação confirma que fala com o serviço verdadeiro"],
+     ["Quando ocorre", "Quando o cliente pede autenticação mútua"]
+    ],
+    "riscos": [
+     {"titulo": "Servidor falso e retransmissão", "tecnica": "T1557", "descricao": "Sem autenticação mútua, como no NTLM, o cliente pode autenticar num servidor do atacante, que retransmite a sessão."}
+    ]
+   }
+  ],
+  "cenarios": [
+   {"id": "normal", "nome": "Autenticação normal", "para_em": null, "erro": null, "ntlm": false, "evento": "4768 e 4769",
+    "explicacao": "As seis mensagens ocorrem e a ana.souza acessa o banco do ERP com os grupos do PAC."},
+   {"id": "relogio", "nome": "Relógio da estação 7 minutos adiantado", "para_em": "AS-REQ", "erro": "KRB_AP_ERR_SKEW", "ntlm": false, "evento": "4771",
+    "explicacao": "O KDC rejeita a pré-autenticação porque a diferença passa da tolerância de 5 minutos. Sincronize as máquinas com o domínio (NTP); a referência é o PDC Emulator da raiz da floresta."},
+   {"id": "senha", "nome": "Senha errada", "para_em": "AS-REQ", "erro": "KDC_ERR_PREAUTH_FAILED", "ntlm": false, "evento": "4771",
+    "explicacao": "A chave derivada da senha errada não decifra o timestamp. Muitas falhas em várias contas indicam password spraying."},
+   {"id": "desativada", "nome": "Conta desativada", "para_em": "AS-REQ", "erro": "KDC_ERR_CLIENT_REVOKED", "ntlm": false, "evento": "4768",
+    "explicacao": "O KDC recusa contas desativadas, bloqueadas ou expiradas; o evento 4768 registra a falha."},
+   {"id": "spn", "nome": "SPN não registrado para o serviço", "para_em": "TGS-REQ", "erro": "KDC_ERR_S_PRINCIPAL_UNKNOWN", "ntlm": true, "evento": "4776",
+    "explicacao": "O KDC não encontra conta dona do SPN (evento 4769 com falha) e o cliente cai para NTLM. Registre o SPN na conta de serviço com setspn."},
+   {"id": "ip", "nome": "Acesso ao servidor pelo endereço IP", "para_em": "TGS-REQ", "erro": null, "ntlm": true, "evento": "4776",
+    "explicacao": "A estação já tem o TGT do logon, mas não há SPN para um endereço IP: ela nem pede ticket de serviço e usa NTLM."},
+   {"id": "sem-preauth", "nome": "Conta sem pré-autenticação", "para_em": null, "erro": null, "ntlm": false, "evento": "4768",
+    "explicacao": "A autenticação funciona, mas o AS-REQ não carrega o timestamp cifrado.",
+    "alerta": "Qualquer pessoa pode pedir o AS-REP dessa conta e quebrar a senha offline (AS-REP roasting, T1558.004). Exija pré-autenticação Kerberos em todas as contas."}
+  ]
+ },
+ "gpo": {
+  "objeto": "SRV-ERP01",
+  "configuracoes": {
+   "firewall": "Firewall do Windows",
+   "smbv1": "Protocolo SMBv1",
+   "rdp": "Área de Trabalho Remota",
+   "bloqueio": "Bloqueio de tela por inatividade (minutos)",
+   "pslog": "Log de blocos de script do PowerShell"
+  },
+  "containers": [
+   {"id": "local", "nome": "Política local do SRV-ERP01", "tipo": "local", "links": [{"gpo": "local-srv"}]},
+   {"id": "site", "nome": "Site SP-Matriz", "tipo": "site", "links": [{"gpo": "site-sp"}]},
+   {"id": "dominio", "nome": "Domínio corp.ipestore.example", "tipo": "dominio", "links": [{"gpo": "linha-base"}]},
+   {"id": "ou-ipe", "nome": "OU Ipe", "tipo": "ou", "links": [{"gpo": "ipe-padrao"}]},
+   {"id": "ou-servidores", "nome": "OU Servidores", "tipo": "ou", "links": [{"gpo": "servidores-hardening"}, {"gpo": "servidores-monitoramento"}]},
+   {"id": "ou-erp", "nome": "OU Servidores-ERP (contém o SRV-ERP01)", "tipo": "ou", "links": [{"gpo": "erp-fornecedor"}]}
+  ],
+  "gpos": {
+   "local-srv": {"nome": "Política local (imagem do fabricante)", "valores": {"firewall": "Desligado", "rdp": "Permitido"}},
+   "site-sp": {"nome": "Site SP - Padrões do escritório", "valores": {"bloqueio": "30"}},
+   "linha-base": {"nome": "Linha de Base de Segurança", "valores": {"firewall": "Ligado", "smbv1": "Desabilitado", "bloqueio": "15", "pslog": "Ligado"}},
+   "ipe-padrao": {"nome": "Ipê - Padrão corporativo", "valores": {"bloqueio": "10"}},
+   "servidores-hardening": {"nome": "Servidores - Hardening", "valores": {"rdp": "Bloqueado", "pslog": "Ligado"}},
+   "servidores-monitoramento": {"nome": "Servidores - Agente de monitoramento", "valores": {"pslog": "Desligado"}},
+   "erp-fornecedor": {"nome": "ERP - Exigências do fornecedor", "valores": {"smbv1": "Habilitado", "rdp": "Permitido"}}
+  },
+  "cenarios": [
+   {"id": "padrao", "titulo": "Configuração atual",
+    "descricao": "Sem Enforced nem bloqueio. A GPO do fornecedor, na OU mais próxima, reativa o SMBv1 e libera o RDP; no log do PowerShell, o link 1 (Hardening) vence o link 2 (Monitoramento).",
+    "ajustes": {},
+    "esperado": {"firewall": ["Ligado", "linha-base"], "smbv1": ["Habilitado", "erp-fornecedor"], "rdp": ["Permitido", "erp-fornecedor"], "bloqueio": ["10", "ipe-padrao"], "pslog": ["Ligado", "servidores-hardening"]}},
+   {"id": "bloqueio", "titulo": "Block Inheritance na OU do ERP",
+    "descricao": "O fornecedor pediu para \"isolar\" a OU. Todas as GPOs herdadas caem, inclusive a linha de base: o firewall volta para Desligado, da política local, e o log do PowerShell fica sem configuração.",
+    "ajustes": {"block": ["ou-erp"]},
+    "esperado": {"firewall": ["Desligado", "local-srv"], "smbv1": ["Habilitado", "erp-fornecedor"], "rdp": ["Permitido", "erp-fornecedor"], "bloqueio": null, "pslog": null}},
+   {"id": "enforced", "titulo": "Linha de base com Enforced",
+    "descricao": "A linha de base passa a vencer as OUs: o SMBv1 volta a Desabilitado. Efeito colateral: o bloqueio de tela também passa a 15 minutos, porque Enforced impõe todas as configurações da GPO.",
+    "ajustes": {"enforced": ["dominio:linha-base"]},
+    "esperado": {"firewall": ["Ligado", "linha-base"], "smbv1": ["Desabilitado", "linha-base"], "rdp": ["Permitido", "erp-fornecedor"], "bloqueio": ["15", "linha-base"], "pslog": ["Ligado", "linha-base"]}},
+   {"id": "bloqueio-enforced", "titulo": "Bloqueio e Enforced juntos",
+    "descricao": "Enforced atravessa o Block Inheritance: a linha de base volta a valer na OU do ERP, enquanto as outras GPOs herdadas continuam bloqueadas.",
+    "ajustes": {"block": ["ou-erp"], "enforced": ["dominio:linha-base"]},
+    "esperado": {"firewall": ["Ligado", "linha-base"], "smbv1": ["Desabilitado", "linha-base"], "rdp": ["Permitido", "erp-fornecedor"], "bloqueio": ["15", "linha-base"], "pslog": ["Ligado", "linha-base"]}},
+   {"id": "ordem", "titulo": "Ordem de link invertida na OU Servidores",
+    "descricao": "Com o Monitoramento no link 1, ele passa a ter precedência sobre o Hardening e desliga o log de blocos de script do PowerShell: um ponto cego para o SOC.",
+    "ajustes": {"ordem": {"ou-servidores": ["servidores-monitoramento", "servidores-hardening"]}},
+    "esperado": {"firewall": ["Ligado", "linha-base"], "smbv1": ["Habilitado", "erp-fornecedor"], "rdp": ["Permitido", "erp-fornecedor"], "bloqueio": ["10", "ipe-padrao"], "pslog": ["Desligado", "servidores-monitoramento"]}}
+  ]
+ }
+}
+</script>
+
+<script>
+(function() {
+    var AD = JSON.parse(document.getElementById("ad-dados").textContent);
+    var K = AD.kerberos, G = AD.gpo;
+    var ajustes = null;
+    var execucao = null;
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function copia(o) { return JSON.parse(JSON.stringify(o)); }
+    function tem(lista, v) { return (lista || []).indexOf(v) !== -1; }
+
+    // ------------------------------------------------------------------ Kerberos
+    function renderizarKerberos(estados) {
+        var box = document.getElementById("ad-kerberos");
+        box.replaceChildren();
+        K.mensagens.forEach(function(m, i) {
+            var st = estados ? estados[m.id] : null;
+            var cor = st === "ok" ? "rgba(22, 163, 74, 0.25)" : st === "erro" ? "rgba(220, 38, 38, 0.3)" : st === "pulado" ? "transparent" : "var(--surface)";
+            var b = el("button", null, "display: flex; flex-wrap: wrap; gap: 0.25rem 0.75rem; align-items: baseline; text-align: left; width: 100%; padding: 0.5rem 0.7rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); background: " + cor + "; color: var(--ink); cursor: pointer; font: inherit;" + (st === "pulado" ? " opacity: 0.5;" : ""));
+            b.type = "button";
+            b.setAttribute("data-mensagem", m.id);
+            b.appendChild(el("strong", (i + 1) + ". " + m.id, "font-family: var(--font-mono);"));
+            b.appendChild(el("span", m.de + " → " + m.para, "font-size: 0.85rem;"));
+            if (st) b.appendChild(el("span", st === "ok" ? "✓" : st === "erro" ? "✗ falhou aqui" : "não enviada", "font-size: 0.8rem; font-weight: 600;"));
+            b.addEventListener("click", function() { mostrarMensagemKerberos(m.id); });
+            box.appendChild(b);
+        });
+    }
+
+    window.mostrarMensagemKerberos = function(id) {
+        var m = K.mensagens.filter(function(x) { return x.id === id; })[0];
+        if (!m) return;
+        var box = document.getElementById("ad-mensagem");
+        box.replaceChildren();
+        box.appendChild(el("strong", m.id + ": " + m.de + " → " + m.para, "font-family: var(--font-mono); display: block;"));
+        box.appendChild(el("p", m.resumo, "margin: 0.3rem 0 0.5rem 0;"));
+        var dl = el("dl", null, "display: grid; grid-template-columns: minmax(0, 9rem) minmax(0, 1fr); gap: 0.25rem 0.75rem; margin: 0 0 0.5rem 0; overflow-wrap: anywhere;");
+        m.campos.forEach(function(c) {
+            dl.appendChild(el("dt", c[0], "font-weight: 600; font-family: var(--font-mono); font-size: 0.8rem;"));
+            dl.appendChild(el("dd", c[1], "margin: 0;"));
+        });
+        box.appendChild(dl);
+        box.appendChild(el("strong", "O que pode dar errado", "display: block; margin-bottom: 0.25rem;"));
+        var ul = el("ul", null, "margin: 0; padding-left: 1.2rem;");
+        m.riscos.forEach(function(r) {
+            var li = el("li");
+            li.appendChild(el("strong", r.titulo + " (" + r.tecnica + "): "));
+            li.appendChild(document.createTextNode(r.descricao));
+            ul.appendChild(li);
+        });
+        box.appendChild(ul);
+    };
+
+    window.executarAutenticacaoKerberos = function() {
+        if (execucao) { clearTimeout(execucao); execucao = null; }
+        var c = K.cenarios.filter(function(x) { return x.id === document.getElementById("ad-cenario").value; })[0];
+        var res = document.getElementById("ad-resultado-kerberos");
+        res.replaceChildren();
+        var estados = {};
+        var ids = K.mensagens.map(function(m) { return m.id; });
+        var parada = c.para_em ? ids.indexOf(c.para_em) : ids.length;
+        var i = 0;
+        renderizarKerberos(estados);
+        function passo() {
+            if (i < parada) {
+                estados[ids[i]] = "ok";
+                i++;
+                renderizarKerberos(estados);
+                execucao = setTimeout(passo, 300);
+                return;
+            }
+            if (c.para_em) {
+                estados[c.para_em] = c.erro ? "erro" : "pulado";
+                for (var j = parada + 1; j < ids.length; j++) estados[ids[j]] = "pulado";
+                renderizarKerberos(estados);
+            }
+            execucao = null;
+            var ok = !c.erro && !c.ntlm;
+            var p = el("div", null, "padding: 0.6rem 0.75rem; border-radius: var(--radius-md); background: " + (ok ? "rgba(22, 163, 74, 0.2)" : "rgba(202, 138, 4, 0.25)") + ";");
+            var titulo = c.erro ? "Falhou em " + c.para_em + " com " + c.erro + "." : (c.ntlm ? "Kerberos não usado: autenticação via NTLM." : "Autenticação Kerberos concluída.");
+            p.appendChild(el("strong", titulo, "display: block;"));
+            p.appendChild(el("p", c.explicacao + " Evento no DC: " + c.evento + ".", "margin: 0.3rem 0 0 0;"));
+            if (c.ntlm) p.appendChild(el("p", "NTLM: NEGOTIATE → CHALLENGE → AUTHENTICATE. Sem autenticação mútua e sujeito a pass-the-hash e retransmissão.", "margin: 0.3rem 0 0 0; font-family: var(--font-mono); font-size: 0.8rem;"));
+            if (c.alerta) p.appendChild(el("p", "⚠️ " + c.alerta, "margin: 0.3rem 0 0 0; color: var(--danger-color); font-weight: 600;"));
+            res.appendChild(p);
+            res.setAttribute("data-resultado", c.erro || (c.ntlm ? "ntlm" : "ok"));
+        }
+        passo();
+    };
+
+    // ----------------------------------------------------------------------- GPO
+    // Mesmo algoritmo dos testes em Python: LSDOU, ordem de link, Enforced e Block Inheritance.
+    function linksDe(c) {
+        var nomes = (ajustes.ordem && ajustes.ordem[c.id]) || c.links.map(function(l) { return l.gpo; });
+        return nomes.filter(function(n) { return !tem(ajustes.desativados, c.id + ":" + n); });
+    }
+    function efetiva() {
+        var conts = G.containers;
+        var prof = -1;
+        conts.forEach(function(c, i) { if (tem(ajustes.block, c.id)) prof = i; });
+        var seq = [];
+        conts.forEach(function(c, i) {
+            var bloqueado = i < prof && c.tipo !== "local";
+            linksDe(c).slice().reverse().forEach(function(n) {
+                if (!tem(ajustes.enforced, c.id + ":" + n) && !bloqueado) seq.push({ gpo: n, container: c });
+            });
+        });
+        conts.slice().reverse().forEach(function(c) {
+            linksDe(c).slice().reverse().forEach(function(n) {
+                if (tem(ajustes.enforced, c.id + ":" + n)) seq.push({ gpo: n, container: c, enforced: true });
+            });
+        });
+        var res = {};
+        seq.forEach(function(s) {
+            var v = G.gpos[s.gpo].valores;
+            Object.keys(v).forEach(function(k) {
+                res[k] = res[k] || { trilha: [] };
+                res[k].trilha.push({ gpo: s.gpo, valor: v[k], enforced: !!s.enforced });
+                res[k].valor = v[k];
+                res[k].gpo = s.gpo;
+            });
+        });
+        return res;
+    }
+
+    function alternar(lista, v, ligado) {
+        ajustes[lista] = (ajustes[lista] || []).filter(function(x) { return x !== v; });
+        if (ligado) ajustes[lista].push(v);
+    }
+
+    function renderizarGpo() {
+        var box = document.getElementById("ad-gpo");
+        box.replaceChildren();
+        G.containers.forEach(function(c, idx) {
+            var card = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 0.6rem 0.75rem; margin-left: " + Math.min(idx, 5) * 0.4 + "rem; min-width: 0;");
+            var topo = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: space-between; align-items: center;");
+            topo.appendChild(el("strong", ["L", "S", "D", "OU", "OU", "OU"][Math.min(idx, 5)] + " · " + c.nome, "font-size: 0.88rem;"));
+            if (c.tipo === "ou") {
+                var rb = el("label", null, "display: flex; gap: 0.35rem; align-items: center; font-size: 0.8rem;");
+                var cb = el("input"); cb.type = "checkbox"; cb.checked = tem(ajustes.block, c.id);
+                cb.addEventListener("change", function() { alternar("block", c.id, cb.checked); calcularGpoEfetiva(); });
+                rb.appendChild(cb); rb.appendChild(document.createTextNode("Block Inheritance"));
+                topo.appendChild(rb);
+            }
+            card.appendChild(topo);
+            var nomes = (ajustes.ordem && ajustes.ordem[c.id]) || c.links.map(function(l) { return l.gpo; });
+            nomes.forEach(function(n, pos) {
+                var chave = c.id + ":" + n;
+                var g = G.gpos[n];
+                var linha = el("div", null, "border-top: 1px solid var(--rule); margin-top: 0.4rem; padding-top: 0.4rem; font-size: 0.82rem;");
+                var cab = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.3rem 0.8rem; align-items: center;");
+                cab.appendChild(el("span", (c.tipo === "local" ? "" : "Link " + (pos + 1) + ": ") + g.nome, "font-weight: 600;"));
+                var la = el("label", null, "display: flex; gap: 0.3rem; align-items: center;");
+                var ca = el("input"); ca.type = "checkbox"; ca.checked = !tem(ajustes.desativados, chave);
+                ca.setAttribute("aria-label", "Link ativo: " + g.nome);
+                ca.addEventListener("change", function() { alternar("desativados", chave, !ca.checked); calcularGpoEfetiva(); });
+                la.appendChild(ca); la.appendChild(document.createTextNode("ativo"));
+                cab.appendChild(la);
+                if (c.tipo !== "local") {
+                    var le = el("label", null, "display: flex; gap: 0.3rem; align-items: center;");
+                    var ce = el("input"); ce.type = "checkbox"; ce.checked = tem(ajustes.enforced, chave);
+                    ce.setAttribute("aria-label", "Enforced: " + g.nome);
+                    ce.addEventListener("change", function() { alternar("enforced", chave, ce.checked); calcularGpoEfetiva(); });
+                    le.appendChild(ce); le.appendChild(document.createTextNode("Enforced"));
+                    cab.appendChild(le);
+                }
+                if (pos > 0) {
+                    var up = el("button", "↑ subir para link " + pos, "font-size: 0.75rem; padding: 0.1rem 0.45rem;");
+                    up.type = "button"; up.className = "btn-secondary";
+                    up.addEventListener("click", function() {
+                        var nova = nomes.slice(); nova.splice(pos, 1); nova.splice(pos - 1, 0, n);
+                        ajustes.ordem = ajustes.ordem || {}; ajustes.ordem[c.id] = nova;
+                        calcularGpoEfetiva();
+                    });
+                    cab.appendChild(up);
+                }
+                linha.appendChild(cab);
+                linha.appendChild(el("div", Object.keys(g.valores).map(function(k) { return G.configuracoes[k] + ": " + g.valores[k]; }).join(" · "), "color: var(--muted); margin-top: 0.2rem;"));
+                card.appendChild(linha);
+            });
+            box.appendChild(card);
+        });
+    }
+
+    function renderizarResultado() {
+        var res = efetiva();
+        var box = document.getElementById("ad-gpo-resultado");
+        box.replaceChildren();
+        var lista = el("div", null, "display: grid; gap: 0.5rem;");
+        Object.keys(G.configuracoes).forEach(function(k) {
+            var r = res[k];
+            var item = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.45rem 0.6rem; min-width: 0;");
+            item.setAttribute("data-config", k);
+            item.setAttribute("data-valor", r ? r.valor : "");
+            item.setAttribute("data-gpo", r ? r.gpo : "");
+            var topo = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.3rem 0.75rem; justify-content: space-between;");
+            topo.appendChild(el("strong", G.configuracoes[k]));
+            topo.appendChild(el("span", r ? r.valor + " — vence: " + G.gpos[r.gpo].nome : "Não configurado (padrão do sistema)", "font-weight: 600;"));
+            item.appendChild(topo);
+            if (r) {
+                item.appendChild(el("div", "Trilha: " + r.trilha.map(function(t) { return G.gpos[t.gpo].nome + (t.enforced ? " [Enforced]" : "") + " = " + t.valor; }).join(" → "),
+                    "font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; overflow-wrap: anywhere;"));
+            }
+            lista.appendChild(item);
+        });
+        box.appendChild(lista);
+    }
+
+    window.calcularGpoEfetiva = function() {
+        renderizarGpo();
+        renderizarResultado();
+    };
+
+    window.aplicarCenarioGpo = function(id) {
+        var c = G.cenarios.filter(function(x) { return x.id === id; })[0];
+        if (!c) return;
+        ajustes = copia(c.ajustes);
+        ajustes.enforced = ajustes.enforced || [];
+        ajustes.block = ajustes.block || [];
+        ajustes.desativados = ajustes.desativados || [];
+        ajustes.ordem = ajustes.ordem || {};
+        document.getElementById("ad-cenario-gpo-descricao").textContent = c.titulo + ": " + c.descricao;
+        Array.prototype.forEach.call(document.querySelectorAll("#ad-cenarios-gpo button"), function(b) {
+            var ativo = b.getAttribute("data-cenario") === id;
+            b.className = ativo ? "btn-primary" : "btn-secondary";
+            b.setAttribute("aria-pressed", ativo ? "true" : "false");
+        });
+        calcularGpoEfetiva();
+    };
+
+    window.restaurarAd = function() {
+        if (execucao) { clearTimeout(execucao); execucao = null; }
+        document.getElementById("ad-cenario").value = "normal";
+        document.getElementById("ad-resultado-kerberos").replaceChildren();
+        renderizarKerberos(null);
+        mostrarMensagemKerberos("AS-REQ");
+        aplicarCenarioGpo("padrao");
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("ad-contexto").textContent = AD.contexto;
+        document.getElementById("ad-participantes").textContent = K.participantes;
+        var sel = document.getElementById("ad-cenario");
+        K.cenarios.forEach(function(c) { var o = el("option", c.nome); o.value = c.id; sel.appendChild(o); });
+        var bx = document.getElementById("ad-cenarios-gpo");
+        G.cenarios.forEach(function(c) {
+            var b = el("button", c.titulo, "font-size: 0.8rem;");
+            b.type = "button"; b.className = "btn-secondary";
+            b.setAttribute("data-cenario", c.id);
+            b.addEventListener("click", function() { aplicarCenarioGpo(c.id); });
+            bx.appendChild(b);
+        });
+        restaurarAd();
+        if (typeof initChecklist === "function") {
+            initChecklist("active-directory");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
