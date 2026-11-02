@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """Testes dos dados da rota da vaga, das certificações e da carreira Analista de SI."""
 
+import re
 import sys
 import unittest
 from html import escape
@@ -121,11 +122,6 @@ class TestRotaVagaRender(unittest.TestCase):
         apoio = nums[len(principais):]
         self.assertEqual(apoio, sorted(apoio))
 
-    def test_botao_filtro_usa_dataset(self):
-        from build_index import _botao_filtro
-        b = _botao_filtro("O'Brien", "x")
-        self.assertIn('onclick="setSubFilter(this.dataset.value, this)"', b)
-
     def test_contador_so_principais(self):
         # 15 é só apoio em "solucoes"; não pode contar
         html = render_rota_vaga(ROTA_VAGA, _status({"Engenharia-Social-e-Phishing"}))
@@ -143,13 +139,19 @@ class TestRotaVagaRender(unittest.TestCase):
         self.assertEqual(html.count('<tr class="cert-row"'), 6)
         self.assertIn("Confira os requisitos atuais no site oficial do órgão emissor", html)
 
-    def test_portal_contem_secoes_na_ordem(self):
+    def test_portal_contem_secoes_cada_uma_na_sua_visao(self):
         conteudo = Path(gerar_index_html(output_path=ROOT / "index.html")).read_text(encoding="utf-8")
-        i_nec = conteudo.index('id="secao-necessidades"')
-        i_rota = conteudo.index('id="secao-rota-vaga"')
-        i_cert = conteudo.index('id="secao-certificacoes"')
-        i_cat = conteudo.index('id="secao-catalogo"')
-        self.assertTrue(i_nec < i_rota < i_cert < i_cat)
+        visoes = [m.start() for m in re.finditer(r'<section class="view" data-view="', conteudo)] + [conteudo.index("</main>")]
+
+        def visao_de(marcador):
+            i = conteudo.index(marcador)
+            j = max(k for k, v in enumerate(visoes) if v < i)
+            return re.match(r'<section class="view" data-view="(\w+)"', conteudo[visoes[j]:]).group(1)
+
+        self.assertEqual(visao_de('id="secao-necessidades"'), "necessidades")
+        self.assertEqual(visao_de('id="secao-rota-vaga"'), "vaga")
+        self.assertEqual(visao_de('id="secao-certificacoes"'), "certificacoes")
+        self.assertEqual(visao_de('id="secao-catalogo"'), "catalogo")
         self.assertIn("Rota por Vaga: Analista de Segurança da Informação", conteudo)
         self.assertIn("Matriz de Certificações", conteudo)
 

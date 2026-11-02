@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Testes das abas "Por Certificação" e "Meu Progresso" do portal."""
+"""Testes das visões "Por certificação" e "Meu progresso" do portal."""
 
 import re
 import sys
@@ -13,11 +13,18 @@ sys.path.insert(0, str(GERADORES_DIR))
 
 from index_dados import CERTIFICACOES, ESTUDOS_DADOS  # noqa: E402
 
-from build_index import gerar_index_html, render_filtros_certificacao, render_painel_certificacoes  # noqa: E402
+from build_index import gerar_index_html, render_painel_certificacoes  # noqa: E402
 
 
 def numero(slug):
     return list(ESTUDOS_DADOS).index(slug) + 1
+
+
+def visao(html, nome):
+    """Trecho do HTML da visão <section class="view" data-view="nome">."""
+    ini = html.index(f'<section class="view" data-view="{nome}"')
+    fim = html.find('<section class="view" ', ini + 1)
+    return html[ini:fim if fim != -1 else html.index("</main>")]
 
 
 class TestAbasCertificacaoProgresso(unittest.TestCase):
@@ -26,19 +33,21 @@ class TestAbasCertificacaoProgresso(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             cls.html = gerar_index_html(output_path=Path(tmp) / "index.html").read_text(encoding="utf-8")
 
-    def test_abas_novas(self):
-        self.assertIn('data-facet="certs" onclick="switchTab(\'certs\')">Por Certificação</button>', self.html)
-        self.assertIn('data-facet="progresso" onclick="switchTab(\'progresso\')">Meu Progresso</button>', self.html)
-        self.assertIn('<div class="filter-subpanel" data-panel="certs"', self.html)
-        self.assertIn('<div class="filter-subpanel" data-panel="progresso"', self.html)
-        for valor in ("concluidos", "a_estudar"):
-            self.assertIn(f'data-value="{valor}"', self.html)
+    def test_visoes_no_menu(self):
+        self.assertRegex(self.html, r'<a href="#v-certificacoes" data-view="certificacoes">[^<]*Por certificação')
+        self.assertRegex(self.html, r'<a href="#v-progresso" data-view="progresso">[^<]*Meu progresso')
 
-    def test_botoes_das_certificacoes(self):
-        botoes = render_filtros_certificacao(CERTIFICACOES)
-        self.assertIn('data-value="all"', botoes)
+    def test_meu_progresso_lista_todos_com_checkbox(self):
+        prog = visao(self.html, "progresso")
+        for slug in ESTUDOS_DADOS:
+            self.assertIn(f'<input type="checkbox" data-slug="{slug}"', prog)
+        self.assertIn(f"0 de {len(ESTUDOS_DADOS)} concluídos", prog)
+        self.assertIn('id="zerar-progresso"', prog)
+
+    def test_um_painel_por_certificacao_na_visao(self):
+        cert = visao(self.html, "certificacoes")
         for c in CERTIFICACOES:
-            self.assertIn(f'data-value="{c["sigla"]}"', botoes)
+            self.assertIn(f'<div class="rota-sugerida" data-rota="{c["sigla"]}"', cert)
 
     def test_cards_marcam_as_certificacoes(self):
         for slug in ESTUDOS_DADOS:
@@ -62,16 +71,11 @@ class TestAbasCertificacaoProgresso(unittest.TestCase):
                 self.assertIn('class="rota-progresso-texto"', bloco.group(0))
                 self.assertIn('class="rota-proximo"', bloco.group(0))
 
-    def test_painel_da_certificacao_comeca_oculto(self):
-        self.assertIn('<section class="rota-sugerida-section" id="secao-cert-painel" hidden', self.html)
-        self.assertLess(self.html.index('id="secao-cert-painel"'), self.html.index('id="secao-catalogo"'))
-
-    def test_javascript_dos_filtros(self):
-        self.assertIn("currentFacet === 'certs'", self.html)
-        self.assertIn("currentFacet === 'progresso'", self.html)
-        self.assertIn("data-certs", self.html)
-        self.assertIn('id="no-results-texto"', self.html)
-        self.assertIn("ainda não marcou nenhum módulo como concluído", self.html)
+    def test_painel_e_matriz_na_visao_certificacoes(self):
+        cert = visao(self.html, "certificacoes")
+        self.assertIn('<section class="rota-sugerida-section" id="secao-cert-painel"', cert)
+        self.assertIn('id="secao-certificacoes"', cert)
+        self.assertIn('<section class="view" data-view="certificacoes" hidden>', self.html)
 
 
 if __name__ == "__main__":

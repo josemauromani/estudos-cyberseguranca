@@ -30,35 +30,35 @@ class TestPortalResponsivo(unittest.TestCase):
     def setUp(self):
         self.root = Path(__file__).resolve().parent.parent.parent
         self.css = (self.root / "_geradores" / "index.css").read_text(encoding="utf-8")
+        self.gaveta = bloco_media(self.css, "max-width: 1023px")
 
     def test_grades_nunca_mais_largas_que_a_tela(self):
         """As grades auto-fill usam min(…, 100%) para não exceder telas de 360px."""
-        for seletor, minimo in [(".needs-grid", "280px"), (".cards-grid", "340px"), (".vaga-grid", "320px")]:
+        for seletor, minimo in [(".grid", "250px"), (".needs-grid", "280px"), (".vaga-grid", "320px")]:
             self.assertIn(f"minmax(min({minimo}, 100%), 1fr)", regra(self.css, seletor), seletor)
 
-    def test_cards_podem_encolher(self):
-        """Os cards do catálogo não impõem largura mínima pelo conteúdo."""
-        self.assertIn("min-width: 0", regra(self.css, ".study-card"))
+    def test_cartoes_podem_encolher(self):
+        """Os cartões do catálogo não impõem largura mínima pelo conteúdo."""
+        self.assertIn("min-width: 0", regra(self.css, ".mc"))
+        self.assertIn("overflow-wrap: anywhere", regra(self.css, ".mc .tag"))
 
-    def test_cabecalho_do_card_nao_estoura_no_desktop(self):
-        """Em qualquer largura, o grupo de selos encolhe e o selo do simulador quebra linha."""
-        self.assertIn("min-width: 0", regra(self.css, ".card-tile-group"))
-        self.assertIn("min-width: 0", regra(self.css, ".card-badges"))
-        simulador = regra(self.css, ".badge-sim")
-        self.assertIn("white-space: normal", simulador)
-        self.assertIn("overflow-wrap: anywhere", simulador)
-        self.assertIn("flex-shrink: 0", regra(self.css, ".status-badge"))
+    def test_menu_vira_gaveta_abaixo_de_1024(self):
+        """Abaixo de 1024 px o menu lateral sai da grade e vira gaveta aberta por body.menu-aberto."""
+        self.assertIn("display: none", regra(self.css, ".menu-toggle"))
+        self.assertIn("display: inline-flex", regra(self.gaveta, ".menu-toggle"))
+        self.assertIn("grid-template-columns: minmax(0, 1fr)", regra(self.gaveta, ".shell"))
+        lateral = regra(self.gaveta, ".side")
+        self.assertIn("position: fixed", lateral)
+        self.assertIn("transform: translateX(-100%)", lateral)
+        self.assertIn("visibility: hidden", lateral)
+        self.assertIn("transform: none", regra(self.gaveta, "body.menu-aberto .side"))
+        self.assertIn("position: fixed", regra(self.gaveta, "body.menu-aberto::before"))
 
-    def test_selos_quebram_linha_no_celular(self):
-        """No celular, os selos (NIST, MITRE, carreiras) podem quebrar linha."""
-        mobile = bloco_media(self.css, "max-width: 768px")
-        self.assertIn("white-space: normal", regra(mobile, ".badge"))
+    def test_movimento_reduzido(self):
+        self.assertIn("transition: none", bloco_media(self.css, "prefers-reduced-motion: reduce"))
 
-    def test_abas_de_filtro_rolam_em_linha_unica(self):
-        """No celular, as abas de filtro ficam numa linha com rolagem horizontal própria."""
-        abas = regra(bloco_media(self.css, "max-width: 768px"), ".filter-tabs")
-        self.assertIn("flex-wrap: nowrap", abas)
-        self.assertIn("overflow-x: auto", abas)
+    def test_tabela_de_certificacoes_empilha_no_celular(self):
+        self.assertIn("display: none", regra(bloco_media(self.css, "max-width: 640px"), ".cert-table thead"))
 
 
 class TestTreinamentosResponsivos(unittest.TestCase):

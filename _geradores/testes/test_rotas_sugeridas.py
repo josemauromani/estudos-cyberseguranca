@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Testes da aba "Rotas Sugeridas" do portal: dados das rotas, coerência com o CURRICULO e HTML gerado."""
+"""Testes da visão "Rotas sugeridas" do portal: dados das rotas, coerência com o CURRICULO e HTML gerado."""
 
 import re
 import sys
@@ -13,13 +13,20 @@ sys.path.insert(0, str(GERADORES_DIR))
 
 from index_dados import ESTUDOS_DADOS, ROTAS_PERFIL  # noqa: E402
 
-from build_index import gerar_index_html, render_filtros_rota, render_painel_rotas  # noqa: E402
+from build_index import gerar_index_html, render_painel_rotas  # noqa: E402
 
 IDS_ESPERADOS = ["blue_soc", "red_team", "devsecops_cloud", "grc", "pericia", "analista_si"]
 
 
 def numero(slug):
     return list(ESTUDOS_DADOS).index(slug) + 1
+
+
+def visao(html, nome):
+    """Trecho do HTML da visão <section class="view" data-view="nome">."""
+    ini = html.index(f'<section class="view" data-view="{nome}"')
+    fim = html.find('<section class="view" ', ini + 1)
+    return html[ini:fim if fim != -1 else html.index("</main>")]
 
 
 def sequencias_do_curriculo():
@@ -63,13 +70,10 @@ class TestHtmlDasRotas(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             cls.html = gerar_index_html(output_path=Path(tmp) / "index.html").read_text(encoding="utf-8")
 
-    def test_aba_e_botoes_das_rotas(self):
-        self.assertIn('data-facet="rotas" onclick="switchTab(\'rotas\')">Rotas Sugeridas</button>', self.html)
-        self.assertIn('<div class="filter-subpanel" data-panel="rotas"', self.html)
-        botoes = render_filtros_rota(ROTAS_PERFIL)
-        self.assertIn('data-value="all"', botoes)
-        for r in ROTAS_PERFIL:
-            self.assertIn(f'data-value="{r["id"]}"', botoes)
+    def test_visao_no_menu_com_uma_rota_por_perfil(self):
+        self.assertRegex(self.html, r'<a href="#v-rotas" data-view="rotas">[^<]*Rotas sugeridas')
+        rotas = visao(self.html, "rotas")
+        self.assertEqual(re.findall(r'<div class="rota-sugerida" data-rota="([^"]+)"', rotas), IDS_ESPERADOS)
 
     def test_cards_marcam_as_rotas_de_que_fazem_parte(self):
         for slug in ESTUDOS_DADOS:
@@ -93,14 +97,9 @@ class TestHtmlDasRotas(unittest.TestCase):
                 self.assertIn('class="rota-progresso-texto"', bloco.group(0))
                 self.assertIn('class="rota-proximo"', bloco.group(0))
 
-    def test_painel_comeca_oculto_e_esta_no_portal(self):
-        self.assertIn('<section class="rota-sugerida-section" id="secao-rota-sugerida" hidden', self.html)
-        self.assertLess(self.html.index('id="secao-rota-sugerida"'), self.html.index('id="secao-catalogo"'))
-
-    def test_javascript_filtra_e_atualiza_o_painel(self):
-        self.assertIn("currentFacet === 'rotas'", self.html)
-        self.assertIn("function atualizarPainelRota()", self.html)
-        self.assertIn("data-rotas", self.html)
+    def test_painel_esta_na_visao_rotas(self):
+        self.assertIn('<section class="rota-sugerida-section" id="secao-rota-sugerida"', visao(self.html, "rotas"))
+        self.assertIn('<section class="view" data-view="rotas" hidden>', self.html)
 
 
 if __name__ == "__main__":

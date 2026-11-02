@@ -3,8 +3,13 @@
 """
 Construtor do Portal Central — Estudos em Cibersegurança
 ========================================================
-Gera a página raiz index.html a partir de index_dados.py, index.css e do
-status de compilação de cada um dos estudos do catálogo.
+Gera a página raiz index.html a partir de index_dados.py, das fontes embutidas,
+de tokens.css, de index.css e do status de compilação de cada estudo do catálogo.
+
+Estrutura: barra superior (menu, marca, busca, tema) + menu lateral com seis visões
+(Catálogo, Rotas sugeridas, Por certificação, Pela necessidade, Rota por vaga,
+Meu progresso) + conteúdo. Só o Catálogo aparece na carga; as demais visões vêm
+com `hidden` e são alternadas pelo JavaScript do portal.
 
 Uso via CLI:
     python3 _geradores/build_index.py [caminho_saida]
@@ -15,8 +20,8 @@ Uso como módulo:
 """
 
 import argparse
-import os
 import sys
+from functools import lru_cache
 from html import escape
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -25,21 +30,68 @@ GERADORES_DIR = Path(__file__).resolve().parent
 ROOT_DIR = GERADORES_DIR.parent
 sys.path.insert(0, str(GERADORES_DIR))
 
+from contrato import extrair_secoes
+from fontes import css_fontes
 from index_dados import (
-    CARREIRAS,
     CERTIFICACOES,
     ESTUDOS_DADOS,
-    FUNCOES_NIST,
     NECESSIDADES,
     NIVEIS,
     ROTA_VAGA,
     ROTAS_PERFIL,
     TRILHAS,
 )
-from montar import carregar_catalogo_estudos
+from montar import carregar_catalogo_estudos, normalizar_chave
 
 DEFAULT_INDEX_CSS = GERADORES_DIR / "index.css"
+TOKENS_CSS = GERADORES_DIR / "tokens.css"
 DEFAULT_OUTPUT_HTML = ROOT_DIR / "index.html"
+
+# Visões do menu lateral, na ordem de exibição: (id, ícone, rótulo)
+VISOES = [
+    ("catalogo", "📚", "Catálogo"),
+    ("rotas", "🧭", "Rotas sugeridas"),
+    ("certificacoes", "🎓", "Por certificação"),
+    ("necessidades", "🛠", "Pela necessidade"),
+    ("vaga", "💼", "Rota por vaga"),
+    ("progresso", "📈", "Meu progresso"),
+]
+
+# Botões da barra "Agrupar por" do catálogo: (id, rótulo)
+GRUPOS_CATALOGO = [
+    ("trilha", "Trilha"),
+    ("nivel", "Nível"),
+    ("perfil", "Perfil"),
+    ("nist", "NIST"),
+]
+
+
+def corpo_do_modulo(slug: str, catalogo: Optional[Dict[str, dict]] = None) -> Optional[Path]:
+    """Fragmento `_geradores/<snake>_body.html` do módulo, ou None se não houver.
+
+    Casa o nome do arquivo com o slug, a pasta ou o arquivo HTML do catálogo pela
+    mesma normalização usada por montar.py e gerar.sh.
+    """
+    catalogo = carregar_catalogo_estudos() if catalogo is None else catalogo
+    info = catalogo.get(slug, {})
+    chaves = {
+        normalizar_chave(v)
+        for v in (slug, info.get("pasta", ""), info.get("arquivo_html", ""))
+        if v
+    }
+    for corpo in sorted(GERADORES_DIR.glob("*_body.html")):
+        if normalizar_chave(corpo.name) in chaves:
+            return corpo
+    return None
+
+
+@lru_cache(maxsize=None)
+def contar_secoes(slug: str) -> int:
+    """Total de seções de primeiro nível do corpo do módulo (0 se não houver corpo)."""
+    corpo = corpo_do_modulo(slug)
+    if corpo is None:
+        return 0
+    return len(extrair_secoes(corpo.read_text(encoding="utf-8")))
 
 
 def calcular_estatisticas(catalogo: Dict[str, dict], dados: Dict[str, dict]) -> dict:
@@ -82,8 +134,13 @@ def calcular_estatisticas(catalogo: Dict[str, dict], dados: Dict[str, dict]) -> 
     }
 
 
-def render_necessidades_grid(necessidades: List[dict]) -> str:
-    """Gera o HTML da grade de desafios práticos do mundo real."""
+def render_necessidades_grid(necessidades: List[dict], status_map: Optional[Dict[str, dict]] = None) -> str:
+    """Gera o HTML da grade de desafios práticos do mundo real.
+
+    Cada cartão leva ao módulo compilado; sem o módulo (ou sem status_map), aponta
+    para o cartão do módulo no catálogo (#estudo-<slug>).
+    """
+    status_map = status_map or {}
     cards_html = []
     for item in necessidades:
         slug = item["slug"]
@@ -92,8 +149,10 @@ def render_necessidades_grid(necessidades: List[dict]) -> str:
         icone = item.get("icone", "🎯")
         estudo_info = ESTUDOS_DADOS.get(slug, {})
         titulo_estudo = escape(estudo_info.get("titulo", slug))
+        info = status_map.get(slug, {})
+        href = escape(info["caminho_relativo"], quote=True) if info.get("disponivel") else f"#estudo-{slug}"
 
-        card = f"""      <a href="#estudo-{slug}" class="need-card" data-slug="{slug}" onclick="focarEstudo('{slug}')">
+        card = f"""      <a href="{href}" class="need-card" data-slug="{slug}">
         <span class="need-category">{icone} {cat}</span>
         <span class="need-title">{desafio}</span>
         <span class="need-target">→ Ver módulo: {titulo_estudo}</span>
@@ -103,140 +162,136 @@ def render_necessidades_grid(necessidades: List[dict]) -> str:
     return "\n".join(cards_html)
 
 
-def render_study_cards(
-    catalogo: Dict[str, dict],
-    dados: Dict[str, dict],
-    status_map: Dict[str, dict],
-) -> str:
-    """Gera o HTML dos cartões de estudos com metadados e simuladores."""
-    cards_html = []
+def render_cartao(slug: str, d: dict, status_info: dict) -> str:
+    """Cartão de módulo do catálogo (a.mc), com os atributos lidos pelo JS do portal.
 
-    for slug, d in dados.items():
-        trilha_id = d["trilha"]
-        trilha_info = TRILHAS.get(trilha_id, {})
-        status_info = status_map.get(slug, {"disponivel": False, "caminho_relativo": ""})
-        disponivel = status_info["disponivel"]
-        link_estudo = status_info["caminho_relativo"]
-
-        titulo = escape(d["titulo"])
-        subtitulo = escape(d["subtitulo"])
-        pergunta = escape(d["pergunta_chave"])
-        simulador = escape(d["simulador_nome"])
-        nist = escape(d["nist"])
-        tempo = d["tempo_minutos"]
-        carreiras_str = ",".join(d["carreiras"])
-        rotas_str = " ".join(r["id"] for r in ROTAS_PERFIL if slug in r["modulos"])
-        certs_str = " ".join(c["sigla"] for c in CERTIFICACOES if slug in c["modulos"])
-        nivel = d["nivel"]
-        nivel_rotulo = escape(NIVEIS[nivel])
-
-        # Lista de termos para busca em tempo real
-        fatos_texto = " ".join(d["fatos"])
-        search_terms = escape(
-            f"{slug} {titulo} {subtitulo} {pergunta} {simulador} {nist} {carreiras_str} {fatos_texto}".lower()
-        )
-
-        fatos_li = "\n".join(
-            f'          <li>{escape(fato)}</li>' for fato in d["fatos"]
-        )
-
-        if disponivel:
-            badge_status = '<span class="status-badge pronto">Disponível</span>'
-            btn_action = f'<a href="{link_estudo}" class="btn-open-study">Acessar Estudo →</a>'
-        else:
-            badge_status = '<span class="status-badge preparo">Em elaboração</span>'
-            btn_action = '<span class="btn-disabled">Em elaboração</span>'
-
-        card = f"""    <article class="study-card" id="estudo-{slug}"
-      data-slug="{slug}"
-      data-trilha="{trilha_id}"
-      data-nist="{nist}"
-      data-carreiras="{escape(carreiras_str)}"
-      data-rotas="{rotas_str}"
-      data-certs="{escape(certs_str, quote=True)}"
-      data-nivel="{nivel}"
-      data-search="{search_terms}">
-      
-      <div class="card-header">
-        <div class="card-tile-group">
-          <div class="track-tile t{trilha_id}" title="Trilha {trilha_id}: {trilha_info.get('nome', '')}">
-            {trilha_id}
-          </div>
-          <div class="card-badges">
-            <span class="badge badge-nist">🛡️ NIST: {nist}</span>
-            <span class="badge badge-time">⏱️ {tempo} min</span>
-            <span class="badge badge-nivel nivel-{nivel}">{nivel_rotulo}</span>
-            <span class="badge badge-sim">🧪 {simulador}</span>
-          </div>
-        </div>
-        {badge_status}
-      </div>
-
-      <h3 class="study-title">{titulo}</h3>
-      <p class="study-desc">{subtitulo}</p>
-
-      <div class="study-ask">
-        <strong>Responde a:</strong>
-        {pergunta}
-      </div>
-
-      <ul class="study-facts">
-{fatos_li}
-      </ul>
-
-      <div class="card-actions">
-        {btn_action}
-        <label class="done-label">
-          <input type="checkbox" data-slug="{slug}" onchange="toggleDone('{slug}', this.checked)">
-          <span>Estudo Concluído</span>
-        </label>
-      </div>
-    </article>"""
-        cards_html.append(card)
-
-    return "\n\n".join(cards_html)
-
-
-def _botao_filtro(valor: str, rotulo: str, ativo: bool = False) -> str:
-    """Gera um botão de filtro; valor e rótulo já devem estar escapados."""
-    classe = "filter-badge active" if ativo else "filter-badge"
-    return (
-        f'<button class="{classe}" data-value="{valor}" '
-        f'onclick="setSubFilter(this.dataset.value, this)">{rotulo}</button>'
+    Mostra número, tempo, título, subtítulo, nível, NIST, simulador e o status
+    (.mc-status, vazio no HTML e preenchido pelo JS).
+    """
+    numero = list(ESTUDOS_DADOS).index(slug) + 1
+    titulo = escape(d["titulo"])
+    subtitulo = escape(d["subtitulo"])
+    simulador = escape(d["simulador_nome"])
+    nist = escape(d["nist"], quote=True)
+    nivel = d["nivel"]
+    perfis = escape("|".join(d["carreiras"]), quote=True)
+    rotas_str = " ".join(r["id"] for r in ROTAS_PERFIL if slug in r["modulos"])
+    certs_str = escape(" ".join(c["sigla"] for c in CERTIFICACOES if slug in c["modulos"]), quote=True)
+    busca = escape(
+        " ".join([
+            slug, d["titulo"], d["subtitulo"], d["pergunta_chave"], d["simulador_nome"],
+            d["nist"], " ".join(d["carreiras"]), " ".join(d["fatos"]),
+        ]).lower(),
+        quote=True,
     )
 
+    if status_info.get("disponivel"):
+        destino = f'href="{escape(status_info["caminho_relativo"], quote=True)}"'
+        classe = "mc"
+        pendente = ""
+    else:
+        destino = 'aria-disabled="true"'
+        classe = "mc pendente"
+        pendente = '<span class="tag tag-pendente">⏳ Em elaboração</span>'
 
-def render_filtros_trilha(trilhas: Dict[int, dict]) -> str:
-    """Gera os botões do filtro por trilha a partir de TRILHAS."""
-    botoes = [_botao_filtro("all", "Todas as Trilhas", ativo=True)]
-    for tid, info in trilhas.items():
-        botoes.append(_botao_filtro(str(tid), f"Trilha {tid}: {escape(info['nome'])}"))
-    return "\n        ".join(botoes)
+    return f"""          <a class="{classe}" id="estudo-{slug}"
+            data-slug="{slug}"
+            data-trilha="{d['trilha']}"
+            data-nivel="{nivel}"
+            data-perfis="{perfis}"
+            data-nist="{nist}"
+            data-secoes="{contar_secoes(slug)}"
+            data-rotas="{rotas_str}"
+            data-certs="{certs_str}"
+            data-busca="{busca}"
+            {destino}>
+            <span class="mc-top"><span class="mc-num">Estudo {numero:02d}</span><span class="mc-tempo">⏱ {d['tempo_minutos']} min</span></span>
+            <h3 class="mc-titulo">{titulo}</h3>
+            <p class="mc-sub">{subtitulo}</p>
+            <span class="mc-tags"><span class="tag tag-nivel">{escape(NIVEIS[nivel])}</span><span class="tag">NIST {escape(d['nist'])}</span><span class="tag lab">🧪 {simulador}</span>{pendente}</span>
+            <span class="mc-status"></span>
+          </a>"""
 
 
-def render_filtros_carreira(carreiras: Dict[str, dict]) -> str:
-    """Gera os botões do filtro por perfil profissional a partir de CARREIRAS."""
-    botoes = [_botao_filtro("all", "Todos os Perfis", ativo=True)]
-    for info in carreiras.values():
-        nome = escape(info["nome"])
-        botoes.append(_botao_filtro(nome, f"{info['icone']} {nome}"))
-    return "\n        ".join(botoes)
+def render_catalogo(dados: Dict[str, dict], status_map: Dict[str, dict]) -> str:
+    """Grupos do catálogo, um por trilha (agrupamento padrão; funciona sem JS)."""
+    grupos = []
+    for tid, info in TRILHAS.items():
+        slugs = [s for s, d in dados.items() if d["trilha"] == tid]
+        if not slugs:
+            continue
+        cartoes = "\n".join(
+            render_cartao(s, dados[s], status_map.get(s, {"disponivel": False, "caminho_relativo": ""}))
+            for s in slugs
+        )
+        grupos.append(f"""        <div class="grupo" data-trilha="{tid}">
+          <div class="grupo-cab"><span class="k">Trilha {tid}</span><h2>{escape(info['nome'])}</h2><span class="p">0 de {len(slugs)} concluídos</span></div>
+          <div class="grid">
+{cartoes}
+          </div>
+        </div>""")
+    return "\n".join(grupos)
 
 
-def render_filtros_rota(rotas: List[dict]) -> str:
-    """Gera os botões da aba Rotas Sugeridas a partir de ROTAS_PERFIL."""
-    botoes = [_botao_filtro("all", "Escolha uma rota", ativo=True)]
-    for r in rotas:
-        botoes.append(_botao_filtro(escape(r["id"]), f"{r['icone']} {escape(r['nome'])}"))
-    return "\n        ".join(botoes)
+def render_menu_lateral(contagens: Dict[str, int]) -> str:
+    """Links do menu lateral (nav.menu-lateral), um por visão; o Catálogo começa ativo."""
+    links = []
+    for vid, icone, rotulo in VISOES:
+        atual = ' aria-current="page"' if vid == "catalogo" else ""
+        n = f' <span class="n">{contagens[vid]}</span>' if vid in contagens else ""
+        links.append(f'      <a href="#v-{vid}" data-view="{vid}"{atual}>{icone} {rotulo}{n}</a>')
+    return "\n".join(links)
+
+
+def render_progresso_global(stats: dict) -> str:
+    """Bloco "Seu progresso" do menu lateral; o JS preenche os campos data-gp."""
+    total = stats["total_estudos"]
+    return f"""    <div class="gprog" id="progresso-global">
+      <span class="gp-rotulo">Seu progresso</span>
+      <p class="gp-total"><b data-gp="concluidos">0</b> de {total} concluídos</p>
+      <div class="bar" role="progressbar" aria-label="Módulos concluídos" aria-valuemin="0" aria-valuemax="{total}" aria-valuenow="0"><i data-gp="barra"></i></div>
+      <div class="gp-row"><span><span data-gp="andamento">0</span> em andamento</span><span>~{stats["tempo_total_minutos"]} min</span></div>
+      <div class="gp-row"><span>Módulos Compilados</span><span>{stats["estudos_disponiveis"]} / {total}</span></div>
+    </div>"""
+
+
+def render_meu_progresso(dados: Dict[str, dict], status_map: Dict[str, dict]) -> str:
+    """Lista "Meu progresso": um item por módulo, com a caixa de conclusão (cs_done_<slug>)."""
+    total = len(dados)
+    itens = []
+    for numero, (slug, d) in enumerate(dados.items(), start=1):
+        titulo = escape(d["titulo"])
+        info = status_map.get(slug, {"disponivel": False, "caminho_relativo": ""})
+        if info["disponivel"]:
+            href = escape(info["caminho_relativo"], quote=True)
+            alvo = f'<a class="progresso-titulo" href="{href}">{titulo}</a>'
+            disp = '<span class="progresso-disp">Disponível</span>'
+        else:
+            alvo = f'<span class="progresso-titulo pendente">{titulo}</span>'
+            disp = '<span class="progresso-disp pendente">⏳ Em elaboração</span>'
+        itens.append(
+            f'        <li class="progresso-item">'
+            f'<input type="checkbox" data-slug="{slug}" id="feito-{slug}" '
+            f'aria-label="Concluí o Estudo {numero:02d}: {titulo}">'
+            f'<span class="progresso-num">{numero:02d}</span>{alvo}{disp}</li>'
+        )
+    lista = "\n".join(itens)
+    return f"""      <div class="progresso-resumo">
+        <span class="progresso-texto" id="progresso-texto">0 de {total} concluídos (0%)</span>
+        <div class="bar" role="progressbar" aria-label="Módulos concluídos" aria-valuemin="0" aria-valuemax="{total}" aria-valuenow="0"><i></i></div>
+        <button type="button" class="btn" id="zerar-progresso">Zerar progresso salvo no navegador</button>
+      </div>
+      <ol class="progresso-lista" id="progresso-lista">
+{lista}
+      </ol>"""
 
 
 def _render_painel(grupos: List[dict], status_map: Dict[str, dict], secao_id: str, comentario: str) -> str:
     """Painel com passos (módulos), progresso e próximo módulo, um bloco por grupo.
 
     Cada grupo traz: id, titulo (cabeçalho), descricao e modulos (slugs na ordem de exibição).
-    Começa oculto; o JavaScript do portal mostra o grupo ativo e calcula o progresso a partir
-    das chaves cs_done_<slug> salvas no navegador.
+    Todos os grupos ficam visíveis dentro da visão; o JavaScript do portal calcula o
+    progresso e o próximo módulo a partir das chaves cs_done_<slug> salvas no navegador.
     """
     ordem = list(ESTUDOS_DADOS)
     blocos = []
@@ -258,7 +313,7 @@ def _render_painel(grupos: List[dict], status_map: Dict[str, dict], secao_id: st
                 f'<span class="rota-passo-check" aria-label="concluído">✓</span></li>'
             )
         total = len(g["modulos"])
-        blocos.append(f"""      <div class="rota-sugerida" data-rota="{escape(g['id'], quote=True)}" hidden>
+        blocos.append(f"""      <div class="rota-sugerida" data-rota="{escape(g['id'], quote=True)}">
         <div class="rota-cabecalho">
           <h2>{g['titulo']}</h2>
           <p>{escape(g['descricao'])}</p>
@@ -273,30 +328,22 @@ def _render_painel(grupos: List[dict], status_map: Dict[str, dict], secao_id: st
         </ol>
       </div>""")
     return f"""    <!-- {comentario} -->
-    <section class="rota-sugerida-section" id="{secao_id}" hidden aria-live="polite">
+    <section class="rota-sugerida-section" id="{secao_id}">
 {chr(10).join(blocos)}
     </section>"""
 
 
 def render_painel_rotas(rotas: List[dict], status_map: Dict[str, dict]) -> str:
-    """Painel da aba Rotas Sugeridas: passos na ordem de estudo da rota."""
+    """Painel da visão Rotas sugeridas: passos na ordem de estudo da rota."""
     grupos = [
         {"id": r["id"], "titulo": f"{r['icone']} Rota: {escape(r['nome'])}", "descricao": r["descricao"], "modulos": r["modulos"]}
         for r in rotas
     ]
-    return _render_painel(grupos, status_map, "secao-rota-sugerida", "Seção: Rota Sugerida (aba Rotas Sugeridas)")
-
-
-def render_filtros_certificacao(certs: List[dict]) -> str:
-    """Gera os botões da aba Por Certificação a partir de CERTIFICACOES."""
-    botoes = [_botao_filtro("all", "Escolha uma certificação", ativo=True)]
-    for c in certs:
-        botoes.append(_botao_filtro(escape(c["sigla"], quote=True), f"🎓 {escape(c['sigla'])}"))
-    return "\n        ".join(botoes)
+    return _render_painel(grupos, status_map, "secao-rota-sugerida", "Painel: rotas sugeridas (visão Rotas sugeridas)")
 
 
 def render_painel_certificacoes(certs: List[dict], status_map: Dict[str, dict]) -> str:
-    """Painel da aba Por Certificação: módulos que cobrem a prova, em ordem numérica."""
+    """Painel da visão Por certificação: módulos que cobrem a prova, em ordem numérica."""
     ordem = list(ESTUDOS_DADOS)
     grupos = [
         {
@@ -307,7 +354,7 @@ def render_painel_certificacoes(certs: List[dict], status_map: Dict[str, dict]) 
         }
         for c in certs
     ]
-    return _render_painel(grupos, status_map, "secao-cert-painel", "Seção: Certificação escolhida (aba Por Certificação)")
+    return _render_painel(grupos, status_map, "secao-cert-painel", "Painel: progresso por certificação (visão Por certificação)")
 
 
 def render_chip_modulo(slug: str, status_map: Dict[str, dict], apoio: bool = False) -> str:
@@ -393,36 +440,10 @@ def render_certificacoes(certs: List[dict], status_map: Dict[str, dict]) -> str:
     </section>"""
 
 
-def gerar_index_html(
-    output_path: Optional[Path] = None,
-    css_path: Optional[Path] = None,
-) -> Path:
-    """Gera o arquivo index.html completo e standalone na raiz do projeto."""
-    out_file = Path(output_path) if output_path else DEFAULT_OUTPUT_HTML
-    css_file = Path(css_path) if css_path else DEFAULT_INDEX_CSS
-
-    css_content = css_file.read_text(encoding="utf-8") if css_file.exists() else ""
-    catalogo = carregar_catalogo_estudos()
-    stats = calcular_estatisticas(catalogo, ESTUDOS_DADOS)
-
-    necessidades_html = render_necessidades_grid(NECESSIDADES)
-    rota_vaga_html = render_rota_vaga(ROTA_VAGA, stats["status_map"])
-    certificacoes_html = render_certificacoes(CERTIFICACOES, stats["status_map"])
-    cards_html = render_study_cards(catalogo, ESTUDOS_DADOS, stats["status_map"])
-
-    filtros_trilha_html = render_filtros_trilha(TRILHAS)
-    filtros_carreira_html = render_filtros_carreira(CARREIRAS)
-    filtros_rota_html = render_filtros_rota(ROTAS_PERFIL)
-    painel_rotas_html = render_painel_rotas(ROTAS_PERFIL, stats["status_map"])
-    filtros_cert_html = render_filtros_certificacao(CERTIFICACOES)
-    filtros_nivel_html = "\n        ".join(
-        [_botao_filtro("all", "Todos os Níveis", ativo=True)]
-        + [_botao_filtro(chave, escape(rotulo)) for chave, rotulo in NIVEIS.items()]
-    )
-    painel_cert_html = render_painel_certificacoes(CERTIFICACOES, stats["status_map"])
-
-    # JavaScript do Portal Central
-    portal_js = """
+# JavaScript do portal. Nesta etapa: armazenamento seguro, tema (mesmo mecanismo dos
+# módulos: chave cs_theme, sem data-theme enquanto o leitor não escolher) e a busca,
+# que filtra os cartões do catálogo e os itens com data-slug das visões especiais.
+PORTAL_JS = """
   // --------------------------------------------------------------------------
   // 0. Utilitários Seguros de Armazenamento Local (localStorage)
   // --------------------------------------------------------------------------
@@ -449,18 +470,6 @@ def gerar_index_html(
     return false;
   }
 
-  function safeStorageRemove(key) {
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.removeItem(key);
-        return true;
-      }
-    } catch (e) {
-      console.warn('[CS] Falha ao remover localStorage chave "' + key + '":', e);
-    }
-    return false;
-  }
-
   // --------------------------------------------------------------------------
   // 1. Normalização de Texto com Remoção de Acentos (Accent Folding)
   // --------------------------------------------------------------------------
@@ -470,251 +479,85 @@ def gerar_index_html(
   }
 
   // --------------------------------------------------------------------------
-  // 2. Gerenciador de Tema (Claro / Escuro)
+  // 2. Tema (Claro / Escuro): mesmo mecanismo dos módulos (cs_theme)
   // --------------------------------------------------------------------------
-  function initTheme() {
-    const savedTheme = safeStorageGet('cs_theme');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
-    applyTheme(theme);
+  function temaDoSistema() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
 
-  function applyTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    safeStorageSet('cs_theme', theme);
-    const icon = document.querySelector('.theme-icon');
-    const label = document.querySelector('.theme-label');
-    if (icon && label) {
-      if (theme === 'dark') {
-        icon.textContent = '☀️';
-        label.textContent = 'Claro';
-      } else {
-        icon.textContent = '🌙';
-        label.textContent = 'Escuro';
-      }
+  function temaAtual() {
+    return safeStorageGet('cs_theme') || temaDoSistema();
+  }
+
+  function atualizarBotoesTema(tema) {
+    document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+      const escuro = tema === 'dark';
+      btn.setAttribute('aria-label', escuro ? 'Alternar para tema claro' : 'Alternar para tema escuro');
+      btn.innerHTML = escuro
+        ? '<span class="theme-icon">☀️</span> <span class="theme-label">Claro</span>'
+        : '<span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>';
+    });
+  }
+
+  function applyTheme(tema) {
+    if (tema === 'dark' || tema === 'light') {
+      document.documentElement.setAttribute('data-theme', tema);
+      atualizarBotoesTema(tema);
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      atualizarBotoesTema(temaDoSistema());
     }
   }
 
   function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-    const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    applyTheme(nextTheme);
+    const proximo = temaAtual() === 'dark' ? 'light' : 'dark';
+    safeStorageSet('cs_theme', proximo);
+    applyTheme(proximo);
   }
 
-  // --------------------------------------------------------------------------
-  // 3. Gerenciador de Progresso Global do Estudante
-  // --------------------------------------------------------------------------
-  const TOTAL_ESTUDOS = __TOTAL_ESTUDOS__;
-
-  function initProgress() {
-    let concluidos = 0;
-    const cards = document.querySelectorAll('.study-card');
-    
-    cards.forEach(card => {
-      const slug = card.getAttribute('data-slug');
-      const isDone = safeStorageGet('cs_done_' + slug) === 'true';
-      const checkbox = card.querySelector('input[type="checkbox"]');
-      if (checkbox) {
-        checkbox.checked = isDone;
-      }
-      if (isDone) {
-        card.classList.add('card-done');
-        concluidos++;
-      } else {
-        card.classList.remove('card-done');
-      }
-    });
-
-    updateProgressUI(concluidos);
-    atualizarPainelRota();
-  }
-
-  // Painel da aba Rotas Sugeridas: mostra a rota escolhida, marca os passos
-  // concluídos (mesmas chaves cs_done_<slug>) e destaca o próximo módulo.
-  function atualizarPainelRota() {
-    atualizarPainel('secao-rota-sugerida', 'rotas');
-    atualizarPainel('secao-cert-painel', 'certs');
-  }
-
-  // Mostra o grupo ativo (rota ou certificação), marca os passos concluídos
-  // (mesmas chaves cs_done_<slug>) e destaca o próximo módulo.
-  function atualizarPainel(secaoId, facet) {
-    const secao = document.getElementById(secaoId);
-    if (!secao) return;
-    const ativa = (typeof currentFacet !== 'undefined' && currentFacet === facet && currentFilterValue !== 'all') ? currentFilterValue : null;
-    secao.hidden = !ativa;
-    secao.querySelectorAll('.rota-sugerida').forEach(div => {
-      const selecionada = div.getAttribute('data-rota') === ativa;
-      div.hidden = !selecionada;
-      if (!selecionada) return;
-      const passos = Array.from(div.querySelectorAll('.rota-passo'));
-      let feitos = 0;
-      let proximo = null;
-      passos.forEach(li => {
-        const feito = safeStorageGet('cs_done_' + li.getAttribute('data-slug')) === 'true';
-        li.classList.toggle('feito', feito);
-        li.classList.remove('proximo');
-        if (feito) feitos++;
-        else if (!proximo) proximo = li;
+  function initTheme() {
+    const salvo = safeStorageGet('cs_theme');
+    if (salvo) applyTheme(salvo);
+    else atualizarBotoesTema(temaAtual());
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (!safeStorageGet('cs_theme')) atualizarBotoesTema(temaDoSistema());
       });
-      if (proximo) proximo.classList.add('proximo');
-      const pct = passos.length ? Math.round((feitos / passos.length) * 100) : 0;
-      div.querySelector('.rota-progresso-barra').setAttribute('aria-valuenow', String(feitos));
-      div.querySelector('.rota-progresso-preenchido').style.width = pct + '%';
-      div.querySelector('.rota-progresso-texto').textContent = feitos + ' de ' + passos.length + ' concluídos (' + pct + '%)';
-      div.querySelector('.rota-proximo').textContent = proximo
-        ? 'Próximo módulo: ' + proximo.getAttribute('data-rotulo')
-        : 'Tudo concluído! Todos os módulos foram marcados como estudados.';
-    });
-  }
-
-
-  function toggleDone(slug, isDone) {
-    if (isDone) {
-      safeStorageSet('cs_done_' + slug, 'true');
-    } else {
-      safeStorageRemove('cs_done_' + slug);
     }
-    const card = document.getElementById('estudo-' + slug);
-    if (card) {
-      if (isDone) {
-        card.classList.add('card-done');
-      } else {
-        card.classList.remove('card-done');
-      }
-    }
-    initProgress();
-    if (currentFacet === 'progresso') filtrarCards();
-  }
-
-  function resetProgress() {
-    if (confirm('Deseja realmente zerar todo o progresso de estudos concluídos registrado neste navegador?')) {
-      const cards = document.querySelectorAll('.study-card');
-      cards.forEach(card => {
-        const slug = card.getAttribute('data-slug');
-        safeStorageRemove('cs_done_' + slug);
-      });
-      initProgress();
-    }
-  }
-
-  function updateProgressUI(concluidos) {
-    const pct = Math.round((concluidos / TOTAL_ESTUDOS) * 100);
-    const progressBar = document.getElementById('progress-bar');
-    const progressText = document.getElementById('progress-text');
-    if (progressBar) {
-      progressBar.style.width = pct + '%';
-    }
-    if (progressText) {
-      progressText.innerHTML = `<strong>${concluidos}</strong> de <strong>${TOTAL_ESTUDOS}</strong> concluídos (${pct}%)`;
-    }
+    document.querySelectorAll('.theme-toggle-btn').forEach(btn => btn.addEventListener('click', toggleTheme));
   }
 
   // --------------------------------------------------------------------------
-  // 4. Filtros Multifacetados e Busca em Tempo Real
+  // 3. Busca: cartões do catálogo (data-busca) e itens das visões especiais
   // --------------------------------------------------------------------------
-  let currentFacet = 'todas';
-  let currentFilterValue = 'all';
-
-  function switchTab(facetName) {
-    currentFacet = facetName;
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-facet') === facetName);
-    });
-
-    document.querySelectorAll('.filter-subpanel').forEach(panel => {
-      panel.style.display = panel.getAttribute('data-panel') === facetName ? 'flex' : 'none';
-    });
-
-    currentFilterValue = 'all';
-    document.querySelectorAll(`.filter-subpanel[data-panel="${facetName}"] .filter-badge`).forEach(b => {
-      b.classList.toggle('active', b.getAttribute('data-value') === 'all');
-    });
-
-    filtrarCards();
-  }
-
-  function setSubFilter(value, element) {
-    currentFilterValue = value;
-    const parent = element.parentElement;
-    parent.querySelectorAll('.filter-badge').forEach(b => b.classList.remove('active'));
-    element.classList.add('active');
-    filtrarCards();
-  }
-
   function filtrarCards() {
-    const rawQuery = (document.getElementById('search-input').value || '').trim();
-    const query = removerAcentos(rawQuery);
-    const clearBtn = document.querySelector('.clear-search-btn');
-    if (clearBtn) {
-      clearBtn.style.display = rawQuery.length > 0 ? 'block' : 'none';
-    }
-
-    const cards = document.querySelectorAll('.study-card');
-    let visibleCount = 0;
+    const input = document.getElementById('busca');
+    const query = removerAcentos((input && input.value || '').trim());
     const slugsVisiveis = new Set();
+    let visiveis = 0;
 
-    cards.forEach(card => {
-      const cardSearchRaw = card.getAttribute('data-search') || '';
-      const cardSearch = removerAcentos(cardSearchRaw);
-      const cardTrilha = card.getAttribute('data-trilha');
-      const cardNist = card.getAttribute('data-nist');
-      const cardCarreiras = card.getAttribute('data-carreiras') || '';
-
-      let matchSearch = !query || cardSearch.includes(query);
-      let matchFacet = true;
-
-      if (currentFacet === 'trilhas' && currentFilterValue !== 'all') {
-        matchFacet = cardTrilha === currentFilterValue;
-      } else if (currentFacet === 'nist' && currentFilterValue !== 'all') {
-        matchFacet = cardNist.includes(currentFilterValue);
-      } else if (currentFacet === 'carreiras' && currentFilterValue !== 'all') {
-        matchFacet = cardCarreiras.includes(currentFilterValue);
-      } else if (currentFacet === 'rotas' && currentFilterValue !== 'all') {
-        const cardRotas = ' ' + (card.getAttribute('data-rotas') || '') + ' ';
-        matchFacet = cardRotas.includes(' ' + currentFilterValue + ' ');
-      } else if (currentFacet === 'certs' && currentFilterValue !== 'all') {
-        const cardCerts = ' ' + (card.getAttribute('data-certs') || '') + ' ';
-        matchFacet = cardCerts.includes(' ' + currentFilterValue + ' ');
-      } else if (currentFacet === 'nivel' && currentFilterValue !== 'all') {
-        matchFacet = card.getAttribute('data-nivel') === currentFilterValue;
-      } else if (currentFacet === 'progresso' && currentFilterValue !== 'all') {
-        const feito = safeStorageGet('cs_done_' + card.getAttribute('data-slug')) === 'true';
-        matchFacet = currentFilterValue === 'concluidos' ? feito : !feito;
-      }
-
-      if (matchSearch && matchFacet) {
-        card.style.display = 'flex';
-        visibleCount++;
+    document.querySelectorAll('.mc[data-slug]').forEach(card => {
+      const ok = !query || removerAcentos(card.getAttribute('data-busca')).includes(query);
+      card.hidden = !ok;
+      if (ok) {
+        visiveis++;
         slugsVisiveis.add(card.getAttribute('data-slug'));
-      } else {
-        card.style.display = 'none';
       }
     });
+    document.querySelectorAll('#grupos .grupo').forEach(grupo => {
+      grupo.hidden = !grupo.querySelector('.mc:not([hidden])');
+    });
 
-    const filtroAtivo = query.length > 0 || (currentFacet !== 'todas' && currentFilterValue !== 'all');
-    filtrarSecoesRelacionadas(slugsVisiveis, filtroAtivo);
-    atualizarPainelRota();
+    const contagem = document.getElementById('contagem');
+    if (contagem) contagem.textContent = visiveis + (visiveis === 1 ? ' módulo' : ' módulos');
+    const vazio = document.getElementById('sem-resultados');
+    if (vazio) vazio.hidden = visiveis > 0;
 
-    const info = document.getElementById('visible-count');
-    if (info) {
-      info.textContent = `Exibindo ${visibleCount} de ${TOTAL_ESTUDOS} estudos`;
-    }
-
-    const noResults = document.getElementById('no-results-msg');
-    if (noResults) {
-      noResults.style.display = visibleCount === 0 ? 'block' : 'none';
-      const texto = document.getElementById('no-results-texto');
-      if (texto) {
-        texto.textContent = (currentFacet === 'progresso' && currentFilterValue === 'concluidos' && !query)
-          ? 'Você ainda não marcou nenhum módulo como concluído. Marque a caixa "Estudo Concluído" no card de cada módulo que terminar.'
-          : 'Nenhum estudo encontrado com os critérios de busca aplicados.';
-      }
-    }
+    filtrarSecoesRelacionadas(slugsVisiveis, query.length > 0);
   }
 
-  // Necessidades, Rota da Vaga e Certificações seguem o mesmo filtro dos cards:
-  // com filtro ativo, só ficam os itens cujo data-slug está entre os módulos visíveis.
+  // Necessidades, Rota da Vaga e Certificações seguem a busca dos cartões:
+  // com busca ativa, só ficam os itens cujo data-slug está entre os módulos visíveis.
   // Grupos (competência, linha de certificação) e seções que ficam vazios somem.
   function filtrarSecoesRelacionadas(slugsVisiveis, filtroAtivo) {
     const mostra = el => !filtroAtivo || slugsVisiveis.has(el.getAttribute('data-slug'));
@@ -742,7 +585,7 @@ def gerar_index_html(
   }
 
   function clearSearch() {
-    const input = document.getElementById('search-input');
+    const input = document.getElementById('busca');
     if (input) {
       input.value = '';
       input.focus();
@@ -750,234 +593,172 @@ def gerar_index_html(
     }
   }
 
-  function focarEstudo(slug) {
-    const card = document.getElementById('estudo-' + slug);
-    if (card) {
-      card.style.display = 'flex';
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      card.classList.add('highlight-pulse');
-      setTimeout(() => card.classList.remove('highlight-pulse'), 2000);
-    }
-  }
-
-  // Inicialização no Carregamento do DOM
   document.addEventListener('DOMContentLoaded', () => {
     initTheme();
-    initProgress();
-    
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-      searchInput.addEventListener('input', filtrarCards);
-    }
-
-    // Suporte a âncora direta na URL (ex: #estudo-Fundamentos-Ciber)
-    if (window.location.hash) {
-      const hashId = window.location.hash.substring(1);
-      const target = document.getElementById(hashId);
-      if (target) {
-        setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-      }
-    }
+    const input = document.getElementById('busca');
+    if (input) input.addEventListener('input', filtrarCards);
+    const limpar = document.getElementById('limpar-busca');
+    if (limpar) limpar.addEventListener('click', clearSearch);
   });
 """
-    portal_js = portal_js.replace("__TOTAL_ESTUDOS__", str(stats["total_estudos"]))
+
+
+def gerar_index_html(
+    output_path: Optional[Path] = None,
+    css_path: Optional[Path] = None,
+) -> Path:
+    """Gera o arquivo index.html completo e standalone na raiz do projeto."""
+    out_file = Path(output_path) if output_path else DEFAULT_OUTPUT_HTML
+    css_file = Path(css_path) if css_path else DEFAULT_INDEX_CSS
+
+    # Fontes embutidas + tokens + CSS do portal, nessa ordem.
+    css_partes = [css_fontes(), TOKENS_CSS.read_text(encoding="utf-8")]
+    if css_file.exists():
+        css_partes.append(css_file.read_text(encoding="utf-8"))
+    css_content = "\n".join(css_partes)
+
+    catalogo = carregar_catalogo_estudos()
+    stats = calcular_estatisticas(catalogo, ESTUDOS_DADOS)
+    status_map = stats["status_map"]
+    total = stats["total_estudos"]
+
+    menu_html = render_menu_lateral({
+        "catalogo": total,
+        "rotas": len(ROTAS_PERFIL),
+        "certificacoes": len(CERTIFICACOES),
+        "necessidades": len(NECESSIDADES),
+        "vaga": len(ROTA_VAGA),
+    })
+    progresso_global_html = render_progresso_global(stats)
+    grupos_html = render_catalogo(ESTUDOS_DADOS, status_map)
+    agrupar_html = "".join(
+        f'<button type="button" data-grupo="{gid}" aria-pressed="{"true" if gid == "trilha" else "false"}">{rotulo}</button>'
+        for gid, rotulo in GRUPOS_CATALOGO
+    )
+    painel_rotas_html = render_painel_rotas(ROTAS_PERFIL, status_map)
+    painel_cert_html = render_painel_certificacoes(CERTIFICACOES, status_map)
+    certificacoes_html = render_certificacoes(CERTIFICACOES, status_map)
+    necessidades_html = render_necessidades_grid(NECESSIDADES, status_map)
+    rota_vaga_html = render_rota_vaga(ROTA_VAGA, status_map)
+    meu_progresso_html = render_meu_progresso(ESTUDOS_DADOS, status_map)
 
     html_content = f"""<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Plataforma de estudos autoinstrucional e prática em cibersegurança com {stats["total_estudos"]} módulos temáticos, {stats["total_trilhas"]} trilhas e simuladores interativos em JavaScript.">
+  <meta name="description" content="Plataforma de estudos autoinstrucional e prática em cibersegurança com {total} módulos temáticos, {stats["total_trilhas"]} trilhas e simuladores interativos em JavaScript.">
   <title>Estudos de Cibersegurança — Catálogo e Portal Central</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%233b82f6' d='M32 4 8 14v16c0 15 10 26 24 30 14-4 24-15 24-30V14z'/%3E%3Cpath fill='%23ffffff' d='M28 40 19 31l4-4 5 5 13-13 4 4z'/%3E%3C/svg%3E">
-
-  <!-- Google Fonts: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-
   <style>
 {css_content}
   </style>
 </head>
 <body>
 
-  <div class="portal-container">
+<header class="topbar">
+  <div class="topbar-in">
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-lateral" aria-label="Abrir menu">☰</button>
+    <a class="brand" href="index.html" aria-label="Estudos de Cibersegurança — início">
+      <svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><path class="brand-escudo" d="M32 4 8 14v16c0 15 10 26 24 30 14-4 24-15 24-30V14z"/><path class="brand-check" d="M28 40 19 31l4-4 5 5 13-13 4 4z"/></svg>
+      <span class="brand-nome">Estudos de Cibersegurança</span>
+    </a>
+    <label class="busca">
+      <span class="busca-icone" aria-hidden="true">🔍</span>
+      <input type="search" id="busca" placeholder="Buscar módulo, protocolo, CVE, norma…" aria-label="Buscar módulos" autocomplete="off">
+      <kbd aria-hidden="true">/</kbd>
+    </label>
+    <button class="theme-toggle-btn" type="button" aria-label="Alternar tema"><span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span></button>
+  </div>
+</header>
 
-    <!-- Masthead e Identidade da Plataforma -->
-    <header class="masthead">
-      <div class="masthead-top">
-        <div>
-          <p class="kicker">Plataforma Autoinstrucional &bull; 100% Offline &bull; Prática em JavaScript</p>
-          <h1>Estudos de Cibersegurança</h1>
-        </div>
-        <button class="theme-toggle-btn" aria-label="Alternar tema" onclick="toggleTheme()">
-          <span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>
-        </button>
-      </div>
+<div class="shell">
+  <aside class="side" id="menu-lateral">
+    <span class="lbl" id="menu-rotulo">Explorar</span>
+    <nav class="menu-lateral" aria-label="Visões do portal">
+{menu_html}
+    </nav>
+{progresso_global_html}
+  </aside>
 
-      <p class="lead">
-        Formação técnica de alto nível em segurança defensiva, ofensiva, arquitetura, operações de SOC, governança e riscos cibernéticos, com fundamentação normativa (NIST CSF 2.0 / MITRE ATT&amp;CK) e simuladores práticos interativos em Vanilla JS.
-      </p>
+  <main class="main" id="conteudo">
 
-      <div class="byline">
-        Curadoria e Desenvolvimento Técnico por <strong>José Mauro da Silva Brandão</strong> &bull; Edição 2026
-      </div>
+    <!-- Visão: Catálogo (tela inicial) -->
+    <section class="view" data-view="catalogo">
+      <div class="catalogo" id="secao-catalogo">
+        <h1>Catálogo de módulos</h1>
+        <p class="lede">{total} módulos em {stats["total_trilhas"]} trilhas, com teoria, laboratório interativo, checklist e questões de concurso. Os simuladores são em JavaScript e tudo roda offline no seu navegador.</p>
 
-      <!-- Barra de Estatísticas do Portal -->
-      <div class="stats-bar">
-        <div class="stat-item">
-          <span class="stat-number">{stats["total_estudos"]}</span>
-          <span class="stat-label">Estudos Mapeados</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-number">{stats["total_trilhas"]}</span>
-          <span class="stat-label">Trilhas Temáticas</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-number">{stats["total_simuladores"]}</span>
-          <span class="stat-label">Simuladores Interativos</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-number">~{stats["tempo_total_minutos"]} min</span>
-          <span class="stat-label">Tempo Total ({stats["horas_totais"]}h)</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-number">{stats["estudos_disponiveis"]} / {stats["total_estudos"]}</span>
-          <span class="stat-label">Módulos Compilados</span>
-        </div>
-      </div>
-    </header>
+        <div id="continuar" class="continuar" hidden></div>
 
-    <!-- Rastreador de Progresso Global do Estudante -->
-    <section class="progress-section" aria-label="Progresso global">
-      <div class="progress-header">
-        <h2 class="progress-title">🎯 Progresso de Conclusão Global</h2>
-        <span class="progress-metrics" id="progress-text">0 de {stats["total_estudos"]} concluídos (0%)</span>
-      </div>
-      <div class="progress-bar-track">
-        <div class="progress-bar-fill" id="progress-bar"></div>
-      </div>
-      <div class="progress-actions">
-        <button class="btn-reset-progress" onclick="resetProgress()">Zerar progresso salvo no navegador</button>
+        <div class="toolbar">
+          <span class="l" id="agrupar-rotulo">Agrupar por</span>
+          <div class="seg agrupar" role="group" aria-labelledby="agrupar-rotulo">{agrupar_html}</div>
+          <label class="toggle"><input type="checkbox" id="so-pendentes"> Só não concluídos</label>
+          <span class="count" id="contagem" aria-live="polite">{total} módulos</span>
+        </div>
+
+        <div id="grupos">
+{grupos_html}
+        </div>
+        <div class="sem-resultados" id="sem-resultados" hidden>
+          <p>Nenhum módulo encontrado com essa busca.</p>
+          <button type="button" class="btn" id="limpar-busca">Limpar busca</button>
+        </div>
       </div>
     </section>
 
-    <!-- Controles de Busca e Filtros Multifacetados -->
-    <section class="controls-section" aria-label="Filtros e busca">
-      <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="search-input" placeholder="Buscar por palavra-chave, protocolo, comando, CVE, simulador ou norma..." aria-label="Buscar estudos">
-        <button class="clear-search-btn" aria-label="Limpar busca" onclick="clearSearch()">&times;</button>
-      </div>
-
-      <!-- Abas de Navegação -->
-      <nav class="filter-tabs" aria-label="Abas de filtragem">
-        <button class="tab-btn active" data-facet="todas" onclick="switchTab('todas')">Todas as Trilhas</button>
-        <button class="tab-btn" data-facet="trilhas" onclick="switchTab('trilhas')">Por Trilha Temática</button>
-        <button class="tab-btn" data-facet="carreiras" onclick="switchTab('carreiras')">Por Perfil Profissional</button>
-        <button class="tab-btn" data-facet="rotas" onclick="switchTab('rotas')">Rotas Sugeridas</button>
-        <button class="tab-btn" data-facet="certs" onclick="switchTab('certs')">Por Certificação</button>
-        <button class="tab-btn" data-facet="nivel" onclick="switchTab('nivel')">Por Nível</button>
-        <button class="tab-btn" data-facet="progresso" onclick="switchTab('progresso')">Meu Progresso</button>
-        <button class="tab-btn" data-facet="nist" onclick="switchTab('nist')">Por Função NIST CSF 2.0</button>
-      </nav>
-
-      <!-- Painel: Por Trilha -->
-      <div class="filter-subpanel" data-panel="trilhas" style="display: none;">
-        {filtros_trilha_html}
-      </div>
-
-      <!-- Painel: Por Perfil Profissional -->
-      <div class="filter-subpanel" data-panel="carreiras" style="display: none;">
-        {filtros_carreira_html}
-      </div>
-
-      <!-- Painel: Rotas Sugeridas -->
-      <div class="filter-subpanel" data-panel="rotas" style="display: none;">
-        {filtros_rota_html}
-      </div>
-
-      <!-- Painel: Por Certificação -->
-      <div class="filter-subpanel" data-panel="certs" style="display: none;">
-        {filtros_cert_html}
-      </div>
-
-      <!-- Painel: Por Nível -->
-      <div class="filter-subpanel" data-panel="nivel" style="display: none;">
-        {filtros_nivel_html}
-      </div>
-
-      <!-- Painel: Meu Progresso -->
-      <div class="filter-subpanel" data-panel="progresso" style="display: none;">
-        <button class="filter-badge active" data-value="all" onclick="setSubFilter(this.dataset.value, this)">Todos os módulos</button>
-        <button class="filter-badge" data-value="concluidos" onclick="setSubFilter(this.dataset.value, this)">✅ Concluídos</button>
-        <button class="filter-badge" data-value="a_estudar" onclick="setSubFilter(this.dataset.value, this)">📖 A estudar</button>
-      </div>
-
-      <!-- Painel: Por Função NIST CSF 2.0 -->
-      <div class="filter-subpanel" data-panel="nist" style="display: none;">
-        <button class="filter-badge active" data-value="all" onclick="setSubFilter('all', this)">Todas as Funções</button>
-        <button class="filter-badge" data-value="Govern" onclick="setSubFilter('Govern', this)">🏛️ Govern (GV)</button>
-        <button class="filter-badge" data-value="Identify" onclick="setSubFilter('Identify', this)">🔎 Identify (ID)</button>
-        <button class="filter-badge" data-value="Protect" onclick="setSubFilter('Protect', this)">🛡️ Protect (PR)</button>
-        <button class="filter-badge" data-value="Detect" onclick="setSubFilter('Detect', this)">👁️ Detect (DE)</button>
-        <button class="filter-badge" data-value="Respond" onclick="setSubFilter('Respond', this)">🚨 Respond (RS)</button>
-        <button class="filter-badge" data-value="Recover" onclick="setSubFilter('Recover', this)">🔄 Recover (RC)</button>
-      </div>
-
-      <div class="results-info">
-        <span id="visible-count">Exibindo {stats["total_estudos"]} de {stats["total_estudos"]} estudos</span>
-        <span>Atalhos: clique nas tags ou use o campo de busca</span>
-      </div>
-    </section>
-
-    <!-- Seção: Escolha pela Necessidade Prática -->
-    <section class="needs-section" id="secao-necessidades">
-      <div class="needs-header">
-        <h2>🧭 Escolha pela Necessidade Prática</h2>
-        <p>Enfrentando um desafio operacional ou projeto corporativo? Encontre a solução direta no catálogo:</p>
-      </div>
-      <div class="needs-grid">
-{necessidades_html}
-      </div>
-    </section>
-
-{rota_vaga_html}
-
-{certificacoes_html}
-
+    <!-- Visão: Rotas sugeridas -->
+    <section class="view" data-view="rotas" hidden>
+      <h1>Rotas sugeridas</h1>
+      <p class="lede">Sequências de estudo por perfil profissional. O próximo módulo de cada rota fica em destaque.</p>
 {painel_rotas_html}
+    </section>
 
+    <!-- Visão: Por certificação -->
+    <section class="view" data-view="certificacoes" hidden>
+      <h1>Por certificação</h1>
+      <p class="lede">Os módulos que preparam para cada prova, em ordem de estudo, e a matriz completa de certificações.</p>
 {painel_cert_html}
 
-    <!-- Seção Principal: Catálogo dos Estudos -->
-    <main class="studies-section" id="secao-catalogo">
-      <div class="section-title-wrap">
-        <h2 class="section-title">📚 Módulos e Treinamentos Práticos</h2>
-      </div>
+{certificacoes_html}
+    </section>
 
-      <div class="cards-grid" id="cards-grid">
-{cards_html}
-
-        <div class="no-results" id="no-results-msg" style="display: none;">
-          <p id="no-results-texto">Nenhum estudo encontrado com os critérios de busca aplicados.</p>
-          <button class="btn-open-study" onclick="clearSearch(); switchTab('todas');">Limpar Filtros e Busca</button>
+    <!-- Visão: Pela necessidade -->
+    <section class="view" data-view="necessidades" hidden>
+      <h1>Escolha pela necessidade prática</h1>
+      <p class="lede">Enfrentando um desafio operacional ou projeto corporativo? Encontre o módulo que resolve.</p>
+      <section class="needs-section" id="secao-necessidades">
+        <div class="needs-grid">
+{necessidades_html}
         </div>
-      </div>
-    </main>
+      </section>
+    </section>
 
-    <!-- Rodapé Geral do Portal -->
+    <!-- Visão: Rota por vaga -->
+    <section class="view" data-view="vaga" hidden>
+      <h1>Rota por vaga</h1>
+      <p class="lede">As competências pedidas numa vaga real e os módulos que as cobrem.</p>
+{rota_vaga_html}
+    </section>
+
+    <!-- Visão: Meu progresso -->
+    <section class="view" data-view="progresso" hidden>
+      <h1>Meu progresso</h1>
+      <p class="lede">Marque os módulos que você concluiu. O progresso fica salvo só neste navegador.</p>
+{meu_progresso_html}
+    </section>
+
     <footer class="portal-footer">
       <p>&copy; 2026 Estudos de Cibersegurança &bull; Material Autoinstrucional e Prático 100% Offline</p>
-      <p>Desenvolvido e mantido por <strong>José Mauro da Silva Brandão</strong> &bull; Alinhado a NIST CSF 2.0, MITRE ATT&amp;CK Enterprise, ISO/IEC 27001:2022 e LGPD (Lei nº 13.709/2018).</p>
+      <p>Curadoria e desenvolvimento técnico por <strong>José Mauro da Silva Brandão</strong> &bull; Alinhado a NIST CSF 2.0, MITRE ATT&amp;CK Enterprise, ISO/IEC 27001:2022 e LGPD (Lei nº 13.709/2018).</p>
     </footer>
+  </main>
+</div>
 
-  </div>
-
-  <script>
-{portal_js}
-  </script>
+<script>
+{PORTAL_JS}
+</script>
 </body>
 </html>
 """

@@ -66,7 +66,7 @@ class TestCatalogoNovo(unittest.TestCase):
             self.assertNotEqual(m.group(1), "1", slug)
             if slug in NOVOS[8:]:
                 self.assertEqual(m.group(1), "10", slug)
-        self.assertIn('data-value="10"', html)
+        self.assertIn('<div class="grupo" data-trilha="10"', html)
 
 
 class TestLigacoesNovas(unittest.TestCase):

@@ -9,7 +9,7 @@ from pathlib import Path
 # Adiciona o diretório _geradores ao sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from build_index import gerar_index_html, render_filtros_carreira, render_filtros_trilha
+from build_index import gerar_index_html
 from index_dados import CARREIRAS, ESTUDOS_DADOS, FUNCOES_NIST, NECESSIDADES, TRILHAS
 
 
@@ -130,9 +130,8 @@ class TestBuildIndex(unittest.TestCase):
         self.assertIn("Estudos de Cibersegurança", conteudo)
         self.assertIn("José Mauro da Silva Brandão", conteudo)
 
-        # Estatísticas do masthead
-        self.assertIn(f'<span class="stat-number">{len(ESTUDOS_DADOS)}</span>', conteudo)
-        self.assertIn(f'<span class="stat-number">{len(TRILHAS)}</span>', conteudo)
+        # Totais do catálogo (lede da tela inicial)
+        self.assertIn(f"{len(ESTUDOS_DADOS)} módulos em {len(TRILHAS)} trilhas", conteudo)
         self.assertIn("simuladores", conteudo.lower())
 
         # Seções principais
@@ -141,22 +140,19 @@ class TestBuildIndex(unittest.TestCase):
             "Seção de necessidades deve estar presente",
         )
         self.assertIn("STRIDE", conteudo)
-        self.assertIn("search-input", conteudo)
+        self.assertIn('id="busca"', conteudo)
 
         # Suporte a temas e persistência segura
         self.assertIn("data-theme", conteudo)
         self.assertIn("localStorage", conteudo)
         self.assertIn("safeStorageGet", conteudo)
         self.assertIn("safeStorageSet", conteudo)
-        self.assertIn("cs_done_", conteudo)
         self.assertIn("cs_theme", conteudo)
 
-        # Filtros interativos e busca com remoção de acentos
-        self.assertIn("filtro", conteudo.lower())
+        # Busca com remoção de acentos e "Agrupar por" do catálogo
         self.assertIn("removerAcentos", conteudo)
-        self.assertIn("card", conteudo)
-        self.assertIn("highlight-pulse", conteudo)
-        self.assertIn("pulseHighlight", conteudo)
+        self.assertIn("Agrupar por", conteudo)
+        self.assertIn('class="mc', conteudo)
 
 
 class TestPortalDerivado(unittest.TestCase):
@@ -166,23 +162,22 @@ class TestPortalDerivado(unittest.TestCase):
         self.root = Path(__file__).resolve().parent.parent.parent
         self.out = self.root / "index.html"
 
-    def test_botoes_trilha_gerados_de_TRILHAS(self):
-        html = render_filtros_trilha(TRILHAS)
-        for tid, info in TRILHAS.items():
-            self.assertIn(f'data-value="{tid}"', html)
-            self.assertIn(f"Trilha {tid}: {escape(info['nome'])}", html)
-        self.assertIn('data-value="all"', html)
-
-    def test_botoes_carreira_gerados_de_CARREIRAS(self):
-        html = render_filtros_carreira(CARREIRAS)
-        for c in CARREIRAS.values():
-            self.assertIn(f'data-value="{escape(c["nome"])}"', html)
-            self.assertIn(c["icone"], html)
-        self.assertIn('data-value="all"', html)
-
-    def test_total_estudos_js_dinamico(self):
+    def test_grupos_do_catalogo_gerados_de_TRILHAS(self):
         conteudo = Path(gerar_index_html(output_path=self.out)).read_text(encoding="utf-8")
-        self.assertIn(f"const TOTAL_ESTUDOS = {len(ESTUDOS_DADOS)};", conteudo)
+        for tid, info in TRILHAS.items():
+            self.assertIn(f'<div class="grupo" data-trilha="{tid}"', conteudo)
+            self.assertIn(f"Trilha {tid}", conteudo)
+            self.assertIn(escape(info["nome"]), conteudo)
+
+    def test_perfis_dos_cartoes_gerados_de_CARREIRAS(self):
+        conteudo = Path(gerar_index_html(output_path=self.out)).read_text(encoding="utf-8")
+        nomes = {c["nome"] for c in CARREIRAS.values()}
+        for slug, d in ESTUDOS_DADOS.items():
+            self.assertLessEqual(set(d["carreiras"]), nomes)
+            self.assertIn(f'data-perfis="{escape("|".join(d["carreiras"]))}"', conteudo)
+
+    def test_total_estudos_dinamico(self):
+        conteudo = Path(gerar_index_html(output_path=self.out)).read_text(encoding="utf-8")
         self.assertIn(f"0 de {len(ESTUDOS_DADOS)} concluídos", conteudo)
         self.assertNotIn("TOTAL_ESTUDOS = 28", conteudo)
 

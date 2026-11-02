@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Testes da aba "Por Nível": nível de cada módulo, selo no card e filtro."""
+"""Testes do nível dos módulos: dados, selo no cartão e agrupamento "Nível" do catálogo."""
 
 import re
 import sys
@@ -46,11 +46,11 @@ class TestHtmlDoNivel(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             cls.html = gerar_index_html(output_path=Path(tmp) / "index.html").read_text(encoding="utf-8")
 
-    def test_aba_e_botoes(self):
-        self.assertIn('data-facet="nivel" onclick="switchTab(\'nivel\')">Por Nível</button>', self.html)
-        self.assertIn('<div class="filter-subpanel" data-panel="nivel"', self.html)
+    def test_agrupar_por_nivel(self):
+        """A aba "Por Nível" virou o botão "Nível" da barra "Agrupar por" do catálogo."""
+        self.assertRegex(self.html, r'<button type="button" data-grupo="nivel"[^>]*>Nível</button>')
         for chave in NIVEIS:
-            self.assertIn(f'data-value="{chave}"', self.html)
+            self.assertIn(f'data-nivel="{chave}"', self.html)
 
     def test_cards_com_nivel_e_selo(self):
         for slug, d in ESTUDOS_DADOS.items():
@@ -58,10 +58,12 @@ class TestHtmlDoNivel(unittest.TestCase):
             with self.subTest(slug=slug):
                 self.assertIsNotNone(m)
                 self.assertEqual(m.group(1), d["nivel"])
-        self.assertEqual(self.html.count('class="badge badge-nivel'), len(ESTUDOS_DADOS))
+        self.assertEqual(self.html.count('class="tag tag-nivel"'), len(ESTUDOS_DADOS))
 
-    def test_javascript_filtra_por_nivel(self):
-        self.assertIn("currentFacet === 'nivel'", self.html)
+    def test_css_colore_grupos_de_nivel(self):
+        css = (GERADORES_DIR / "index.css").read_text(encoding="utf-8")
+        for chave in NIVEIS:
+            self.assertIn(f'.grupo[data-nivel="{chave}"]', css)
 
 
 if __name__ == "__main__":

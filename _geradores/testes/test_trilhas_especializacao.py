@@ -113,7 +113,7 @@ class TestCatalogoEspecializacao(unittest.TestCase):
                 self.assertEqual(m.group(1), str(ESTUDOS_DADOS[slug]["trilha"]))
                 self.assertNotEqual(m.group(1), "1")
         for valor in ("11", "12", "13"):
-            self.assertIn(f'data-value="{valor}"', html)
+            self.assertIn(f'<div class="grupo" data-trilha="{valor}"', html)
 
 
 class TestLigacoesEspecializacao(unittest.TestCase):
