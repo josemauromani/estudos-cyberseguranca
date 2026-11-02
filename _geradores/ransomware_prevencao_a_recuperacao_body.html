@@ -1,0 +1,668 @@
+<!-- Estudo 42: Ransomware-Prevencao-a-Recuperacao Body Fragment -->
+<article class="study-container" data-slug="ransomware">
+
+    <!-- SEÇÃO 1: ANATOMIA -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: A Criptografia É o Último Passo</h2>
+        </div>
+
+        <p class="lead-text">
+            Quando a tela de resgate aparece, o ataque já está no fim. Antes dela, o grupo entrou, roubou credenciais, andou pela rede, copiou dados e destruiu o que permitiria a recuperação. Por isso as primeiras horas de resposta pesam tanto: cada decisão muda quantas máquinas serão criptografadas, quanta evidência sobra e quantos dias a empresa fica parada. Neste estudo você vai conduzir essas horas na Ipê Store, quatro dias depois da invasão que o SOC investigou no Estudo 16.
+        </p>
+
+        <h3>A Cadeia do Ataque</h3>
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Anatomia de um Ataque de Ransomware</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Anatomia de um Ataque de Ransomware">
+flowchart TD
+    A["Acesso inicial<br><small>RDP ou VPN sem MFA, phishing, equipamento de borda vulnerável</small>"]
+    C["Credenciais<br><small>memória das máquinas, DCSync (T1003.006)</small>"]
+    L["Movimentação lateral<br><small>RDP, SMB, ferramentas administrativas</small>"]
+    E["Exfiltração<br><small>rclone para armazenamento em nuvem (T1567.002)</small>"]
+    R["Sabotagem da recuperação<br><small>shadow copies, catálogo de backup (T1490)</small>"]
+    X["Criptografia e nota de resgate<br><small>T1486</small>"]
+    A --> C
+    C --> L
+    L --> E
+    E --> R
+    R --> X
+            </pre>
+        </div>
+
+        <ul>
+            <li><strong>Acesso inicial:</strong> acesso remoto sem MFA (RDP exposto, VPN), phishing com anexo ou link, e falhas em equipamentos de borda (VPN, firewall) exploradas antes do patch.</li>
+            <li><strong>Credenciais:</strong> o grupo procura senhas na memória das máquinas e, com uma conta privilegiada, replica os hashes do AD pelo <strong>DCSync</strong> (T1003.006), fingindo ser um controlador de domínio.</li>
+            <li><strong>Exfiltração:</strong> antes de criptografar, copia dados com ferramentas legítimas como o <strong>rclone</strong> para armazenamento em nuvem (T1567).</li>
+            <li><strong>Sabotagem da recuperação</strong> (T1490): apaga as <strong>shadow copies</strong> com <code>vssadmin</code>, o catálogo do backup e as opções de recuperação do Windows; ataca o console do backup se tiver acesso.</li>
+            <li><strong>Criptografia</strong> (T1486): em massa, quase sempre fora do horário comercial, para atrasar a resposta.</li>
+        </ul>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">comandos típicos de um ataque — bons alvos de detecção</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-rw-comandos')">Copiar</button>
+            </div>
+            <pre><code id="code-rw-comandos">vssadmin delete shadows /all /quiet            # T1490: apaga as shadow copies
+wbadmin delete catalog -quiet                  # T1490: apaga o catálogo de backup
+bcdedit /set {default} recoveryenabled No      # T1490: desativa a recuperação do Windows
+rclone copy \\FS01\financeiro remoto:ipe --transfers 16   # T1567.002: exfiltração</code></pre>
+        </div>
+        <p>
+            Nenhum desses comandos tem uso legítimo frequente num servidor de produção fora de janela de manutenção. Uma regra Sigma para cada um (Estudo 16) é das detecções mais baratas e eficazes contra ransomware.
+        </p>
+
+        <h3>O Modelo de Negócio</h3>
+        <p>
+            O ransomware virou serviço: no <strong>RaaS</strong> (<em>Ransomware as a Service</em>), um grupo desenvolve o malware, o painel de negociação e o site de vazamento; os <strong>afiliados</strong> invadem as empresas e ficam com a maior parte do resgate. Corretores de acesso inicial vendem credenciais de VPN e RDP para esses afiliados. Na <strong>dupla extorsão</strong>, o grupo criptografa e ameaça publicar os dados roubados; na <strong>tripla extorsão</strong>, acrescenta ataques de negação de serviço ou contato direto com clientes e parceiros da vítima. Backup resolve a criptografia, mas não resolve o vazamento.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 2: CONTENÇÃO E RECUPERAÇÃO -->
+    <section class="study-section" id="resposta">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Contenção, Notificação, Pagamento e Recuperação</h2>
+        </div>
+
+        <h3>Isolar ou Desligar</h3>
+        <p>
+            Desligar um servidor interrompe a criptografia local, mas apaga a <strong>RAM</strong>: processos, conexões abertas e, em alguns casos, as chaves que ajudariam a investigação. <strong>isolar</strong> pela rede, com a função de contenção do EDR ou bloqueando a porta do switch, corta a propagação e preserva a memória para a coleta forense. O guia <strong>#StopRansomware</strong> da CISA orienta a <strong>desligar</strong> apenas quando não for possível desconectar os equipamentos da rede.
+        </p>
+
+        <h3>Credenciais: Reset em Massa</h3>
+        <p>
+            Se houve DCSync, o atacante tem os hashes de todas as contas, inclusive a <strong>krbtgt</strong>. Trocar só a senha da conta que entrou não basta. O plano é: a partir de estações limpas, trocar as senhas das contas privilegiadas e de serviço, trocar a da krbtgt duas vezes (com intervalo para a replicação, Estudo 38), revogar sessões e tokens, e só então devolver o acesso aos usuários.
+        </p>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Notificar não é opcional</strong>
+            </div>
+            <p>
+                Se dados pessoais foram afetados, a LGPD (art. 48) exige comunicar a <strong>ANPD</strong> e os titulares; a Resolução CD/ANPD nº 15/2024 fixa o prazo de <strong>3 dias úteis</strong> a partir do conhecimento do incidente, com complementação posterior permitida. Com dados de cartão, o PCI DSS e os contratos exigem avisar o adquirente e as bandeiras. Registre também boletim de ocorrência e acione a seguradora, que costuma exigir aviso imediato e indicar empresas de resposta.
+            </p>
+        </div>
+
+        <h3>O Pagamento, do Ponto de Vista de Risco</h3>
+        <p>
+            A decisão de pagar é da alta direção, com jurídico e seguradora, e não do time técnico. Os pontos que entram na conta: o pagamento não garante a chave nem que o descriptografador funcione bem; não garante que os dados roubados sejam apagados; marca a empresa como pagadora; e pode violar listas de sanções, como as da <strong>OFAC</strong> (Departamento do Tesouro dos EUA), relevantes para empresas com vínculos americanos. Nenhuma dessas análises dispensa a notificação.
+        </p>
+
+        <h3>Recuperação</h3>
+        <ul>
+            <li><strong>Identifique a família</strong> pela nota ou por um arquivo cifrado (o serviço <strong>ID Ransomware</strong> faz isso) e consulte o <strong>No More Ransom</strong>, iniciativa da Europol, da polícia holandesa e de empresas de segurança que publica descriptografadores gratuitos. Para famílias recentes, quase sempre não há.</li>
+            <li><strong>Reconstruir em vez de restaurar</strong> o que controla a identidade: AD e DCs voltam em rede isolada, a partir de cópias anteriores à invasão ou reconstruídos.</li>
+            <li><strong>Escolha o ponto de restauração pela linha do tempo do ataque</strong>, não pela data mais recente: um backup feito depois da invasão traz junto o acesso do atacante. Varra a cópia em busca dos indicadores antes de colocá-la em produção.</li>
+            <li><strong>Restaure por dependência e por negócio:</strong> visibilidade e identidade primeiro, depois dados e aplicações que geram receita, por último o resto.</li>
+        </ul>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">💾</span>
+                <strong>Regra 3-2-1-1-0</strong>
+            </div>
+            <p>
+                Três cópias, em dois tipos de mídia, uma fora do local, uma <strong>imutável</strong> ou offline e zero erros nos testes de restauração. A cópia imutável é a que sobrevive quando o atacante tem as credenciais do backup. O Estudo 45 aprofunda o tema.
+            </p>
+        </div>
+
+        <h3>Prevenção em Uma Lista</h3>
+        <p>
+            MFA em todo acesso remoto; equipamentos de borda atualizados; EDR com proteção contra adulteração e isolamento testado; segmentação; Windows LAPS e PAM (Estudo 40); filtragem de e-mail (Estudo 29); backups 3-2-1-1-0; detecção dos comandos de sabotagem e de saídas anômalas; e exercícios tabletop. O <strong>NIST IR 8374</strong> organiza essas medidas como um perfil de ransomware do Cybersecurity Framework.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Linha do Tempo do Ransomware</h2>
+        </div>
+
+        <p class="lead-text">
+            Sexta-feira, 22:40. O EDR acaba de disparar no SRV-ERP01. Você conduz as próximas doze horas: em cada ponto de decisão, escolha uma ação e veja a consequência nos indicadores. Depois, monte a ordem de recuperação dos sistemas.
+        </p>
+
+        <div class="lab-box rw-lab" id="rw-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Laboratório de Resposta a Ransomware</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Incidente na Ipê Store</h3>
+                    <p id="rw-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">1. As primeiras horas</h4>
+                <div id="rw-metricas" aria-live="polite" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr)); gap: 0.5rem; margin-bottom: 0.75rem;"></div>
+                <div id="rw-linha" style="display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.75rem;"></div>
+                <div id="rw-decisao" style="border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 0.85rem; background: var(--surface);"></div>
+                <div id="rw-historico" style="margin-top: 0.75rem; font-size: 0.85rem;"></div>
+
+                <h4 style="margin-top: 1.75rem;">2. Ordem de recuperação</h4>
+                <p style="font-size: 0.85rem; margin: 0 0 0.5rem 0;">Use ↑ e ↓ para ordenar os sistemas do primeiro ao último a voltar. Qualquer ordem que respeite as dependências é aceita.</p>
+                <ol id="rw-recuperacao" style="margin: 0; padding-left: 1.6rem; display: grid; gap: 0.35rem;"></ol>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;">
+                    <button class="btn-primary" type="button" onclick="verificarOrdemRecuperacao()">Verificar ordem</button>
+                </div>
+                <div id="rw-ordem-resultado" aria-live="polite" style="margin-top: 0.75rem; font-size: 0.88rem;"></div>
+
+                <div style="margin-top: 1.25rem;">
+                    <button class="btn-secondary" type="button" onclick="restaurarRansomware()">Restaurar laboratório</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Prontidão contra Ransomware</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para avaliar se a organização aguentaria uma sexta-feira à noite como a do laboratório. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="ransomware">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-rw-1">
+                <label for="chk-rw-1"><strong>Porta de entrada fechada:</strong> todo acesso remoto exige MFA, não há RDP exposto e os equipamentos de borda recebem patch com prioridade.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-rw-2">
+                <label for="chk-rw-2"><strong>Contenção pronta:</strong> o EDR tem proteção contra adulteração, e o isolamento de máquinas foi testado, inclusive fora do horário comercial.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-rw-3">
+                <label for="chk-rw-3"><strong>Backup que sobrevive:</strong> há cópia imutável ou offline, credenciais do backup separadas do domínio e restauração testada (3-2-1-1-0).</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-rw-4">
+                <label for="chk-rw-4"><strong>Credenciais protegidas:</strong> Windows LAPS, PAM e modelo de camadas reduzem o que um atacante consegue a partir de uma máquina.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-rw-5">
+                <label for="chk-rw-5"><strong>Detecções específicas:</strong> há alertas para vssadmin, wbadmin, bcdedit, ferramentas de sincronização com nuvem e volumes de saída fora do padrão.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-rw-6">
+                <label for="chk-rw-6"><strong>Contatos à mão, fora da rede:</strong> jurídico, DPO, seguradora, empresa de resposta e polícia estão numa lista impressa, com o fluxo de notificação à ANPD.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-rw-7">
+                <label for="chk-rw-7"><strong>Ordem de recuperação ensaiada:</strong> as dependências entre sistemas estão documentadas e foram testadas num exercício tabletop.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Contenção):</strong> O EDR mostra um servidor criptografando arquivos neste momento e permite isolá-lo da rede. Isolar ou desligar?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Isolar.</p>
+                    <p>O isolamento corta a propagação e preserva a memória para a investigação. Desligar perde a RAM e só é recomendado quando não há como desconectar a máquina da rede.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Credenciais):</strong> A investigação encontrou DCSync feito pela conta comprometida. Trocar a senha dessa conta resolve?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. Com DCSync, o atacante tem os hashes de todas as contas do domínio.</p>
+                    <p>É preciso trocar as senhas de contas privilegiadas e de serviço, a da krbtgt duas vezes e revogar sessões, a partir de estações limpas.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Ponto de restauração):</strong> A invasão começou na segunda. Há backup imutável de domingo e backup comum de quinta. Qual usar?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O de domingo, anterior à invasão, recuperando depois os dados da semana por outras fontes.</p>
+                    <p>O backup de quinta é mais recente, mas carrega as contas, as tarefas agendadas e os implantes do atacante. Restaurá-lo devolve o acesso a ele.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Dupla extorsão):</strong> A empresa restaurou tudo do backup em dois dias. O incidente acabou?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não, se houve exfiltração.</p>
+                    <p>Os dados roubados continuam com o grupo e podem ser publicados. É preciso apurar o que saiu, notificar ANPD e titulares e acompanhar o site de vazamento.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Prazo):</strong> Qual é o prazo para comunicar à ANPD um incidente com dados pessoais que possa causar risco ou dano relevante aos titulares?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> 3 dias úteis a partir do conhecimento do incidente, pela Resolução CD/ANPD nº 15/2024.</p>
+                    <p>A comunicação pode ser complementada depois, à medida que a investigação avança. Esperar a investigação terminar para comunicar perde o prazo.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Descriptografador):</strong> Qual é a sequência correta para procurar um descriptografador gratuito?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Identificar a família (pela nota ou por um arquivo, com o ID Ransomware) e consultar o No More Ransom.</p>
+                    <p>Faça isso em paralelo com a recuperação por backup, sem esperar: para a maioria das famílias recentes, não há descriptografador público.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Criptografia é o fim</h4>
+                <p>Antes vêm acesso, credenciais, movimentação, exfiltração e sabotagem do backup.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Isolar, não desligar</h4>
+                <p>Isolar preserva a RAM; desligar só quando não der para desconectar.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Dupla extorsão</h4>
+                <p>Backup resolve a criptografia, não o vazamento. ANPD em 3 dias úteis.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Restaurar com critério</h4>
+                <p>Ponto anterior à invasão, identidade primeiro, depois receita.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>CISA, FBI, NSA e MS-ISAC — #StopRansomware Guide.</li>
+            <li>NIST IR 8374 — Ransomware Risk Management: A Cybersecurity Framework 2.0 Profile.</li>
+            <li>No More Ransom (nomoreransom.org) e ID Ransomware.</li>
+            <li>ANPD — Resolução CD/ANPD nº 15/2024 (Regulamento de Comunicação de Incidente de Segurança).</li>
+            <li>MITRE ATT&amp;CK — T1486, T1490, T1567 e T1003.006.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 43 — Gestão de Crise e Comunicação e 45 — Backup Imutável e Recuperação</strong>
+            </div>
+            <p>
+                O Estudo 43 cuida do que acontece fora da sala técnica: comitê de crise, porta-vozes e mensagens. O Estudo 45 detalha a cópia imutável e a recuperação da identidade.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="rw-dados">
+{
+ "contexto": "Incidente fictício. O atacante entrou na segunda (03/11) pela conta erp_admin, copiou dados na quarta e detonou o ransomware na sexta (07/11). O backup imutável mais recente é de domingo (02/11).",
+ "estado_inicial": {"hosts": 2, "parada_h": 0, "evidencia_perdida": 0, "risco": 0},
+ "pesos": {"hosts": 10, "parada_h": 1, "evidencia_perdida": 0.5, "risco": 5},
+ "custo_melhor_caminho": 17,
+ "decisoes": [
+  {"id": "contencao", "quando": "2025-11-07T22:40", "rotulo_hora": "Sexta, 22:40",
+   "situacao": "O EDR alerta: vssadmin apagou as shadow copies do SRV-ERP01, e arquivos com a extensão .lockipe aparecem no compartilhamento do FS01. Os dois servidores estão sendo criptografados agora.",
+   "opcoes": [
+    {"texto": "Isolar SRV-ERP01 e FS01 pela rede, com o EDR, mantendo-os ligados", "melhor": true,
+     "efeitos": {"parada_h": 2},
+     "consequencia": "A criptografia para de se espalhar pela rede e a memória fica preservada para a coleta forense."},
+    {"texto": "Desligar os dois servidores da tomada", "melhor": false,
+     "efeitos": {"parada_h": 4, "evidencia_perdida": 40, "risco": 1},
+     "consequencia": "A criptografia local para, mas a RAM se perde: processos, conexões e possíveis chaves não poderão mais ser analisados."},
+    {"texto": "Observar por mais uma hora para entender o ataque", "melhor": false,
+     "efeitos": {"hosts": 12, "parada_h": 10, "risco": 2},
+     "consequencia": "Em uma hora o ransomware alcança mais 12 máquinas pelos compartilhamentos. Observar faz sentido em intrusão silenciosa, não durante a criptografia."}
+   ]},
+  {"id": "credenciais", "quando": "2025-11-07T23:30", "rotulo_hora": "Sexta, 23:30",
+   "situacao": "A linha do tempo montada pelo SOC mostra o erp_admin comprometido desde segunda e um DCSync feito a partir do SRV-ERP01 na terça.",
+   "opcoes": [
+    {"texto": "Reset em massa a partir de estação limpa: contas privilegiadas e de serviço, krbtgt duas vezes e revogação de sessões", "melhor": true,
+     "efeitos": {"parada_h": 3},
+     "consequencia": "Os hashes roubados deixam de valer. O custo é parar a autenticação por algumas horas e reconfigurar serviços."},
+    {"texto": "Trocar só a senha do erp_admin", "melhor": false,
+     "efeitos": {"hosts": 5, "parada_h": 6, "risco": 4},
+     "consequencia": "Com os hashes do DCSync, o atacante volta com outra conta privilegiada e criptografa mais 5 máquinas."},
+    {"texto": "Não mexer nas contas até a forense terminar", "melhor": false,
+     "efeitos": {"hosts": 8, "parada_h": 8, "risco": 4},
+     "consequencia": "A investigação leva dias; enquanto isso, o atacante segue com acesso válido e amplia o estrago."}
+   ]},
+  {"id": "rede", "quando": "2025-11-08T00:15", "rotulo_hora": "Sábado, 00:15",
+   "situacao": "Há conexões do SRV-ERP01 para um IP externo, e a VPN continua aceitando logins sem MFA. A loja online está funcionando, isolada atrás do WAF.",
+   "opcoes": [
+    {"texto": "Bloquear a saída não essencial, derrubar a VPN sem MFA e o RDP exposto, e manter a loja online no ar", "melhor": true,
+     "efeitos": {"parada_h": 1},
+     "consequencia": "O canal de comando do atacante e as portas de entrada são cortados, e a receita da loja continua."},
+    {"texto": "Desligar toda a rede da empresa, inclusive a loja", "melhor": false,
+     "efeitos": {"parada_h": 12},
+     "consequencia": "Contém, mas derruba também a loja, que não estava comprometida: 12 horas a mais sem vendas."},
+    {"texto": "Manter tudo como está para não perder vendas", "melhor": false,
+     "efeitos": {"hosts": 10, "parada_h": 6, "risco": 3},
+     "consequencia": "O atacante usa a VPN aberta para voltar e criptografa mais 10 máquinas."}
+   ]},
+  {"id": "exfiltracao", "quando": "2025-11-08T02:00", "rotulo_hora": "Sábado, 02:00",
+   "situacao": "A nota de resgate diz que 120 GB foram copiados. O firewall mostra 118 GB enviados do FS01 para armazenamento em nuvem na quarta-feira, com rclone.",
+   "opcoes": [
+    {"texto": "Confirmar o que saiu, acionar jurídico e DPO e preparar a comunicação à ANPD e aos titulares em até 3 dias úteis", "melhor": true,
+     "efeitos": {"parada_h": 1},
+     "consequencia": "A empresa cumpre a LGPD e consegue orientar clientes antes de uma eventual publicação."},
+    {"texto": "Ignorar: os backups resolvem", "melhor": false,
+     "efeitos": {"risco": 8},
+     "consequencia": "O backup recupera os arquivos, mas não desfaz o vazamento. A comunicação fora do prazo vira infração."},
+    {"texto": "Negociar com o grupo para que não publique os dados", "melhor": false,
+     "efeitos": {"risco": 6},
+     "consequencia": "Não há garantia de que os dados sejam apagados, e a negociação não dispensa a notificação."}
+   ]},
+  {"id": "restauracao", "quando": "2025-11-08T08:00", "rotulo_hora": "Sábado, 08:00",
+   "situacao": "Hora de restaurar. Há o backup imutável de domingo (antes da invasão) e o backup comum de quinta, mais recente. A família do ransomware foi identificada.",
+   "opcoes": [
+    {"texto": "Consultar o No More Ransom, montar ambiente limpo e restaurar do imutável de domingo; reprocessar os pedidos da semana a partir do gateway de pagamento", "melhor": true,
+     "efeitos": {"parada_h": 10},
+     "consequencia": "Não há descriptografador público para essa família. A restauração é mais lenta, mas volta sem o acesso do atacante."},
+    {"texto": "Restaurar o backup de quinta direto em produção, por ser o mais recente", "melhor": false,
+     "efeitos": {"hosts": 8, "parada_h": 6, "risco": 6},
+     "consequencia": "O backup de quinta contém a tarefa agendada do atacante. Na segunda-feira, 8 máquinas são criptografadas de novo."},
+    {"texto": "Esperar até surgir um descriptografador público", "melhor": false,
+     "efeitos": {"parada_h": 48, "risco": 1},
+     "consequencia": "Pode nunca surgir. Dois dias parados sem nenhum avanço."}
+   ]},
+  {"id": "pagamento", "quando": "2025-11-08T10:00", "rotulo_hora": "Sábado, 10:00",
+   "situacao": "A diretoria pergunta se a empresa deve pagar o resgate para voltar mais rápido.",
+   "opcoes": [
+    {"texto": "Levar a decisão ao comitê de crise, com jurídico, seguradora e verificação de sanções, deixando claro que o pagamento não garante a chave nem o apagamento dos dados", "melhor": true,
+     "efeitos": {},
+     "consequencia": "A decisão é tomada por quem pode assumi-la, com os riscos explícitos. Com backup limpo disponível, o comitê decide não pagar."},
+    {"texto": "Pagar logo para voltar mais rápido", "melhor": false,
+     "efeitos": {"parada_h": 4, "risco": 8},
+     "consequencia": "O descriptografador recebido é lento e falha em parte dos arquivos; a empresa entra na lista de pagadoras e corre risco de violar sanções."},
+    {"texto": "Recusar por princípio, sem análise", "melhor": false,
+     "efeitos": {"risco": 2},
+     "consequencia": "Neste caso o backup salvaria a operação, mas a decisão não registrou a análise que a diretoria, a seguradora e o jurídico vão pedir depois."}
+   ]}
+ ],
+ "recuperacao": {
+  "itens": [
+   {"id": "seguranca", "nome": "Segurança e visibilidade (firewall de contenção, EDR e SIEM)", "depende_de": [],
+    "motivo": "Sem ver o ambiente, a restauração acontece no escuro e uma reinfecção passa despercebida."},
+   {"id": "ad", "nome": "Active Directory e DNS, reconstruídos em rede isolada", "depende_de": ["seguranca"],
+    "motivo": "Quase tudo autentica no AD; restaurar dados antes da identidade devolve o acesso ao atacante."},
+   {"id": "backup", "nome": "Infraestrutura de backup (cópia imutável)", "depende_de": ["seguranca"],
+    "motivo": "É de onde saem os dados de todos os outros sistemas."},
+   {"id": "cofre", "nome": "Cofre de senhas do PAM", "depende_de": ["ad"],
+    "motivo": "Guarda as novas credenciais das contas de serviço que as aplicações vão usar."},
+   {"id": "banco", "nome": "Banco de dados do ERP e da loja", "depende_de": ["ad", "backup"],
+    "motivo": "Os dados de pedidos e clientes vêm do backup e o acesso ao banco depende do AD."},
+   {"id": "loja", "nome": "Loja online e checkout", "depende_de": ["banco"],
+    "motivo": "É a receita da empresa; volta assim que o banco estiver íntegro."},
+   {"id": "erp", "nome": "Aplicação do ERP", "depende_de": ["banco", "cofre"],
+    "motivo": "Precisa do banco e da nova senha da conta de serviço, que está no cofre."},
+   {"id": "arquivos", "nome": "Servidor de arquivos FS01", "depende_de": ["ad", "backup"],
+    "motivo": "Importante para o escritório, mas não gera receita direta."},
+   {"id": "estacoes", "nome": "Estações dos usuários (reinstaladas)", "depende_de": ["ad", "seguranca"],
+    "motivo": "Voltam reinstaladas, com EDR, depois que a identidade estiver limpa."}
+  ],
+  "sugerida": ["seguranca", "ad", "backup", "cofre", "banco", "loja", "erp", "arquivos", "estacoes"],
+  "inicial": ["estacoes", "arquivos", "loja", "banco", "erp", "backup", "ad", "cofre", "seguranca"]
+ }
+}
+</script>
+
+<script>
+(function() {
+    var RW = JSON.parse(document.getElementById("rw-dados").textContent);
+    var ROTULOS = {
+        hosts: "Máquinas criptografadas",
+        parada_h: "Horas de parada",
+        evidencia_perdida: "Evidência preservada",
+        risco: "Risco jurídico e de reinfecção"
+    };
+    var estado = null;
+    var passo = 0;
+    var escolhas = [];
+    var ordem = [];
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function custo(efeitos) {
+        return Object.keys(efeitos).reduce(function(s, k) { return s + RW.pesos[k] * efeitos[k]; }, 0);
+    }
+    function item(id) { return RW.recuperacao.itens.filter(function(i) { return i.id === id; })[0]; }
+
+    // ------------------------------------------------------------ linha do tempo
+    function renderizarMetricas() {
+        var box = document.getElementById("rw-metricas");
+        box.replaceChildren();
+        Object.keys(ROTULOS).forEach(function(k) {
+            var v = k === "evidencia_perdida" ? Math.max(0, 100 - estado[k]) + "%" : String(estado[k]);
+            var c = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.45rem 0.6rem; min-width: 0;");
+            c.setAttribute("data-metrica", k);
+            c.setAttribute("data-valor", String(estado[k]));
+            c.appendChild(el("div", ROTULOS[k], "font-size: 0.75rem; color: var(--muted);"));
+            c.appendChild(el("div", v, "font-size: 1.2rem; font-weight: 700; font-family: var(--font-mono);"));
+            box.appendChild(c);
+        });
+    }
+    function renderizarLinha() {
+        var box = document.getElementById("rw-linha");
+        box.replaceChildren();
+        RW.decisoes.forEach(function(d, i) {
+            var feito = i < escolhas.length, atual = i === passo && passo < RW.decisoes.length;
+            var s = el("span", d.rotulo_hora, "font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: var(--radius-pill); border: 1px solid var(--rule); font-family: var(--font-mono);" +
+                (atual ? " background: var(--accent); color: #fff;" : feito ? " background: var(--sunk);" : " opacity: 0.6;"));
+            box.appendChild(s);
+        });
+    }
+    function renderizarDecisao() {
+        var box = document.getElementById("rw-decisao");
+        box.replaceChildren();
+        if (passo >= RW.decisoes.length) { renderizarResumo(box); return; }
+        var d = RW.decisoes[passo];
+        box.appendChild(el("strong", d.rotulo_hora, "font-family: var(--font-mono); display: block;"));
+        box.appendChild(el("p", d.situacao, "margin: 0.3rem 0 0.6rem 0;"));
+        var escolhida = escolhas[passo];
+        var ops = el("div", null, "display: grid; gap: 0.4rem;");
+        d.opcoes.forEach(function(o, j) {
+            var marcada = escolhida === j;
+            var b = el("button", o.texto, "text-align: left; padding: 0.55rem 0.7rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); color: var(--ink); font: inherit; font-size: 0.88rem; cursor: " + (escolhida === undefined ? "pointer" : "default") + "; background: " +
+                (escolhida === undefined ? "var(--surface)" : marcada ? (o.melhor ? "rgba(22, 163, 74, 0.25)" : "rgba(220, 38, 38, 0.25)") : "transparent") + ";");
+            b.type = "button";
+            b.disabled = escolhida !== undefined;
+            b.setAttribute("aria-pressed", marcada ? "true" : "false");
+            b.addEventListener("click", function() { escolherAcaoRansomware(j); });
+            ops.appendChild(b);
+        });
+        box.appendChild(ops);
+        if (escolhida !== undefined) {
+            var o = d.opcoes[escolhida];
+            var efeitos = Object.keys(o.efeitos).map(function(k) {
+                if (k === "evidencia_perdida") return "-" + o.efeitos[k] + "% de evidência";
+                if (k === "risco") return "+" + o.efeitos[k] + (o.efeitos[k] === 1 ? " ponto" : " pontos") + " de risco";
+                return "+" + o.efeitos[k] + " " + ROTULOS[k].toLowerCase();
+            });
+            var fb = el("div", null, "margin-top: 0.6rem; padding: 0.55rem 0.7rem; border-radius: var(--radius-sm); background: var(--sunk); font-size: 0.88rem;");
+            fb.appendChild(el("strong", (o.melhor ? "✓ " : "✗ ") + o.consequencia, "display: block;"));
+            fb.appendChild(el("span", efeitos.length ? "Efeito: " + efeitos.join(", ") + "." : "Sem efeito negativo nos indicadores.", "color: var(--muted);"));
+            if (!o.melhor) {
+                var melhor = d.opcoes.filter(function(x) { return x.melhor; })[0];
+                fb.appendChild(el("p", "A melhor escolha aqui: " + melhor.texto + ".", "margin: 0.4rem 0 0 0;"));
+            }
+            box.appendChild(fb);
+            var prox = el("button", passo + 1 < RW.decisoes.length ? "Avançar para " + RW.decisoes[passo + 1].rotulo_hora : "Ver o resultado", "margin-top: 0.6rem;");
+            prox.type = "button";
+            prox.className = "btn-primary";
+            prox.addEventListener("click", avancarRansomware);
+            box.appendChild(prox);
+        }
+    }
+    function renderizarResumo(box) {
+        var total = escolhas.reduce(function(s, j, i) { return s + custo(RW.decisoes[i].opcoes[j].efeitos); }, 0);
+        var acertos = escolhas.filter(function(j, i) { return RW.decisoes[i].opcoes[j].melhor; }).length;
+        box.setAttribute("data-custo", String(total));
+        box.appendChild(el("strong", "Fim das primeiras horas", "display: block; font-size: 1rem;"));
+        box.appendChild(el("p", "Você escolheu a melhor ação em " + acertos + " de " + RW.decisoes.length + " decisões. Custo do seu caminho: " + total +
+            " pontos; o melhor caminho possível custa " + RW.custo_melhor_caminho + ".", "margin: 0.4rem 0;"));
+        box.appendChild(el("p", "Pontos = 10 por máquina criptografada + 1 por hora de parada + 0,5 por ponto de evidência perdida + 5 por ponto de risco.",
+            "margin: 0; font-size: 0.8rem; color: var(--muted);"));
+    }
+    function renderizarHistorico() {
+        var box = document.getElementById("rw-historico");
+        box.replaceChildren();
+        if (!escolhas.length) return;
+        box.appendChild(el("strong", "Diário do incidente", "display: block; margin-bottom: 0.25rem;"));
+        var ol = el("ol", null, "margin: 0; padding-left: 1.3rem;");
+        escolhas.forEach(function(j, i) {
+            var d = RW.decisoes[i], o = d.opcoes[j];
+            ol.appendChild(el("li", d.rotulo_hora + " — " + (o.melhor ? "✓ " : "✗ ") + o.texto));
+        });
+        box.appendChild(ol);
+    }
+    function renderizarTudo() {
+        renderizarMetricas();
+        renderizarLinha();
+        renderizarDecisao();
+        renderizarHistorico();
+    }
+
+    window.escolherAcaoRansomware = function(j) {
+        var d = RW.decisoes[passo];
+        if (!d || escolhas[passo] !== undefined || !d.opcoes[j]) return;
+        escolhas[passo] = j;
+        var ef = d.opcoes[j].efeitos;
+        Object.keys(ef).forEach(function(k) { estado[k] += ef[k]; });
+        renderizarTudo();
+    };
+    window.avancarRansomware = function() {
+        if (escolhas[passo] === undefined) return;
+        passo++;
+        renderizarTudo();
+    };
+
+    // ------------------------------------------------------- ordem de recuperação
+    function renderizarOrdem() {
+        var ol = document.getElementById("rw-recuperacao");
+        ol.replaceChildren();
+        ordem.forEach(function(id, i) {
+            var it = item(id);
+            var li = el("li", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.35rem 0.5rem; display: flex; gap: 0.5rem; align-items: center; justify-content: space-between; min-width: 0;");
+            li.setAttribute("data-item", id);
+            li.appendChild(el("span", it.nome, "font-size: 0.85rem; min-width: 0; overflow-wrap: anywhere;"));
+            var acoes = el("span", null, "display: flex; gap: 0.25rem; flex-shrink: 0;");
+            [["↑", -1, "Subir "], ["↓", 1, "Descer "]].forEach(function(par) {
+                var b = el("button", par[0], "padding: 0.1rem 0.5rem; font-size: 0.85rem;");
+                b.type = "button";
+                b.className = "btn-secondary";
+                b.disabled = (par[1] < 0 && i === 0) || (par[1] > 0 && i === ordem.length - 1);
+                b.setAttribute("aria-label", par[2] + it.nome);
+                b.addEventListener("click", function() { moverItemRecuperacao(id, par[1]); });
+                acoes.appendChild(b);
+            });
+            li.appendChild(acoes);
+            ol.appendChild(li);
+        });
+    }
+    window.moverItemRecuperacao = function(id, direcao) {
+        var i = ordem.indexOf(id), j = i + direcao;
+        if (i === -1 || j < 0 || j >= ordem.length) return;
+        ordem[i] = ordem[j];
+        ordem[j] = id;
+        renderizarOrdem();
+        document.getElementById("rw-ordem-resultado").replaceChildren();
+    };
+    window.verificarOrdemRecuperacao = function() {
+        var box = document.getElementById("rw-ordem-resultado");
+        box.replaceChildren();
+        var pos = {};
+        ordem.forEach(function(id, n) { pos[id] = n; });
+        var violacoes = [];
+        RW.recuperacao.itens.forEach(function(it) {
+            it.depende_de.forEach(function(dep) {
+                if (pos[dep] > pos[it.id]) violacoes.push(it.nome + " precisa vir depois de " + item(dep).nome + ". " + it.motivo);
+            });
+        });
+        box.setAttribute("data-violacoes", String(violacoes.length));
+        if (violacoes.length) {
+            box.appendChild(el("strong", plural(violacoes.length) + " a corrigir:", "display: block; color: var(--danger-color);"));
+            var ul = el("ul", null, "margin: 0.3rem 0 0 0; padding-left: 1.2rem;");
+            violacoes.forEach(function(v) { ul.appendChild(el("li", v)); });
+            box.appendChild(ul);
+            return;
+        }
+        box.appendChild(el("strong", "✓ Ordem válida: todas as dependências foram respeitadas.", "display: block; color: var(--tip-color);"));
+        var internos = ["arquivos", "estacoes"].filter(function(x) { return pos[x] < pos.loja; });
+        if (internos.length) {
+            box.appendChild(el("p", "Dica de negócio: a loja online, que gera a receita, ficou atrás de " + internos.map(function(x) { return item(x).nome; }).join(" e ") +
+                ". Tecnicamente funciona, mas costuma valer a pena trazê-la antes.", "margin: 0.3rem 0 0 0;"));
+        }
+    };
+    function plural(n) { return n === 1 ? "1 dependência violada" : n + " dependências violadas"; }
+
+    window.restaurarRansomware = function() {
+        estado = JSON.parse(JSON.stringify(RW.estado_inicial));
+        passo = 0;
+        escolhas = [];
+        ordem = RW.recuperacao.inicial.slice();
+        document.getElementById("rw-ordem-resultado").replaceChildren();
+        renderizarTudo();
+        renderizarOrdem();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("rw-contexto").textContent = RW.contexto;
+        restaurarRansomware();
+        if (typeof initChecklist === "function") {
+            initChecklist("ransomware");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
