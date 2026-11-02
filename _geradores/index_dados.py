@@ -1604,7 +1604,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "simulador_nome": "Enquadramento de Casos",
         "fatos": [
             "Art. 154-A: invasão de dispositivo informático",
-            "Fraude eletrônica: art. 171 §2º-A (Lei 14.155/2021)",
+            "Fraude eletrônica: art. 171 §2º-A (redação de 2026)",
             "Marco Civil: conexão 1 ano, aplicações 6 meses",
             "PNCiber (2023) e E-Ciber (2025)",
         ],

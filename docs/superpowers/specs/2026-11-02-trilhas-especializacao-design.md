@@ -338,13 +338,13 @@ Cada módulo abaixo vira uma entrada em `ESTUDOS_DADOS` e uma seção no §3 do 
   - Preservar provas digitais de forma que sejam aceitas.
   - Situar a Política Nacional de Cibersegurança e a E-Ciber.
 - **Pré-requisitos:** LGPD-e-Privacidade, Forense-Digital.
-- **Conceitos-chave:** Lei 12.737/2012 (art. 154-A do Código Penal); Lei 14.155/2021 (penas maiores, fraude eletrônica no art. 171 §2º-A, furto mediante fraude eletrônica no art. 155 §4º-B); Marco Civil da Internet (Lei 12.965/2014): registros de conexão por 1 ano (art. 13) e de acesso a aplicações por 6 meses (art. 15); requisição judicial de registros; cadeia de custódia (arts. 158-A a 158-F do CPP); PNCiber (Decreto 11.856/2023) e E-Ciber (Decreto 12.573/2025).
+- **Conceitos-chave:** Lei 12.737/2012 (art. 154-A do Código Penal); Lei 14.155/2021 (penas maiores, fraude eletrônica no art. 171 §2º-A, furto mediante fraude eletrônica no art. 155 §4º-B), com nova redação do art. 171 §2º-A e do art. 155 §4º-B dada pela Lei 15.397/2026; Marco Civil da Internet (Lei 12.965/2014): registros de conexão por 1 ano (art. 13) e de acesso a aplicações por 6 meses (art. 15); requisição judicial de registros; cadeia de custódia (arts. 158-A a 158-F do CPP); PNCiber (Decreto 11.856/2023) e E-Ciber (Decreto 12.573/2025).
 - **Diferença para o módulo 27:** o 27 trata de dados pessoais e da ANPD; este trata da esfera penal e da prova.
 - **Pergunta-chave:** "O que guardar, por quanto tempo e como, para que o caso chegue ao processo penal?"
 - **Simulador: *Enquadramento de Casos*.** O aluno lê casos fictícios, escolhe o tipo penal, indica quais registros pedir e a quem, e ordena os passos de preservação de provas. O simulador corrige cada escolha com o dispositivo legal correspondente.
 - **Fatos:**
   - "Art. 154-A: invasão de dispositivo informático"
-  - "Fraude eletrônica: art. 171 §2º-A (Lei 14.155/2021)"
+  - "Fraude eletrônica: art. 171 §2º-A (redação de 2026)"
   - "Marco Civil: conexão 1 ano, aplicações 6 meses"
   - "PNCiber (2023) e E-Ciber (2025)"
 - **Conferência na construção:** penas e redação dos artigos são conferidas no texto consolidado do Código Penal (planalto.gov.br) antes de entrar no módulo.
@@ -507,7 +507,7 @@ Conferidas por busca antes desta spec. As marcadas "conferir" precisam de checag
 | Res. CMN 4.893/2021 | Em vigor, **alterada pela Res. CMN 5.274/2025** (18/12/2025): controles mínimos detalhados, teste de intrusão anual, segregação Pix/STR; adequação até 01/03/2026 | 54, 57 |
 | Res. BCB 85/2021 | Em vigor, alterada em 18/12/2025. **Conferir** o número da norma de alteração (fontes citam BCB 538 e BCB 448) e a alteração posterior citada (BCB 552/2026) | 54 |
 | Res. BCB 493/2025 (MED 2.0) | Publicada em 28/08/2025; devolução a partir de contas diferentes da usada na fraude; contestação pelo autoatendimento. **Conferir** prazos no texto oficial ou no guia do MED | 55 |
-| Lei 12.737/2012 e Lei 14.155/2021 | Art. 154-A com pena de reclusão; fraude eletrônica (art. 171 §2º-A) e furto mediante fraude eletrônica (art. 155 §4º-B). Nenhuma alteração posterior encontrada; **conferir** penas no Código Penal consolidado | 56 |
+| Lei 12.737/2012 e Lei 14.155/2021 | Art. 154-A com pena de reclusão; fraude eletrônica (art. 171 §2º-A) e furto mediante fraude eletrônica (art. 155 §4º-B). A Lei 15.397/2026 deu nova redação ao art. 155 §4º-B (reclusão de 4 a 10 anos e multa) e ao art. 171 §2º-A; **conferir** penas no Código Penal consolidado | 56 |
 | Lei 12.965/2014 (Marco Civil) | Guarda de registros de conexão por 1 ano (art. 13) e de acesso a aplicações por 6 meses (art. 15) | 56 |
 | Decreto 11.856/2023 (PNCiber) | Em vigor; institui a Política e o Comitê Nacional de Cibersegurança | 56 |
 | Decreto 12.573/2025 (E-Ciber) | Publicado em 05/08/2025; nova Estratégia Nacional de Cibersegurança, revoga o Decreto 10.222/2020 | 56 |

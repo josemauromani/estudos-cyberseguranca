@@ -1,0 +1,789 @@
+<!-- Estudo 56: Legislacao-e-Crimes-Ciberneticos Body Fragment -->
+<article class="study-container" data-slug="legislacao-e-crimes-ciberneticos">
+
+    <!-- SEÇÃO 1: DO INCIDENTE AO PROCESSO PENAL -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: O Incidente Que Precisa Virar Prova</h2>
+        </div>
+
+        <p class="lead-text">
+            Antônio, cliente da Ipê Pay (instituição de pagamento fictícia), caiu no golpe da falsa central e fez ele mesmo um Pix de R$ 15.000 para uma "conta segura". A mesa antifraude registrou tudo: horário, dispositivo, conta recebedora. Dez dias depois, a polícia pede à Ipê Pay o que ela tem sobre o caso. Agora as perguntas são outras. Que crime foi esse: furto, estelionato ou invasão? Quem guarda o IP do golpista e por quanto tempo? Os logs exportados por um analista, sem hash e sem registro de quem os coletou, valem como prova? Este módulo trata da esfera penal do incidente: o enquadramento da conduta, os registros que a investigação pode pedir e a preservação das provas para que o caso chegue ao processo.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>Pergunta-chave do módulo</strong>
+            </div>
+            <p>O que guardar, por quanto tempo e como, para que o caso chegue ao processo penal?</p>
+        </div>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🧭</span>
+                <strong>O que vem dos Estudos 19, 27 e 55</strong>
+            </div>
+            <p>
+                O Estudo 19 ensinou a técnica forense: cópia bit a bit, hash, bloqueador de escrita, ordem de volatilidade e a cadeia de custódia dos arts. 158-A a 158-F do Código de Processo Penal (CPP). Aqui a mesma cadeia aparece pelo lado do processo: por que cada passo existe e o que acontece com a prova quando um deles falta. O Estudo 27 tratou dos dados pessoais, das bases legais e da ANPD, a esfera administrativa da LGPD; este módulo trata da esfera penal, que corre em paralelo e com outras regras. E o Estudo 55 terminou com os golpes que passaram pela mesa antifraude da Ipê Pay: são eles que viram casos de polícia aqui.
+            </p>
+        </div>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Material educativo: confira o texto vigente</strong>
+            </div>
+            <p>
+                Este módulo é material de estudo e não é orientação jurídica: o enquadramento de um caso real é feito pela polícia, pelo Ministério Público e pelo juiz, com o apoio de advogados. As penas mudam com frequência; a Lei 15.397/2026, por exemplo, endureceu penas de crimes patrimoniais. Os dispositivos citados aqui foram conferidos no Código Penal compilado, em planalto.gov.br, em 02/11/2026. Antes de usar qualquer número de pena, confira o texto vigente.
+            </p>
+        </div>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🛡️</span>
+                <strong>Escopo do módulo</strong>
+            </div>
+            <p>O foco é o lado de quem investiga e de quem preserva: enquadrar, pedir os registros certos e não estragar a prova. Os casos do simulador são fictícios, sem pessoas, contas, endereços IP ou serviços reais, e o módulo não descreve como cometer as condutas.</p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: TIPOS PENAIS, REGISTROS E CUSTÓDIA -->
+    <section class="study-section" id="tipos-registros-e-custodia">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Tipos Penais, Guarda de Registros e Cadeia de Custódia</h2>
+        </div>
+
+        <h3>Três tipos penais que o analista precisa reconhecer</h3>
+        <p>
+            A <strong>Lei 12.737/2012</strong> incluiu no Código Penal o crime de invasão de dispositivo informático (art. 154-A). A <strong>Lei 14.155/2021</strong> aumentou a pena da invasão e criou duas figuras para golpes com meio eletrônico: a fraude eletrônica, no estelionato (art. 171, §2º-A), e o furto mediante fraude eletrônica (art. 155, §4º-B). Em 2026, a <strong>Lei 15.397/2026</strong> deu nova redação a esses dois parágrafos ao endurecer as penas dos crimes patrimoniais.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Tipo penal</th><th>Núcleo da conduta</th><th>Pena e alterações</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Invasão de dispositivo informático</strong><br>Código Penal, art. 154-A</td><td>Entrar em dispositivo informático de uso alheio, sem autorização, para obter, adulterar ou destruir dados.</td><td>Reclusão de 1 a 4 anos e multa, redação dada pela Lei 14.155/2021.</td></tr>
+                    <tr><td><strong>Furto mediante fraude eletrônica</strong><br>Código Penal, art. 155, §4º-B</td><td>O próprio agente subtrai o bem; a fraude por dispositivo eletrônico ou informático serve para burlar a vigilância da vítima.</td><td>No art. 155, §4º-B, reclusão de 4 a 10 anos e multa, redação dada pela Lei 15.397/2026. O §4º-C (Lei 14.155/2021) aumenta a pena de 1/3 a 2/3 se usado servidor fora do país, e de 1/3 ao dobro se a vítima for idosa ou vulnerável.</td></tr>
+                    <tr><td><strong>Fraude eletrônica</strong><br>Código Penal, art. 171, §2º-A</td><td>A vítima, ou um terceiro, é induzida a erro por meio eletrônico (contato telefônico, mensagens, e-mail, redes sociais) e entrega ela mesma o bem ou a informação.</td><td>Redação atualizada pela Lei 15.397/2026: confira a pena no texto vigente. O §2º-B (Lei 14.155/2021) aumenta a pena de 1/3 a 2/3 se usado servidor fora do país.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">🔍</span>
+                <strong>A pergunta que separa furto de estelionato: quem tirou o dinheiro?</strong>
+            </div>
+            <p>Se a vítima, enganada, fez ela mesma o Pix ou entregou a senha, a fraude obteve a entrega: é <strong>fraude eletrônica</strong>. Se o golpista usou a fraude só para burlar a vigilância (uma senha redefinida, o aplicativo habilitado no aparelho dele) e transferiu ele mesmo, houve subtração: é <strong>furto mediante fraude eletrônica</strong>. E se alguém entrou no dispositivo para pegar ou destruir dados, sem obter dinheiro da vítima, o ponto de partida é a <strong>invasão de dispositivo</strong>. Nem todo incidente é crime: o funcionário que manda uma planilha para o e-mail pessoal usando o acesso que já tinha comete uma falta grave e, talvez, um incidente com dados pessoais (Estudo 27), mas não invade dispositivo alheio.</p>
+        </div>
+
+        <h3>Marco Civil da Internet: quem guarda o quê, e por quanto tempo</h3>
+        <p>
+            Quase toda investigação de crime cibernético passa por identificar quem estava por trás de um endereço IP. O <strong>Marco Civil da Internet (Lei 12.965/2014)</strong> divide essa informação entre dois tipos de provedor, com prazos de guarda diferentes:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Quem guarda</th><th>O quê</th><th>Prazo mínimo</th><th>Como obter</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Provedor de conexão</strong> (a operadora que dá acesso à internet)</td><td>Registros de conexão: IP atribuído ao assinante, data, hora e duração da conexão.</td><td>1 ano (art. 13)</td><td>Ordem judicial</td></tr>
+                    <tr><td><strong>Provedor de aplicação</strong> (e-mail, mensagens, nuvem, sites)</td><td>Registros de acesso a aplicações: de que IP, em que data e hora, a conta usou o serviço.</td><td>6 meses (art. 15)</td><td>Ordem judicial</td></tr>
+                    <tr><td><strong>Provedor de aplicação</strong></td><td>Conteúdo de comunicações privadas (mensagens, e-mails).</td><td>Sem o prazo dos registros</td><td>Ordem judicial</td></tr>
+                    <tr><td><strong>A própria empresa</strong></td><td>Logs internos: aplicativo, VPN, EDR, painel, transações.</td><td>Política de retenção da empresa</td><td>A empresa preserva e entrega, com registro de custódia</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            O caminho típico é encadeado: o log interno mostra o IP e o horário de quem atacou; o provedor de aplicação revela de que IP a conta do golpista foi usada; o provedor de conexão diz qual assinante tinha aquele IP naquele momento. Data, hora e fuso horário precisos (e, quando houver, a porta de origem) são o que permite essa última resposta. E o relógio corre desde o fato: os registros de acesso a aplicações têm guarda obrigatória de só 6 meses. Peça a preservação logo no início da investigação, e não quando o inquérito já estiver adiantado.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Do Incidente ao Processo: Registros e Cadeia de Custódia</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Do Incidente ao Processo: Registros e Cadeia de Custódia">
+flowchart TD
+    I["Incidente na empresa<br><small>invasão, golpe ou furto por aplicativo</small>"]
+    L["Logs internos preservados<br><small>hash e registro de quem coletou</small>"]
+    BO["Boletim de ocorrência<br><small>notícia do crime à polícia</small>"]
+    OJ{"Ordem judicial<br><small>registros e conteúdo</small>"}
+    PA["Provedor de aplicação<br><small>registros de acesso: 6 meses, art. 15</small>"]
+    PC["Provedor de conexão<br><small>registros de conexão: 1 ano, art. 13</small>"]
+    A["Assinante identificado<br><small>IP, data, hora e fuso</small>"]
+    CC["Cadeia de custódia<br><small>CPP, arts. 158-A a 158-F</small>"]
+    P["Prova aceita no processo penal"]
+    I --> L
+    L --> BO
+    BO --> OJ
+    OJ -->|"IP e horário do log"| PA
+    PA -->|"IP usado pela conta"| PC
+    PC --> A
+    L --> CC
+    A --> CC
+    CC --> P
+            </pre>
+        </div>
+
+        <h3>Cadeia de custódia: a prova que resiste à defesa</h3>
+        <p>
+            Desde a Lei 13.964/2019, o CPP disciplina a <strong>cadeia de custódia</strong> nos <strong>arts. 158-A a 158-F</strong>: o registro cronológico de tudo o que aconteceu com o vestígio, do reconhecimento e isolamento à coleta, ao acondicionamento, ao armazenamento e à análise. Na prova digital, isso se traduz em quatro regras práticas: não alterar o original, documentar o estado em que foi encontrado, provar a integridade com <strong>hash</strong> (SHA-256) e registrar cada pessoa que manuseou o material. Um log exportado por um analista, editado numa planilha e enviado por e-mail sem hash nem registro pode ser contestado pela defesa justamente por isso.
+        </p>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">bash — preservação de logs exportados com hash e registro de custódia</span>
+                <button class="btn-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <pre><code># 1. exporte os logs sem editar e calcule o hash do arquivo original
+sha256sum transacoes-2026-10-23.jsonl &gt; transacoes-2026-10-23.jsonl.sha256
+
+# 2. trabalhe numa cópia; o hash da cópia tem de ser igual ao do original
+cp transacoes-2026-10-23.jsonl analise/copia-trabalho.jsonl
+sha256sum analise/copia-trabalho.jsonl
+
+# 3. registro de custódia (uma linha por manuseio)
+# data/hora (com fuso) | quem | o quê | hash SHA-256 | onde ficou guardado
+# 02/11/2026 10:14 -03 | Ana R. (SOC) | exportação do painel | 9f2c...e41a | cofre de evidências, item 56-01</code></pre>
+        </div>
+
+        <h3>PNCiber e E-Ciber: o quadro nacional</h3>
+        <p>
+            Além do Código Penal e do Marco Civil, o país tem uma política de Estado para o tema. A <strong>Política Nacional de Cibersegurança (PNCiber)</strong> foi instituída pelo <strong>Decreto 11.856/2023</strong>, de 26/12/2023, que também criou o Comitê Nacional de Cibersegurança. A nova <strong>Estratégia Nacional de Cibersegurança (E-Ciber)</strong> veio com o <strong>Decreto 12.573/2025</strong>, de 04/08/2025, que revogou a estratégia anterior (Decreto 10.222/2020). Elas não criam crimes nem prazos de guarda; orientam a atuação do governo, a cooperação com o setor privado e a formação de profissionais. Para o analista, servem de referência ao alinhar o programa de segurança e a resposta a incidentes com as prioridades nacionais.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Enquadramento de Casos</h2>
+        </div>
+
+        <p class="lead-text">
+            Cinco casos fictícios da Ipê Pay e da Ipê Store chegaram à equipe de segurança. Para cada um: (1) escolha o tipo penal, ou diga que não é crime; (2) marque os registros que a investigação precisa e indique a quem pedir cada um; (3) ponha os passos de preservação de provas na ordem certa. Ao corrigir, o simulador explica cada escolha com o dispositivo legal correspondente. Cada caso vale até 3 pontos: um pelo tipo, um pelos registros sem nenhum erro e um pela ordem dos passos.
+        </p>
+
+        <div class="lab-box lcc-lab" id="lcc-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Tipo penal, registros e cadeia de custódia</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Enquadramento de Casos: Ipê Pay e Ipê Store</h3>
+                    <p id="lcc-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body" style="min-width: 0;">
+                <div id="lcc-casos" role="group" aria-label="Escolha o caso" style="display: flex; flex-wrap: wrap; gap: 0.4rem;"></div>
+                <div id="lcc-placar" aria-live="polite" style="margin-top: 0.6rem; font-size: 0.85rem; font-weight: 600;"></div>
+                <div id="lcc-caso" style="margin-top: 0.8rem; min-width: 0; overflow-wrap: anywhere;"></div>
+                <p style="font-size: 0.76rem; color: var(--muted); margin: 0.8rem 0 0 0;">Material educativo, não é orientação jurídica. Penas conferidas no Código Penal compilado (planalto.gov.br) em 02/11/2026.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Preparação Jurídica e Preservação</h2>
+        </div>
+
+        <p class="lead-text">
+            Use como roteiro para preparar a resposta a incidentes para a esfera penal. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="legislacao-e-crimes-ciberneticos">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lcc-1">
+                <label for="chk-lcc-1"><strong>Retenção de logs definida:</strong> a política de retenção cobre aplicativo, VPN, EDR, painéis e transações por tempo suficiente para uma investigação, com relógios sincronizados e fuso horário registrado.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lcc-2">
+                <label for="chk-lcc-2"><strong>Coleta com hash:</strong> toda exportação de evidência tem hash SHA-256 calculado na coleta e conferido a cada cópia; a análise é feita só na cópia de trabalho.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lcc-3">
+                <label for="chk-lcc-3"><strong>Registro de custódia:</strong> existe formulário com quem coletou, quando, como, o hash e onde o material ficou guardado, alinhado aos arts. 158-A a 158-F do CPP.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lcc-4">
+                <label for="chk-lcc-4"><strong>Prazos do Marco Civil no playbook:</strong> o plano de resposta lembra que registros de acesso a aplicações têm guarda mínima de 6 meses (art. 15) e de conexão de 1 ano (art. 13), e prevê pedir a preservação logo no início.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lcc-5">
+                <label for="chk-lcc-5"><strong>Canal com o jurídico:</strong> o jurídico participa da decisão de registrar boletim de ocorrência e de responder a ordens judiciais, e a equipe técnica sabe que o conteúdo e os registros de terceiros só saem com ordem judicial.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lcc-6">
+                <label for="chk-lcc-6"><strong>Esferas separadas:</strong> o mesmo incidente é avaliado na esfera penal (este módulo), na LGPD e na ANPD (Estudo 27) e na regulação setorial (Estudo 54), cada uma com seus prazos.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lcc-7">
+                <label for="chk-lcc-7"><strong>Texto vigente conferido:</strong> qualquer pena ou artigo citado em relatório ou treinamento interno é conferido no Código Penal compilado (planalto.gov.br), com a data da conferência.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Falsa central):</strong> Antônio, convencido por uma falsa central, fez ele mesmo o Pix para a "conta segura". Furto mediante fraude ou fraude eletrônica?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Fraude eletrônica (art. 171, §2º-A). A vítima foi induzida a erro por contato telefônico e mensagens e entregou ela mesma o dinheiro. No furto mediante fraude, quem tira o dinheiro é o agente, depois de usar a fraude para burlar a vigilância da vítima.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Sequestro de conta):</strong> Um golpista entrou no e-mail de um cliente de 70 anos, redefiniu a senha do aplicativo, habilitou-o no próprio aparelho e transferiu o saldo. Qual o enquadramento e o que pesa na pena?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Furto mediante fraude eletrônica (art. 155, §4º-B): o golpista subtraiu o dinheiro, e a fraude serviu para burlar a vigilância. Como a vítima é idosa, incide o aumento do §4º-C (de 1/3 ao dobro). A pena-base desse parágrafo ganhou nova redação pela Lei 15.397/2026; confira sempre o texto vigente.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Quem guarda o quê):</strong> O log do aplicativo mostra o IP de quem acessou a conta. A quem se pede a identificação do assinante, e por quanto tempo ele é obrigado a guardar essa informação?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Ao provedor de conexão, a operadora que atribuiu aquele IP, que guarda os registros de conexão por 1 ano (Marco Civil, art. 13). O pedido depende de ordem judicial e precisa de data, hora e fuso exatos e, quando houver, da porta de origem. O provedor de aplicação guarda os registros de acesso a aplicações por 6 meses (art. 15).</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Prazo vencido):</strong> Uma auditoria descobre, oito meses depois, que a credencial usada numa invasão foi roubada por uma página falsa hospedada num serviço de sites. Que registro provavelmente se perdeu, e qual ainda pode existir?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Os registros de acesso à página falsa, no provedor de aplicação, tinham guarda obrigatória de 6 meses (art. 15) e podem não existir mais. Os registros de conexão, guardados por 1 ano (art. 13), ainda estão no prazo e podem identificar o assinante a partir do IP que ficou nos logs internos. A lição é pedir a preservação logo no início.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Custódia):</strong> Um analista exportou os logs do painel, filtrou numa planilha, apagou as linhas "irrelevantes" e mandou o arquivo por e-mail ao jurídico. O que a defesa pode alegar?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Que a prova foi alterada e não há como provar a integridade: sem hash do arquivo original, sem registro de quem coletou e manuseou e com edição no meio do caminho, a cadeia de custódia (CPP, arts. 158-A a 158-F) foi quebrada. O certo é exportar sem editar, calcular o hash, registrar a custódia e filtrar só numa cópia de trabalho.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Não é crime):</strong> Uma analista mandou para o e-mail pessoal uma planilha de clientes a que tinha acesso legítimo, para trabalhar em casa. A diretoria quer registrar boletim de ocorrência por invasão. O que você responde?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não houve invasão de dispositivo alheio, porque ela usou o próprio acesso autorizado, nem vantagem obtida por fraude. É violação de política interna e possivelmente incidente de segurança com dados pessoais: esfera trabalhista e LGPD, com avaliação da comunicação à ANPD (Estudo 27). Os logs internos devem ser preservados do mesmo jeito, com hash e registro de custódia.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>Art. 154-A: invasão de dispositivo informático</h4>
+                <p>Incluído pela Lei 12.737/2012; reclusão de 1 a 4 anos e multa, redação dada pela Lei 14.155/2021.</p>
+            </div>
+            <div class="facts-card">
+                <h4>Fraude eletrônica: art. 171 §2º-A (redação de 2026)</h4>
+                <p>Vítima induzida a erro entrega o bem. Criada pela Lei 14.155/2021, com redação atualizada pela Lei 15.397/2026; confira a pena no texto vigente. O furto mediante fraude eletrônica (art. 155, §4º-B) passou a reclusão de 4 a 10 anos e multa.</p>
+            </div>
+            <div class="facts-card">
+                <h4>Marco Civil: conexão 1 ano, aplicações 6 meses</h4>
+                <p>Lei 12.965/2014: registros de conexão (art. 13) e de acesso a aplicações (art. 15), fornecidos mediante ordem judicial. Cadeia de custódia nos arts. 158-A a 158-F do CPP.</p>
+            </div>
+            <div class="facts-card">
+                <h4>PNCiber (2023) e E-Ciber (2025)</h4>
+                <p>Decreto 11.856/2023 (Política e Comitê Nacional de Cibersegurança) e Decreto 12.573/2025 (Estratégia Nacional de Cibersegurança, que revogou o Decreto 10.222/2020).</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>Decreto-Lei nº 2.848/1940 (Código Penal), texto compilado em planalto.gov.br: art. 154-A, art. 155, §§4º-B e 4º-C, e art. 171, §§2º-A e 2º-B (conferido em 02/11/2026).</li>
+            <li>Lei nº 12.737/2012 (invasão de dispositivo informático), Lei nº 14.155/2021 (fraude eletrônica e furto mediante fraude eletrônica) e Lei nº 15.397/2026 (penas de crimes patrimoniais).</li>
+            <li>Lei nº 12.965/2014 (Marco Civil da Internet), arts. 13 e 15.</li>
+            <li>Decreto-Lei nº 3.689/1941 (Código de Processo Penal), arts. 158-A a 158-F, incluídos pela Lei nº 13.964/2019.</li>
+            <li>Decreto nº 11.856/2023 (PNCiber) e Decreto nº 12.573/2025 (E-Ciber).</li>
+            <li>ABNT NBR ISO/IEC 27037: diretrizes para identificação, coleta, aquisição e preservação de evidência digital.</li>
+            <li>NIST Cybersecurity Framework 2.0: função Govern (GV.OC, requisitos legais e regulatórios).</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos passos na Trilha 13</strong>
+            </div>
+            <p>
+                Este é o terceiro estudo da Trilha 13 (Setor Regulado no Brasil). O Estudo 54 apresentou a regulação de cibersegurança do setor financeiro que a Ipê Pay segue, e o Estudo 55 a mesa antifraude que gera os primeiros vestígios dos golpes. O Estudo 57 fecha a trilha com a gestão de riscos de terceiros: os provedores e fornecedores que guardam parte dos registros de que uma investigação depende.
+            </p>
+        </div>
+    </section>
+
+</article>
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="lcc-dados">
+{
+ "contexto": "Casos fictícios da Ipê Pay (instituição de pagamento fictícia) e da Ipê Store (varejista fictícia), com data de referência 02/11/2026. Pessoas, contas e serviços inventados.",
+ "tipos": {
+  "invasao": {"nome": "Invasão de dispositivo informático",
+   "dispositivo": "Código Penal, art. 154-A (incluído pela Lei 12.737/2012)",
+   "pena": "Reclusão de 1 a 4 anos e multa (redação dada pela Lei 14.155/2021).",
+   "nucleo": "Entrar em dispositivo informático de uso alheio, sem autorização, para obter, adulterar ou destruir dados."},
+  "furto_fraude": {"nome": "Furto mediante fraude eletrônica",
+   "dispositivo": "Código Penal, art. 155, §4º-B (incluído pela Lei 14.155/2021); aumentos no §4º-C",
+   "pena": "Reclusão de 4 a 10 anos e multa (redação dada pela Lei 15.397/2026).",
+   "nucleo": "O próprio agente subtrai o bem; a fraude por dispositivo eletrônico ou informático serve para burlar a vigilância da vítima."},
+  "fraude_eletronica": {"nome": "Fraude eletrônica",
+   "dispositivo": "Código Penal, art. 171, §2º-A (incluído pela Lei 14.155/2021); aumento do §2º-B se usado servidor fora do país",
+   "pena": "Redação dada pela Lei 15.397/2026; confira a pena no texto vigente.",
+   "nucleo": "A vítima, ou um terceiro, é induzida a erro por meio eletrônico e entrega ela mesma o bem ou a informação."},
+  "nao_crime": {"nome": "Não é crime: ilícito civil, trabalhista ou LGPD",
+   "dispositivo": "Sem tipo penal: política interna, contrato de trabalho e LGPD (Estudo 27)",
+   "pena": "Sem pena criminal; cabem medidas disciplinares, responsabilidade civil e, havendo dados pessoais, as regras da LGPD e da ANPD.",
+   "nucleo": "Acesso autorizado, erro ou descumprimento de política, sem invasão de dispositivo alheio nem vantagem obtida por fraude."}
+ },
+ "destinos": {
+  "propria_empresa": "A própria empresa (equipe de segurança)",
+  "provedor_conexao": "Provedor de conexão (operadora de internet)",
+  "provedor_aplicacao": "Provedor de aplicação (e-mail, mensagens, nuvem, sites)"
+ },
+ "registros": {
+  "logs_internos": {"nome": "Logs internos da própria empresa (aplicativo, VPN, EDR, painel, transações)",
+   "destino": "propria_empresa", "prazo_dias": null, "ordem_judicial": false,
+   "fundamento": "São da própria empresa: preserve com hash e registro de custódia, conforme a política de retenção. Não dependem de ordem judicial."},
+  "conexao": {"nome": "Registros de conexão (IP atribuído, data, hora e duração)",
+   "destino": "provedor_conexao", "prazo_dias": 365, "ordem_judicial": true,
+   "fundamento": "Marco Civil, art. 13: o provedor de conexão guarda os registros de conexão por 1 ano. O fornecimento depende de ordem judicial."},
+  "aplicacao": {"nome": "Registros de acesso a aplicações (IP, data e hora de uso do serviço)",
+   "destino": "provedor_aplicacao", "prazo_dias": 180, "ordem_judicial": true,
+   "fundamento": "Marco Civil, art. 15: o provedor de aplicação guarda os registros de acesso a aplicações por 6 meses. O fornecimento depende de ordem judicial."},
+  "conteudo": {"nome": "Conteúdo de comunicações privadas (mensagens, e-mails)",
+   "destino": "provedor_aplicacao", "prazo_dias": null, "ordem_judicial": true,
+   "fundamento": "O conteúdo de comunicações privadas só é fornecido pelo provedor de aplicação mediante ordem judicial. Peça só quando for indispensável e a vítima não tiver cópia."}
+ },
+ "ordem_canonica": ["isolar", "fixar", "coletar_hash", "registrar", "analisar_copia", "comunicar"],
+ "passos": {
+  "isolar": {"texto": "Isolar o vestígio e não alterar o original",
+   "fundamento": "Antes de qualquer manuseio, o vestígio é isolado: ligar, desligar, reiniciar ou navegar no original altera dados e metadados (cadeia de custódia, CPP, arts. 158-A a 158-F)."},
+  "fixar": {"texto": "Documentar o estado em que foi encontrado (fotos, telas, data e hora)",
+   "fundamento": "A fixação descreve o vestígio como foi encontrado, antes da coleta, e mostra a quem ler o laudo o ponto de partida."},
+  "coletar_hash": {"texto": "Coletar a cópia forense e calcular o hash SHA-256 do original e da cópia",
+   "fundamento": "O hash prova que a cópia é idêntica ao original: qualquer bit alterado muda o valor (Estudo 19)."},
+  "registrar": {"texto": "Registrar quem coletou, quando e como, e lacrar o material",
+   "fundamento": "O registro de cada pessoa que manuseou o vestígio dá rastreabilidade à prova; sem ele, a defesa pode questionar a integridade."},
+  "analisar_copia": {"texto": "Analisar só a cópia de trabalho, conferindo o hash",
+   "fundamento": "A análise nunca é feita no original: a cópia de trabalho pode ser refeita a partir da cópia preservada, e o hash confirma que nada mudou."},
+  "comunicar": {"texto": "Entregar o material à autoridade com o registro de custódia (boletim de ocorrência)",
+   "fundamento": "A investigação penal começa com a notícia do crime à polícia; o material segue com o registro de custódia e os hashes."}
+ },
+ "casos": [
+  {"id": "C1", "empresa": "Ipê Store", "titulo": "Estação do gerente financeiro acessada de fora", "dias_desde_fato": 40, "tipo": "invasao",
+   "relato": "Há 40 dias, a estação de trabalho do gerente financeiro da Ipê Store foi acessada remotamente por alguém de fora da empresa, por meio de uma ferramenta de acesso remoto instalada depois de um e-mail falso. O invasor copiou planilhas de fornecedores para uma conta num serviço de armazenamento em nuvem. Não houve transferência de dinheiro.",
+   "vestigio": "Estação de trabalho do gerente (disco e memória) e logs do proxy e do EDR.",
+   "registros": ["logs_internos", "aplicacao", "conexao"],
+   "ordem_correta": ["isolar", "fixar", "coletar_hash", "registrar", "analisar_copia", "comunicar"],
+   "ordem_inicial": ["coletar_hash", "analisar_copia", "isolar", "comunicar", "registrar", "fixar"],
+   "explicacao_tipo": "Entrar sem autorização no dispositivo de uso alheio para obter dados é o núcleo do art. 154-A. Ninguém obteve dinheiro da vítima, então não é furto nem fraude eletrônica. A cópia das planilhas pode também ser incidente de segurança (Estudo 27), mas essa é outra esfera.",
+   "explicacao_registros": "Os logs do proxy e do EDR são da própria Ipê Store. A conta de armazenamento em nuvem é de um provedor de aplicação: os registros de acesso (6 meses, art. 15) mostram de que IP o invasor a usou. Com IP, data e hora, o provedor de conexão (1 ano, art. 13) identifica o assinante. Os dois pedidos externos dependem de ordem judicial."},
+  {"id": "C2", "empresa": "Ipê Pay", "titulo": "Falsa central: o Pix de Antônio", "dias_desde_fato": 10, "tipo": "fraude_eletronica",
+   "relato": "Há 10 dias, Antônio, 66 anos, cliente da Ipê Pay, recebeu mensagens e uma chamada por um aplicativo de mensagens de uma suposta central de segurança. Convencido de que a conta tinha sido invadida, fez ele mesmo um Pix de R$ 15.000 para uma \"conta segura\". Por orientação do golpista, apagou a conversa logo depois.",
+   "vestigio": "Celular da vítima (comprovante e o que restou da conversa) e registros da transação na Ipê Pay.",
+   "registros": ["logs_internos", "aplicacao", "conteudo", "conexao"],
+   "ordem_correta": ["fixar", "coletar_hash", "registrar", "comunicar"],
+   "ordem_inicial": ["comunicar", "coletar_hash", "fixar", "registrar"],
+   "explicacao_tipo": "A vítima, induzida a erro por contato telefônico e mensagens, transferiu ela mesma o dinheiro: é a fraude eletrônica do art. 171, §2º-A. Não é furto mediante fraude, porque ninguém subtraiu o valor. Se o golpista usou servidor fora do país, pesa o aumento do §2º-B.",
+   "explicacao_registros": "Os logs da transação e da conta recebedora estão na própria Ipê Pay. A conta do golpista no aplicativo de mensagens é de um provedor de aplicação: registros de acesso (6 meses, art. 15) e, como a vítima apagou a conversa, o conteúdo das mensagens, que só sai com ordem judicial. Com o IP, o provedor de conexão (1 ano, art. 13) identifica o assinante."},
+  {"id": "C3", "empresa": "Ipê Pay", "titulo": "Conta sequestrada pelo e-mail", "dias_desde_fato": 20, "tipo": "furto_fraude",
+   "relato": "Há 20 dias, um golpista entrou no e-mail de Rafael, 70 anos, com uma senha vazada, redefiniu a senha do aplicativo da Ipê Pay, habilitou o aplicativo no próprio aparelho e transferiu R$ 4.800 para uma conta de passagem. Rafael só percebeu no dia seguinte.",
+   "vestigio": "Registros da sessão e do dispositivo no aplicativo da Ipê Pay e o celular da vítima.",
+   "registros": ["logs_internos", "aplicacao", "conexao"],
+   "ordem_correta": ["fixar", "coletar_hash", "registrar", "analisar_copia", "comunicar"],
+   "ordem_inicial": ["analisar_copia", "registrar", "fixar", "comunicar", "coletar_hash"],
+   "explicacao_tipo": "Aqui a vítima não entregou nada: o golpista usou a fraude (a senha redefinida, o aplicativo no aparelho dele) para burlar a vigilância e subtraiu ele mesmo o dinheiro. É o furto mediante fraude eletrônica do art. 155, §4º-B. Como a vítima é idosa, incide o aumento do §4º-C (de 1/3 ao dobro).",
+   "explicacao_registros": "Os logs do aplicativo (dispositivo novo, redefinição de senha, IP da sessão) estão na própria Ipê Pay. O provedor do e-mail é provedor de aplicação: registros de acesso à conta invadida (6 meses, art. 15). Com o IP, o provedor de conexão (1 ano, art. 13) identifica o assinante. Os pedidos externos dependem de ordem judicial."},
+  {"id": "C4", "empresa": "Ipê Store", "titulo": "Planilha de clientes no e-mail pessoal", "dias_desde_fato": 5, "tipo": "nao_crime",
+   "relato": "Há 5 dias, o DLP da Ipê Store alertou que uma analista de marketing enviou para o próprio e-mail pessoal uma planilha com nomes e telefones de 3.000 clientes, para terminar uma campanha em casa. Ela tinha acesso legítimo à planilha, e não há sinal de venda nem de uso dos dados.",
+   "vestigio": "Estação da analista, alerta do DLP e logs do e-mail corporativo.",
+   "registros": ["logs_internos"],
+   "ordem_correta": ["isolar", "fixar", "coletar_hash", "registrar", "analisar_copia"],
+   "ordem_inicial": ["fixar", "analisar_copia", "registrar", "isolar", "coletar_hash"],
+   "explicacao_tipo": "Não houve invasão de dispositivo alheio, porque ela usou o próprio acesso autorizado, nem vantagem obtida por fraude. É violação de política interna e possivelmente incidente de segurança com dados pessoais: esfera trabalhista e LGPD, com avaliação da comunicação à ANPD (Estudo 27), e não penal.",
+   "explicacao_registros": "Tudo o que importa está nos logs internos da própria Ipê Store (DLP e e-mail corporativo). Pedir ao provedor o conteúdo do e-mail pessoal exigiria ordem judicial, e não há crime que a justifique; a planilha enviada já está registrada no servidor corporativo."},
+  {"id": "C5", "empresa": "Ipê Store", "titulo": "Painel da loja alterado oito meses atrás", "dias_desde_fato": 240, "tipo": "invasao",
+   "relato": "Uma auditoria descobriu agora que, há 240 dias (cerca de oito meses), alguém entrou no painel administrativo da loja virtual da Ipê Store com a credencial de um funcionário, roubada por uma página falsa hospedada num serviço de sites, e apagou o histórico de pedidos de uma semana.",
+   "vestigio": "Servidor da loja virtual e logs do painel administrativo, que guardam o IP do acesso.",
+   "registros": ["logs_internos", "conexao"],
+   "ordem_correta": ["isolar", "coletar_hash", "registrar", "analisar_copia", "comunicar"],
+   "ordem_inicial": ["registrar", "comunicar", "analisar_copia", "coletar_hash", "isolar"],
+   "explicacao_tipo": "Entrar sem autorização no servidor da loja, com credencial roubada, para destruir dados é invasão de dispositivo informático (art. 154-A). Ninguém obteve dinheiro da vítima.",
+   "explicacao_registros": "Os logs do painel são da própria Ipê Store e trazem o IP do invasor. O provedor de conexão guarda os registros por 1 ano (art. 13): 240 dias ainda estão no prazo. Já os registros de acesso à página falsa, no provedor de aplicação, tinham guarda obrigatória de só 6 meses (art. 15): passados 240 dias, podem não existir mais. Lição: peça a preservação logo no início."}
+ ]
+}
+</script>
+<script>
+(function() {
+    var D = JSON.parse(document.getElementById("lcc-dados").textContent);
+    var estado = { atual: D.casos[0].id, casos: {} };
+    D.casos.forEach(function(c) {
+        estado.casos[c.id] = { tipo: null, escolhas: {}, ordem: c.ordem_inicial.slice(), resultado: null };
+    });
+
+    function $(id) { return document.getElementById(id); }
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function has(o, k) { return o !== null && typeof o === "object" && Object.prototype.hasOwnProperty.call(o, k); }
+    function casoPorId(id) {
+        for (var i = 0; i < D.casos.length; i++) if (D.casos[i].id === id) return D.casos[i];
+        return null;
+    }
+
+    // ================================================ regras (espelhadas nos testes)
+    window.prazoVencido = function(registro, dias) {
+        return registro.prazo_dias !== null && registro.prazo_dias !== undefined && dias > registro.prazo_dias;
+    };
+
+    window.corrigirTipo = function(caso, escolha) {
+        return escolha === caso.tipo;
+    };
+
+    window.classificarRegistros = function(caso, escolhas) {
+        var res = {};
+        caso.registros.forEach(function(rid) {
+            if (!has(escolhas, rid)) res[rid] = "faltou";
+            else if (escolhas[rid] !== D.registros[rid].destino) res[rid] = "destinatario_errado";
+            else res[rid] = "acerto";
+        });
+        Object.keys(escolhas).forEach(function(rid) {
+            if (caso.registros.indexOf(rid) >= 0 || !has(D.registros, rid)) return;
+            res[rid] = window.prazoVencido(D.registros[rid], caso.dias_desde_fato) ? "vencido" : "desnecessario";
+        });
+        return res;
+    };
+
+    window.corrigirOrdem = function(caso, ordem) {
+        var certa = caso.ordem_correta, posicoes = 0;
+        for (var i = 0; i < certa.length && i < ordem.length; i++) if (ordem[i] === certa[i]) posicoes++;
+        return { posicoes: posicoes, total: certa.length, ok: posicoes === certa.length && ordem.length === certa.length };
+    };
+
+    window.moverPasso = function(ordem, i, delta) {
+        var j = i + delta, nova = ordem.slice();
+        if (i >= 0 && i < nova.length && j >= 0 && j < nova.length) {
+            var tmp = nova[i];
+            nova[i] = nova[j];
+            nova[j] = tmp;
+        }
+        return nova;
+    };
+
+    window.corrigirCaso = function(caso, tipo, escolhas, ordem) {
+        var t = window.corrigirTipo(caso, tipo);
+        var r = window.classificarRegistros(caso, escolhas);
+        var o = window.corrigirOrdem(caso, ordem);
+        var regOk = Object.keys(r).every(function(k) { return r[k] === "acerto"; });
+        return { tipo_ok: t, registros: r, registros_ok: regOk, ordem: o,
+                 pontos: (t ? 1 : 0) + (regOk ? 1 : 0) + (o.ok ? 1 : 0) };
+    };
+
+    // ================================================ interface
+    var ROTULO_STATUS = {
+        acerto: "Certo",
+        faltou: "Faltou pedir",
+        destinatario_errado: "Pedido ao destinatário errado",
+        desnecessario: "Desnecessário neste caso",
+        vencido: "Prazo de guarda obrigatória vencido"
+    };
+    var COR_STATUS = {
+        acerto: "var(--tip-color)", faltou: "var(--danger-color)", destinatario_errado: "var(--danger-color)",
+        desnecessario: "var(--warning-color)", vencido: "var(--warning-color)"
+    };
+
+    function renderPlacar() {
+        var pontos = 0, corrigidos = 0;
+        D.casos.forEach(function(c) {
+            var r = estado.casos[c.id].resultado;
+            if (r) { corrigidos++; pontos += r.pontos; }
+        });
+        $("lcc-placar").textContent = "Placar: " + pontos + " de " + (D.casos.length * 3) + " pontos · casos corrigidos: " +
+            corrigidos + " de " + D.casos.length;
+    }
+
+    function renderSeletor() {
+        var box = $("lcc-casos");
+        box.replaceChildren();
+        D.casos.forEach(function(c) {
+            var r = estado.casos[c.id].resultado;
+            var b = el("button", c.id + (r ? " (" + r.pontos + "/3)" : ""));
+            b.type = "button";
+            b.className = c.id === estado.atual ? "btn-primary" : "btn-secondary";
+            b.setAttribute("aria-pressed", c.id === estado.atual ? "true" : "false");
+            b.setAttribute("aria-label", "Caso " + c.id + ": " + c.titulo);
+            b.addEventListener("click", function() { estado.atual = c.id; renderTudo(); });
+            box.appendChild(b);
+        });
+    }
+
+    function grupo(titulo) {
+        var fs = el("fieldset", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem 0.7rem; margin: 0.8rem 0 0 0; min-width: 0;");
+        fs.appendChild(el("legend", titulo, "font-weight: 700; font-size: 0.9rem; padding: 0 0.3rem;"));
+        return fs;
+    }
+
+    function renderEtapaTipo(caso, st) {
+        var fs = grupo("1. Tipo penal");
+        Object.keys(D.tipos).forEach(function(tid) {
+            var t = D.tipos[tid];
+            var lb = el("label", null, "display: flex; gap: 0.5rem; align-items: flex-start; font-size: 0.85rem; margin: 0.25rem 0;");
+            var inp = document.createElement("input");
+            inp.type = "radio";
+            inp.name = "lcc-tipo-" + caso.id;
+            inp.value = tid;
+            inp.checked = st.tipo === tid;
+            inp.setAttribute("aria-label", t.nome);
+            inp.addEventListener("change", function() { st.tipo = tid; });
+            lb.appendChild(inp);
+            lb.appendChild(el("span", t.nome));
+            fs.appendChild(lb);
+        });
+        return fs;
+    }
+
+    function renderEtapaRegistros(caso, st) {
+        var fs = grupo("2. Registros a pedir e a quem");
+        Object.keys(D.registros).forEach(function(rid) {
+            var r = D.registros[rid];
+            var linha = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.3rem 0.7rem; align-items: center; margin: 0.35rem 0; font-size: 0.85rem;");
+            var lb = el("label", null, "display: flex; gap: 0.5rem; align-items: flex-start; flex: 1 1 14rem; min-width: 0;");
+            var chk = document.createElement("input");
+            chk.type = "checkbox";
+            chk.id = "lcc-reg-" + caso.id + "-" + rid;
+            chk.checked = has(st.escolhas, rid);
+            lb.appendChild(chk);
+            lb.appendChild(el("span", r.nome));
+            lb.setAttribute("for", chk.id);
+            var sel = el("select", null, "flex: 1 1 12rem; min-width: 0; max-width: 100%; font-size: 0.8rem;");
+            sel.className = "form-control";
+            sel.setAttribute("aria-label", "A quem pedir: " + r.nome);
+            Object.keys(D.destinos).forEach(function(did) {
+                var op = el("option", D.destinos[did]);
+                op.value = did;
+                sel.appendChild(op);
+            });
+            sel.value = has(st.escolhas, rid) ? st.escolhas[rid] : "propria_empresa";
+            sel.disabled = !chk.checked;
+            chk.addEventListener("change", function() {
+                if (chk.checked) st.escolhas[rid] = sel.value; else delete st.escolhas[rid];
+                sel.disabled = !chk.checked;
+            });
+            sel.addEventListener("change", function() { if (chk.checked) st.escolhas[rid] = sel.value; });
+            linha.appendChild(lb);
+            linha.appendChild(sel);
+            fs.appendChild(linha);
+        });
+        return fs;
+    }
+
+    function renderEtapaOrdem(caso, st) {
+        var fs = grupo("3. Ordem dos passos de preservação");
+        var lista = el("ol", null, "margin: 0.3rem 0 0 0; padding-left: 1.4rem; font-size: 0.85rem;");
+        st.ordem.forEach(function(pid, i) {
+            var li = el("li", null, "margin: 0.3rem 0;");
+            var linha = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.3rem 0.6rem; align-items: center;");
+            linha.appendChild(el("span", D.passos[pid].texto, "flex: 1 1 12rem; min-width: 0;"));
+            var botoes = el("span", null, "display: inline-flex; gap: 0.3rem;");
+            [[-1, "↑", "para cima"], [1, "↓", "para baixo"]].forEach(function(cfg) {
+                var b = el("button", cfg[1]);
+                b.type = "button";
+                b.className = "btn-secondary";
+                b.setAttribute("aria-label", "Mover \"" + D.passos[pid].texto + "\" " + cfg[2]);
+                b.setAttribute("data-passo", pid);
+                b.setAttribute("data-dir", String(cfg[0]));
+                b.disabled = (cfg[0] < 0 && i === 0) || (cfg[0] > 0 && i === st.ordem.length - 1);
+                b.addEventListener("click", function() {
+                    st.ordem = window.moverPasso(st.ordem, i, cfg[0]);
+                    renderCaso();
+                    var alvo = document.querySelector("#lcc-caso button[data-passo=\"" + pid + "\"][data-dir=\"" + cfg[0] + "\"]");
+                    if (alvo && alvo.disabled) alvo = document.querySelector("#lcc-caso button[data-passo=\"" + pid + "\"]:not([disabled])");
+                    if (alvo) alvo.focus();
+                });
+                botoes.appendChild(b);
+            });
+            linha.appendChild(botoes);
+            li.appendChild(linha);
+            lista.appendChild(li);
+        });
+        fs.appendChild(lista);
+        return fs;
+    }
+
+    function renderFeedback(caso, st) {
+        var box = el("div", null, "margin-top: 0.8rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.6rem; font-size: 0.82rem;");
+        box.id = "lcc-feedback";
+        box.setAttribute("role", "region");
+        box.setAttribute("aria-label", "Correção do caso " + caso.id);
+        box.setAttribute("tabindex", "-1");
+        var r = st.resultado;
+        if (!r) return box;
+        box.appendChild(el("strong", "Pontos neste caso: " + r.pontos + " de 3", "font-size: 0.9rem;"));
+
+        // tipo penal
+        var tc = D.tipos[caso.tipo];
+        var cTipo = el("div", null, "border-left: 4px solid " + (r.tipo_ok ? "var(--tip-color)" : "var(--danger-color)") + "; padding: 0.3rem 0.6rem;");
+        cTipo.appendChild(el("strong", r.tipo_ok ? "Tipo penal: certo." :
+            "Tipo penal: " + (st.tipoCorrigido ? "você escolheu \"" + D.tipos[st.tipoCorrigido].nome + "\"" : "nenhum escolhido") + "; o enquadramento é \"" + tc.nome + "\"."));
+        cTipo.appendChild(el("div", tc.dispositivo + ". " + tc.pena, "margin-top: 0.2rem; font-weight: 600;"));
+        cTipo.appendChild(el("div", caso.explicacao_tipo, "margin-top: 0.2rem;"));
+        box.appendChild(cTipo);
+
+        // registros
+        var cReg = el("div", null, "border-left: 4px solid " + (r.registros_ok ? "var(--tip-color)" : "var(--danger-color)") + "; padding: 0.3rem 0.6rem;");
+        cReg.appendChild(el("strong", r.registros_ok ? "Registros: todos certos." : "Registros: há o que corrigir."));
+        var ul = el("ul", null, "margin: 0.3rem 0 0 0; padding-left: 1.2rem;");
+        Object.keys(r.registros).forEach(function(rid) {
+            var s = r.registros[rid], reg = D.registros[rid];
+            var li = el("li", null, "margin: 0.2rem 0;");
+            li.setAttribute("data-status", s);
+            li.appendChild(el("strong", ROTULO_STATUS[s] + ": ", "color: " + COR_STATUS[s] + ";"));
+            var txt = reg.nome + " → " + D.destinos[reg.destino] + ". " + reg.fundamento;
+            if (s === "vencido") txt += " Passaram " + caso.dias_desde_fato + " dias desde o fato, além dos " + reg.prazo_dias + " dias de guarda obrigatória.";
+            li.appendChild(el("span", txt));
+            ul.appendChild(li);
+        });
+        cReg.appendChild(ul);
+        cReg.appendChild(el("div", caso.explicacao_registros, "margin-top: 0.2rem;"));
+        box.appendChild(cReg);
+
+        // ordem
+        var cOrd = el("div", null, "border-left: 4px solid " + (r.ordem.ok ? "var(--tip-color)" : "var(--danger-color)") + "; padding: 0.3rem 0.6rem;");
+        cOrd.appendChild(el("strong", "Ordem: " + r.ordem.posicoes + " de " + r.ordem.total + " passos na posição certa. Ordem correta:"));
+        var ol = el("ol", null, "margin: 0.3rem 0 0 0; padding-left: 1.3rem;");
+        caso.ordem_correta.forEach(function(pid, i) {
+            var certo = st.ordemCorrigida[i] === pid;
+            var li = el("li", null, "margin: 0.2rem 0;");
+            li.appendChild(el("strong", (certo ? "✔ " : "✘ ") + D.passos[pid].texto + ". ", "color: " + (certo ? "var(--tip-color)" : "var(--danger-color)") + ";"));
+            li.appendChild(el("span", D.passos[pid].fundamento));
+            ol.appendChild(li);
+        });
+        cOrd.appendChild(ol);
+        box.appendChild(cOrd);
+        return box;
+    }
+
+    function renderCaso() {
+        var caso = casoPorId(estado.atual), st = estado.casos[caso.id];
+        var box = $("lcc-caso");
+        box.replaceChildren();
+        var card = el("div", null, "border: 1px solid var(--rule); border-left: 4px solid var(--accent, var(--rule)); border-radius: var(--radius-sm); padding: 0.6rem 0.8rem; min-width: 0;");
+        card.appendChild(el("h4", caso.id + " · " + caso.titulo, "margin: 0;"));
+        card.appendChild(el("div", caso.empresa + " · " + caso.dias_desde_fato + " dias desde o fato", "font-size: 0.8rem; color: var(--muted); margin-top: 0.15rem;"));
+        card.appendChild(el("p", caso.relato, "margin: 0.4rem 0 0 0; font-size: 0.88rem;"));
+        card.appendChild(el("p", "Vestígio principal: " + caso.vestigio, "margin: 0.3rem 0 0 0; font-size: 0.82rem; font-style: italic;"));
+        box.appendChild(card);
+        box.appendChild(renderEtapaTipo(caso, st));
+        box.appendChild(renderEtapaRegistros(caso, st));
+        box.appendChild(renderEtapaOrdem(caso, st));
+        var acoes = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem;");
+        var bCorr = el("button", "Corrigir este caso");
+        bCorr.type = "button";
+        bCorr.className = "btn-primary";
+        bCorr.addEventListener("click", function() { window.corrigirCasoAtualLcc(); });
+        var bLimpa = el("button", "Recomeçar este caso");
+        bLimpa.type = "button";
+        bLimpa.className = "btn-secondary";
+        bLimpa.addEventListener("click", function() {
+            estado.casos[caso.id] = { tipo: null, escolhas: {}, ordem: caso.ordem_inicial.slice(), resultado: null };
+            renderTudo();
+        });
+        acoes.appendChild(bCorr);
+        acoes.appendChild(bLimpa);
+        box.appendChild(acoes);
+        var fb = renderFeedback(caso, st);
+        fb.setAttribute("aria-live", "polite");
+        box.appendChild(fb);
+    }
+
+    function renderTudo() {
+        renderSeletor();
+        renderPlacar();
+        renderCaso();
+    }
+
+    window.corrigirCasoAtualLcc = function() {
+        var caso = casoPorId(estado.atual), st = estado.casos[caso.id];
+        st.resultado = window.corrigirCaso(caso, st.tipo, st.escolhas, st.ordem);
+        st.tipoCorrigido = st.tipo;
+        st.ordemCorrigida = st.ordem.slice();
+        renderTudo();
+        var fb = $("lcc-feedback");
+        if (fb) fb.focus();
+        return st.resultado;
+    };
+
+    // atalho usado nos testes de navegador: escolhe o caso e preenche as respostas
+    window.responderCasoLcc = function(id, tipo, escolhas, ordem) {
+        if (!casoPorId(id)) return null;
+        estado.atual = id;
+        var st = estado.casos[id];
+        st.tipo = tipo;
+        st.escolhas = {};
+        Object.keys(escolhas || {}).forEach(function(k) { if (has(D.registros, k)) st.escolhas[k] = escolhas[k]; });
+        if (ordem) st.ordem = ordem.slice();
+        return window.corrigirCasoAtualLcc();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        $("lcc-contexto").textContent = D.contexto;
+        renderTudo();
+
+        if (typeof initChecklist === "function") {
+            initChecklist("legislacao-e-crimes-ciberneticos");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
