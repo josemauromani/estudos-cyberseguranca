@@ -140,6 +140,11 @@ class TestAssets(unittest.TestCase):
             "escapeHtml",
             "formatBytes",
             "formatNumber",
+            "bytesToHex",
+            "hexToBytes",
+            "sha256Hex",
+            "toggleTheme",
+            "labProgress",
         ]
         for fn in funcoes:
             self.assertIn(fn, content, f"Função JS obrigatória ausente em base.js: {fn}")
@@ -152,6 +157,9 @@ class TestAssets(unittest.TestCase):
         self.assertIn("cs_theme", content, "Chave de tema no localStorage deve ser cs_theme")
         self.assertIn("cs_check_", content, "Chave de checklist no localStorage deve conter cs_check_")
         self.assertIn("cs_done_", content, "Chave de conclusão no localStorage deve conter cs_done_")
+        self.assertIn("cs_read_", content, "Chave de leitura no localStorage deve conter cs_read_")
+        self.assertIn("cs_quiz_", content, "Chave de questões no localStorage deve conter cs_quiz_")
+        self.assertIn("cs_last", content, "Chave de último acesso no localStorage deve ser cs_last")
 
 
 if __name__ == "__main__":
