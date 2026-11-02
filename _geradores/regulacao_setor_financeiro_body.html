@@ -1,0 +1,823 @@
+<!-- Estudo 54: Regulacao-Setor-Financeiro Body Fragment -->
+<article class="study-container" data-slug="regulacao-setor-financeiro">
+
+    <!-- SEÇÃO 1: A PARCEIRA REGULADA -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: A Parceira Que Responde ao Banco Central</h2>
+        </div>
+
+        <p class="lead-text">
+            O checkout da Ipê Store passou a oferecer a carteira digital da Ipê Pay, uma instituição de pagamento (fictícia) autorizada pelo Banco Central, que emite moeda eletrônica, mantém contas de pagamento e participa do Pix. Para a loja, segurança é LGPD e PCI DSS. Para a Ipê Pay há mais uma camada, que não é contrato nem certificação voluntária: regulação. Em novembro de 2026, a auditoria interna da Ipê Pay pede uma avaliação da política de segurança cibernética e do contrato com o provedor de nuvem contra as regras do Banco Central, já com as alterações de dezembro de 2025. Este módulo ensina a fazer essa avaliação: quem se sujeita a qual norma, o que a política e o plano de resposta a incidentes precisam conter, o que muda quando o sistema vai para a nuvem e o que as alterações de 2025 acrescentaram.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>Pergunta-chave do módulo</strong>
+            </div>
+            <p>O que o Banco Central exige da sua política de segurança, e o que muda quando o sistema vai para a nuvem?</p>
+        </div>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🧭</span>
+                <strong>O que vem dos Estudos 25, 26, 31, 43 e 53</strong>
+            </div>
+            <p>
+                O Estudo 25 deu o vocabulário de risco (inerente, residual, apetite) que sustenta qualquer plano de ação. O Estudo 26 mostrou o SGSI da ISO/IEC 27001 e os controles da 27002, que muitas instituições usam como esqueleto da política. O Estudo 31 tratou do PCI DSS, uma obrigação contratual das bandeiras de cartão. O Estudo 43 apenas citou que a Res. CMN 4.893 exige comunicar incidentes relevantes ao Banco Central; aqui está o conjunto da norma. E o Estudo 53 investigou um incidente numa conta de nuvem: este módulo pergunta o que precisa estar no contrato e na política antes de um incidente desses acontecer numa instituição regulada.
+            </p>
+        </div>
+
+        <h3>Quem se sujeita a qual norma</h3>
+        <p>
+            São duas resoluções com o mesmo desenho de exigências, editadas por órgãos diferentes porque a competência para regular cada tipo de instituição é diferente. O Conselho Monetário Nacional (CMN) regula as instituições financeiras; o próprio Banco Central regula as instituições de pagamento e alguns outros tipos de instituição.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Norma</th><th>Quem se sujeita</th><th>Alteração mais recente conferida</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Res. CMN 4.893/2021</strong></td><td>Instituições financeiras e demais instituições autorizadas a funcionar pelo Banco Central sob competência do CMN: bancos, cooperativas de crédito, financeiras.</td><td>Res. CMN 5.274, de 18/12/2025</td></tr>
+                    <tr><td><strong>Res. BCB 85/2021</strong></td><td>Instituições de pagamento autorizadas, corretoras e distribuidoras de títulos e valores mobiliários e corretoras de câmbio.</td><td>Res. BCB 538, de 18/12/2025</td></tr>
+                    <tr><td>Nenhuma das duas</td><td>Empresas não autorizadas pelo Banco Central, como a Ipê Store. Valem LGPD, PCI DSS por contrato e as cláusulas que a instituição contratante repassar.</td><td>—</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Confira sempre o texto vigente</strong>
+            </div>
+            <p>Este módulo descreve as exigências no nível em que são amplamente conhecidas e se refere a elas por tema (por exemplo, "contratação de serviços de nuvem — Res. CMN 4.893"), sem citar números de artigos. As duas resoluções já foram alteradas e podem voltar a ser. Antes de usar qualquer requisito numa avaliação real, confira o texto compilado em <strong>normativos.bcb.gov.br</strong>, inclusive prazos e listas de controles.</p>
+        </div>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Quem Responde a Qual Norma e o Que Ela Exige</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Quem Responde a Qual Norma e o Que Ela Exige">
+flowchart TD
+    Q{"A empresa é autorizada<br>pelo Banco Central?"}
+    Q -->|"Não"| N["Nenhuma das duas<br><small>LGPD, PCI DSS por contrato</small>"]
+    Q -->|"Sim, instituição financeira"| C["Res. CMN 4.893/2021<br><small>alterada pela Res. CMN 5.274/2025</small>"]
+    Q -->|"Sim, instituição de pagamento"| B["Res. BCB 85/2021<br><small>alterada pela Res. BCB 538/2025</small>"]
+    C --> X["Mesmo conjunto de exigências"]
+    B --> X
+    subgraph EX["O que a instituição precisa ter"]
+        P["Política de segurança cibernética<br><small>aprovada pelo conselho</small>"]
+        R["Plano de ação e de resposta<br><small>diretor responsável, comunicação ao BC</small>"]
+        A["Relatório anual<br><small>data-base 31 de dezembro</small>"]
+        V["Contratação de nuvem<br><small>comunicação, contrato, responsabilidade</small>"]
+        D["Alterações de dez/2025<br><small>controles mínimos, teste de intrusão, Pix</small>"]
+    end
+    X --> P
+    X --> R
+    X --> A
+    X --> V
+    X --> D
+            </pre>
+        </div>
+
+        <p>
+            Uma consequência prática: a avaliação da Ipê Pay usa a Res. BCB 85, mas o raciocínio serve igual para um banco sob a Res. CMN 4.893. Por isso o simulador indica, em cada requisito, o tema nas duas normas.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 2: O QUE AS NORMAS EXIGEM -->
+    <section class="study-section" id="exigencias">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Política, Plano de Resposta, Nuvem e as Alterações de 2025</h2>
+        </div>
+
+        <h3>A política de segurança cibernética</h3>
+        <p>
+            A política de segurança cibernética é aprovada pelo conselho de administração ou, se a instituição não tiver conselho, pela diretoria. É divulgada aos funcionários e aos prestadores de serviço, em linguagem clara, e um resumo com as linhas gerais vai ao público. Ela precisa ser compatível com o porte, o perfil de risco e o modelo de negócio da instituição e tratar, pelo menos, de:
+        </p>
+        <ul>
+            <li><strong>Objetivos de segurança cibernética</strong> da instituição.</li>
+            <li><strong>Procedimentos e controles</strong> para reduzir a vulnerabilidade a incidentes: autenticação, criptografia, prevenção e detecção de intrusão, prevenção de vazamento de informações, testes e varreduras de vulnerabilidades, proteção contra código malicioso, rastreabilidade, controle de acesso e segmentação de rede, cópias de segurança. Os controles valem também para o desenvolvimento de sistemas seguros e para os serviços de terceiros.</li>
+            <li><strong>Classificação dos dados e das informações</strong> quanto à relevância.</li>
+            <li><strong>Registro, análise da causa e do impacto e controle dos efeitos</strong> dos incidentes, inclusive os que ocorrem em prestadores de serviço.</li>
+            <li><strong>Cenários de incidentes</strong> considerados nos testes de continuidade de negócios (Estudo 28).</li>
+            <li><strong>Capacitação e avaliação periódica de pessoal</strong> e informação aos clientes e usuários sobre precauções no uso dos produtos e serviços.</li>
+            <li><strong>Compartilhamento de informações</strong> sobre incidentes relevantes com outras instituições.</li>
+        </ul>
+
+        <h3>Plano de ação e de resposta a incidentes, diretor e relatório anual</h3>
+        <p>
+            A política vem acompanhada do <strong>plano de ação e de resposta a incidentes</strong>: as ações para adequar estrutura, rotinas e procedimentos à política; as rotinas, procedimentos, controles e tecnologias para prevenir e responder a incidentes; e a área responsável por registrar e controlar os efeitos dos incidentes relevantes. A instituição designa um <strong>diretor</strong> responsável pela política e pelo plano, que pode acumular outras funções desde que não haja conflito de interesses.
+        </p>
+        <p>
+            Uma vez por ano, a instituição elabora um <strong>relatório anual</strong> sobre a implementação do plano, com data-base de <strong>31 de dezembro</strong>, que trata, entre outros pontos, da efetividade das ações e dos incidentes relevantes do período. O relatório é apresentado ao comitê de riscos, quando houver, e ao conselho de administração ou, na falta dele, à diretoria.
+        </p>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">📣</span>
+                <strong>Comunicação ao Banco Central não é comunicação à ANPD</strong>
+            </div>
+            <p>As normas exigem comunicar ao Banco Central, de forma tempestiva, os incidentes relevantes e as interrupções de serviços relevantes que configurem situação de crise, com as providências adotadas. Como no Estudo 43, este módulo não afirma prazo: ele tem de ser conferido no texto vigente e escrito no plano a partir dessa conferência. Um incidente com dados pessoais numa instituição de pagamento pode gerar as duas comunicações, para destinatários diferentes e com regras diferentes.</p>
+        </div>
+
+        <h3>Contratação de processamento, armazenamento de dados e computação em nuvem</h3>
+        <p>
+            A parte das normas que mais pesa no dia a dia trata da contratação de serviços de processamento, armazenamento de dados e computação em nuvem. Em resumo:
+        </p>
+        <ul>
+            <li><strong>Antes de contratar:</strong> procedimentos para verificar a capacidade do prestador: conformidade com a legislação, acesso da instituição aos dados, confidencialidade, integridade, disponibilidade e recuperação dos dados, certificações exigidas, acesso a relatórios de auditoria independente e informação para monitorar o serviço.</li>
+            <li><strong>Comunicação ao Banco Central:</strong> a contratação de serviços relevantes é comunicada ao Banco Central, com as informações e no prazo que a norma estabelece.</li>
+            <li><strong>Exterior:</strong> só em país com convênio de troca de informações entre o Banco Central e a autoridade supervisora local, ou com autorização do Banco Central na falta de convênio; o contrato indica os <strong>países e regiões</strong> onde os dados podem ser armazenados e processados.</li>
+            <li><strong>Cláusulas do contrato:</strong> medidas de segurança e segregação dos dados; acesso do Banco Central a contratos, documentos e dados; obrigação de informar limitações que afetem o serviço; e, na extinção do contrato, transferência dos dados ao novo prestador ou à instituição, com exclusão só depois.</li>
+            <li><strong>Responsabilidade:</strong> a instituição continua responsável pela confiabilidade, integridade, disponibilidade, segurança e sigilo dos serviços contratados e pelo cumprimento da regulação. O contrato divide tarefas; a responsabilidade não se transfere ao fornecedor.</li>
+        </ul>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🚨</span>
+                <strong>Responsabilidade não se transfere ao fornecedor de nuvem</strong>
+            </div>
+            <p>Cláusulas como "a segurança dos dados hospedados é responsabilidade exclusiva do provedor" são comuns em minutas e contrariam a lógica das normas. O modelo de responsabilidade compartilhada do Estudo 21 continua valendo para dividir o trabalho (o provedor cuida do data center, a instituição cuida de identidades, configuração e dados), mas perante o Banco Central quem responde é a instituição.</p>
+        </div>
+
+        <h3>O que mudou em 18/12/2025</h3>
+        <p>
+            Em 18/12/2025 a Res. CMN 5.274 alterou a Res. CMN 4.893 e a Res. BCB 538 alterou a Res. BCB 85, no mesmo sentido. Os temas novos, descritos de forma concordante pelas fontes consultadas:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Tema</th><th>O que muda na prática</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Controles mínimos</strong></td><td>Controles detalhados e auditáveis, que precisam ser demonstrados com evidência, e não só descritos na política. Confira a lista no texto vigente.</td></tr>
+                    <tr><td><strong>Teste de intrusão anual</strong></td><td>Teste de intrusão ao menos uma vez por ano, conduzido por profissionais independentes. Varredura automatizada não substitui (Estudos 9 e 14).</td></tr>
+                    <tr><td><strong>Ambientes críticos</strong></td><td>Atenção aos ambientes que se conectam aos sistemas do Banco Central, como RSFN, Pix e STR, com isolamento do ambiente Pix.</td></tr>
+                    <tr><td><strong>Deep e dark web</strong></td><td>Monitoramento de vazamentos e de menções à instituição (Estudo 17).</td></tr>
+                    <tr><td><strong>Nuvem</strong></td><td>Reforço de que a responsabilidade não se transfere ao fornecedor.</td></tr>
+                    <tr><td><strong>Prazo</strong></td><td>Adequação até 01/03/2026 para quem já operava.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Onde a regulação se encaixa entre PCI DSS e ISO/IEC 27001</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th></th><th>PCI DSS (Estudo 31)</th><th>ISO/IEC 27001 (Estudo 26)</th><th>Res. CMN 4.893 / Res. BCB 85</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Natureza</strong></td><td>Contratual (bandeiras e adquirentes)</td><td>Voluntária (certificação)</td><td>Obrigatória (regulação)</td></tr>
+                    <tr><td><strong>Escopo</strong></td><td>Ambiente de dados de cartão</td><td>Escopo que a organização define</td><td>A instituição inteira e seus prestadores</td></tr>
+                    <tr><td><strong>Quem cobra</strong></td><td>QSA, adquirente</td><td>Organismo certificador</td><td>Banco Central (supervisão)</td></tr>
+                    <tr><td><strong>Consequência</strong></td><td>Multas contratuais, perda do credenciamento</td><td>Perda do certificado</td><td>Medidas de supervisão e processo administrativo sancionador</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Um SGSI certificado ajuda muito, mas não garante aderência: a ISO/IEC 27001 não exige comunicar incidentes ao Banco Central, nem relatório com data-base de 31 de dezembro, nem cláusula de acesso do regulador no contrato de nuvem. A técnica de trabalho é a mesma da declaração de aplicabilidade: uma matriz requisito por requisito, com status, evidência e dono.
+        </p>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">planilha — matriz de aderência da Ipê Pay (CSV)</span>
+                <button class="btn-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <pre><code>requisito;tema;status;evidencia;dono;prazo
+Politica aprovada pelo conselho;politica;parcial;Ata DTI 10/02/2026;Diretor responsavel;P3
+Plano de acao e de resposta a incidentes;incidentes;ausente;-;Diretor responsavel;P1
+Responsabilidade nao transferida ao provedor;nuvem;ausente;Contrato cl. 3;Juridico + Seguranca;P1
+Teste de intrusao anual independente;dez2025;ausente;Relatorio 2023 (interno);Seguranca;P1</code></pre>
+        </div>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">💡</span>
+                <strong>Atendido, parcial ou ausente</strong>
+            </div>
+            <p><strong>Atendido</strong>: o requisito está escrito e há evidência de que funciona. <strong>Parcial</strong>: existe algo, mas falta parte do conteúdo, o nível de aprovação está errado ou não há evidência. <strong>Ausente</strong>: não existe, ou o que existe trata de outra coisa (comunicar a ANPD não é comunicar o Banco Central). Marcar "parcial" por cortesia esconde a lacuna; marcar "ausente" por precaução infla o plano. Os dois erros custam.</p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Verificador de Aderência</h2>
+        </div>
+
+        <p class="lead-text">
+            Na fase 1 você indica a norma que vale para cada tipo de instituição. Na fase 2 lê trechos da política de segurança cibernética e do contrato de nuvem da Ipê Pay e marca, requisito por requisito, se está atendido, parcial ou ausente. O simulador compara com o gabarito, mostra as lacunas que você deixou passar e monta o plano de ação priorizado a partir das suas marcações. Todos os dados são fictícios e ficam na página.
+        </p>
+
+        <div class="lab-box rsf-lab" id="rsf-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Sujeição, aderência e plano de ação</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Verificador de Aderência: Ipê Pay</h3>
+                    <p id="rsf-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body" style="min-width: 0;">
+                <!-- FASE 1 -->
+                <h4 style="margin-top: 0.4rem;">Fase 1. Quem se sujeita a qual norma?</h4>
+                <div id="rsf-entidades" role="group" aria-label="Entidades e a norma aplicável" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 0.5rem 0.9rem; font-size: 0.82rem;"></div>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.6rem;">
+                    <button class="btn-primary" type="button" onclick="conferirSujeicaoRsf()">Conferir sujeição</button>
+                </div>
+                <div id="rsf-sujeicao-resultado" aria-live="polite" style="font-size: 0.85rem; margin-top: 0.6rem; overflow-wrap: anywhere;"></div>
+
+                <!-- FASE 2 -->
+                <h4 style="margin-top: 1.6rem;">Fase 2. Marque cada requisito</h4>
+                <p style="font-size: 0.85rem; margin: 0;">Leia o trecho e decida: atendido, parcial ou ausente. A fonte indica de qual documento da Ipê Pay o trecho saiu.</p>
+                <div id="rsf-requisitos" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.6rem; margin-top: 0.6rem;"></div>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem;">
+                    <button class="btn-primary" type="button" onclick="avaliarAderenciaRsf()">Avaliar aderência</button>
+                    <button class="btn-secondary" type="button" onclick="preencherGabaritoRsf()">Preencher com o gabarito</button>
+                    <button class="btn-secondary" type="button" onclick="limparRsf()">Limpar</button>
+                </div>
+
+                <div id="rsf-resultado" role="region" aria-label="Resultado da avaliação de aderência" tabindex="0" style="margin-top: 0.9rem; min-width: 0; overflow-wrap: anywhere;">
+                    <div id="rsf-indice" aria-live="polite" style="font-size: 0.9rem;"></div>
+                    <div id="rsf-divergencias" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.4rem; font-size: 0.8rem; margin-top: 0.5rem;"></div>
+                    <h4 style="margin-top: 1rem;">Plano de ação priorizado</h4>
+                    <p style="font-size: 0.78rem; margin: 0; color: var(--muted);">Pontos = criticidade (1 a 3) × 2 se ausente ou × 1 se parcial. P1 a partir de 6 pontos, P2 de 3 a 5, P3 abaixo de 3. Os prazos são metas internas sugeridas, não prazos normativos.</p>
+                    <ol id="rsf-plano" aria-label="Plano de ação priorizado" style="font-size: 0.8rem; margin: 0.5rem 0 0 0; padding-left: 1.4rem;"></ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Aderência às Normas do Banco Central</h2>
+        </div>
+
+        <p class="lead-text">
+            Use como roteiro da avaliação anual. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="regulacao-setor-financeiro">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-rsf-1">
+                <label for="chk-rsf-1"><strong>Sujeição e texto vigente:</strong> norma aplicável identificada (Res. CMN 4.893 ou Res. BCB 85) e texto compilado conferido em normativos.bcb.gov.br na data da avaliação, com as alterações de 18/12/2025.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-rsf-2">
+                <label for="chk-rsf-2"><strong>Política:</strong> aprovada pelo conselho de administração (ou diretoria, sem conselho), divulgada a funcionários e prestadores, com resumo público e todas as famílias de controles cobertas.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-rsf-3">
+                <label for="chk-rsf-3"><strong>Plano e diretor:</strong> plano de ação e de resposta a incidentes aprovado, área de registro dos incidentes relevantes definida e diretor responsável formalmente designado.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-rsf-4">
+                <label for="chk-rsf-4"><strong>Comunicação:</strong> critério de incidente relevante e fluxo de comunicação ao Banco Central escritos, separados do fluxo da ANPD, com prazo conferido no texto vigente.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-rsf-5">
+                <label for="chk-rsf-5"><strong>Relatório anual:</strong> data-base de 31 de dezembro, apresentado ao comitê de riscos e ao conselho, com efetividade das ações, incidentes relevantes e resultados dos testes.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-rsf-6">
+                <label for="chk-rsf-6"><strong>Nuvem:</strong> contratações relevantes comunicadas ao Banco Central; contrato com países e regiões, acesso do Banco Central, segregação, transferência antes da exclusão; nenhuma cláusula que transfira a responsabilidade ao provedor.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-rsf-7">
+                <label for="chk-rsf-7"><strong>Alterações de 2025:</strong> controles mínimos com dono, periodicidade e evidência; teste de intrusão anual por equipe independente; ambiente Pix isolado; monitoramento da deep e da dark web.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Sujeição):</strong> Uma fintech é autorizada pelo Banco Central como instituição de pagamento emissora de moeda eletrônica. O consultor entrega uma política "aderente à Res. CMN 4.893". Está errado?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A norma de referência está errada: instituição de pagamento segue a Res. BCB 85, editada pelo Banco Central. Como as duas têm o mesmo desenho de exigências, o conteúdo pode estar quase todo certo, mas a política, o plano e o relatório devem citar a norma que se aplica e acompanhar as alterações dela (no caso, a Res. BCB 538, de 18/12/2025).</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Responsabilidade):</strong> O contrato com o provedor de nuvem diz que "a segurança dos dados hospedados é de responsabilidade exclusiva do provedor". O jurídico acha ótimo. Qual é o problema?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Perante o Banco Central, a instituição continua responsável pela confiabilidade, integridade, disponibilidade, segurança e sigilo dos serviços contratados. O contrato pode distribuir tarefas e prever indenização, mas a responsabilidade regulatória não se transfere ao fornecedor. Além disso, na prática, a maioria dos incidentes em nuvem vem de configuração e identidade, que são do lado do cliente (Estudos 21 e 53).</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Teste de intrusão):</strong> A instituição roda varredura automatizada de vulnerabilidades toda semana e diz que isso cobre a exigência de teste de intrusão anual. Cobre?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. Varredura identifica vulnerabilidades conhecidas; teste de intrusão explora, encadeia e mede o impacto real (Estudos 9 e 14). As alterações de dezembro de 2025 pedem o teste de intrusão anual conduzido por profissionais independentes, o que também exclui a equipe que administra o ambiente testado.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Duas comunicações):</strong> A Ipê Pay sofre um vazamento de dados de clientes que também tira o Pix do ar por horas. A equipe comunica a ANPD e os titulares e encerra o assunto. O que faltou?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A comunicação ao Banco Central do incidente relevante e da interrupção de serviço relevante, com as providências adotadas, na forma e no prazo do texto vigente da norma. A obrigação da LGPD (Estudo 43) é outra, com outro destinatário. O plano de resposta precisa ter os dois fluxos, com critérios e responsáveis próprios.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Saída do provedor):</strong> A cláusula de rescisão diz "os dados serão excluídos em até 30 dias após o término". Por que isso é uma lacuna?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque a ordem exigida é transferir os dados ao novo prestador ou à instituição e só depois excluí-los. Uma exclusão automática sem transferência garantida pode deixar a instituição sem os dados de contas de clientes no meio de uma troca de fornecedor. O contrato precisa definir formato, prazo e confirmação da transferência; o plano de saída fica no dossiê da contratação (Estudo 57).</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Certificação ISO):</strong> A diretoria pergunta se a certificação ISO/IEC 27001 da Ipê Pay basta para considerar as normas do Banco Central atendidas. O que você responde?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não basta. O SGSI dá estrutura, controles e evidências que aproveitam boa parte dos requisitos, mas o escopo da certificação pode ser parcial e a norma tem exigências próprias: aprovação da política pelo conselho, diretor designado, comunicação ao Banco Central, relatório anual com data-base de 31 de dezembro, cláusulas específicas no contrato de nuvem, teste de intrusão anual e isolamento do ambiente Pix. A resposta certa é uma matriz de aderência requisito por requisito, como a do simulador.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Instituições financeiras</h4>
+                <p>CMN 4.893/2021, alterada pela CMN 5.274/2025: política, plano de ação e de resposta, relatório anual e contratação de nuvem.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Instituições de pagamento</h4>
+                <p>BCB 85/2021 para instituições de pagamento, com o mesmo desenho de exigências, alterada pela Res. BCB 538 em 18/12/2025.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Nuvem</h4>
+                <p>Responsabilidade não se transfere ao fornecedor de nuvem. O contrato divide tarefas, indica países e regiões e garante o acesso do Banco Central.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Dezembro de 2025</h4>
+                <p>Teste de intrusão anual e controles mínimos auditáveis, isolamento do ambiente Pix, monitoramento da dark web; adequação até 01/03/2026 para quem já operava.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>Resolução CMN nº 4.893/2021 e Resolução CMN nº 5.274, de 18/12/2025: texto compilado em normativos.bcb.gov.br.</li>
+            <li>Resolução BCB nº 85/2021 e Resolução BCB nº 538, de 18/12/2025: texto compilado em normativos.bcb.gov.br.</li>
+            <li>Voto CMN 88/2025, que fundamenta a alteração da Res. CMN 4.893 (normativos.bcb.gov.br).</li>
+            <li>ABNT NBR ISO/IEC 27001:2022 e 27002:2022 (Estudo 26) e PCI DSS v4.0.1 (Estudo 31), para o mapeamento de controles.</li>
+            <li>NIST Cybersecurity Framework 2.0, função Govern (GV.OC, GV.RR, GV.PO, GV.SC).</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos passos na Trilha 13</strong>
+            </div>
+            <p>
+                Este é o primeiro estudo da Trilha 13 (Setor Regulado no Brasil). O Estudo 55 desce ao ambiente Pix que você acabou de mandar isolar e trata da fraude em pagamentos e do MED 2.0, do lado da instituição. O Estudo 56 leva o incidente para a esfera penal e da prova. O Estudo 57 aprofunda a gestão de riscos de terceiros: a due diligence, as cláusulas e o plano de saída que apareceram aqui no contrato de nuvem valem para todo fornecedor crítico.
+            </p>
+        </div>
+    </section>
+
+</article>
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="rsf-dados">
+{
+ "contexto": "Ipê Pay Instituição de Pagamento S.A. (fictícia): emissora de moeda eletrônica autorizada pelo Banco Central, participante do Pix, com conselho de administração, operando desde 2023 e parceira da Ipê Store no checkout. Avaliação de novembro de 2026 sobre a Política de Segurança Cibernética (PSC v3) e o contrato com a NuvemSul (provedor de nuvem fictício).",
+ "normas": {
+  "cmn4893": "Res. CMN 4.893",
+  "bcb85": "Res. BCB 85",
+  "nenhuma": "Nenhuma das duas"
+ },
+ "entidades": [
+  {"id": "banco_multiplo", "nome": "Banco múltiplo", "norma": "cmn4893",
+   "explicacao": "Instituição financeira: segue a Res. CMN 4.893, alterada pela Res. CMN 5.274."},
+  {"id": "cooperativa", "nome": "Cooperativa de crédito", "norma": "cmn4893",
+   "explicacao": "Cooperativa de crédito é instituição financeira autorizada pelo Banco Central: Res. CMN 4.893."},
+  {"id": "financeira", "nome": "Sociedade de crédito, financiamento e investimento (financeira)", "norma": "cmn4893",
+   "explicacao": "A financeira é instituição financeira: Res. CMN 4.893."},
+  {"id": "ipe_pay", "nome": "Ipê Pay, instituição de pagamento emissora de moeda eletrônica", "norma": "bcb85",
+   "explicacao": "Instituição de pagamento segue a Res. BCB 85, editada pelo próprio Banco Central, com o mesmo desenho de exigências da CMN 4.893."},
+  {"id": "corretora_cambio", "nome": "Corretora de câmbio", "norma": "bcb85",
+   "explicacao": "Corretora de câmbio está entre as instituições da Res. BCB 85."},
+  {"id": "dtvm", "nome": "Distribuidora de títulos e valores mobiliários (DTVM)", "norma": "bcb85",
+   "explicacao": "Corretoras e distribuidoras de títulos e valores mobiliários estão entre as instituições da Res. BCB 85."},
+  {"id": "ipe_store", "nome": "Ipê Store, varejista online", "norma": "nenhuma",
+   "explicacao": "Loja não é instituição autorizada pelo Banco Central: nenhuma das duas. Valem a LGPD (Estudo 27), o PCI DSS por contrato (Estudo 31) e as cláusulas que a Ipê Pay repassar como contratante."}
+ ],
+ "temas": {
+  "politica": "Política de segurança cibernética",
+  "incidentes": "Plano de ação, resposta a incidentes e relatório anual",
+  "nuvem": "Contratação de nuvem",
+  "dez2025": "Alterações de dezembro de 2025"
+ },
+ "status": {
+  "atendido": "Atendido",
+  "parcial": "Parcial",
+  "ausente": "Ausente"
+ },
+ "prioridades": {
+  "P1": {"rotulo": "P1 · imediata", "prazo": "meta interna: até 30 dias"},
+  "P2": {"rotulo": "P2 · curto prazo", "prazo": "meta interna: até 90 dias"},
+  "P3": {"rotulo": "P3 · planejada", "prazo": "meta interna: até 180 dias"}
+ },
+ "requisitos": [
+  {"id": "pol_aprovacao", "tema": "politica", "gabarito": "parcial", "criticidade": 2,
+   "titulo": "Política aprovada pelo conselho de administração (ou pela diretoria, se não houver conselho) e divulgada a funcionários, prestadores de serviço e, em resumo, ao público",
+   "fonte": "PSC v3, capa e item 1",
+   "trecho": "Aprovada pela Diretoria de Tecnologia em 10/02/2026. Publicada na intranet para os colaboradores.",
+   "norma": "Política de segurança cibernética — Res. CMN 4.893 (instituições financeiras) e Res. BCB 85 (instituições de pagamento)",
+   "explicacao": "A política existe e chegou aos colaboradores, mas quem aprova é o conselho de administração (a Ipê Pay tem um); a diretoria só aprova quando não há conselho. Faltam também a divulgação aos prestadores de serviço e o resumo público com as linhas gerais.",
+   "acao": "Levar a política à aprovação do conselho de administração, divulgá-la aos prestadores de serviço e publicar um resumo com as linhas gerais."},
+  {"id": "pol_controles", "tema": "politica", "gabarito": "parcial", "criticidade": 2,
+   "titulo": "Procedimentos e controles para reduzir a vulnerabilidade a incidentes: autenticação, criptografia, prevenção e detecção de intrusão, prevenção de vazamento, testes e varreduras, proteção contra código malicioso, rastreabilidade, controle de acesso e segmentação de rede, cópias de segurança",
+   "fonte": "PSC v3, item 4",
+   "trecho": "4.1 MFA em todo acesso administrativo. 4.2 Criptografia em trânsito (TLS 1.2 ou superior) e em repouso. 4.3 Antimalware e EDR em todas as estações. 4.4 Backup diário com cópia fora do provedor principal.",
+   "norma": "Política de segurança cibernética — Res. CMN 4.893 (instituições financeiras) e Res. BCB 85 (instituições de pagamento)",
+   "explicacao": "Quatro famílias estão cobertas (autenticação, criptografia, código malicioso, cópias de segurança). Faltam prevenção e detecção de intrusão, prevenção de vazamento, testes e varreduras de vulnerabilidades, rastreabilidade e controle de acesso com segmentação de rede.",
+   "acao": "Completar o item 4 com as famílias que faltam e indicar, para cada uma, o controle, o dono e a evidência."},
+  {"id": "pol_classificacao", "tema": "politica", "gabarito": "atendido", "criticidade": 1,
+   "titulo": "Classificação dos dados e das informações quanto à relevância",
+   "fonte": "PSC v3, item 3",
+   "trecho": "Dados classificados como público, interno, confidencial e restrito (norma interna NI-02). Dados de conta de pagamento e chaves Pix são restritos; a classe define criptografia, retenção e acesso.",
+   "norma": "Política de segurança cibernética — Res. CMN 4.893 (instituições financeiras) e Res. BCB 85 (instituições de pagamento)",
+   "explicacao": "Atende: há classificação por relevância, aplicada aos dados críticos e ligada a controles, na mesma lógica da classificação da informação da ISO/IEC 27002 (Estudo 26).",
+   "acao": "Manter: revisar a NI-02 junto com a revisão anual da política."},
+  {"id": "pol_capacitacao", "tema": "politica", "gabarito": "atendido", "criticidade": 1,
+   "titulo": "Capacitação e avaliação periódica de pessoal; informação a clientes e usuários sobre precauções no uso de produtos e serviços",
+   "fonte": "PSC v3, item 7",
+   "trecho": "Treinamento anual obrigatório, com prova, para colaboradores e prestadores com acesso a sistemas; simulações de phishing trimestrais; página Segurança da sua conta no aplicativo, com orientações sobre golpes.",
+   "norma": "Política de segurança cibernética — Res. CMN 4.893 (instituições financeiras) e Res. BCB 85 (instituições de pagamento)",
+   "explicacao": "Atende: cobre pessoal próprio e terceirizado, mede o resultado e informa os clientes. É também a primeira defesa contra os golpes do Estudo 55.",
+   "acao": "Manter: levar as taxas de clique das simulações ao relatório anual como indicador."},
+  {"id": "inc_plano", "tema": "incidentes", "gabarito": "ausente", "criticidade": 3,
+   "titulo": "Plano de ação e de resposta a incidentes, com rotinas, procedimentos, controles e tecnologias de prevenção e resposta, e área responsável por registrar e controlar os efeitos dos incidentes relevantes",
+   "fonte": "PSC v3, item 8",
+   "trecho": "Os alertas de segurança são tratados pelo SOC terceirizado conforme o contrato de prestação de serviços.",
+   "norma": "Plano de ação e de resposta a incidentes — Res. CMN 4.893 (instituições financeiras) e Res. BCB 85 (instituições de pagamento)",
+   "explicacao": "Não há plano, só a indicação de que um fornecedor trata alertas. O plano é da instituição: ações para adequar estrutura e procedimentos, forma de prevenir e responder e área interna que registra os incidentes relevantes. Terceirizar o monitoramento não terceiriza a obrigação.",
+   "acao": "Escrever e aprovar o plano de ação e de resposta a incidentes (papéis, critério de relevância, acionamento, comunicação, registro), designar a área interna de registro e testá-lo em tabletop (Estudo 44)."},
+  {"id": "inc_diretor", "tema": "incidentes", "gabarito": "ausente", "criticidade": 2,
+   "titulo": "Diretor designado como responsável pela política de segurança cibernética e pelo plano de ação e de resposta a incidentes",
+   "fonte": "PSC v3, item 2",
+   "trecho": "A segurança cibernética é conduzida pela equipe de infraestrutura, sob coordenação do Gerente de Infraestrutura.",
+   "norma": "Plano de ação e de resposta a incidentes — Res. CMN 4.893 (instituições financeiras) e Res. BCB 85 (instituições de pagamento)",
+   "explicacao": "A norma pede um diretor designado, que pode acumular outras funções se não houver conflito de interesses. Um gerente coordenando a equipe não supre a designação formal nem a responsabilidade perante o Banco Central.",
+   "acao": "Designar formalmente um diretor responsável pela política e pelo plano e registrar a designação."},
+  {"id": "inc_comunicacao", "tema": "incidentes", "gabarito": "ausente", "criticidade": 3,
+   "titulo": "Comunicação tempestiva ao Banco Central dos incidentes relevantes e das interrupções de serviços relevantes que configurem situação de crise, com as providências adotadas",
+   "fonte": "PSC v3, item 8.3",
+   "trecho": "Incidentes que envolvam dados pessoais são comunicados à ANPD e aos titulares, conforme a LGPD.",
+   "norma": "Comunicação de incidentes relevantes ao Banco Central — Res. CMN 4.893 (instituições financeiras) e Res. BCB 85 (instituições de pagamento)",
+   "explicacao": "A comunicação à ANPD (Estudo 43) é outra obrigação, com outro destinatário. Para o Banco Central não há critério de relevância, responsável nem fluxo. O prazo e a forma vêm do texto vigente da norma e entram no plano depois dessa conferência.",
+   "acao": "Incluir no plano o critério de incidente relevante, o responsável e o fluxo de comunicação ao Banco Central, com prazo e forma conferidos no texto vigente."},
+  {"id": "rel_anual", "tema": "incidentes", "gabarito": "parcial", "criticidade": 2,
+   "titulo": "Relatório anual sobre a implementação do plano de ação e de resposta, com data-base de 31 de dezembro, apresentado ao comitê de riscos (quando houver) e ao conselho de administração",
+   "fonte": "PSC v3, item 9",
+   "trecho": "Os indicadores do SOC (alertas, tempo de resposta) são apresentados trimestralmente à Diretoria de Tecnologia.",
+   "norma": "Relatório anual do plano de ação e de resposta — Res. CMN 4.893 (instituições financeiras) e Res. BCB 85 (instituições de pagamento)",
+   "explicacao": "Há reporte periódico, mas de indicadores operacionais, ao destinatário errado e sem o relatório anual com data-base de 31 de dezembro sobre a implementação do plano, que trata da efetividade das ações e dos incidentes relevantes do período.",
+   "acao": "Instituir o relatório anual (data-base de 31 de dezembro) e apresentá-lo ao comitê de riscos e ao conselho de administração."},
+  {"id": "nuv_comunicacao", "tema": "nuvem", "gabarito": "ausente", "criticidade": 2,
+   "titulo": "Comunicação ao Banco Central da contratação de serviços relevantes de processamento, armazenamento de dados e computação em nuvem",
+   "fonte": "Ata do Comitê de TI, 05/01/2026",
+   "trecho": "Aprovada a contratação da NuvemSul para hospedar o núcleo de contas de pagamento e o módulo Pix. Migração concluída em 30/04/2026.",
+   "norma": "Contratação de serviços de nuvem — Res. CMN 4.893 (instituições financeiras) e Res. BCB 85 (instituições de pagamento)",
+   "explicacao": "Contas de pagamento e Pix são serviços relevantes. A contratação tem de ser comunicada ao Banco Central, com as informações e no prazo que a norma fixa (confira no texto vigente); aprovação interna não substitui a comunicação.",
+   "acao": "Comunicar a contratação ao Banco Central com as informações exigidas e incluir esse passo, obrigatório, no fluxo de contratação de nuvem."},
+  {"id": "nuv_diligencia", "tema": "nuvem", "gabarito": "atendido", "criticidade": 2,
+   "titulo": "Verificação prévia da capacidade do prestador: conformidade legal, acesso aos dados, confidencialidade, integridade, disponibilidade e recuperação, certificações e relatórios de auditoria independente, monitoramento",
+   "fonte": "Dossiê de contratação da NuvemSul",
+   "trecho": "Avaliação prévia registrada: relatório SOC 2 Tipo II e certificado ISO/IEC 27001 do provedor analisados; teste de restauração em outra região; painel de monitoramento com acesso da Ipê Pay; relatórios recebidos anualmente.",
+   "norma": "Contratação de serviços de nuvem — Res. CMN 4.893 (instituições financeiras) e Res. BCB 85 (instituições de pagamento)",
+   "explicacao": "Atende: a capacidade do prestador foi verificada antes da contratação, com evidência independente, teste de recuperação e acompanhamento contínuo. É a diligência prévia que o Estudo 57 aprofunda.",
+   "acao": "Manter: refazer a análise a cada novo relatório e quando o provedor mudar subcontratados."},
+  {"id": "nuv_localizacao", "tema": "nuvem", "gabarito": "ausente", "criticidade": 2,
+   "titulo": "Contrato indica os países e as regiões onde os dados podem ser armazenados e processados; no exterior, só com convênio entre o Banco Central e a autoridade supervisora local ou com autorização do Banco Central",
+   "fonte": "Contrato NuvemSul, cláusula 7",
+   "trecho": "Os dados do CONTRATANTE poderão ser armazenados e processados em quaisquer regiões da infraestrutura global do CONTRATADO, a critério deste.",
+   "norma": "Contratação de serviços de nuvem — Res. CMN 4.893 (instituições financeiras) e Res. BCB 85 (instituições de pagamento)",
+   "explicacao": "Sem países e regiões indicados, a instituição não sabe se os dados saíram do Brasil nem consegue verificar o convênio exigido para o exterior. Deixar a critério do provedor é o oposto do que a norma pede.",
+   "acao": "Aditar o contrato com a lista de países e regiões permitidos e conferir o requisito de convênio ou autorização para qualquer país estrangeiro."},
+  {"id": "nuv_acesso_saida", "tema": "nuvem", "gabarito": "parcial", "criticidade": 2,
+   "titulo": "Contrato garante o acesso do Banco Central a contratos, documentos e dados e prevê, na extinção, a transferência dos dados ao novo prestador ou à instituição, com exclusão só depois",
+   "fonte": "Contrato NuvemSul, cláusulas 12 e 15",
+   "trecho": "Cláusula 15: o CONTRATADO dará ao Banco Central do Brasil acesso aos termos deste contrato, à documentação e às informações dos serviços prestados. Cláusula 12: em caso de rescisão, os dados do CONTRATANTE serão excluídos em até 30 dias.",
+   "norma": "Contratação de serviços de nuvem — Res. CMN 4.893 (instituições financeiras) e Res. BCB 85 (instituições de pagamento)",
+   "explicacao": "O acesso do Banco Central está garantido; a saída não. Excluir os dados sem antes transferi-los à Ipê Pay ou ao novo prestador deixa a instituição sem os dados. A ordem exigida é transferir e, depois, excluir.",
+   "acao": "Aditar a cláusula 12: transferência dos dados (formato e prazo definidos) e exclusão só após a confirmação; anexar o plano de saída ao dossiê."},
+  {"id": "nuv_responsabilidade", "tema": "nuvem", "gabarito": "ausente", "criticidade": 3,
+   "titulo": "A instituição continua responsável pela confiabilidade, integridade, disponibilidade, segurança e sigilo dos serviços contratados e pelo cumprimento da regulação",
+   "fonte": "Contrato NuvemSul, cláusula 3, e PSC v3, item 6.1",
+   "trecho": "Cláusula 3: a segurança dos dados hospedados é de responsabilidade exclusiva do CONTRATADO. PSC 6.1: a Ipê Pay transfere ao provedor de nuvem a responsabilidade pela segurança do ambiente hospedado.",
+   "norma": "Contratação de serviços de nuvem — Res. CMN 4.893 (instituições financeiras) e Res. BCB 85 (instituições de pagamento)",
+   "explicacao": "A responsabilidade perante o Banco Central não se transfere ao fornecedor de nuvem. O contrato pode dividir tarefas (responsabilidade compartilhada, Estudo 21), mas a política não pode declarar que a obrigação saiu da instituição.",
+   "acao": "Reescrever o item 6.1 com a matriz de responsabilidade compartilhada e a afirmação de que a responsabilidade regulatória permanece com a Ipê Pay; ajustar a cláusula 3 para dividir tarefas, não responsabilidade."},
+  {"id": "dez_controles", "tema": "dez2025", "gabarito": "parcial", "criticidade": 2,
+   "titulo": "Controles mínimos detalhados e auditáveis, com evidência de execução",
+   "fonte": "PSC v3, item 4 (nota final)",
+   "trecho": "Os controles do item 4 são aplicados conforme a disponibilidade da equipe. Não há registro centralizado de execução.",
+   "norma": "Alterações de 18/12/2025 — Res. CMN 5.274 (na Res. CMN 4.893) e Res. BCB 538 (na Res. BCB 85)",
+   "explicacao": "Os controles estão descritos, mas não são verificáveis: sem periodicidade, dono e registro, uma auditoria não tem o que testar. As alterações de dezembro de 2025 detalharam controles mínimos que precisam ser demonstrados; a lista exata se confere no texto vigente.",
+   "acao": "Para cada controle mínimo do texto vigente, definir dono, periodicidade, evidência guardada e indicador, e revisar a matriz com a auditoria interna."},
+  {"id": "dez_pentest", "tema": "dez2025", "gabarito": "ausente", "criticidade": 3,
+   "titulo": "Teste de intrusão anual, conduzido por profissionais independentes",
+   "fonte": "PSC v3, item 4.5",
+   "trecho": "Varredura automatizada de vulnerabilidades trimestral. Último teste de intrusão: 2023, executado pela equipe interna de infraestrutura.",
+   "norma": "Alterações de 18/12/2025 — Res. CMN 5.274 (na Res. CMN 4.893) e Res. BCB 538 (na Res. BCB 85)",
+   "explicacao": "Varredura não é teste de intrusão (Estudos 9 e 14), o último teste tem mais de um ano e foi feito por quem administra o ambiente. A alteração de dezembro de 2025 exige teste anual por profissionais independentes.",
+   "acao": "Contratar teste de intrusão anual com equipe independente, com escopo que inclua o ambiente Pix e as APIs, e levar achados e correções ao relatório anual."},
+  {"id": "dez_pix", "tema": "dez2025", "gabarito": "ausente", "criticidade": 3,
+   "titulo": "Isolamento do ambiente Pix e atenção aos demais ambientes críticos",
+   "fonte": "Diagrama de arquitetura, revisão de 08/2026",
+   "trecho": "Os servidores do Pix estão na mesma rede de produção do back-office e da integração com o checkout da Ipê Store, separados só por grupos de segurança; os administradores de nuvem têm acesso a todos os ambientes.",
+   "norma": "Alterações de 18/12/2025 — Res. CMN 5.274 (na Res. CMN 4.893) e Res. BCB 538 (na Res. BCB 85)",
+   "explicacao": "As alterações de dezembro de 2025 deram atenção aos ambientes que se conectam aos sistemas do Banco Central, como RSFN, Pix e STR, e pedem o isolamento do ambiente Pix. Mesma rede e mesmos administradores fazem o comprometimento do back-office chegar ao Pix.",
+   "acao": "Isolar o ambiente Pix: conta e rede próprias, acesso administrativo dedicado com MFA e registro (Estudo 40), fluxos de rede explícitos e monitoramento específico."},
+  {"id": "dez_darkweb", "tema": "dez2025", "gabarito": "atendido", "criticidade": 1,
+   "titulo": "Monitoramento de vazamentos e de menções à instituição na deep e na dark web",
+   "fonte": "PSC v3, item 4.6",
+   "trecho": "Serviço de inteligência de ameaças monitora credenciais vazadas, dados de clientes e menções à Ipê Pay em fóruns e mercados da deep e da dark web; os alertas vão ao SOC, com triagem em 24 horas.",
+   "norma": "Alterações de 18/12/2025 — Res. CMN 5.274 (na Res. CMN 4.893) e Res. BCB 538 (na Res. BCB 85)",
+   "explicacao": "Atende ao tema incluído em dezembro de 2025: há monitoramento contínuo, com destino e prazo de triagem definidos (Estudo 17).",
+   "acao": "Manter: medir a proporção de alertas acionáveis e levar os casos ao relatório anual."}
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var D = JSON.parse(document.getElementById("rsf-dados").textContent);
+    var NIVEL = { atendido: 2, parcial: 1, ausente: 0 };
+    var FATOR = { ausente: 2, parcial: 1 };
+    var COR_PRIORIDADE = { P1: "var(--danger-color)", P2: "var(--warning-color)", P3: "var(--muted)" };
+    var ROTULO_RESULTADO = {
+        otimista: "Lacuna que você deixou passar",
+        pessimista: "Mais severo que o gabarito",
+        sem_marcacao: "Sem marcação"
+    };
+    var estado = { sujeicao: {}, marcacoes: {} };
+
+    function $(id) { return document.getElementById(id); }
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function has(o, k) { return o !== null && typeof o === "object" && Object.prototype.hasOwnProperty.call(o, k); }
+    function porId(id) {
+        for (var i = 0; i < D.requisitos.length; i++) if (D.requisitos[i].id === id) return D.requisitos[i];
+        return null;
+    }
+
+    // ================================================ regras (espelhadas nos testes)
+    window.conferirSujeicao = function(respostas) {
+        var erros = D.entidades.filter(function(e) { return respostas[e.id] !== e.norma; })
+            .map(function(e) { return e.id; });
+        return { acertos: D.entidades.length - erros.length, total: D.entidades.length, erros: erros };
+    };
+
+    window.avaliarAderencia = function(marcacoes) {
+        var r = { itens: [], certo: 0, otimista: 0, pessimista: 0, sem_marcacao: 0 };
+        D.requisitos.forEach(function(q) {
+            var m = marcacoes[q.id], res;
+            if (!has(NIVEL, m)) res = "sem_marcacao";
+            else if (NIVEL[m] > NIVEL[q.gabarito]) res = "otimista";
+            else if (NIVEL[m] < NIVEL[q.gabarito]) res = "pessimista";
+            else res = "certo";
+            r[res]++;
+            r.itens.push({ id: q.id, marcado: has(NIVEL, m) ? m : null, gabarito: q.gabarito, resultado: res });
+        });
+        return r;
+    };
+
+    window.indiceAderencia = function(marcacoes) {
+        var soma = 0, den = 0;
+        D.requisitos.forEach(function(q) {
+            var m = marcacoes[q.id];
+            if (has(NIVEL, m)) { soma += NIVEL[m]; den++; }
+        });
+        if (!den) return null;
+        return Math.floor((100 * soma + den) / (2 * den));
+    };
+
+    function prioridade(pontos) { return pontos >= 6 ? "P1" : (pontos >= 3 ? "P2" : "P3"); }
+
+    window.planoDeAcao = function(marcacoes) {
+        var plano = [];
+        D.requisitos.forEach(function(q, k) {
+            var m = marcacoes[q.id];
+            if (!has(FATOR, m)) return;
+            var pontos = q.criticidade * FATOR[m];
+            plano.push({ id: q.id, status: m, pontos: pontos, prioridade: prioridade(pontos), criticidade: q.criticidade, ordem: k });
+        });
+        plano.sort(function(a, b) {
+            if (a.pontos !== b.pontos) return b.pontos - a.pontos;
+            if (a.criticidade !== b.criticidade) return b.criticidade - a.criticidade;
+            return a.ordem - b.ordem;
+        });
+        return plano;
+    };
+
+    // ================================================ fase 1
+    function montarEntidades() {
+        var box = $("rsf-entidades");
+        D.entidades.forEach(function(e) {
+            var linha = el("div", null, "display: flex; flex-direction: column; gap: 0.2rem; min-width: 0;");
+            var id = "rsf-ent-" + e.id;
+            var lb = el("label", e.nome, "font-weight: 600;");
+            lb.setAttribute("for", id);
+            var sel = el("select", null, "min-width: 0; max-width: 100%;");
+            sel.className = "form-control";
+            sel.id = id;
+            var vazio = el("option", "Escolha a norma…");
+            vazio.value = "";
+            sel.appendChild(vazio);
+            Object.keys(D.normas).forEach(function(n) {
+                var o = el("option", D.normas[n]);
+                o.value = n;
+                sel.appendChild(o);
+            });
+            sel.addEventListener("change", function() { estado.sujeicao[e.id] = sel.value; });
+            linha.appendChild(lb);
+            linha.appendChild(sel);
+            box.appendChild(linha);
+        });
+    }
+
+    window.conferirSujeicaoRsf = function() {
+        var r = window.conferirSujeicao(estado.sujeicao);
+        var box = $("rsf-sujeicao-resultado");
+        box.replaceChildren();
+        var ok = r.acertos === r.total;
+        box.appendChild(el("p", (ok ? "✓ " : "") + r.acertos + " de " + r.total + " corretas.",
+            "margin: 0 0 0.3rem 0; font-weight: 600; color: " + (ok ? "var(--tip-color)" : "var(--warning-color)") + ";"));
+        var lista = el("ul", null, "margin: 0; padding-left: 1.2rem;");
+        D.entidades.forEach(function(e) {
+            var certo = r.erros.indexOf(e.id) === -1;
+            var li = el("li", null, "margin-bottom: 0.25rem;");
+            li.appendChild(el("strong", (certo ? "✓ " : "✗ ") + e.nome + " → " + D.normas[e.norma] + ". ",
+                "color: " + (certo ? "var(--tip-color)" : "var(--danger-color)") + ";"));
+            li.appendChild(el("span", e.explicacao));
+            lista.appendChild(li);
+        });
+        box.appendChild(lista);
+        return r;
+    };
+
+    // ================================================ fase 2
+    function montarRequisitos() {
+        var box = $("rsf-requisitos");
+        var temaAtual = null;
+        D.requisitos.forEach(function(q, k) {
+            if (q.tema !== temaAtual) {
+                temaAtual = q.tema;
+                box.appendChild(el("h5", D.temas[q.tema], "margin: 0.6rem 0 0 0; font-size: 0.9rem;"));
+            }
+            var fs = el("fieldset", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.55rem 0.7rem; margin: 0; min-width: 0;");
+            fs.id = "rsf-req-" + q.id;
+            var lg = el("legend", (k + 1) + ". " + q.titulo, "font-size: 0.84rem; font-weight: 600; padding: 0 0.3rem; max-width: 100%; white-space: normal;");
+            fs.appendChild(lg);
+            fs.appendChild(el("p", q.fonte, "margin: 0.1rem 0 0.2rem 0; font-size: 0.74rem; color: var(--muted);"));
+            fs.appendChild(el("blockquote", "“" + q.trecho + "”", "margin: 0 0 0.4rem 0; padding: 0.35rem 0.6rem; border-left: 3px solid var(--rule); background: var(--sunk); font-size: 0.8rem;"));
+            var opcoes = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; font-size: 0.82rem;");
+            Object.keys(D.status).forEach(function(s) {
+                var lb = el("label", null, "display: inline-flex; gap: 0.3rem; align-items: center; cursor: pointer;");
+                var rd = document.createElement("input");
+                rd.type = "radio";
+                rd.name = "rsf-marca-" + q.id;
+                rd.value = s;
+                rd.setAttribute("aria-label", D.status[s] + ": " + q.titulo);
+                rd.addEventListener("change", function() { if (rd.checked) estado.marcacoes[q.id] = s; });
+                lb.appendChild(rd);
+                lb.appendChild(el("span", D.status[s]));
+                opcoes.appendChild(lb);
+            });
+            fs.appendChild(opcoes);
+            box.appendChild(fs);
+        });
+    }
+
+    function sincronizarRadios() {
+        D.requisitos.forEach(function(q) {
+            var radios = document.getElementsByName("rsf-marca-" + q.id);
+            for (var i = 0; i < radios.length; i++) radios[i].checked = estado.marcacoes[q.id] === radios[i].value;
+        });
+    }
+
+    window.avaliarAderenciaRsf = function() {
+        var r = window.avaliarAderencia(estado.marcacoes);
+        var indice = window.indiceAderencia(estado.marcacoes);
+        var plano = window.planoDeAcao(estado.marcacoes);
+        var ind = $("rsf-indice"), div = $("rsf-divergencias"), pl = $("rsf-plano");
+        ind.replaceChildren();
+        div.replaceChildren();
+        pl.replaceChildren();
+        if (indice === null) {
+            ind.appendChild(el("p", "Marque ao menos um requisito.", "margin: 0; color: var(--muted);"));
+            return null;
+        }
+        ind.appendChild(el("p", "Índice de aderência pelas suas marcações: " + indice + "% (atendido vale 2, parcial 1, ausente 0).", "margin: 0; font-weight: 600;"));
+        ind.appendChild(el("p", "Conferência com o gabarito: " + r.certo + " certas, " + r.otimista + " otimistas (lacunas que somem do plano), " +
+            r.pessimista + " mais severas que o necessário, " + r.sem_marcacao + " sem marcação.", "margin: 0.2rem 0 0 0; font-size: 0.85rem;"));
+        r.itens.forEach(function(it) {
+            if (it.resultado === "certo") return;
+            var q = porId(it.id);
+            var cor = it.resultado === "otimista" ? "var(--danger-color)" : (it.resultado === "pessimista" ? "var(--warning-color)" : "var(--muted)");
+            var card = el("div", null, "border: 1px solid var(--rule); border-left: 4px solid " + cor + "; border-radius: var(--radius-sm); padding: 0.45rem 0.6rem; min-width: 0;");
+            card.setAttribute("data-resultado", it.resultado);
+            card.appendChild(el("strong", ROTULO_RESULTADO[it.resultado] + " · " + q.titulo, "color: " + cor + ";"));
+            card.appendChild(el("div", "Você marcou: " + (it.marcado ? D.status[it.marcado] : "nada") + ". Gabarito: " + D.status[it.gabarito] + ".", "margin-top: 0.2rem;"));
+            card.appendChild(el("div", q.explicacao, "margin-top: 0.2rem;"));
+            card.appendChild(el("div", "Tema: " + q.norma, "margin-top: 0.2rem; color: var(--muted);"));
+            div.appendChild(card);
+        });
+        if (!plano.length) {
+            pl.appendChild(el("li", "Nenhuma lacuna nas suas marcações. Se o gabarito discorda, o plano está incompleto.", "color: var(--muted);"));
+        }
+        plano.forEach(function(p) {
+            var q = porId(p.id);
+            var li = el("li", null, "margin-bottom: 0.5rem;");
+            li.setAttribute("data-prioridade", p.prioridade);
+            li.appendChild(el("strong", D.prioridades[p.prioridade].rotulo + " (" + p.pontos + " pts, " + D.status[p.status].toLowerCase() + ") · ", "color: " + COR_PRIORIDADE[p.prioridade] + ";"));
+            li.appendChild(el("span", q.acao));
+            li.appendChild(el("div", "Tema: " + q.norma + " · " + D.prioridades[p.prioridade].prazo, "font-size: 0.74rem; color: var(--muted);"));
+            pl.appendChild(li);
+        });
+        return { aderencia: r, indice: indice, plano: plano };
+    };
+
+    window.preencherGabaritoRsf = function() {
+        estado.marcacoes = {};
+        D.requisitos.forEach(function(q) { estado.marcacoes[q.id] = q.gabarito; });
+        sincronizarRadios();
+        window.avaliarAderenciaRsf();
+    };
+
+    window.limparRsf = function() {
+        estado.marcacoes = {};
+        sincronizarRadios();
+        $("rsf-indice").replaceChildren();
+        $("rsf-divergencias").replaceChildren();
+        $("rsf-plano").replaceChildren();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        $("rsf-contexto").textContent = D.contexto;
+        montarEntidades();
+        montarRequisitos();
+
+        if (typeof initChecklist === "function") {
+            initChecklist("regulacao-setor-financeiro");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
