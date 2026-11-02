@@ -157,7 +157,7 @@ class TestLigacoesEspecializacao(unittest.TestCase):
             ("Preciso saber o que guardar e como preservar provas de um crime cibernético", "Legislacao-e-Crimes-Ciberneticos", "Regulação", "⚖️"),
             ("Preciso avaliar o risco de um fornecedor crítico antes de contratar", "Gestao-de-Riscos-de-Terceiros", "Regulação", "🤝"),
         ]
-        obtido = [(n["desafio"], n["slug"], n["categoria"], n["icone"]) for n in NECESSIDADES[-12:]]
+        obtido = [(n["desafio"], n["slug"], n["categoria"], n["icone"]) for n in NECESSIDADES if n["slug"] in NOVOS]
         self.assertEqual(obtido, esperado)
 
     def test_certificacoes_novas(self):
@@ -169,10 +169,10 @@ class TestLigacoesEspecializacao(unittest.TestCase):
             "Security+": ["Engenharia-de-Deteccao", "Fraude-em-Pagamentos-e-Pix"],
             "CEH": ["Seguranca-em-Kubernetes"],
         }
-        por_sigla = {c["sigla"]: c["modulos"] for c in CERTIFICACOES}
-        for sigla, novos in esperado.items():
-            with self.subTest(sigla=sigla):
-                self.assertEqual(por_sigla[sigla][-len(novos):], novos)
+        self.assertTrue(set(esperado) <= {c["sigla"] for c in CERTIFICACOES})
+        for c in CERTIFICACOES:
+            with self.subTest(sigla=c["sigla"]):
+                self.assertEqual([m for m in c["modulos"] if m in NOVOS], esperado.get(c["sigla"], []))
 
     def test_chips_de_apoio_normas_tem_data_slug(self):
         html = render_rota_vaga(ROTA_VAGA, {})

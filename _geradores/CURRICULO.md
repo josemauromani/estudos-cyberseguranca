@@ -733,7 +733,7 @@ flowchart LR
 Para orientar estudantes e profissionais com focos específicos, a matriz curricular recomenda as seguintes trilhas rápidas:
 
 1. **Rota Blue Team / Analista SOC:**  
-   `01 -> 02 -> 34 -> 36 -> 05 -> 06 -> 07 -> 48 -> 10 -> 39 -> 16 -> 46 -> 17 -> 47 -> 18 -> 49 -> 42`
+   `01 -> 02 -> 34 -> 36 -> 05 -> 06 -> 07 -> 48 -> 10 -> 39 -> 16 -> 17 -> 46 -> 47 -> 18 -> 49 -> 42`
 2. **Rota Red Team / Pentest:**  
    `01 -> 02 -> 34 -> 04 -> 11 -> 12 -> 13 -> 38 -> 39 -> 51 -> 14 -> 15`
 3. **Rota DevSecOps & Cloud Security:**  

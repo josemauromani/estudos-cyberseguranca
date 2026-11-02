@@ -51,6 +51,11 @@ class TestDadosDasRotas(unittest.TestCase):
         self.assertEqual(numero(r["modulos"][-1]), 42)
         self.assertEqual(len(r["modulos"]), 17)
 
+    def test_rota_blue_team_poe_threat_intel_antes_da_engenharia_de_deteccao(self):
+        """O 17 é pré-requisito do 46: a rota não pode pedir a detecção antes da inteligência."""
+        m = [numero(s) for s in ROTAS_PERFIL[0]["modulos"]]
+        self.assertEqual(m[m.index(16):m.index(47) + 1], [16, 17, 46, 47])
+
 
 class TestHtmlDasRotas(unittest.TestCase):
     @classmethod
