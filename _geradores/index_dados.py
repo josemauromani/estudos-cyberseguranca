@@ -605,6 +605,13 @@ ROTA_VAGA: List[Dict[str, Any]] = [
 
 # 4c. CERTIFICAÇÕES CITADAS NA VAGA
 
+# 4b2. NÍVEIS DE DIFICULDADE (aba "Por Nível" do portal)
+NIVEIS: Dict[str, str] = {
+    "iniciante": "🌱 Iniciante",
+    "intermediario": "🌿 Intermediário",
+    "avancado": "🌳 Avançado",
+}
+
 # 4c. ROTAS SUGERIDAS POR PERFIL: sequência recomendada de estudo (fonte única; o §5 do CURRICULO.md documenta as mesmas)
 ROTAS_PERFIL: List[Dict[str, Any]] = [
     {
@@ -815,6 +822,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0043 Reconnaissance / TA0001 Initial Access",
         "carreiras": ["Blue Team & Defesa", "Red Team & Pentest", "AppSec & DevSecOps", "Operações SOC & Resposta", "GRC & Auditoria"],
         "tempo_minutos": 40,
+        "nivel": "iniciante",
         "pergunta_chave": "Como identificar e categorizar vulnerabilidades arquiteturais em um sistema antes que sejam exploradas?",
         "simulador_nome": "STRIDE Threat Canvas",
         "fatos": [
@@ -832,6 +840,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0011 Command and Control",
         "carreiras": ["Blue Team & Defesa", "Red Team & Pentest", "Operações SOC & Resposta"],
         "tempo_minutos": 50,
+        "nivel": "iniciante",
         "pergunta_chave": "O que cada campo dos cabeçalhos IP/TCP revela sobre a intenção do tráfego e possíveis anomalias?",
         "simulador_nome": "Inspetor Visual de Cabeçalhos IP/TCP/UDP",
         "fatos": [
@@ -849,6 +858,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0009 Collection / TA0006 Credential Access",
         "carreiras": ["Blue Team & Defesa", "AppSec & DevSecOps", "GRC & Auditoria"],
         "tempo_minutos": 45,
+        "nivel": "iniciante",
         "pergunta_chave": "Qual algoritmo criptográfico utilizar para garantir confidencialidade sem comprometer o desempenho?",
         "simulador_nome": "Lab de Cifras (Web Crypto API)",
         "fatos": [
@@ -866,6 +876,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0006 Credential Access / TA0004 Privilege Escalation",
         "carreiras": ["AppSec & DevSecOps", "Blue Team & Defesa", "GRC & Auditoria"],
         "tempo_minutos": 45,
+        "nivel": "iniciante",
         "pergunta_chave": "Como garantir que apenas identidades legítimas acessem recursos corporativos críticos com privilégio mínimo?",
         "simulador_nome": "Validador e Decodificador JWT + Matriz RBAC",
         "fatos": [
@@ -883,6 +894,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0008 Lateral Movement",
         "carreiras": ["Blue Team & Defesa", "Operações SOC & Resposta", ROTULO_ANALISTA_SI],
         "tempo_minutos": 40,
+        "nivel": "iniciante",
         "pergunta_chave": "Como isolar servidores públicos da rede corporativa sensível garantindo regra Default Drop?",
         "simulador_nome": "Simulador de Regras de Firewall (Pass / Drop)",
         "fatos": [
@@ -900,6 +912,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0005 Defense Evasion",
         "carreiras": ["Blue Team & Defesa", "AppSec & DevSecOps", "Operações SOC & Resposta", ROTULO_ANALISTA_SI],
         "tempo_minutos": 50,
+        "nivel": "intermediario",
         "pergunta_chave": "Quais configurações padrão de fábrica expõem servidores corporativos a ataques imediatos?",
         "simulador_nome": "Auditor Interativo de Configuração de Servidor",
         "fatos": [
@@ -917,6 +930,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0011 Command and Control",
         "carreiras": ["Blue Team & Defesa", "Operações SOC & Resposta", ROTULO_ANALISTA_SI],
         "tempo_minutos": 50,
+        "nivel": "intermediario",
         "pergunta_chave": "Como interceptar e bloquear tráfego hostil antes que ele atinja serviços internos sensíveis?",
         "simulador_nome": "Analisador de Regras Snort/Suricata vs Tráfego",
         "fatos": [
@@ -934,6 +948,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0008 Lateral Movement / TA0004 Privilege Escalation",
         "carreiras": ["Blue Team & Defesa", "GRC & Auditoria", ROTULO_ANALISTA_SI],
         "tempo_minutos": 40,
+        "nivel": "intermediario",
         "pergunta_chave": "Por que não se deve mais confiar na rede interna mesmo após autenticação inicial bem-sucedida?",
         "simulador_nome": "Motor de Decisão de Acesso Zero Trust (PDP/PEP)",
         "fatos": [
@@ -951,6 +966,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0001 Initial Access",
         "carreiras": ["Blue Team & Defesa", "GRC & Auditoria", "Operações SOC & Resposta"],
         "tempo_minutos": 45,
+        "nivel": "intermediario",
         "pergunta_chave": "Como determinar qual vulnerabilidade corrigir primeiro entre centenas de falhas detectadas em varreduras?",
         "simulador_nome": "Calculadora Interativa de Score CVSS v3.1 / v4.0",
         "fatos": [
@@ -968,6 +984,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0002 Execution / TA0005 Defense Evasion",
         "carreiras": ["Blue Team & Defesa", "Operações SOC & Resposta", "Perícia Forense & Malware", ROTULO_ANALISTA_SI],
         "tempo_minutos": 45,
+        "nivel": "intermediario",
         "pergunta_chave": "Como identificar a presença de um adversário no endpoint antes que ocorra dano ou exfiltração?",
         "simulador_nome": "Linha do Tempo de Telemetria e Detecção EDR",
         "fatos": [
@@ -985,6 +1002,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0043 Reconnaissance",
         "carreiras": ["Red Team & Pentest", "Operações SOC & Resposta"],
         "tempo_minutos": 45,
+        "nivel": "intermediario",
         "pergunta_chave": "O que um atacante consegue descobrir sobre nossa infraestrutura sem enviar um único pacote invasivo?",
         "simulador_nome": "Terminal Simulado de OSINT e Enumeração",
         "fatos": [
@@ -1002,6 +1020,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0001 Initial Access / TA0002 Execution",
         "carreiras": ["AppSec & DevSecOps", "Red Team & Pentest", ROTULO_ANALISTA_SI],
         "tempo_minutos": 55,
+        "nivel": "intermediario",
         "pergunta_chave": "Como desenvolvedores podem eliminar falhas críticas de injeção diretamente na raiz do código?",
         "simulador_nome": "Playground de Injeção e Sanitização Web",
         "fatos": [
@@ -1019,6 +1038,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0001 Initial Access",
         "carreiras": ["AppSec & DevSecOps", "Red Team & Pentest"],
         "tempo_minutos": 40,
+        "nivel": "intermediario",
         "pergunta_chave": "Por que firewalls convencionais falham em detectar abusos lógicos e quebras de BOLA em APIs?",
         "simulador_nome": "Simulador de Chamadas de API com Rate Limiter",
         "fatos": [
@@ -1036,6 +1056,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "Todas as Táticas (PTES)",
         "carreiras": ["Red Team & Pentest", "GRC & Auditoria"],
         "tempo_minutos": 45,
+        "nivel": "avancado",
         "pergunta_chave": "Como conduzir um teste de invasão ético agregando valor real ao negócio sem indisponibilizar sistemas?",
         "simulador_nome": "Construtor de Matriz de Achados e Relatórios de Pentest",
         "fatos": [
@@ -1053,6 +1074,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0001 Initial Access (Phishing)",
         "carreiras": ["Red Team & Pentest", "Blue Team & Defesa", "GRC & Auditoria", ROTULO_ANALISTA_SI],
         "tempo_minutos": 40,
+        "nivel": "iniciante",
         "pergunta_chave": "Como proteger a organização do elo mais explorado da cadeia de segurança: o fator humano?",
         "simulador_nome": "Analisador de E-mails Suspeitos (Spot the Indicators)",
         "fatos": [
@@ -1070,6 +1092,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0007 Discovery / TA0005 Defense Evasion",
         "carreiras": ["Operações SOC & Resposta", "Blue Team & Defesa", ROTULO_ANALISTA_SI],
         "tempo_minutos": 50,
+        "nivel": "intermediario",
         "pergunta_chave": "Como separar ruído de alertas genuínos em fluxos corporativos de milhões de eventos por segundo?",
         "simulador_nome": "Console SIEM com Busca de Logs e Alertas",
         "fatos": [
@@ -1087,6 +1110,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "Matriz ATT&CK Enterprise",
         "carreiras": ["Operações SOC & Resposta", "Blue Team & Defesa"],
         "tempo_minutos": 45,
+        "nivel": "intermediario",
         "pergunta_chave": "Por que focar em técnicas e táticas de adversários é infinitamente mais eficaz que caçar hashes e IPs?",
         "simulador_nome": "Mapeador de IoCs e TTPs na Matriz ATT&CK",
         "fatos": [
@@ -1104,6 +1128,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0040 Impact",
         "carreiras": ["Operações SOC & Resposta", "Perícia Forense & Malware", "GRC & Auditoria", ROTULO_ANALISTA_SI],
         "tempo_minutos": 50,
+        "nivel": "intermediario",
         "pergunta_chave": "Quais passos imediatos tomar para conter um ataque ativo sem destruir evidências forenses vitais, seguindo o ciclo da Rev. 2 e a organização da Rev. 3?",
         "simulador_nome": "Runbook Interativo em Árvore de Decisão",
         "fatos": [
@@ -1121,6 +1146,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0009 Collection / TA0005 Defense Evasion",
         "carreiras": ["Perícia Forense & Malware", "Operações SOC & Resposta", ROTULO_ANALISTA_SI],
         "tempo_minutos": 45,
+        "nivel": "avancado",
         "pergunta_chave": "Como reconstruir os passos exatos de um invasor e produzir provas digitais legalmente irrefutáveis?",
         "simulador_nome": "Analisador de Timeline de Evidências e Logs Forenses",
         "fatos": [
@@ -1138,6 +1164,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0002 Execution / TA0005 Defense Evasion",
         "carreiras": ["Perícia Forense & Malware", "Operações SOC & Resposta"],
         "tempo_minutos": 45,
+        "nivel": "avancado",
         "pergunta_chave": "O que o binário suspeito é capaz de fazer, e quais indicadores ele gera ao rodar em ambiente isolado?",
         "simulador_nome": "Inspetor de Metadados PE/ELF e Hashes",
         "fatos": [
@@ -1155,6 +1182,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0001 Initial Access / TA0006 Credential Access",
         "carreiras": ["AppSec & DevSecOps", "Blue Team & Defesa", "GRC & Auditoria"],
         "tempo_minutos": 45,
+        "nivel": "intermediario",
         "pergunta_chave": "Onde termina a obrigação do provedor de nuvem e onde começa a responsabilidade da sua organização?",
         "simulador_nome": "Auditor de Permissões S3 e Políticas IAM Cloud",
         "fatos": [
@@ -1172,6 +1200,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0001 Initial Access / TA0008 Lateral Movement",
         "carreiras": ["AppSec & DevSecOps"],
         "tempo_minutos": 45,
+        "nivel": "intermediario",
         "pergunta_chave": "Como detectar e bloquear vulnerabilidades em código e dependências antes do deploy em produção?",
         "simulador_nome": "Simulador de Pipeline CI/CD com Security Gates",
         "fatos": [
@@ -1189,6 +1218,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "MITRE ATT&CK for ICS",
         "carreiras": ["Blue Team & Defesa"],
         "tempo_minutos": 40,
+        "nivel": "avancado",
         "pergunta_chave": "Como proteger sistemas ciberfísicos que não suportam paradas, patches frequentes ou criptografia pesada?",
         "simulador_nome": "Mapeador do Modelo Purdue (TI vs TO)",
         "fatos": [
@@ -1206,6 +1236,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "ATLAS (Adversarial Threat Landscape for AI)",
         "carreiras": ["AppSec & DevSecOps", "Blue Team & Defesa"],
         "tempo_minutos": 45,
+        "nivel": "avancado",
         "pergunta_chave": "Como impedir que usuários maliciosos manipulem instruções de sistemas baseados em inteligência artificial?",
         "simulador_nome": "Lab de Prompt Injection e Defesas",
         "fatos": [
@@ -1223,6 +1254,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "Governança Corporativa",
         "carreiras": ["GRC & Auditoria", ROTULO_ANALISTA_SI],
         "tempo_minutos": 45,
+        "nivel": "intermediario",
         "pergunta_chave": "Como conduzir o processo de riscos da ISO 31000:2018 e quantificar em reais o impacto de uma ameaça para justificar orçamentos à diretoria?",
         "simulador_nome": "Calculadora de Matriz 5x5 e Risco Financeiro (ALE/SLE)",
         "fatos": [
@@ -1240,6 +1272,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "Conformidade Normativa",
         "carreiras": ["GRC & Auditoria", ROTULO_ANALISTA_SI],
         "tempo_minutos": 50,
+        "nivel": "intermediario",
         "pergunta_chave": "Como estruturar um SGSI auditável e mapear os controles do Anexo A para CIS Controls v8.1 (IG1/IG2/IG3) e NIST SP 800-53 Rev. 5?",
         "simulador_nome": "Matriz de Controles e Declaração de Aplicabilidade (SoA)",
         "fatos": [
@@ -1257,6 +1290,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "Conformidade Regulatória",
         "carreiras": ["GRC & Auditoria"],
         "tempo_minutos": 45,
+        "nivel": "iniciante",
         "pergunta_chave": "Qual base legal legitima o tratamento de dados pessoais e como demonstrar conformidade perante a ANPD?",
         "simulador_nome": "Construtor de Avaliação de Impacto à Privacidade (RIPD)",
         "fatos": [
@@ -1274,6 +1308,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0040 Impact (Mitigação)",
         "carreiras": ["GRC & Auditoria", "Blue Team & Defesa"],
         "tempo_minutos": 40,
+        "nivel": "intermediario",
         "pergunta_chave": "Quanto tempo a organização suporta ficar inoperante e qual volume de dados pode ser perdido em um desastre?",
         "simulador_nome": "Calculadora de RTO/RPO e Validador da Estratégia 3-2-1",
         "fatos": [
@@ -1291,6 +1326,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0010 Exfiltration (T1048, T1567) / T1566 Phishing",
         "carreiras": ["Blue Team & Defesa", "Operações SOC & Resposta", "GRC & Auditoria", ROTULO_ANALISTA_SI],
         "tempo_minutos": 50,
+        "nivel": "intermediario",
         "pergunta_chave": "Como impedir que dados sensíveis saiam da organização por e-mail ou web sem bloquear o trabalho legítimo?",
         "simulador_nome": "Gateway de Conteúdo",
         "fatos": [
@@ -1308,6 +1344,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "T1190 Exploit Public-Facing Application / T1078 Valid Accounts / T1213 Data from Information Repositories",
         "carreiras": ["Blue Team & Defesa", "AppSec & DevSecOps", "GRC & Auditoria", ROTULO_ANALISTA_SI],
         "tempo_minutos": 50,
+        "nivel": "intermediario",
         "pergunta_chave": "Quem pode ler e alterar cada tabela do banco, e como provar isso numa auditoria?",
         "simulador_nome": "Matriz GRANT/REVOKE",
         "fatos": [
@@ -1325,6 +1362,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0009 Collection / TA0010 Exfiltration",
         "carreiras": ["GRC & Auditoria", "Blue Team & Defesa", ROTULO_ANALISTA_SI],
         "tempo_minutos": 45,
+        "nivel": "intermediario",
         "pergunta_chave": "Quais sistemas entram no escopo do PCI DSS e como reduzir esse escopo sem abrir mão da conformidade?",
         "simulador_nome": "Delimitador de Escopo CDE",
         "fatos": [
@@ -1342,6 +1380,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "N/A (módulo de carreira)",
         "carreiras": ["Blue Team & Defesa", "Red Team & Pentest", "Operações SOC & Resposta", "Perícia Forense & Malware", "AppSec & DevSecOps", "GRC & Auditoria", ROTULO_ANALISTA_SI],
         "tempo_minutos": 40,
+        "nivel": "iniciante",
         "pergunta_chave": "Como ler um boletim de segurança em inglês e extrair versão afetada, impacto e mitigação sem erro de interpretação?",
         "simulador_nome": "Leitor de Advisory",
         "fatos": [
@@ -1359,6 +1398,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "N/A (módulo de carreira)",
         "carreiras": ["Blue Team & Defesa", "Red Team & Pentest", "Operações SOC & Resposta", "Perícia Forense & Malware", "AppSec & DevSecOps", "GRC & Auditoria", ROTULO_ANALISTA_SI],
         "tempo_minutos": 35,
+        "nivel": "iniciante",
         "pergunta_chave": "Qual combinação de formação e certificações leva ao perfil de carreira desejado, e que lacunas ainda restam?",
         "simulador_nome": "Planejador de Certificações",
         "fatos": [
@@ -1376,6 +1416,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "T1548.001 Setuid and Setgid / T1053.003 Cron / T1110 Brute Force",
         "carreiras": ["Blue Team & Defesa", "Operações SOC & Resposta", "Red Team & Pentest", ROTULO_ANALISTA_SI],
         "tempo_minutos": 50,
+        "nivel": "iniciante",
         "pergunta_chave": "Que comandos revelam, em poucos minutos, se um servidor Linux foi comprometido?",
         "simulador_nome": "Terminal de Investigação Linux",
         "fatos": [
@@ -1393,6 +1434,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "T1059.006 Python (uso defensivo e reconhecimento do vetor)",
         "carreiras": ["Blue Team & Defesa", "Operações SOC & Resposta", "AppSec & DevSecOps", ROTULO_ANALISTA_SI],
         "tempo_minutos": 50,
+        "nivel": "intermediario",
         "pergunta_chave": "Como transformar uma triagem manual de logs em um script repetível?",
         "simulador_nome": "Montador de Detector",
         "fatos": [
@@ -1410,6 +1452,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "T1059.001 PowerShell / T1547.001 Registry Run Keys / T1136 Create Account",
         "carreiras": ["Blue Team & Defesa", "Operações SOC & Resposta", "Perícia Forense & Malware", ROTULO_ANALISTA_SI],
         "tempo_minutos": 50,
+        "nivel": "intermediario",
         "pergunta_chave": "Que eventos do Windows contam a história de uma intrusão?",
         "simulador_nome": "Visualizador de Eventos",
         "fatos": [
@@ -1427,6 +1470,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "N/A (módulo de carreira)",
         "carreiras": ["Blue Team & Defesa", "Red Team & Pentest", "AppSec & DevSecOps", "Operações SOC & Resposta", "GRC & Auditoria", "Perícia Forense & Malware", ROTULO_ANALISTA_SI],
         "tempo_minutos": 35,
+        "nivel": "iniciante",
         "pergunta_chave": "Como provar numa entrevista o que você sabe fazer?",
         "simulador_nome": "Planejador de Homelab",
         "fatos": [
@@ -1444,6 +1488,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0006 Credential Access / TA0008 Lateral Movement (contexto)",
         "carreiras": ["Blue Team & Defesa", "Red Team & Pentest", "Operações SOC & Resposta", ROTULO_ANALISTA_SI],
         "tempo_minutos": 50,
+        "nivel": "iniciante",
         "pergunta_chave": "Como o AD decide quem é você e o que você pode fazer em cada máquina?",
         "simulador_nome": "Kerberos Passo a Passo",
         "fatos": [
@@ -1461,6 +1506,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "T1558.003 Kerberoasting / T1550.002 Pass the Hash / T1003.006 DCSync",
         "carreiras": ["Blue Team & Defesa", "Red Team & Pentest", "Operações SOC & Resposta"],
         "tempo_minutos": 55,
+        "nivel": "avancado",
         "pergunta_chave": "Qual é o caminho mais curto de um usuário comum até Domain Admin, e como fechá-lo?",
         "simulador_nome": "Mapa de Caminhos de Ataque",
         "fatos": [
@@ -1478,6 +1524,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "T1078.002 Domain Accounts / T1098 Account Manipulation",
         "carreiras": ["Blue Team & Defesa", "GRC & Auditoria", ROTULO_ANALISTA_SI],
         "tempo_minutos": 40,
+        "nivel": "intermediario",
         "pergunta_chave": "Quem tem poder de administrador hoje, e por quanto tempo deveria ter?",
         "simulador_nome": "Auditor de Contas Privilegiadas",
         "fatos": [
@@ -1495,6 +1542,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "T1110.003 Password Spraying / T1528 Steal Application Access Token / T1566 Phishing",
         "carreiras": ["Blue Team & Defesa", "AppSec & DevSecOps", ROTULO_ANALISTA_SI],
         "tempo_minutos": 45,
+        "nivel": "intermediario",
         "pergunta_chave": "Que política de acesso bloqueia o atacante sem travar o usuário legítimo?",
         "simulador_nome": "Avaliador de Acesso Condicional",
         "fatos": [
@@ -1512,6 +1560,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "T1486 Data Encrypted for Impact / T1490 Inhibit System Recovery / T1567 Exfiltration Over Web Service",
         "carreiras": ["Blue Team & Defesa", "Operações SOC & Resposta", "Perícia Forense & Malware", ROTULO_ANALISTA_SI],
         "tempo_minutos": 50,
+        "nivel": "intermediario",
         "pergunta_chave": "Nas primeiras horas de um ransomware, que decisões reduzem o estrago e quais o pioram?",
         "simulador_nome": "Linha do Tempo do Ransomware",
         "fatos": [
@@ -1529,6 +1578,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "N/A (gestão e comunicação)",
         "carreiras": ["GRC & Auditoria", "Operações SOC & Resposta", ROTULO_ANALISTA_SI],
         "tempo_minutos": 40,
+        "nivel": "intermediario",
         "pergunta_chave": "Quem precisa saber do incidente, quando e com que mensagem?",
         "simulador_nome": "Relógio da Crise",
         "fatos": [
@@ -1546,6 +1596,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "N/A (preparação e exercício)",
         "carreiras": ["GRC & Auditoria", "Operações SOC & Resposta", ROTULO_ANALISTA_SI],
         "tempo_minutos": 35,
+        "nivel": "intermediario",
         "pergunta_chave": "Como descobrir as falhas do plano de resposta antes de um incidente real?",
         "simulador_nome": "Gerador de Tabletop",
         "fatos": [
@@ -1563,6 +1614,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "T1490 Inhibit System Recovery / T1485 Data Destruction (mitigação)",
         "carreiras": ["Blue Team & Defesa", "GRC & Auditoria", ROTULO_ANALISTA_SI],
         "tempo_minutos": 45,
+        "nivel": "intermediario",
         "pergunta_chave": "Seu backup sobrevive a um atacante que já é administrador do domínio?",
         "simulador_nome": "Teste de Sobrevivência do Backup",
         "fatos": [
@@ -1580,6 +1632,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "Cobertura da matriz ATT&CK Enterprise (mapeamento de detecções)",
         "carreiras": ["Operações SOC & Resposta", "Blue Team & Defesa"],
         "tempo_minutos": 45,
+        "nivel": "avancado",
         "pergunta_chave": "Quantas técnicas ATT&CK suas regras realmente detectam, e como você sabe?",
         "simulador_nome": "Bancada de Detecções",
         "fatos": [
@@ -1597,6 +1650,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "TA0003 Persistence / T1053 Scheduled Task/Job / T1543 Create or Modify System Process (alvos de caça)",
         "carreiras": ["Operações SOC & Resposta", "Blue Team & Defesa", "Perícia Forense & Malware"],
         "tempo_minutos": 45,
+        "nivel": "avancado",
         "pergunta_chave": "Se um invasor estiver na rede sem disparar alertas, por onde você começa a procurar?",
         "simulador_nome": "Caçada Guiada",
         "fatos": [
@@ -1614,6 +1668,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "T1071 Application Layer Protocol / T1071.004 DNS / T1048 Exfiltration Over Alternative Protocol",
         "carreiras": ["Operações SOC & Resposta", "Blue Team & Defesa", "Perícia Forense & Malware"],
         "tempo_minutos": 45,
+        "nivel": "avancado",
         "pergunta_chave": "Como achar um implante que fala com o atacante a cada 60 segundos, mesmo com o tráfego cifrado?",
         "simulador_nome": "Analisador de Conexões",
         "fatos": [
@@ -1631,6 +1686,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "N/A (orquestração da resposta)",
         "carreiras": ["Operações SOC & Resposta", "Blue Team & Defesa", ROTULO_ANALISTA_SI],
         "tempo_minutos": 40,
+        "nivel": "avancado",
         "pergunta_chave": "O que o seu playbook deve fazer sozinho, e o que ele nunca deve fazer sem perguntar?",
         "simulador_nome": "Montador de Playbook",
         "fatos": [
@@ -1648,6 +1704,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "T1610 Deploy Container / T1611 Escape to Host",
         "carreiras": ["AppSec & DevSecOps", "Blue Team & Defesa", "Red Team & Pentest"],
         "tempo_minutos": 45,
+        "nivel": "avancado",
         "pergunta_chave": "O que separa um container comprometido do servidor que o hospeda?",
         "simulador_nome": "Auditor de Dockerfile",
         "fatos": [
@@ -1665,6 +1722,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "T1609 Container Administration Command / T1613 Container and Resource Discovery / T1611 Escape to Host",
         "carreiras": ["AppSec & DevSecOps", "Blue Team & Defesa", "Red Team & Pentest"],
         "tempo_minutos": 50,
+        "nivel": "avancado",
         "pergunta_chave": "Uma conta de serviço comprometida consegue chegar a administrador do cluster?",
         "simulador_nome": "Cluster em Miniatura",
         "fatos": [
@@ -1682,6 +1740,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "T1578 Modify Cloud Compute Infrastructure / T1530 Data from Cloud Storage (prevenção)",
         "carreiras": ["AppSec & DevSecOps", "GRC & Auditoria"],
         "tempo_minutos": 40,
+        "nivel": "avancado",
         "pergunta_chave": "Como impedir que um bucket público chegue à produção, em vez de achá-lo depois?",
         "simulador_nome": "Revisor de Plano Terraform",
         "fatos": [
@@ -1699,6 +1758,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "T1078.004 Valid Accounts: Cloud Accounts / T1098 Account Manipulation / T1530 Data from Cloud Storage",
         "carreiras": ["Operações SOC & Resposta", "Blue Team & Defesa", "Perícia Forense & Malware", "AppSec & DevSecOps"],
         "tempo_minutos": 50,
+        "nivel": "avancado",
         "pergunta_chave": "Uma chave de acesso vazou no GitHub há três dias: o que o atacante fez, e como você o tira de lá?",
         "simulador_nome": "Conta Comprometida",
         "fatos": [
@@ -1716,6 +1776,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "Conformidade Regulatória",
         "carreiras": ["GRC & Auditoria", ROTULO_ANALISTA_SI],
         "tempo_minutos": 45,
+        "nivel": "intermediario",
         "pergunta_chave": "O que o Banco Central exige da sua política de segurança, e o que muda quando o sistema vai para a nuvem?",
         "simulador_nome": "Verificador de Aderência",
         "fatos": [
@@ -1733,6 +1794,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "T1656 Impersonation / T1566 Phishing (vetores de golpe)",
         "carreiras": ["Operações SOC & Resposta", "GRC & Auditoria", ROTULO_ANALISTA_SI],
         "tempo_minutos": 45,
+        "nivel": "intermediario",
         "pergunta_chave": "Quais sinais separam um Pix legítimo de um golpe, e quanto atrito o cliente honesto aceita?",
         "simulador_nome": "Mesa Antifraude",
         "fatos": [
@@ -1750,6 +1812,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "N/A (legislação)",
         "carreiras": ["GRC & Auditoria", "Perícia Forense & Malware", ROTULO_ANALISTA_SI],
         "tempo_minutos": 40,
+        "nivel": "intermediario",
         "pergunta_chave": "O que guardar, por quanto tempo e como, para que o caso chegue ao processo penal?",
         "simulador_nome": "Enquadramento de Casos",
         "fatos": [
@@ -1767,6 +1830,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "mitre": "T1195 Supply Chain Compromise / T1199 Trusted Relationship",
         "carreiras": ["GRC & Auditoria", ROTULO_ANALISTA_SI],
         "tempo_minutos": 40,
+        "nivel": "intermediario",
         "pergunta_chave": "Seu fornecedor crítico tem acesso aos seus dados: como você sabe que ele protege, e como sai do contrato se precisar?",
         "simulador_nome": "Avaliador de Fornecedores",
         "fatos": [

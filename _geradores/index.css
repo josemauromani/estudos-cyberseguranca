@@ -1080,6 +1080,13 @@ a.vaga-chip:hover {
    Responsividade Mobile (Menor que 768px)
    ========================================================================== */
 
+/* Selo de nível no card (aba Por Nível) */
+.badge-nivel {
+  background: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+}
+
 /* --------------------------------------------------------------------------
    Rotas Sugeridas (aba): passos em ordem, progresso e próximo módulo
    -------------------------------------------------------------------------- */

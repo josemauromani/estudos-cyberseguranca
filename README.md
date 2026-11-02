@@ -276,6 +276,7 @@ O currículo é estruturado de forma a atender diferentes objetivos e momentos d
 
 > No portal, a aba **Rotas Sugeridas** mostra a rota de cada perfil como sequência numerada, com progresso e o próximo módulo a estudar.
 > A aba **Por Certificação** reúne os módulos que cobrem cada prova (CEH, CISM, CISSP, CCSP, GSEC e Security+), com progresso e próximo módulo, e a aba **Meu Progresso** separa os módulos concluídos dos que faltam estudar.
+> A aba **Por Nível** classifica os 57 módulos em iniciante (12), intermediário (31) e avançado (14), e cada card mostra o seu nível.
 
 - **Blue Team & Defesa Ativa:** Módulos de redes, bastionamento Linux/Windows, firewalls, Zero Trust, EDR e detecção de ameaças; Linux e PowerShell para investigação (Trilha 8), Active Directory e detecção de ataques ao AD (Trilha 9) e ransomware (Trilha 10); engenharia de detecção, threat hunting, monitoramento de rede e SOAR (Trilha 11).
 - **Red Team & Testes de Invasão:** Técnicas de reconhecimento OSINT, OWASP Top 10 Web, segurança de APIs e metodologias de pentest; Linux e caminhos de ataque no Active Directory (Trilhas 8 e 9); escalação de privilégio em Kubernetes (Trilha 12).

@@ -31,6 +31,7 @@ from index_dados import (
     ESTUDOS_DADOS,
     FUNCOES_NIST,
     NECESSIDADES,
+    NIVEIS,
     ROTA_VAGA,
     ROTAS_PERFIL,
     TRILHAS,
@@ -126,6 +127,8 @@ def render_study_cards(
         carreiras_str = ",".join(d["carreiras"])
         rotas_str = " ".join(r["id"] for r in ROTAS_PERFIL if slug in r["modulos"])
         certs_str = " ".join(c["sigla"] for c in CERTIFICACOES if slug in c["modulos"])
+        nivel = d["nivel"]
+        nivel_rotulo = escape(NIVEIS[nivel])
 
         # Lista de termos para busca em tempo real
         fatos_texto = " ".join(d["fatos"])
@@ -151,6 +154,7 @@ def render_study_cards(
       data-carreiras="{escape(carreiras_str)}"
       data-rotas="{rotas_str}"
       data-certs="{escape(certs_str, quote=True)}"
+      data-nivel="{nivel}"
       data-search="{search_terms}">
       
       <div class="card-header">
@@ -161,6 +165,7 @@ def render_study_cards(
           <div class="card-badges">
             <span class="badge badge-nist">🛡️ NIST: {nist}</span>
             <span class="badge badge-time">⏱️ {tempo} min</span>
+            <span class="badge badge-nivel nivel-{nivel}">{nivel_rotulo}</span>
             <span class="badge badge-sim">🧪 {simulador}</span>
           </div>
         </div>
@@ -410,6 +415,10 @@ def gerar_index_html(
     filtros_rota_html = render_filtros_rota(ROTAS_PERFIL)
     painel_rotas_html = render_painel_rotas(ROTAS_PERFIL, stats["status_map"])
     filtros_cert_html = render_filtros_certificacao(CERTIFICACOES)
+    filtros_nivel_html = "\n        ".join(
+        [_botao_filtro("all", "Todos os Níveis", ativo=True)]
+        + [_botao_filtro(chave, escape(rotulo)) for chave, rotulo in NIVEIS.items()]
+    )
     painel_cert_html = render_painel_certificacoes(CERTIFICACOES, stats["status_map"])
 
     # JavaScript do Portal Central
@@ -667,6 +676,8 @@ def gerar_index_html(
       } else if (currentFacet === 'certs' && currentFilterValue !== 'all') {
         const cardCerts = ' ' + (card.getAttribute('data-certs') || '') + ' ';
         matchFacet = cardCerts.includes(' ' + currentFilterValue + ' ');
+      } else if (currentFacet === 'nivel' && currentFilterValue !== 'all') {
+        matchFacet = card.getAttribute('data-nivel') === currentFilterValue;
       } else if (currentFacet === 'progresso' && currentFilterValue !== 'all') {
         const feito = safeStorageGet('cs_done_' + card.getAttribute('data-slug')) === 'true';
         matchFacet = currentFilterValue === 'concluidos' ? feito : !feito;
@@ -867,6 +878,7 @@ def gerar_index_html(
         <button class="tab-btn" data-facet="carreiras" onclick="switchTab('carreiras')">Por Perfil Profissional</button>
         <button class="tab-btn" data-facet="rotas" onclick="switchTab('rotas')">Rotas Sugeridas</button>
         <button class="tab-btn" data-facet="certs" onclick="switchTab('certs')">Por Certificação</button>
+        <button class="tab-btn" data-facet="nivel" onclick="switchTab('nivel')">Por Nível</button>
         <button class="tab-btn" data-facet="progresso" onclick="switchTab('progresso')">Meu Progresso</button>
         <button class="tab-btn" data-facet="nist" onclick="switchTab('nist')">Por Função NIST CSF 2.0</button>
       </nav>
@@ -889,6 +901,11 @@ def gerar_index_html(
       <!-- Painel: Por Certificação -->
       <div class="filter-subpanel" data-panel="certs" style="display: none;">
         {filtros_cert_html}
+      </div>
+
+      <!-- Painel: Por Nível -->
+      <div class="filter-subpanel" data-panel="nivel" style="display: none;">
+        {filtros_nivel_html}
       </div>
 
       <!-- Painel: Meu Progresso -->
