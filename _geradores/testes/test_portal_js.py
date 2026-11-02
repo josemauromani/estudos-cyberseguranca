@@ -15,7 +15,7 @@ sys.path.insert(0, str(TESTES))
 
 from build_index import corpo_do_modulo, gerar_index_html  # noqa: E402
 from contrato import extrair_secoes  # noqa: E402
-from index_dados import CERTIFICACOES, ESTUDOS_DADOS, NIVEIS  # noqa: E402
+from index_dados import CARREIRAS, CERTIFICACOES, ESTUDOS_DADOS, NIVEIS  # noqa: E402
 from navegador import CHROME, executar  # noqa: E402
 
 SLUG = "Threat-Hunting"
@@ -102,14 +102,66 @@ class TestPortalJs(unittest.TestCase):
         r = self.rodar(f"__fim(document.querySelector('{CARD}').closest('.grupo').querySelector('.grupo-cab .p').textContent)", antes)
         self.assertRegex(r["saida"], r"^1 de \d+ concluídos$")
 
-    def test_agrupar_por_perfil_e_nist(self):
-        for g in ("perfil", "nist"):
-            r = self.rodar(f"document.querySelector('[data-grupo=\"{g}\"]').click();"
-                           "__fim({g:document.querySelectorAll('#grupos .grupo').length,"
-                           "n:document.querySelectorAll('#grupos .mc').length})")
-            self.assertEqual(r["erros"], [])
-            self.assertGreater(r["saida"]["g"], 1)
-            self.assertEqual(r["saida"]["n"], len(ESTUDOS_DADOS))
+    def _grupos(self, modo, extra=""):
+        r = self.rodar(f"document.querySelector('[data-grupo=\"{modo}\"]').click();{extra}"
+                       "const g={};document.querySelectorAll('#grupos .grupo').forEach(x=>{"
+                       "g[x.querySelector('h2').textContent]=[...x.querySelectorAll('.mc')].map(c=>c.dataset.slug)});"
+                       "__fim({g,ids:[...document.querySelectorAll('[id]')].map(e=>e.id).filter((v,i,a)=>a.indexOf(v)!==i),"
+                       "ordem:[...document.querySelectorAll('#grupos .grupo-cab h2')].map(e=>e.textContent),"
+                       "contagem:document.getElementById('contagem').textContent,"
+                       "links:[...document.querySelectorAll('#grupos .mc')].every(c=>c.getAttribute('href')||c.classList.contains('pendente'))})")
+        self.assertEqual(r["erros"], [])
+        return r["saida"]
+
+    def test_agrupar_por_perfil_repete_modulo_em_cada_perfil(self):
+        out = self._grupos("perfil")
+        self.assertEqual(out["ids"], [])
+        self.assertTrue(out["links"])
+        self.assertEqual(out["contagem"], f"{len(ESTUDOS_DADOS)} módulos")
+        multi = next(sl for sl, d in ESTUDOS_DADOS.items()
+                     if len(d["carreiras"]) > 1 and d["carreiras"][0] != d["carreiras"][1])
+        for nome in ESTUDOS_DADOS[multi]["carreiras"]:
+            self.assertIn(multi, out["g"][nome])
+        for nome in {c for d in ESTUDOS_DADOS.values() for c in d["carreiras"]}:
+            esperado = [sl for sl, d in ESTUDOS_DADOS.items() if nome in d["carreiras"]]
+            self.assertEqual(sorted(out["g"][nome]), sorted(esperado), nome)
+        self.assertIn("Analista de Segurança da Informação", out["g"])
+
+    def test_perfil_segue_ordem_de_carreiras(self):
+        out = self._grupos("perfil")
+        nomes = [v["nome"] for v in CARREIRAS.values()]
+        esperado = [n for n in nomes if n in out["ordem"]]
+        self.assertEqual(out["ordem"], esperado)
+
+    def test_nist_repete_modulo_protect_detect(self):
+        out = self._grupos("nist")
+        self.assertEqual(out["ids"], [])
+        alvos = [sl for sl, d in ESTUDOS_DADOS.items() if d["nist"] == "Protect / Detect"]
+        self.assertTrue(alvos)
+        for sl in alvos:
+            self.assertIn(sl, out["g"]["Protect"])
+            self.assertIn(sl, out["g"]["Detect"])
+
+    def test_perfil_busca_e_pendentes_afetam_todas_as_copias(self):
+        multi = next(sl for sl, d in ESTUDOS_DADOS.items() if len(d["carreiras"]) > 1)
+        antes = semear(**{f"cs_done_{multi}": "true"})
+        r = self.rodar("document.querySelector('[data-grupo=\"perfil\"]').click();"
+                       "const cb=document.getElementById('so-pendentes');cb.checked=true;cb.dispatchEvent(new Event('change',{bubbles:true}));"
+                       f"const c=[...document.querySelectorAll('.mc[data-slug=\"{multi}\"]')];"
+                       "__fim({n:c.length,ocultas:c.every(x=>x.hidden),contagem:document.getElementById('contagem').textContent,"
+                       "gp:document.querySelector('[data-gp=\"concluidos\"]').textContent})", antes)
+        self.assertEqual(r["erros"], [])
+        self.assertGreater(r["saida"]["n"], 1)
+        self.assertTrue(r["saida"]["ocultas"])
+        self.assertEqual(r["saida"]["contagem"], f"{len(ESTUDOS_DADOS) - 1} módulos")
+        self.assertEqual(r["saida"]["gp"], "1")
+
+    def test_entradas_hostis_nao_quebram(self):
+        antes = ("localStorage.setItem('cs_last',JSON.stringify({slug:'a\\nb',secao:'x',ts:1}));"
+                 "history.replaceState(null,'','#v-a\\\\')")
+        r = self.rodar(f"__fim(document.querySelector('{CARD} .mc-status').textContent)", antes)
+        self.assertEqual(r["erros"], [])
+        self.assertIn("Não iniciado", r["saida"])
 
     def test_so_pendentes(self):
         antes = semear(**{f"cs_done_{SLUG}": "true"})

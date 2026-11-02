@@ -563,7 +563,7 @@ PORTAL_JS = """
     const soPend = document.getElementById('so-pendentes');
     const apenasPendentes = !!(soPend && soPend.checked);
     const slugsVisiveis = new Set();
-    let visiveis = 0;
+    const slugsMostrados = new Set();
 
     document.querySelectorAll('.mc[data-slug]').forEach(card => {
       const slug = card.getAttribute('data-slug');
@@ -571,8 +571,9 @@ PORTAL_JS = """
       if (casaBusca) slugsVisiveis.add(slug);
       const ok = casaBusca && !(apenasPendentes && safeStorageGet('cs_done_' + slug) === 'true');
       card.hidden = !ok;
-      if (ok) visiveis++;
+      if (ok) slugsMostrados.add(slug);
     });
+    const visiveis = slugsMostrados.size;
     document.querySelectorAll('#grupos .grupo').forEach(grupo => {
       grupo.hidden = !grupo.querySelector('.mc:not([hidden])');
     });
@@ -705,11 +706,14 @@ PORTAL_JS = """
     const resumo = { concluidos: 0, andamento: 0, total: 0, estados: {} };
     document.querySelectorAll('.mc[data-slug]').forEach(card => {
       const slug = card.getAttribute('data-slug');
-      const est = estadoDoModulo(slug, parseInt(card.getAttribute('data-secoes'), 10) || 0, chaves);
-      resumo.total++;
-      resumo.estados[slug] = est;
-      if (est.estado === 'concluido') resumo.concluidos++;
-      else if (est.estado === 'andamento') resumo.andamento++;
+      let est = resumo.estados[slug];
+      if (!est) {
+        est = estadoDoModulo(slug, parseInt(card.getAttribute('data-secoes'), 10) || 0, chaves);
+        resumo.total++;
+        resumo.estados[slug] = est;
+        if (est.estado === 'concluido') resumo.concluidos++;
+        else if (est.estado === 'andamento') resumo.andamento++;
+      }
       preencherStatus(card, est);
     });
     return resumo;
@@ -744,7 +748,7 @@ PORTAL_JS = """
       ultimo = JSON.parse(safeStorageGet('cs_last') || 'null');
     } catch (e) { ultimo = null; }
     const card = ultimo && typeof ultimo.slug === 'string'
-      ? document.querySelector('.mc[data-slug="' + ultimo.slug.replace(/"/g, '') + '"]') : null;
+      ? cartoesOrdem.find(c => c.getAttribute('data-slug') === ultimo.slug) : null;
     if (!card || !card.getAttribute('href')) {
       alvo.hidden = true;
       alvo.textContent = '';
@@ -900,30 +904,29 @@ PORTAL_JS = """
   const ORDEM_NIST = ['Govern', 'Identify', 'Protect', 'Detect', 'Respond', 'Recover'];
   let cartoesOrdem = [];
 
-  // Cada módulo entra em um único grupo: o primeiro perfil e a primeira função NIST.
+  // Em trilha e nível cada módulo cai em um grupo; em perfil e NIST, em todos os que carrega.
   function chavesDoGrupo(modo, card) {
     if (modo === 'trilha') {
       const id = card.getAttribute('data-trilha');
-      return { id, kicker: 'Trilha ' + id, nome: DADOS.trilhas[id] || id, attrs: { 'data-trilha': id } };
+      return [{ id, kicker: 'Trilha ' + id, nome: DADOS.trilhas[id] || id, attrs: { 'data-trilha': id } }];
     }
     if (modo === 'nivel') {
       const id = card.getAttribute('data-nivel');
       const par = DADOS.niveis.find(n => n[0] === id);
-      return { id, kicker: 'Nível', nome: par ? par[1] : id, attrs: { 'data-nivel': id } };
+      return [{ id, kicker: 'Nível', nome: par ? par[1] : id, attrs: { 'data-nivel': id } }];
     }
     if (modo === 'perfil') {
-      const id = (card.getAttribute('data-perfis') || '').split('|')[0] || 'outros';
-      const par = DADOS.carreiras.find(c => c[0] === id);
-      return { id, kicker: 'Perfil', nome: par ? par[1] : id, attrs: {} };
+      const nomes = (card.getAttribute('data-perfis') || '').split('|').map(x => x.trim()).filter(Boolean);
+      return (nomes.length ? nomes : ['Outros']).map(nome => ({ id: nome, kicker: 'Perfil', nome, attrs: {} }));
     }
-    const nome = (card.getAttribute('data-nist') || 'Outros').split('/')[0].trim();
-    return { id: nome, kicker: 'NIST CSF 2.0', nome, attrs: {} };
+    const funcoes = (card.getAttribute('data-nist') || '').split('/').map(x => x.trim()).filter(Boolean);
+    return (funcoes.length ? funcoes : ['Outros']).map(nome => ({ id: nome, kicker: 'NIST CSF 2.0', nome, attrs: {} }));
   }
 
   function ordemDoGrupo(modo, id) {
     if (modo === 'trilha') return parseInt(id, 10) || 0;
     if (modo === 'nivel') return DADOS.niveis.findIndex(n => n[0] === id);
-    if (modo === 'perfil') return DADOS.carreiras.findIndex(c => c[0] === id);
+    if (modo === 'perfil') { const k = DADOS.carreiras.indexOf(id); return k < 0 ? DADOS.carreiras.length : k; }
     const k = ORDEM_NIST.indexOf(id);
     return k < 0 ? ORDEM_NIST.length : k;
   }
@@ -936,9 +939,16 @@ PORTAL_JS = """
     });
     const grupos = new Map();
     cartoesOrdem.forEach(card => {
-      const info = chavesDoGrupo(modo, card);
-      if (!grupos.has(info.id)) grupos.set(info.id, { info, cards: [] });
-      grupos.get(info.id).cards.push(card);
+      chavesDoGrupo(modo, card).forEach((info, n) => {
+        if (!grupos.has(info.id)) grupos.set(info.id, { info, cards: [] });
+        let alvo = card;
+        if (n > 0) {
+          alvo = card.cloneNode(true);
+          alvo.removeAttribute('id');
+          alvo.setAttribute('data-copia', 'true');
+        }
+        grupos.get(info.id).cards.push(alvo);
+      });
     });
     const lista = Array.from(grupos.values()).sort((a, b) => {
       const d = ordemDoGrupo(modo, a.info.id) - ordemDoGrupo(modo, b.info.id);
@@ -970,8 +980,7 @@ PORTAL_JS = """
     });
     raiz.textContent = '';
     raiz.appendChild(frag);
-    atualizarGrupos();
-    filtrarCards();
+    atualizarTudo();
   }
 
   // --------------------------------------------------------------------------
@@ -981,7 +990,8 @@ PORTAL_JS = """
     const h = location.hash || '';
     if (h.indexOf('#v-') !== 0) return null;
     const v = h.slice(3);
-    return document.querySelector('section.view[data-view="' + v.replace(/"/g, '') + '"]') ? v : null;
+    const existe = Array.from(document.querySelectorAll('section.view')).some(s => s.getAttribute('data-view') === v);
+    return existe ? v : null;
   }
 
   function mostrarVisao(v) {
@@ -1105,7 +1115,7 @@ def dados_portal() -> dict:
     return {
         "trilhas": {str(tid): info["nome"] for tid, info in TRILHAS.items()},
         "niveis": [[k, v] for k, v in NIVEIS.items()],
-        "carreiras": [[k, v["nome"]] for k, v in CARREIRAS.items()],
+        "carreiras": [v["nome"] for v in CARREIRAS.values()],
         "modulos": modulos,
     }
 
