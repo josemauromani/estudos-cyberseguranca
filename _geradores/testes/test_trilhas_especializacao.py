@@ -60,7 +60,7 @@ ROTAS_NOVAS = {
     ("Blue Team & Defesa", "Operações SOC & Resposta"): [
         "Monitoramento-de-Rede-NSM", "Engenharia-de-Deteccao", "Threat-Hunting", "SOAR-e-Automacao-de-Resposta",
     ],
-    ("Red Team & Pentest",): ["Seguranca-em-Kubernetes"],
+    ("Red Team & Pentest",): ["Seguranca-de-Containers", "Seguranca-em-Kubernetes"],
     ("AppSec & DevSecOps",): [
         "Seguranca-de-Containers", "Seguranca-em-Kubernetes", "Infraestrutura-como-Codigo-Segura", "Deteccao-e-Resposta-em-Nuvem",
     ],

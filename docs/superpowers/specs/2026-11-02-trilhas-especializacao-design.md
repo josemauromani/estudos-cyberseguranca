@@ -199,7 +199,7 @@ Cada módulo abaixo vira uma entrada em `ESTUDOS_DADOS` e uma seção no §3 do 
 
 - **Trilha:** 12 · **NIST:** Protect · **Tempo:** 45 min
 - **MITRE:** T1610 Deploy Container / T1611 Escape to Host
-- **Carreiras:** AppSec & DevSecOps, Blue Team & Defesa
+- **Carreiras:** AppSec & DevSecOps, Blue Team & Defesa, Red Team & Pentest
 - **Subtítulo:** "Da imagem base ao processo em execução"
 - **Objetivos:**
   - Endurecer um Dockerfile: imagem mínima, usuário não root, tag fixa, sem segredos.
@@ -396,7 +396,7 @@ Nenhuma rota nova. As 6 existentes passam a ser (módulos novos em **negrito**):
 | Rota | Sequência nova |
 |---|---|
 | 1. Blue Team / Analista SOC | 01 → 02 → 34 → 36 → 05 → 06 → 07 → **48** → 10 → 39 → 16 → 17 → **46** → **47** → 18 → **49** → 42 |
-| 2. Red Team / Pentest | 01 → 02 → 34 → 04 → 11 → 12 → 13 → 38 → 39 → **51** → 14 → 15 |
+| 2. Red Team / Pentest | 01 → 02 → 34 → 04 → 11 → 12 → 13 → 38 → 39 → **50** → **51** → 14 → 15 |
 | 3. DevSecOps & Cloud Security | 01 → 03 → 04 → 35 → 06 → 12 → 13 → 21 → 41 → 22 → **50** → **51** → **52** → **53** → 24 |
 | 4. GRC, Auditoria & Privacidade | 01 → 08 → 40 → 09 → 25 → 26 → **57** → 27 → **56** → **54** → **55** → 28 → 43 → 44 |
 | 5. Perícia & Resposta a Incidentes | 01 → 02 → 06 → 36 → 10 → **48** → 16 → **47** → 18 → **53** → 42 → 45 → 19 → **56** → 20 |

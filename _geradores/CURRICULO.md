@@ -622,7 +622,7 @@ flowchart LR
 #### 50. Seguranca-de-Containers
 - **Título:** Segurança de Containers: Imagens, Build e Runtime
 - **Função NIST CSF 2.0:** *Protect (PR)*
-- **Tempo Estimado:** 45 minutos | **Carreiras:** AppSec, Blue Team
+- **Tempo Estimado:** 45 minutos | **Carreiras:** AppSec, Blue Team, Red Team
 - **MITRE ATT&CK:** T1610 Deploy Container / T1611 Escape to Host
 - **Objetivos de Aprendizagem:** Endurecer um Dockerfile: imagem mínima, usuário não root, tag fixa, sem segredos; interpretar a varredura de vulnerabilidades de uma imagem e priorizar o que corrigir; assinar imagens e restringir o registro de origem; reconhecer configurações que permitem escape (privilegiado, socket do Docker, *capabilities*).
 - **Pré-requisitos:** Linux-para-Seguranca, DevSecOps-e-CI-CD.
@@ -735,7 +735,7 @@ Para orientar estudantes e profissionais com focos específicos, a matriz curric
 1. **Rota Blue Team / Analista SOC:**  
    `01 -> 02 -> 34 -> 36 -> 05 -> 06 -> 07 -> 48 -> 10 -> 39 -> 16 -> 17 -> 46 -> 47 -> 18 -> 49 -> 42`
 2. **Rota Red Team / Pentest:**  
-   `01 -> 02 -> 34 -> 04 -> 11 -> 12 -> 13 -> 38 -> 39 -> 51 -> 14 -> 15`
+   `01 -> 02 -> 34 -> 04 -> 11 -> 12 -> 13 -> 38 -> 39 -> 50 -> 51 -> 14 -> 15`
 3. **Rota DevSecOps & Cloud Security:**  
    `01 -> 03 -> 04 -> 35 -> 06 -> 12 -> 13 -> 21 -> 41 -> 22 -> 50 -> 51 -> 52 -> 53 -> 24`
 4. **Rota GRC, Auditoria & Privacidade:**  
