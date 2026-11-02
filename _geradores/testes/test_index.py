@@ -147,6 +147,7 @@ class TestBuildIndex(unittest.TestCase):
         self.assertIn("localStorage", conteudo)
         self.assertIn("safeStorageGet", conteudo)
         self.assertIn("safeStorageSet", conteudo)
+        self.assertIn("cs_done_", conteudo)
         self.assertIn("cs_theme", conteudo)
 
         # Busca com remoção de acentos e "Agrupar por" do catálogo

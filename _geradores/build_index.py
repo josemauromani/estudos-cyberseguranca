@@ -20,6 +20,7 @@ Uso como módulo:
 """
 
 import argparse
+import json
 import sys
 from functools import lru_cache
 from html import escape
@@ -440,9 +441,9 @@ def render_certificacoes(certs: List[dict], status_map: Dict[str, dict]) -> str:
     </section>"""
 
 
-# JavaScript do portal. Nesta etapa: armazenamento seguro, tema (mesmo mecanismo dos
-# módulos: chave cs_theme, sem data-theme enquanto o leitor não escolher) e a busca,
-# que filtra os cartões do catálogo e os itens com data-slug das visões especiais.
+# JavaScript do portal: armazenamento seguro, tema (chave cs_theme), status dos módulos,
+# "Continuar estudando", agrupamento, busca, visões, gaveta do menu e progresso.
+# `__DADOS_PORTAL__` é trocado pelo JSON de dados_portal().
 PORTAL_JS = """
   // --------------------------------------------------------------------------
   // 0. Utilitários Seguros de Armazenamento Local (localStorage)
@@ -468,6 +469,32 @@ PORTAL_JS = """
       console.warn('[CS] Falha ao gravar localStorage chave "' + key + '":', e);
     }
     return false;
+  }
+
+  function safeStorageRemove(key) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.removeItem(key);
+        return true;
+      }
+    } catch (e) {
+      console.warn('[CS] Falha ao remover localStorage chave "' + key + '":', e);
+    }
+    return false;
+  }
+
+  // Todas as chaves do localStorage (lista vazia se o armazenamento estiver bloqueado).
+  function safeStorageKeys() {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const keys = [];
+        for (let i = 0; i < window.localStorage.length; i++) keys.push(window.localStorage.key(i));
+        return keys;
+      }
+    } catch (e) {
+      console.warn('[CS] Falha ao listar localStorage:', e);
+    }
+    return [];
   }
 
   // --------------------------------------------------------------------------
@@ -533,16 +560,18 @@ PORTAL_JS = """
   function filtrarCards() {
     const input = document.getElementById('busca');
     const query = removerAcentos((input && input.value || '').trim());
+    const soPend = document.getElementById('so-pendentes');
+    const apenasPendentes = !!(soPend && soPend.checked);
     const slugsVisiveis = new Set();
     let visiveis = 0;
 
     document.querySelectorAll('.mc[data-slug]').forEach(card => {
-      const ok = !query || removerAcentos(card.getAttribute('data-busca')).includes(query);
+      const slug = card.getAttribute('data-slug');
+      const casaBusca = !query || removerAcentos(card.getAttribute('data-busca')).includes(query);
+      if (casaBusca) slugsVisiveis.add(slug);
+      const ok = casaBusca && !(apenasPendentes && safeStorageGet('cs_done_' + slug) === 'true');
       card.hidden = !ok;
-      if (ok) {
-        visiveis++;
-        slugsVisiveis.add(card.getAttribute('data-slug'));
-      }
+      if (ok) visiveis++;
     });
     document.querySelectorAll('#grupos .grupo').forEach(grupo => {
       grupo.hidden = !grupo.querySelector('.mc:not([hidden])');
@@ -593,14 +622,492 @@ PORTAL_JS = """
     }
   }
 
+  // --------------------------------------------------------------------------
+  // 4. Estado dos módulos (cs_done_, cs_read_, cs_check_, cs_quiz_, cs_last)
+  // --------------------------------------------------------------------------
+  const DADOS = __DADOS_PORTAL__;
+  const ROTULOS_TIPO = {
+    teoria: '📘 Teoria',
+    laboratorio: '🧪 Laboratório',
+    checklist: '☑️ Checklist',
+    questoes: '❓ Questões de concurso',
+    referencias: '📚 Referências'
+  };
+  const PREFIXOS_PROGRESSO = ['cs_done_', 'cs_read_', 'cs_check_', 'cs_quiz_'];
+
+  function listaLida(slug) {
+    const bruto = safeStorageGet('cs_read_' + slug);
+    if (!bruto) return { presente: false, ids: [] };
+    let ids = [];
+    try {
+      const v = JSON.parse(bruto);
+      if (Array.isArray(v)) ids = v.filter(x => typeof x === 'string');
+    } catch (e) { /* corrompido: conta como nenhuma seção lida */ }
+    const conhecidas = DADOS.modulos[slug] && DADOS.modulos[slug].secoes;
+    if (conhecidas) ids = ids.filter(id => Object.prototype.hasOwnProperty.call(conhecidas, id));
+    return { presente: true, ids: Array.from(new Set(ids)) };
+  }
+
+  // Resume o progresso de um módulo a partir do localStorage.
+  function estadoDoModulo(slug, totalSecoes, chaves) {
+    if (safeStorageGet('cs_done_' + slug) === 'true') return { estado: 'concluido', pct: 100 };
+    const lida = listaLida(slug);
+    const prefChk = 'cs_check_' + slug + '_';
+    const prefQuiz = 'cs_quiz_' + slug + '_';
+    let checks = 0;
+    let quiz = 0;
+    let acertos = 0;
+    chaves.forEach(k => {
+      if (k.indexOf(prefChk) === 0 && safeStorageGet(k) === 'true') checks++;
+      else if (k.indexOf(prefQuiz) === 0) {
+        quiz++;
+        if (safeStorageGet(k) === 'acertei') acertos++;
+      }
+    });
+    const pct = totalSecoes > 0 ? Math.min(100, Math.round(100 * lida.ids.length / totalSecoes)) : 0;
+    const andamento = lida.presente || checks > 0 || quiz > 0;
+    return { estado: andamento ? 'andamento' : 'novo', pct: andamento ? pct : 0, checks, quiz, acertos };
+  }
+
+  function preencherStatus(card, est) {
+    const el = card.querySelector('.mc-status');
+    if (!el) return;
+    el.textContent = '';
+    el.className = 'mc-status';
+    if (est.estado === 'concluido') {
+      el.classList.add('concluido');
+      el.textContent = '✓ Concluído';
+    } else if (est.estado === 'andamento') {
+      el.classList.add('andamento');
+      el.appendChild(document.createTextNode('◐ ' + est.pct + '% lido'));
+      const bar = document.createElement('span');
+      bar.className = 'bar';
+      const i = document.createElement('i');
+      i.style.width = est.pct + '%';
+      bar.appendChild(i);
+      el.appendChild(bar);
+    } else if (!card.classList.contains('pendente')) {
+      el.classList.add('novo');
+      el.textContent = '○ Não iniciado';
+    }
+  }
+
+  function definirBarra(bar, valor, maximo) {
+    if (!bar) return;
+    const pct = maximo > 0 ? Math.round(100 * valor / maximo) : 0;
+    bar.setAttribute('aria-valuenow', String(valor));
+    const i = bar.querySelector('i');
+    if (i) i.style.width = pct + '%';
+  }
+
+  function atualizarStatusCartoes() {
+    const chaves = safeStorageKeys();
+    const resumo = { concluidos: 0, andamento: 0, total: 0, estados: {} };
+    document.querySelectorAll('.mc[data-slug]').forEach(card => {
+      const slug = card.getAttribute('data-slug');
+      const est = estadoDoModulo(slug, parseInt(card.getAttribute('data-secoes'), 10) || 0, chaves);
+      resumo.total++;
+      resumo.estados[slug] = est;
+      if (est.estado === 'concluido') resumo.concluidos++;
+      else if (est.estado === 'andamento') resumo.andamento++;
+      preencherStatus(card, est);
+    });
+    return resumo;
+  }
+
+  function atualizarProgressoGlobal(resumo) {
+    const raiz = document.getElementById('progresso-global');
+    if (!raiz) return;
+    const c = raiz.querySelector('[data-gp="concluidos"]');
+    if (c) c.textContent = String(resumo.concluidos);
+    const a = raiz.querySelector('[data-gp="andamento"]');
+    if (a) a.textContent = String(resumo.andamento);
+    const barra = raiz.querySelector('.bar');
+    definirBarra(barra, resumo.concluidos, resumo.total);
+  }
+
+  function atualizarGrupos() {
+    document.querySelectorAll('#grupos .grupo').forEach(grupo => {
+      const cards = Array.from(grupo.querySelectorAll('.mc[data-slug]'));
+      const feitos = cards.filter(c => safeStorageGet('cs_done_' + c.getAttribute('data-slug')) === 'true').length;
+      const p = grupo.querySelector('.grupo-cab .p');
+      if (p) p.textContent = feitos + ' de ' + cards.length + ' concluídos';
+    });
+  }
+
+  // "Continuar estudando": último módulo/seção aberto (cs_last).
+  function atualizarContinuar(resumo) {
+    const alvo = document.getElementById('continuar');
+    if (!alvo) return;
+    let ultimo = null;
+    try {
+      ultimo = JSON.parse(safeStorageGet('cs_last') || 'null');
+    } catch (e) { ultimo = null; }
+    const card = ultimo && typeof ultimo.slug === 'string'
+      ? document.querySelector('.mc[data-slug="' + ultimo.slug.replace(/"/g, '') + '"]') : null;
+    if (!card || !card.getAttribute('href')) {
+      alvo.hidden = true;
+      alvo.textContent = '';
+      return;
+    }
+    const slug = ultimo.slug;
+    const est = resumo.estados[slug] || { pct: 0, checks: 0, quiz: 0, acertos: 0 };
+    const modulo = DADOS.modulos[slug] || { secoes: {}, chk: 0, q: 0 };
+    const secaoId = typeof ultimo.secao === 'string' ? ultimo.secao : '';
+    const tipo = modulo.secoes[secaoId];
+    const rotulo = ROTULOS_TIPO[tipo] || secaoId || 'Início';
+
+    const el = (tag, cls, texto) => {
+      const n = document.createElement(tag);
+      if (cls) n.className = cls;
+      if (texto !== undefined) n.textContent = texto;
+      return n;
+    };
+    const meta = el('div', 'meta');
+    const item = (rot, valor) => {
+      const s = el('span', '', rot + ' ');
+      s.appendChild(el('b', '', valor));
+      meta.appendChild(s);
+    };
+    item('Lido', (est.pct || 0) + '%');
+    item('Parou em', rotulo);
+    if (modulo.chk) item('Checklist', (est.checks || 0) + '/' + modulo.chk);
+    if (modulo.q) item('Questões', (est.acertos || 0) + '/' + modulo.q);
+
+    const texto = el('div');
+    texto.appendChild(el('div', 'k', 'Continuar estudando'));
+    texto.appendChild(el('h2', '', card.querySelector('.mc-titulo').textContent));
+    const bar = el('div', 'bar');
+    bar.setAttribute('role', 'progressbar');
+    bar.setAttribute('aria-label', 'Leitura do módulo');
+    bar.setAttribute('aria-valuemin', '0');
+    bar.setAttribute('aria-valuemax', '100');
+    bar.setAttribute('aria-valuenow', String(est.pct || 0));
+    const i = document.createElement('i');
+    i.style.width = (est.pct || 0) + '%';
+    bar.appendChild(i);
+    texto.appendChild(bar);
+    texto.appendChild(meta);
+
+    const link = el('a', 'btn btn-primary', 'Continuar');
+    link.href = card.getAttribute('href') + (secaoId ? '#' + encodeURIComponent(secaoId) : '');
+
+    alvo.textContent = '';
+    alvo.setAttribute('data-trilha', card.getAttribute('data-trilha') || '');
+    alvo.appendChild(texto);
+    alvo.appendChild(link);
+    alvo.hidden = false;
+  }
+
+  // Rotas sugeridas e Por certificação: progresso "X de N concluídos", passo feito e próximo.
+  function atualizarPaineis() {
+    ['secao-rota-sugerida', 'secao-cert-painel'].forEach(secaoId => {
+      const secao = document.getElementById(secaoId);
+      if (!secao) return;
+      secao.querySelectorAll('.rota-sugerida').forEach(div => {
+        const passos = Array.from(div.querySelectorAll('.rota-passo'));
+        let feitos = 0;
+        let proximo = null;
+        passos.forEach(li => {
+          const feito = safeStorageGet('cs_done_' + li.getAttribute('data-slug')) === 'true';
+          li.classList.toggle('feito', feito);
+          li.classList.remove('proximo');
+          if (feito) feitos++;
+          else if (!proximo) proximo = li;
+        });
+        if (proximo) proximo.classList.add('proximo');
+        const pct = passos.length ? Math.round((feitos / passos.length) * 100) : 0;
+        const barra = div.querySelector('.rota-progresso-barra');
+        if (barra) barra.setAttribute('aria-valuenow', String(feitos));
+        const cheio = div.querySelector('.rota-progresso-preenchido');
+        if (cheio) cheio.style.width = pct + '%';
+        const texto = div.querySelector('.rota-progresso-texto');
+        if (texto) texto.textContent = feitos + ' de ' + passos.length + ' concluídos (' + pct + '%)';
+        const prox = div.querySelector('.rota-proximo');
+        if (prox) {
+          prox.textContent = proximo
+            ? 'Próximo módulo: ' + proximo.getAttribute('data-rotulo')
+            : 'Tudo concluído! Todos os módulos foram marcados como estudados.';
+        }
+      });
+    });
+  }
+
+  // Meu progresso: caixas de conclusão, resumo e barra.
+  function atualizarMeuProgresso() {
+    let feitos = 0;
+    let total = 0;
+    document.querySelectorAll('#progresso-lista input[data-slug]').forEach(cb => {
+      const feito = safeStorageGet('cs_done_' + cb.getAttribute('data-slug')) === 'true';
+      cb.checked = feito;
+      total++;
+      if (feito) feitos++;
+    });
+    const pct = total ? Math.round((feitos / total) * 100) : 0;
+    const texto = document.getElementById('progresso-texto');
+    if (texto) texto.textContent = feitos + ' de ' + total + ' concluídos (' + pct + '%)';
+    definirBarra(document.querySelector('.progresso-resumo .bar'), feitos, total);
+  }
+
+  function atualizarTudo() {
+    const resumo = atualizarStatusCartoes();
+    atualizarProgressoGlobal(resumo);
+    atualizarGrupos();
+    atualizarContinuar(resumo);
+    atualizarPaineis();
+    atualizarMeuProgresso();
+    filtrarCards();
+  }
+
+  function alternarConclusao(slug, feito) {
+    if (feito) safeStorageSet('cs_done_' + slug, 'true');
+    else safeStorageRemove('cs_done_' + slug);
+    atualizarTudo();
+  }
+
+  // Zera só o progresso de estudo; mantém o tema. A confirmação é inline (sem diálogo).
+  let zerarTimer = null;
+  function restaurarBotaoZerar(btn) {
+    if (zerarTimer) clearTimeout(zerarTimer);
+    zerarTimer = null;
+    btn.removeAttribute('data-confirmar');
+    if (btn.dataset.rotuloOriginal) btn.textContent = btn.dataset.rotuloOriginal;
+  }
+
+  function zerarProgresso() {
+    safeStorageKeys().forEach(k => {
+      if (k === 'cs_last' || PREFIXOS_PROGRESSO.some(p => k.indexOf(p) === 0)) safeStorageRemove(k);
+    });
+    atualizarTudo();
+  }
+
+  function aoClicarZerar(e) {
+    const btn = e.currentTarget;
+    if (btn.getAttribute('data-confirmar') === 'true') {
+      restaurarBotaoZerar(btn);
+      zerarProgresso();
+      return;
+    }
+    btn.dataset.rotuloOriginal = btn.textContent;
+    btn.setAttribute('data-confirmar', 'true');
+    btn.textContent = 'Confirmar? Clique de novo para zerar';
+    zerarTimer = setTimeout(() => restaurarBotaoZerar(btn), 5000);
+  }
+
+  // --------------------------------------------------------------------------
+  // 5. Agrupar o catálogo (trilha, nível, perfil, NIST)
+  // --------------------------------------------------------------------------
+  const ORDEM_NIST = ['Govern', 'Identify', 'Protect', 'Detect', 'Respond', 'Recover'];
+  let cartoesOrdem = [];
+
+  // Cada módulo entra em um único grupo: o primeiro perfil e a primeira função NIST.
+  function chavesDoGrupo(modo, card) {
+    if (modo === 'trilha') {
+      const id = card.getAttribute('data-trilha');
+      return { id, kicker: 'Trilha ' + id, nome: DADOS.trilhas[id] || id, attrs: { 'data-trilha': id } };
+    }
+    if (modo === 'nivel') {
+      const id = card.getAttribute('data-nivel');
+      const par = DADOS.niveis.find(n => n[0] === id);
+      return { id, kicker: 'Nível', nome: par ? par[1] : id, attrs: { 'data-nivel': id } };
+    }
+    if (modo === 'perfil') {
+      const id = (card.getAttribute('data-perfis') || '').split('|')[0] || 'outros';
+      const par = DADOS.carreiras.find(c => c[0] === id);
+      return { id, kicker: 'Perfil', nome: par ? par[1] : id, attrs: {} };
+    }
+    const nome = (card.getAttribute('data-nist') || 'Outros').split('/')[0].trim();
+    return { id: nome, kicker: 'NIST CSF 2.0', nome, attrs: {} };
+  }
+
+  function ordemDoGrupo(modo, id) {
+    if (modo === 'trilha') return parseInt(id, 10) || 0;
+    if (modo === 'nivel') return DADOS.niveis.findIndex(n => n[0] === id);
+    if (modo === 'perfil') return DADOS.carreiras.findIndex(c => c[0] === id);
+    const k = ORDEM_NIST.indexOf(id);
+    return k < 0 ? ORDEM_NIST.length : k;
+  }
+
+  function agruparPor(modo) {
+    const raiz = document.getElementById('grupos');
+    if (!raiz) return;
+    document.querySelectorAll('.agrupar button[data-grupo]').forEach(b => {
+      b.setAttribute('aria-pressed', b.getAttribute('data-grupo') === modo ? 'true' : 'false');
+    });
+    const grupos = new Map();
+    cartoesOrdem.forEach(card => {
+      const info = chavesDoGrupo(modo, card);
+      if (!grupos.has(info.id)) grupos.set(info.id, { info, cards: [] });
+      grupos.get(info.id).cards.push(card);
+    });
+    const lista = Array.from(grupos.values()).sort((a, b) => {
+      const d = ordemDoGrupo(modo, a.info.id) - ordemDoGrupo(modo, b.info.id);
+      return d || String(a.info.nome).localeCompare(String(b.info.nome), 'pt-BR');
+    });
+    const frag = document.createDocumentFragment();
+    lista.forEach(g => {
+      const div = document.createElement('div');
+      div.className = 'grupo';
+      Object.keys(g.info.attrs).forEach(k => div.setAttribute(k, g.info.attrs[k]));
+      const cab = document.createElement('div');
+      cab.className = 'grupo-cab';
+      const k = document.createElement('span');
+      k.className = 'k';
+      k.textContent = g.info.kicker;
+      const h2 = document.createElement('h2');
+      h2.textContent = g.info.nome;
+      const p = document.createElement('span');
+      p.className = 'p';
+      cab.appendChild(k);
+      cab.appendChild(h2);
+      cab.appendChild(p);
+      const grid = document.createElement('div');
+      grid.className = 'grid';
+      g.cards.forEach(c => grid.appendChild(c));
+      div.appendChild(cab);
+      div.appendChild(grid);
+      frag.appendChild(div);
+    });
+    raiz.textContent = '';
+    raiz.appendChild(frag);
+    atualizarGrupos();
+    filtrarCards();
+  }
+
+  // --------------------------------------------------------------------------
+  // 6. Visões, gaveta do menu e atalhos
+  // --------------------------------------------------------------------------
+  function visaoDoHash() {
+    const h = location.hash || '';
+    if (h.indexOf('#v-') !== 0) return null;
+    const v = h.slice(3);
+    return document.querySelector('section.view[data-view="' + v.replace(/"/g, '') + '"]') ? v : null;
+  }
+
+  function mostrarVisao(v) {
+    document.querySelectorAll('section.view').forEach(s => { s.hidden = s.getAttribute('data-view') !== v; });
+    document.querySelectorAll('.menu-lateral a[data-view]').forEach(a => {
+      if (a.getAttribute('data-view') === v) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
+  }
+
+  function menuAberto() {
+    return document.body.classList.contains('menu-aberto');
+  }
+
+  function abrirMenu() {
+    const btn = document.querySelector('.menu-toggle');
+    document.body.classList.add('menu-aberto');
+    if (btn) {
+      btn.setAttribute('aria-expanded', 'true');
+      btn.setAttribute('aria-label', 'Fechar menu');
+    }
+    const atual = document.querySelector('.menu-lateral a[aria-current="page"]');
+    if (atual) atual.focus();
+  }
+
+  function fecharMenu(devolverFoco) {
+    const btn = document.querySelector('.menu-toggle');
+    document.body.classList.remove('menu-aberto');
+    if (btn) {
+      btn.setAttribute('aria-expanded', 'false');
+      btn.setAttribute('aria-label', 'Abrir menu');
+      if (devolverFoco) btn.focus();
+    }
+  }
+
+  function initNavegacao() {
+    const btn = document.querySelector('.menu-toggle');
+    if (btn) btn.addEventListener('click', () => { if (menuAberto()) fecharMenu(true); else abrirMenu(); });
+
+    document.querySelectorAll('.menu-lateral a[data-view]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const v = a.getAttribute('data-view');
+        mostrarVisao(v);
+        if (location.hash !== '#v-' + v) location.hash = '#v-' + v;
+        window.scrollTo(0, 0);
+        if (menuAberto()) fecharMenu(true);
+      });
+    });
+    window.addEventListener('hashchange', () => {
+      const v = visaoDoHash();
+      if (v) mostrarVisao(v);
+    });
+    const inicial = visaoDoHash();
+    if (inicial) mostrarVisao(inicial);
+
+    document.addEventListener('click', e => {
+      if (!menuAberto()) return;
+      if (e.target.closest && (e.target.closest('.side') || e.target.closest('.menu-toggle'))) return;
+      fecharMenu(true);
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && menuAberto()) {
+        fecharMenu(true);
+        return;
+      }
+      const alvo = e.target;
+      const digitando = alvo && (alvo.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(alvo.tagName || ''));
+      if (e.key === '/' && !digitando && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const busca = document.getElementById('busca');
+        if (busca) {
+          e.preventDefault();
+          busca.focus();
+        }
+      }
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     const input = document.getElementById('busca');
     if (input) input.addEventListener('input', filtrarCards);
     const limpar = document.getElementById('limpar-busca');
     if (limpar) limpar.addEventListener('click', clearSearch);
+
+    cartoesOrdem = Array.from(document.querySelectorAll('.mc[data-slug]'));
+    document.querySelectorAll('.agrupar button[data-grupo]').forEach(b => {
+      b.addEventListener('click', () => agruparPor(b.getAttribute('data-grupo')));
+    });
+    const soPend = document.getElementById('so-pendentes');
+    if (soPend) soPend.addEventListener('change', filtrarCards);
+    document.querySelectorAll('#progresso-lista input[data-slug]').forEach(cb => {
+      cb.addEventListener('change', () => alternarConclusao(cb.getAttribute('data-slug'), cb.checked));
+    });
+    const zerar = document.getElementById('zerar-progresso');
+    if (zerar) zerar.addEventListener('click', aoClicarZerar);
+    window.addEventListener('storage', atualizarTudo);
+    window.addEventListener('pageshow', e => { if (e.persisted) atualizarTudo(); });
+
+    initNavegacao();
+    atualizarTudo();
   });
 """
+
+
+def dados_portal() -> dict:
+    """Dados estáticos lidos pelo JS do portal: nomes de grupos e seções/itens de cada módulo."""
+    from index_dados import CARREIRAS
+
+    modulos = {}
+    for slug in ESTUDOS_DADOS:
+        corpo = corpo_do_modulo(slug)
+        if corpo is None:
+            continue
+        secoes = extrair_secoes(corpo.read_text(encoding="utf-8"))
+        modulos[slug] = {
+            "secoes": {s.id: s.tipo for s in secoes},
+            "chk": sum(s.n_checklist for s in secoes),
+            "q": sum(s.n_questoes for s in secoes),
+        }
+    return {
+        "trilhas": {str(tid): info["nome"] for tid, info in TRILHAS.items()},
+        "niveis": [[k, v] for k, v in NIVEIS.items()],
+        "carreiras": [[k, v["nome"]] for k, v in CARREIRAS.items()],
+        "modulos": modulos,
+    }
 
 
 def gerar_index_html(
@@ -641,6 +1148,9 @@ def gerar_index_html(
     necessidades_html = render_necessidades_grid(NECESSIDADES, status_map)
     rota_vaga_html = render_rota_vaga(ROTA_VAGA, status_map)
     meu_progresso_html = render_meu_progresso(ESTUDOS_DADOS, status_map)
+
+    dados_json = json.dumps(dados_portal(), ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    portal_js = PORTAL_JS.replace("__DADOS_PORTAL__", dados_json)
 
     html_content = f"""<!DOCTYPE html>
 <html lang="pt-BR">
@@ -757,7 +1267,7 @@ def gerar_index_html(
 </div>
 
 <script>
-{PORTAL_JS}
+{portal_js}
 </script>
 </body>
 </html>
