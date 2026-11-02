@@ -111,6 +111,10 @@ pre code {
   font-size: inherit;
 }
 
+/* Contraste AA (4,5:1) em rótulos pequenos coloridos: a cor do tipo, da trilha
+   ou do callout é misturada com 25% de --ink. No claro isso escurece a cor; no
+   escuro, clareia. Coberto por test_componentes_css.TestContrasteAA. */
+
 /* Foco visível em todo controle (teclado). */
 a:focus-visible,
 button:focus-visible,
@@ -180,7 +184,7 @@ summary:focus-visible,
   padding: 3px 10px;
   border-radius: var(--radius-pill);
   background: var(--soft, var(--sunk));
-  color: var(--c, var(--ink));
+  color: color-mix(in srgb, var(--c, var(--ink)) 75%, var(--ink));
 }
 
 .theme-toggle-btn, .toc-toggle {
@@ -341,7 +345,7 @@ summary:focus-visible,
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--c, var(--muted));
+  color: color-mix(in srgb, var(--c, var(--muted)) 75%, var(--ink));
 }
 
 .toc-contador {
@@ -445,7 +449,7 @@ summary:focus-visible,
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--track-color, var(--accent));
+  color: color-mix(in srgb, var(--track-color, var(--accent)) 75%, var(--ink));
 }
 
 .mhead h1 {
@@ -541,7 +545,7 @@ summary:focus-visible,
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--c, var(--muted));
+  color: color-mix(in srgb, var(--c, var(--muted)) 75%, var(--ink));
   background: var(--soft, var(--sunk));
   padding: 3px 10px 3px 8px;
   border-radius: var(--radius-sm);
@@ -598,7 +602,7 @@ summary:focus-visible,
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--cc);
+  color: color-mix(in srgb, var(--cc) 75%, var(--ink));
   margin-bottom: 3px;
 }
 
@@ -1070,7 +1074,7 @@ td {
 
 .quiz-selfeval button[data-v="acertei"].on { background: var(--ok); border-color: var(--ok); color: var(--surface); }
 .quiz-selfeval button[data-v="errei"].on { background: var(--bad); border-color: var(--bad); color: var(--surface); }
-.quiz-selfeval button[data-v="revisar"].on { background: var(--warning-color); border-color: var(--warning-color); color: var(--surface); }
+.quiz-selfeval button[data-v="revisar"].on { background: var(--warning-color); background: color-mix(in srgb, var(--warning-color) 75%, var(--ink)); border-color: color-mix(in srgb, var(--warning-color) 75%, var(--ink)); color: var(--surface); }
 
 /* Múltipla escolha (Fundamentos-Ciber: quiz-item[data-formato="multipla"]). */
 .quiz-section {
