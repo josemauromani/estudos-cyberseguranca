@@ -275,6 +275,7 @@ python3 -m unittest discover -s _geradores/testes -v
 O currículo é estruturado de forma a atender diferentes objetivos e momentos de carreira:
 
 > No portal, a aba **Rotas Sugeridas** mostra a rota de cada perfil como sequência numerada, com progresso e o próximo módulo a estudar.
+> A aba **Por Certificação** reúne os módulos que cobrem cada prova (CEH, CISM, CISSP, CCSP, GSEC e Security+), com progresso e próximo módulo, e a aba **Meu Progresso** separa os módulos concluídos dos que faltam estudar.
 
 - **Blue Team & Defesa Ativa:** Módulos de redes, bastionamento Linux/Windows, firewalls, Zero Trust, EDR e detecção de ameaças; Linux e PowerShell para investigação (Trilha 8), Active Directory e detecção de ataques ao AD (Trilha 9) e ransomware (Trilha 10); engenharia de detecção, threat hunting, monitoramento de rede e SOAR (Trilha 11).
 - **Red Team & Testes de Invasão:** Técnicas de reconhecimento OSINT, OWASP Top 10 Web, segurança de APIs e metodologias de pentest; Linux e caminhos de ataque no Active Directory (Trilhas 8 e 9); escalação de privilégio em Kubernetes (Trilha 12).

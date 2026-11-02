@@ -1379,6 +1379,8 @@ a.vaga-chip:hover {
         <button class="tab-btn" data-facet="trilhas" onclick="switchTab('trilhas')">Por Trilha Temática</button>
         <button class="tab-btn" data-facet="carreiras" onclick="switchTab('carreiras')">Por Perfil Profissional</button>
         <button class="tab-btn" data-facet="rotas" onclick="switchTab('rotas')">Rotas Sugeridas</button>
+        <button class="tab-btn" data-facet="certs" onclick="switchTab('certs')">Por Certificação</button>
+        <button class="tab-btn" data-facet="progresso" onclick="switchTab('progresso')">Meu Progresso</button>
         <button class="tab-btn" data-facet="nist" onclick="switchTab('nist')">Por Função NIST CSF 2.0</button>
       </nav>
 
@@ -1421,6 +1423,24 @@ a.vaga-chip:hover {
         <button class="filter-badge" data-value="grc" onclick="setSubFilter(this.dataset.value, this)">📋 GRC, Auditoria &amp; Privacidade</button>
         <button class="filter-badge" data-value="pericia" onclick="setSubFilter(this.dataset.value, this)">🔬 Perícia &amp; Resposta a Incidentes</button>
         <button class="filter-badge" data-value="analista_si" onclick="setSubFilter(this.dataset.value, this)">🎯 Analista de Segurança da Informação (vaga)</button>
+      </div>
+
+      <!-- Painel: Por Certificação -->
+      <div class="filter-subpanel" data-panel="certs" style="display: none;">
+        <button class="filter-badge active" data-value="all" onclick="setSubFilter(this.dataset.value, this)">Escolha uma certificação</button>
+        <button class="filter-badge" data-value="CEH" onclick="setSubFilter(this.dataset.value, this)">🎓 CEH</button>
+        <button class="filter-badge" data-value="CISM" onclick="setSubFilter(this.dataset.value, this)">🎓 CISM</button>
+        <button class="filter-badge" data-value="CISSP" onclick="setSubFilter(this.dataset.value, this)">🎓 CISSP</button>
+        <button class="filter-badge" data-value="CCSP" onclick="setSubFilter(this.dataset.value, this)">🎓 CCSP</button>
+        <button class="filter-badge" data-value="GSEC" onclick="setSubFilter(this.dataset.value, this)">🎓 GSEC</button>
+        <button class="filter-badge" data-value="Security+" onclick="setSubFilter(this.dataset.value, this)">🎓 Security+</button>
+      </div>
+
+      <!-- Painel: Meu Progresso -->
+      <div class="filter-subpanel" data-panel="progresso" style="display: none;">
+        <button class="filter-badge active" data-value="all" onclick="setSubFilter(this.dataset.value, this)">Todos os módulos</button>
+        <button class="filter-badge" data-value="concluidos" onclick="setSubFilter(this.dataset.value, this)">✅ Concluídos</button>
+        <button class="filter-badge" data-value="a_estudar" onclick="setSubFilter(this.dataset.value, this)">📖 A estudar</button>
       </div>
 
       <!-- Painel: Por Função NIST CSF 2.0 -->
@@ -1882,7 +1902,7 @@ a.vaga-chip:hover {
           <p>Defesa e operação de SOC: redes, hardening, EDR, Active Directory, SIEM, threat intel, detecção avançada e resposta.</p>
         </div>
         <div class="rota-progresso">
-          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso da rota" aria-valuemin="0" aria-valuemax="17" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
+          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="17" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
           <span class="rota-progresso-texto">0 de 17 concluídos (0%)</span>
         </div>
         <p class="rota-proximo"></p>
@@ -1912,7 +1932,7 @@ a.vaga-chip:hover {
           <p>Segurança ofensiva ética: reconhecimento, falhas web e de APIs, caminhos de ataque no AD e no Kubernetes, pentest e engenharia social.</p>
         </div>
         <div class="rota-progresso">
-          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso da rota" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
+          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
           <span class="rota-progresso-texto">0 de 12 concluídos (0%)</span>
         </div>
         <p class="rota-proximo"></p>
@@ -1937,7 +1957,7 @@ a.vaga-chip:hover {
           <p>Desenvolvimento e nuvem seguros: criptografia, IAM, APIs, pipeline, containers, Kubernetes, infraestrutura como código e resposta em nuvem.</p>
         </div>
         <div class="rota-progresso">
-          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso da rota" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
+          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
           <span class="rota-progresso-texto">0 de 15 concluídos (0%)</span>
         </div>
         <p class="rota-proximo"></p>
@@ -1965,7 +1985,7 @@ a.vaga-chip:hover {
           <p>Governança, riscos e conformidade: ISO 27001, riscos, terceiros, LGPD, legislação, regulação financeira, continuidade e gestão de crise.</p>
         </div>
         <div class="rota-progresso">
-          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso da rota" aria-valuemin="0" aria-valuemax="14" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
+          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="14" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
           <span class="rota-progresso-texto">0 de 14 concluídos (0%)</span>
         </div>
         <p class="rota-proximo"></p>
@@ -1992,7 +2012,7 @@ a.vaga-chip:hover {
           <p>Investigação: rede, SOC, threat hunting, resposta a incidentes (inclusive em nuvem), ransomware, forense, legislação e malware.</p>
         </div>
         <div class="rota-progresso">
-          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso da rota" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
+          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
           <span class="rota-progresso-texto">0 de 15 concluídos (0%)</span>
         </div>
         <p class="rota-proximo"></p>
@@ -2020,7 +2040,7 @@ a.vaga-chip:hover {
           <p>A rota da vaga de Analista de SI: soluções de segurança, bancos de dados, normas, controles, resposta a incidentes, inglês e certificações.</p>
         </div>
         <div class="rota-progresso">
-          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso da rota" aria-valuemin="0" aria-valuemax="23" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
+          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="23" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
           <span class="rota-progresso-texto">0 de 23 concluídos (0%)</span>
         </div>
         <p class="rota-proximo"></p>
@@ -2052,6 +2072,157 @@ a.vaga-chip:hover {
       </div>
     </section>
 
+    <!-- Seção: Certificação escolhida (aba Por Certificação) -->
+    <section class="rota-sugerida-section" id="secao-cert-painel" hidden aria-live="polite">
+      <div class="rota-sugerida" data-rota="CEH" hidden>
+        <div class="rota-cabecalho">
+          <h2>🎓 CEH: Certified Ethical Hacker</h2>
+          <p>EC-Council · Técnica / ofensiva · Experiência: 2 anos em SI ou treinamento oficial</p>
+        </div>
+        <div class="rota-progresso">
+          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
+          <span class="rota-progresso-texto">0 de 9 concluídos (0%)</span>
+        </div>
+        <p class="rota-proximo"></p>
+        <ol class="rota-passos">
+          <li class="rota-passo" data-slug="Redes-e-Protocolos" data-rotulo="02 · TCP/IP, DNS, Roteamento e Inspeção de Tráfego"><span class="rota-passo-num">02</span> <a href="Redes-e-Protocolos/treinamento-redes-e-protocolos.html" class="rota-passo-link">TCP/IP, DNS, Roteamento e Inspeção de Tráfego</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Reconhecimento-e-OSINT" data-rotulo="11 · Superfície de Ataque, DNS, WHOIS e Shodan"><span class="rota-passo-num">11</span> <a href="Reconhecimento-e-OSINT/treinamento-reconhecimento-e-osint.html" class="rota-passo-link">Superfície de Ataque, DNS, WHOIS e Shodan</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="OWASP-Top-10-Web" data-rotulo="12 · Falhas Web (SQLi, XSS, CSRF, Broken Auth)"><span class="rota-passo-num">12</span> <a href="OWASP-Top-10-Web/treinamento-owasp-top-10-web.html" class="rota-passo-link">Falhas Web (SQLi, XSS, CSRF, Broken Auth)</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Seguranca-em-APIs" data-rotulo="13 · OWASP API Security, Rate Limiting e Tokens"><span class="rota-passo-num">13</span> <a href="Seguranca-em-APIs/treinamento-seguranca-em-apis.html" class="rota-passo-link">OWASP API Security, Rate Limiting e Tokens</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Pentest-Metodologias" data-rotulo="14 · Fases do Pentest (PTES), Escopo e Relatório"><span class="rota-passo-num">14</span> <a href="Pentest-Metodologias/treinamento-pentest-metodologias.html" class="rota-passo-link">Fases do Pentest (PTES), Escopo e Relatório</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Engenharia-Social-e-Phishing" data-rotulo="15 · Pretexting, Spear Phishing e Defesas Humanas"><span class="rota-passo-num">15</span> <a href="Engenharia-Social-e-Phishing/treinamento-engenharia-social-e-phishing.html" class="rota-passo-link">Pretexting, Spear Phishing e Defesas Humanas</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Analise-Basica-de-Malware" data-rotulo="20 · Análise Estática vs Dinâmica e Sandboxes"><span class="rota-passo-num">20</span> <a href="Analise-Basica-de-Malware/treinamento-analise-basica-de-malware.html" class="rota-passo-link">Análise Estática vs Dinâmica e Sandboxes</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Ataques-e-Defesa-no-AD" data-rotulo="39 · Ataques ao AD e Detecção: Kerberoasting, Pass-the-Hash e DCSync"><span class="rota-passo-num">39</span> <a href="Ataques-e-Defesa-no-AD/treinamento-ataques-e-defesa-no-ad.html" class="rota-passo-link">Ataques ao AD e Detecção: Kerberoasting, Pass-the-Hash e DCSync</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Seguranca-em-Kubernetes" data-rotulo="51 · Segurança em Kubernetes: RBAC, Pod Security e NetworkPolicy"><span class="rota-passo-num">51</span> <a href="Seguranca-em-Kubernetes/treinamento-seguranca-em-kubernetes.html" class="rota-passo-link">Segurança em Kubernetes: RBAC, Pod Security e NetworkPolicy</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+        </ol>
+      </div>
+      <div class="rota-sugerida" data-rota="CISM" hidden>
+        <div class="rota-cabecalho">
+          <h2>🎓 CISM: Certified Information Security Manager</h2>
+          <p>ISACA · Gestão de programa de SI · Experiência: 5 anos em SI, sendo 3 em gestão</p>
+        </div>
+        <div class="rota-progresso">
+          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
+          <span class="rota-progresso-texto">0 de 9 concluídos (0%)</span>
+        </div>
+        <p class="rota-proximo"></p>
+        <ol class="rota-passos">
+          <li class="rota-passo" data-slug="Resposta-a-Incidentes" data-rotulo="18 · Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)"><span class="rota-passo-num">18</span> <a href="Resposta-a-Incidentes/treinamento-resposta-a-incidentes.html" class="rota-passo-link">Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Gestao-de-Riscos-TI" data-rotulo="25 · ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)"><span class="rota-passo-num">25</span> <a href="Gestao-de-Riscos-TI/treinamento-gestao-de-riscos-ti.html" class="rota-passo-link">ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="ISO-27001-e-27002" data-rotulo="26 · SGSI, Anexo A, CIS Controls e NIST 800-53"><span class="rota-passo-num">26</span> <a href="ISO-27001-e-27002/treinamento-iso-27001-e-27002.html" class="rota-passo-link">SGSI, Anexo A, CIS Controls e NIST 800-53</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Continuidade-e-Disaster-Recovery" data-rotulo="28 · BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1"><span class="rota-passo-num">28</span> <a href="Continuidade-e-Disaster-Recovery/treinamento-continuidade-e-disaster-recovery.html" class="rota-passo-link">BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="PCI-DSS" data-rotulo="31 · PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos"><span class="rota-passo-num">31</span> <a href="PCI-DSS/treinamento-pci-dss.html" class="rota-passo-link">PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Gestao-de-Crise-e-Comunicacao" data-rotulo="43 · Gestão de Crise Cibernética e Comunicação de Incidentes"><span class="rota-passo-num">43</span> <a href="Gestao-de-Crise-e-Comunicacao/treinamento-gestao-de-crise-e-comunicacao.html" class="rota-passo-link">Gestão de Crise Cibernética e Comunicação de Incidentes</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Exercicios-Tabletop" data-rotulo="44 · Exercícios Tabletop: Planejar, Conduzir e Avaliar"><span class="rota-passo-num">44</span> <a href="Exercicios-Tabletop/treinamento-exercicios-tabletop.html" class="rota-passo-link">Exercícios Tabletop: Planejar, Conduzir e Avaliar</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Regulacao-Setor-Financeiro" data-rotulo="54 · Regulação Cibernética do Setor Financeiro"><span class="rota-passo-num">54</span> <a href="Regulacao-Setor-Financeiro/treinamento-regulacao-setor-financeiro.html" class="rota-passo-link">Regulação Cibernética do Setor Financeiro</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Gestao-de-Riscos-de-Terceiros" data-rotulo="57 · Gestão de Riscos de Terceiros e Fornecedores"><span class="rota-passo-num">57</span> <a href="Gestao-de-Riscos-de-Terceiros/treinamento-gestao-de-riscos-de-terceiros.html" class="rota-passo-link">Gestão de Riscos de Terceiros e Fornecedores</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+        </ol>
+      </div>
+      <div class="rota-sugerida" data-rota="CISSP" hidden>
+        <div class="rota-cabecalho">
+          <h2>🎓 CISSP: Certified Information Systems Security Professional</h2>
+          <p>ISC2 · Generalista sênior (8 domínios) · Experiência: 5 anos em 2+ domínios (1 ano dispensável por graduação ou certificação aprovada)</p>
+        </div>
+        <div class="rota-progresso">
+          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="16" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
+          <span class="rota-progresso-texto">0 de 16 concluídos (0%)</span>
+        </div>
+        <p class="rota-proximo"></p>
+        <ol class="rota-passos">
+          <li class="rota-passo" data-slug="Fundamentos-Ciber" data-rotulo="01 · Tríade CIA, Ameaças e Modelagem STRIDE"><span class="rota-passo-num">01</span> <a href="Fundamentos-Ciber/treinamento-fundamentos-ciber.html" class="rota-passo-link">Tríade CIA, Ameaças e Modelagem STRIDE</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Criptografia-Pratica" data-rotulo="03 · Criptografia Simétrica, Assimétrica, Hashes e PKI"><span class="rota-passo-num">03</span> <a href="Criptografia-Pratica/treinamento-criptografia-pratica.html" class="rota-passo-link">Criptografia Simétrica, Assimétrica, Hashes e PKI</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Autenticacao-e-IAM" data-rotulo="04 · Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC"><span class="rota-passo-num">04</span> <a href="Autenticacao-e-IAM/treinamento-autenticacao-e-iam.html" class="rota-passo-link">Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Segmentacao-e-Firewall" data-rotulo="05 · DMZ, VLANs, Regras de Firewall e Filtragem"><span class="rota-passo-num">05</span> <a href="Segmentacao-e-Firewall/treinamento-segmentacao-e-firewall.html" class="rota-passo-link">DMZ, VLANs, Regras de Firewall e Filtragem</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Resposta-a-Incidentes" data-rotulo="18 · Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)"><span class="rota-passo-num">18</span> <a href="Resposta-a-Incidentes/treinamento-resposta-a-incidentes.html" class="rota-passo-link">Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="DevSecOps-e-CI-CD" data-rotulo="22 · Shift-Left, SAST, DAST, SCA e Containers"><span class="rota-passo-num">22</span> <a href="DevSecOps-e-CI-CD/treinamento-devsecops-e-ci-cd.html" class="rota-passo-link">Shift-Left, SAST, DAST, SCA e Containers</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Gestao-de-Riscos-TI" data-rotulo="25 · ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)"><span class="rota-passo-num">25</span> <a href="Gestao-de-Riscos-TI/treinamento-gestao-de-riscos-ti.html" class="rota-passo-link">ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="ISO-27001-e-27002" data-rotulo="26 · SGSI, Anexo A, CIS Controls e NIST 800-53"><span class="rota-passo-num">26</span> <a href="ISO-27001-e-27002/treinamento-iso-27001-e-27002.html" class="rota-passo-link">SGSI, Anexo A, CIS Controls e NIST 800-53</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Continuidade-e-Disaster-Recovery" data-rotulo="28 · BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1"><span class="rota-passo-num">28</span> <a href="Continuidade-e-Disaster-Recovery/treinamento-continuidade-e-disaster-recovery.html" class="rota-passo-link">BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Seguranca-de-Bancos-de-Dados" data-rotulo="30 · Bancos de Dados Relacionais: SQL, Privilégios e Auditoria"><span class="rota-passo-num">30</span> <a href="Seguranca-de-Bancos-de-Dados/treinamento-seguranca-de-bancos-de-dados.html" class="rota-passo-link">Bancos de Dados Relacionais: SQL, Privilégios e Auditoria</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Active-Directory-Fundamentos" data-rotulo="38 · Active Directory: Domínios, GPO e Kerberos"><span class="rota-passo-num">38</span> <a href="Active-Directory-Fundamentos/treinamento-active-directory-fundamentos.html" class="rota-passo-link">Active Directory: Domínios, GPO e Kerberos</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="PAM-e-Acessos-Privilegiados" data-rotulo="40 · Gestão de Acessos Privilegiados (PAM)"><span class="rota-passo-num">40</span> <a href="PAM-e-Acessos-Privilegiados/treinamento-pam-e-acessos-privilegiados.html" class="rota-passo-link">Gestão de Acessos Privilegiados (PAM)</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Backup-Imutavel-e-Recuperacao" data-rotulo="45 · Backup Imutável e Recuperação de Identidade"><span class="rota-passo-num">45</span> <a href="Backup-Imutavel-e-Recuperacao/treinamento-backup-imutavel-e-recuperacao.html" class="rota-passo-link">Backup Imutável e Recuperação de Identidade</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Monitoramento-de-Rede-NSM" data-rotulo="48 · Monitoramento de Rede: Zeek, PCAP e NetFlow"><span class="rota-passo-num">48</span> <a href="Monitoramento-de-Rede-NSM/treinamento-monitoramento-de-rede-nsm.html" class="rota-passo-link">Monitoramento de Rede: Zeek, PCAP e NetFlow</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Deteccao-e-Resposta-em-Nuvem" data-rotulo="53 · Detecção e Resposta a Incidentes em Nuvem"><span class="rota-passo-num">53</span> <a href="Deteccao-e-Resposta-em-Nuvem/treinamento-deteccao-e-resposta-em-nuvem.html" class="rota-passo-link">Detecção e Resposta a Incidentes em Nuvem</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Gestao-de-Riscos-de-Terceiros" data-rotulo="57 · Gestão de Riscos de Terceiros e Fornecedores"><span class="rota-passo-num">57</span> <a href="Gestao-de-Riscos-de-Terceiros/treinamento-gestao-de-riscos-de-terceiros.html" class="rota-passo-link">Gestão de Riscos de Terceiros e Fornecedores</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+        </ol>
+      </div>
+      <div class="rota-sugerida" data-rota="CCSP" hidden>
+        <div class="rota-cabecalho">
+          <h2>🎓 CCSP: Certified Cloud Security Professional</h2>
+          <p>ISC2 · Segurança em nuvem (6 domínios) · Experiência: 5 anos em TI, sendo 3 em SI e 1 em nuvem (CISSP substitui)</p>
+        </div>
+        <div class="rota-progresso">
+          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
+          <span class="rota-progresso-texto">0 de 10 concluídos (0%)</span>
+        </div>
+        <p class="rota-proximo"></p>
+        <ol class="rota-passos">
+          <li class="rota-passo" data-slug="Criptografia-Pratica" data-rotulo="03 · Criptografia Simétrica, Assimétrica, Hashes e PKI"><span class="rota-passo-num">03</span> <a href="Criptografia-Pratica/treinamento-criptografia-pratica.html" class="rota-passo-link">Criptografia Simétrica, Assimétrica, Hashes e PKI</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Autenticacao-e-IAM" data-rotulo="04 · Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC"><span class="rota-passo-num">04</span> <a href="Autenticacao-e-IAM/treinamento-autenticacao-e-iam.html" class="rota-passo-link">Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Seguranca-em-Nuvem" data-rotulo="21 · Responsabilidade Compartilhada e CSPM"><span class="rota-passo-num">21</span> <a href="Seguranca-em-Nuvem/treinamento-seguranca-em-nuvem.html" class="rota-passo-link">Responsabilidade Compartilhada e CSPM</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="DevSecOps-e-CI-CD" data-rotulo="22 · Shift-Left, SAST, DAST, SCA e Containers"><span class="rota-passo-num">22</span> <a href="DevSecOps-e-CI-CD/treinamento-devsecops-e-ci-cd.html" class="rota-passo-link">Shift-Left, SAST, DAST, SCA e Containers</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="LGPD-e-Privacidade" data-rotulo="27 · Bases Legais, Direitos do Titular e RIPD/DPIA"><span class="rota-passo-num">27</span> <a href="LGPD-e-Privacidade/treinamento-lgpd-e-privacidade.html" class="rota-passo-link">Bases Legais, Direitos do Titular e RIPD/DPIA</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Seguranca-de-Bancos-de-Dados" data-rotulo="30 · Bancos de Dados Relacionais: SQL, Privilégios e Auditoria"><span class="rota-passo-num">30</span> <a href="Seguranca-de-Bancos-de-Dados/treinamento-seguranca-de-bancos-de-dados.html" class="rota-passo-link">Bancos de Dados Relacionais: SQL, Privilégios e Auditoria</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Seguranca-de-Containers" data-rotulo="50 · Segurança de Containers: Imagens, Build e Runtime"><span class="rota-passo-num">50</span> <a href="Seguranca-de-Containers/treinamento-seguranca-de-containers.html" class="rota-passo-link">Segurança de Containers: Imagens, Build e Runtime</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Seguranca-em-Kubernetes" data-rotulo="51 · Segurança em Kubernetes: RBAC, Pod Security e NetworkPolicy"><span class="rota-passo-num">51</span> <a href="Seguranca-em-Kubernetes/treinamento-seguranca-em-kubernetes.html" class="rota-passo-link">Segurança em Kubernetes: RBAC, Pod Security e NetworkPolicy</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Infraestrutura-como-Codigo-Segura" data-rotulo="52 · Infraestrutura como Código Segura: Terraform e Policy-as-Code"><span class="rota-passo-num">52</span> <a href="Infraestrutura-como-Codigo-Segura/treinamento-infraestrutura-como-codigo-segura.html" class="rota-passo-link">Infraestrutura como Código Segura: Terraform e Policy-as-Code</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Deteccao-e-Resposta-em-Nuvem" data-rotulo="53 · Detecção e Resposta a Incidentes em Nuvem"><span class="rota-passo-num">53</span> <a href="Deteccao-e-Resposta-em-Nuvem/treinamento-deteccao-e-resposta-em-nuvem.html" class="rota-passo-link">Detecção e Resposta a Incidentes em Nuvem</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+        </ol>
+      </div>
+      <div class="rota-sugerida" data-rota="GSEC" hidden>
+        <div class="rota-cabecalho">
+          <h2>🎓 GSEC: GIAC Security Essentials</h2>
+          <p>GIAC (SANS) · Técnica generalista · Experiência: Sem exigência formal</p>
+        </div>
+        <div class="rota-progresso">
+          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
+          <span class="rota-progresso-texto">0 de 12 concluídos (0%)</span>
+        </div>
+        <p class="rota-proximo"></p>
+        <ol class="rota-passos">
+          <li class="rota-passo" data-slug="Redes-e-Protocolos" data-rotulo="02 · TCP/IP, DNS, Roteamento e Inspeção de Tráfego"><span class="rota-passo-num">02</span> <a href="Redes-e-Protocolos/treinamento-redes-e-protocolos.html" class="rota-passo-link">TCP/IP, DNS, Roteamento e Inspeção de Tráfego</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Criptografia-Pratica" data-rotulo="03 · Criptografia Simétrica, Assimétrica, Hashes e PKI"><span class="rota-passo-num">03</span> <a href="Criptografia-Pratica/treinamento-criptografia-pratica.html" class="rota-passo-link">Criptografia Simétrica, Assimétrica, Hashes e PKI</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Segmentacao-e-Firewall" data-rotulo="05 · DMZ, VLANs, Regras de Firewall e Filtragem"><span class="rota-passo-num">05</span> <a href="Segmentacao-e-Firewall/treinamento-segmentacao-e-firewall.html" class="rota-passo-link">DMZ, VLANs, Regras de Firewall e Filtragem</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Hardening-Sistemas" data-rotulo="06 · Bastionamento Linux e Windows (CIS Benchmarks)"><span class="rota-passo-num">06</span> <a href="Hardening-Sistemas/treinamento-hardening-sistemas.html" class="rota-passo-link">Bastionamento Linux e Windows (CIS Benchmarks)</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Seguranca-de-Redes-Defesa" data-rotulo="07 · IDS/IPS, WAF, VPNs e Proxies Reversos"><span class="rota-passo-num">07</span> <a href="Seguranca-de-Redes-Defesa/treinamento-seguranca-de-redes-defesa.html" class="rota-passo-link">IDS/IPS, WAF, VPNs e Proxies Reversos</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Seguranca-em-Endpoints-EDR" data-rotulo="10 · Antivírus, EDR/XDR e Proteção de Host"><span class="rota-passo-num">10</span> <a href="Seguranca-em-Endpoints-EDR/treinamento-seguranca-em-endpoints-edr.html" class="rota-passo-link">Antivírus, EDR/XDR e Proteção de Host</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Operacoes-SOC-e-SIEM" data-rotulo="16 · Rotina de SOC L1/L2, Logs e Regras Sigma"><span class="rota-passo-num">16</span> <a href="Operacoes-SOC-e-SIEM/treinamento-operacoes-soc-e-siem.html" class="rota-passo-link">Rotina de SOC L1/L2, Logs e Regras Sigma</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Linux-para-Seguranca" data-rotulo="34 · Linux para Segurança: Shell, Permissões e Logs"><span class="rota-passo-num">34</span> <a href="Linux-para-Seguranca/treinamento-linux-para-seguranca.html" class="rota-passo-link">Linux para Segurança: Shell, Permissões e Logs</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="PowerShell-e-Windows-Interno" data-rotulo="36 · PowerShell, Event Log e Registro do Windows"><span class="rota-passo-num">36</span> <a href="PowerShell-e-Windows-Interno/treinamento-powershell-e-windows-interno.html" class="rota-passo-link">PowerShell, Event Log e Registro do Windows</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Active-Directory-Fundamentos" data-rotulo="38 · Active Directory: Domínios, GPO e Kerberos"><span class="rota-passo-num">38</span> <a href="Active-Directory-Fundamentos/treinamento-active-directory-fundamentos.html" class="rota-passo-link">Active Directory: Domínios, GPO e Kerberos</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Monitoramento-de-Rede-NSM" data-rotulo="48 · Monitoramento de Rede: Zeek, PCAP e NetFlow"><span class="rota-passo-num">48</span> <a href="Monitoramento-de-Rede-NSM/treinamento-monitoramento-de-rede-nsm.html" class="rota-passo-link">Monitoramento de Rede: Zeek, PCAP e NetFlow</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Seguranca-de-Containers" data-rotulo="50 · Segurança de Containers: Imagens, Build e Runtime"><span class="rota-passo-num">50</span> <a href="Seguranca-de-Containers/treinamento-seguranca-de-containers.html" class="rota-passo-link">Segurança de Containers: Imagens, Build e Runtime</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+        </ol>
+      </div>
+      <div class="rota-sugerida" data-rota="Security+" hidden>
+        <div class="rota-cabecalho">
+          <h2>🎓 Security+: CompTIA Security+ (SY0-701)</h2>
+          <p>CompTIA · Entrada / fundamentos · Experiência: Recomendada, sem exigência formal</p>
+        </div>
+        <div class="rota-progresso">
+          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="13" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
+          <span class="rota-progresso-texto">0 de 13 concluídos (0%)</span>
+        </div>
+        <p class="rota-proximo"></p>
+        <ol class="rota-passos">
+          <li class="rota-passo" data-slug="Fundamentos-Ciber" data-rotulo="01 · Tríade CIA, Ameaças e Modelagem STRIDE"><span class="rota-passo-num">01</span> <a href="Fundamentos-Ciber/treinamento-fundamentos-ciber.html" class="rota-passo-link">Tríade CIA, Ameaças e Modelagem STRIDE</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Redes-e-Protocolos" data-rotulo="02 · TCP/IP, DNS, Roteamento e Inspeção de Tráfego"><span class="rota-passo-num">02</span> <a href="Redes-e-Protocolos/treinamento-redes-e-protocolos.html" class="rota-passo-link">TCP/IP, DNS, Roteamento e Inspeção de Tráfego</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Criptografia-Pratica" data-rotulo="03 · Criptografia Simétrica, Assimétrica, Hashes e PKI"><span class="rota-passo-num">03</span> <a href="Criptografia-Pratica/treinamento-criptografia-pratica.html" class="rota-passo-link">Criptografia Simétrica, Assimétrica, Hashes e PKI</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Autenticacao-e-IAM" data-rotulo="04 · Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC"><span class="rota-passo-num">04</span> <a href="Autenticacao-e-IAM/treinamento-autenticacao-e-iam.html" class="rota-passo-link">Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Segmentacao-e-Firewall" data-rotulo="05 · DMZ, VLANs, Regras de Firewall e Filtragem"><span class="rota-passo-num">05</span> <a href="Segmentacao-e-Firewall/treinamento-segmentacao-e-firewall.html" class="rota-passo-link">DMZ, VLANs, Regras de Firewall e Filtragem</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Gestao-de-Vulnerabilidades" data-rotulo="09 · CVE, CVSS v3.1/v4.0 e Priorização de Patches"><span class="rota-passo-num">09</span> <a href="Gestao-de-Vulnerabilidades/treinamento-gestao-de-vulnerabilidades.html" class="rota-passo-link">CVE, CVSS v3.1/v4.0 e Priorização de Patches</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Seguranca-em-Endpoints-EDR" data-rotulo="10 · Antivírus, EDR/XDR e Proteção de Host"><span class="rota-passo-num">10</span> <a href="Seguranca-em-Endpoints-EDR/treinamento-seguranca-em-endpoints-edr.html" class="rota-passo-link">Antivírus, EDR/XDR e Proteção de Host</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Resposta-a-Incidentes" data-rotulo="18 · Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)"><span class="rota-passo-num">18</span> <a href="Resposta-a-Incidentes/treinamento-resposta-a-incidentes.html" class="rota-passo-link">Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="PAM-e-Acessos-Privilegiados" data-rotulo="40 · Gestão de Acessos Privilegiados (PAM)"><span class="rota-passo-num">40</span> <a href="PAM-e-Acessos-Privilegiados/treinamento-pam-e-acessos-privilegiados.html" class="rota-passo-link">Gestão de Acessos Privilegiados (PAM)</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Ransomware-Prevencao-a-Recuperacao" data-rotulo="42 · Ransomware: Prevenção, Contenção e Recuperação"><span class="rota-passo-num">42</span> <a href="Ransomware-Prevencao-a-Recuperacao/treinamento-ransomware-prevencao-a-recuperacao.html" class="rota-passo-link">Ransomware: Prevenção, Contenção e Recuperação</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Backup-Imutavel-e-Recuperacao" data-rotulo="45 · Backup Imutável e Recuperação de Identidade"><span class="rota-passo-num">45</span> <a href="Backup-Imutavel-e-Recuperacao/treinamento-backup-imutavel-e-recuperacao.html" class="rota-passo-link">Backup Imutável e Recuperação de Identidade</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Engenharia-de-Deteccao" data-rotulo="46 · Engenharia de Detecção: Detection-as-Code e Cobertura ATT&amp;CK"><span class="rota-passo-num">46</span> <a href="Engenharia-de-Deteccao/treinamento-engenharia-de-deteccao.html" class="rota-passo-link">Engenharia de Detecção: Detection-as-Code e Cobertura ATT&amp;CK</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+          <li class="rota-passo" data-slug="Fraude-em-Pagamentos-e-Pix" data-rotulo="55 · Fraude em Pagamentos: Pix, Golpes e Antifraude"><span class="rota-passo-num">55</span> <a href="Fraude-em-Pagamentos-e-Pix/treinamento-fraude-em-pagamentos-e-pix.html" class="rota-passo-link">Fraude em Pagamentos: Pix, Golpes e Antifraude</a><span class="rota-passo-check" aria-label="concluído">✓</span></li>
+        </ol>
+      </div>
+    </section>
+
     <!-- Seção Principal: Catálogo dos Estudos -->
     <main class="studies-section" id="secao-catalogo">
       <div class="section-title-wrap">
@@ -2065,6 +2236,7 @@ a.vaga-chip:hover {
       data-nist="Identify"
       data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,AppSec &amp; DevSecOps,Operações SOC &amp; Resposta,GRC &amp; Auditoria"
       data-rotas="blue_soc red_team devsecops_cloud grc pericia analista_si"
+      data-certs="CISSP Security+"
       data-search="fundamentos-ciber tríade cia, ameaças e modelagem stride pilares da segurança da informação, vetores de ameaça e metodologia stride como identificar e categorizar vulnerabilidades arquiteturais em um sistema antes que sejam exploradas? stride threat canvas identify blue team &amp; defesa,red team &amp; pentest,appsec &amp; devsecops,operações soc &amp; resposta,grc &amp; auditoria tríade cia, autenticidade e não-repúdio taxonomia stride (spoofing a elevation of privilege) simulador stride threat canvas interativo checklist de auditoria com persistência local">
       
       <div class="card-header">
@@ -2111,6 +2283,7 @@ a.vaga-chip:hover {
       data-nist="Protect / Detect"
       data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,Operações SOC &amp; Resposta"
       data-rotas="blue_soc red_team pericia"
+      data-certs="CEH GSEC Security+"
       data-search="redes-e-protocolos tcp/ip, dns, roteamento e inspeção de tráfego pilha de protocolos, 3-way handshake, flags tcp e vetores de ataque em rede o que cada campo dos cabeçalhos ip/tcp revela sobre a intenção do tráfego e possíveis anomalias? inspetor visual de cabeçalhos ip/tcp/udp protect / detect blue team &amp; defesa,red team &amp; pentest,operações soc &amp; resposta pilha tcp/ip em 4 camadas e modelo osi dissecação de flags syn/ack/fin/rst vulnerabilidades em dns e envenenamento arp simulador de montagem de pacotes e resposta de host">
       
       <div class="card-header">
@@ -2157,6 +2330,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="Blue Team &amp; Defesa,AppSec &amp; DevSecOps,GRC &amp; Auditoria"
       data-rotas="devsecops_cloud"
+      data-certs="CISSP CCSP GSEC Security+"
       data-search="criptografia-pratica criptografia simétrica, assimétrica, hashes e pki algoritmos modernos de cifragem, funções de resumo e infraestrutura de chaves públicas qual algoritmo criptográfico utilizar para garantir confidencialidade sem comprometer o desempenho? lab de cifras (web crypto api) protect blue team &amp; defesa,appsec &amp; devsecops,grc &amp; auditoria cifras aes-gcm e chacha20-poly1305 curvas elípticas (ecdsa/ed25519) vs rsa cadeia de confiança x.509 e revogação crl/ocsp lab nativo com web crypto api sem bibliotecas externas">
       
       <div class="card-header">
@@ -2203,6 +2377,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="AppSec &amp; DevSecOps,Blue Team &amp; Defesa,GRC &amp; Auditoria"
       data-rotas="red_team devsecops_cloud"
+      data-certs="CISSP CCSP Security+"
       data-search="autenticacao-e-iam senhas, mfa, oauth 2.0, tokens jwt e rbac controle de acesso robusto, fatores múltiplos, autorização moderna e federação de identidades como garantir que apenas identidades legítimas acessem recursos corporativos críticos com privilégio mínimo? validador e decodificador jwt + matriz rbac protect appsec &amp; devsecops,blue team &amp; defesa,grc &amp; auditoria hashing com argon2, bcrypt e proteção de credenciais protocolos totp (rfc 6238) e webauthn/fido2 ataques a tokens jwt (algoritmo &#x27;none&#x27;, chave fraca) validador de jwt e matriz de permissões rbac">
       
       <div class="card-header">
@@ -2249,6 +2424,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,Analista de Segurança da Informação"
       data-rotas="blue_soc analista_si"
+      data-certs="CISSP GSEC Security+"
       data-search="segmentacao-e-firewall dmz, vlans, regras de firewall e filtragem arquitetura de perímetros, isolamento inter-vlan e ordem de precedência de regras de filtragem como isolar servidores públicos da rede corporativa sensível garantindo regra default drop? simulador de regras de firewall (pass / drop) protect blue team &amp; defesa,operações soc &amp; resposta,analista de segurança da informação arquitetura de dmz em 2 estágios tabela de estados conntrack (stateful vs stateless) trunking 802.1q e segregação inter-vlan simulador de filtragem com ordem de precedência first-match">
       
       <div class="card-header">
@@ -2295,6 +2471,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="Blue Team &amp; Defesa,AppSec &amp; DevSecOps,Operações SOC &amp; Resposta,Analista de Segurança da Informação"
       data-rotas="blue_soc devsecops_cloud pericia analista_si"
+      data-certs="GSEC"
       data-search="hardening-sistemas bastionamento linux e windows (cis benchmarks) redução da superfície de ataque operacional em servidores corporativos linux e windows quais configurações padrão de fábrica expõem servidores corporativos a ataques imediatos? auditor interativo de configuração de servidor protect blue team &amp; defesa,appsec &amp; devsecops,operações soc &amp; resposta,analista de segurança da informação cis benchmarks nível 1 e nível 2 bastionamento de ssh (/etc/ssh/sshd_config) e pam módulos de segurança do kernel (apparmor e selinux) auditor interativo de arquivos de configuração de so">
       
       <div class="card-header">
@@ -2341,6 +2518,7 @@ a.vaga-chip:hover {
       data-nist="Protect / Detect"
       data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,Analista de Segurança da Informação"
       data-rotas="blue_soc analista_si"
+      data-certs="GSEC"
       data-search="seguranca-de-redes-defesa ids/ips, waf, vpns e proxies reversos sistemas de inspeção profunda de tráfego, mitigação de ameaças web e túneis criptografados como interceptar e bloquear tráfego hostil antes que ele atinja serviços internos sensíveis? analisador de regras snort/suricata vs tráfego protect / detect blue team &amp; defesa,operações soc &amp; resposta,analista de segurança da informação assinaturas snort/suricata e detecção heurística waf core rule set (crs) contra injeções web túneis seguros com wireguard e ipsec ikev2 analisador de payloads de tráfego com alertas em tempo real">
       
       <div class="card-header">
@@ -2387,6 +2565,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="Blue Team &amp; Defesa,GRC &amp; Auditoria,Analista de Segurança da Informação"
       data-rotas="grc"
+      data-certs=""
       data-search="arquitetura-zero-trust princípios zero trust e microsegmentação implementação prática do nist sp 800-207, decisão de acesso contínua e perímetros definidos por software por que não se deve mais confiar na rede interna mesmo após autenticação inicial bem-sucedida? motor de decisão de acesso zero trust (pdp/pep) protect blue team &amp; defesa,grc &amp; auditoria,analista de segurança da informação nist sp 800-207: never trust, always verify, assume breach componentes centrais: pdp (decision) e pep (enforcement) acesso contextual baseado em postura do dispositivo e risco motor de decisão de acesso em tempo real com score de risco">
       
       <div class="card-header">
@@ -2433,6 +2612,7 @@ a.vaga-chip:hover {
       data-nist="Identify / Protect"
       data-carreiras="Blue Team &amp; Defesa,GRC &amp; Auditoria,Operações SOC &amp; Resposta"
       data-rotas="grc"
+      data-certs="Security+"
       data-search="gestao-de-vulnerabilidades cve, cvss v3.1/v4.0 e priorização de patches ciclo de vida de vulnerabilidades, cálculo de criticidade de riscos e correlação com ameaças ativas como determinar qual vulnerabilidade corrigir primeiro entre centenas de falhas detectadas em varreduras? calculadora interativa de score cvss v3.1 / v4.0 identify / protect blue team &amp; defesa,grc &amp; auditoria,operações soc &amp; resposta métricas base, temporal e ambiental do cvss novidades do cvss v4.0 e integração com epss catálogo cisa kev (known exploited vulnerabilities) calculadora vetorial com geração da string cvss">
       
       <div class="card-header">
@@ -2479,6 +2659,7 @@ a.vaga-chip:hover {
       data-nist="Protect / Detect"
       data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,Analista de Segurança da Informação"
       data-rotas="blue_soc pericia analista_si"
+      data-certs="GSEC Security+"
       data-search="seguranca-em-endpoints-edr antivírus, edr/xdr e proteção de host telemetria comportamental de processos, detecção de técnicas evasivas e contenção de hosts como identificar a presença de um adversário no endpoint antes que ocorra dano ou exfiltração? linha do tempo de telemetria e detecção edr protect / detect blue team &amp; defesa,operações soc &amp; resposta,perícia forense &amp; malware,analista de segurança da informação evolução de antivírus baseado em assinatura para edr/xdr sysmon e event ids do windows (event id 1, 3, 10) árvores de processos maliciosos parent-child simulador de telemetria com isolamento de máquina da rede">
       
       <div class="card-header">
@@ -2525,6 +2706,7 @@ a.vaga-chip:hover {
       data-nist="Identify"
       data-carreiras="Red Team &amp; Pentest,Operações SOC &amp; Resposta"
       data-rotas="red_team"
+      data-certs="CEH"
       data-search="reconhecimento-e-osint superfície de ataque, dns, whois e shodan mapeamento ético de pegada digital, inteligência de fontes abertas e enumeração de ativos expostos o que um atacante consegue descobrir sobre nossa infraestrutura sem enviar um único pacote invasivo? terminal simulado de osint e enumeração identify red team &amp; pentest,operações soc &amp; resposta reconhecimento passivo vs ativo e pegada digital google dorks, certificate transparency logs e whois consultas especializadas em shodan e censys terminal interativo com comandos de enumeração simulados">
       
       <div class="card-header">
@@ -2571,6 +2753,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="AppSec &amp; DevSecOps,Red Team &amp; Pentest,Analista de Segurança da Informação"
       data-rotas="red_team devsecops_cloud"
+      data-certs="CEH"
       data-search="owasp-top-10-web falhas web (sqli, xss, csrf, broken auth) principais riscos de segurança em aplicações web e métodos definitivos de remediação em código como desenvolvedores podem eliminar falhas críticas de injeção diretamente na raiz do código? playground de injeção e sanitização web protect appsec &amp; devsecops,red team &amp; pentest,analista de segurança da informação categorias a01 a a10 do owasp top 10 prepared statements para imunização contra sql injection content security policy (csp) contra ataques xss playground interativo de injeção com filtros sanitizadores">
       
       <div class="card-header">
@@ -2617,6 +2800,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="AppSec &amp; DevSecOps,Red Team &amp; Pentest"
       data-rotas="red_team devsecops_cloud"
+      data-certs="CEH"
       data-search="seguranca-em-apis owasp api security, rate limiting e tokens proteção de microsserviços, controle de autorização em nível de objeto (bola) e limitação de taxa por que firewalls convencionais falham em detectar abusos lógicos e quebras de bola em apis? simulador de chamadas de api com rate limiter protect appsec &amp; devsecops,red team &amp; pentest owasp api security top 10 (foco em bola e broken auth) algoritmos de rate limiting: token bucket e leaky bucket validação rigorosa de esquemas e proteção contra mass assignment simulador de requisições rest com bloqueios http 429 e 403">
       
       <div class="card-header">
@@ -2663,6 +2847,7 @@ a.vaga-chip:hover {
       data-nist="Identify"
       data-carreiras="Red Team &amp; Pentest,GRC &amp; Auditoria"
       data-rotas="red_team"
+      data-certs="CEH"
       data-search="pentest-metodologias fases do pentest (ptes), escopo e relatório estruturação profissional de testes de intrusão, regras de engajamento e relatórios técnicos e executivos como conduzir um teste de invasão ético agregando valor real ao negócio sem indisponibilizar sistemas? construtor de matriz de achados e relatórios de pentest identify red team &amp; pentest,grc &amp; auditoria as 7 fases do padrão ptes (do pré-engajamento ao relatório) modalidades white-box, gray-box e black-box regras de engajamento (roe) e comunicação de incidentes construtor interativo de matriz de achados e relatórios">
       
       <div class="card-header">
@@ -2709,6 +2894,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="Red Team &amp; Pentest,Blue Team &amp; Defesa,GRC &amp; Auditoria,Analista de Segurança da Informação"
       data-rotas="red_team"
+      data-certs="CEH"
       data-search="engenharia-social-e-phishing pretexting, spear phishing e defesas humanas gatilhos comportamentais, autenticação de e-mail (spf/dkim/dmarc) e conscientização corporativa como proteger a organização do elo mais explorado da cadeia de segurança: o fator humano? analisador de e-mails suspeitos (spot the indicators) protect red team &amp; pentest,blue team &amp; defesa,grc &amp; auditoria,analista de segurança da informação táticas de pretexting, spear phishing e whaling autenticação de e-mail com spf, dkim e políticas dmarc tokens físicos fido2 contra ataques de adversary-in-the-middle analisador interativo de e-mails com detecção de indicadores">
       
       <div class="card-header">
@@ -2755,6 +2941,7 @@ a.vaga-chip:hover {
       data-nist="Detect"
       data-carreiras="Operações SOC &amp; Resposta,Blue Team &amp; Defesa,Analista de Segurança da Informação"
       data-rotas="blue_soc pericia"
+      data-certs="GSEC"
       data-search="operacoes-soc-e-siem rotina de soc l1/l2, logs e regras sigma estrutura operacional de um centro de monitoramento, ciclo de vida de alertas e regras sigma portáveis como separar ruído de alertas genuínos em fluxos corporativos de milhões de eventos por segundo? console siem com busca de logs e alertas detect operações soc &amp; resposta,blue team &amp; defesa,analista de segurança da informação estrutura de níveis soc n1 (triagem), n2 (investigação) e n3 (hunting) métricas operacionais: mttd e mttr formato de regras de detecção sigma e conversão para siem console interativo estilo siem com pesquisa de logs e alertas">
       
       <div class="card-header">
@@ -2801,6 +2988,7 @@ a.vaga-chip:hover {
       data-nist="Identify / Detect"
       data-carreiras="Operações SOC &amp; Resposta,Blue Team &amp; Defesa"
       data-rotas="blue_soc"
+      data-certs=""
       data-search="threat-intelligence iocs, ttps, mitre att&amp;amp;ck e stix/taxii transformação de dados brutos de ameaças em inteligência acionável e compartilhamento padronizado por que focar em técnicas e táticas de adversários é infinitamente mais eficaz que caçar hashes e ips? mapeador de iocs e ttps na matriz att&amp;amp;ck identify / detect operações soc &amp; resposta,blue team &amp; defesa pirâmide da dor de david bianco e robustez defensiva navegação na matriz mitre att&amp;ck enterprise padrões de compartilhamento stix 2.1 e taxii mapeador interativo de iocs com visualização de técnicas">
       
       <div class="card-header">
@@ -2847,6 +3035,7 @@ a.vaga-chip:hover {
       data-nist="Respond"
       data-carreiras="Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,GRC &amp; Auditoria,Analista de Segurança da Informação"
       data-rotas="blue_soc pericia analista_si"
+      data-certs="CISM CISSP Security+"
       data-search="resposta-a-incidentes ciclo nist sp 800-61 rev. 2 e rev. 3 (contenção e erradicação) gestão operacional de crises cibernéticas, ciclo clássico da rev. 2, reorganização da rev. 3 pelas funções do csf 2.0 e playbooks de contenção ágil quais passos imediatos tomar para conter um ataque ativo sem destruir evidências forenses vitais, seguindo o ciclo da rev. 2 e a organização da rev. 3? runbook interativo em árvore de decisão respond operações soc &amp; resposta,perícia forense &amp; malware,grc &amp; auditoria,analista de segurança da informação ciclo em 4 fases do nist sp 800-61 rev. 2 e a reorganização da rev. 3 (2025) pelas funções do csf 2.0 contenção de curto prazo vs contenção de longo prazo condução de lições aprendidas e retrospectiva sem culpa simulador de crise em árvore de decisão com ramificações">
       
       <div class="card-header">
@@ -2893,6 +3082,7 @@ a.vaga-chip:hover {
       data-nist="Respond"
       data-carreiras="Perícia Forense &amp; Malware,Operações SOC &amp; Resposta,Analista de Segurança da Informação"
       data-rotas="pericia"
+      data-certs=""
       data-search="forense-digital cadeia de custódia, coleta de ram e artefatos metodologia pericial rigorosa, ordem de volatilidade, integridade de cópias e análise de artefatos do so como reconstruir os passos exatos de um invasor e produzir provas digitais legalmente irrefutáveis? analisador de timeline de evidências e logs forenses respond perícia forense &amp; malware,operações soc &amp; resposta,analista de segurança da informação norma iso/iec 27037 e ordem de volatilidade rfc 3227 bloqueadores de escrita físicos/lógicos e hashes sha-256 artefatos forenses de host: prefetch, shimcache, $mft e registro analisador interativo de super-timeline de eventos">
       
       <div class="card-header">
@@ -2939,6 +3129,7 @@ a.vaga-chip:hover {
       data-nist="Detect / Respond"
       data-carreiras="Perícia Forense &amp; Malware,Operações SOC &amp; Resposta"
       data-rotas="pericia"
+      data-certs="CEH"
       data-search="analise-basica-de-malware análise estática vs dinâmica e sandboxes inspeção inicial de artefatos maliciosos, cálculo de entropia, importações e relatórios de sandboxes o que o binário suspeito é capaz de fazer, e quais indicadores ele gera ao rodar em ambiente isolado? inspetor de metadados pe/elf e hashes detect / respond perícia forense &amp; malware,operações soc &amp; resposta diferenças entre análise estática e dinâmica em sandbox estrutura do cabeçalho portable executable (pe) e seções cálculo de entropia de shannon para detectar packers (upx) inspetor interativo de metadados de binários e chamadas de api">
       
       <div class="card-header">
@@ -2985,6 +3176,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="AppSec &amp; DevSecOps,Blue Team &amp; Defesa,GRC &amp; Auditoria"
       data-rotas="devsecops_cloud"
+      data-certs="CCSP"
       data-search="seguranca-em-nuvem responsabilidade compartilhada e cspm arquiteturas seguras em provedores de nuvem, gestão de postura e políticas de acesso a dados onde termina a obrigação do provedor de nuvem e onde começa a responsabilidade da sua organização? auditor de permissões s3 e políticas iam cloud protect appsec &amp; devsecops,blue team &amp; defesa,grc &amp; auditoria modelo de responsabilidade compartilhada (iaas, paas, saas) endurecimento de políticas iam e proteção de buckets s3 postura de segurança em nuvem com cspm e cwpp auditor interativo de arquivos de políticas json de nuvem">
       
       <div class="card-header">
@@ -3031,6 +3223,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="AppSec &amp; DevSecOps"
       data-rotas="devsecops_cloud"
+      data-certs="CISSP CCSP"
       data-search="devsecops-e-ci-cd shift-left, sast, dast, sca e containers automação de segurança no ciclo de entrega contínua, governança de dependências e proteção de containers como detectar e bloquear vulnerabilidades em código e dependências antes do deploy em produção? simulador de pipeline ci/cd com security gates protect appsec &amp; devsecops filosofia shift-left e ciclo ssdlc integração de testes sast, dast e sca com sbom boas práticas em dockerfiles e imagens distroless simulador de pipeline ci/cd com parametrização de thresholds de quebra">
       
       <div class="card-header">
@@ -3077,6 +3270,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="Blue Team &amp; Defesa"
       data-rotas=""
+      data-certs=""
       data-search="seguranca-em-iot-e-ot redes industriais (scada/modbus) e iot proteção de sistemas de controle operacional, modelo purdue, protocolos legados e isolamento físico como proteger sistemas ciberfísicos que não suportam paradas, patches frequentes ou criptografia pesada? mapeador do modelo purdue (ti vs to) protect blue team &amp; defesa convergência ti e to e prioridades de disponibilidade níveis 0 a 5 do modelo purdue para sistemas ics/scada limitações de segurança do protocolo modbus tcp (porta 502) mapeador arquitetural interativo de zonas industriais">
       
       <div class="card-header">
@@ -3123,6 +3317,7 @@ a.vaga-chip:hover {
       data-nist="Protect / Detect"
       data-carreiras="AppSec &amp; DevSecOps,Blue Team &amp; Defesa"
       data-rotas="devsecops_cloud"
+      data-certs=""
       data-search="ia-e-ciberseguranca ameaças a llms (owasp llm), deepfakes e defesa segurança de modelos fundacionais, vetores de injeção de prompt, envenenamento e uso defensivo de ia como impedir que usuários maliciosos manipulem instruções de sistemas baseados em inteligência artificial? lab de prompt injection e defesas protect / detect appsec &amp; devsecops,blue team &amp; defesa owasp top 10 for llm applications (llm01 prompt injection) ataques de data poisoning e vazamento de dados sensíveis mecanismos de guardrails de entrada e sanitização de prompts laboratório interativo de bypass de chatbot e aplicação de defesas">
       
       <div class="card-header">
@@ -3169,6 +3364,7 @@ a.vaga-chip:hover {
       data-nist="Govern / Identify"
       data-carreiras="GRC &amp; Auditoria,Analista de Segurança da Informação"
       data-rotas="grc analista_si"
+      data-certs="CISM CISSP"
       data-search="gestao-de-riscos-ti iso 31000 e avaliação qualitativa vs quantitativa (ale/sle) processo da iso 31000:2018, metodologias de análise de risco, matrizes 5x5, cálculo financeiro de perdas e justificativa de roi como conduzir o processo de riscos da iso 31000:2018 e quantificar em reais o impacto de uma ameaça para justificar orçamentos à diretoria? calculadora de matriz 5x5 e risco financeiro (ale/sle) govern / identify grc &amp; auditoria,analista de segurança da informação processo da iso 31000:2018: contexto, identificação, análise, avaliação, tratamento, monitoramento e comunicação, ao lado do nist sp 800-30 fórmulas quantitativas: sle = av * ef e ale = sle * aro estratégias de tratamento de risco: mitigar, aceitar, transferir, evitar calculadora interativa com matriz 5x5 e cálculo de viabilidade rosi">
       
       <div class="card-header">
@@ -3215,6 +3411,7 @@ a.vaga-chip:hover {
       data-nist="Govern"
       data-carreiras="GRC &amp; Auditoria,Analista de Segurança da Informação"
       data-rotas="grc analista_si"
+      data-certs="CISM CISSP"
       data-search="iso-27001-e-27002 sgsi, anexo a, cis controls e nist 800-53 estrutura do sgsi, os 93 controles do anexo a, declaração de aplicabilidade e crosswalk com cis controls v8.1 e nist sp 800-53 rev. 5 como estruturar um sgsi auditável e mapear os controles do anexo a para cis controls v8.1 (ig1/ig2/ig3) e nist sp 800-53 rev. 5? matriz de controles e declaração de aplicabilidade (soa) govern grc &amp; auditoria,analista de segurança da informação estrutura hls da iso/iec 27001:2022 (cláusulas 4 a 10) os 93 controles consolidados em 4 temas organizacionais, com crosswalk para cis controls v8.1 (ig1/ig2/ig3) e nist sp 800-53 rev. 5 elaboração e manutenção da declaração de aplicabilidade (soa) matriz interativa de aplicabilidade com sumário percentual">
       
       <div class="card-header">
@@ -3261,6 +3458,7 @@ a.vaga-chip:hover {
       data-nist="Govern / Protect"
       data-carreiras="GRC &amp; Auditoria"
       data-rotas="grc"
+      data-certs="CCSP"
       data-search="lgpd-e-privacidade bases legais, direitos do titular e ripd/dpia conformidade com a lei 13.709/2018, governança de dados pessoais e relatórios de impacto à privacidade qual base legal legitima o tratamento de dados pessoais e como demonstrar conformidade perante a anpd? construtor de avaliação de impacto à privacidade (ripd) govern / protect grc &amp; auditoria as 10 bases legais da lgpd para dados pessoais e sensíveis garantia dos direitos dos titulares e atuação do dpo/encarregado protocolo de notificação de incidentes à anpd (art. 48) construtor interativo de relatório de impacto à privacidade (ripd)">
       
       <div class="card-header">
@@ -3307,6 +3505,7 @@ a.vaga-chip:hover {
       data-nist="Recover"
       data-carreiras="GRC &amp; Auditoria,Blue Team &amp; Defesa"
       data-rotas="grc"
+      data-certs="CISM CISSP"
       data-search="continuidade-e-disaster-recovery bcp, drp, cálculo de rto/rpo e regra 3-2-1 planejamento de continuidade de negócios, estratégias de recuperação de desastres e resiliência a desastres quanto tempo a organização suporta ficar inoperante e qual volume de dados pode ser perdido em um desastre? calculadora de rto/rpo e validador da estratégia 3-2-1 recover grc &amp; auditoria,blue team &amp; defesa diferenciação operacional entre bcp, drp e análise bia definição e cálculo de slas de rto e rpo estratégia de backup 3-2-1 e cópias imutáveis/air-gapped calculadora interativa de resiliência e simulação de perdas">
       
       <div class="card-header">
@@ -3353,6 +3552,7 @@ a.vaga-chip:hover {
       data-nist="Protect / Detect"
       data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,GRC &amp; Auditoria,Analista de Segurança da Informação"
       data-rotas="analista_si"
+      data-certs=""
       data-search="protecao-de-dados-e-conteudo dlp, antispam e filtro de conteúdo prevenção de perda de dados, autenticação de e-mail (spf, dkim, dmarc) e filtragem de conteúdo e url em proxy seguro como impedir que dados sensíveis saiam da organização por e-mail ou web sem bloquear o trabalho legítimo? gateway de conteúdo protect / detect blue team &amp; defesa,operações soc &amp; resposta,grc &amp; auditoria,analista de segurança da informação dlp de rede, de endpoint e de nuvem (casb), com detectores por regex, checksum (luhn) e dicionário autenticação de e-mail com spf, dkim e dmarc (none, quarantine, reject) e antispam por reputação filtro de url por categoria em swg, inspeção tls e o equilíbrio entre falso positivo e falso negativo simulador gateway de conteúdo: antispam, dlp e filtro de url com veredito permitir, quarentena ou bloquear">
       
       <div class="card-header">
@@ -3399,6 +3599,7 @@ a.vaga-chip:hover {
       data-nist="Protect / Detect"
       data-carreiras="Blue Team &amp; Defesa,AppSec &amp; DevSecOps,GRC &amp; Auditoria,Analista de Segurança da Informação"
       data-rotas="analista_si"
+      data-certs="CISSP CCSP"
       data-search="seguranca-de-bancos-de-dados bancos de dados relacionais: sql, privilégios e auditoria modelo relacional, sql ddl/dml/dcl, menor privilégio, auditoria nativa e proteção de dados em repouso quem pode ler e alterar cada tabela do banco, e como provar isso numa auditoria? matriz grant/revoke protect / detect blue team &amp; defesa,appsec &amp; devsecops,grc &amp; auditoria,analista de segurança da informação modelo relacional, acid e as linguagens sql ddl, dml e dcl menor privilégio com roles, grant/revoke, views e row-level security tde, criptografia de coluna, mascaramento dinâmico, auditoria nativa e prepared statements contra sqli simulador matriz grant/revoke com consultas permitidas ou negadas e trilha de auditoria">
       
       <div class="card-header">
@@ -3445,6 +3646,7 @@ a.vaga-chip:hover {
       data-nist="Govern / Protect"
       data-carreiras="GRC &amp; Auditoria,Blue Team &amp; Defesa,Analista de Segurança da Informação"
       data-rotas="analista_si"
+      data-certs="CISM"
       data-search="pci-dss pci dss v4.0.1: escopo cde e os 12 requisitos os 6 objetivos e 12 requisitos do padrão de cartões, delimitação do cde, segmentação para reduzir escopo e tipos de saq quais sistemas entram no escopo do pci dss e como reduzir esse escopo sem abrir mão da conformidade? delimitador de escopo cde govern / protect grc &amp; auditoria,blue team &amp; defesa,analista de segurança da informação 6 objetivos e 12 requisitos do pci dss v4.0.1, com a diferença entre abordagem definida e customizada pan versus dados sensíveis de autenticação (sad) e tokenização versus truncamento versus criptografia cde, sistemas conectados, segmentação validada por teste, saq a, a-ep, b, c e d, roc, qsa e aoc simulador delimitador de escopo cde: sistemas dentro, conectados ou fora do escopo, com sugestão de saq">
       
       <div class="card-header">
@@ -3491,6 +3693,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,AppSec &amp; DevSecOps,GRC &amp; Auditoria,Analista de Segurança da Informação"
       data-rotas="analista_si"
+      data-certs=""
       data-search="ingles-tecnico-ciber inglês técnico para segurança da informação leitura de advisories, registros cve/nvd e rfcs, vocabulário essencial, falsos cognatos e redação técnica em inglês como ler um boletim de segurança em inglês e extrair versão afetada, impacto e mitigação sem erro de interpretação? leitor de advisory protect blue team &amp; defesa,red team &amp; pentest,operações soc &amp; resposta,perícia forense &amp; malware,appsec &amp; devsecops,grc &amp; auditoria,analista de segurança da informação estrutura de um advisory: summary, affected versions, impact, mitigation e workaround verbos modais normativos must, should e may conforme a rfc 2119 falsos cognatos da área (exploit, eventually, actually) e diferença entre registro formal e informal simulador leitor de advisory: termos clicáveis, perguntas de compreensão e flashcards de glossário">
       
       <div class="card-header">
@@ -3537,6 +3740,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,AppSec &amp; DevSecOps,GRC &amp; Auditoria,Analista de Segurança da Informação"
       data-rotas="analista_si"
+      data-certs=""
       data-search="certificacoes-e-carreira formação, certificações e carreira graduações e pós em segurança, certificações ceh, cism, cissp, ccsp, gsec e security+, e papéis do nice framework qual combinação de formação e certificações leva ao perfil de carreira desejado, e que lacunas ainda restam? planejador de certificações protect blue team &amp; defesa,red team &amp; pentest,operações soc &amp; resposta,perícia forense &amp; malware,appsec &amp; devsecops,grc &amp; auditoria,analista de segurança da informação graduações (ciência da computação, sistemas de informação) e pós-graduações em segurança da informação certificações de entrada, gestão e especialidade: órgão emissor, domínios, experiência exigida e cpe nice framework (nist sp 800-181) para descrever papéis profissionais simulador planejador de certificações: domínios cobertos pelo currículo, lacunas e ordem de estudo">
       
       <div class="card-header">
@@ -3583,6 +3787,7 @@ a.vaga-chip:hover {
       data-nist="Protect / Detect"
       data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,Red Team &amp; Pentest,Analista de Segurança da Informação"
       data-rotas="blue_soc red_team analista_si"
+      data-certs="GSEC"
       data-search="linux-para-seguranca linux para segurança: shell, permissões e logs linha de comando, permissões, usuários, processos e logs para investigar um servidor linux que comandos revelam, em poucos minutos, se um servidor linux foi comprometido? terminal de investigação linux protect / detect blue team &amp; defesa,operações soc &amp; resposta,red team &amp; pentest,analista de segurança da informação permissões octais, suid/sgid e sudoers investigação de auth.log e journalctl processos, portas e persistência em cron terminal simulado com missões de investigação">
       
       <div class="card-header">
@@ -3629,6 +3834,7 @@ a.vaga-chip:hover {
       data-nist="Detect"
       data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,AppSec &amp; DevSecOps,Analista de Segurança da Informação"
       data-rotas="devsecops_cloud"
+      data-certs=""
       data-search="python-para-seguranca python para segurança: automação, regex e parsing scripts para ler logs, extrair indicadores com regex e consultar apis de reputação como transformar uma triagem manual de logs em um script repetível? montador de detector detect blue team &amp; defesa,operações soc &amp; resposta,appsec &amp; devsecops,analista de segurança da informação regex aplicada a logs reais agregação com counter e limiares de alerta consulta a apis de reputação com requests montador visual de detector com código python gerado">
       
       <div class="card-header">
@@ -3675,6 +3881,7 @@ a.vaga-chip:hover {
       data-nist="Detect"
       data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,Analista de Segurança da Informação"
       data-rotas="blue_soc pericia analista_si"
+      data-certs="GSEC"
       data-search="powershell-e-windows-interno powershell, event log e registro do windows pipeline de objetos, eventos de segurança, sysmon e chaves de persistência no registro que eventos do windows contam a história de uma intrusão? visualizador de eventos detect blue team &amp; defesa,operações soc &amp; resposta,perícia forense &amp; malware,analista de segurança da informação pipeline de objetos e get-winevent event ids essenciais e tipos de logon sysmon e scriptblock logging linha do tempo de intrusão para investigar">
       
       <div class="card-header">
@@ -3721,6 +3928,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,AppSec &amp; DevSecOps,Operações SOC &amp; Resposta,GRC &amp; Auditoria,Perícia Forense &amp; Malware,Analista de Segurança da Informação"
       data-rotas="analista_si"
+      data-certs=""
       data-search="laboratorio-domestico-e-portfolio laboratório doméstico, ctfs e portfólio montar um laboratório isolado, praticar em ctfs e transformar a prática em portfólio como provar numa entrevista o que você sabe fazer? planejador de homelab protect blue team &amp; defesa,red team &amp; pentest,appsec &amp; devsecops,operações soc &amp; resposta,grc &amp; auditoria,perícia forense &amp; malware,analista de segurança da informação topologia mínima de laboratório isolado orçamento de ram e cpu por vm ctfs, write-ups e portfólio no github planejador de homelab com checklist de isolamento">
       
       <div class="card-header">
@@ -3767,6 +3975,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,Operações SOC &amp; Resposta,Analista de Segurança da Informação"
       data-rotas="red_team analista_si"
+      data-certs="CISSP GSEC"
       data-search="active-directory-fundamentos active directory: domínios, gpo e kerberos estrutura do ad, precedência de gpo, kerberos e ntlm e o modelo de camadas de administração como o ad decide quem é você e o que você pode fazer em cada máquina? kerberos passo a passo protect blue team &amp; defesa,red team &amp; pentest,operações soc &amp; resposta,analista de segurança da informação floresta, domínio, ou e controladores de domínio precedência de gpo (lsdou) kerberos (as, tgs, ap) e ntlm simulador da troca kerberos e calculadora de gpo">
       
       <div class="card-header">
@@ -3813,6 +4022,7 @@ a.vaga-chip:hover {
       data-nist="Protect / Detect"
       data-carreiras="Blue Team &amp; Defesa,Red Team &amp; Pentest,Operações SOC &amp; Resposta"
       data-rotas="blue_soc red_team"
+      data-certs="CEH"
       data-search="ataques-e-defesa-no-ad ataques ao ad e detecção: kerberoasting, pass-the-hash e dcsync caminhos de ataque no ad, sinais de detecção e mitigações que quebram cada caminho qual é o caminho mais curto de um usuário comum até domain admin, e como fechá-lo? mapa de caminhos de ataque protect / detect blue team &amp; defesa,red team &amp; pentest,operações soc &amp; resposta caminhos de ataque em grafo kerberoasting, pass-the-hash e dcsync sinais de detecção nos eventos do windows mapa interativo para quebrar caminhos de ataque">
       
       <div class="card-header">
@@ -3859,6 +4069,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="Blue Team &amp; Defesa,GRC &amp; Auditoria,Analista de Segurança da Informação"
       data-rotas="grc analista_si"
+      data-certs="CISSP Security+"
       data-search="pam-e-acessos-privilegiados gestão de acessos privilegiados (pam) inventário, cofre, rotação, gravação de sessão e acesso just-in-time a contas privilegiadas quem tem poder de administrador hoje, e por quanto tempo deveria ter? auditor de contas privilegiadas protect blue team &amp; defesa,grc &amp; auditoria,analista de segurança da informação inventário de contas privilegiadas cofre, rotação e gravação de sessão just-in-time, jea e break-glass auditor interativo de contas privilegiadas">
       
       <div class="card-header">
@@ -3905,6 +4116,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="Blue Team &amp; Defesa,AppSec &amp; DevSecOps,Analista de Segurança da Informação"
       data-rotas="devsecops_cloud"
+      data-certs=""
       data-search="identidade-hibrida-e-nuvem entra id, identidade híbrida e acesso condicional sincronização híbrida, acesso condicional, mfa resistente a phishing e pim que política de acesso bloqueia o atacante sem travar o usuário legítimo? avaliador de acesso condicional protect blue team &amp; defesa,appsec &amp; devsecops,analista de segurança da informação phs, pta e federação acesso condicional por risco e dispositivo mfa resistente a phishing e pim avaliador de políticas com logins simulados">
       
       <div class="card-header">
@@ -3951,6 +4163,7 @@ a.vaga-chip:hover {
       data-nist="Respond / Recover"
       data-carreiras="Blue Team &amp; Defesa,Operações SOC &amp; Resposta,Perícia Forense &amp; Malware,Analista de Segurança da Informação"
       data-rotas="blue_soc pericia analista_si"
+      data-certs="Security+"
       data-search="ransomware-prevencao-a-recuperacao ransomware: prevenção, contenção e recuperação anatomia do ataque, dupla extorsão, decisões de contenção e retomada da operação nas primeiras horas de um ransomware, que decisões reduzem o estrago e quais o pioram? linha do tempo do ransomware respond / recover blue team &amp; defesa,operações soc &amp; resposta,perícia forense &amp; malware,analista de segurança da informação anatomia do ataque e dupla extorsão decisões de contenção e seus custos ordem de recuperação e descriptografadores públicos linha do tempo interativa com pontos de decisão">
       
       <div class="card-header">
@@ -3997,6 +4210,7 @@ a.vaga-chip:hover {
       data-nist="Respond"
       data-carreiras="GRC &amp; Auditoria,Operações SOC &amp; Resposta,Analista de Segurança da Informação"
       data-rotas="grc analista_si"
+      data-certs="CISM"
       data-search="gestao-de-crise-e-comunicacao gestão de crise cibernética e comunicação de incidentes comitê de crise, registro de decisões e comunicação a público interno, clientes, imprensa e anpd quem precisa saber do incidente, quando e com que mensagem? relógio da crise respond grc &amp; auditoria,operações soc &amp; resposta,analista de segurança da informação comitê de crise e matriz raci registro de decisões e porta-voz único comunicação à anpd em 3 dias úteis relógio da crise com notificações e prazos">
       
       <div class="card-header">
@@ -4043,6 +4257,7 @@ a.vaga-chip:hover {
       data-nist="Respond / Recover"
       data-carreiras="GRC &amp; Auditoria,Operações SOC &amp; Resposta,Analista de Segurança da Informação"
       data-rotas="grc"
+      data-certs="CISM"
       data-search="exercicios-tabletop exercícios tabletop: planejar, conduzir e avaliar tipos de exercício, injects, facilitação e relatório pós-ação com plano de melhorias como descobrir as falhas do plano de resposta antes de um incidente real? gerador de tabletop respond / recover grc &amp; auditoria,operações soc &amp; resposta,analista de segurança da informação tipos de exercício (nist sp 800-84) injects e papel do facilitador relatório pós-ação e plano de melhorias gerador de tabletop com cronômetro e relatório">
       
       <div class="card-header">
@@ -4089,6 +4304,7 @@ a.vaga-chip:hover {
       data-nist="Recover"
       data-carreiras="Blue Team &amp; Defesa,GRC &amp; Auditoria,Analista de Segurança da Informação"
       data-rotas="pericia"
+      data-certs="CISSP Security+"
       data-search="backup-imutavel-e-recuperacao backup imutável e recuperação de identidade regra 3-2-1-1-0, imutabilidade, air gap e recuperação do active directory seu backup sobrevive a um atacante que já é administrador do domínio? teste de sobrevivência do backup recover blue team &amp; defesa,grc &amp; auditoria,analista de segurança da informação regra 3-2-1-1-0 imutabilidade, object lock e air gap recuperação do active directory teste de sobrevivência do backup a um admin de domínio">
       
       <div class="card-header">
@@ -4135,6 +4351,7 @@ a.vaga-chip:hover {
       data-nist="Detect"
       data-carreiras="Operações SOC &amp; Resposta,Blue Team &amp; Defesa"
       data-rotas="blue_soc"
+      data-certs="Security+"
       data-search="engenharia-de-deteccao engenharia de detecção: detection-as-code e cobertura att&amp;amp;ck regras versionadas, testadas e medidas pela cobertura de técnicas quantas técnicas att&amp;amp;ck suas regras realmente detectam, e como você sabe? bancada de detecções detect operações soc &amp; resposta,blue team &amp; defesa detecção como código: versionar, revisar, testar regras sigma com filtros e condições cobertura att&amp;ck medida por teste, não por existência da regra precisão e volume de alertas antes da produção">
       
       <div class="card-header">
@@ -4181,6 +4398,7 @@ a.vaga-chip:hover {
       data-nist="Detect"
       data-carreiras="Operações SOC &amp; Resposta,Blue Team &amp; Defesa,Perícia Forense &amp; Malware"
       data-rotas="blue_soc pericia"
+      data-certs=""
       data-search="threat-hunting threat hunting: caça por hipótese e linhas de base procurar o que nenhum alerta pegou, partindo de uma hipótese se um invasor estiver na rede sem disparar alertas, por onde você começa a procurar? caçada guiada detect operações soc &amp; resposta,blue team &amp; defesa,perícia forense &amp; malware caça por hipótese, não por alerta linha de base e contagem de ocorrências raras ciclo de caça peak toda caça bem-sucedida vira detecção">
       
       <div class="card-header">
@@ -4227,6 +4445,7 @@ a.vaga-chip:hover {
       data-nist="Detect"
       data-carreiras="Operações SOC &amp; Resposta,Blue Team &amp; Defesa,Perícia Forense &amp; Malware"
       data-rotas="blue_soc pericia"
+      data-certs="CISSP GSEC"
       data-search="monitoramento-de-rede-nsm monitoramento de rede: zeek, pcap e netflow logs de conexão, beaconing, túnel dns e fingerprints tls como achar um implante que fala com o atacante a cada 60 segundos, mesmo com o tráfego cifrado? analisador de conexões detect operações soc &amp; resposta,blue team &amp; defesa,perícia forense &amp; malware pcap, zeek e netflow: custo vs valor beaconing pela regularidade dos intervalos túnel dns por entropia e volume de subdomínios ja3/ja4 ajudam, mas não provam sozinhos">
       
       <div class="card-header">
@@ -4273,6 +4492,7 @@ a.vaga-chip:hover {
       data-nist="Respond"
       data-carreiras="Operações SOC &amp; Resposta,Blue Team &amp; Defesa,Analista de Segurança da Informação"
       data-rotas="blue_soc analista_si"
+      data-certs=""
       data-search="soar-e-automacao-de-resposta soar: playbooks e automação de resposta enriquecer, decidir e conter, com aprovação humana onde o erro custa caro o que o seu playbook deve fazer sozinho, e o que ele nunca deve fazer sem perguntar? montador de playbook respond operações soc &amp; resposta,blue team &amp; defesa,analista de segurança da informação playbook: gatilho, enriquecimento, decisão, ação aprovação humana para ações de alto impacto mtta e mttr como medida da automação exceções para ativos críticos">
       
       <div class="card-header">
@@ -4319,6 +4539,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="AppSec &amp; DevSecOps,Blue Team &amp; Defesa"
       data-rotas="devsecops_cloud"
+      data-certs="CCSP GSEC"
       data-search="seguranca-de-containers segurança de containers: imagens, build e runtime da imagem base ao processo em execução o que separa um container comprometido do servidor que o hospeda? auditor de dockerfile protect appsec &amp; devsecops,blue team &amp; defesa imagem mínima, usuário não root e tag fixa segredos nunca em camadas da imagem --privileged e docker.sock abrem caminho ao host assinatura e registro confiável">
       
       <div class="card-header">
@@ -4365,6 +4586,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="AppSec &amp; DevSecOps,Blue Team &amp; Defesa,Red Team &amp; Pentest"
       data-rotas="red_team devsecops_cloud"
+      data-certs="CEH CCSP"
       data-search="seguranca-em-kubernetes segurança em kubernetes: rbac, pod security e networkpolicy quem pode fazer o quê no cluster, e o que cada pod alcança uma conta de serviço comprometida consegue chegar a administrador do cluster? cluster em miniatura protect appsec &amp; devsecops,blue team &amp; defesa,red team &amp; pentest rbac: create pods, bind e escalate são privilégio pod security standards: privileged, baseline, restricted networkpolicy com negação por padrão token de conta de serviço é credencial">
       
       <div class="card-header">
@@ -4411,6 +4633,7 @@ a.vaga-chip:hover {
       data-nist="Protect"
       data-carreiras="AppSec &amp; DevSecOps,GRC &amp; Auditoria"
       data-rotas="devsecops_cloud"
+      data-certs="CCSP"
       data-search="infraestrutura-como-codigo-segura infraestrutura como código segura: terraform e policy-as-code barrar a configuração insegura antes do apply como impedir que um bucket público chegue à produção, em vez de achá-lo depois? revisor de plano terraform protect appsec &amp; devsecops,grc &amp; auditoria plano antes do apply, política antes do plano state do terraform contém segredos policy-as-code com exceções com prazo drift: o ambiente diverge do código">
       
       <div class="card-header">
@@ -4457,6 +4680,7 @@ a.vaga-chip:hover {
       data-nist="Detect / Respond"
       data-carreiras="Operações SOC &amp; Resposta,Blue Team &amp; Defesa,Perícia Forense &amp; Malware,AppSec &amp; DevSecOps"
       data-rotas="devsecops_cloud pericia"
+      data-certs="CISSP CCSP"
       data-search="deteccao-e-resposta-em-nuvem detecção e resposta a incidentes em nuvem trilhas de auditoria, detecção nativa e contenção de credencial vazada uma chave de acesso vazou no github há três dias: o que o atacante fez, e como você o tira de lá? conta comprometida detect / respond operações soc &amp; resposta,blue team &amp; defesa,perícia forense &amp; malware,appsec &amp; devsecops eventos de dados não vêm ligados por padrão credencial vazada: revogar, girar, investigar criação de usuário e de chave como persistência snapshot antes de desligar">
       
       <div class="card-header">
@@ -4503,6 +4727,7 @@ a.vaga-chip:hover {
       data-nist="Govern"
       data-carreiras="GRC &amp; Auditoria,Analista de Segurança da Informação"
       data-rotas="grc analista_si"
+      data-certs="CISM"
       data-search="regulacao-setor-financeiro regulação cibernética do setor financeiro resolução cmn 4.893 e resolução bcb 85, com as alterações de dezembro de 2025 o que o banco central exige da sua política de segurança, e o que muda quando o sistema vai para a nuvem? verificador de aderência govern grc &amp; auditoria,analista de segurança da informação cmn 4.893/2021, alterada pela cmn 5.274/2025 bcb 85/2021 para instituições de pagamento responsabilidade não se transfere ao fornecedor de nuvem teste de intrusão anual e controles mínimos">
       
       <div class="card-header">
@@ -4549,6 +4774,7 @@ a.vaga-chip:hover {
       data-nist="Detect / Protect"
       data-carreiras="Operações SOC &amp; Resposta,GRC &amp; Auditoria,Analista de Segurança da Informação"
       data-rotas="grc"
+      data-certs="Security+"
       data-search="fraude-em-pagamentos-e-pix fraude em pagamentos: pix, golpes e antifraude golpes com pix, sinais de risco, regras antifraude e o med 2.0 quais sinais separam um pix legítimo de um golpe, e quanto atrito o cliente honesto aceita? mesa antifraude detect / protect operações soc &amp; resposta,grc &amp; auditoria,analista de segurança da informação golpe de falsa central e conta laranja pontuação de risco com sinais combinados fraude evitada vs cliente bloqueado med 2.0 e bloqueio cautelar">
       
       <div class="card-header">
@@ -4595,6 +4821,7 @@ a.vaga-chip:hover {
       data-nist="Govern"
       data-carreiras="GRC &amp; Auditoria,Perícia Forense &amp; Malware,Analista de Segurança da Informação"
       data-rotas="grc pericia"
+      data-certs=""
       data-search="legislacao-e-crimes-ciberneticos legislação brasileira e crimes cibernéticos tipos penais, guarda de registros e preservação de provas o que guardar, por quanto tempo e como, para que o caso chegue ao processo penal? enquadramento de casos govern grc &amp; auditoria,perícia forense &amp; malware,analista de segurança da informação art. 154-a: invasão de dispositivo informático fraude eletrônica: art. 171 §2º-a (redação de 2026) marco civil: conexão 1 ano, aplicações 6 meses pnciber (2023) e e-ciber (2025)">
       
       <div class="card-header">
@@ -4641,6 +4868,7 @@ a.vaga-chip:hover {
       data-nist="Govern"
       data-carreiras="GRC &amp; Auditoria,Analista de Segurança da Informação"
       data-rotas="grc analista_si"
+      data-certs="CISM CISSP"
       data-search="gestao-de-riscos-de-terceiros gestão de riscos de terceiros e fornecedores due diligence, cláusulas mínimas, monitoramento e plano de saída seu fornecedor crítico tem acesso aos seus dados: como você sabe que ele protege, e como sai do contrato se precisar? avaliador de fornecedores govern grc &amp; auditoria,analista de segurança da informação due diligence proporcional à criticidade cláusulas: incidente, auditoria, subcontratação, saída quarta parte: o fornecedor do fornecedor nist csf 2.0 gv.sc e iso 27002 5.19–5.23">
       
       <div class="card-header">
@@ -4682,7 +4910,7 @@ a.vaga-chip:hover {
     </article>
 
         <div class="no-results" id="no-results-msg" style="display: none;">
-          <p>Nenhum estudo encontrado com os critérios de busca aplicados.</p>
+          <p id="no-results-texto">Nenhum estudo encontrado com os critérios de busca aplicados.</p>
           <button class="btn-open-study" onclick="clearSearch(); switchTab('todas');">Limpar Filtros e Busca</button>
         </div>
       </div>
@@ -4807,9 +5035,16 @@ a.vaga-chip:hover {
   // Painel da aba Rotas Sugeridas: mostra a rota escolhida, marca os passos
   // concluídos (mesmas chaves cs_done_<slug>) e destaca o próximo módulo.
   function atualizarPainelRota() {
-    const secao = document.getElementById('secao-rota-sugerida');
+    atualizarPainel('secao-rota-sugerida', 'rotas');
+    atualizarPainel('secao-cert-painel', 'certs');
+  }
+
+  // Mostra o grupo ativo (rota ou certificação), marca os passos concluídos
+  // (mesmas chaves cs_done_<slug>) e destaca o próximo módulo.
+  function atualizarPainel(secaoId, facet) {
+    const secao = document.getElementById(secaoId);
     if (!secao) return;
-    const ativa = (typeof currentFacet !== 'undefined' && currentFacet === 'rotas' && currentFilterValue !== 'all') ? currentFilterValue : null;
+    const ativa = (typeof currentFacet !== 'undefined' && currentFacet === facet && currentFilterValue !== 'all') ? currentFilterValue : null;
     secao.hidden = !ativa;
     secao.querySelectorAll('.rota-sugerida').forEach(div => {
       const selecionada = div.getAttribute('data-rota') === ativa;
@@ -4827,15 +5062,15 @@ a.vaga-chip:hover {
       });
       if (proximo) proximo.classList.add('proximo');
       const pct = passos.length ? Math.round((feitos / passos.length) * 100) : 0;
-      const barra = div.querySelector('.rota-progresso-barra');
-      barra.setAttribute('aria-valuenow', String(feitos));
+      div.querySelector('.rota-progresso-barra').setAttribute('aria-valuenow', String(feitos));
       div.querySelector('.rota-progresso-preenchido').style.width = pct + '%';
       div.querySelector('.rota-progresso-texto').textContent = feitos + ' de ' + passos.length + ' concluídos (' + pct + '%)';
       div.querySelector('.rota-proximo').textContent = proximo
         ? 'Próximo módulo: ' + proximo.getAttribute('data-rotulo')
-        : 'Rota concluída! Todos os módulos foram marcados como estudados.';
+        : 'Tudo concluído! Todos os módulos foram marcados como estudados.';
     });
   }
+
 
   function toggleDone(slug, isDone) {
     if (isDone) {
@@ -4852,6 +5087,7 @@ a.vaga-chip:hover {
       }
     }
     initProgress();
+    if (currentFacet === 'progresso') filtrarCards();
   }
 
   function resetProgress() {
@@ -4940,6 +5176,12 @@ a.vaga-chip:hover {
       } else if (currentFacet === 'rotas' && currentFilterValue !== 'all') {
         const cardRotas = ' ' + (card.getAttribute('data-rotas') || '') + ' ';
         matchFacet = cardRotas.includes(' ' + currentFilterValue + ' ');
+      } else if (currentFacet === 'certs' && currentFilterValue !== 'all') {
+        const cardCerts = ' ' + (card.getAttribute('data-certs') || '') + ' ';
+        matchFacet = cardCerts.includes(' ' + currentFilterValue + ' ');
+      } else if (currentFacet === 'progresso' && currentFilterValue !== 'all') {
+        const feito = safeStorageGet('cs_done_' + card.getAttribute('data-slug')) === 'true';
+        matchFacet = currentFilterValue === 'concluidos' ? feito : !feito;
       }
 
       if (matchSearch && matchFacet) {
@@ -4963,6 +5205,12 @@ a.vaga-chip:hover {
     const noResults = document.getElementById('no-results-msg');
     if (noResults) {
       noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+      const texto = document.getElementById('no-results-texto');
+      if (texto) {
+        texto.textContent = (currentFacet === 'progresso' && currentFilterValue === 'concluidos' && !query)
+          ? 'Você ainda não marcou nenhum módulo como concluído. Marque a caixa "Estudo Concluído" no card de cada módulo que terminar.'
+          : 'Nenhum estudo encontrado com os critérios de busca aplicados.';
+      }
     }
   }
 

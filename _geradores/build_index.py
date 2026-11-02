@@ -125,6 +125,7 @@ def render_study_cards(
         tempo = d["tempo_minutos"]
         carreiras_str = ",".join(d["carreiras"])
         rotas_str = " ".join(r["id"] for r in ROTAS_PERFIL if slug in r["modulos"])
+        certs_str = " ".join(c["sigla"] for c in CERTIFICACOES if slug in c["modulos"])
 
         # Lista de termos para busca em tempo real
         fatos_texto = " ".join(d["fatos"])
@@ -149,6 +150,7 @@ def render_study_cards(
       data-nist="{nist}"
       data-carreiras="{escape(carreiras_str)}"
       data-rotas="{rotas_str}"
+      data-certs="{escape(certs_str, quote=True)}"
       data-search="{search_terms}">
       
       <div class="card-header">
@@ -224,17 +226,18 @@ def render_filtros_rota(rotas: List[dict]) -> str:
     return "\n        ".join(botoes)
 
 
-def render_painel_rotas(rotas: List[dict], status_map: Dict[str, dict]) -> str:
-    """Painel da rota escolhida: passos na ordem de estudo, progresso e próximo módulo.
+def _render_painel(grupos: List[dict], status_map: Dict[str, dict], secao_id: str, comentario: str) -> str:
+    """Painel com passos (módulos), progresso e próximo módulo, um bloco por grupo.
 
-    Começa oculto; o JavaScript do portal mostra a rota ativa e calcula o progresso
-    a partir das chaves cs_done_<slug> salvas no navegador.
+    Cada grupo traz: id, titulo (cabeçalho), descricao e modulos (slugs na ordem de exibição).
+    Começa oculto; o JavaScript do portal mostra o grupo ativo e calcula o progresso a partir
+    das chaves cs_done_<slug> salvas no navegador.
     """
     ordem = list(ESTUDOS_DADOS)
     blocos = []
-    for r in rotas:
+    for g in grupos:
         passos = []
-        for slug in r["modulos"]:
+        for slug in g["modulos"]:
             numero = ordem.index(slug) + 1
             titulo = escape(ESTUDOS_DADOS[slug]["titulo"])
             rotulo = f"{numero:02d} · {titulo}"
@@ -249,14 +252,14 @@ def render_painel_rotas(rotas: List[dict], status_map: Dict[str, dict]) -> str:
                 f'<span class="rota-passo-num">{numero:02d}</span> {alvo}'
                 f'<span class="rota-passo-check" aria-label="concluído">✓</span></li>'
             )
-        total = len(r["modulos"])
-        blocos.append(f"""      <div class="rota-sugerida" data-rota="{escape(r['id'], quote=True)}" hidden>
+        total = len(g["modulos"])
+        blocos.append(f"""      <div class="rota-sugerida" data-rota="{escape(g['id'], quote=True)}" hidden>
         <div class="rota-cabecalho">
-          <h2>{r['icone']} Rota: {escape(r['nome'])}</h2>
-          <p>{escape(r['descricao'])}</p>
+          <h2>{g['titulo']}</h2>
+          <p>{escape(g['descricao'])}</p>
         </div>
         <div class="rota-progresso">
-          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso da rota" aria-valuemin="0" aria-valuemax="{total}" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
+          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="{total}" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
           <span class="rota-progresso-texto">0 de {total} concluídos (0%)</span>
         </div>
         <p class="rota-proximo"></p>
@@ -264,10 +267,42 @@ def render_painel_rotas(rotas: List[dict], status_map: Dict[str, dict]) -> str:
           {chr(10).join("          " + p for p in passos).lstrip()}
         </ol>
       </div>""")
-    return f"""    <!-- Seção: Rota Sugerida (aba Rotas Sugeridas) -->
-    <section class="rota-sugerida-section" id="secao-rota-sugerida" hidden aria-live="polite">
+    return f"""    <!-- {comentario} -->
+    <section class="rota-sugerida-section" id="{secao_id}" hidden aria-live="polite">
 {chr(10).join(blocos)}
     </section>"""
+
+
+def render_painel_rotas(rotas: List[dict], status_map: Dict[str, dict]) -> str:
+    """Painel da aba Rotas Sugeridas: passos na ordem de estudo da rota."""
+    grupos = [
+        {"id": r["id"], "titulo": f"{r['icone']} Rota: {escape(r['nome'])}", "descricao": r["descricao"], "modulos": r["modulos"]}
+        for r in rotas
+    ]
+    return _render_painel(grupos, status_map, "secao-rota-sugerida", "Seção: Rota Sugerida (aba Rotas Sugeridas)")
+
+
+def render_filtros_certificacao(certs: List[dict]) -> str:
+    """Gera os botões da aba Por Certificação a partir de CERTIFICACOES."""
+    botoes = [_botao_filtro("all", "Escolha uma certificação", ativo=True)]
+    for c in certs:
+        botoes.append(_botao_filtro(escape(c["sigla"], quote=True), f"🎓 {escape(c['sigla'])}"))
+    return "\n        ".join(botoes)
+
+
+def render_painel_certificacoes(certs: List[dict], status_map: Dict[str, dict]) -> str:
+    """Painel da aba Por Certificação: módulos que cobrem a prova, em ordem numérica."""
+    ordem = list(ESTUDOS_DADOS)
+    grupos = [
+        {
+            "id": c["sigla"],
+            "titulo": f"🎓 {escape(c['sigla'])}: {escape(c['nome'])}",
+            "descricao": f"{c['orgao']} · {c['foco']} · Experiência: {c['experiencia']}",
+            "modulos": sorted(c["modulos"], key=ordem.index),
+        }
+        for c in certs
+    ]
+    return _render_painel(grupos, status_map, "secao-cert-painel", "Seção: Certificação escolhida (aba Por Certificação)")
 
 
 def render_chip_modulo(slug: str, status_map: Dict[str, dict], apoio: bool = False) -> str:
@@ -374,6 +409,8 @@ def gerar_index_html(
     filtros_carreira_html = render_filtros_carreira(CARREIRAS)
     filtros_rota_html = render_filtros_rota(ROTAS_PERFIL)
     painel_rotas_html = render_painel_rotas(ROTAS_PERFIL, stats["status_map"])
+    filtros_cert_html = render_filtros_certificacao(CERTIFICACOES)
+    painel_cert_html = render_painel_certificacoes(CERTIFICACOES, stats["status_map"])
 
     # JavaScript do Portal Central
     portal_js = """
@@ -486,9 +523,16 @@ def gerar_index_html(
   // Painel da aba Rotas Sugeridas: mostra a rota escolhida, marca os passos
   // concluídos (mesmas chaves cs_done_<slug>) e destaca o próximo módulo.
   function atualizarPainelRota() {
-    const secao = document.getElementById('secao-rota-sugerida');
+    atualizarPainel('secao-rota-sugerida', 'rotas');
+    atualizarPainel('secao-cert-painel', 'certs');
+  }
+
+  // Mostra o grupo ativo (rota ou certificação), marca os passos concluídos
+  // (mesmas chaves cs_done_<slug>) e destaca o próximo módulo.
+  function atualizarPainel(secaoId, facet) {
+    const secao = document.getElementById(secaoId);
     if (!secao) return;
-    const ativa = (typeof currentFacet !== 'undefined' && currentFacet === 'rotas' && currentFilterValue !== 'all') ? currentFilterValue : null;
+    const ativa = (typeof currentFacet !== 'undefined' && currentFacet === facet && currentFilterValue !== 'all') ? currentFilterValue : null;
     secao.hidden = !ativa;
     secao.querySelectorAll('.rota-sugerida').forEach(div => {
       const selecionada = div.getAttribute('data-rota') === ativa;
@@ -506,15 +550,15 @@ def gerar_index_html(
       });
       if (proximo) proximo.classList.add('proximo');
       const pct = passos.length ? Math.round((feitos / passos.length) * 100) : 0;
-      const barra = div.querySelector('.rota-progresso-barra');
-      barra.setAttribute('aria-valuenow', String(feitos));
+      div.querySelector('.rota-progresso-barra').setAttribute('aria-valuenow', String(feitos));
       div.querySelector('.rota-progresso-preenchido').style.width = pct + '%';
       div.querySelector('.rota-progresso-texto').textContent = feitos + ' de ' + passos.length + ' concluídos (' + pct + '%)';
       div.querySelector('.rota-proximo').textContent = proximo
         ? 'Próximo módulo: ' + proximo.getAttribute('data-rotulo')
-        : 'Rota concluída! Todos os módulos foram marcados como estudados.';
+        : 'Tudo concluído! Todos os módulos foram marcados como estudados.';
     });
   }
+
 
   function toggleDone(slug, isDone) {
     if (isDone) {
@@ -531,6 +575,7 @@ def gerar_index_html(
       }
     }
     initProgress();
+    if (currentFacet === 'progresso') filtrarCards();
   }
 
   function resetProgress() {
@@ -619,6 +664,12 @@ def gerar_index_html(
       } else if (currentFacet === 'rotas' && currentFilterValue !== 'all') {
         const cardRotas = ' ' + (card.getAttribute('data-rotas') || '') + ' ';
         matchFacet = cardRotas.includes(' ' + currentFilterValue + ' ');
+      } else if (currentFacet === 'certs' && currentFilterValue !== 'all') {
+        const cardCerts = ' ' + (card.getAttribute('data-certs') || '') + ' ';
+        matchFacet = cardCerts.includes(' ' + currentFilterValue + ' ');
+      } else if (currentFacet === 'progresso' && currentFilterValue !== 'all') {
+        const feito = safeStorageGet('cs_done_' + card.getAttribute('data-slug')) === 'true';
+        matchFacet = currentFilterValue === 'concluidos' ? feito : !feito;
       }
 
       if (matchSearch && matchFacet) {
@@ -642,6 +693,12 @@ def gerar_index_html(
     const noResults = document.getElementById('no-results-msg');
     if (noResults) {
       noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+      const texto = document.getElementById('no-results-texto');
+      if (texto) {
+        texto.textContent = (currentFacet === 'progresso' && currentFilterValue === 'concluidos' && !query)
+          ? 'Você ainda não marcou nenhum módulo como concluído. Marque a caixa "Estudo Concluído" no card de cada módulo que terminar.'
+          : 'Nenhum estudo encontrado com os critérios de busca aplicados.';
+      }
     }
   }
 
@@ -809,6 +866,8 @@ def gerar_index_html(
         <button class="tab-btn" data-facet="trilhas" onclick="switchTab('trilhas')">Por Trilha Temática</button>
         <button class="tab-btn" data-facet="carreiras" onclick="switchTab('carreiras')">Por Perfil Profissional</button>
         <button class="tab-btn" data-facet="rotas" onclick="switchTab('rotas')">Rotas Sugeridas</button>
+        <button class="tab-btn" data-facet="certs" onclick="switchTab('certs')">Por Certificação</button>
+        <button class="tab-btn" data-facet="progresso" onclick="switchTab('progresso')">Meu Progresso</button>
         <button class="tab-btn" data-facet="nist" onclick="switchTab('nist')">Por Função NIST CSF 2.0</button>
       </nav>
 
@@ -825,6 +884,18 @@ def gerar_index_html(
       <!-- Painel: Rotas Sugeridas -->
       <div class="filter-subpanel" data-panel="rotas" style="display: none;">
         {filtros_rota_html}
+      </div>
+
+      <!-- Painel: Por Certificação -->
+      <div class="filter-subpanel" data-panel="certs" style="display: none;">
+        {filtros_cert_html}
+      </div>
+
+      <!-- Painel: Meu Progresso -->
+      <div class="filter-subpanel" data-panel="progresso" style="display: none;">
+        <button class="filter-badge active" data-value="all" onclick="setSubFilter(this.dataset.value, this)">Todos os módulos</button>
+        <button class="filter-badge" data-value="concluidos" onclick="setSubFilter(this.dataset.value, this)">✅ Concluídos</button>
+        <button class="filter-badge" data-value="a_estudar" onclick="setSubFilter(this.dataset.value, this)">📖 A estudar</button>
       </div>
 
       <!-- Painel: Por Função NIST CSF 2.0 -->
@@ -861,6 +932,8 @@ def gerar_index_html(
 
 {painel_rotas_html}
 
+{painel_cert_html}
+
     <!-- Seção Principal: Catálogo dos Estudos -->
     <main class="studies-section" id="secao-catalogo">
       <div class="section-title-wrap">
@@ -871,7 +944,7 @@ def gerar_index_html(
 {cards_html}
 
         <div class="no-results" id="no-results-msg" style="display: none;">
-          <p>Nenhum estudo encontrado com os critérios de busca aplicados.</p>
+          <p id="no-results-texto">Nenhum estudo encontrado com os critérios de busca aplicados.</p>
           <button class="btn-open-study" onclick="clearSearch(); switchTab('todas');">Limpar Filtros e Busca</button>
         </div>
       </div>
