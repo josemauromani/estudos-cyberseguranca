@@ -1,0 +1,2891 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="study-slug" content="SOAR-e-Automacao-de-Resposta">
+  <title>SOAR: Playbooks e Automação de Resposta — Estudos de Cibersegurança</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%233b82f6' d='M32 4 8 14v16c0 15 10 26 24 30 14-4 24-15 24-30V14z'/%3E%3Cpath fill='%23ffffff' d='M28 40 19 31l4-4 5 5 13-13 4 4z'/%3E%3C/svg%3E">
+
+  <!-- Google Fonts: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+/* ==========================================================================
+   ESTUDOS DE CIBERSEGURANÇA — DESIGN SYSTEM BASE (base.css)
+   Compatível com temas Claro / Escuro, responsivo e 100% offline-ready.
+   Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0. Importação de Fontes Web (Google Fonts com Fallbacks Locais Nativos)
+   -------------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+/* --------------------------------------------------------------------------
+   1. Design Tokens & Variáveis CSS (Tema Claro - Padrão)
+   -------------------------------------------------------------------------- */
+:root {
+  /* Paleta Base */
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+
+  /* Cores Temáticas das 10 Trilhas */
+  --t1-blue: #2563EB;     /* Trilha 1: Fundamentos & Princípios */
+  --t2-green: #059669;    /* Trilha 2: Defesa & Operações Blue Team */
+  --t3-red: #DC2626;      /* Trilha 3: Segurança Ofensiva & Red Team */
+  --t4-purple: #7C3AED;   /* Trilha 4: Engenharia, Cloud & AppSec */
+  --t5-cyan: #0891B2;     /* Trilha 5: Criptografia & Identidade */
+  --t6-amber: #D97706;    /* Trilha 6: Governança, Risco & Regulação */
+  --t7-rose: #DB2777;
+  --t8-slate: #475569;
+  --t9-indigo: #4F46E5;
+  --t10-orange: #C2410C;
+  --t11-fuchsia: #A21CAF;
+  --t12-teal: #0F766E;
+  --t13-lime: #4D7C0F;
+
+  /* Cores de Alerta / Callouts */
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+
+  --warning-color: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #F59E0B;
+
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+
+  --law-color: #7C3AED;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+
+  /* Tipografia */
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+
+  /* Espaçamento e Bordas */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+  --radius: var(--radius-md);
+  --accent: var(--t1-blue);
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 28, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 28, 0.08), 0 2px 4px -2px rgba(15, 23, 28, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 28, 0.1), 0 4px 6px -4px rgba(15, 23, 28, 0.05);
+
+  /* Transição */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.25s ease-in-out;
+}
+
+/* --------------------------------------------------------------------------
+   2. Suporte a Tema Escuro (Modo Noturno / Dark Mode)
+   -------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0F171C;
+    --surface: #172229;
+    --sunk: #1E2B33;
+    --ink: #E4EAED;
+    --muted: #9BABB6;
+    --rule: #2B3A44;
+
+    /* Trilhas no Dark Mode (ajuste de saturação e contraste) */
+    --t1-blue: #60A5FA;
+    --t2-green: #34D399;
+    --t3-red: #F87171;
+    --t4-purple: #A78BFA;
+    --t5-cyan: #22D3EE;
+    --t6-amber: #FBBF24;
+    --t7-rose: #F472B6;
+    --t8-slate: #94A3B8;
+    --t9-indigo: #818CF8;
+    --t10-orange: #FB923C;
+    --t11-fuchsia: #E879F9;
+    --t12-teal: #2DD4BF;
+    --t13-lime: #A3E635;
+
+    /* Alertas no Dark Mode */
+    --tip-color: #34D399;
+    --tip-bg: rgba(5, 150, 105, 0.18);
+    --tip-border: #059669;
+
+    --warning-color: #FBBF24;
+    --warning-bg: rgba(217, 119, 6, 0.18);
+    --warning-border: #D97706;
+
+    --danger-color: #F87171;
+    --danger-bg: rgba(220, 38, 38, 0.20);
+    --danger-border: #DC2626;
+
+    --law-color: #A78BFA;
+    --law-bg: rgba(124, 58, 237, 0.18);
+    --law-border: #7C3AED;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #0F171C;
+  --surface: #172229;
+  --sunk: #1E2B33;
+  --ink: #E4EAED;
+  --muted: #9BABB6;
+  --rule: #2B3A44;
+
+  --t1-blue: #60A5FA;
+  --t2-green: #34D399;
+  --t3-red: #F87171;
+  --t4-purple: #A78BFA;
+  --t5-cyan: #22D3EE;
+  --t6-amber: #FBBF24;
+  --t7-rose: #F472B6;
+  --t8-slate: #94A3B8;
+  --t9-indigo: #818CF8;
+  --t10-orange: #FB923C;
+  --t11-fuchsia: #E879F9;
+  --t12-teal: #2DD4BF;
+  --t13-lime: #A3E635;
+
+  --tip-color: #34D399;
+  --tip-bg: rgba(5, 150, 105, 0.18);
+  --tip-border: #059669;
+
+  --warning-color: #FBBF24;
+  --warning-bg: rgba(217, 119, 6, 0.18);
+  --warning-border: #D97706;
+
+  --danger-color: #F87171;
+  --danger-bg: rgba(220, 38, 38, 0.20);
+  --danger-border: #DC2626;
+
+  --law-color: #A78BFA;
+  --law-bg: rgba(124, 58, 237, 0.18);
+  --law-border: #7C3AED;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="light"] {
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+
+  --t1-blue: #2563EB;
+  --t2-green: #059669;
+  --t3-red: #DC2626;
+  --t4-purple: #7C3AED;
+  --t5-cyan: #0891B2;
+  --t6-amber: #D97706;
+  --t7-rose: #DB2777;
+  --t8-slate: #475569;
+  --t9-indigo: #4F46E5;
+  --t10-orange: #C2410C;
+  --t11-fuchsia: #A21CAF;
+  --t12-teal: #0F766E;
+  --t13-lime: #4D7C0F;
+
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+
+  --warning-color: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #F59E0B;
+
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+
+  --law-color: #7C3AED;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+}
+
+/* --------------------------------------------------------------------------
+   3. Reset e Estilos Globais
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+img, select, input, textarea {
+  max-width: 100%;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  color-scheme: light dark;
+}
+
+body {
+  background-color: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  margin: 0;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* Tipografia Estrutural */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.75rem; margin-top: 2rem; border-bottom: 2px solid var(--rule); padding-bottom: 0.5rem; }
+h3 { font-size: 1.35rem; margin-top: 1.5rem; }
+h4 { font-size: 1.15rem; }
+
+p {
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--t1-blue);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity var(--transition-fast);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code, kbd, samp {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background-color: var(--sunk);
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--rule);
+}
+
+:not(pre) > code {
+  overflow-wrap: anywhere;
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  background-color: #0D1418;
+  color: #E2E8F0;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  border: none;
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   4. Layout do Documento & Barra de Navegação Superior
+   -------------------------------------------------------------------------- */
+.top-nav {
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.top-nav-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.nav-back:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.theme-toggle-btn {
+  background: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+  background: var(--surface);
+  border-color: var(--muted);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 4rem 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   5. Cabeçalho de Destaque (.hero-header) e Metadados
+   -------------------------------------------------------------------------- */
+.hero-header {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-color: var(--track-color, var(--t1-blue));
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  background-color: var(--sunk);
+  color: var(--ink);
+}
+
+.badge-t1 { background-color: rgba(37, 99, 235, 0.15); color: var(--t1-blue); }
+.badge-t2 { background-color: rgba(5, 150, 105, 0.15); color: var(--t2-green); }
+.badge-t3 { background-color: rgba(220, 38, 38, 0.15); color: var(--t3-red); }
+.badge-t4 { background-color: rgba(124, 58, 237, 0.15); color: var(--t4-purple); }
+.badge-t5 { background-color: rgba(8, 145, 178, 0.15); color: var(--t5-cyan); }
+.badge-t6 { background-color: rgba(217, 119, 6, 0.15); color: var(--t6-amber); }
+.badge-t7 { background-color: rgba(219, 39, 119, 0.15); color: var(--t7-rose); }
+.badge-t8 { background-color: rgba(71, 85, 105, 0.15); color: var(--t8-slate); }
+.badge-t9 { background-color: rgba(79, 70, 229, 0.15); color: var(--t9-indigo); }
+.badge-t10 { background-color: rgba(194, 65, 12, 0.15); color: var(--t10-orange); }
+.badge-t11 { background-color: rgba(162, 28, 175, 0.15); color: var(--t11-fuchsia); }
+.badge-t12 { background-color: rgba(15, 118, 110, 0.15); color: var(--t12-teal); }
+.badge-t13 { background-color: rgba(77, 124, 15, 0.15); color: var(--t13-lime); }
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+}
+
+.meta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.meta-item strong {
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   6. Caixas de Destaque (.callout)
+   -------------------------------------------------------------------------- */
+.callout {
+  padding: 1.1rem 1.35rem;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  border-left: 5px solid var(--muted);
+  background-color: var(--sunk);
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+}
+
+.callout strong {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+}
+
+.callout-tip, .callout.tip {
+  border-left-color: var(--tip-color);
+  background-color: var(--tip-bg);
+}
+
+.callout-warning, .callout.warning {
+  border-left-color: var(--warning-color);
+  background-color: var(--warning-bg);
+}
+
+.callout-danger, .callout.danger {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg);
+}
+
+.callout-law, .callout.law {
+  border-left-color: var(--law-color);
+  background-color: var(--law-bg);
+}
+
+/* --------------------------------------------------------------------------
+   7. Bloco Terminal / Comandos (.terminal-box)
+   -------------------------------------------------------------------------- */
+.terminal-box {
+  background-color: #0A0F13;
+  color: #E2E8F0;
+  border: 1px solid #1E293B;
+  border-radius: var(--radius-md);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.terminal-header {
+  background-color: #151E27;
+  padding: 0.5rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1E2B37;
+}
+
+.terminal-title {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #94A3B8;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.terminal-title::before {
+  content: "● ● ●";
+  letter-spacing: 0.15rem;
+  color: #475569;
+  font-size: 0.65rem;
+}
+
+.btn-copy {
+  background-color: #243242;
+  color: #CBD5E1;
+  border: 1px solid #334155;
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-copy:hover {
+  background-color: #334155;
+  color: #FFFFFF;
+}
+
+.terminal-box pre {
+  margin: 0;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 1rem;
+  color: #E2E8F0;
+}
+
+/* --------------------------------------------------------------------------
+   8. Simulador / Painel de Laboratório (.lab-box)
+   -------------------------------------------------------------------------- */
+.lab-box {
+  background-color: var(--surface);
+  border: 2px solid var(--rule);
+  border-radius: var(--radius-lg);
+  margin: 2rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.lab-header {
+  background-color: var(--sunk);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.lab-header h3 {
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+  font-size: 1.3rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lab-header p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+.lab-body {
+  padding: 1.5rem;
+}
+
+.lab-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  background-color: var(--ground);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+}
+
+.lab-controls > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.lab-controls label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.lab-controls input[type="text"],
+.lab-controls input[type="number"],
+.lab-controls select,
+.lab-controls textarea {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.lab-controls input:focus,
+.lab-controls select:focus,
+.lab-controls textarea:focus {
+  outline: none;
+  border-color: var(--t1-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.lab-output {
+  background-color: #0B1116;
+  color: #38BDF8;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid #1E293B;
+  min-height: 100px;
+  max-height: 400px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.55;
+}
+
+/* Controles e Grid do Laboratório Interativo */
+.lab-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background-color: var(--ground);
+  border-bottom: 1px solid var(--rule);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.form-control {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--t1-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.form-range {
+  width: 100%;
+  accent-color: var(--t1-blue);
+  cursor: pointer;
+}
+
+.flags-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.flag-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.flag-toggle:hover {
+  border-color: var(--t1-blue);
+}
+
+.flag-toggle input[type="checkbox"] {
+  accent-color: var(--t1-blue);
+  cursor: pointer;
+}
+
+.lab-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--rule);
+}
+
+.packet-display-wrap {
+  padding: 1.5rem;
+  background-color: var(--surface);
+}
+
+.packet-display-wrap h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.packet-header-grid {
+  display: grid;
+  grid-template-columns: repeat(32, 1fr);
+  gap: 4px;
+  background-color: var(--ground);
+  padding: 0.75rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.header-field-cell {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-width: 75px;
+}
+
+.header-field-cell.span-8 {
+  grid-column: span 8;
+}
+
+.header-field-cell.span-16 {
+  grid-column: span 16;
+}
+
+.header-field-cell.span-32 {
+  grid-column: span 32;
+}
+
+.header-field-cell .field-title {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.2rem;
+}
+
+.header-field-cell .field-val {
+  font-size: 0.88rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.header-field-cell .field-val.highlight {
+  color: var(--t1-blue);
+}
+
+.header-field-cell .field-val.flag-badge {
+  background-color: var(--sunk);
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+  .packet-header-grid {
+    grid-template-columns: repeat(16, 1fr);
+  }
+  .header-field-cell.span-8 {
+    grid-column: span 16;
+  }
+}
+
+.edr-grid-container {
+  grid-template-columns: 1fr 1fr;
+}
+
+
+/* --------------------------------------------------------------------------
+   9. Botões e Controles Padrão
+   -------------------------------------------------------------------------- */
+.btn-primary {
+  background-color: var(--t1-blue);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface);
+  border-color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   10. Lista de Verificação Interativa (.checklist)
+   -------------------------------------------------------------------------- */
+.checklist {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin: 1.75rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.checklist h4 {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.checklist-progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: var(--sunk);
+  border-radius: var(--radius-pill);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.checklist-progress-fill {
+  height: 100%;
+  background-color: var(--t2-green);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  margin: 0.25rem 0;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast);
+}
+
+.check-item:hover {
+  background-color: var(--sunk);
+}
+
+.check-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--muted);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.check-item input[type="checkbox"]:checked {
+  background-color: var(--t2-green);
+  border-color: var(--t2-green);
+}
+
+.check-item input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.check-item span {
+  font-size: 0.95rem;
+  color: var(--ink);
+  line-height: 1.45;
+  transition: color var(--transition-fast);
+}
+
+.check-item.completed span {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   11. Quiz de Fixação (.quiz, .quiz-item, .quiz-section)
+   -------------------------------------------------------------------------- */
+.quiz-section {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  margin: 2rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.quiz-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.quiz-item {
+  background-color: var(--sunk);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.quiz-question {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 0.85rem;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.quiz-btn {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1.4;
+}
+
+.quiz-btn:hover:not(:disabled) {
+  border-color: var(--t1-blue);
+  background-color: var(--ground);
+}
+
+.quiz-btn.correct {
+  background-color: var(--tip-bg) !important;
+  border-color: var(--t2-green) !important;
+  color: var(--t2-green) !important;
+  font-weight: 600;
+}
+
+.quiz-btn.incorrect {
+  background-color: var(--danger-bg) !important;
+  border-color: var(--danger-color) !important;
+  color: var(--danger-color) !important;
+}
+
+.quiz-feedback {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-top: 0.75rem;
+  border-left: 4px solid var(--rule);
+  background-color: var(--surface);
+}
+
+.quiz-feedback.correct {
+  border-left-color: var(--t2-green);
+  background-color: var(--tip-bg);
+  color: var(--ink);
+}
+
+.quiz-feedback.incorrect {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg);
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   12. Grade de Fatos / Cards Comparativos (.facts-grid, .facts-card)
+   -------------------------------------------------------------------------- */
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.facts-card {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.facts-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.facts-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+}
+
+.facts-card p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   13. Tabelas Técnicas Comparativas
+   -------------------------------------------------------------------------- */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  background-color: var(--surface);
+  text-align: left;
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+th {
+  background-color: var(--sunk);
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: var(--ground);
+}
+
+/* --------------------------------------------------------------------------
+   14. Diagramas de Arquitetura e Fluxo (Mermaid pré-compilado em SVG)
+   -------------------------------------------------------------------------- */
+.diagram-box {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.diagram-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 1rem;
+  background: var(--ground);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.diagram-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.diagram-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.725rem;
+  font-family: var(--font-mono);
+}
+
+.diagram-svg-wrap {
+  padding: 1.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  text-align: center;
+  /* Fundo escuro fixo nos dois temas, como o .terminal-box: os SVGs são gerados
+     com o tema escuro do Mermaid e trazem textos e setas em lightgrey. */
+  background: #172229;
+}
+
+.diagram-svg-wrap svg {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+  margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   15. Rodapé e Referências
+   -------------------------------------------------------------------------- */
+.study-footer {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   16. Responsividade & Impressão (@media)
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  h1 { font-size: 1.85rem; }
+  h2 { font-size: 1.45rem; }
+  .hero-header { padding: 1.25rem; }
+  .lab-body { padding: 1rem; }
+  .lab-controls { flex-direction: column; align-items: stretch; }
+  .top-nav-inner { padding: 0.5rem 1rem; }
+  .nav-title { display: none; }
+  .nav-actions .badge { display: none; }
+  .btn { overflow-wrap: anywhere; }
+  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media print {
+  body {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  .top-nav, .theme-toggle-btn, .btn-copy, .lab-controls button {
+    display: none !important;
+  }
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+  .hero-header, .lab-box, .checklist, .quiz-section {
+    border: 1px solid #CCC !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+}
+
+  </style>
+</head>
+<body data-slug="SOAR-e-Automacao-de-Resposta">
+
+  <!-- Barra de Navegação Superior e Breadcrumbs -->
+  <header class="top-nav">
+    <div class="top-nav-inner">
+      <a href="../index.html" class="nav-back">← Painel de Estudos</a>
+      <span class="nav-title">SOAR: Playbooks e Automação de Resposta</span>
+      <div class="nav-actions">
+        <span class="badge badge-t11">Trilha 11</span>
+        <button class="theme-toggle-btn" aria-label="Alternar tema" onclick="toggleTheme()">
+          <span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal do Treinamento -->
+  <main class="container">
+<!-- Estudo 49: SOAR-e-Automacao-de-Resposta Body Fragment -->
+<article class="study-container" data-slug="soar-e-automacao-de-resposta">
+
+    <!-- SEÇÃO 1: SOAR, PLAYBOOK E ANATOMIA -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: O Beacon Disparou às 09:42, o Isolamento Saiu às 11:18</h2>
+        </div>
+
+        <p class="lead-text">
+            A Trilha 11 deu ao SOC da Ipê Store detecções boas: a regra testada na bancada do Estudo 46, a caçada do Estudo 47 que achou o implante e os alertas de beaconing e de túnel DNS do Estudo 48. Na segunda-feira, o alerta de beacon de WS-FIN-03 entrou na fila às 09:42. O analista de plantão estava com outros onze alertas abertos, assumiu o caso 24 minutos depois, gastou mais meia hora consultando a reputação do IP, o dono da máquina e o histórico, e pediu o isolamento às 11:18. Foram 96 minutos com o canal de controle aberto e as notas fiscais saindo por DNS. Detectar bem não basta: a resposta também precisa ser rápida. Este módulo ensina a codificar a parte repetitiva da resposta num playbook de SOAR, sem deixar a máquina fazer o que só uma pessoa deve decidir.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🤖</span>
+                <strong>Pergunta-chave do módulo</strong>
+            </div>
+            <p>
+                O que o seu playbook deve fazer sozinho, e o que ele nunca deve fazer sem perguntar?
+            </p>
+        </div>
+
+        <h3>O que é SOAR</h3>
+        <p>
+            <strong>SOAR</strong> (<em>Security Orchestration, Automation and Response</em>) é a categoria de ferramenta que junta três coisas, nome popularizado pelo Gartner em 2017. A <strong>orquestração</strong> integra por API as ferramentas que o analista usaria uma a uma: SIEM, EDR, firewall, provedor de identidade (IdP), CMDB, plataforma de inteligência e sistema de chamados. A <strong>automação</strong> executa sequências dessas chamadas sem uma pessoa clicando em cada etapa. A <strong>resposta</strong> é a gestão do caso: quem assumiu, o que foi feito, com qual evidência. O alerta chega por um <strong>webhook</strong> (o SIEM faz um POST com o JSON do alerta) ou por consulta periódica à API, e dispara o playbook certo.
+        </p>
+        <p>
+            No mercado: Splunk SOAR (antigo Phantom), Cortex XSOAR (antigo Demisto, da Palo Alto Networks), Google SecOps SOAR (antigo Siemplify) e Microsoft Sentinel, cujos playbooks rodam sobre Azure Logic Apps. Entre os abertos, Shuffle e a dupla TheHive (gestão de casos) e Cortex (análise de observáveis). Cada vez mais o SIEM e o XDR trazem automação embutida; o conceito é o mesmo em qualquer produto, e o simulador deste módulo é neutro.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🧭</span>
+                <strong>Diferença para o Estudo 18 e para o Estudo 35</strong>
+            </div>
+            <p>
+                No Estudo 18 você percorreu o ciclo da NIST SP 800-61 e um <strong>runbook</strong> em árvore de decisão: passos escritos para uma pessoa executar e julgar. Aqui o foco é codificar parte desses passos para a máquina executar e, principalmente, decidir onde a máquina para e pergunta. No Estudo 35 você escreveu em Python a consulta de reputação com <code>timeout</code>, tratamento do código 429 e do cabeçalho <code>Retry-After</code>: cada bloco de um playbook é exatamente esse tipo de chamada, empacotada para ser reaproveitada. As métricas MTTA e MTTR foram definidas no Estudo 16; aqui elas medem o efeito da automação.
+            </p>
+        </div>
+
+        <h3>Playbook vs runbook</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th></th><th>Runbook</th><th>Playbook de SOAR</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Quem executa</strong></td><td>Uma pessoa, lendo os passos</td><td>A plataforma, chamando APIs; a pessoa entra onde o playbook pede</td></tr>
+                    <tr><td><strong>Formato</strong></td><td>Documento, wiki, árvore de decisão</td><td>Fluxo versionado (visual, YAML, JSON ou código), testado como software</td></tr>
+                    <tr><td><strong>Ponto forte</strong></td><td>Julgamento em situação nova ou ambígua</td><td>Velocidade, consistência e registro completo de cada passo</td></tr>
+                    <tr><td><strong>Ponto fraco</strong></td><td>Lento e variável conforme o analista e o horário</td><td>Repete o erro em escala se a lógica estiver errada</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Os termos se misturam no mercado: muita equipe chama de playbook o documento do Estudo 18. Neste módulo, playbook é o fluxo executável. O padrão aberto <strong>CACAO</strong> (<em>Collaborative Automated Course of Action Operations</em>, OASIS, versão 2.0) descreve playbooks em JSON para que possam ser trocados entre organizações e ferramentas.
+        </p>
+
+        <h3>Anatomia: gatilho, enriquecimento, decisão, ação</h3>
+        <p>
+            Todo playbook tem quatro partes. O <strong>gatilho</strong> é o evento que o inicia (um alerta de uma regra específica). O <strong>enriquecimento</strong> busca contexto que o alerta não traz: a <strong>reputação</strong> do IP, domínio ou hash; o <strong>ativo</strong> na CMDB (estação ou servidor, criticidade, dono); o <strong>usuário</strong> no IdP (conta comum, executiva ou de serviço, viagem registrada no RH). A <strong>decisão</strong> usa esse contexto para escolher o caminho: encerrar como falso positivo, conter, pedir aprovação ou escalar. A <strong>ação</strong> é a contenção propriamente dita, sempre acompanhada do registro no chamado.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Anatomia de um Playbook de SOAR</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <div class="diagram-svg-wrap" role="img" aria-label="Anatomia de um Playbook de SOAR">
+    <svg id="my-svg" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 661.055px; background-color: transparent;" viewBox="4 4 661.0546875 1564" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#my-svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#ccc;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#a44141;}#my-svg .error-text{fill:#ddd;stroke:#ddd;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:lightgrey;stroke:lightgrey;}#my-svg .marker.cross{stroke:lightgrey;}#my-svg svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#my-svg p{margin:0;}#my-svg .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#ccc;}#my-svg .cluster-label text{fill:#F9FFFE;}#my-svg .cluster-label span{color:#F9FFFE;}#my-svg .cluster-label span p{background-color:transparent;}#my-svg .label text,#my-svg span{fill:#ccc;color:#ccc;}#my-svg .node rect,#my-svg .node circle,#my-svg .node ellipse,#my-svg .node polygon,#my-svg .node path{fill:#1f2020;stroke:#ccc;stroke-width:1px;}#my-svg .rough-node .label text,#my-svg .node .label text,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-anchor:middle;}#my-svg .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#my-svg .rough-node .label,#my-svg .node .label,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-align:center;}#my-svg .node.clickable{cursor:pointer;}#my-svg .root .anchor path{fill:lightgrey!important;stroke-width:0;stroke:lightgrey;}#my-svg .arrowheadPath{fill:lightgrey;}#my-svg .edgePaths .path{stroke:lightgrey;stroke-width:1px;}#my-svg .flowchart-link{stroke:lightgrey;fill:none;}#my-svg .edgeLabel{background-color:hsl(0, 0%, 34.4117647059%);text-align:center;}#my-svg .edgeLabel p{background-color:hsl(0, 0%, 34.4117647059%);}#my-svg .edgeLabel rect{opacity:0.5;background-color:hsl(0, 0%, 34.4117647059%);fill:hsl(0, 0%, 34.4117647059%);}#my-svg .labelBkg{background-color:rgba(87.75, 87.75, 87.75, 0.5);}#my-svg .cluster rect{fill:hsl(180, 1.5873015873%, 28.3529411765%);stroke:rgba(255, 255, 255, 0.25);stroke-width:1px;}#my-svg .cluster text{fill:#F9FFFE;}#my-svg .cluster span{color:#F9FFFE;}#my-svg .node .collapsed-indicator{fill:rgba(255, 255, 255, 0.25);stroke:none;opacity:0.6;}#my-svg .node .collapsed-separator{stroke:rgba(255, 255, 255, 0.25);stroke-width:0.75px;}#my-svg div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(20, 1.5873015873%, 12.3529411765%);border:1px solid rgba(255, 255, 255, 0.25);border-radius:2px;pointer-events:none;z-index:100;}#my-svg .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#ccc;}#my-svg rect.text{fill:none;stroke-width:0;}#my-svg .icon-shape,#my-svg .image-shape{background-color:hsl(0, 0%, 34.4117647059%);text-align:center;}#my-svg .icon-shape p,#my-svg .image-shape p{background-color:hsl(0, 0%, 34.4117647059%);padding:2px;}#my-svg .icon-shape .label rect,#my-svg .image-shape .label rect{opacity:0.5;background-color:hsl(0, 0%, 34.4117647059%);fill:hsl(0, 0%, 34.4117647059%);}#my-svg .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#my-svg .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#my-svg .node .neo-node{stroke:#ccc;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#my-svg [data-look="neo"].node path{stroke:url(#my-svg-gradient);stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#ccc;filter:none;}#my-svg [data-look="neo"].node circle{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node circle .state-start{fill:#000000;}#my-svg [data-look="neo"].icon-shape .icon{fill:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="my-svg_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"/></marker><marker id="my-svg_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"/></marker><g class="root"><g class="clusters"/><g class="edges edgePaths"><path d="M217.4296875,132L217.4296875,168" id="my-svg-L_G_E_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_G_E_0" data-points="W3sieCI6MjE3LjQyOTY4NzUsInkiOjEzMn0seyJ4IjoyMTcuNDI5Njg3NSwieSI6MTcyfV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M217.4296875,292L217.4296875,328" id="my-svg-L_E_F_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_E_F_0" data-points="W3sieCI6MjE3LjQyOTY4NzUsInkiOjI5Mn0seyJ4IjoyMTcuNDI5Njg3NSwieSI6MzMyfV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M187.763,500.333 L187.763,530 L187.763,542.929 Q187.763,550 180.692,550 L66.071,550 Q59,550 59,557.071 L59,582 L59,757 L59,1056 L59,1180 L59,1204.929 Q59,1212 66.071,1212 L150,1212 A6,6 0 0 1 162,1212 L249.429,1212 Q256.5,1212 256.5,1219.071 L256.5,1236" id="my-svg-L_F_ESC_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 1054.125732421875 4; stroke-dashoffset: 0;" data-edge="true" data-et="edge" data-id="L_F_ESC_0" data-points="W3sieCI6MTg3Ljc2MzAyMDgzMzMzMzMxLCJ5Ijo1MDAuMzMzMzA5MTczNTg0fSx7IngiOjE4Ny43NjMwMjA4MzMzMzMzMSwieSI6NTMwfSx7IngiOjE4Ny43NjMwMjA4MzMzMzMzMSwieSI6NTUwfSx7IngiOjU5LCJ5Ijo1NTB9LHsieCI6NTksInkiOjU4Mn0seyJ4Ijo1OSwieSI6NzU3fSx7IngiOjU5LCJ5IjoxMDU2fSx7IngiOjU5LCJ5IjoxMTgwfSx7IngiOjU5LCJ5IjoxMjEyfSx7IngiOjI1Ni41LCJ5IjoxMjEyfSx7IngiOjI1Ni41LCJ5IjoxMjQwfV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M247.09635416666669,500.333309173584L247.09635416666669,530L247.09635416666669,542.9289321881345Q247.09635416666669,550 254.16742197853216,550L354.8586196881345,550Q361.9296875,550 361.9296875,557.0710678118655L361.9296875,630" id="my-svg-L_F_D_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 235.17172241210938 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_F_D_0" data-points="W3sieCI6MjQ3LjA5NjM1NDE2NjY2NjY5LCJ5Ijo1MDAuMzMzMzA5MTczNTg0fSx7IngiOjI0Ny4wOTYzNTQxNjY2NjY2OSwieSI6NTMwfSx7IngiOjI0Ny4wOTYzNTQxNjY2NjY2OSwieSI6NTUwfSx7IngiOjM2MS45Mjk2ODc1LCJ5Ijo1NTB9LHsieCI6MzYxLjkyOTY4NzUsInkiOjYzNH1d" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M305.4296875,823.4999952316284L305.4296875,880L305.4296875,892.9289321881345Q305.4296875,900 298.3586196881345,900L163.07106781186548,900Q156,900 156,907.0710678118655L156,992" id="my-svg-L_D_FP_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 308.6014099121094 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_D_FP_0" data-points="W3sieCI6MzA1LjQyOTY4NzUsInkiOjgyMy40OTk5OTUyMzE2Mjg0fSx7IngiOjMwNS40Mjk2ODc1LCJ5Ijo4ODB9LHsieCI6MzA1LjQyOTY4NzUsInkiOjkwMH0seyJ4IjoxNTYsInkiOjkwMH0seyJ4IjoxNTYsInkiOjk5Nn1d" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M418.4296875,823.4999952316284L418.4296875,880L418.4296875,892.9289321881345Q418.4296875,900 425.5007553118655,900L560.8586196881345,900Q567.9296875,900 567.9296875,907.0710678118655L567.9296875,932L567.9296875,1180L567.9296875,1204.9289321881345Q567.9296875,1212 560.8586196881345,1212L557.0007553118655,1212Q549.9296875,1212 549.9296875,1219.0710678118655L549.9296875,1228" id="my-svg-L_D_AUTO_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 557.3434448242188 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_D_AUTO_0" data-points="W3sieCI6NDE4LjQyOTY4NzUsInkiOjgyMy40OTk5OTUyMzE2Mjg0fSx7IngiOjQxOC40Mjk2ODc1LCJ5Ijo4ODB9LHsieCI6NDE4LjQyOTY4NzUsInkiOjkwMH0seyJ4Ijo1NjcuOTI5Njg3NSwieSI6OTAwfSx7IngiOjU2Ny45Mjk2ODc1LCJ5Ijo5MzJ9LHsieCI6NTY3LjkyOTY4NzUsInkiOjExODB9LHsieCI6NTY3LjkyOTY4NzUsInkiOjEyMTJ9LHsieCI6NTQ5LjkyOTY4NzUsInkiOjEyMTJ9LHsieCI6NTQ5LjkyOTY4NzUsInkiOjEyMzJ9XQ==" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M361.9296875,880L361.9296875,980" id="my-svg-L_D_APR_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 96 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_D_APR_0" data-points="W3sieCI6MzYxLjkyOTY4NzUsInkiOjg4MH0seyJ4IjozNjEuOTI5Njg3NSwieSI6OTg0fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M383.9296875,1128L383.9296875,1140.9289321881345Q383.9296875,1148 391.0007553118655,1148L428.8586196881345,1148Q435.9296875,1148 435.9296875,1155.0710678118655L435.9296875,1204.9289321881345Q435.9296875,1212 443.0007553118655,1212L498.8586196881345,1212Q505.9296875,1212 505.9296875,1219.0710678118655L505.9296875,1228" id="my-svg-L_APR_AUTO_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 207.3433837890625 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_APR_AUTO_0" data-points="W3sieCI6MzgzLjkyOTY4NzUsInkiOjExMjh9LHsieCI6MzgzLjkyOTY4NzUsInkiOjExNDh9LHsieCI6NDM1LjkyOTY4NzUsInkiOjExNDh9LHsieCI6NDM1LjkyOTY4NzUsInkiOjEyMTJ9LHsieCI6NTA1LjkyOTY4NzUsInkiOjEyMTJ9LHsieCI6NTA1LjkyOTY4NzUsInkiOjEyMzJ9XQ==" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M339.9296875,1128L339.9296875,1140.9289321881345Q339.9296875,1148 332.8586196881345,1148L307.5710678118655,1148Q300.5,1148 300.5,1155.0710678118655L300.5,1236" id="my-svg-L_APR_ESC_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 138.1013641357422 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_APR_ESC_0" data-points="W3sieCI6MzM5LjkyOTY4NzUsInkiOjExMjh9LHsieCI6MzM5LjkyOTY4NzUsInkiOjExNDh9LHsieCI6MzAwLjUsInkiOjExNDh9LHsieCI6MzAwLjUsInkiOjEyNDB9XQ==" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M527.9296875,1376L527.9296875,1388.9289321881345Q527.9296875,1396 520.8586196881345,1396L318.5710678118655,1396Q311.5,1396 311.5,1403.0710678118655L311.5,1412" id="my-svg-L_AUTO_REG_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 243.10140991210938 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_AUTO_REG_0" data-points="W3sieCI6NTI3LjkyOTY4NzUsInkiOjEzNzZ9LHsieCI6NTI3LjkyOTY4NzUsInkiOjEzOTZ9LHsieCI6MzExLjUsInkiOjEzOTZ9LHsieCI6MzExLjUsInkiOjE0MTZ9XQ==" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M156,1116L156,1180L156,1304L156,1388.9289321881345Q156,1396 163.07106781186548,1396L238.42893218813452,1396Q245.5,1396 245.5,1403.0710678118655L245.5,1412" id="my-svg-L_FP_REG_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 376.1717224121094 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_FP_REG_0" data-points="W3sieCI6MTU2LCJ5IjoxMTE2fSx7IngiOjE1NiwieSI6MTE4MH0seyJ4IjoxNTYsInkiOjEzMDR9LHsieCI6MTU2LCJ5IjoxMzk2fSx7IngiOjI0NS41LCJ5IjoxMzk2fSx7IngiOjI0NS41LCJ5IjoxNDE2fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M278.5,1360L278.5,1412" id="my-svg-L_ESC_REG_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 48 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_ESC_REG_0" data-points="W3sieCI6Mjc4LjUsInkiOjEzNjB9LHsieCI6Mjc4LjUsInkiOjE0MTZ9XQ==" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/></g><g class="edgeLabels"><g class="edgeLabel" transform="translate(58.5078125, 932)"><g class="label" data-id="L_F_ESC_0" transform="translate(-46.5078125, -12)"><foreignObject width="93.015625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>não: timeout</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(361.59375, 582)"><g class="label" data-id="L_F_D_0" transform="translate(-12.1640625, -12)"><foreignObject width="24.328125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>sim</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(155.53125, 932)"><g class="label" data-id="L_D_FP_0" transform="translate(-20.03125, -12)"><foreignObject width="40.0625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>limpo</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(567.4921875, 1056)"><g class="label" data-id="L_D_AUTO_0" transform="translate(-89.5625, -12)"><foreignObject width="179.125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>malicioso, baixo impacto</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(361.875, 932)"><g class="label" data-id="L_D_APR_0" transform="translate(-45.4453125, -12)"><foreignObject width="90.890625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>alto impacto</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(435.7734375, 1180)"><g class="label" data-id="L_APR_AUTO_0" transform="translate(-32.84375, -12)"><foreignObject width="65.6875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>aprovada</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(300.1796875, 1180)"><g class="label" data-id="L_APR_ESC_0" transform="translate(-70.1796875, -12)"><foreignObject width="140.359375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>negada ou expirada</p></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default" id="my-svg-flowchart-G-0" data-look="neo" transform="translate(217.4296875, 72)"><rect class="basic label-container" style="" x="-76" y="-60" width="152" height="120"/><g class="label" style="" transform="translate(-60, -48)"><rect/><foreignObject width="120" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Gatilho<br /><small>alerta do SIEM, EDR ou NSM via webhook</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-E-1" data-look="neo" transform="translate(217.4296875, 232)"><rect class="basic label-container" style="" x="-76" y="-60" width="152" height="120"/><g class="label" style="" transform="translate(-60, -48)"><rect/><foreignObject width="120" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Enriquecimento<br /><small>reputação, ativo (CMDB), usuário (IdP)</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-F-2" data-look="neo" transform="translate(217.4296875, 431)"><polygon points="99,0 198,-99 99,-198 0,-99" class="label-container" transform="translate(-98.5, 99)"/><g class="label" style="" transform="translate(-60, -24)"><rect/><foreignObject width="120" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>A fonte respondeu?</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-D-3" data-look="neo" transform="translate(361.9296875, 757)"><polygon points="123,0 246,-123 123,-246 0,-123" class="label-container" transform="translate(-122.5, 123)"/><g class="label" style="" transform="translate(-60, -48)"><rect/><foreignObject width="120" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Decisão<br /><small>reputação, tipo de ativo, lista de exceção</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-FP-4" data-look="neo" transform="translate(156, 1056)"><rect class="basic label-container" style="" x="-76" y="-60" width="152" height="120"/><g class="label" style="" transform="translate(-60, -48)"><rect/><foreignObject width="120" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Encerrar como falso positivo<br /><small>com o contexto anexado</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-AUTO-5" data-look="neo" transform="translate(527.9296875, 1304)"><rect class="basic label-container" style="" x="-76" y="-72" width="152" height="144"/><g class="label" style="" transform="translate(-60, -60)"><rect/><foreignObject width="120" height="120"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Ação automática<br /><small>isolar estação, bloquear IP malicioso</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-APR-6" data-look="neo" transform="translate(361.9296875, 1056)"><rect class="basic label-container" style="" x="-76" y="-72" width="152" height="144"/><g class="label" style="" transform="translate(-60, -60)"><rect/><foreignObject width="120" height="120"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Aprovação humana<br /><small>servidor, conta, parceiro, alvo na exceção</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-ESC-7" data-look="neo" transform="translate(278.5, 1300)"><rect class="basic label-container" style="" x="-76" y="-60" width="152" height="120"/><g class="label" style="" transform="translate(-60, -48)"><rect/><foreignObject width="120" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Escalar ao analista<br /><small>caso enriquecido e priorizado</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-REG-8" data-look="neo" transform="translate(278.5, 1488)"><rect class="basic label-container" style="" x="-76" y="-72" width="152" height="144"/><g class="label" style="" transform="translate(-60, -60)"><rect/><foreignObject width="120" height="120"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Chamado e trilha de auditoria<br /><small>quem, o quê, quando e por quê</small></p></span></div></foreignObject></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#FFFFFF"/></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#FFFFFF"/></filter></defs><linearGradient id="my-svg-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#cccccc" stop-opacity="1"/><stop offset="100%" stop-color="hsl(180, 0%, 18.3529411765%)" stop-opacity="1"/></linearGradient></svg>
+  </div>
+        </div>
+
+        <h3>Cada bloco é uma chamada de API</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Bloco</th><th>Sistema</th><th>Chamada típica</th><th>Cuidado</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Gatilho</strong></td><td>SIEM, EDR, sensor NSM</td><td>Webhook com o JSON do alerta</td><td>Validar a origem (token, assinatura HMAC) e deduplicar reenvios</td></tr>
+                    <tr><td><strong>Enriquecer reputação</strong></td><td>Plataforma de inteligência (MISP, VirusTotal, AbuseIPDB)</td><td><code>GET /ip/{ip}</code>, <code>GET /files/{hash}</code></td><td>Limite de consultas, <code>timeout</code>, resposta "desconhecido"</td></tr>
+                    <tr><td><strong>Enriquecer ativo</strong></td><td>CMDB</td><td><code>GET /ci?hostname=WS-FIN-03</code></td><td>CMDB desatualizada classifica servidor como estação</td></tr>
+                    <tr><td><strong>Enriquecer usuário</strong></td><td>IdP (Active Directory, Entra ID)</td><td><code>GET /users/{upn}</code></td><td>Contas de serviço e executivas têm regras próprias</td></tr>
+                    <tr><td><strong>Isolar host</strong></td><td>EDR</td><td><code>POST /hosts/{id}/contain</code></td><td>Derruba tudo o que roda na máquina, menos o canal com o console</td></tr>
+                    <tr><td><strong>Bloquear IP/domínio</strong></td><td>Firewall, proxy, DNS (RPZ)</td><td><code>POST /blocklist</code></td><td>IP compartilhado (CDN, parceiro) bloqueia mais do que o atacante</td></tr>
+                    <tr><td><strong>Desativar conta</strong></td><td>IdP</td><td>Desabilitar a conta e revogar as sessões</td><td>Afeta uma pessoa ou uma integração inteira</td></tr>
+                    <tr><td><strong>Abrir chamado</strong></td><td>ITSM</td><td><code>POST /incidents</code> com chave de deduplicação</td><td>Sem chave, cada reenvio vira um chamado novo</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: O QUE AUTOMATIZAR, APROVAÇÃO, EXCEÇÕES, FALHAS E MÉTRICAS -->
+    <section class="study-section" id="automacao">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Automatizar com Segurança: Aprovação, Exceções, Falhas e Métricas</h2>
+        </div>
+
+        <h3>O que automatizar</h3>
+        <p>
+            Duas perguntas decidem: quanto custa a ação se o alerta for falso positivo, e quão fácil é desfazê-la. Enriquecer não muda nada no ambiente e pode rodar sempre. Isolar uma estação com reputação maliciosa confirmada custa pouco se estiver errado e economiza muito se estiver certo. Isolar o servidor que recebe as vendas dos caixas, bloquear o IP do gateway de pagamento ou desativar a conta de um diretor custa caro em qualquer erro. A <strong>precisão</strong> da regra, medida na bancada do Estudo 46, entra na conta: com 98% de precisão, a contenção automática erra pouco; com 30%, o playbook deve só enriquecer e priorizar.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Faixa</th><th>Exemplos</th><th>Por quê</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Automatizar sempre</strong></td><td>Enriquecer, deduplicar, abrir ou atualizar o chamado, notificar o dono, coletar evidências voláteis</td><td>Não altera o ambiente; só economiza tempo</td></tr>
+                    <tr><td><strong>Automatizar com condição</strong></td><td>Isolar estação com reputação maliciosa ou suspeita; bloquear IP malicioso fora da lista de exceção</td><td>Erro barato e reversível; acerto rápido vale muito</td></tr>
+                    <tr><td><strong>Sempre com aprovação humana</strong></td><td>Desativar conta, isolar servidor, bloquear faixa ou IP de parceiro, apagar e-mail de todas as caixas</td><td>Alto impacto: o erro para o negócio ou afeta uma pessoa</td></tr>
+                    <tr><td><strong>Nunca automatizar</strong></td><td>Apagar dados, reinstalar máquinas, comunicar clientes, ANPD ou imprensa</td><td>Irreversível ou exige julgamento jurídico e de negócio (Estudo 43)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Human-in-the-loop: aprovação humana para ações de alto impacto</h3>
+        <p>
+            O princípio de <em>human-in-the-loop</em> (pessoa no circuito) significa que o playbook prepara tudo e para antes da ação: o analista recebe o pedido de aprovação já com a reputação, o dono do ativo, o histórico e a ação proposta, e responde com um clique. A contenção ainda sai em minutos, não em horas, e quem conhece o contexto evita o erro caro. Três regras práticas: o pedido mostra o contexto, não só "aprovar isolamento?"; o pedido tem prazo, e se ninguém responder em 15 minutos o caso <strong>escala</strong> para o plantão, nunca é aprovado sozinho; e pedidos demais geram fadiga, e a pessoa passa a aprovar sem ler. Por isso a aprovação humana fica reservada às ações de alto impacto.
+        </p>
+
+        <h3>Listas de exceção para ativos críticos</h3>
+        <p>
+            A <strong>lista de exceção</strong> é o freio de segurança do playbook: ativos críticos (controlador de domínio, ERP, concentrador dos caixas), IPs de parceiros (gateway de pagamento, API do marketplace), contas de serviço e contas executivas. Uma ação contra um item da lista nunca é executada automaticamente: vira pedido de aprovação. Exceção não quer dizer "não responder"; quer dizer "uma pessoa decide". Cada item tem motivo, dono e data de revisão, como as exceções documentadas do Estudo 48. Guarde a lista no próprio SOAR: se ela depender da CMDB e a CMDB cair, o freio some junto.
+        </p>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🚨</span>
+                <strong>O erro em escala</strong>
+            </div>
+            <p>
+                Um analista que erra isola uma máquina. Um playbook que erra isola todas as que casarem com a condição, em segundos. A regra de beaconing antiga do Estudo 48, sem o critério de tamanho, dispara para o SRV-PDV-01, que manda o lote de vendas ao gateway de pagamento a cada 60 s. Um playbook "isolar e bloquear tudo o que for beacon" para os caixas das 14 lojas e bloqueia o parceiro de pagamento. Limite também o volume: um disjuntor que suspende a automação depois de, por exemplo, cinco isolamentos por hora impede que uma regra quebrada derrube a frota.
+            </p>
+        </div>
+
+        <h3>Quando a fonte falha: desconhecido não é limpo</h3>
+        <p>
+            Toda integração falha em algum momento: a API de reputação responde 429 por excesso de consultas, a CMDB sai do ar para manutenção, o IdP demora. O bloco precisa de <code>timeout</code> curto, novas tentativas com <strong>backoff</strong> exponencial (esperar 1 s, 2 s, 4 s), respeito ao <code>Retry-After</code> e, esgotadas as tentativas, um resultado explícito de "sem dado". A decisão seguinte nunca pode tratar "sem dado" como "limpo": um playbook que encerra o alerta quando a reputação não responde transforma uma queda de fornecedor em ameaças fechadas como falso positivo. O comportamento <strong>fail-safe</strong> é escalar ao analista com o que se tem. O mesmo vale para o veredito "desconhecido": o implante recompilado do Estudo 47 tem um hash que ninguém viu, e desconhecido não é limpo.
+        </p>
+
+        <h3>Idempotência e deduplicação</h3>
+        <p>
+            Uma operação é <strong>idempotente</strong> quando executá-la duas vezes tem o mesmo efeito que executá-la uma vez. Alertas chegam repetidos: o SIEM reprocessa uma janela, duas regras disparam para o mesmo host, a rede falha e o webhook é reenviado. Sem idempotência, o playbook abre um segundo chamado, manda outra ordem de isolamento e bloqueia de novo o mesmo IP, poluindo o registro e às vezes falhando porque o objeto já existe. A receita: consultar o estado antes de agir ("já está isolado?"), usar uma chave de <strong>deduplicação</strong> para o caso (host, conta ou indicador) e atualizar o chamado existente em vez de criar outro.
+        </p>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Python — um bloco de contenção idempotente, com exceção e fail-safe (ilustrativo)</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-soar-py')">Copiar</button>
+            </div>
+            <pre><code id="code-soar-py">import requests
+
+EXCECOES = {"host": {"SRV-PDV-01", "SRV-ERP-01", "DC-01"},
+            "indicador": {"198.51.100.60", "198.51.100.77"},
+            "conta": {"svc-erp-integracao", "carlos.mendes"}}
+
+def reputacao(indicador):
+    """Veredito da plataforma de inteligência, ou None se a fonte não respondeu."""
+    try:
+        r = requests.get(f"https://ti.ipestore.example/api/v1/indicadores/{indicador}", timeout=5)
+        r.raise_for_status()
+        return r.json()["veredito"]          # maliciosa, suspeita, limpa ou desconhecida
+    except requests.RequestException:
+        return None                           # sem dado: quem chama decide, nunca "limpa"
+
+def isolar(host, caso):
+    if host in EXCECOES["host"]:
+        return caso.pedir_aprovacao(f"isolar {host}", prazo_min=15, ao_expirar="escalar")
+    if edr.get(f"/hosts/{host}").json()["isolamento"] == "isolado":
+        caso.registrar(f"{host} já estava isolado: nada a fazer")   # idempotente
+        return
+    edr.post(f"/hosts/{host}/contain", json={"caso": caso.id})
+    caso.registrar(f"{host} isolado pelo playbook")
+
+veredito = reputacao(alerta["indicador"])
+if veredito is None:
+    caso.escalar("fonte de reputação fora do ar")                  # fail-safe
+elif veredito in ("maliciosa", "suspeita", "desconhecida"):
+    isolar(alerta["host"], caso)
+else:
+    caso.encerrar("reputação limpa; contexto anexado ao chamado")</code></pre>
+        </div>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">YAML — o mesmo playbook descrito de forma neutra (cada produto tem a sua sintaxe)</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-soar-yaml')">Copiar</button>
+            </div>
+            <pre><code id="code-soar-yaml">playbook: beacon-https-periodico
+versao: 3
+gatilho: alerta "Beacon HTTPS periódico" (severidade alta)
+politicas:
+  lista_de_excecao: sim            # alvo na lista vira pedido de aprovação
+  sem_dado: escalar                # fail-safe
+passos:
+  - enriquecer: reputacao(indicador)   # timeout 5 s, 3 tentativas com backoff
+  - enriquecer: cmdb(host)
+  - decidir: reputacao in [maliciosa, suspeita, desconhecida]
+    senao: encerrar_como_falso_positivo
+  - chamado: abrir_ou_atualizar(chave=host)
+  - decidir: cmdb.tipo == estacao
+    senao: exigir_aprovacao(prazo=15m, ao_expirar=escalar)
+  - acao: edr.isolar(host)             # idempotente: confere o estado antes
+  - acao: firewall.bloquear(indicador)</code></pre>
+        </div>
+
+        <h3>MTTA e MTTR como medida da automação</h3>
+        <p>
+            O <strong>MTTA</strong> (<em>Mean Time to Acknowledge</em>) mede do alerta até alguém, ou algo, assumi-lo; o <strong>MTTR</strong> (<em>Mean Time to Respond</em>, aqui até a contenção ou o encerramento) mede do alerta até a resposta. Com o processo manual da Ipê Store, a fila tem MTTA médio de 24,8 minutos e MTTR de 76,5 minutos. A automação derruba os dois de formas diferentes: o enriquecimento automático entrega o caso pronto ao analista, e a contenção automática resolve em segundos. Meça sempre com e sem automação, na mesma fila, e desconfie de médias bonitas: um playbook que encerra ameaças como falso positivo tem MTTR ótimo, porque o que ele não resolveu some da conta. Acompanhe junto o número de ações revertidas, de falsos negativos e de pedidos de aprovação negados.
+        </p>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Decisão automatizada, trilha de auditoria e LGPD</strong>
+            </div>
+            <p>
+                Desativar a conta de um funcionário é uma decisão sobre uma pessoa. O art. 20 da LGPD (Lei 13.709/2018) garante ao titular o direito de pedir a revisão de decisões tomadas unicamente com base em tratamento automatizado que afetem seus interesses. A aprovação humana nas ações sobre contas atende a isso na origem. Além disso, todo passo do playbook precisa deixar <strong>trilha de auditoria</strong>: quem ou o que agiu, sobre qual alvo, com qual dado de enriquecimento, quem aprovou e quando. É essa trilha que sustenta a análise pós-incidente do Estudo 18 e a função Respond do NIST CSF 2.0 (RS.MA e RS.MI).
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Montador de Playbook</h2>
+        </div>
+
+        <p class="lead-text">
+            Monte o playbook de triagem da Ipê Store encadeando blocos e rode-o contra a fila fixa de dez alertas das 09:42 às 10:12. O simulador mostra, para cada alerta, o passo a passo, o MTTA e o MTTR com e sem automação, e o custo de cada erro: servidor de produção isolado, IP de parceiro bloqueado, conta desativada à toa ou ameaça encerrada como falso positivo. O playbook inicial é de propósito ingênuo. Depois de acertar, ligue as falhas de fonte e veja se ele continua seguro.
+        </p>
+
+        <div class="lab-box soar-lab" id="soar-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Orquestração da resposta</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Montador de Playbook do SOC da Ipê Store</h3>
+                    <p id="soar-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body" style="min-width: 0;">
+                <details style="margin-bottom: 0.5rem;">
+                    <summary style="cursor: pointer; font-size: 0.88rem;">Fila de alertas (<span id="soar-total-fila"></span> alertas)</summary>
+                    <div id="soar-fila" role="region" aria-label="Fila de alertas" tabindex="0" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.3rem; max-height: 22rem; overflow-y: auto; font-size: 0.8rem; margin-top: 0.4rem;"></div>
+                </details>
+                <details>
+                    <summary style="cursor: pointer; font-size: 0.88rem;">Lista de exceção (<span id="soar-total-excecoes"></span> itens)</summary>
+                    <div id="soar-excecoes" role="region" aria-label="Lista de exceção" tabindex="0" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.3rem; font-size: 0.8rem; margin-top: 0.4rem;"></div>
+                </details>
+
+                <h4 style="margin-top: 1.3rem;">1. Blocos disponíveis</h4>
+                <p style="font-size: 0.85rem; margin: 0 0 0.5rem 0;">Clique para acrescentar ao fim do playbook. Passe o mouse ou o foco num bloco para ver o que ele faz.</p>
+                <div id="soar-paleta" style="display: flex; flex-wrap: wrap; gap: 0.4rem;"></div>
+
+                <h4 style="margin-top: 1.3rem;">2. Seu playbook</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; font-size: 0.85rem; margin-bottom: 0.6rem;">
+                    <label for="soar-preset">Modelo</label>
+                    <select class="form-control" id="soar-preset" style="min-width: 0; max-width: 100%; flex: 1 1 14rem;"></select>
+                    <button class="btn-secondary" type="button" onclick="carregarPresetSoar()">Carregar modelo</button>
+                </div>
+                <div id="soar-passos" role="region" aria-label="Passos do playbook" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem; font-size: 0.84rem;"></div>
+
+                <fieldset style="border: 0; padding: 0; margin: 1rem 0 0 0; min-width: 0;">
+                    <legend style="font-size: 0.88rem; margin-bottom: 0.4rem; font-weight: 600;">Políticas do playbook</legend>
+                    <div style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem; font-size: 0.84rem;">
+                        <div style="display: flex; gap: 0.45rem; align-items: flex-start; min-width: 0;">
+                            <input type="checkbox" id="soar-pol-excecoes" style="margin-top: 0.2rem;">
+                            <label for="soar-pol-excecoes">Consultar a lista de exceção antes de cada ação: alvo na lista vira pedido de aprovação</label>
+                        </div>
+                        <div style="display: flex; gap: 0.45rem; align-items: flex-start; min-width: 0;">
+                            <input type="checkbox" id="soar-pol-escalar" style="margin-top: 0.2rem;">
+                            <label for="soar-pol-escalar">Se faltar o dado que uma decisão usa (fonte fora do ar ou enriquecimento ausente), escalar ao analista</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset style="border: 0; padding: 0; margin: 0.9rem 0 0 0; min-width: 0;">
+                    <legend style="font-size: 0.88rem; margin-bottom: 0.4rem; font-weight: 600;">Cenários de falha</legend>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: 0.35rem 0.9rem; font-size: 0.84rem;">
+                        <div style="display: flex; gap: 0.45rem; align-items: flex-start; min-width: 0;">
+                            <input type="checkbox" id="soar-falha-reputacao" style="margin-top: 0.2rem;">
+                            <label for="soar-falha-reputacao">Plataforma de reputação fora do ar (timeout de 30 s)</label>
+                        </div>
+                        <div style="display: flex; gap: 0.45rem; align-items: flex-start; min-width: 0;">
+                            <input type="checkbox" id="soar-falha-cmdb" style="margin-top: 0.2rem;">
+                            <label for="soar-falha-cmdb">CMDB fora do ar</label>
+                        </div>
+                        <div style="display: flex; gap: 0.45rem; align-items: flex-start; min-width: 0;">
+                            <input type="checkbox" id="soar-falha-idp" style="margin-top: 0.2rem;">
+                            <label for="soar-falha-idp">Provedor de identidade (IdP) fora do ar</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <details style="margin-top: 0.9rem;">
+                    <summary style="cursor: pointer; font-size: 0.85rem;">Ver o playbook como código</summary>
+                    <pre id="soar-codigo" role="region" aria-label="Playbook como código" tabindex="0" style="max-height: 18rem; overflow: auto; max-width: 100%; font-size: 0.74rem; background: var(--sunk); border-radius: var(--radius-sm); padding: 0.5rem; margin: 0.4rem 0 0 0;"></pre>
+                </details>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.9rem;">
+                    <button class="btn-primary" type="button" onclick="rodarPlaybookSoar()">Rodar playbook na fila</button>
+                </div>
+
+                <h4 style="margin-top: 1.3rem;">3. Resultado</h4>
+                <div id="soar-placar" aria-live="polite" style="font-size: 0.85rem;"></div>
+                <div id="soar-resultados" role="region" aria-label="Resultado por alerta" tabindex="0" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.4rem; max-height: 40rem; overflow-y: auto; font-size: 0.8rem; margin-top: 0.6rem;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de um Playbook de Resposta</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista antes de colocar um playbook em produção ou ao revisar os que já rodam. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="soar-e-automacao-de-resposta">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-soar-1">
+                <label for="chk-soar-1"><strong>Gatilho:</strong> o playbook dispara por regras específicas com precisão medida (Estudo 46), com origem do webhook validada.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-soar-2">
+                <label for="chk-soar-2"><strong>Enriquecimento:</strong> reputação, ativo e usuário consultados antes de qualquer decisão, com <code>timeout</code>, novas tentativas com backoff e resultado explícito de "sem dado".</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-soar-3">
+                <label for="chk-soar-3"><strong>Fail-safe:</strong> fonte fora do ar ou veredito desconhecido escalam ao analista; nenhuma decisão trata ausência de dado como "limpo".</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-soar-4">
+                <label for="chk-soar-4"><strong>Aprovação humana:</strong> ações de alto impacto (conta, servidor, parceiro) pedem aprovação com contexto e prazo; ao expirar, escalam, nunca se aprovam sozinhas.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-soar-5">
+                <label for="chk-soar-5"><strong>Lista de exceção:</strong> ativos críticos, IPs de parceiros, contas de serviço e executivas listados no próprio SOAR, com motivo, dono e data de revisão.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-soar-6">
+                <label for="chk-soar-6"><strong>Idempotência:</strong> cada ação confere o estado antes de agir e o chamado usa chave de deduplicação; existe um limite de ações por hora (disjuntor).</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-soar-7">
+                <label for="chk-soar-7"><strong>Medição e auditoria:</strong> MTTA e MTTR medidos com e sem automação, junto com ações revertidas e falsos negativos; todo passo deixa trilha de auditoria.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Playbook vs runbook):</strong> A equipe já tem o runbook de "conta comprometida" do Estudo 18, revisado e testado em tabletop. O gerente quer "transformar o runbook em playbook" copiando todos os passos para o SOAR. O que você propõe?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Separar os passos por impacto e reversibilidade. Enriquecimento (IdP, reputação do IP, histórico de logins), abertura do chamado e coleta de evidências viram automação sem condição. Revogar sessões e desativar a conta ficam atrás de aprovação humana, porque afetam uma pessoa (e o art. 20 da LGPD dá direito à revisão de decisões só automatizadas). Comunicação ao titular e à ANPD continuam no runbook, com julgamento humano. O runbook segue existindo para o que o playbook escala.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Precisão e automação):</strong> A regra A tem precisão de 97% e dispara três vezes por semana; a regra B tem precisão de 30% e dispara 40 vezes por dia. Qual delas pode isolar estações automaticamente?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A regra A, desde que o alvo seja uma estação fora da lista de exceção e a reputação confirme. A regra B isolaria cerca de 28 máquinas inocentes por dia. Para ela, o playbook deve enriquecer e priorizar, deixando a decisão ao analista, enquanto a bancada do Estudo 46 melhora a precisão. Volume alto não justifica automação de contenção; o que justifica é precisão alta com erro barato.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Fonte fora do ar):</strong> Num sábado, a API de reputação passou a responder 429 e depois a não responder. O playbook tratava "sem resposta" como reputação limpa e encerrou como falso positivo todos os alertas de beacon do fim de semana. O que corrigir?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O bloco de reputação precisa de <code>timeout</code>, novas tentativas com backoff exponencial, respeito ao <code>Retry-After</code> do 429 e, esgotadas as tentativas, um resultado explícito de "sem dado". A decisão seguinte deve ser fail-safe: sem dado, escalar ao analista com o restante do contexto. Desconhecido não é limpo. Vale também monitorar a saúde das integrações: uma fonte calada por horas é um incidente operacional do SOC.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Lista de exceção):</strong> A regra antiga de beaconing disparou para o SRV-PDV-01, que manda o lote de vendas ao gateway de pagamento a cada 60 s. Um colega sugere tirar o servidor da regra de detecção para o playbook nunca mais tocar nele. É a melhor saída?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. Tirar o servidor da detecção cria um ponto cego justamente no ativo mais valioso: se ele for comprometido, ninguém verá. O certo é ajustar a regra (o critério de tamanho do Estudo 48 já separa o lote de vendas) e pôr o servidor e o IP do parceiro na lista de exceção do playbook. Assim o alerta continua existindo, mas qualquer ação contra eles exige uma pessoa decidindo, com contexto.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Idempotência):</strong> O SIEM reprocessou uma janela e reenviou o alerta de beacon de WS-FIN-03, já contido 27 minutos antes. O playbook abriu um segundo chamado e mandou uma nova ordem de isolamento, que falhou com erro porque a máquina já estava isolada. Como evitar?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Tornando cada bloco idempotente: antes de isolar, consultar o estado no EDR e registrar "já isolado" sem nova ordem; antes de bloquear, conferir se o indicador já está na lista; e abrir o chamado com uma chave de deduplicação (o host, a conta ou o indicador do caso), atualizando o chamado existente. Rodar o playbook duas vezes tem de produzir o mesmo resultado que rodar uma vez.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (MTTA e MTTR):</strong> Depois do novo playbook, o painel mostra MTTR médio de 1 minuto, contra 76 minutos antes. Na mesma semana, o playbook encerrou seis alertas maliciosos como falso positivo. A automação melhorou a resposta?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não dá para afirmar. O MTTR só conta o que foi resolvido; alertas encerrados indevidamente somem da média e deixam o número bonito. Meça com e sem automação na mesma fila e acompanhe junto os falsos negativos, as ações revertidas e as aprovações negadas. Uma automação que reduz o MTTR e aumenta os falsos negativos piorou a segurança.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 7 (Human-in-the-loop):</strong> Às 3h, o playbook pede aprovação para desativar a conta de uma analista financeira que entrou de um IP malicioso e criou uma regra de encaminhamento de e-mail. Ninguém responde. O que o playbook deve fazer depois do prazo?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Escalar para o próximo nível do plantão (telefone, não só e-mail) e, enquanto espera, executar o que é de baixo impacto e reversível: bloquear o IP malicioso e remover a regra de encaminhamento, se a política permitir. Aprovar sozinho ao fim do prazo anula o sentido da aprovação. Se a desativação sem aprovação for aceitável em casos assim, isso é decisão prévia, escrita na política, e não um efeito colateral do <code>timeout</code>.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Anatomia</h4>
+                <p>Playbook: gatilho, enriquecimento, decisão, ação, com cada passo registrado no chamado.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Pessoa no circuito</h4>
+                <p>Aprovação humana para ações de alto impacto, com contexto e prazo; ao expirar, escala.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Métricas</h4>
+                <p>MTTA e MTTR como medida da automação, sempre junto dos falsos negativos e das ações revertidas.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Freio</h4>
+                <p>Exceções para ativos críticos, parceiros e contas sensíveis: uma pessoa decide, o alerta continua existindo.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>NIST SP 800-61 Rev. 3 — Incident Response Recommendations and Considerations for Cybersecurity Risk Management (2025).</li>
+            <li>NIST CSWP 29 — Cybersecurity Framework (CSF) 2.0, função Respond (RS.MA e RS.MI).</li>
+            <li>OASIS — CACAO Security Playbooks Version 2.0.</li>
+            <li>Documentação de Splunk SOAR, Cortex XSOAR, Google SecOps SOAR e Microsoft Sentinel (regras de automação e playbooks com Azure Logic Apps).</li>
+            <li>Shuffle — documentação de workflows; StrangeBee — TheHive e Cortex.</li>
+            <li>Lei 13.709/2018 (LGPD), art. 20 — revisão de decisões automatizadas.</li>
+            <li>IETF — RFC 9110 (semântica HTTP, cabeçalho Retry-After), RFC 6585 (código 429) e RFC 5737 (endereços de documentação).</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Fechando a Trilha 11</strong>
+            </div>
+            <p>
+                A Trilha 11 percorreu o caminho inteiro de uma detecção. No Estudo 46 a regra foi escrita, testada e medida, e a precisão dela decide aqui o que pode ser automatizado. No Estudo 47 a caçada achou o implante que nenhuma regra via e virou regra nova. No Estudo 48 a rede mostrou o beacon e o túnel DNS. Neste estudo, os mesmos alertas entram num playbook que contém em segundos o que é seguro conter e pede aprovação onde o erro custa caro. Na Trilha 12, o Estudo 53 retoma a lógica na nuvem: chave de acesso vazada, credencial girada e conta suspensa, com a mesma pergunta sobre o que a automação pode fazer sozinha.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="soar-dados">
+{
+ "contexto": "Ipê Store, domínio corp.ipestore.example. Fila fictícia de dez alertas de 02/11/2026, das 09:42 às 10:12 (UTC-3), vindos das regras dos Estudos 46 a 48, do EDR e do provedor de identidade. Reputação, CMDB e IdP são simulados; IPs privados e da faixa de documentação (RFC 5737), domínios .example e custos estimados fictícios. Nada sai do seu navegador.",
+ "parametros": {"ack_escalado_min": 8, "aprovacao_min": 6, "timeout_s": 30, "idempotente_s": 1, "chamado_atualizar_s": 1},
+ "blocos": {
+  "rep": {"nome": "Enriquecer reputação", "grupo": "enriquecimento", "duracao_s": 4, "fonte": "reputacao", "ajuda": "Consulta o indicador do alerta (IP, domínio ou hash) na plataforma de inteligência: maliciosa, suspeita, limpa ou desconhecida."},
+  "ativo": {"nome": "Enriquecer ativo (CMDB)", "grupo": "enriquecimento", "duracao_s": 2, "fonte": "cmdb", "ajuda": "Consulta o host do alerta na CMDB: estação ou servidor, criticidade e dono."},
+  "usuario": {"nome": "Enriquecer usuário (IdP)", "grupo": "enriquecimento", "duracao_s": 2, "fonte": "idp", "ajuda": "Consulta a conta do alerta no provedor de identidade: comum, executiva ou de serviço, com o contexto do RH."},
+  "decidir": {"nome": "Decidir por condição", "grupo": "decisao", "duracao_s": 0, "ajuda": "Testa uma condição. Verdadeira: o playbook segue. Falsa: aplica o desvio escolhido."},
+  "aprovacao": {"nome": "Pedir aprovação humana", "grupo": "decisao", "duracao_s": 0, "ajuda": "Daqui em diante, toda ação espera um analista, que vê o contexto e nega o que for indevido."},
+  "isolar": {"nome": "Isolar host (EDR)", "grupo": "acao", "duracao_s": 15, "alvo": "host", "ajuda": "Isola o host do alerta pela API do EDR; só o canal com o console continua aberto."},
+  "bloquear": {"nome": "Bloquear IP/domínio", "grupo": "acao", "duracao_s": 8, "alvo": "indicador", "ajuda": "Bloqueia o IP ou o domínio do alerta no firewall de borda e no DNS (RPZ). Hash não se bloqueia aqui."},
+  "desativar": {"nome": "Desativar conta", "grupo": "acao", "duracao_s": 6, "alvo": "conta", "ajuda": "Desativa a conta do alerta no provedor de identidade e revoga as sessões abertas."},
+  "chamado": {"nome": "Abrir chamado", "grupo": "registro", "duracao_s": 3, "ajuda": "Abre o chamado do caso no ITSM com o contexto enriquecido, ou atualiza o que já existe para o mesmo caso."}
+ },
+ "ordem_paleta": ["rep", "ativo", "usuario", "decidir", "aprovacao", "isolar", "bloquear", "desativar", "chamado"],
+ "condicoes": {
+  "rep_maliciosa": {"rotulo": "Reputação maliciosa", "fonte": "rep"},
+  "rep_nao_limpa": {"rotulo": "Reputação não limpa (maliciosa, suspeita ou desconhecida)", "fonte": "rep"},
+  "ativo_estacao": {"rotulo": "Ativo é estação de trabalho", "fonte": "ativo"},
+  "conta_comum": {"rotulo": "Conta comum (nem executiva nem de serviço)", "fonte": "usuario"},
+  "severidade_alta": {"rotulo": "Severidade alta ou crítica", "fonte": null}
+ },
+ "senao": {
+  "encerrar": "senão: encerrar como falso positivo",
+  "escalar": "senão: escalar ao analista",
+  "aprovacao": "senão: seguir, exigindo aprovação para as ações"
+ },
+ "ativos": {
+  "WS-FIN-03": {"ip": "10.20.3.13", "tipo": "estacao", "criticidade": "normal", "dono": "Financeiro (ana.souza)"},
+  "WS-VEN-07": {"ip": "10.20.7.17", "tipo": "estacao", "criticidade": "normal", "dono": "Vendas (bruno.alves)"},
+  "WS-VEN-02": {"ip": "10.20.7.12", "tipo": "estacao", "criticidade": "normal", "dono": "Vendas (julia.prado)"},
+  "WS-TI-01": {"ip": "10.20.5.11", "tipo": "estacao", "criticidade": "normal", "dono": "TI (rafael.costa)"},
+  "SRV-PDV-01": {"ip": "10.20.1.20", "tipo": "servidor", "criticidade": "crítica", "dono": "Gerência de Lojas: concentrador dos caixas das 14 lojas"},
+  "SRV-ERP-01": {"ip": "10.20.1.10", "tipo": "servidor", "criticidade": "crítica", "dono": "Gerência de Sistemas: ERP e integração com o marketplace"},
+  "DC-01": {"ip": "10.20.0.10", "tipo": "servidor", "criticidade": "crítica", "dono": "Infraestrutura: controlador de domínio e DNS interno"}
+ },
+ "usuarios": {
+  "marina.lopes": {"tipo": "comum", "nota": "Analista financeira; MFA por aplicativo; nenhuma viagem registrada."},
+  "carlos.mendes": {"tipo": "executivo", "nota": "Diretor comercial; viagem a Lisboa registrada no RH de 01 a 06/11."},
+  "svc-erp-integracao": {"tipo": "servico", "nota": "Conta de serviço da integração ERP–marketplace; senha trocada hoje às 09:30 (chamado TI-2317)."}
+ },
+ "reputacao": {
+  "203.0.113.47": {"veredito": "maliciosa", "nota": "C2 do OneDriveReport.exe (caçada TH-2026-047 e Estudo 48), no feed interno com confiança alta."},
+  "dados-cdn.example": {"veredito": "suspeita", "nota": "Domínio registrado há 3 dias, sem histórico; nenhum fornecedor o classificou ainda."},
+  "198.51.100.60": {"veredito": "limpa", "nota": "Gateway de pagamento contratado (parceiro), no ar há seis anos."},
+  "198.51.100.77": {"veredito": "limpa", "nota": "API do marketplace parceiro."},
+  "f1b07840b0901638efec072af967f4a17918e98cd97cafce07da2e89855ab92f": {"veredito": "desconhecida", "nota": "Hash nunca visto: o implante é recompilado para cada vítima (Estudo 47)."},
+  "198.51.100.231": {"veredito": "maliciosa", "nota": "Saída de proxy residencial usada em ataques de credenciais contra varejistas."},
+  "203.0.113.99": {"veredito": "limpa", "nota": "Rede Wi-Fi de um hotel em Lisboa, sem histórico de abuso."},
+  "d9bc88cdfb6e0f14d26a8320a2ffc348b29341cd65ff48c6b6c3ca417ebfd36d": {"veredito": "limpa", "nota": "Script de inventário da TI, assinado com o certificado de código da empresa."}
+ },
+ "excecoes": [
+  {"tipo": "host", "valor": "SRV-PDV-01", "motivo": "Concentrador dos caixas: isolar para as vendas das 14 lojas", "dono": "Gerência de Lojas", "revisao": "2027-05-01"},
+  {"tipo": "host", "valor": "SRV-ERP-01", "motivo": "ERP: isolar para pedidos, notas fiscais e a integração com o marketplace", "dono": "Gerência de Sistemas", "revisao": "2027-05-01"},
+  {"tipo": "host", "valor": "DC-01", "motivo": "Controlador de domínio: isolar derruba a autenticação da empresa inteira", "dono": "Infraestrutura", "revisao": "2027-05-01"},
+  {"tipo": "indicador", "valor": "198.51.100.60", "motivo": "Gateway de pagamento (parceiro): bloquear para as vendas com cartão", "dono": "Financeiro", "revisao": "2027-02-01"},
+  {"tipo": "indicador", "valor": "198.51.100.77", "motivo": "API do marketplace parceiro", "dono": "Gerência de Sistemas", "revisao": "2027-02-01"},
+  {"tipo": "conta", "valor": "svc-erp-integracao", "motivo": "Conta de serviço da integração ERP–marketplace", "dono": "Gerência de Sistemas", "revisao": "2027-02-01"},
+  {"tipo": "conta", "valor": "carlos.mendes", "motivo": "Conta executiva: desativação só com aprovação", "dono": "Diretoria", "revisao": "2027-02-01"}
+ ],
+ "fila": [
+  {"id": "A01", "hora": "09:42", "regra": "Beacon HTTPS periódico", "origem": "Regra de beaconing (Estudos 46 e 48)", "severidade": "alta",
+   "host": "WS-FIN-03", "indicador": {"tipo": "ip", "valor": "203.0.113.47"}, "conta": null,
+   "resumo": "WS-FIN-03 → 203.0.113.47:443 a cada 60 s, jitter de 6%, check-ins do mesmo tamanho.",
+   "verdade": "malicioso", "corretas": ["isolar", "bloquear"], "caso": "WS-FIN-03",
+   "manual": {"mtta_min": 24, "mttr_min": 96}, "analista_min": 25, "custo_fn": 60000, "erros": {},
+   "nota": "O implante do Estudo 47 falando com o C2. Isolar a estação e bloquear o C2 cortam o canal; a reputação maliciosa e o tipo estação permitem fazer isso sem esperar ninguém."},
+  {"id": "A02", "hora": "09:43", "regra": "Beacon HTTPS periódico", "origem": "Regra de beaconing (Estudos 46 e 48)", "severidade": "alta",
+   "host": "WS-VEN-07", "indicador": {"tipo": "ip", "valor": "203.0.113.47"}, "conta": null,
+   "resumo": "WS-VEN-07 → 203.0.113.47:443, média de 60 s e jitter de 25%.",
+   "verdade": "malicioso", "corretas": ["isolar", "bloquear"], "caso": "WS-VEN-07",
+   "manual": {"mtta_min": 31, "mttr_min": 104}, "analista_min": 25, "custo_fn": 60000, "erros": {},
+   "nota": "Segunda vítima do mesmo implante. Se o C2 já foi bloqueado no A01, um bloco idempotente percebe e não repete a ordem."},
+  {"id": "A03", "hora": "09:44", "regra": "Beacon HTTPS periódico (versão antiga, sem o critério de tamanho)", "origem": "Regra de beaconing v1, esquecida ativa no SIEM", "severidade": "alta",
+   "host": "SRV-PDV-01", "indicador": {"tipo": "ip", "valor": "198.51.100.60"}, "conta": null,
+   "resumo": "SRV-PDV-01 → 198.51.100.60:443 a cada 60 s: o lote de vendas para o gateway de pagamento.",
+   "verdade": "benigno", "corretas": [], "caso": "SRV-PDV-01",
+   "manual": {"mtta_min": 18, "mttr_min": 40}, "analista_min": 12, "custo_fn": 0,
+   "erros": {
+    "isolar": {"custo": 36000, "texto": "SRV-PDV-01 isolado: os caixas das 14 lojas param de autorizar cartão por cerca de 2 h, até alguém reverter."},
+    "bloquear": {"custo": 24000, "texto": "IP do gateway de pagamento (parceiro) bloqueado: nenhuma venda com cartão até desfazer o bloqueio."}
+   },
+   "nota": "Falso positivo conhecido do Estudo 48: periódico, mas legítimo. O servidor e o IP do parceiro estão na lista de exceção, e a reputação limpa permite encerrar com o contexto anexado."},
+  {"id": "A04", "hora": "09:47", "regra": "Tarefa agendada executa binário de pasta gravável por usuário", "origem": "Regra Sigma do Estudo 46, nascida da caçada do Estudo 47", "severidade": "alta",
+   "host": "WS-VEN-02", "indicador": {"tipo": "hash", "valor": "f1b07840b0901638efec072af967f4a17918e98cd97cafce07da2e89855ab92f"}, "conta": null,
+   "resumo": "Tarefa \"OneDrive Reporting Task\" executa C:\\Users\\Public\\OneDriveReport.exe em WS-VEN-02.",
+   "verdade": "malicioso", "corretas": ["isolar"], "caso": "WS-VEN-02",
+   "manual": {"mtta_min": 35, "mttr_min": 140}, "analista_min": 30, "custo_fn": 60000, "erros": {},
+   "nota": "Terceira estação com o implante. O hash é desconhecido porque o binário é recompilado para cada vítima: desconhecido não é limpo. Uma decisão que exige reputação maliciosa encerra este alerta."},
+  {"id": "A05", "hora": "09:51", "regra": "Túnel DNS: subdomínios longos de alta entropia", "origem": "Regra de túnel DNS (Estudo 48), janela das 09:00 às 09:45", "severidade": "alta",
+   "host": "WS-FIN-03", "indicador": {"tipo": "dominio", "valor": "dados-cdn.example"}, "conta": null,
+   "resumo": "WS-FIN-03 fez 120 consultas TXT com rótulos em base32 sob dados-cdn.example.",
+   "verdade": "malicioso", "corretas": ["isolar", "bloquear"], "caso": "WS-FIN-03",
+   "manual": {"mtta_min": 22, "mttr_min": 85}, "analista_min": 20, "custo_fn": 80000, "erros": {},
+   "nota": "As notas fiscais saindo por DNS. O domínio ainda não tem veredito (suspeito). Se a estação já foi isolada no A01, o bloco não repete; o bloqueio do domínio é novo, e o chamado do caso WS-FIN-03 é atualizado em vez de duplicado."},
+  {"id": "A06", "hora": "09:55", "regra": "Login de IP anômalo seguido de regra de encaminhamento de e-mail", "origem": "Provedor de identidade e auditoria do e-mail", "severidade": "alta",
+   "host": null, "indicador": {"tipo": "ip", "valor": "198.51.100.231"}, "conta": "marina.lopes",
+   "resumo": "marina.lopes entrou a partir de 198.51.100.231 e criou uma regra que encaminha para fora os e-mails com \"boleto\".",
+   "verdade": "malicioso", "corretas": ["bloquear", "desativar"], "caso": "marina.lopes",
+   "manual": {"mtta_min": 27, "mttr_min": 110}, "analista_min": 25, "custo_fn": 45000, "erros": {},
+   "nota": "Conta comprometida para fraude de boleto. Desativar uma conta é ação de alto impacto sobre uma pessoa: com aprovação, o analista confirma em minutos e a contenção ainda sai muito antes do processo manual."},
+  {"id": "A07", "hora": "10:02", "regra": "Viagem impossível: login em Lisboa 40 minutos depois de São Paulo", "origem": "Provedor de identidade", "severidade": "média",
+   "host": null, "indicador": {"tipo": "ip", "valor": "203.0.113.99"}, "conta": "carlos.mendes",
+   "resumo": "carlos.mendes: sessão renovada em São Paulo às 09:20 e login em Lisboa às 10:00.",
+   "verdade": "benigno", "corretas": [], "caso": "carlos.mendes",
+   "manual": {"mtta_min": 20, "mttr_min": 45}, "analista_min": 10, "custo_fn": 0,
+   "erros": {
+    "desativar": {"custo": 6000, "texto": "Diretor comercial sem e-mail e sem VPN no meio da negociação com um fornecedor em Lisboa."},
+    "bloquear": {"custo": 1500, "texto": "Rede do hotel bloqueada na borda: o diretor perde a VPN e o webmail até alguém desfazer."}
+   },
+   "nota": "Falso positivo: a viagem está registrada no RH e a sessão de São Paulo é o desktop da sala dele renovando o token. A conta executiva está na lista de exceção, e a reputação limpa do IP do hotel permite encerrar."},
+  {"id": "A08", "hora": "10:06", "regra": "Muitas falhas de autenticação em conta de serviço", "origem": "Controlador de domínio (evento 4625)", "severidade": "média",
+   "host": "SRV-ERP-01", "indicador": null, "conta": "svc-erp-integracao",
+   "resumo": "380 falhas de logon de svc-erp-integracao a partir de SRV-ERP-01 em 10 minutos.",
+   "verdade": "benigno", "corretas": [], "caso": "svc-erp-integracao",
+   "manual": {"mtta_min": 26, "mttr_min": 60}, "analista_min": 15, "custo_fn": 0,
+   "erros": {
+    "isolar": {"custo": 30000, "texto": "SRV-ERP-01 isolado: pedidos, notas fiscais e a integração com o marketplace param por cerca de 1 h."},
+    "desativar": {"custo": 9000, "texto": "Conta de serviço desativada: a integração com o marketplace para e os pedidos do dia se acumulam."}
+   },
+   "nota": "Falso positivo: a senha foi trocada às 09:30 (chamado TI-2317) e a integração ainda tenta a antiga. Não há indicador externo, e o servidor e a conta estão na lista de exceção. O certo é avisar o dono, não conter."},
+  {"id": "A09", "hora": "10:09", "regra": "Beacon HTTPS periódico (reenvio)", "origem": "Regra de beaconing: o SIEM reprocessou a janela e reenviou o alerta", "severidade": "alta",
+   "host": "WS-FIN-03", "indicador": {"tipo": "ip", "valor": "203.0.113.47"}, "conta": null,
+   "resumo": "O mesmo par WS-FIN-03 → 203.0.113.47:443 do A01, reenviado depois de um reprocessamento.",
+   "verdade": "malicioso", "corretas": ["isolar", "bloquear"], "caso": "WS-FIN-03",
+   "manual": {"mtta_min": 15, "mttr_min": 30}, "analista_min": 5, "custo_fn": 0, "erros": {},
+   "nota": "Duplicado do A01 (o custo de deixá-lo passar já conta lá). Com blocos idempotentes, o playbook vê que a estação já está isolada e o C2 já está bloqueado e só atualiza o chamado do caso."},
+  {"id": "A10", "hora": "10:12", "regra": "PowerShell com comando codificado (Base64)", "origem": "EDR", "severidade": "média",
+   "host": "WS-TI-01", "indicador": {"tipo": "hash", "valor": "d9bc88cdfb6e0f14d26a8320a2ffc348b29341cd65ff48c6b6c3ca417ebfd36d"}, "conta": null,
+   "resumo": "powershell.exe -EncodedCommand lançado pelo agendador de tarefas em WS-TI-01.",
+   "verdade": "benigno", "corretas": [], "caso": "WS-TI-01",
+   "manual": {"mtta_min": 30, "mttr_min": 55}, "analista_min": 12, "custo_fn": 0,
+   "erros": {
+    "isolar": {"custo": 800, "texto": "Estação do analista de TI isolada: duas horas de trabalho perdidas e uma reinstalação desnecessária."}
+   },
+   "nota": "Falso positivo: o script de inventário da TI, assinado com o certificado de código da empresa. Mesmo numa estação, isolar sem olhar a reputação tem custo."}
+ ],
+ "presets": {
+  "ingenuo": {"rotulo": "Ingênuo: contém tudo, sem perguntar", "passos": [{"tipo": "isolar"}, {"tipo": "bloquear"}, {"tipo": "desativar"}, {"tipo": "chamado"}], "politicas": {"excecoes": false, "escalar_sem_dado": false}},
+  "enriquecer": {"rotulo": "Só enriquece e escala ao analista", "passos": [{"tipo": "rep"}, {"tipo": "ativo"}, {"tipo": "usuario"}, {"tipo": "chamado"}], "politicas": {"excecoes": true, "escalar_sem_dado": true}},
+  "vazio": {"rotulo": "Vazio: sem automação (processo manual)", "passos": [], "politicas": {"excecoes": false, "escalar_sem_dado": false}}
+ }
+}
+</script>
+
+<script>
+(function() {
+    var SOAR = JSON.parse(document.getElementById("soar-dados").textContent);
+    var ACOES = ["isolar", "bloquear", "desativar"];
+    var ENRIQ = ["rep", "ativo", "usuario"];
+    var TIPO_EXC = { isolar: "host", bloquear: "indicador", desativar: "conta" };
+    var PASSOS = [];
+
+    function $(id) { return document.getElementById(id); }
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function has(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
+    function fmtTempo(s) {
+        if (s < 60) return Math.round(s) + " s";
+        if (s < 5400) return (s / 60).toFixed(1).replace(".", ",") + " min";
+        return (s / 3600).toFixed(1).replace(".", ",") + " h";
+    }
+    function fmtReais(v) { return "R$ " + Math.round(v).toLocaleString("pt-BR"); }
+    function nomeBloco(tipo) { return SOAR.blocos[tipo].nome; }
+
+    // ===================================================== motor (espelhado nos testes)
+    window.alvoDoBloco = function(a, tipo) {
+        if (tipo === "rep") return a.indicador ? a.indicador.valor : null;
+        if (tipo === "ativo" || tipo === "isolar") return a.host;
+        if (tipo === "usuario" || tipo === "desativar") return a.conta;
+        if (tipo === "bloquear") return a.indicador && (a.indicador.tipo === "ip" || a.indicador.tipo === "dominio") ? a.indicador.valor : null;
+        return null;
+    };
+    function consultar(tipo, valor) {
+        if (tipo === "rep") return SOAR.reputacao[valor].veredito;
+        if (tipo === "ativo") return SOAR.ativos[valor].tipo;
+        return SOAR.usuarios[valor].tipo;
+    }
+    function notaConsulta(tipo, valor) {
+        if (tipo === "rep") return SOAR.reputacao[valor].nota;
+        if (tipo === "ativo") { var x = SOAR.ativos[valor]; return x.ip + ", criticidade " + x.criticidade + ", " + x.dono; }
+        return SOAR.usuarios[valor].nota;
+    }
+    window.avaliarCondicao = function(cond, a, ctx) {
+        if (cond === "severidade_alta") return a.severidade === "alta" || a.severidade === "crítica";
+        var fonte = SOAR.condicoes[cond].fonte;
+        var v = has(ctx, fonte) ? ctx[fonte] : null;
+        if (v === null || v === "indisponivel") return null;
+        if (cond === "rep_maliciosa") return v === "maliciosa";
+        if (cond === "rep_nao_limpa") return v === "maliciosa" || v === "suspeita" || v === "desconhecida";
+        if (cond === "ativo_estacao") return v === "estacao";
+        if (cond === "conta_comum") return v === "comum";
+        return null;
+    };
+    function altoImpacto(a, tipo) {
+        return tipo === "desativar" || (tipo === "isolar" && SOAR.ativos[a.host].tipo === "servidor");
+    }
+
+    window.executarPlaybook = function(passos, politicas, falhas) {
+        politicas = politicas || {};
+        falhas = falhas || {};
+        var P = SOAR.parametros, B = SOAR.blocos;
+        var exc = {};
+        SOAR.excecoes.forEach(function(e) { exc[e.tipo + "|" + e.valor] = e; });
+        var estado = { isolar: {}, bloquear: {}, desativar: {} };
+        var chamados = {}, numChamado = 4100, resultados = [];
+
+        SOAR.fila.forEach(function(a) {
+            var r = { id: a.id, t: 0, mtta: null, mttr: null, status: "andamento", ctx: {}, enriquecido: false,
+                      gate: false, aprov: false, executadas: [], efeito: {}, erradas: [], negadas: [], aprovadas: [],
+                      idempotentes: [], chamado: null, custo: 0, altoSemAprov: 0, fn: false, log: [] };
+            function log(texto, tom) { r.log.push({ t: r.t, texto: texto, tom: tom || "" }); }
+            function escalar(motivo) {
+                r.status = "escalado";
+                var ack = r.enriquecido ? P.ack_escalado_min * 60 : a.manual.mtta_min * 60;
+                var trab = r.enriquecido ? a.analista_min * 60 : (a.manual.mttr_min - a.manual.mtta_min) * 60;
+                if (r.mtta === null) r.mtta = r.t + ack;
+                r.mttr = r.t + ack + trab;
+                log("Escalado ao analista: " + motivo + ". " + (r.enriquecido
+                    ? "O caso chega enriquecido: o analista assume em " + P.ack_escalado_min + " min e resolve em " + a.analista_min + " min."
+                    : "Sem nenhum enriquecimento, o caso segue o tempo do processo manual."), "aviso");
+            }
+
+            for (var i = 0; i < passos.length; i++) {
+                if (r.status !== "andamento") break;
+                var p = passos[i], tipo = p.tipo, n = "Passo " + (i + 1) + ": ";
+                if (ENRIQ.indexOf(tipo) !== -1) {
+                    var v = window.alvoDoBloco(a, tipo);
+                    if (v === null) { r.ctx[tipo] = "sem_alvo"; log(n + nomeBloco(tipo) + ": o alerta não tem " + (tipo === "rep" ? "indicador" : tipo === "ativo" ? "host" : "conta") + " para consultar."); continue; }
+                    if (falhas[B[tipo].fonte]) {
+                        r.t += P.timeout_s;
+                        r.ctx[tipo] = "indisponivel";
+                        log(n + nomeBloco(tipo) + " de " + v + ": fonte fora do ar, timeout de " + P.timeout_s + " s. Resultado: sem dado.", "aviso");
+                        continue;
+                    }
+                    r.t += B[tipo].duracao_s;
+                    r.ctx[tipo] = consultar(tipo, v);
+                    r.enriquecido = true;
+                    log(n + nomeBloco(tipo) + " de " + v + ": " + r.ctx[tipo] + " (" + notaConsulta(tipo, v) + ")");
+                } else if (tipo === "decidir") {
+                    var ok = window.avaliarCondicao(p.condicao, a, r.ctx);
+                    var rot = SOAR.condicoes[p.condicao].rotulo;
+                    if (ok === null && politicas.escalar_sem_dado) { log(n + "decisão \"" + rot + "\" sem o dado de que precisa.", "aviso"); escalar("faltou o dado da decisão (política fail-safe)"); continue; }
+                    if (ok) { log(n + "decisão \"" + rot + "\": verdadeira, segue."); continue; }
+                    log(n + "decisão \"" + rot + "\": " + (ok === null ? "sem dado, tratada como falsa" : "falsa") + "; " + SOAR.senao[p.senao] + ".", ok === null ? "aviso" : "");
+                    if (p.senao === "encerrar") {
+                        r.status = "encerrado";
+                        if (r.mtta === null) r.mtta = r.t;
+                        if (a.verdade === "malicioso") {
+                            r.fn = true;
+                            r.custo += a.custo_fn;
+                            log("Ameaça real encerrada como falso positivo" + (a.custo_fn ? ": custo estimado de " + fmtReais(a.custo_fn) + "." : " (duplicado: o custo conta no alerta original)."), "erro");
+                        } else {
+                            r.mttr = r.t;
+                            log("Encerrado como falso positivo, com o contexto anexado.", "ok");
+                        }
+                    } else if (p.senao === "escalar") {
+                        escalar("desvio da decisão");
+                    } else {
+                        r.gate = true;
+                    }
+                } else if (tipo === "aprovacao") {
+                    r.gate = true;
+                    log(n + "daqui em diante, ações esperam aprovação humana.");
+                } else if (tipo === "chamado") {
+                    if (has(chamados, a.caso)) {
+                        r.t += P.chamado_atualizar_s;
+                        r.chamado = "atualizado";
+                        log(n + "chamado " + chamados[a.caso].numero + " do caso " + a.caso + " atualizado (deduplicação).", "ok");
+                    } else {
+                        r.t += B.chamado.duracao_s;
+                        numChamado++;
+                        chamados[a.caso] = { numero: "INC-" + numChamado, alerta: a.id };
+                        r.chamado = "aberto";
+                        log(n + "chamado INC-" + numChamado + " aberto para o caso " + a.caso + ".", "ok");
+                    }
+                } else {
+                    var alvo = window.alvoDoBloco(a, tipo);
+                    if (alvo === null) { log(n + nomeBloco(tipo) + ": sem alvo neste alerta, nada a fazer."); continue; }
+                    if (has(estado[tipo], alvo)) {
+                        r.t += P.idempotente_s;
+                        r.idempotentes.push(tipo);
+                        r.efeito[tipo] = true;
+                        log(n + nomeBloco(tipo) + " " + alvo + ": já estava feito, nada a repetir (idempotente).", "ok");
+                        continue;
+                    }
+                    var naLista = !!politicas.excecoes && has(exc, TIPO_EXC[tipo] + "|" + alvo);
+                    var precisa = r.gate || naLista;
+                    var correta = a.corretas.indexOf(tipo) !== -1;
+                    if (precisa) {
+                        if (!r.aprov) {
+                            r.t += P.aprovacao_min * 60;
+                            r.aprov = true;
+                            log(n + "pedido de aprovação para " + nomeBloco(tipo).toLowerCase() + " " + alvo + (naLista ? " (alvo na lista de exceção: " + exc[TIPO_EXC[tipo] + "|" + alvo].motivo + ")" : "") + "; o analista responde em " + P.aprovacao_min + " min.", "aviso");
+                        } else {
+                            log(n + "pedido de aprovação para " + nomeBloco(tipo).toLowerCase() + " " + alvo + (naLista ? " (alvo na lista de exceção)" : "") + ", junto com o anterior.", "aviso");
+                        }
+                        if (r.mtta === null) r.mtta = r.t;
+                        if (!correta) { r.negadas.push(tipo); log("Aprovador negou " + nomeBloco(tipo).toLowerCase() + " " + alvo + ": com o contexto, a ação seria indevida.", "ok"); continue; }
+                        r.aprovadas.push(tipo);
+                    }
+                    r.t += B[tipo].duracao_s;
+                    estado[tipo][alvo] = a.id;
+                    r.executadas.push(tipo);
+                    r.efeito[tipo] = true;
+                    if (!precisa) {
+                        if (r.mtta === null) r.mtta = r.t;
+                        if (altoImpacto(a, tipo)) r.altoSemAprov++;
+                        if (!correta) {
+                            r.erradas.push(tipo);
+                            r.custo += a.erros[tipo].custo;
+                            log(n + nomeBloco(tipo) + " " + alvo + " executado sem perguntar. AÇÃO INDEVIDA: " + a.erros[tipo].texto + " Custo estimado: " + fmtReais(a.erros[tipo].custo) + ".", "erro");
+                            continue;
+                        }
+                    }
+                    log(n + nomeBloco(tipo) + " " + alvo + (precisa ? " aprovado e executado." : " executado automaticamente."), "ok");
+                }
+            }
+            if (r.status === "andamento") {
+                if (a.verdade === "malicioso" && a.corretas.every(function(c) { return r.efeito[c]; })) {
+                    r.status = "contido";
+                    r.mttr = r.t;
+                    if (r.mtta === null) r.mtta = r.t;
+                    log("Contido: todas as ações necessárias estão em vigor.", "ok");
+                } else if (a.verdade === "benigno" && r.aprov && !r.erradas.length) {
+                    r.status = "encerrado_humano";
+                    r.mttr = r.t;
+                    log("O aprovador negou o que foi pedido e encerrou o caso como falso positivo.", "ok");
+                } else {
+                    escalar(a.verdade === "malicioso" ? "o playbook terminou sem completar a contenção" : "o playbook terminou sem desfecho");
+                }
+            }
+            r.semRegistro = r.executadas.length > 0 && r.chamado === null;
+            if (r.semRegistro) log("Houve ação sem chamado: o caso fica sem trilha de auditoria.", "erro");
+            resultados.push(r);
+        });
+        return { resultados: resultados, chamados: chamados };
+    };
+
+    window.resumirExecucao = function(resultados) {
+        var n = resultados.length, resolvidos = resultados.filter(function(r) { return r.mttr !== null; });
+        var manual = {};
+        SOAR.fila.forEach(function(a) { manual[a.id] = a.manual; });
+        function conta(f) { return resultados.filter(f).length; }
+        function soma(f) { return resultados.reduce(function(acc, r) { return acc + f(r); }, 0); }
+        return {
+            contidos: conta(function(r) { return r.status === "contido"; }),
+            encerrados: conta(function(r) { return r.status === "encerrado" && !r.fn; }),
+            encerrados_humano: conta(function(r) { return r.status === "encerrado_humano"; }),
+            escalados: conta(function(r) { return r.status === "escalado"; }),
+            fn: conta(function(r) { return r.fn; }),
+            aprovacoes: conta(function(r) { return r.aprov; }),
+            negadas: soma(function(r) { return r.negadas.length; }),
+            indevidas: soma(function(r) { return r.erradas.length; }),
+            custo: soma(function(r) { return r.custo; }),
+            alto_sem_aprov: soma(function(r) { return r.altoSemAprov; }),
+            sem_registro: conta(function(r) { return r.semRegistro; }),
+            mtta_s: soma(function(r) { return r.mtta; }) / n,
+            mttr_s: resolvidos.length ? resolvidos.reduce(function(acc, r) { return acc + r.mttr; }, 0) / resolvidos.length : 0,
+            manual_mtta_s: 60 * SOAR.fila.reduce(function(acc, a) { return acc + a.manual.mtta_min; }, 0) / n,
+            manual_mttr_s: 60 * SOAR.fila.reduce(function(acc, a) { return acc + a.manual.mttr_min; }, 0) / n,
+            economia_s: resolvidos.reduce(function(acc, r) { return acc + manual[r.id].mttr_min * 60 - r.mttr; }, 0)
+        };
+    };
+
+    // ===================================================== montagem do playbook
+    function novoPasso(tipo) {
+        return tipo === "decidir" ? { tipo: "decidir", condicao: "rep_nao_limpa", senao: "encerrar" } : { tipo: tipo };
+    }
+    window.adicionarBlocoSoar = function(tipo) {
+        if (!has(SOAR.blocos, tipo)) return;
+        PASSOS.push(novoPasso(tipo));
+        renderPassos();
+        window.rodarPlaybookSoar();
+    };
+    function mover(i, delta) {
+        var j = i + delta;
+        if (j < 0 || j >= PASSOS.length) return;
+        var x = PASSOS[i]; PASSOS[i] = PASSOS[j]; PASSOS[j] = x;
+        renderPassos(j, delta < 0 ? "subir" : "descer");
+        window.rodarPlaybookSoar();
+    }
+    function remover(i) {
+        PASSOS.splice(i, 1);
+        renderPassos();
+        window.rodarPlaybookSoar();
+    }
+    var COR_GRUPO = { enriquecimento: "var(--accent)", decisao: "var(--warning-color)", acao: "var(--danger-color)", registro: "var(--tip-color)" };
+
+    function selectCom(opcoes, valor, rotulo, aoMudar) {
+        var s = el("select", null, "min-width: 0; max-width: 100%; flex: 1 1 12rem; font-size: 0.8rem;");
+        s.className = "form-control";
+        s.setAttribute("aria-label", rotulo);
+        Object.keys(opcoes).forEach(function(k) {
+            var o = el("option", opcoes[k]);
+            o.value = k;
+            s.appendChild(o);
+        });
+        s.value = valor;
+        s.addEventListener("change", function() { aoMudar(s.value); });
+        return s;
+    }
+    function botaoPequeno(texto, rotulo, acao, desabilitado) {
+        var b = el("button", texto, "padding: 0.15rem 0.5rem; font-size: 0.8rem; min-width: 2rem;");
+        b.type = "button";
+        b.className = "btn-secondary";
+        b.setAttribute("aria-label", rotulo);
+        b.disabled = !!desabilitado;
+        b.addEventListener("click", acao);
+        return b;
+    }
+    function renderPassos(foco, qual) {
+        var box = $("soar-passos");
+        box.replaceChildren();
+        var g = el("div", null, "border-left: 4px solid var(--rule); background: var(--sunk); border-radius: var(--radius-sm); padding: 0.35rem 0.55rem;");
+        g.appendChild(el("strong", "Gatilho: "));
+        g.appendChild(document.createTextNode("alerta novo na fila do SIEM (webhook), um por vez, na ordem de chegada."));
+        box.appendChild(g);
+        if (!PASSOS.length) box.appendChild(el("div", "Playbook vazio: todo alerta vai direto para a fila do analista, como no processo manual.", "color: var(--muted); padding: 0.2rem 0.55rem;"));
+        PASSOS.forEach(function(p, i) {
+            var b = SOAR.blocos[p.tipo];
+            var linha = el("div", null, "border-left: 4px solid " + COR_GRUPO[b.grupo] + "; background: var(--sunk); border-radius: var(--radius-sm); padding: 0.35rem 0.55rem; display: flex; flex-wrap: wrap; gap: 0.35rem 0.6rem; align-items: center; min-width: 0;");
+            linha.setAttribute("data-passo", p.tipo);
+            var nome = el("span", (i + 1) + ". " + b.nome, "font-weight: 600; flex: 1 1 10rem; min-width: 0; overflow-wrap: anywhere;");
+            nome.title = b.ajuda;
+            linha.appendChild(nome);
+            if (p.tipo === "decidir") {
+                var conds = {};
+                Object.keys(SOAR.condicoes).forEach(function(k) { conds[k] = "se " + SOAR.condicoes[k].rotulo.charAt(0).toLowerCase() + SOAR.condicoes[k].rotulo.slice(1); });
+                linha.appendChild(selectCom(conds, p.condicao, "Condição do passo " + (i + 1), function(v) { p.condicao = v; renderCodigo(); window.rodarPlaybookSoar(); }));
+                linha.appendChild(selectCom(SOAR.senao, p.senao, "Desvio do passo " + (i + 1) + " quando a condição é falsa", function(v) { p.senao = v; renderCodigo(); window.rodarPlaybookSoar(); }));
+            }
+            var bts = el("span", null, "display: inline-flex; gap: 0.25rem; margin-left: auto;");
+            var up = botaoPequeno("↑", "Subir o passo " + (i + 1) + " (" + b.nome + ")", function() { mover(i, -1); }, i === 0);
+            var down = botaoPequeno("↓", "Descer o passo " + (i + 1) + " (" + b.nome + ")", function() { mover(i, 1); }, i === PASSOS.length - 1);
+            var del = botaoPequeno("✕", "Remover o passo " + (i + 1) + " (" + b.nome + ")", function() { remover(i); });
+            bts.appendChild(up); bts.appendChild(down); bts.appendChild(del);
+            linha.appendChild(bts);
+            box.appendChild(linha);
+            if (foco === i) {
+                var alvoFoco = qual === "subir" ? (i === 0 ? down : up) : (i === PASSOS.length - 1 ? up : down);
+                alvoFoco.focus();
+            }
+        });
+        renderCodigo();
+    }
+    function lerPoliticas() { return { excecoes: $("soar-pol-excecoes").checked, escalar_sem_dado: $("soar-pol-escalar").checked }; }
+    function lerFalhas() { return { reputacao: $("soar-falha-reputacao").checked, cmdb: $("soar-falha-cmdb").checked, idp: $("soar-falha-idp").checked }; }
+
+    var CODIGO_PASSO = {
+        rep: "enriquecer: reputacao(indicador)",
+        ativo: "enriquecer: cmdb(host)",
+        usuario: "enriquecer: idp(conta)",
+        aprovacao: "exigir_aprovacao: ações seguintes",
+        isolar: "acao: edr.isolar(host)",
+        bloquear: "acao: firewall_dns.bloquear(indicador)",
+        desativar: "acao: idp.desativar(conta)",
+        chamado: "chamado: abrir_ou_atualizar(chave=caso)"
+    };
+    var CODIGO_SENAO = { encerrar: "encerrar_como_falso_positivo", escalar: "escalar_ao_analista", aprovacao: "exigir_aprovacao" };
+    function renderCodigo() {
+        var pol = lerPoliticas(), linhas = ["playbook: triagem-ipe-store", "gatilho: alerta novo na fila do SIEM (webhook)", "politicas:",
+            "  lista_de_excecao: " + (pol.excecoes ? "sim" : "nao"), "  sem_dado: " + (pol.escalar_sem_dado ? "escalar" : "seguir_o_desvio"), "passos:"];
+        if (!PASSOS.length) linhas.push("  []   # nenhum passo: tudo vai para o analista");
+        PASSOS.forEach(function(p) {
+            if (p.tipo === "decidir") {
+                linhas.push("  - decidir: " + p.condicao);
+                linhas.push("    senao: " + CODIGO_SENAO[p.senao]);
+            } else {
+                linhas.push("  - " + CODIGO_PASSO[p.tipo]);
+            }
+        });
+        $("soar-codigo").textContent = linhas.join("\n");
+    }
+
+    // ===================================================== renderização do resultado
+    var ROTULO_STATUS = {
+        contido: ["Contido pelo playbook", "var(--tip-color)"],
+        encerrado: ["Encerrado como falso positivo", "var(--tip-color)"],
+        encerrado_humano: ["Encerrado pelo aprovador", "var(--accent)"],
+        escalado: ["Escalado ao analista", "var(--warning-color)"]
+    };
+    function cartaoAlerta(a, r) {
+        var st = r.fn ? ["AMEAÇA ENCERRADA como falso positivo", "var(--danger-color)"] : ROTULO_STATUS[r.status];
+        var cor = r.fn || r.erradas.length || r.semRegistro ? "var(--danger-color)" : st[1];
+        var d = el("div", null, "border-left: 4px solid " + cor + "; background: var(--sunk); border-radius: var(--radius-sm); padding: 0.4rem 0.55rem; min-width: 0;");
+        d.setAttribute("data-alerta", a.id);
+        d.setAttribute("data-status", r.fn ? "fn" : r.status);
+        var cab = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.2rem 0.7rem; align-items: baseline;");
+        cab.appendChild(el("strong", a.id + " · " + a.hora + " · " + a.regra, "overflow-wrap: anywhere;"));
+        cab.appendChild(el("span", st[0], "color: " + st[1] + "; font-weight: 700;"));
+        d.appendChild(cab);
+        d.appendChild(el("div", a.resumo, "font-size: 0.76rem; color: var(--muted); overflow-wrap: anywhere;"));
+        d.appendChild(el("div", "MTTA " + fmtTempo(r.mtta) + " · MTTR " + (r.mttr === null ? "não resolvido" : fmtTempo(r.mttr)) + " (manual: " + a.manual.mtta_min + " / " + a.manual.mttr_min + " min)" + (r.custo ? " · custo dos erros " + fmtReais(r.custo) : ""), "margin-top: 0.15rem;"));
+        r.erradas.forEach(function(t) { d.appendChild(el("div", "Ação indevida (" + nomeBloco(t).toLowerCase() + "): " + a.erros[t].texto, "margin-top: 0.15rem; color: var(--danger-color); font-size: 0.76rem;")); });
+        if (r.negadas.length) d.appendChild(el("div", "Negado pelo aprovador: " + r.negadas.map(function(t) { return nomeBloco(t).toLowerCase(); }).join(", ") + ".", "margin-top: 0.15rem; font-size: 0.76rem;"));
+        var det = el("details", null, "margin-top: 0.25rem;");
+        det.appendChild(el("summary", "Passo a passo e o que era de verdade", "cursor: pointer; font-size: 0.76rem;"));
+        var lista = el("ol", null, "margin: 0.3rem 0 0 0; padding-left: 1.2rem; font-size: 0.74rem;");
+        r.log.forEach(function(l) {
+            var cores = { erro: "var(--danger-color)", aviso: "var(--warning-color)", ok: "var(--tip-color)" };
+            var li = el("li", "[" + fmtTempo(l.t) + "] " + l.texto, "overflow-wrap: anywhere;" + (l.tom ? " color: " + cores[l.tom] + ";" : ""));
+            lista.appendChild(li);
+        });
+        det.appendChild(lista);
+        var verdade = el("div", null, "margin-top: 0.3rem; font-size: 0.76rem; overflow-wrap: anywhere;");
+        verdade.appendChild(el("strong", (a.verdade === "malicioso" ? "Malicioso" : "Benigno") + ": "));
+        verdade.appendChild(document.createTextNode(a.nota + (a.corretas.length ? " Ações necessárias: " + a.corretas.map(function(t) { return nomeBloco(t).toLowerCase(); }).join(" e ") + "." : " Nenhuma contenção é necessária.")));
+        det.appendChild(verdade);
+        d.appendChild(det);
+        return d;
+    }
+    function placar(box, s, mensagem, ok) {
+        box.replaceChildren();
+        var itens = [
+            ["MTTA sem automação", fmtTempo(s.manual_mtta_s), "var(--muted)"],
+            ["MTTA com o playbook", fmtTempo(s.mtta_s), s.mtta_s < s.manual_mtta_s ? "var(--tip-color)" : "var(--ink)"],
+            ["MTTR sem automação", fmtTempo(s.manual_mttr_s), "var(--muted)"],
+            ["MTTR com o playbook" + (s.fn ? " (sem os não resolvidos)" : ""), fmtTempo(s.mttr_s), s.fn ? "var(--danger-color)" : s.mttr_s < s.manual_mttr_s ? "var(--tip-color)" : "var(--ink)"],
+            ["Tempo economizado na fila", fmtTempo(Math.max(0, s.economia_s)), "var(--accent)"],
+            ["Custo dos erros", fmtReais(s.custo), s.custo ? "var(--danger-color)" : "var(--tip-color)"],
+            ["Ameaças encerradas como FP", s.fn, s.fn ? "var(--danger-color)" : "var(--tip-color)"],
+            ["Ações indevidas", s.indevidas, s.indevidas ? "var(--danger-color)" : "var(--tip-color)"],
+            ["Contidos · encerrados · escalados", s.contidos + " · " + (s.encerrados + s.encerrados_humano) + " · " + s.escalados, "var(--accent)"],
+            ["Aprovações pedidas (negadas)", s.aprovacoes + " (" + s.negadas + ")", "var(--accent)"],
+            ["Alto impacto sem aprovação", s.alto_sem_aprov, s.alto_sem_aprov ? "var(--warning-color)" : "var(--tip-color)"],
+            ["Ações sem chamado", s.sem_registro, s.sem_registro ? "var(--danger-color)" : "var(--tip-color)"]
+        ];
+        var grade = el("div", null, "display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); gap: 0.4rem;");
+        itens.forEach(function(it) {
+            var c = el("div", null, "border: 1px solid " + it[2] + "; border-radius: var(--radius-sm); padding: 0.4rem 0.55rem; background: var(--surface); min-width: 0;");
+            c.appendChild(el("div", it[0], "font-size: 0.74rem; color: var(--muted);"));
+            c.appendChild(el("strong", String(it[1]), "font-size: 1.1rem; color: " + it[2] + "; overflow-wrap: anywhere;"));
+            grade.appendChild(c);
+        });
+        box.appendChild(grade);
+        box.appendChild(el("p", (ok ? "✓ " : "") + mensagem, "margin: 0.5rem 0 0 0; overflow-wrap: anywhere; color: " + (ok ? "var(--tip-color)" : "var(--ink)") + ";"));
+    }
+    function mensagem(s, res, falhas) {
+        var partes = [], algumaFalha = falhas.reputacao || falhas.cmdb || falhas.idp;
+        var seguro = !s.custo && !s.fn && !s.sem_registro;
+        if (s.fn) partes.push(s.fn + " ameaça(s) real(is) encerrada(s) como falso positivo. Desconhecido não é limpo, e sem dado não é limpo: decida por \"reputação não limpa\" e ligue a política de escalar quando faltar dado.");
+        if (s.indevidas) {
+            var exemplos = [];
+            res.forEach(function(r) { r.erradas.forEach(function(t) { if (exemplos.length < 2) exemplos.push(r.id + " (" + nomeBloco(t).toLowerCase() + ")"); }); });
+            var custoAcoes = res.reduce(function(acc, r, i) { return acc + r.erradas.reduce(function(x, t) { return x + SOAR.fila[i].erros[t].custo; }, 0); }, 0);
+            partes.push(s.indevidas + " ação(ões) indevida(s), " + fmtReais(custoAcoes) + " em prejuízo estimado, por exemplo " + exemplos.join(" e ") + ". Enriqueça e decida antes de agir, e use a lista de exceção para ativos críticos e parceiros.");
+        }
+        if (s.sem_registro) partes.push(s.sem_registro + " caso(s) com ação executada e sem chamado: acrescente o bloco de chamado para manter a trilha de auditoria.");
+        if (seguro && s.alto_sem_aprov) partes.push("Nenhum prejuízo nesta fila, mas " + s.alto_sem_aprov + " ação(ões) de alto impacto (conta desativada ou servidor isolado) rodaram sem aprovação humana. Uma decisão com desvio para aprovação resolve.");
+        if (seguro && !s.alto_sem_aprov) {
+            if (s.escalados === res.length && !algumaFalha) return { ok: false, texto: "Seguro, mas tudo foi para o analista. O enriquecimento já reduziu o MTTA; agora acrescente decisões e ações para conter sozinho o que é seguro conter." };
+            if (algumaFalha) return { ok: true, texto: "Com fonte fora do ar, o playbook não adivinhou: " + s.escalados + " alerta(s) escalado(s) com o contexto disponível e nenhum prejuízo. É o comportamento fail-safe. Desligue a falha para ver o ganho de tempo completo." };
+            if (s.escalados > 2) return { ok: false, texto: "Seguro, sem nenhum prejuízo, mas " + s.escalados + " alertas ainda dependem do analista. Veja no passo a passo o que faltou para conter ou encerrar com segurança." };
+            return { ok: true, texto: "Playbook seguro: nenhuma ação indevida, nenhuma ameaça encerrada e aprovação humana onde o erro custa caro. MTTR médio de " + fmtTempo(s.mttr_s) + " contra " + fmtTempo(s.manual_mttr_s) + " no processo manual. Agora ligue os cenários de falha e confira se ele continua seguro." };
+        }
+        return { ok: false, texto: partes.join(" ") || "Monte o playbook e rode de novo." };
+    }
+
+    window.rodarPlaybookSoar = function() {
+        var politicas = lerPoliticas(), falhas = lerFalhas();
+        var exec = window.executarPlaybook(PASSOS, politicas, falhas);
+        var s = window.resumirExecucao(exec.resultados);
+        var box = $("soar-placar");
+        ["custo", "fn", "contidos", "escalados", "aprovacoes", "indevidas", "alto_sem_aprov", "sem_registro"].forEach(function(k) { box.setAttribute("data-" + k.replace(/_/g, "-"), s[k]); });
+        var m = mensagem(s, exec.resultados, falhas);
+        placar(box, s, m.texto, m.ok);
+        var lista = $("soar-resultados");
+        lista.replaceChildren();
+        exec.resultados.forEach(function(r, i) { lista.appendChild(cartaoAlerta(SOAR.fila[i], r)); });
+        renderCodigo();
+        return { resultados: exec.resultados, chamados: exec.chamados, resumo: s };
+    };
+
+    window.carregarPresetSoar = function(nome) {
+        nome = nome || $("soar-preset").value;
+        var p = SOAR.presets[nome];
+        if (!p) return;
+        $("soar-preset").value = nome;
+        PASSOS = p.passos.map(function(x) { var c = {}; Object.keys(x).forEach(function(k) { c[k] = x[k]; }); return c; });
+        $("soar-pol-excecoes").checked = !!p.politicas.excecoes;
+        $("soar-pol-escalar").checked = !!p.politicas.escalar_sem_dado;
+        renderPassos();
+        return window.rodarPlaybookSoar();
+    };
+
+    // ===================================================== montagem inicial
+    function montarFila() {
+        var box = $("soar-fila");
+        box.replaceChildren();
+        SOAR.fila.forEach(function(a) {
+            var d = el("div", null, "background: var(--sunk); border-radius: var(--radius-sm); padding: 0.35rem 0.55rem; min-width: 0; overflow-wrap: anywhere;");
+            d.appendChild(el("strong", a.id + " · " + a.hora + " · " + a.regra));
+            d.appendChild(el("div", a.origem + " · severidade " + a.severidade, "font-size: 0.74rem; color: var(--muted);"));
+            var alvos = [];
+            if (a.host) alvos.push("host " + a.host);
+            if (a.indicador) alvos.push(a.indicador.tipo + " " + (a.indicador.tipo === "hash" ? a.indicador.valor.slice(0, 16) + "…" : a.indicador.valor));
+            if (a.conta) alvos.push("conta " + a.conta);
+            d.appendChild(el("div", a.resumo + " Alvos: " + alvos.join(", ") + ".", "font-size: 0.76rem;"));
+            box.appendChild(d);
+        });
+        $("soar-total-fila").textContent = SOAR.fila.length;
+    }
+    function montarExcecoes() {
+        var box = $("soar-excecoes");
+        box.replaceChildren();
+        var rot = { host: "Host", indicador: "IP/domínio", conta: "Conta" };
+        SOAR.excecoes.forEach(function(e) {
+            var d = el("div", null, "background: var(--sunk); border-radius: var(--radius-sm); padding: 0.3rem 0.55rem; min-width: 0; overflow-wrap: anywhere;");
+            d.appendChild(el("strong", rot[e.tipo] + " " + e.valor + ": "));
+            d.appendChild(document.createTextNode(e.motivo + ". Dono: " + e.dono + "; revisão em " + e.revisao.split("-").reverse().join("/") + "."));
+            box.appendChild(d);
+        });
+        $("soar-total-excecoes").textContent = SOAR.excecoes.length;
+    }
+    function montarPaleta() {
+        var box = $("soar-paleta");
+        box.replaceChildren();
+        SOAR.ordem_paleta.forEach(function(tipo) {
+            var b = SOAR.blocos[tipo];
+            var bt = el("button", "+ " + b.nome, "border-left: 4px solid " + COR_GRUPO[b.grupo] + "; font-size: 0.8rem; padding: 0.3rem 0.6rem; max-width: 100%; white-space: normal; text-align: left;");
+            bt.type = "button";
+            bt.className = "btn-secondary";
+            bt.title = b.ajuda;
+            bt.setAttribute("aria-label", "Adicionar bloco " + b.nome + ": " + b.ajuda);
+            bt.addEventListener("click", function() { window.adicionarBlocoSoar(tipo); });
+            box.appendChild(bt);
+        });
+        var sel = $("soar-preset");
+        sel.replaceChildren();
+        Object.keys(SOAR.presets).forEach(function(k) {
+            var o = el("option", SOAR.presets[k].rotulo);
+            o.value = k;
+            sel.appendChild(o);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        $("soar-contexto").textContent = SOAR.contexto;
+        montarFila();
+        montarExcecoes();
+        montarPaleta();
+        ["soar-pol-excecoes", "soar-pol-escalar", "soar-falha-reputacao", "soar-falha-cmdb", "soar-falha-idp"].forEach(function(id) {
+            $(id).addEventListener("change", window.rodarPlaybookSoar);
+        });
+        window.carregarPresetSoar("ingenuo");
+        if (typeof initChecklist === "function") {
+            initChecklist("soar-e-automacao-de-resposta");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
+    <footer class="study-footer">
+      <p>&copy; 2026 Estudos em Cibersegurança &bull; Material Autoinstrucional e Prático 100% Offline</p>
+      <p><a href="../index.html">← Painel de Estudos</a> &bull; Curadoria e Desenvolvimento por José Mauro da Silva Brandão</p>
+    </footer>
+  </main>
+
+  <!-- Scripts Interativos Embutidos -->
+  <script>
+/**
+ * ============================================================================
+ * ESTUDOS DE CIBERSEGURANÇA — BIBLIOTECA BASE COMPARTILHADA (base.js)
+ * Utilitários reativos, persistência local segura, acessibilidade e interatividade.
+ * Vanilla JavaScript (Zero dependências externas, 100% offline-ready).
+ * ============================================================================
+ */
+
+(function (window, document) {
+  'use strict';
+
+  // --------------------------------------------------------------------------
+  // 0. Utilitários Seguros de Armazenamento Local (localStorage)
+  // --------------------------------------------------------------------------
+  function safeStorageGet(key) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.localStorage.getItem(key);
+      }
+    } catch (e) {
+      console.warn(`[CS] Falha ao ler localStorage chave "${key}":`, e);
+    }
+    return null;
+  }
+
+  function safeStorageSet(key, value) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, String(value));
+        return true;
+      }
+    } catch (e) {
+      console.warn(`[CS] Falha ao gravar localStorage chave "${key}":`, e);
+    }
+    return false;
+  }
+
+  // --------------------------------------------------------------------------
+  // 1. Gerenciamento de Tema (Claro / Escuro)
+  // --------------------------------------------------------------------------
+  const THEME_STORAGE_KEY = 'cs_theme';
+
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    updateThemeButtons(theme);
+  }
+
+  function getSystemTheme() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  }
+
+  function getCurrentTheme() {
+    const saved = safeStorageGet(THEME_STORAGE_KEY);
+    return saved || getSystemTheme();
+  }
+
+  function updateThemeButtons(currentTheme) {
+    const effectiveTheme = currentTheme === 'dark' || (!currentTheme && getSystemTheme() === 'dark') ? 'dark' : 'light';
+    const buttons = document.querySelectorAll('.theme-toggle-btn, [data-theme-toggle]');
+    buttons.forEach((btn) => {
+      btn.setAttribute('aria-label', effectiveTheme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro');
+      btn.innerHTML = effectiveTheme === 'dark'
+        ? '<span class="theme-icon">☀️</span> <span class="theme-label">Claro</span>'
+        : '<span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>';
+    });
+  }
+
+  function toggleTheme() {
+    const current = getCurrentTheme();
+    const next = current === 'dark' ? 'light' : 'dark';
+    safeStorageSet(THEME_STORAGE_KEY, next);
+    applyTheme(next);
+    return next;
+  }
+
+  function initTheme() {
+    const saved = safeStorageGet(THEME_STORAGE_KEY);
+    if (saved) {
+      applyTheme(saved);
+    } else {
+      updateThemeButtons(getSystemTheme());
+    }
+
+    // Monitora preferência do sistema operacional caso usuário não tenha fixado
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!safeStorageGet(THEME_STORAGE_KEY)) {
+          updateThemeButtons(e.matches ? 'dark' : 'light');
+        }
+      });
+    }
+
+    // Vincula cliques em botões de tema
+    document.querySelectorAll('.theme-toggle-btn, [data-theme-toggle]').forEach((btn) => {
+      btn.onclick = toggleTheme;
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 2. Checklist Operacional Interativo & Status de Conclusão de Estudo
+  // --------------------------------------------------------------------------
+  function extractSlug() {
+    if (document.body && document.body.dataset && document.body.dataset.slug) {
+      return document.body.dataset.slug;
+    }
+    const metaSlug = document.querySelector('meta[name="study-slug"]');
+    if (metaSlug && metaSlug.content) {
+      return metaSlug.content;
+    }
+    // Fallback: tenta obter do pathname
+    const match = window.location.pathname.match(/treinamento-([^.]+)\.html/);
+    if (match) {
+      return match[1];
+    }
+    return 'default';
+  }
+
+  function updateChecklistProgress(checklistEl) {
+    const checkboxes = checklistEl.querySelectorAll('input[type="checkbox"]');
+    if (!checkboxes.length) return;
+
+    let checkedCount = 0;
+    checkboxes.forEach((cb) => {
+      if (cb.checked) checkedCount++;
+    });
+
+    const progressFill = checklistEl.querySelector('.checklist-progress-fill');
+    if (progressFill) {
+      const pct = Math.round((checkedCount / checkboxes.length) * 100);
+      progressFill.style.width = `${pct}%`;
+    }
+
+    const counterEl = checklistEl.querySelector('.checklist-counter');
+    if (counterEl) {
+      counterEl.textContent = `${checkedCount} de ${checkboxes.length} itens auditados`;
+    }
+  }
+
+  function initChecklist(slug) {
+    const activeSlug = slug || extractSlug();
+    const checklists = document.querySelectorAll('.checklist');
+
+    checklists.forEach((checklist, listIdx) => {
+      const listId = checklist.dataset.checklistId || `list_${listIdx}`;
+      const items = checklist.querySelectorAll('.check-item');
+
+      items.forEach((item, itemIdx) => {
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        if (!checkbox) return;
+
+        const itemId = checkbox.id || checkbox.getAttribute('data-id') || `${listId}_${itemIdx}`;
+        const storageKey = `cs_check_${activeSlug}_${itemId}`;
+
+        // Restaura estado
+        const savedState = safeStorageGet(storageKey);
+        if (savedState === 'true') {
+          checkbox.checked = true;
+          item.classList.add('completed');
+        } else {
+          checkbox.checked = false;
+          item.classList.remove('completed');
+        }
+
+        // Event listener
+        checkbox.onchange = function () {
+          safeStorageSet(storageKey, checkbox.checked ? 'true' : 'false');
+          if (checkbox.checked) {
+            item.classList.add('completed');
+          } else {
+            item.classList.remove('completed');
+          }
+          updateChecklistProgress(checklist);
+        };
+      });
+
+      updateChecklistProgress(checklist);
+    });
+  }
+
+  function isStudyDone(slug) {
+    const activeSlug = slug || extractSlug();
+    return safeStorageGet(`cs_done_${activeSlug}`) === 'true';
+  }
+
+  function setStudyDone(slug, isDone) {
+    const activeSlug = slug || extractSlug();
+    const doneValue = isDone !== false;
+    return safeStorageSet(`cs_done_${activeSlug}`, doneValue ? 'true' : 'false');
+  }
+
+  // --------------------------------------------------------------------------
+  // 3. Sistema de Quiz com Feedback Explicativo
+  // --------------------------------------------------------------------------
+  function checkQuiz(btn, isCorrect, explanation) {
+    const quizItem = btn.closest('.quiz-item');
+    if (!quizItem) return;
+
+    // Desabilita botões para registrar a tentativa
+    const buttons = quizItem.querySelectorAll('.quiz-btn');
+    buttons.forEach((b) => {
+      b.disabled = true;
+      b.classList.remove('selected');
+    });
+
+    // Destaca o botão clicado
+    btn.classList.add('selected');
+    if (isCorrect) {
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('incorrect');
+    }
+
+    // Exibe ou atualiza o painel de feedback
+    let feedbackEl = quizItem.querySelector('.quiz-feedback');
+    if (!feedbackEl) {
+      feedbackEl = document.createElement('div');
+      feedbackEl.className = 'quiz-feedback';
+      quizItem.appendChild(feedbackEl);
+    }
+
+    feedbackEl.className = `quiz-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+    const icon = isCorrect ? '✅' : '❌';
+    const statusText = isCorrect ? 'Correto!' : 'Incorreto.';
+    feedbackEl.innerHTML = `<strong>${icon} ${statusText}</strong> ${escapeHtml(explanation || '')}`;
+    feedbackEl.style.display = 'block';
+  }
+
+  function initQuiz() {
+    const quizItems = document.querySelectorAll('.quiz-item');
+    quizItems.forEach((quiz, idx) => {
+      const qId = quiz.dataset.quizId || `quiz_${idx}`;
+      quiz.setAttribute('data-initialized', 'true');
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 4. Copiar Código para Área de Transferência
+  // --------------------------------------------------------------------------
+  function copyCode(button, targetId) {
+    let textToCopy = '';
+
+    if (targetId) {
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        textToCopy = targetEl.innerText || targetEl.textContent;
+      }
+    } else if (button) {
+      const terminalBox = button.closest('.terminal-box') || button.parentElement;
+      const codeEl = terminalBox ? terminalBox.querySelector('pre code, pre, code') : null;
+      if (codeEl) {
+        textToCopy = codeEl.innerText || codeEl.textContent;
+      }
+    }
+
+    if (!textToCopy) return;
+
+    const originalText = button ? button.innerText : 'Copiar';
+
+    function setSuccess() {
+      if (button) {
+        button.innerText = '✓ Copiado!';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.innerText = originalText;
+          button.classList.remove('copied');
+        }, 2000);
+      }
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textToCopy.trim()).then(setSuccess).catch(() => {
+        fallbackCopy(textToCopy.trim(), setSuccess);
+      });
+    } else {
+      fallbackCopy(textToCopy.trim(), setSuccess);
+    }
+  }
+
+  function fallbackCopy(text, callback) {
+    if (!document.body) {
+      console.warn('document.body não está pronto para cópia via textarea.');
+      return;
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const successful = document.execCommand('copy');
+      if (successful && callback) {
+        callback();
+      }
+    } catch (e) {
+      console.warn('Falha ao copiar texto:', e);
+    } finally {
+      if (textarea.parentNode) {
+        textarea.parentNode.removeChild(textarea);
+      }
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 5. Utilitários Reutilizáveis para Simuladores e Laboratórios
+  // --------------------------------------------------------------------------
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function formatBytes(bytes, decimals = 2) {
+    if (!+bytes || bytes < 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  }
+
+  function formatNumber(num) {
+    if (isNaN(num)) return '0';
+    return new Intl.NumberFormat('pt-BR').format(num);
+  }
+
+  function bytesToHex(uint8Array) {
+    return Array.from(uint8Array)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  function hexToBytes(hexString) {
+    let cleaned = String(hexString || '').replace(/\s+/g, '');
+    if (cleaned.length % 2 !== 0) {
+      cleaned = '0' + cleaned;
+    }
+    const bytes = new Uint8Array(cleaned.length / 2);
+    for (let i = 0; i < cleaned.length; i += 2) {
+      bytes[i / 2] = parseInt(cleaned.substring(i, i + 2), 16);
+    }
+    return bytes;
+  }
+
+  async function sha256Hex(message) {
+    if (!window.crypto || !window.crypto.subtle) {
+      throw new Error('Web Cryptography API não suportada neste ambiente.');
+    }
+    const msgUint8 = new TextEncoder().encode(message);
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // --------------------------------------------------------------------------
+  // 6. Exposição Global de Funções & Inicialização Automática
+  // --------------------------------------------------------------------------
+  window.safeStorageGet = safeStorageGet;
+  window.safeStorageSet = safeStorageSet;
+  window.initTheme = initTheme;
+  window.toggleTheme = toggleTheme;
+  window.initChecklist = initChecklist;
+  window.isStudyDone = isStudyDone;
+  window.setStudyDone = setStudyDone;
+  window.initQuiz = initQuiz;
+  window.checkQuiz = checkQuiz;
+  window.copyCode = copyCode;
+  window.escapeHtml = escapeHtml;
+  window.formatBytes = formatBytes;
+  window.formatNumber = formatNumber;
+  window.bytesToHex = bytesToHex;
+  window.hexToBytes = hexToBytes;
+  window.sha256Hex = sha256Hex;
+
+  // Namespace unificado
+  window.CS = {
+    safeStorageGet,
+    safeStorageSet,
+    initTheme,
+    toggleTheme,
+    initChecklist,
+    isStudyDone,
+    setStudyDone,
+    initQuiz,
+    checkQuiz,
+    copyCode,
+    escapeHtml,
+    formatBytes,
+    formatNumber,
+    bytesToHex,
+    hexToBytes,
+    sha256Hex,
+  };
+
+  // Auto-inicialização na carga do DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      initChecklist();
+      initQuiz();
+    });
+  } else {
+    initTheme();
+    initChecklist();
+    initQuiz();
+  }
+})(window, document);
+
+  </script>
+</body>
+</html>
