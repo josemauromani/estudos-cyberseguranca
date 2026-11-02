@@ -24,6 +24,8 @@ GERADORES_DIR = Path(__file__).resolve().parent
 ROOT_DIR = GERADORES_DIR.parent
 DEFAULT_ESTUDOS_TXT = GERADORES_DIR / "estudos.txt"
 DEFAULT_BASE_CSS = GERADORES_DIR / "base.css"
+TOKENS_CSS = GERADORES_DIR / "tokens.css"
+LABORATORIO_CSS = GERADORES_DIR / "laboratorio.css"
 DEFAULT_BASE_JS = GERADORES_DIR / "base.js"
 
 if str(GERADORES_DIR) not in sys.path:
@@ -33,6 +35,18 @@ try:
     from diagramas import processar_diagramas_html
 except ImportError:
     from _geradores.diagramas import processar_diagramas_html
+
+
+def carregar_css(base_css: Optional[Path] = None) -> str:
+    """Monta o CSS inline: fontes embutidas + tokens + base + laboratório (se existir)."""
+    from fontes import css_fontes
+
+    base = Path(base_css) if base_css else DEFAULT_BASE_CSS
+    partes = [css_fontes()]
+    for arquivo in (TOKENS_CSS, base, LABORATORIO_CSS):
+        if arquivo.exists():
+            partes.append(arquivo.read_text(encoding="utf-8"))
+    return "\n".join(partes)
 
 
 def normalizar_chave(texto: str) -> str:
@@ -113,7 +127,7 @@ def montar_treinamento(
         output_path: Caminho de destino para gravação do HTML compilado.
         titulo: Título da página/treinamento (opcional, extraído do catálogo se omitido).
         meta: Metadados contextuais opcionais (slug, trilha, nist, etc.).
-        css_path: Caminho customizado para base.css (padrão: _geradores/base.css).
+        css_path: Caminho customizado para base.css (padrão: _geradores/base.css; tokens e fontes são sempre incluídos).
         js_path: Caminho customizado para base.js (padrão: _geradores/base.js).
         recompilar_diagramas: Se True, força a recompilação dos diagramas Mermaid ignorando cache.
         cache_diagramas: Diretório do cache de SVGs (padrão: _geradores/cache_diagramas).
@@ -128,10 +142,9 @@ def montar_treinamento(
         raise FileNotFoundError(f"Arquivo de corpo HTML não encontrado: {body_path}")
 
     # Leitura do CSS e JS para inlining
-    css_file = Path(css_path) if css_path else DEFAULT_BASE_CSS
     js_file = Path(js_path) if js_path else DEFAULT_BASE_JS
 
-    css_content = css_file.read_text(encoding="utf-8") if css_file.exists() else ""
+    css_content = carregar_css(Path(css_path) if css_path else DEFAULT_BASE_CSS)
     js_content = js_file.read_text(encoding="utf-8") if js_file.exists() else ""
 
     # Resolução de metadados
@@ -191,10 +204,6 @@ def montar_treinamento(
   <title>{titulo_final} — Estudos de Cibersegurança</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%233b82f6' d='M32 4 8 14v16c0 15 10 26 24 30 14-4 24-15 24-30V14z'/%3E%3Cpath fill='%23ffffff' d='M28 40 19 31l4-4 5 5 13-13 4 4z'/%3E%3C/svg%3E">
 
-  <!-- Google Fonts: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
   <style>
 {css_content}

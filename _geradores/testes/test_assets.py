@@ -13,6 +13,7 @@ class TestAssets(unittest.TestCase):
     def setUp(self):
         self.root = Path(__file__).resolve().parent.parent.parent
         self.css_file = self.root / "_geradores" / "base.css"
+        self.tokens_file = self.root / "_geradores" / "tokens.css"
         self.js_file = self.root / "_geradores" / "base.js"
 
     def test_base_css_exists_and_valid(self):
@@ -23,8 +24,8 @@ class TestAssets(unittest.TestCase):
 
     def test_base_css_contains_design_tokens(self):
         """Verifica a presença de tokens de cores, temas e fontes obrigatórios."""
-        self.assertTrue(self.css_file.exists(), "base.css deve existir")
-        content = self.css_file.read_text(encoding="utf-8")
+        self.assertTrue(self.tokens_file.exists(), "tokens.css deve existir")
+        content = self.tokens_file.read_text(encoding="utf-8")
 
         # Tokens fundamentais
         tokens_fundamentais = [
@@ -51,14 +52,15 @@ class TestAssets(unittest.TestCase):
 
     def test_tokens_de_cada_trilha(self):
         """Cada trilha de TRILHAS tem token nos 4 blocos de tema, selo e bloco."""
-        base = self.css_file.read_text(encoding="utf-8")
+        base = self.tokens_file.read_text(encoding="utf-8")
+        base_css = self.css_file.read_text(encoding="utf-8")
         index = (self.root / "_geradores" / "index.css").read_text(encoding="utf-8")
         for tid, info in TRILHAS.items():
             token = f"--t{tid}-{info['cor_nome']}:"
             with self.subTest(trilha=tid):
                 self.assertEqual(base.count(token), 4)
                 self.assertEqual(index.count(token), 4)
-                self.assertIn(f".badge-t{tid} ", base)
+                self.assertIn(f".badge-t{tid} ", base_css)
                 self.assertIn(f".track-tile.t{tid} ", index)
 
     def test_numero_do_bloco_de_trilha_legivel_nos_dois_temas(self):
@@ -125,8 +127,8 @@ class TestAssets(unittest.TestCase):
 
     def test_base_css_supports_dark_mode(self):
         """Verifica se há suporte a tema escuro via media query e atributo de dados."""
-        self.assertTrue(self.css_file.exists(), "base.css deve existir")
-        content = self.css_file.read_text(encoding="utf-8")
+        self.assertTrue(self.tokens_file.exists(), "tokens.css deve existir")
+        content = self.tokens_file.read_text(encoding="utf-8")
 
         self.assertIn("prefers-color-scheme: dark", content, "Deve suportar prefers-color-scheme: dark")
         self.assertIn('data-theme="dark"', content, "Deve suportar alternância explícita data-theme='dark'")

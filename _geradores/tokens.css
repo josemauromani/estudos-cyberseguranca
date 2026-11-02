@@ -1,0 +1,300 @@
+/* ==========================================================================
+   ESTUDOS DE CIBERSEGURANÇA — TOKENS (tokens.css)
+   Fonte única dos design tokens. Embutido por montar.py antes de base.css.
+   Todo token tem o mesmo nome nos temas claro, escuro (preferência do sistema)
+   e escuro/claro explícitos (data-theme).
+   ========================================================================== */
+
+:root {
+  /* Superfícies */
+  --ground: #F4F6F8;
+  --surface: #FFFFFF;
+  --sunk: #EAEFF2;
+  --rule: #D5DCE1;
+  --rule-strong: #C4CDD3;
+
+  /* Texto */
+  --ink: #14212B;
+  --muted: #5B6B77;
+
+  /* Ação e estados */
+  --accent: #2563EB;
+  --accent-soft: #E0ECFF;
+  --ok: #15803D;
+  --bad: #DC2626;
+
+  /* Tipos de seção */
+  --tipo-teoria: #2563EB;
+  --tipo-teoria-bg: #EFF5FF;
+  --tipo-laboratorio: #0D9488;
+  --tipo-laboratorio-bg: #ECFDF8;
+  --tipo-checklist: #B45309;
+  --tipo-checklist-bg: #FFF8EB;
+  --tipo-questoes: #C026D3;
+  --tipo-questoes-bg: #FDF2FE;
+  --tipo-referencias: #64748B;
+  --tipo-referencias-bg: #F1F5F9;
+
+  /* Cores temáticas das trilhas */
+  --t1-blue: #2563EB;
+  --t2-green: #059669;
+  --t3-red: #DC2626;
+  --t4-purple: #7C3AED;
+  --t5-cyan: #0891B2;
+  --t6-amber: #D97706;
+  --t7-rose: #DB2777;
+  --t8-slate: #475569;
+  --t9-indigo: #4F46E5;
+  --t10-orange: #C2410C;
+  --t11-fuchsia: #A21CAF;
+  --t12-teal: #0F766E;
+  --t13-lime: #4D7C0F;
+
+  /* Callouts */
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+  --warning-color: #EA580C;
+  --warning-bg: #FFF4ED;
+  --warning-border: #F97316;
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+  --law-color: #6D28D9;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+
+  /* Console */
+  --console: #0F1820;
+  --console-ink: #D6E2EA;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 28, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 28, 0.08), 0 2px 4px -2px rgba(15, 23, 28, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 28, 0.1), 0 4px 6px -4px rgba(15, 23, 28, 0.05);
+
+  /* Tipografia */
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+
+  /* Forma */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+  --radius: var(--radius-md);
+
+  /* Transição */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.25s ease-in-out;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    /* Superfícies */
+    --ground: #0E151A;
+    --surface: #152028;
+    --sunk: #1C2A33;
+    --rule: #2A3943;
+    --rule-strong: #364853;
+
+    /* Texto */
+    --ink: #E4EAED;
+    --muted: #9BABB6;
+
+    /* Ação e estados */
+    --accent: #60A5FA;
+    --accent-soft: rgba(96, 165, 250, 0.15);
+    --ok: #4ADE80;
+    --bad: #F87171;
+
+    /* Tipos de seção */
+    --tipo-teoria: #60A5FA;
+    --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
+    --tipo-laboratorio: #2DD4BF;
+    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
+    --tipo-checklist: #FBBF24;
+    --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
+    --tipo-questoes: #E879F9;
+    --tipo-questoes-bg: rgba(232, 121, 249, 0.09);
+    --tipo-referencias: #94A3B8;
+    --tipo-referencias-bg: rgba(148, 163, 184, 0.08);
+
+    /* Cores temáticas das trilhas */
+    --t1-blue: #60A5FA;
+    --t2-green: #34D399;
+    --t3-red: #F87171;
+    --t4-purple: #A78BFA;
+    --t5-cyan: #22D3EE;
+    --t6-amber: #FBBF24;
+    --t7-rose: #F472B6;
+    --t8-slate: #94A3B8;
+    --t9-indigo: #818CF8;
+    --t10-orange: #FB923C;
+    --t11-fuchsia: #E879F9;
+    --t12-teal: #2DD4BF;
+    --t13-lime: #A3E635;
+
+    /* Callouts */
+    --tip-color: #34D399;
+    --tip-bg: rgba(52, 211, 153, 0.10);
+    --tip-border: #059669;
+    --warning-color: #FB923C;
+    --warning-bg: rgba(251, 146, 60, 0.10);
+    --warning-border: #EA580C;
+    --danger-color: #F87171;
+    --danger-bg: rgba(248, 113, 113, 0.10);
+    --danger-border: #DC2626;
+    --law-color: #A78BFA;
+    --law-bg: rgba(167, 139, 250, 0.10);
+    --law-border: #7C3AED;
+
+    /* Console */
+    --console: #0A1015;
+    --console-ink: #D6E2EA;
+
+    /* Sombras (nenhuma no escuro) */
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+  }
+}
+
+:root[data-theme="dark"] {
+  /* Superfícies */
+  --ground: #0E151A;
+  --surface: #152028;
+  --sunk: #1C2A33;
+  --rule: #2A3943;
+  --rule-strong: #364853;
+
+  /* Texto */
+  --ink: #E4EAED;
+  --muted: #9BABB6;
+
+  /* Ação e estados */
+  --accent: #60A5FA;
+  --accent-soft: rgba(96, 165, 250, 0.15);
+  --ok: #4ADE80;
+  --bad: #F87171;
+
+  /* Tipos de seção */
+  --tipo-teoria: #60A5FA;
+  --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
+  --tipo-laboratorio: #2DD4BF;
+  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
+  --tipo-checklist: #FBBF24;
+  --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
+  --tipo-questoes: #E879F9;
+  --tipo-questoes-bg: rgba(232, 121, 249, 0.09);
+  --tipo-referencias: #94A3B8;
+  --tipo-referencias-bg: rgba(148, 163, 184, 0.08);
+
+  /* Cores temáticas das trilhas */
+  --t1-blue: #60A5FA;
+  --t2-green: #34D399;
+  --t3-red: #F87171;
+  --t4-purple: #A78BFA;
+  --t5-cyan: #22D3EE;
+  --t6-amber: #FBBF24;
+  --t7-rose: #F472B6;
+  --t8-slate: #94A3B8;
+  --t9-indigo: #818CF8;
+  --t10-orange: #FB923C;
+  --t11-fuchsia: #E879F9;
+  --t12-teal: #2DD4BF;
+  --t13-lime: #A3E635;
+
+  /* Callouts */
+  --tip-color: #34D399;
+  --tip-bg: rgba(52, 211, 153, 0.10);
+  --tip-border: #059669;
+  --warning-color: #FB923C;
+  --warning-bg: rgba(251, 146, 60, 0.10);
+  --warning-border: #EA580C;
+  --danger-color: #F87171;
+  --danger-bg: rgba(248, 113, 113, 0.10);
+  --danger-border: #DC2626;
+  --law-color: #A78BFA;
+  --law-bg: rgba(167, 139, 250, 0.10);
+  --law-border: #7C3AED;
+
+  /* Console */
+  --console: #0A1015;
+  --console-ink: #D6E2EA;
+
+  /* Sombras (nenhuma no escuro) */
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+}
+
+:root[data-theme="light"] {
+  /* Superfícies */
+  --ground: #F4F6F8;
+  --surface: #FFFFFF;
+  --sunk: #EAEFF2;
+  --rule: #D5DCE1;
+  --rule-strong: #C4CDD3;
+
+  /* Texto */
+  --ink: #14212B;
+  --muted: #5B6B77;
+
+  /* Ação e estados */
+  --accent: #2563EB;
+  --accent-soft: #E0ECFF;
+  --ok: #15803D;
+  --bad: #DC2626;
+
+  /* Tipos de seção */
+  --tipo-teoria: #2563EB;
+  --tipo-teoria-bg: #EFF5FF;
+  --tipo-laboratorio: #0D9488;
+  --tipo-laboratorio-bg: #ECFDF8;
+  --tipo-checklist: #B45309;
+  --tipo-checklist-bg: #FFF8EB;
+  --tipo-questoes: #C026D3;
+  --tipo-questoes-bg: #FDF2FE;
+  --tipo-referencias: #64748B;
+  --tipo-referencias-bg: #F1F5F9;
+
+  /* Cores temáticas das trilhas */
+  --t1-blue: #2563EB;
+  --t2-green: #059669;
+  --t3-red: #DC2626;
+  --t4-purple: #7C3AED;
+  --t5-cyan: #0891B2;
+  --t6-amber: #D97706;
+  --t7-rose: #DB2777;
+  --t8-slate: #475569;
+  --t9-indigo: #4F46E5;
+  --t10-orange: #C2410C;
+  --t11-fuchsia: #A21CAF;
+  --t12-teal: #0F766E;
+  --t13-lime: #4D7C0F;
+
+  /* Callouts */
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+  --warning-color: #EA580C;
+  --warning-bg: #FFF4ED;
+  --warning-border: #F97316;
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+  --law-color: #6D28D9;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+
+  /* Console */
+  --console: #0F1820;
+  --console-ink: #D6E2EA;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 28, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 28, 0.08), 0 2px 4px -2px rgba(15, 23, 28, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 28, 0.1), 0 4px 6px -4px rgba(15, 23, 28, 0.05);
+}
