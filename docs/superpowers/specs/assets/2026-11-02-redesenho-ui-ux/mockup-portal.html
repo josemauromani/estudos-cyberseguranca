@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup — Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#F4F6F8; --surface:#FFFFFF; --sunk:#EAEFF2; --ink:#14212B; --muted:#5B6B77; --rule:#D5DCE1; --rule-strong:#C4CDD3;
+  --accent:#2563EB; --accent-soft:#E0ECFF; --ok:#15803D; --ok-soft:#ECFDF3; --prog:#B45309; --prog-soft:#FFF8EB;
+  --lab:#0D9488; --qst:#C026D3;
+  --f-display:"Barlow Semi Condensed","Arial Narrow",Arial,sans-serif; --f-body:"IBM Plex Sans",system-ui,sans-serif; --f-mono:"IBM Plex Mono",monospace;
+  --r-md:8px; --r-lg:12px; --shadow:0 1px 2px rgba(15,23,28,.05),0 2px 8px rgba(15,23,28,.04);
+  --t1:#2563EB; --t2:#0891B2; --t3:#DC2626; --t4:#EA580C; --t11:#0E7490; --t12:#7C3AED;
+}
+:root[data-theme="dark"]{
+  --ground:#0E151A; --surface:#152028; --sunk:#1C2A33; --ink:#E4EAED; --muted:#9BABB6; --rule:#2A3943; --rule-strong:#364853;
+  --accent:#60A5FA; --accent-soft:rgba(96,165,250,.15); --ok:#4ADE80; --ok-soft:rgba(74,222,128,.10); --prog:#FBBF24; --prog-soft:rgba(251,191,36,.10); --shadow:none;
+  --t1:#60A5FA; --t2:#22D3EE; --t3:#F87171; --t4:#FB923C; --t11:#2DD4BF; --t12:#A78BFA;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.6 var(--f-body);-webkit-font-smoothing:antialiased}
+.topbar{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--rule)}
+.topbar-in{display:flex;align-items:center;gap:18px;height:56px;padding:0 20px}
+.brand{display:flex;align-items:center;gap:8px;font:700 19px var(--f-display);white-space:nowrap}
+.brand svg{flex:none}
+.search{flex:1;max-width:560px;display:flex;align-items:center;gap:8px;background:var(--ground);border:1px solid var(--rule);border-radius:var(--r-md);padding:7px 12px;color:var(--muted)}
+.search input{flex:1;border:0;background:transparent;color:var(--ink);font:14px var(--f-body);outline:none}
+.search kbd{font:500 11px var(--f-mono);border:1px solid var(--rule-strong);border-radius:4px;padding:0 5px}
+.sp{flex:1}
+.iconbtn{border:1px solid var(--rule);background:var(--surface);color:var(--ink);border-radius:var(--r-md);padding:5px 10px;font:500 12px var(--f-body);cursor:pointer}
+
+.shell{display:grid;grid-template-columns:240px minmax(0,1fr);max-width:1320px;margin:0 auto}
+.side{position:sticky;top:57px;height:calc(100vh - 57px);overflow:auto;border-right:1px solid var(--rule);padding:20px 14px}
+.side .lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 10px 6px}
+.side nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-md);color:var(--ink);text-decoration:none;font-size:14px;margin-bottom:2px;cursor:pointer}
+.side nav a:hover{background:var(--sunk)}
+.side nav a.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.side nav a .n{margin-left:auto;font-size:11px;color:var(--muted);font-weight:500}
+.gprog{margin:22px 10px 0;padding-top:18px;border-top:1px solid var(--rule);font-size:13px;color:var(--muted)}
+.gprog b{font:700 26px var(--f-display);color:var(--ink)}
+.bar{height:6px;background:var(--sunk);border-radius:3px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%;background:var(--accent)}
+.gprog .row{display:flex;justify-content:space-between;margin-top:4px}
+
+.main{padding:26px 34px 70px;min-width:0}
+h1{font:700 30px/1.15 var(--f-display);margin:0 0 4px}
+.lede{color:var(--muted);margin:0 0 22px;max-width:70ch}
+
+.continue{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;background:var(--surface);border:1px solid var(--rule);border-left:5px solid var(--t11);border-radius:var(--r-lg);padding:18px 22px;margin-bottom:26px;box-shadow:var(--shadow)}
+.continue .k{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.continue h2{font:700 22px/1.2 var(--f-display);margin:3px 0 6px}
+.continue .meta{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted)}
+.continue .meta b{color:var(--ink)}
+.continue .bar{max-width:420px}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--r-md);padding:9px 16px;font:600 14px var(--f-body);cursor:pointer;border:1px solid var(--rule-strong);background:var(--surface);color:var(--ink);text-decoration:none;white-space:nowrap}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:18px}
+.toolbar .l{font-size:13px;color:var(--muted);margin-right:2px}
+.seg{display:inline-flex;border:1px solid var(--rule-strong);border-radius:var(--r-md);overflow:hidden;background:var(--surface)}
+.seg button{border:0;border-right:1px solid var(--rule);background:transparent;color:var(--ink);padding:5px 12px;font:500 13px var(--f-body);cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--ink);color:var(--surface)}
+.toggle{display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;margin-left:8px}
+.count{margin-left:auto;font-size:13px;color:var(--muted)}
+
+.group{margin-bottom:28px}
+.ghead{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--gc)}
+.ghead h3{font:700 18px var(--f-display);margin:0}
+.ghead .k{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gc)}
+.ghead .p{margin-left:auto;font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.mc{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r-lg);padding:14px 16px 12px;text-decoration:none;color:var(--ink);position:relative;transition:border-color .15s,transform .15s}
+.mc:hover{border-color:var(--gc);transform:translateY(-1px)}
+.mc::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--gc)}
+.mc .top{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.mc .num{font:600 12px var(--f-mono);color:var(--gc)}
+.mc h4{font:700 17px/1.25 var(--f-display);margin:5px 0 4px}
+.mc p{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45;flex:1}
+.mc .tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.mc .tag{font-size:11px;background:var(--sunk);border-radius:99px;padding:1px 8px}
+.mc .tag.lab{color:var(--lab)}
+.st{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;padding-top:9px;border-top:1px solid var(--rule)}
+.st .bar{flex:1;margin:0}
+.st.done{color:var(--ok)}.st.doing{color:var(--prog)}.st.new{color:var(--muted);font-weight:500}
+.st.doing .bar i{background:var(--prog)}
+.st small{font-weight:500;color:var(--muted)}
+
+.view{display:none}.view.on{display:block}
+.route{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r-lg);padding:18px 20px;margin-bottom:14px}
+.route h3{font:700 19px var(--f-display);margin:0 0 4px}
+.steps{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.steps span{font-size:12px;border:1px solid var(--rule-strong);border-radius:99px;padding:2px 10px}
+.steps span.ok{background:var(--ok-soft);border-color:transparent;color:var(--ok)}
+.steps span.next{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.note{position:fixed;right:16px;bottom:16px;z-index:30;max-width:300px;background:#14212B;color:#E4EAED;font-size:12px;line-height:1.5;padding:12px 14px;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.note b{color:#7DD3FC}.note button{float:right;background:transparent;border:0;color:#9BABB6;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="note"><button onclick="this.parentNode.remove()">✕</button><b>Mockup funcional</b><br>Teste: menu lateral (Catálogo, Rotas sugeridas), "Agrupar por", "Só não concluídos", busca e tema 🌙. Amostra de 9 dos 57 módulos.</div>
+
+<header class="topbar"><div class="topbar-in">
+  <div class="brand"><svg width="22" height="22" viewBox="0 0 64 64"><path fill="#2563EB" d="M32 4 8 14v16c0 15 10 26 24 30 14-4 24-15 24-30V14z"/><path fill="#fff" d="M28 40 19 31l4-4 5 5 13-13 4 4z"/></svg>Estudos de Cibersegurança</div>
+  <label class="search">🔍 <input id="q" placeholder="Buscar módulo, protocolo, CVE, norma…"><kbd>/</kbd></label>
+  <span class="sp"></span>
+  <button class="iconbtn" id="themeBtn" onclick="toggleTheme()">🌙 Escuro</button>
+</div></header>
+
+<div class="shell">
+  <aside class="side">
+    <div class="lbl">Explorar</div>
+    <nav id="nav">
+      <a class="on" data-v="catalogo">📚 Catálogo <span class="n">57</span></a>
+      <a data-v="rotas">🧭 Rotas sugeridas <span class="n">6</span></a>
+      <a data-v="rotas">🎓 Por certificação <span class="n">7</span></a>
+      <a data-v="rotas">🛠 Pela necessidade</a>
+      <a data-v="rotas">💼 Rota por vaga</a>
+      <a data-v="rotas">📈 Meu progresso</a>
+    </nav>
+    <div class="gprog">
+      Seu progresso<br><b>12</b> de 57 concluídos
+      <div class="bar"><i style="width:21%"></i></div>
+      <div class="row"><span>3 em andamento</span><span>~2560 min</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- ===== CATÁLOGO ===== -->
+    <section class="view on" id="v-catalogo">
+      <h1>Catálogo de módulos</h1>
+      <p class="lede">57 módulos em 13 trilhas, com teoria, laboratório interativo, checklist e questões de concurso. Tudo roda offline no seu navegador.</p>
+
+      <div class="continue">
+        <div>
+          <div class="k">Continuar estudando</div>
+          <h2>47 · Threat Hunting: Caça por Hipótese</h2>
+          <div class="bar"><i style="width:38%;background:var(--t11)"></i></div>
+          <div class="meta"><span><b>38%</b> lido</span><span>parou em <b>🧪 Laboratório</b></span><span>checklist <b>3/7</b></span><span>questões <b>2/7</b></span></div>
+        </div>
+        <a class="btn btn-primary" href="#">Continuar →</a>
+      </div>
+
+      <div class="toolbar">
+        <span class="l">Agrupar por</span>
+        <div class="seg" id="grp"><button class="on" data-g="trilha">Trilha</button><button data-g="nivel">Nível</button><button data-g="perfil">Perfil</button><button data-g="nist">NIST</button></div>
+        <label class="toggle"><input type="checkbox" id="pend"> Só não concluídos</label>
+        <span class="count" id="count"></span>
+      </div>
+      <div id="groups"></div>
+    </section>
+
+    <!-- ===== ROTAS ===== -->
+    <section class="view" id="v-rotas">
+      <h1>Rotas sugeridas</h1>
+      <p class="lede">Sequências por perfil profissional. O próximo módulo de cada rota fica em destaque.</p>
+      <div class="route"><h3>🛡 Blue Team / SOC</h3><span style="font-size:13px;color:var(--muted)">4 de 14 concluídos</span>
+        <div class="steps"><span class="ok">✓ 01 Tríade CIA</span><span class="ok">✓ 02 TCP/IP</span><span class="ok">✓ 07 IDS/IPS</span><span class="ok">✓ 16 SOC</span><span class="next">17 Threat Intelligence →</span><span>46 Eng. de Detecção</span><span>47 Threat Hunting</span><span>48 NSM</span><span>…</span></div></div>
+      <div class="route"><h3>🎯 Red Team</h3><span style="font-size:13px;color:var(--muted)">1 de 12 concluídos</span>
+        <div class="steps"><span class="ok">✓ 01 Tríade CIA</span><span class="next">02 TCP/IP →</span><span>11 OSINT</span><span>12 Web</span><span>14 Pentest</span><span>…</span></div></div>
+      <p style="font-size:13px;color:var(--muted)">As demais visões (certificação, necessidade, vaga, meu progresso) usam o mesmo esqueleto: título, descrição curta e conteúdo próprio, sem empilhar com o catálogo.</p>
+    </section>
+  </main>
+</div>
+
+<script>
+const M=[
+ {n:'01',t:'Tríade CIA, Ameaças e STRIDE',d:'Pilares da segurança e modelagem de ameaças STRIDE.',tr:1,tn:'Fundamentos & Redes',min:40,nv:'Iniciante',pf:'Generalista',ni:'Identify',lab:'STRIDE Canvas',s:'done'},
+ {n:'02',t:'TCP/IP, DNS, Roteamento e Tráfego',d:'Cabeçalhos, handshake e flags TCP para dissecar ataques.',tr:1,tn:'Fundamentos & Redes',min:50,nv:'Iniciante',pf:'Blue Team',ni:'Protect',lab:'Inspetor de cabeçalhos',s:'doing',p:60},
+ {n:'03',t:'Criptografia Simétrica, Assimétrica e PKI',d:'Algoritmos modernos, hashes e infraestrutura de chaves.',tr:1,tn:'Fundamentos & Redes',min:45,nv:'Iniciante',pf:'Generalista',ni:'Protect',lab:'Web Crypto API',s:'new'},
+ {n:'04',t:'Senhas, MFA, OAuth 2.0 e JWT',d:'Autenticação forte, federação e tokens.',tr:2,tn:'Segurança Defensiva',min:45,nv:'Intermediário',pf:'AppSec',ni:'Protect',lab:'Decodificador JWT',s:'done'},
+ {n:'05',t:'DMZ, VLANs e Firewall',d:'Arquitetura de perímetro e regras de filtragem.',tr:2,tn:'Segurança Defensiva',min:40,nv:'Iniciante',pf:'Blue Team',ni:'Protect',lab:'Regras de firewall',s:'new'},
+ {n:'06',t:'Bastionamento Linux e Windows',d:'Redução da superfície de ataque com CIS Benchmarks.',tr:2,tn:'Segurança Defensiva',min:50,nv:'Intermediário',pf:'Blue Team',ni:'Protect',lab:'Auditor de configuração',s:'new'},
+ {n:'46',t:'Engenharia de Detecção',d:'Detection-as-Code e cobertura ATT&CK.',tr:11,tn:'Detecção Avançada & Threat Hunting',min:50,nv:'Avançado',pf:'Blue Team',ni:'Detect',lab:'Bancada de regras',s:'done'},
+ {n:'47',t:'Threat Hunting: Caça por Hipótese',d:'Hipótese, fonte de dados e stack counting na cauda longa.',tr:11,tn:'Detecção Avançada & Threat Hunting',min:45,nv:'Avançado',pf:'Blue Team',ni:'Detect',lab:'Caçada guiada',s:'doing',p:38},
+ {n:'48',t:'Monitoramento de Rede (NSM)',d:'Zeek, PCAP e NetFlow para achar beacons e túnel DNS.',tr:11,tn:'Detecção Avançada & Threat Hunting',min:50,nv:'Avançado',pf:'Blue Team',ni:'Detect',lab:'Analisador de conn.log',s:'new'},
+];
+const cor={1:'var(--t1)',2:'var(--t2)',11:'var(--t11)'};
+const nvCor={Iniciante:'var(--t2)',Intermediário:'var(--t4)',Avançado:'var(--t12)'};
+let g='trilha';
+function card(m,c){
+  const st=m.s==='done'?'<div class="st done">✓ Concluído</div>':m.s==='doing'?`<div class="st doing">◐ ${m.p}% lido<div class="bar"><i style="width:${m.p}%"></i></div></div>`:'<div class="st new">○ Não iniciado <small>· '+m.min+' min</small></div>';
+  return `<a class="mc" href="#" style="--gc:${c}"><div class="top"><span class="num">Estudo ${m.n}</span><span>⏱ ${m.min} min</span></div><h4>${m.t}</h4><p>${m.d}</p><div class="tags"><span class="tag">${m.nv}</span><span class="tag">NIST ${m.ni}</span><span class="tag lab">🧪 ${m.lab}</span></div>${st}</a>`;
+}
+function render(){
+  const q=document.getElementById('q').value.toLowerCase(), pend=document.getElementById('pend').checked;
+  const list=M.filter(m=>(!q||(m.t+m.d+m.lab).toLowerCase().includes(q))&&(!pend||m.s!=='done'));
+  const key={trilha:m=>'Trilha '+m.tr+'|'+m.tn,nivel:m=>'Nível|'+m.nv,perfil:m=>'Perfil|'+m.pf,nist:m=>'NIST CSF 2.0|'+m.ni}[g];
+  const gs={};list.forEach(m=>{(gs[key(m)]=gs[key(m)]||[]).push(m)});
+  document.getElementById('groups').innerHTML=Object.entries(gs).map(([k,ms])=>{const [kk,name]=k.split('|');const c=g==='trilha'?cor[ms[0].tr]:g==='nivel'?nvCor[name]:'var(--accent)';const d=ms.filter(m=>m.s==='done').length;
+    return `<div class="group" style="--gc:${c}"><div class="ghead"><span class="k">${kk}</span><h3>${name}</h3><span class="p">${d} de ${ms.length} concluídos</span></div><div class="grid">${ms.map(m=>card(m,g==='trilha'?c:cor[m.tr])).join('')}</div></div>`}).join('')||'<p style="color:var(--muted)">Nenhum módulo encontrado.</p>';
+  document.getElementById('count').textContent=list.length+' módulos';
+}
+document.querySelectorAll('#grp button').forEach(b=>b.onclick=()=>{g=b.dataset.g;document.querySelectorAll('#grp button').forEach(x=>x.classList.toggle('on',x===b));render();});
+document.getElementById('q').oninput=render;document.getElementById('pend').onchange=render;
+document.querySelectorAll('#nav a').forEach(a=>a.onclick=()=>{document.querySelectorAll('#nav a').forEach(x=>x.classList.toggle('on',x===a));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+a.dataset.v));});
+addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();document.getElementById('q').focus();}});
+function toggleTheme(){const r=document.documentElement,d=r.dataset.theme==='dark';r.dataset.theme=d?'light':'dark';document.getElementById('themeBtn').textContent=d?'🌙 Escuro':'☀️ Claro';}
+render();
+</script>
+</body>
+</html>

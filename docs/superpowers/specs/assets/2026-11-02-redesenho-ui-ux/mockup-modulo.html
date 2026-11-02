@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup — Página de Módulo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ================= TOKENS ================= */
+:root{
+  --ground:#F4F6F8; --surface:#FFFFFF; --sunk:#EAEFF2; --ink:#14212B; --muted:#5B6B77; --rule:#D5DCE1; --rule-strong:#C4CDD3;
+  --accent:#2563EB; --accent-soft:#E0ECFF;
+  --track:#0E7490; /* cor da trilha 11 */
+  /* tipos de seção */
+  --teo:#2563EB; --teo-soft:#EFF5FF;
+  --lab:#0D9488; --lab-soft:#ECFDF8;
+  --chk:#B45309; --chk-soft:#FFF8EB;
+  --qst:#C026D3; --qst-soft:#FDF2FE;
+  --ref:#64748B; --ref-soft:#F1F5F9;
+  /* callouts */
+  --tip:#059669; --tip-soft:#ECFDF5; --warn:#EA580C; --warn-soft:#FFF4ED; --danger:#DC2626; --danger-soft:#FEF2F2; --law:#6D28D9; --law-soft:#F5F3FF;
+  --console:#0F1820; --console-ink:#D6E2EA;
+  --ok:#15803D; --bad:#DC2626;
+  --f-display:"Barlow Semi Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"IBM Plex Mono",Menlo,Consolas,monospace;
+  --r-sm:4px; --r-md:8px; --r-lg:12px;
+  --shadow:0 1px 2px rgba(15,23,28,.05),0 2px 8px rgba(15,23,28,.04);
+}
+:root[data-theme="dark"]{
+  --ground:#0E151A; --surface:#152028; --sunk:#1C2A33; --ink:#E4EAED; --muted:#9BABB6; --rule:#2A3943; --rule-strong:#364853;
+  --accent:#60A5FA; --accent-soft:rgba(96,165,250,.15); --track:#22D3EE;
+  --teo:#60A5FA; --teo-soft:rgba(96,165,250,.10);
+  --lab:#2DD4BF; --lab-soft:rgba(45,212,191,.09);
+  --chk:#FBBF24; --chk-soft:rgba(251,191,36,.09);
+  --qst:#E879F9; --qst-soft:rgba(232,121,249,.09);
+  --ref:#94A3B8; --ref-soft:rgba(148,163,184,.08);
+  --tip:#34D399; --tip-soft:rgba(52,211,153,.10); --warn:#FB923C; --warn-soft:rgba(251,146,60,.10); --danger:#F87171; --danger-soft:rgba(248,113,113,.10); --law:#A78BFA; --law-soft:rgba(167,139,250,.10);
+  --console:#0A1015; --ok:#4ADE80; --bad:#F87171;
+  --shadow:none;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.65 var(--f-body);-webkit-font-smoothing:antialiased}
+code{font-family:var(--f-mono);font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:var(--r-sm)}
+a{color:var(--accent)}
+
+/* ================= BARRA SUPERIOR ================= */
+.topbar{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--rule)}
+.topbar-in{display:flex;align-items:center;gap:16px;height:52px;padding:0 20px}
+.topbar .back{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500}
+.topbar .crumb{font-size:13px;color:var(--muted);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar .crumb b{color:var(--ink)}
+.topbar .now{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--sunk)}
+.iconbtn{border:1px solid var(--rule);background:var(--surface);color:var(--ink);border-radius:var(--r-md);padding:5px 10px;font:500 12px var(--f-body);cursor:pointer}
+.readbar{height:3px;background:transparent}.readbar i{display:block;height:3px;width:0;background:var(--accent);transition:width .15s}
+
+/* ================= ESQUELETO ================= */
+.shell{display:grid;grid-template-columns:272px minmax(0,1fr);max-width:1240px;margin:0 auto}
+.content{padding:28px 40px 80px;max-width:860px}
+
+/* ================= SUMÁRIO LATERAL ================= */
+.toc{position:sticky;top:55px;height:calc(100vh - 55px);overflow:auto;border-right:1px solid var(--rule);padding:22px 16px 20px 20px;background:var(--ground)}
+.toc .lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.toc .mod{font:700 17px/1.2 var(--f-display);margin:4px 0 10px}
+.ring{display:flex;align-items:center;gap:10px;margin-bottom:16px;font-size:12px;color:var(--muted)}
+.ring .bar{flex:1;height:6px;background:var(--sunk);border-radius:3px;overflow:hidden}.ring .bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}
+.ring b{color:var(--ink);font-size:13px}
+.toc ol{list-style:none;margin:0;padding:0}
+.toc li a{display:grid;grid-template-columns:18px 1fr auto;gap:8px;align-items:start;padding:7px 8px;border-radius:var(--r-md);text-decoration:none;color:var(--ink);font-size:13px;line-height:1.35;border-left:3px solid transparent}
+.toc li a:hover{background:var(--sunk)}
+.toc li a .ic{font-size:13px;line-height:1.35;text-align:center}
+.toc li a .ty{display:block;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--c)}
+.toc li a .cnt{font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap}
+.toc li a.read .tt{color:var(--muted)}
+.toc li a.read .ic::after{content:""}
+.toc li a.on{background:var(--surface);border-left-color:var(--c);box-shadow:var(--shadow)}
+.toc li a.on .tt{font-weight:600}
+.toc .check{color:var(--ok);font-size:11px;font-weight:700}
+.toc .foot{margin-top:18px;padding-top:16px;border-top:1px solid var(--rule)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:var(--r-md);padding:8px 14px;font:600 13px var(--f-body);cursor:pointer;border:1px solid var(--rule-strong);background:var(--surface);color:var(--ink);text-decoration:none}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-done{width:100%;background:var(--surface)}
+.btn-done.ready{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn-done.is-done{background:transparent;color:var(--ok);border-color:var(--ok)}
+.toc .nav2{display:flex;justify-content:space-between;margin-top:10px;font-size:12px}
+.toc .nav2 a{color:var(--muted);text-decoration:none}
+
+/* ================= CABEÇALHO DO MÓDULO ================= */
+.mhead{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r-lg);padding:26px 28px 22px;margin-bottom:34px;position:relative;overflow:hidden}
+.mhead::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--track)}
+.kicker{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--track)}
+.mhead h1{font:700 34px/1.1 var(--f-display);margin:6px 0 8px;letter-spacing:-.01em}
+.mhead .sub{color:var(--muted);margin:0 0 14px;max-width:62ch}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;background:var(--sunk);border-radius:99px;padding:3px 10px;color:var(--ink)}
+.chip b{font-weight:600}
+.roadmap{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:20px;padding-top:18px;border-top:1px dashed var(--rule)}
+.roadmap a{display:block;text-decoration:none;color:var(--ink);background:var(--soft);border:1px solid transparent;border-radius:var(--r-md);padding:9px 10px;font-size:12px;line-height:1.3}
+.roadmap a:hover{border-color:var(--c)}
+.roadmap .ty{display:block;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--c);margin-bottom:2px}
+
+/* ================= SEÇÃO TIPADA ================= */
+.study-section{margin:0 0 56px;scroll-margin-top:72px}
+.shead{display:flex;flex-direction:column;gap:6px;margin-bottom:18px;padding-bottom:12px;border-bottom:2px solid var(--c)}
+.stype{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c);background:var(--soft);padding:3px 10px 3px 8px;border-radius:var(--r-sm)}
+.stype small{font-weight:600;color:var(--muted);letter-spacing:.04em}
+.shead h2{font:700 26px/1.2 var(--f-display);margin:0}
+.study-section h3{font:700 19px/1.3 var(--f-display);margin:26px 0 8px}
+.lead{font-size:16.5px;line-height:1.7}
+[data-tipo="teoria"]{--c:var(--teo);--soft:var(--teo-soft)}
+[data-tipo="laboratorio"]{--c:var(--lab);--soft:var(--lab-soft)}
+[data-tipo="checklist"]{--c:var(--chk);--soft:var(--chk-soft)}
+[data-tipo="questoes"]{--c:var(--qst);--soft:var(--qst-soft)}
+[data-tipo="referencias"]{--c:var(--ref);--soft:var(--ref-soft)}
+
+/* ================= CALLOUTS ================= */
+.callout{--cc:var(--tip);--cs:var(--tip-soft);background:var(--cs);border:1px solid color-mix(in srgb,var(--cc) 25%,transparent);border-left:4px solid var(--cc);border-radius:var(--r-md);padding:12px 16px;margin:18px 0}
+.callout .ct{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--cc);margin-bottom:3px}
+.callout p{margin:0}
+.callout.warning{--cc:var(--warn);--cs:var(--warn-soft)}
+.callout.danger{--cc:var(--danger);--cs:var(--danger-soft)}
+.callout.law{--cc:var(--law);--cs:var(--law-soft)}
+.callout.key{--cc:var(--accent);--cs:var(--accent-soft)}
+
+/* ================= TABELA ================= */
+.table-wrap{overflow:auto;border:1px solid var(--rule);border-radius:var(--r-md);margin:16px 0;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{background:var(--sunk);text-align:left;font-weight:600;padding:9px 12px;font-size:12px;letter-spacing:.02em}
+td{padding:9px 12px;border-top:1px solid var(--rule);vertical-align:top}
+
+/* ================= TERMINAL ================= */
+.terminal{background:var(--console);border-radius:var(--r-md);overflow:hidden;margin:18px 0;border:1px solid #1F2C36}
+.terminal .th{display:flex;align-items:center;gap:8px;padding:7px 12px;background:#111C24;color:#8FA3B1;font:500 12px var(--f-mono)}
+.terminal .th .dots{display:flex;gap:5px}.terminal .th .dots i{width:9px;height:9px;border-radius:50%;background:#2A3A46}
+.terminal .th .t{flex:1}
+.terminal .th button{background:transparent;border:1px solid #2A3A46;color:#8FA3B1;border-radius:4px;font:500 11px var(--f-mono);padding:2px 8px;cursor:pointer}
+.terminal pre{margin:0;padding:14px 16px;color:var(--console-ink);font:13px/1.6 var(--f-mono);overflow:auto}
+.terminal .p{color:#22D3EE}.terminal .c{color:#6B8394}
+
+/* ================= DIAGRAMA ================= */
+.diagram{border:1px solid var(--rule);border-radius:var(--r-md);overflow:hidden;margin:18px 0;background:var(--surface)}
+.diagram .dh{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-size:13px;font-weight:600;border-bottom:1px solid var(--rule)}
+.diagram .dh span{font-size:11px;color:var(--muted);font-weight:500}
+.diagram .plate{background:var(--console);padding:18px;display:flex;justify-content:center}
+.diagram svg text{font-family:var(--f-body)}
+
+/* ================= LABORATÓRIO ================= */
+.lab{border:1px solid color-mix(in srgb,var(--lab) 35%,var(--rule));border-radius:var(--r-lg);overflow:hidden;background:var(--surface);box-shadow:var(--shadow)}
+.lab-h{background:var(--console);color:var(--console-ink);padding:14px 18px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.lab-h .k{font:500 11px var(--f-mono);color:#2DD4BF;letter-spacing:.04em}
+.lab-h h4{font:700 19px/1.25 var(--f-display);margin:2px 0 2px;color:#F1F7FA}
+.lab-h p{margin:0;font-size:13px;color:#9FB3C1}
+.lab-h .badge{font:500 11px var(--f-mono);border:1px solid #2DD4BF;color:#2DD4BF;border-radius:4px;padding:2px 8px;white-space:nowrap}
+.lab-steps{display:flex;border-bottom:1px solid var(--rule);background:var(--lab-soft)}
+.lab-steps div{flex:1;padding:8px 10px;font-size:12px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent}
+.lab-steps div.on{color:var(--lab);border-color:var(--lab)}
+.lab-steps div.ok{color:var(--ink)}
+.lab-b{padding:18px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--rule);border-radius:var(--r-md);padding:10px 12px;margin-bottom:8px;cursor:pointer;font-size:14px}
+.opt:hover{border-color:var(--lab)}
+.opt.sel{border-color:var(--lab);background:var(--lab-soft)}
+.opt small{display:block;color:var(--muted);font-size:12px}
+.lab-out{margin-top:12px;background:var(--console);color:var(--console-ink);font:12.5px/1.6 var(--f-mono);border-radius:var(--r-md);padding:12px 14px;min-height:46px}
+.lab-out .ok{color:#4ADE80}
+
+/* ================= CHECKLIST ================= */
+.checklist{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r-lg);overflow:hidden}
+.cl-head{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--chk-soft);border-bottom:1px solid var(--rule);font-size:13px}
+.cl-head .bar{flex:1;height:6px;background:var(--sunk);border-radius:3px;overflow:hidden}.cl-head .bar i{display:block;height:100%;background:var(--chk);width:0;transition:width .2s}
+.checklist-item{display:flex;gap:12px;align-items:flex-start;padding:11px 16px;border-top:1px solid var(--rule);cursor:pointer;font-size:14px}
+.checklist-item:first-of-type{border-top:0}
+.checklist-item input{appearance:none;flex:none;width:20px;height:20px;margin-top:2px;border:2px solid var(--rule-strong);border-radius:5px;display:grid;place-content:center;cursor:pointer;background:var(--surface)}
+.checklist-item input:checked{background:var(--chk);border-color:var(--chk)}
+.checklist-item input:checked::after{content:"✓";color:#fff;font-size:13px;font-weight:700;line-height:1}
+.checklist-item.completed label{color:var(--muted)}
+.checklist-item label{cursor:pointer}
+
+/* ================= QUESTÕES (FLASHCARD) ================= */
+.score{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r-lg);padding:12px 16px;margin-bottom:14px;font-size:13px}
+.score .pill{display:inline-flex;gap:5px;align-items:center;padding:2px 10px;border-radius:99px;background:var(--sunk);font-weight:600}
+.score .sp{flex:1}
+.filters{display:flex;gap:6px}
+.filters button{border:1px solid var(--rule-strong);background:var(--surface);color:var(--ink);border-radius:99px;padding:3px 10px;font:500 12px var(--f-body);cursor:pointer}
+.filters button.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.quiz-item{background:var(--surface);border:1px solid var(--rule);border-left:4px solid var(--rule-strong);border-radius:var(--r-md);padding:14px 18px;margin-bottom:12px}
+.quiz-item[data-res="acertei"]{border-left-color:var(--ok)}
+.quiz-item[data-res="errei"]{border-left-color:var(--bad)}
+.quiz-item[data-res="revisar"]{border-left-color:var(--warn)}
+.qn{display:flex;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--qst);margin-bottom:4px}
+.qn .st{color:var(--muted);letter-spacing:.04em}
+.quiz-question{font-weight:500;font-size:15px}
+.hint{font-size:12px;color:var(--muted);margin:8px 0 0}
+.quiz-details summary{list-style:none;cursor:pointer;display:inline-flex;margin-top:10px}
+.quiz-details summary::-webkit-details-marker{display:none}
+.quiz-details[open] summary .btn{background:var(--sunk)}
+.quiz-answer{margin-top:12px;padding:12px 14px;background:var(--qst-soft);border-radius:var(--r-md);font-size:14px}
+.selfeval{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;font-size:13px;color:var(--muted)}
+.selfeval button{border:1px solid var(--rule-strong);background:var(--surface);color:var(--ink);border-radius:var(--r-md);padding:5px 12px;font:600 13px var(--f-body);cursor:pointer}
+.selfeval button[data-v="acertei"].on{background:var(--ok);border-color:var(--ok);color:#fff}
+.selfeval button[data-v="errei"].on{background:var(--bad);border-color:var(--bad);color:#fff}
+.selfeval button[data-v="revisar"].on{background:var(--warn);border-color:var(--warn);color:#fff}
+.hide{display:none!important}
+
+/* ================= REFERÊNCIAS / PRÓXIMO ================= */
+.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0 22px}
+.fact{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r-md);padding:12px 14px;font-size:14px}
+.fact b{display:block;font:700 15px var(--f-display)}
+.refs{font-size:14px;padding-left:18px}.refs li{margin-bottom:4px}
+.endcard{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:26px}
+.endcard a{display:block;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:var(--r-lg);padding:14px 16px}
+.endcard a:hover{border-color:var(--accent)}
+.endcard small{display:block;color:var(--muted);font-size:12px}
+.endcard b{font:700 16px var(--f-display)}
+.donebox{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border:1px dashed var(--ok);border-radius:var(--r-lg);padding:14px 18px;font-size:14px}
+
+.note{position:fixed;right:16px;bottom:16px;z-index:30;max-width:300px;background:#14212B;color:#E4EAED;font-size:12px;line-height:1.5;padding:12px 14px;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.note b{color:#7DD3FC}
+.note button{float:right;background:transparent;border:0;color:#9BABB6;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="note" id="note"><button onclick="this.parentNode.remove()">✕</button><b>Mockup funcional</b><br>Role a página: o sumário acompanha e marca seções lidas. Teste o tema 🌙, o checklist, os flashcards (revelar → autoavaliar → filtros) e o laboratório. Conteúdo real do Estudo 47.</div>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="back" href="#">← Painel</a>
+    <div class="crumb">Trilha 11 · Detecção e Resposta &nbsp;/&nbsp; <b>47 · Threat Hunting</b></div>
+    <span class="now" id="now"><span id="nowIc">📘</span> <span id="nowTx">Teoria</span></span>
+    <button class="iconbtn" onclick="toggleTheme()" id="themeBtn">🌙 Escuro</button>
+  </div>
+  <div class="readbar"><i id="readbar"></i></div>
+</header>
+
+<div class="shell">
+
+  <!-- ============ SUMÁRIO LATERAL (gerado pelo montar.py) ============ -->
+  <aside class="toc" aria-label="Sumário do módulo">
+    <div class="lbl">Estudo 47 de 57</div>
+    <div class="mod">Threat Hunting: Caça por Hipótese</div>
+    <div class="ring"><div class="bar"><i id="ringBar"></i></div><b id="ringTx">0%</b> lido</div>
+    <ol id="tocList">
+      <li><a href="#introducao" data-tipo="teoria"><span class="ic">📘</span><span><span class="ty">Teoria</span><span class="tt">Nenhum alerta não quer dizer nenhum invasor</span></span><span class="cnt"></span></a></li>
+      <li><a href="#fontes" data-tipo="teoria"><span class="ic">📘</span><span><span class="ty">Teoria</span><span class="tt">Fontes, linha de base e stack counting</span></span><span class="cnt"></span></a></li>
+      <li><a href="#laboratorio" data-tipo="laboratorio"><span class="ic">🧪</span><span><span class="ty">Laboratório</span><span class="tt">Caçada guiada na Ipê Store</span></span><span class="cnt" id="cntLab">0/4</span></a></li>
+      <li><a href="#checklist" data-tipo="checklist"><span class="ic">☑️</span><span><span class="ty">Checklist</span><span class="tt">Checklist de uma caçada</span></span><span class="cnt" id="cntChk">0/5</span></a></li>
+      <li><a href="#questoes" data-tipo="questoes"><span class="ic">❓</span><span><span class="ty">Questões de concurso</span><span class="tt">Fixação e entrevista</span></span><span class="cnt" id="cntQst">0/3</span></a></li>
+      <li><a href="#referencias" data-tipo="referencias"><span class="ic">📚</span><span><span class="ty">Referências</span><span class="tt">Fatos essenciais e próximos passos</span></span><span class="cnt"></span></a></li>
+    </ol>
+    <div class="foot">
+      <button class="btn btn-done" id="doneBtn" onclick="toggleDone()">✓ Concluir módulo</button>
+      <div class="nav2"><a href="#">← 46 Eng. de Detecção</a><a href="#">48 NSM →</a></div>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- ============ CABEÇALHO DO MÓDULO (gerado de index_dados.py) ============ -->
+    <header class="mhead">
+      <div class="kicker">Trilha 11 · Detecção e Resposta · Estudo 47</div>
+      <h1>Threat Hunting: Caça por Hipótese e Linhas de Base</h1>
+      <p class="sub">Parta de uma hipótese, escolha a fonte que a confirma ou refuta, ache o raro por contagem e transforme o achado em detecção.</p>
+      <div class="chips">
+        <span class="chip">⏱ <b>45 min</b></span>
+        <span class="chip">📈 <b>Avançado</b></span>
+        <span class="chip">🛡 NIST <b>DE.CM · DE.AE</b></span>
+        <span class="chip">🎯 ATT&amp;CK <b>T1053.005 · T1543.003</b></span>
+        <span class="chip">👤 Blue Team · SOC</span>
+      </div>
+      <nav class="roadmap" aria-label="O que tem neste módulo">
+        <a href="#introducao" data-tipo="teoria"><span class="ty">📘 Teoria</span>2 seções</a>
+        <a href="#laboratorio" data-tipo="laboratorio"><span class="ty">🧪 Laboratório</span>Caçada guiada</a>
+        <a href="#checklist" data-tipo="checklist"><span class="ty">☑️ Checklist</span>5 itens</a>
+        <a href="#questoes" data-tipo="questoes"><span class="ty">❓ Questões</span>3 flashcards</a>
+        <a href="#referencias" data-tipo="referencias"><span class="ty">📚 Referências</span>e próximos passos</a>
+      </nav>
+    </header>
+
+    <!-- ============ TEORIA 1 ============ -->
+    <section class="study-section" id="introducao" data-tipo="teoria">
+      <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Nenhum alerta não quer dizer nenhum invasor</h2></div>
+      <p class="lead">Na segunda-feira, o SOC da Ipê Store recebeu um relatório de inteligência: um grupo que ataca varejistas ganha persistência com uma tarefa agendada de nome parecido com as do OneDrive, que executa um binário guardado em <code>C:\Users\Public</code>. A fila de alertas está vazia. Boa notícia, ou nenhuma regra enxerga esse comportamento?</p>
+      <div class="callout key"><div class="ct">🔦 Pergunta-chave do módulo</div><p>Se um invasor estiver na rede sem disparar alertas, por onde você começa a procurar?</p></div>
+      <h3>O que é threat hunting</h3>
+      <p><strong><em>Threat hunting</em></strong> é a busca proativa, conduzida por pessoas, por atividade maliciosa que passou pelas defesas automatizadas. Parte do <strong>comprometimento presumido</strong> (<em>assume breach</em>): em vez de esperar um alerta, o caçador supõe que alguém já está dentro e procura o rastro.</p>
+      <div class="table-wrap"><table>
+        <tr><th>Tipo</th><th>Ponto de partida</th><th>Limite</th></tr>
+        <tr><td><b>Por hipótese</b></td><td>Inteligência, ATT&amp;CK, ambiente</td><td>Depende da qualidade da hipótese</td></tr>
+        <tr><td><b>Por indicador</b> (IOC)</td><td>Hash, IP ou domínio de relatório</td><td>Atacante troca o indicador com pouco esforço</td></tr>
+        <tr><td><b>Exploratória</b></td><td>Os próprios dados</td><td>Exige conhecer o normal</td></tr>
+      </table></div>
+      <div class="callout danger"><div class="ct">🔺 Armadilha</div><p>Zero resultado numa caça por hash prova pouco: o implante é recompilado para cada vítima. Na <b>Pirâmide da Dor</b>, hash está na base.</p></div>
+      <div class="callout law"><div class="ct">⚖️ Norma</div><p>NIST CSF 2.0, função Detect: DE.CM (monitoramento contínuo) e DE.AE (análise de eventos adversos).</p></div>
+    </section>
+
+    <!-- ============ TEORIA 2 ============ -->
+    <section class="study-section" id="fontes" data-tipo="teoria">
+      <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Fontes de dados, linha de base e stack counting</h2></div>
+      <p>Stack counting agrupa eventos por um campo e conta em quantas estações cada valor aparece. O software legítimo se repete na frota; o implante mora na <b>cauda longa</b>.</p>
+      <div class="terminal">
+        <div class="th"><span class="dots"><i></i><i></i><i></i></span><span class="t">splunk — stack counting de tarefas agendadas</span><button>Copiar</button></div>
+<pre><span class="p">index=edr</span> sourcetype=scheduled_tasks
+| stats dc(host) as estacoes values(host) as hosts by task_name, action_path
+| where estacoes &lt;= 3   <span class="c"># cauda longa: raros na frota</span>
+| sort estacoes</pre>
+      </div>
+      <div class="diagram">
+        <div class="dh">Ciclo de caça PEAK <span>diagrama</span></div>
+        <div class="plate">
+          <svg width="520" height="96" viewBox="0 0 520 96" role="img" aria-label="Ciclo PEAK">
+            <g font-size="13" fill="#E4EAED" text-anchor="middle">
+              <rect x="10" y="26" width="140" height="44" rx="6" fill="#1C2A33" stroke="#4B6170"/><text x="80" y="53">Prepare</text>
+              <rect x="190" y="26" width="140" height="44" rx="6" fill="#1C2A33" stroke="#4B6170"/><text x="260" y="53">Execute</text>
+              <rect x="370" y="26" width="140" height="44" rx="6" fill="#1C2A33" stroke="#4B6170"/><text x="440" y="53">Act with Knowledge</text>
+              <path d="M150 48h36M330 48h36" stroke="#8FA3B1" stroke-width="1.5" marker-end="url(#ar)"/>
+              <path d="M440 26 C440 4, 80 4, 80 24" stroke="#8FA3B1" stroke-dasharray="4 3" fill="none" marker-end="url(#ar)"/>
+            </g>
+            <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8FA3B1"/></marker></defs>
+          </svg>
+        </div>
+      </div>
+      <div class="callout"><div class="ct">💡 Dica</div><p>Normalize antes de contar: usuário, versão, SID e GUID variam e inflam a cauda longa com falsos raros.</p></div>
+    </section>
+
+    <!-- ============ LABORATÓRIO ============ -->
+    <section class="study-section" id="laboratorio" data-tipo="laboratorio">
+      <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 3 de 6</small></span><h2>Caçada guiada na frota da Ipê Store</h2></div>
+      <p>Conduza a caçada do relatório na frota fictícia. O simulador pontua cada escolha.</p>
+      <div class="lab">
+        <div class="lab-h"><div><div class="k">// laboratório interativo</div><h4>Caçada guiada: corp.ipestore.example</h4><p>30 estações Windows fictícias. Nada sai do seu navegador.</p></div><span class="badge">offline</span></div>
+        <div class="lab-steps" id="labSteps"><div class="on">1 · Hipótese</div><div>2 · Fonte</div><div>3 · Contagem</div><div>4 · Achado</div></div>
+        <div class="lab-b">
+          <p style="margin:0 0 10px;font-weight:600">Qual hipótese você vai caçar?</p>
+          <div class="opt" onclick="pick(this,true)"><input type="radio" name="h"><div>Tarefas agendadas executam binários de pastas graváveis por usuário em poucas estações.<small>Origem: inteligência mapeada no ATT&amp;CK (T1053.005)</small></div></div>
+          <div class="opt" onclick="pick(this,false)"><input type="radio" name="h"><div>Procurar em todas as estações o hash SHA-256 do implante.<small>Origem: indicador (IOC) do relatório</small></div></div>
+          <div class="opt" onclick="pick(this,false)"><input type="radio" name="h"><div>Procurar qualquer coisa estranha nos logs da última semana.<small>Origem: nenhuma</small></div></div>
+          <div class="lab-out" id="labOut">&gt; aguardando hipótese…</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CHECKLIST ============ -->
+    <section class="study-section" id="checklist" data-tipo="checklist">
+      <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist de uma caçada</h2></div>
+      <p>Use antes de dar uma caçada por encerrada. O estado fica salvo no seu navegador.</p>
+      <ul class="checklist" id="chk">
+        <div class="cl-head"><b id="chkTx">0 de 5</b><div class="bar"><i id="chkBar"></i></div><span style="color:var(--muted)">salvo automaticamente</span></div>
+        <li class="checklist-item"><input type="checkbox" id="c1"><label for="c1"><strong>Hipótese:</strong> escrita antes da busca, testável, com origem e técnica mapeada.</label></li>
+        <li class="checklist-item"><input type="checkbox" id="c2"><label for="c2"><strong>Visibilidade:</strong> a fonte enxerga o comportamento em toda a população e janela.</label></li>
+        <li class="checklist-item"><input type="checkbox" id="c3"><label for="c3"><strong>Linha de base:</strong> população comparável e valores normalizados antes de contar.</label></li>
+        <li class="checklist-item"><input type="checkbox" id="c4"><label for="c4"><strong>Raros verificados:</strong> caminho, assinatura, dono e registro na CMDB conferidos.</label></li>
+        <li class="checklist-item"><input type="checkbox" id="c5"><label for="c5"><strong>Saída:</strong> incidente aberto, regra proposta ou pedido de coleta, com dono.</label></li>
+      </ul>
+    </section>
+
+    <!-- ============ QUESTÕES ============ -->
+    <section class="study-section" id="questoes" data-tipo="questoes">
+      <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Fixação e entrevista</h2></div>
+      <div class="score">
+        <span class="pill" style="color:var(--ok)">✓ <span id="sA">0</span> acertos</span>
+        <span class="pill" style="color:var(--bad)">✗ <span id="sE">0</span> erros</span>
+        <span class="pill" style="color:var(--warn)">↻ <span id="sR">0</span> revisar</span>
+        <span class="sp"></span>
+        <div class="filters" id="filters"><button class="on" data-f="todas">Todas</button><button data-f="pendentes">Erradas e a revisar</button><button data-f="sem">Sem resposta</button></div>
+      </div>
+
+      <div class="quiz-item" data-q="q1">
+        <div class="qn"><span>Questão 1 · Indicador</span><span class="st">sem resposta</span></div>
+        <div class="quiz-question">O relatório traz o hash do implante. A varredura no EDR deu zero resultados. Dá para encerrar dizendo que a empresa não foi atingida?</div>
+        <p class="hint">Pense na sua resposta antes de revelar.</p>
+        <details class="quiz-details"><summary class="quiz-toggle"><span class="btn">Ver resposta explicada</span></summary>
+          <div class="quiz-answer"><p><strong>Resposta:</strong> Não. O hash fica na base da Pirâmide da Dor: o grupo recompila o implante para cada vítima, então zero resultado prova pouco. O passo seguinte é caçar o comportamento (tarefa agendada que executa binário de pasta gravável).</p></div>
+          <div class="selfeval">Como você foi? <button data-v="acertei">✓ Acertei</button><button data-v="errei">✗ Errei</button><button data-v="revisar">↻ Revisar depois</button></div>
+        </details>
+      </div>
+
+      <div class="quiz-item" data-q="q2">
+        <div class="qn"><span>Questão 2 · Visibilidade</span><span class="st">sem resposta</span></div>
+        <div class="quiz-question">A busca por eventos 4698 dos últimos 30 dias não achou nada suspeito, mas o relatório diz que o grupo age há três meses. Qual o resultado da caçada?</div>
+        <p class="hint">Pense na sua resposta antes de revelar.</p>
+        <details class="quiz-details"><summary class="quiz-toggle"><span class="btn">Ver resposta explicada</span></summary>
+          <div class="quiz-answer"><p><strong>Resposta:</strong> Inconclusiva, não refutada. A janela da fonte não cobre a janela da hipótese: uma tarefa criada há 90 dias não gera 4698 nos últimos 30. Use o inventário atual de tarefas do EDR, que mostra o estado presente independentemente da data de criação.</p></div>
+          <div class="selfeval">Como você foi? <button data-v="acertei">✓ Acertei</button><button data-v="errei">✗ Errei</button><button data-v="revisar">↻ Revisar depois</button></div>
+        </details>
+      </div>
+
+      <div class="quiz-item" data-q="q3">
+        <div class="qn"><span>Questão 3 · Cardinalidade</span><span class="st">sem resposta</span></div>
+        <div class="quiz-question">Agrupando as tarefas por nome, você obteve 300 valores que aparecem em uma única estação cada. O que aconteceu e como corrigir?</div>
+        <p class="hint">Pense na sua resposta antes de revelar.</p>
+        <details class="quiz-details"><summary class="quiz-toggle"><span class="btn">Ver resposta explicada</span></summary>
+          <div class="quiz-answer"><p><strong>Resposta:</strong> O campo tem alta cardinalidade: nomes carregam SID ou GUID do usuário. Normalize (remova SID/GUID) ou agrupe pelo caminho do executável antes de contar.</p></div>
+          <div class="selfeval">Como você foi? <button data-v="acertei">✓ Acertei</button><button data-v="errei">✗ Errei</button><button data-v="revisar">↻ Revisar depois</button></div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ============ REFERÊNCIAS ============ -->
+    <section class="study-section" id="referencias" data-tipo="referencias">
+      <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos essenciais e próximos passos</h2></div>
+      <div class="facts">
+        <div class="fact"><b>Hipótese</b>Comportamento, fonte e população escritos antes da busca.</div>
+        <div class="fact"><b>Cauda longa</b>Linha de base e contagem por estações distintas, com valores normalizados.</div>
+        <div class="fact"><b>PEAK</b>Prepare, Execute e Act with Knowledge, com conhecimento realimentado.</div>
+        <div class="fact"><b>Saída</b>Toda caça vira detecção ou registro.</div>
+      </div>
+      <ol class="refs">
+        <li>Splunk SURGe — PEAK Threat Hunting Framework (2023).</li>
+        <li>David Bianco — The Pyramid of Pain (2013) e Hunting Maturity Model.</li>
+        <li>MITRE ATT&amp;CK — T1053.005 Scheduled Task, T1543.003 Windows Service.</li>
+      </ol>
+      <div class="donebox"><span>Chegou ao fim. Marque o módulo como concluído para atualizar o seu progresso no painel.</span><button class="btn" id="doneBtn2" onclick="toggleDone()">✓ Concluir módulo</button></div>
+      <div class="endcard">
+        <a href="#"><small>← Anterior · Estudo 46</small><b>Engenharia de Detecção</b></a>
+        <a href="#" style="text-align:right"><small>Próximo · Estudo 48 →</small><b>Monitoramento de Rede (NSM)</b></a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  let done=false;
+  const root=document.documentElement;
+  window.toggleTheme=function(){const d=root.dataset.theme==='dark';root.dataset.theme=d?'light':'dark';document.getElementById('themeBtn').textContent=d?'🌙 Escuro':'☀️ Claro';};
+
+  const secs=[...document.querySelectorAll('.study-section')];
+  const links=[...document.querySelectorAll('#tocList a')];
+  const read=new Set();
+  const label={teoria:['📘','Teoria'],laboratorio:['🧪','Laboratório'],checklist:['☑️','Checklist'],questoes:['❓','Questões de concurso'],referencias:['📚','Referências']};
+  links.forEach(a=>{a.style.setProperty('--c',getComputedStyle(document.querySelector('#'+a.getAttribute('href').slice(1))).getPropertyValue('--c'))});
+  function onScroll(){
+    const y=window.scrollY, h=document.documentElement.scrollHeight-innerHeight;
+    document.getElementById('readbar').style.width=(h>0?y/h*100:0)+'%';
+    let cur=secs[0];
+    secs.forEach(s=>{const r=s.getBoundingClientRect(); if(r.top<innerHeight*0.35) cur=s; if(r.bottom<innerHeight*0.6) read.add(s.id);});
+    if(innerHeight+y>=document.documentElement.scrollHeight-4) secs.forEach(s=>read.add(s.id));
+    links.forEach(a=>{const id=a.getAttribute('href').slice(1);a.classList.toggle('on',id===cur.id);a.classList.toggle('read',read.has(id)&&id!==cur.id);});
+    const t=label[cur.dataset.tipo];document.getElementById('nowIc').textContent=t[0];document.getElementById('nowTx').textContent=t[1];
+    const pct=Math.round(read.size/secs.length*100);document.getElementById('ringBar').style.width=pct+'%';document.getElementById('ringTx').textContent=pct+'%';
+    document.getElementById('doneBtn').classList.toggle('ready',pct===100&&!done);
+  }
+  addEventListener('scroll',onScroll,{passive:true});onScroll();
+  // atualiza a cor dos links quando o tema muda
+  new MutationObserver(()=>links.forEach(a=>a.style.setProperty('--c',getComputedStyle(document.querySelector('#'+a.getAttribute('href').slice(1))).getPropertyValue('--c')))).observe(root,{attributes:true});
+
+  // checklist
+  const items=[...document.querySelectorAll('.checklist-item')];
+  function chk(){const n=items.filter(i=>i.querySelector('input').checked).length;items.forEach(i=>i.classList.toggle('completed',i.querySelector('input').checked));
+    document.getElementById('chkTx').textContent=n+' de '+items.length;document.getElementById('chkBar').style.width=(n/items.length*100)+'%';document.getElementById('cntChk').textContent=n+'/'+items.length;}
+  items.forEach(i=>i.querySelector('input').addEventListener('change',chk));chk();
+
+  // flashcards
+  const qs=[...document.querySelectorAll('.quiz-item')];
+  const stTx={acertei:'✓ acertou',errei:'✗ errou',revisar:'↻ revisar'};
+  function score(){let a=0,e=0,r=0;qs.forEach(q=>{const v=q.dataset.res;if(v==='acertei')a++;if(v==='errei')e++;if(v==='revisar')r++;});
+    sA.textContent=a;sE.textContent=e;sR.textContent=r;document.getElementById('cntQst').textContent=a+'/'+qs.length;}
+  qs.forEach(q=>q.querySelectorAll('.selfeval button').forEach(b=>b.addEventListener('click',()=>{
+    q.dataset.res=b.dataset.v;q.querySelectorAll('.selfeval button').forEach(x=>x.classList.toggle('on',x===b));
+    q.querySelector('.qn .st').textContent=stTx[b.dataset.v];score();applyFilter();})));
+  let filt='todas';
+  function applyFilter(){qs.forEach(q=>{const v=q.dataset.res;let show=true;if(filt==='pendentes')show=v==='errei'||v==='revisar';if(filt==='sem')show=!v;q.classList.toggle('hide',!show);});}
+  document.querySelectorAll('#filters button').forEach(b=>b.addEventListener('click',()=>{filt=b.dataset.f;document.querySelectorAll('#filters button').forEach(x=>x.classList.toggle('on',x===b));applyFilter();}));
+  score();
+
+  // lab
+  window.pick=function(el,ok){document.querySelectorAll('.opt').forEach(o=>o.classList.toggle('sel',o===el));el.querySelector('input').checked=true;
+    const out=document.getElementById('labOut');
+    if(ok){out.innerHTML='&gt; hipótese registrada: <span class="ok">testável ✓</span> comportamento + técnica + população.\n&gt; próximo passo: escolha a fonte de dados.';const s=document.querySelectorAll('#labSteps div');s[0].className='ok';s[1].className='on';document.getElementById('cntLab').textContent='1/4';}
+    else{out.textContent='> essa hipótese não é testável como caça por comportamento. Tente outra.';}};
+
+  // concluir
+  window.toggleDone=function(){done=!done;[doneBtn,doneBtn2].forEach(b=>{b.classList.toggle('is-done',done);b.classList.remove('ready');b.textContent=done?'✓ Concluído · desfazer':'✓ Concluir módulo';});};
+})();
+</script>
+</body>
+</html>
