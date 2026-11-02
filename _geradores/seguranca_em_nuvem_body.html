@@ -1,0 +1,648 @@
+<!-- Estudo 21: Seguranca-em-Nuvem Body Fragment -->
+<article class="study-container" data-slug="seguranca-nuvem">
+
+    <!-- SEÇÃO 1: RESPONSABILIDADE COMPARTILHADA -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: A Nuvem É Segura, a Sua Configuração Talvez Não</h2>
+        </div>
+
+        <p class="lead-text">
+            A Ipê Store guarda as imagens dos produtos e as notas fiscais dos clientes em buckets na AWS, e a aplicação da loja acessa os dois com uma role. Quase nenhum vazamento em nuvem vem de uma falha do provedor: vem de um bucket público por engano, de uma permissão <code>s3:*</code> "para funcionar" ou de uma instância que entrega as próprias credenciais a quem pedir. Este estudo mostra onde termina a responsabilidade do provedor e como ler, auditar e corrigir as permissões que são suas.
+        </p>
+
+        <h3>Responsabilidade compartilhada</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Camada</th><th>IaaS (máquinas virtuais)</th><th>PaaS (banco gerenciado, funções)</th><th>SaaS (correio, CRM)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Datacenter, hardware, rede física</td><td>Provedor</td><td>Provedor</td><td>Provedor</td></tr>
+                    <tr><td>Sistema operacional e patches</td><td><strong>Cliente</strong></td><td>Provedor</td><td>Provedor</td></tr>
+                    <tr><td>Aplicação e configuração do serviço</td><td><strong>Cliente</strong></td><td><strong>Cliente</strong></td><td>Provedor, com opções do cliente</td></tr>
+                    <tr><td>Identidades, permissões e dados</td><td><strong>Cliente</strong></td><td><strong>Cliente</strong></td><td><strong>Cliente</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            A última linha nunca muda de dono: em qualquer modelo, quem decide quem acessa o quê é o cliente. É o modelo de <strong>responsabilidade compartilhada</strong> publicado pela AWS, pela Azure e pelo GCP, com pequenas diferenças de nome.
+        </p>
+
+        <h3>Anatomia de uma política IAM</h3>
+        <ul>
+            <li><strong>Effect:</strong> <code>Allow</code> ou <code>Deny</code>.</li>
+            <li><strong>Principal:</strong> quem (só em políticas de recurso, como a de um bucket); <code>"*"</code> significa qualquer pessoa, inclusive sem login.</li>
+            <li><strong>Action:</strong> o que (<code>s3:GetObject</code>); curingas como <code>s3:*</code> incluem até apagar o bucket.</li>
+            <li><strong>Resource:</strong> sobre o quê, em ARN (<code>arn:aws:s3:::bucket/*</code> são os objetos; <code>arn:aws:s3:::bucket</code> é o próprio bucket).</li>
+            <li><strong>Condition:</strong> quando (IP de origem, TLS, MFA, tags).</li>
+        </ul>
+        <p>
+            A avaliação segue três regras, nesta ordem: uma <strong>negação explícita</strong> em qualquer política vence; senão, basta uma permissão (na política da identidade ou na do recurso, dentro da mesma conta); se nada permite, vale a <strong>negação implícita</strong>. Em organizações, SCPs e permission boundaries podem limitar ainda mais o que uma permissão concede.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Avaliação de uma Requisição na Mesma Conta</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Avaliação de uma Requisição na Mesma Conta">
+flowchart TD
+    Q["Requisição: principal, ação, recurso, contexto"]
+    D{"Algum Deny se aplica?"}
+    ND["Negado (negação explícita)"]
+    A{"Algum Allow se aplica?<br><small>identidade ou bucket</small>"}
+    P["Permitido"]
+    NI["Negado (negação implícita)"]
+    Q --> D
+    D -->|"sim"| ND
+    D -->|"não"| A
+    A -->|"sim"| P
+    A -->|"não"| NI
+            </pre>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: BUCKETS, METADADOS E POSTURA -->
+    <section class="study-section" id="controles">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Buckets, Metadados de Instância e Gestão de Postura</h2>
+        </div>
+
+        <h3>Buckets públicos</h3>
+        <p>
+            O <strong>Block Public Access</strong> do S3 impede, na conta ou em cada bucket, que políticas e ACLs tornem dados públicos; buckets novos já nascem com ele ligado e com ACLs desativadas. Quando um site precisa servir arquivos ao público, o caminho recomendado é uma CDN com acesso de origem controlado, deixando o bucket privado. Nos outros provedores, o equivalente é bloquear o acesso anônimo a blobs na conta de armazenamento (Azure) e a prevenção de acesso público com acesso uniforme no bucket (GCP).
+        </p>
+        <p>
+            Para dados sensíveis, acrescente uma negação para conexões sem TLS, usando a condição <code>aws:SecureTransport</code>: assim nenhum cliente mal configurado busca notas fiscais por HTTP.
+        </p>
+
+        <h3>Metadados de instância: IMDSv2 contra SSRF</h3>
+        <p>
+            Toda instância EC2 consulta o serviço de metadados em <code>169.254.169.254</code> para obter, entre outras coisas, as credenciais temporárias da role. No IMDSv1, um simples GET devolve essas credenciais, e uma falha de <strong>SSRF</strong> (a aplicação busca uma URL indicada pelo atacante, Estudo 12) vira roubo de credenciais. Foi o caminho do vazamento da Capital One, em 2019. O <strong>IMDSv2</strong> exige primeiro um PUT que gera um token de sessão, com limite de saltos de rede, o que barra a maioria dos SSRF.
+        </p>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">aws cli — verificações defensivas</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-nv-cli')">Copiar</button>
+            </div>
+            <pre><code id="code-nv-cli"># O bucket está público?
+aws s3api get-bucket-policy-status --bucket ipestore-notas-fiscais
+
+# Bloquear acesso público no bucket
+aws s3api put-public-access-block --bucket ipestore-notas-fiscais \
+  --public-access-block-configuration BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
+
+# Exigir IMDSv2 numa instância
+aws ec2 modify-instance-metadata-options --instance-id i-0abc1234def567890 \
+  --http-tokens required --http-endpoint enabled
+
+# Validar uma política antes de aplicar (IAM Access Analyzer)
+aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-document file://app-loja.json</code></pre>
+        </div>
+
+        <h3>Postura em escala: CSPM, CWPP e CNAPP</h3>
+        <ul>
+            <li><strong>CSPM</strong> (Cloud Security Posture Management): varre as contas atrás de configurações erradas, como bucket público, IMDSv1 e portas abertas, comparando com referências como os <strong>CIS</strong> Benchmarks de cada provedor.</li>
+            <li><strong>CWPP</strong> (Cloud Workload Protection Platform): protege o que roda, como máquinas, containers e funções (vulnerabilidades, malware, comportamento).</li>
+            <li><strong>CNAPP</strong>: junta os dois e cruza com identidades e código, para priorizar o caminho que um atacante realmente usaria.</li>
+        </ul>
+        <p>
+            O <strong>IAM Access Analyzer</strong> da AWS aponta recursos compartilhados com fora da conta e permissões não usadas, um bom ponto de partida para chegar ao <strong>mínimo privilégio</strong>.
+        </p>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>Mínimo privilégio na prática</strong>
+            </div>
+            <p>
+                Comece pelo que a aplicação faz (quais ações, em quais recursos), não pelo que "pode precisar um dia". Troque <code>s3:*</code> em <code>*</code> pelas ações exatas nos ARNs exatos, e use os registros de acesso para cortar o que nunca é usado.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Auditor de Permissões S3 e Políticas IAM Cloud</h2>
+        </div>
+
+        <p class="lead-text">
+            Edite as três políticas em JSON e aplique. A auditoria aponta os riscos de cada uma, e as nove requisições abaixo são reavaliadas na hora, mostrando qual declaração permitiu ou negou cada uma.
+        </p>
+
+        <div class="lab-box nv-lab" id="nv-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Conta AWS 111122223333 (simulada)</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Buckets e role da loja da Ipê Store</h3>
+                    <p id="nv-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">Missões</h4>
+                <ul id="nv-missoes" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.25rem; font-size: 0.85rem;"></ul>
+
+                <h4 style="margin-top: 1.5rem;">1. Buckets</h4>
+                <div id="nv-buckets" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 0.5rem; font-size: 0.83rem;"></div>
+
+                <h4 style="margin-top: 1.25rem;">2. Editor de políticas</h4>
+                <div id="nv-editor" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.45rem; font-size: 0.83rem;">
+                    <select class="form-control" id="nv-politica" aria-label="Política"></select>
+                    <textarea class="form-control" id="nv-json" rows="14" spellcheck="false" aria-label="Política em JSON" style="width: 100%; box-sizing: border-box; font-family: var(--font-mono); font-size: 0.74rem; resize: vertical;"></textarea>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                        <button class="btn-primary" type="button" onclick="aplicarPoliticaNuvem()">Aplicar política</button>
+                        <button class="btn-secondary" type="button" id="nv-desfazer">Voltar ao original</button>
+                        <button class="btn-secondary" type="button" id="nv-sugestao">Carregar uma solução</button>
+                    </div>
+                    <div id="nv-editor-status" aria-live="polite"></div>
+                </div>
+
+                <h4 style="margin-top: 1.25rem;">3. Auditoria</h4>
+                <div id="nv-auditoria" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem; font-size: 0.82rem;"></div>
+
+                <h4 style="margin-top: 1.25rem;">4. Requisições</h4>
+                <div id="nv-requisicoes" aria-live="polite" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.4rem; font-size: 0.82rem;"></div>
+
+                <div style="margin-top: 1.25rem;">
+                    <button class="btn-secondary" type="button" onclick="restaurarNuvem()">Restaurar laboratório</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Segurança em Nuvem</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para revisar uma conta de nuvem. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="seguranca-nuvem">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-nv-1">
+                <label for="chk-nv-1"><strong>Responsabilidades mapeadas:</strong> para cada serviço usado, está claro o que cabe ao provedor e o que cabe à empresa.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-nv-2">
+                <label for="chk-nv-2"><strong>Acesso público bloqueado:</strong> Block Public Access ligado na conta; exceções documentadas e servidas por CDN.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-nv-3">
+                <label for="chk-nv-3"><strong>Mínimo privilégio:</strong> nenhuma política com <code>*</code> em ações ou recursos sem justificativa; Access Analyzer revisado.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-nv-4">
+                <label for="chk-nv-4"><strong>Dados sensíveis:</strong> negação de conexões sem TLS, criptografia ativa e logs de acesso aos buckets.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-nv-5">
+                <label for="chk-nv-5"><strong>IMDSv2:</strong> obrigatório em todas as instâncias.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-nv-6">
+                <label for="chk-nv-6"><strong>Contas raiz e administradores:</strong> raiz sem chaves de acesso e com MFA; administradores via identidade federada.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-nv-7">
+                <label for="chk-nv-7"><strong>Postura contínua:</strong> CSPM comparando com os CIS Benchmarks e alertas para mudanças críticas.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Responsabilidade):</strong> Num banco de dados gerenciado (PaaS), quem aplica os patches do sistema e quem decide quem acessa os dados?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O provedor aplica os patches; o cliente continua responsável por usuários, permissões, exposição de rede e pelos próprios dados.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Avaliação):</strong> A política da role permite <code>s3:*</code> e a do bucket tem um Deny para conexões sem TLS. Uma requisição por HTTP passa?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. Uma negação explícita vence qualquer permissão, venha de onde vier.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Bucket):</strong> O que significa <code>"Principal": "*"</code> com <code>s3:GetObject</code> numa política de bucket sem condição?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Que qualquer pessoa na internet, sem login, baixa qualquer objeto do bucket. Só é aceitável para conteúdo realmente público, e mesmo assim de preferência por uma CDN.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (IMDS):</strong> Por que o IMDSv2 dificulta o roubo de credenciais por SSRF?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque exige obter antes um token com um PUT e enviá-lo num cabeçalho. A maioria das falhas de SSRF só consegue fazer GET simples, sem controlar método nem cabeçalhos.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Mínimo privilégio):</strong> A aplicação só lê notas fiscais e grava imagens. O que há de errado em <code>s3:*</code> com <code>Resource: *</code>?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Uma falha na aplicação passa a poder apagar buckets, alterar notas fiscais e mexer em qualquer bucket da conta. A política deve listar só GetObject nas notas e Get e PutObject nas imagens, nos ARNs exatos.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Ferramentas):</strong> Qual a diferença entre CSPM e CWPP?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O CSPM verifica a configuração da conta e dos serviços (buckets, IAM, rede); o CWPP protege as cargas que rodam (máquinas, containers, funções). Um CNAPP reúne os dois.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Responsabilidade</h4>
+                <p>Identidades, permissões e dados são sempre do cliente.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Avaliação</h4>
+                <p>Deny explícito vence; sem Allow, negação implícita.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Exposição</h4>
+                <p>Block Public Access, TLS obrigatório e IMDSv2.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Postura</h4>
+                <p>CSPM com CIS Benchmarks e Access Analyzer para o mínimo privilégio.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>AWS — Shared Responsibility Model e documentação de lógica de avaliação de políticas IAM.</li>
+            <li>AWS — Blocking public access to your Amazon S3 storage e Use IMDSv2.</li>
+            <li>CIS Benchmarks para AWS, Azure e GCP.</li>
+            <li>Microsoft Learn e Google Cloud — controles equivalentes de acesso anônimo a armazenamento.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 22 — DevSecOps e CI/CD e 41 — Identidade Híbrida e Nuvem</strong>
+            </div>
+            <p>
+                No Estudo 22, as mesmas verificações entram no pipeline como análise de infraestrutura como código. O Estudo 41 trata das identidades humanas que acessam a nuvem.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="nv-dados">
+{
+ "contexto": "Conta e ARNs fictícios (a conta 111122223333 é a usada nos exemplos da própria AWS). O avaliador cobre a lógica da mesma conta, com um subconjunto de condições.",
+ "conta": "111122223333",
+ "buckets": {
+  "ipestore-notas-fiscais": {"descricao": "Notas fiscais dos clientes (dados pessoais e fiscais)", "publico_intencional": false},
+  "ipestore-imagens-produtos": {"descricao": "Fotos dos produtos exibidas no site", "publico_intencional": true}
+ },
+ "bpa_inicial": {"ipestore-notas-fiscais": false, "ipestore-imagens-produtos": false},
+ "nomes": {"bucket:ipestore-notas-fiscais": "Política do bucket ipestore-notas-fiscais", "bucket:ipestore-imagens-produtos": "Política do bucket ipestore-imagens-produtos", "identidade:app-loja": "Política da role app-loja"},
+ "politicas": {
+  "bucket:ipestore-notas-fiscais": {"Version": "2012-10-17", "Statement": [
+   {"Sid": "LeituraPublica", "Effect": "Allow", "Principal": "*", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::ipestore-notas-fiscais/*"}
+  ]},
+  "bucket:ipestore-imagens-produtos": {"Version": "2012-10-17", "Statement": [
+   {"Sid": "ImagensPublicas", "Effect": "Allow", "Principal": "*", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::ipestore-imagens-produtos/*"}
+  ]},
+  "identidade:app-loja": {"Version": "2012-10-17", "Statement": [
+   {"Sid": "TudoNoS3", "Effect": "Allow", "Action": "s3:*", "Resource": "*"}
+  ]}
+ },
+ "corrigidas": {
+  "bucket:ipestore-notas-fiscais": {"Version": "2012-10-17", "Statement": [
+   {"Sid": "SomenteTLS", "Effect": "Deny", "Principal": "*", "Action": "s3:*", "Resource": ["arn:aws:s3:::ipestore-notas-fiscais", "arn:aws:s3:::ipestore-notas-fiscais/*"], "Condition": {"Bool": {"aws:SecureTransport": "false"}}}
+  ]},
+  "bucket:ipestore-imagens-produtos": {"Version": "2012-10-17", "Statement": [
+   {"Sid": "ImagensPublicas", "Effect": "Allow", "Principal": "*", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::ipestore-imagens-produtos/*"},
+   {"Sid": "SomenteTLS", "Effect": "Deny", "Principal": "*", "Action": "s3:*", "Resource": ["arn:aws:s3:::ipestore-imagens-produtos", "arn:aws:s3:::ipestore-imagens-produtos/*"], "Condition": {"Bool": {"aws:SecureTransport": "false"}}}
+  ]},
+  "identidade:app-loja": {"Version": "2012-10-17", "Statement": [
+   {"Sid": "ImagensLeituraEscrita", "Effect": "Allow", "Action": ["s3:GetObject", "s3:PutObject"], "Resource": "arn:aws:s3:::ipestore-imagens-produtos/*"},
+   {"Sid": "NotasSomenteLeitura", "Effect": "Allow", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::ipestore-notas-fiscais/*"}
+  ]}
+ },
+ "regras": {
+  "publico": "Acesso público (Principal *) sem condição",
+  "acao_curinga": "Ação com curinga (todas as ações de um serviço ou de todos)",
+  "recurso_curinga": "Recurso * (qualquer recurso da conta)",
+  "negacao_invertida": "NotAction ou NotResource em Allow concede mais do que parece",
+  "passrole_curinga": "iam:PassRole em qualquer role permite escalar privilégio",
+  "sem_tls": "Sem negação de conexões sem TLS (aws:SecureTransport)"
+ },
+ "requisicoes": [
+  {"id": "r1", "descricao": "Visitante anônimo baixa a nota fiscal de um cliente", "principal": "anonimo", "acao": "s3:GetObject", "recurso": "arn:aws:s3:::ipestore-notas-fiscais/2026/NF-1043.pdf", "contexto": {"aws:SourceIp": "203.0.113.77", "aws:SecureTransport": "true"}, "esperado_inicial": "permitido", "esperado_corrigido": "negado_implicito"},
+  {"id": "r2", "descricao": "Visitante anônimo carrega a foto de um produto no site", "principal": "anonimo", "acao": "s3:GetObject", "recurso": "arn:aws:s3:::ipestore-imagens-produtos/caixa-media.jpg", "contexto": {"aws:SourceIp": "198.51.100.140", "aws:SecureTransport": "true"}, "esperado_inicial": "permitido", "esperado_corrigido": "permitido"},
+  {"id": "r3", "descricao": "A aplicação lê a nota fiscal para o cliente logado", "principal": "arn:aws:iam::111122223333:role/app-loja", "acao": "s3:GetObject", "recurso": "arn:aws:s3:::ipestore-notas-fiscais/2026/NF-1042.pdf", "contexto": {"aws:SourceIp": "10.20.40.11", "aws:SecureTransport": "true"}, "esperado_inicial": "permitido", "esperado_corrigido": "permitido"},
+  {"id": "r4", "descricao": "A aplicação grava a foto de um produto novo", "principal": "arn:aws:iam::111122223333:role/app-loja", "acao": "s3:PutObject", "recurso": "arn:aws:s3:::ipestore-imagens-produtos/caixa-grande.jpg", "contexto": {"aws:SourceIp": "10.20.40.11", "aws:SecureTransport": "true"}, "esperado_inicial": "permitido", "esperado_corrigido": "permitido"},
+  {"id": "r5", "descricao": "Uma falha na aplicação tenta apagar o bucket de notas", "principal": "arn:aws:iam::111122223333:role/app-loja", "acao": "s3:DeleteBucket", "recurso": "arn:aws:s3:::ipestore-notas-fiscais", "contexto": {"aws:SourceIp": "10.20.40.11", "aws:SecureTransport": "true"}, "esperado_inicial": "permitido", "esperado_corrigido": "negado_implicito"},
+  {"id": "r6", "descricao": "Um componente antigo da aplicação lê nota fiscal por HTTP", "principal": "arn:aws:iam::111122223333:role/app-loja", "acao": "s3:GetObject", "recurso": "arn:aws:s3:::ipestore-notas-fiscais/2026/NF-1042.pdf", "contexto": {"aws:SourceIp": "10.20.40.12", "aws:SecureTransport": "false"}, "esperado_inicial": "permitido", "esperado_corrigido": "negado_explicito"},
+  {"id": "r7", "descricao": "A aplicação comprometida tenta sobrescrever uma nota fiscal", "principal": "arn:aws:iam::111122223333:role/app-loja", "acao": "s3:PutObject", "recurso": "arn:aws:s3:::ipestore-notas-fiscais/2026/NF-1042.pdf", "contexto": {"aws:SourceIp": "10.20.40.11", "aws:SecureTransport": "true"}, "esperado_inicial": "permitido", "esperado_corrigido": "negado_implicito"},
+  {"id": "r8", "descricao": "Visitante anônimo tenta enviar um arquivo para o bucket de imagens", "principal": "anonimo", "acao": "s3:PutObject", "recurso": "arn:aws:s3:::ipestore-imagens-produtos/webshell.php", "contexto": {"aws:SourceIp": "203.0.113.9", "aws:SecureTransport": "true"}, "esperado_inicial": "negado_implicito", "esperado_corrigido": "negado_implicito"},
+  {"id": "r9", "descricao": "A aplicação lê as permissões (ACL) de uma nota, algo de que não precisa", "principal": "arn:aws:iam::111122223333:role/app-loja", "acao": "s3:GetObjectAcl", "recurso": "arn:aws:s3:::ipestore-notas-fiscais/2026/NF-1042.pdf", "contexto": {"aws:SourceIp": "10.20.40.11", "aws:SecureTransport": "true"}, "esperado_inicial": "permitido", "esperado_corrigido": "negado_implicito"}
+ ],
+ "missoes": [
+  {"id": "publico", "texto": "Feche o vazamento das notas fiscais sem tirar as fotos dos produtos do ar."},
+  {"id": "minimo", "texto": "Reduza a role app-loja ao mínimo: a aplicação continua lendo notas e gravando imagens, e nada além disso (nem apagar, nem alterar, nem ler ACLs)."},
+  {"id": "tls", "texto": "Barre leituras de notas fiscais sem TLS com uma negação explícita."},
+  {"id": "auditoria", "texto": "Zere os achados de severidade alta na auditoria das três políticas."}
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var NV = JSON.parse(document.getElementById("nv-dados").textContent);
+    var CONTA = NV.conta;
+    var politicas = {}, bpa = {}, feitas = {};
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function copia(o) { return JSON.parse(JSON.stringify(o)); }
+    function lista(v) { return Array.isArray(v) ? v : [v]; }
+
+    // ===================================================== avaliador (espelhado nos testes)
+    function curinga(p, v, semCaixa) {
+        var rx = "^" + String(p).split("").map(function(c) { return c === "*" ? "[\\s\\S]*" : c === "?" ? "[\\s\\S]" : c.replace(/[.+^${}()|[\]\\]/g, "\\$&"); }).join("") + "$";
+        return new RegExp(rx, semCaixa ? "i" : "").test(v);
+    }
+    function ipNum(ip) { var p = String(ip).split(".").map(Number); return ((p[0] * 256 + p[1]) * 256 + p[2]) * 256 + p[3]; }
+    function naRede(ip, cidr) {
+        var c = String(cidr).split("/"), bits = c.length > 1 ? Number(c[1]) : 32, tam = Math.pow(2, 32 - bits);
+        var base = Math.floor(ipNum(c[0]) / tam) * tam, n = ipNum(ip);
+        return n >= base && n < base + tam;
+    }
+    function condicaoOk(cond, ctx) {
+        var ops = Object.keys(cond || {});
+        for (var i = 0; i < ops.length; i++) {
+            var op = ops[i], pares = cond[op], chaves = Object.keys(pares);
+            for (var j = 0; j < chaves.length; j++) {
+                var chave = chaves[j], vals = lista(pares[chave]).map(String);
+                var negado = op === "StringNotEquals" || op === "NotIpAddress";
+                if (!Object.prototype.hasOwnProperty.call(ctx, chave)) { if (!negado) return false; continue; }
+                var atual = String(ctx[chave]), ok;
+                if (op === "Bool") ok = vals.map(function(v) { return v.toLowerCase(); }).indexOf(atual.toLowerCase()) !== -1;
+                else if (op === "StringEquals") ok = vals.indexOf(atual) !== -1;
+                else if (op === "StringNotEquals") ok = vals.indexOf(atual) === -1;
+                else if (op === "StringLike") ok = vals.some(function(v) { return curinga(v, atual); });
+                else if (op === "IpAddress" || op === "NotIpAddress") { var dentro = vals.some(function(v) { return naRede(atual, v); }); ok = op === "IpAddress" ? dentro : !dentro; }
+                else return false;
+                if (!ok) return false;
+            }
+        }
+        return true;
+    }
+    function casaAcao(st, a) { return "Action" in st ? lista(st.Action).some(function(x) { return curinga(x, a, true); }) : !lista(st.NotAction).some(function(x) { return curinga(x, a, true); }); }
+    function casaRecurso(st, r) { return "Resource" in st ? lista(st.Resource).some(function(x) { return curinga(x, r); }) : !lista(st.NotResource).some(function(x) { return curinga(x, r); }); }
+    function casaPrincipal(st, quem) {
+        var p = st.Principal;
+        if (p === "*") return true;
+        var alvos = p && typeof p === "object" ? lista(p.AWS || []) : [];
+        return alvos.some(function(a) {
+            if (a === "*") return true;
+            return quem !== "anonimo" && (a === quem || (a === "arn:aws:iam::" + CONTA + ":root" && quem.indexOf("arn:aws:iam::" + CONTA + ":") === 0));
+        });
+    }
+    function publico(st) { var p = st.Principal; return p === "*" || (!!p && typeof p === "object" && lista(p.AWS || []).indexOf("*") !== -1); }
+    function bucketDe(r) { return r.split(":::")[1].split("/")[0]; }
+    window.avaliarRequisicaoNuvem = function(pols, bpas, req) {
+        var ctx = req.contexto, quem = req.principal, cands = [];
+        if (quem !== "anonimo") {
+            var papel = quem.split("/").pop(), nome = "identidade:" + papel;
+            (pols[nome] || { Statement: [] }).Statement.forEach(function(st, i) { cands.push([nome, i, st]); });
+        }
+        var b = bucketDe(req.recurso), nb = "bucket:" + b;
+        (pols[nb] || { Statement: [] }).Statement.forEach(function(st, i) {
+            if (!casaPrincipal(st, quem)) return;
+            if (st.Effect === "Allow" && publico(st) && bpas[b] && quem === "anonimo") return;
+            cands.push([nb, i, st]);
+        });
+        var aplic = cands.filter(function(c) { return casaAcao(c[2], req.acao) && casaRecurso(c[2], req.recurso) && condicaoOk(c[2].Condition, ctx); });
+        var negs = aplic.filter(function(c) { return c[2].Effect === "Deny"; }).map(function(c) { return c[0] + "#" + c[1]; });
+        if (negs.length) return { decisao: "negado_explicito", por: negs };
+        var perms = aplic.filter(function(c) { return c[2].Effect === "Allow"; }).map(function(c) { return c[0] + "#" + c[1]; });
+        if (perms.length) return { decisao: "permitido", por: perms };
+        return { decisao: "negado_implicito", por: [] };
+    };
+    window.auditarPoliticaNuvem = function(nome, pol) {
+        var meta = nome.indexOf("bucket:") === 0 ? (NV.buckets[nome.split(":")[1]] || {}) : {};
+        var achados = [], temTls = false;
+        pol.Statement.forEach(function(st, i) {
+            var acoes = lista(st.Action || []).map(function(a) { return String(a).toLowerCase(); });
+            var tls = st.Condition && st.Condition.Bool && st.Condition.Bool["aws:SecureTransport"];
+            if (st.Effect === "Deny" && (tls === "false" || tls === false)) temTls = true;
+            if (st.Effect !== "Allow") return;
+            if (nome.indexOf("bucket:") === 0 && publico(st) && !st.Condition) {
+                achados.push([i, "publico", meta.publico_intencional && acoes.every(function(a) { return a === "s3:getobject"; }) ? "info" : "alta"]);
+            }
+            if (acoes.indexOf("*") !== -1 || acoes.some(function(a) { return /:\*$/.test(a); })) achados.push([i, "acao_curinga", "alta"]);
+            if ("Resource" in st && lista(st.Resource).indexOf("*") !== -1) achados.push([i, "recurso_curinga", "media"]);
+            if ("NotAction" in st || "NotResource" in st) achados.push([i, "negacao_invertida", "media"]);
+            if (acoes.indexOf("iam:passrole") !== -1 && lista(st.Resource || []).indexOf("*") !== -1) achados.push([i, "passrole_curinga", "alta"]);
+        });
+        if (nome.indexOf("bucket:") === 0 && !temTls) achados.push([null, "sem_tls", "media"]);
+        return achados;
+    };
+    function validar(nome, pol) {
+        if (!pol || typeof pol !== "object" || Array.isArray(pol)) return "A política precisa ser um objeto JSON.";
+        if (pol.Version !== "2012-10-17") return "Use \"Version\": \"2012-10-17\".";
+        if (!Array.isArray(pol.Statement) || !pol.Statement.length) return "Statement precisa ser uma lista com pelo menos uma declaração.";
+        for (var i = 0; i < pol.Statement.length; i++) {
+            var st = pol.Statement[i];
+            if (!st || typeof st !== "object") return "Declaração " + i + " inválida.";
+            if (st.Effect !== "Allow" && st.Effect !== "Deny") return "Declaração " + i + ": Effect deve ser Allow ou Deny.";
+            if (("Action" in st) === ("NotAction" in st)) return "Declaração " + i + ": use Action ou NotAction (um dos dois).";
+            if (("Resource" in st) === ("NotResource" in st)) return "Declaração " + i + ": use Resource ou NotResource (um dos dois).";
+            if (nome.indexOf("bucket:") === 0 && !("Principal" in st)) return "Declaração " + i + ": política de bucket precisa de Principal.";
+            if (nome.indexOf("identidade:") === 0 && "Principal" in st) return "Declaração " + i + ": política de identidade não leva Principal.";
+            var ops = Object.keys(st.Condition || {});
+            var suportados = ["StringEquals", "StringNotEquals", "StringLike", "Bool", "IpAddress", "NotIpAddress"];
+            for (var k = 0; k < ops.length; k++) if (suportados.indexOf(ops[k]) === -1) return "Operador " + ops[k] + " não é suportado neste laboratório (use " + suportados.join(", ") + ").";
+        }
+        return null;
+    }
+
+    // ===================================================== missões
+    function concluir(id) { if (!feitas[id]) { feitas[id] = true; renderizarMissoes(); } }
+    function renderizarMissoes() {
+        var ul = document.getElementById("nv-missoes");
+        ul.replaceChildren();
+        NV.missoes.forEach(function(m) {
+            var li = el("li", (feitas[m.id] ? "✓ " : "○ ") + m.texto, "color: " + (feitas[m.id] ? "var(--tip-color)" : "var(--ink)") + ";");
+            li.setAttribute("data-missao", m.id);
+            li.setAttribute("data-feita", feitas[m.id] ? "sim" : "nao");
+            ul.appendChild(li);
+        });
+    }
+
+    // ===================================================== interface
+    function renderizarBuckets() {
+        var box = document.getElementById("nv-buckets");
+        box.replaceChildren();
+        Object.keys(NV.buckets).forEach(function(b) {
+            var c = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem 0.6rem; min-width: 0;");
+            c.appendChild(el("strong", b, "display: block; font-family: var(--font-mono); font-size: 0.78rem; overflow-wrap: anywhere;"));
+            c.appendChild(el("span", NV.buckets[b].descricao, "display: block; color: var(--muted);"));
+            var l = el("label", null, "display: flex; gap: 0.4rem; align-items: center; margin-top: 0.3rem;");
+            var cb = el("input"); cb.type = "checkbox"; cb.checked = !!bpa[b]; cb.setAttribute("data-bpa", b);
+            cb.addEventListener("change", function() { alternarBpaNuvem(b); });
+            l.appendChild(cb); l.appendChild(el("span", "Block Public Access neste bucket"));
+            c.appendChild(l);
+            box.appendChild(c);
+        });
+    }
+    window.alternarBpaNuvem = function(b) { bpa[b] = !bpa[b]; renderizarBuckets(); renderizarResultados(); };
+    function carregarEditor() {
+        var nome = document.getElementById("nv-politica").value;
+        document.getElementById("nv-json").value = JSON.stringify(politicas[nome], null, 2);
+        document.getElementById("nv-editor-status").replaceChildren();
+    }
+    window.aplicarPoliticaNuvem = function() {
+        var nome = document.getElementById("nv-politica").value, st = document.getElementById("nv-editor-status"), pol;
+        st.replaceChildren();
+        try { pol = JSON.parse(document.getElementById("nv-json").value); }
+        catch (e) { st.appendChild(el("span", "JSON inválido: " + e.message, "color: var(--danger-color);")); st.setAttribute("data-ok", "nao"); return false; }
+        var erro = validar(nome, pol);
+        if (erro) { st.appendChild(el("span", erro, "color: var(--danger-color);")); st.setAttribute("data-ok", "nao"); return false; }
+        politicas[nome] = pol;
+        st.setAttribute("data-ok", "sim");
+        st.appendChild(el("span", "Política aplicada.", "color: var(--tip-color);"));
+        renderizarResultados();
+        return true;
+    };
+    var ROT = { permitido: "Permitido", negado_explicito: "Negado (negação explícita)", negado_implicito: "Negado (negação implícita)" };
+    function renderizarResultados() {
+        var aud = document.getElementById("nv-auditoria");
+        aud.replaceChildren();
+        var altas = 0;
+        Object.keys(NV.nomes).forEach(function(nome) {
+            var ach = window.auditarPoliticaNuvem(nome, politicas[nome]);
+            altas += ach.filter(function(a) { return a[2] === "alta"; }).length;
+            var c = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.4rem 0.55rem; min-width: 0;");
+            c.setAttribute("data-auditoria", nome);
+            c.setAttribute("data-altas", String(ach.filter(function(a) { return a[2] === "alta"; }).length));
+            c.appendChild(el("strong", NV.nomes[nome], "display: block;"));
+            if (!ach.length) c.appendChild(el("span", "Nenhum achado.", "color: var(--tip-color);"));
+            ach.forEach(function(a) {
+                var cor = a[2] === "alta" ? "var(--danger-color)" : a[2] === "media" ? "rgb(202, 138, 4)" : "var(--muted)";
+                c.appendChild(el("div", (a[2] === "alta" ? "Alta" : a[2] === "media" ? "Média" : "Info") + (a[0] === null ? "" : " · declaração " + a[0]) + ": " + NV.regras[a[1]] + (a[2] === "info" ? " (intencional: conteúdo público)" : ""), "color: " + cor + ";"));
+            });
+            aud.appendChild(c);
+        });
+        var box = document.getElementById("nv-requisicoes");
+        box.replaceChildren();
+        var r = {};
+        NV.requisicoes.forEach(function(q) {
+            var res = window.avaliarRequisicaoNuvem(politicas, bpa, q);
+            r[q.id] = res.decisao;
+            var cor = res.decisao === "permitido" ? "var(--tip-color)" : "var(--danger-color)";
+            var c = el("div", null, "border-left: 4px solid " + cor + "; background: var(--sunk); border-radius: var(--radius-sm); padding: 0.4rem 0.6rem; min-width: 0;");
+            c.setAttribute("data-requisicao", q.id);
+            c.setAttribute("data-decisao", res.decisao);
+            c.appendChild(el("strong", q.id + ". " + q.descricao, "display: block;"));
+            c.appendChild(el("div", (q.principal === "anonimo" ? "anônimo" : q.principal) + " · " + q.acao + " · " + q.recurso + " · TLS " + (q.contexto["aws:SecureTransport"] === "true" ? "sim" : "não"), "font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); overflow-wrap: anywhere;"));
+            c.appendChild(el("div", ROT[res.decisao] + (res.por.length ? " — " + res.por.map(function(p) { var n = p.split("#"); var sid = politicas[n[0]].Statement[Number(n[1])].Sid; return NV.nomes[n[0]] + (sid ? " (" + sid + ")" : ", declaração " + n[1]); }).join("; ") : " — nenhuma declaração permite"), "font-weight: 600; color: " + cor + "; overflow-wrap: anywhere;"));
+            box.appendChild(c);
+        });
+        if (r.r1 !== "permitido" && r.r2 === "permitido") concluir("publico");
+        var appAltas = window.auditarPoliticaNuvem("identidade:app-loja", politicas["identidade:app-loja"]).filter(function(a) { return a[2] === "alta"; }).length;
+        if (r.r3 === "permitido" && r.r4 === "permitido" && r.r5 !== "permitido" && r.r7 !== "permitido" && r.r9 !== "permitido" && !appAltas) concluir("minimo");
+        if (r.r6 === "negado_explicito" && r.r3 === "permitido") concluir("tls");
+        if (!altas) concluir("auditoria");
+    }
+
+    window.restaurarNuvem = function() {
+        politicas = copia(NV.politicas); bpa = copia(NV.bpa_inicial); feitas = {};
+        renderizarMissoes(); renderizarBuckets();
+        document.getElementById("nv-politica").value = Object.keys(NV.nomes)[0];
+        carregarEditor(); renderizarResultados();
+        feitas = {}; renderizarMissoes();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("nv-contexto").textContent = NV.contexto;
+        var sel = document.getElementById("nv-politica");
+        Object.keys(NV.nomes).forEach(function(n) { var o = el("option", NV.nomes[n]); o.value = n; sel.appendChild(o); });
+        sel.addEventListener("change", carregarEditor);
+        document.getElementById("nv-desfazer").addEventListener("click", function() {
+            var n = sel.value; politicas[n] = copia(NV.politicas[n]); carregarEditor(); renderizarResultados();
+        });
+        document.getElementById("nv-sugestao").addEventListener("click", function() {
+            document.getElementById("nv-json").value = JSON.stringify(NV.corrigidas[sel.value], null, 2);
+            var st = document.getElementById("nv-editor-status");
+            st.replaceChildren(el("span", "Solução carregada no editor. Leia, compare com o original e clique em Aplicar.", "color: var(--muted);"));
+        });
+        restaurarNuvem();
+        if (typeof initChecklist === "function") {
+            initChecklist("seguranca-nuvem");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
