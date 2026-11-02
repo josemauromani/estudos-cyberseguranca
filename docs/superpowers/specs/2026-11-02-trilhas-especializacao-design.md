@@ -472,7 +472,7 @@ TDD (Red → Green → Refactor) com `unittest`. Antes de rodar a suíte, confer
 | Arquivo | Ajuste |
 |---|---|
 | `test_curriculo.py` | `test_tamanho_da_grade`: `estudos.txt` com **57** módulos e `TRILHAS` com **13** trilhas. Continua sendo o único lugar com esses números |
-| `test_trilhas_empregabilidade.py` | `test_rotas_por_perfil_no_curriculo` passa a exigir as 6 sequências do §3.2, porque as rotas mudam de propósito. Os demais testes do arquivo (posições 34–45, apoios, necessidades e certificações das Trilhas 8–10) continuam válidos, porque só se acrescenta ao fim das listas |
+| `test_trilhas_empregabilidade.py` | `test_rotas_por_perfil_no_curriculo` passa a exigir as 6 sequências do §3.2, porque as rotas mudam de propósito. `test_posicoes_34_a_45` recorta `list(ESTUDOS_DADOS)[33:45]` em vez de `[33:]`, que passaria a incluir 46–57. Os demais testes do arquivo (apoios, necessidades e certificações das Trilhas 8–10) continuam válidos, porque só se acrescenta ao fim das listas |
 
 Já cobertos pelos testes atuais, sem mudança: tokens `--t{id}-{cor_nome}` 4 vezes em cada CSS, `.badge-t{id}` e `.track-tile.t{id}` para toda trilha de `TRILHAS` (`test_assets.py`); total de módulos e trilhas no portal (`test_index.py`); README cita todos os slugs (`test_cli.py`); módulos da Rota da Vaga com a carreira de Analista de SI e as 6 certificações exatas (`test_rota_vaga.py`). O `test_favicon.py` conta páginas compiladas (portal + 45) e não muda, porque nenhuma página nova é criada.
 
