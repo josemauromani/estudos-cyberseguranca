@@ -247,6 +247,23 @@ chown -R appuser:appgroup /etc/app-secrets/</code></pre>
         </tbody>
       </table>
     </div>
+
+    <p>
+      Na prática, o STRIDE é aplicado a cada elemento do <strong>diagrama de fluxo de dados (DFD)</strong> do sistema, e nem toda categoria se aplica a todo elemento. Comece pelos fluxos que cruzam a <strong>fronteira de confiança</strong>: é ali que dados de origem não confiável entram no sistema.
+    </p>
+
+    <pre class="mermaid" data-title="STRIDE por Elemento do Diagrama de Fluxo de Dados">
+flowchart LR
+    subgraph EXT["Fora da fronteira de confiança"]
+        EE["Entidade Externa<br><small>usuário, sistema parceiro</small><br>S · R"]
+    end
+    subgraph INT["Dentro da fronteira de confiança"]
+        PR["Processo<br><small>API, serviço, função</small><br>S · T · R · I · D · E"]
+        DS["Armazenamento de Dados<br><small>banco, fila, arquivo</small><br>T · I · D<br><small>e R, se guarda logs de auditoria</small>"]
+    end
+    EE -->|"Fluxo de dados: T · I · D"| PR
+    PR -->|"Fluxo de dados: T · I · D"| DS
+    </pre>
   </section>
 
   <!-- 4. LABORATÓRIO / SIMULADOR INTERATIVO STRIDE CANVAS -->

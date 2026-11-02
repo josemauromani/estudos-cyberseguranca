@@ -141,6 +141,26 @@ site:alvo.com.br filetype:pdf | filetype:xlsx "confidencial" OR "interno"</code>
             <li><strong>Subdomain Takeover:</strong> Ocorre quando um subdomínio (ex: <code>blog.empresa.com.br</code>) possui um registro DNS CNAME apontando para um serviço de nuvem (como AWS S3, GitHub Pages ou Heroku) que foi cancelado ou excluído. Se o registro DNS não for removido, qualquer atacante pode criar uma conta no provedor de nuvem com aquele mesmo identificador e assumir o controle completo do subdomínio legítimo com certificado válido!</li>
             <li><strong>Metadados com ExifTool:</strong> Arquivos PDF e imagens disponibilizados publicamente contêm metadados (nomes de usuários do Active Directory, versões de softwares, caminhos de rede UNC). A ferramenta <strong>ExifTool</strong> extrai esses dados sem esforço.</li>
         </ul>
+
+        <pre class="mermaid" data-title="Do Domínio à Superfície de Ataque Externa">
+flowchart TD
+    D["Domínio-alvo<br><small>empresa.com.br</small>"]
+    W["WHOIS e ASN/BGP<br><small>blocos de IP da organização</small>"]
+    CT["DNS e CT Logs<br><small>subdomínios vistos em certificados</small>"]
+    G["Google Dorks<br><small>arquivos e páginas indexados</small>"]
+    SH["Shodan e Censys<br><small>serviços e banners por IP</small>"]
+    TK["CNAME órfão<br><small>risco de subdomain takeover</small>"]
+    SA["Superfície de ataque externa"]
+    D --> W
+    D --> CT
+    D --> G
+    W --> SH
+    CT --> SH
+    CT --> TK
+    SH --> SA
+    G --> SA
+    TK --> SA
+        </pre>
     </section>
 
     <!-- SEÇÃO 3: LABORATÓRIO / SIMULADOR INTERATIVO -->

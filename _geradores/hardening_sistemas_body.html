@@ -290,6 +290,21 @@
       de configuração e gera um índice de endurecimento (<em>Hardening Index</em> de 0 a 100).
     </li>
   </ul>
+
+  <pre class="mermaid" data-title="Ciclo Contínuo de Conformidade (Compliance-as-Code)">
+flowchart TD
+    B["Linha de base<br><small>perfil CIS Nível 1 ou 2</small>"]
+    A["Aplicar<br><small>playbooks Ansible, GPO</small>"]
+    V["Auditar<br><small>OpenSCAP, Lynis</small>"]
+    D{"Desvio da linha de base?"}
+    C["Corrigir ou registrar exceção aprovada"]
+    M["Conforme<br><small>reauditar no próximo ciclo</small>"]
+    B --> A --> V --> D
+    D -->|"sim"| C
+    C --> V
+    D -->|"não"| M
+    M -.->|"agendado"| V
+  </pre>
 </section>
 
 <!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (AUDITOR CIS BENCHMARK) -->

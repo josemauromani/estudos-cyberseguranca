@@ -182,5 +182,19 @@ flowchart TD
                 self.assertIn("dark", cmd)
 
 
+class TestCoberturaDiagramasModulos(unittest.TestCase):
+    """Todo módulo traz ao menos um diagrama Mermaid com título."""
+
+    def test_todo_modulo_tem_diagrama_com_titulo(self):
+        corpos = sorted(Path(__file__).parent.parent.glob("*_body.html"))
+        self.assertGreater(len(corpos), 0)
+        sem_diagrama = []
+        for corpo in corpos:
+            blocos = extrair_blocos_mermaid(corpo.read_text(encoding="utf-8"))
+            if not any(b["titulo"].strip() for b in blocos):
+                sem_diagrama.append(corpo.name)
+        self.assertEqual(sem_diagrama, [], f"Módulos sem diagrama Mermaid: {sem_diagrama}")
+
+
 if __name__ == "__main__":
     unittest.main()

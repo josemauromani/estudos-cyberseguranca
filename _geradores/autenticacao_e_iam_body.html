@@ -250,6 +250,23 @@
       O servidor confere o hash e emite o token. Isso impede que malwares em dispositivos móveis que interceptem o código de autorização consigam trocá-lo pelo token de acesso.
     </p>
   </div>
+
+  <pre class="mermaid" data-title="Authorization Code Flow com PKCE">
+sequenceDiagram
+    actor U as Resource Owner (usuário)
+    participant C as Client (aplicação)
+    participant A as Authorization Server
+    participant R as Resource Server (API)
+    C->>C: gera code_verifier e code_challenge (SHA-256 do verifier)
+    C->>A: redireciona o usuário com o code_challenge
+    U->>A: autentica e consente
+    A-->>C: código de autorização (via redirect_uri)
+    C->>A: envia o código e o code_verifier original
+    A->>A: confere se o SHA-256 do verifier bate com o challenge
+    A-->>C: Access Token (e ID Token, no OIDC)
+    C->>R: requisição com o Access Token
+    R-->>C: recurso protegido
+  </pre>
 </section>
 
 <!-- SEÇÃO 4: ANATOMIA E ATAQUES A TOKENS JWT -->

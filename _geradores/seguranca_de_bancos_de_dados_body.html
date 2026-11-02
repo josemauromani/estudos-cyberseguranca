@@ -154,6 +154,23 @@ cur.execute("SELECT id, nome FROM clientes WHERE email = '" + email + "'")
 cur.execute("SELECT id, nome FROM clientes WHERE email = %s", (email,))</code></pre>
         </div>
 
+        <pre class="mermaid" data-title="Concatenação vs Prepared Statement">
+flowchart LR
+    subgraph VUL["Concatenação (vulnerável)"]
+        direction TB
+        V1["Entrada: ' OR '1'='1"] --> V2["Aplicação cola a entrada no texto SQL"]
+        V2 --> V3["Parser lê a entrada como código"]
+        V3 --> V4["WHERE sempre verdadeiro<br><small>todas as linhas voltam</small>"]
+    end
+    subgraph SEG["Prepared statement (seguro)"]
+        direction TB
+        P1["Comando com marcador %s"] --> P3["Banco recebe comando e valor separados"]
+        P2["Entrada: ' OR '1'='1"] --> P3
+        P3 --> P4["Busca o e-mail literal<br><small>nenhuma linha volta</small>"]
+    end
+    VUL ~~~ SEG
+        </pre>
+
         <h3>Hardening do SGBD</h3>
         <p>
             Os <strong>CIS Benchmarks</strong> publicam guias de configuração segura para PostgreSQL, MySQL e SQL Server. Os pontos que mais aparecem em auditoria:

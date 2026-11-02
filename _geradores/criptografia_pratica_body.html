@@ -204,6 +204,18 @@
     <li><strong>Autoridade Certificadora Intermediária (Intermediate CA):</strong> Emite certificados finais no dia a dia. Se for comprometida, a Root CA pode revogá-la sem afetar a confiança de toda a cadeia global.</li>
     <li><strong>Certificado Final / Folha (End-Entity / Leaf):</strong> Emitido para o domínio corporativo no padrão <strong>X.509</strong>, contendo a chave pública do servidor, período de validade, nome do domínio e <em>SAN (Subject Alternative Name)</em>, assinado digitalmente pela autoridade intermediária.</li>
   </ol>
+
+  <pre class="mermaid" data-title="Cadeia de Confiança PKI X.509">
+flowchart TD
+    R["Root CA<br><small>autoassinada, pré-instalada no SO ou navegador</small>"]
+    I["CA Intermediária<br><small>emite os certificados do dia a dia</small>"]
+    F["Certificado Folha X.509<br><small>banco.com.br e sua chave pública</small>"]
+    N["Navegador"]
+    R -->|"assina"| I
+    I -->|"assina"| F
+    F -->|"enviado no handshake TLS<br>junto com a intermediária"| N
+    N -.->|"confere assinaturas até uma raiz confiável,<br>validade, nome do domínio e revogação (OCSP)"| R
+  </pre>
   <p>
     Para revogar certificados vazados antes da expiração, utilizavam-se listas de revogação volumosas (<strong>CRL</strong>).
     O padrão moderno substituiu esse modelo por consultas em tempo real via <strong>OCSP (Online Certificate Status Protocol)</strong>

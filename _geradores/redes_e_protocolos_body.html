@@ -144,6 +144,19 @@
     </ol>
   </div>
 
+  <pre class="mermaid" data-title="3-Way Handshake TCP e Estados da Conexão">
+sequenceDiagram
+    participant C as Cliente
+    participant S as Servidor
+    Note over S: LISTEN
+    C->>S: SYN (SEQ=1000)
+    Note over C: SYN_SENT
+    S-->>C: SYN, ACK (SEQ=5000, ACK=1001)
+    Note over S: SYN_RECEIVED (fila que o SYN flood esgota)
+    C->>S: ACK (SEQ=1001, ACK=5001)
+    Note over C,S: ESTABLISHED
+  </pre>
+
   <p>As 6 flags primárias de controle do cabeçalho TCP desempenham papéis fundamentais na análise de tráfego:</p>
   <div class="cards-grid">
     <div class="info-card">
