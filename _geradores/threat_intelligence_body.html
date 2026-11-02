@@ -1,0 +1,666 @@
+<!-- Estudo 17: Threat-Intelligence Body Fragment -->
+<article class="study-container" data-slug="threat-intelligence">
+
+    <!-- SEÇÃO 1: INTELIGÊNCIA E A PIRÂMIDE -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: Conhecer o Adversário Antes Dele Chegar</h2>
+        </div>
+
+        <p class="lead-text">
+            Uma associação de varejistas compartilhou com a Ipê Store um relatório sobre um grupo que ataca lojas virtuais. Ele traz IPs, domínios e hashes, mas também descreve como o grupo trabalha: phishing, webshell, Kerberoasting, DCSync, ransomware. Inteligência de ameaças é transformar esse tipo de informação em decisões: o que bloquear hoje, o que detectar sempre e onde investir.
+        </p>
+
+        <h3>Ciclo e tipos de inteligência</h3>
+        <p>
+            O <strong>ciclo de inteligência</strong> vai da direção (quais perguntas a empresa precisa responder) à coleta, ao processamento, à análise, à disseminação e ao retorno de quem usou. Conforme o público, a inteligência é <strong>estratégica</strong> (tendências e riscos para a diretoria), <strong>operacional</strong> (campanhas e atores que miram o setor), <strong>tática</strong> (TTPs, para quem detecta e defende) ou técnica (indicadores, para bloqueio automático).
+        </p>
+
+        <h3>A Pirâmide da Dor</h3>
+        <p>
+            Proposta por <strong>David Bianco</strong> em 2013, a <strong>Pirâmide da Dor</strong> ordena os indicadores pelo trabalho que o atacante tem para trocá-los quando são bloqueados:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Nível</th><th>Exemplo</th><th>Dor para o atacante trocar</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Hash</td><td>SHA-256 de um executável</td><td>Trivial: recompilar muda o hash</td></tr>
+                    <tr><td>Endereço IP</td><td>Servidor de comando e controle</td><td>Fácil: outro servidor alugado</td></tr>
+                    <tr><td>Domínio</td><td>Domínio parecido com o da vítima</td><td>Simples: registrar outro</td></tr>
+                    <tr><td>Artefatos de rede e de host</td><td>User-Agent, caminho de arquivo, extensão</td><td>Incômodo: mexer no código ou na configuração</td></tr>
+                    <tr><td>Ferramentas</td><td>Cobalt Strike, Mimikatz</td><td>Desafiador: trocar e reaprender ferramentas</td></tr>
+                    <tr><td>TTPs</td><td>Kerberoasting, DCSync</td><td>Difícil: mudar o próprio jeito de trabalhar</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Um <strong>IoC</strong> (indicador de comprometimento) como um hash ou um IP é útil para bloqueio rápido, mas expira em dias. Uma detecção baseada em <strong>TTP</strong> (táticas, técnicas e procedimentos) continua valendo quando o grupo troca de infraestrutura. Por isso, a saída mais valiosa de um relatório costuma ser uma regra de detecção, não uma lista de IPs.
+        </p>
+
+        <h3>MITRE ATT&amp;CK</h3>
+        <p>
+            O <strong>MITRE ATT&amp;CK</strong> Enterprise organiza o comportamento dos atacantes em 14 táticas (o objetivo, como Credential Access, TA0006), técnicas (o como, como T1558 Steal or Forge Kerberos Tickets) e subtécnicas (o detalhe, como T1558.003 Kerberoasting ou T1059.001 PowerShell). Mapear um relatório na matriz mostra onde o adversário age e onde a sua detecção tem lacunas.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Do Relatório à Defesa</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Do Relatório à Defesa">
+flowchart TD
+    R["Relatório de inteligência<br><small>TLP:AMBER</small>"]
+    I["Extrair IoCs<br><small>hash, IP, domínio, URL</small>"]
+    T["Mapear TTPs<br><small>técnicas ATT&amp;CK</small>"]
+    B["Bloqueio rápido<br><small>firewall, proxy, EDR</small>"]
+    D["Detecções duradouras<br><small>regras Sigma, Estudo 16</small>"]
+    S["Compartilhar em STIX 2.1<br><small>via TAXII ou MISP</small>"]
+    R --> I
+    R --> T
+    I --> B
+    T --> D
+    I --> S
+    T --> S
+            </pre>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: COMPARTILHAMENTO -->
+    <section class="study-section" id="compartilhamento">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>TLP, Defang, STIX 2.1 e TAXII</h2>
+        </div>
+
+        <h3>TLP 2.0: com quem compartilhar</h3>
+        <ul>
+            <li><strong>TLP:RED</strong>: só para quem estava na conversa.</li>
+            <li><strong>TLP:AMBER+STRICT</strong>: só dentro da organização que recebeu. <strong>TLP:AMBER</strong>: na organização e com clientes que precisam agir.</li>
+            <li><strong>TLP:GREEN</strong>: na comunidade (por exemplo, a associação do setor), não em público.</li>
+            <li><strong>TLP:CLEAR</strong>: sem restrição.</li>
+        </ul>
+
+        <h3>Defang</h3>
+        <p>
+            Para que ninguém clique por engano e nenhum sistema transforme o texto em link, os indicadores são compartilhados com <strong>defang</strong>: <code>hxxps://dominio[.]example</code>, <code>203.0.113[.]9</code>, <code>contato[@]dominio[.]example</code>. Ferramentas de análise fazem o caminho inverso antes de processar.
+        </p>
+
+        <h3>STIX 2.1 e TAXII</h3>
+        <p>
+            O <strong>STIX 2.1</strong> é o formato padrão da OASIS para inteligência em JSON. Ele tem objetos de domínio (SDOs), como <strong>Indicator</strong> (com um padrão de detecção), <strong>Threat Actor</strong>, Malware, Attack Pattern e Campaign, e objetos de relacionamento (SROs), como <strong>Relationship</strong> ("indicates", "uses") e Sighting. O <strong>TAXII</strong> 2.1 é o protocolo HTTPS que transporta STIX em coleções. Plataformas como <strong>MISP</strong> e <strong>OpenCTI</strong> armazenam, relacionam e compartilham essa inteligência.
+        </p>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">STIX 2.1 — um indicador e um relacionamento</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ti-stix')">Copiar</button>
+            </div>
+            <pre><code id="code-ti-stix">{
+  "type": "indicator",
+  "spec_version": "2.1",
+  "id": "indicator--8e2e2d2b-17d4-4cbf-938f-98ee46b3cd3f",
+  "created": "2026-11-02T00:00:00.000Z",
+  "modified": "2026-11-02T00:00:00.000Z",
+  "name": "C2 do Sabiá-Negro",
+  "pattern": "[ipv4-addr:value = '203.0.113.9']",
+  "pattern_type": "stix",
+  "valid_from": "2026-11-02T00:00:00.000Z"
+}
+{
+  "type": "relationship",
+  "relationship_type": "indicates",
+  "source_ref": "indicator--8e2e2d2b-17d4-4cbf-938f-98ee46b3cd3f",
+  "target_ref": "threat-actor--..."
+}</code></pre>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">🧭</span>
+                <strong>Inteligência só vale se mudar uma decisão</strong>
+            </div>
+            <p>
+                Antes de importar mil indicadores no firewall, pergunte: eles são recentes? Vêm de fonte confiável? Algum é um serviço legítimo compartilhado, como uma CDN, que bloquearia clientes? E qual detecção de comportamento este relatório sugere? Uma regra para PowerShell codificado vale mais que cem hashes vencidos.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Mapeador de IoCs e TTPs na Matriz ATT&amp;CK</h2>
+        </div>
+
+        <p class="lead-text">
+            O relatório abaixo é fictício e usa domínios .example e IPs de documentação. Extraia os indicadores, mapeie as técnicas na matriz e gere o pacote STIX para compartilhar. Você também pode colar outro texto.
+        </p>
+
+        <div class="lab-box ti-lab" id="ti-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Analista de CTI</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Relatório IPE-CTI-2026-07</h3>
+                    <p id="ti-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">Missões</h4>
+                <ul id="ti-missoes" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.25rem; font-size: 0.85rem;"></ul>
+
+                <h4 style="margin-top: 1.5rem;">1. Relatório</h4>
+                <textarea class="form-control" id="ti-texto" rows="12" spellcheck="false" aria-label="Texto do relatório" style="width: 100%; box-sizing: border-box; font-size: 0.78rem; resize: vertical;"></textarea>
+                <div style="margin-top: 0.4rem;"><button class="btn-primary" type="button" onclick="extrairIocsTi()">Extrair indicadores e técnicas</button></div>
+
+                <h4 style="margin-top: 1.25rem;">2. Indicadores</h4>
+                <div id="ti-iocs" aria-live="polite" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem; font-size: 0.8rem;"></div>
+
+                <h4 style="margin-top: 1.25rem;">3. Mapa de calor ATT&amp;CK</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; font-size: 0.82rem; margin-bottom: 0.5rem;">
+                    <input class="form-control" type="text" id="ti-nova-tecnica" placeholder="T1234 ou T1234.001" aria-label="ID da técnica" spellcheck="false" style="width: 11rem; font-family: var(--font-mono);">
+                    <button class="btn-secondary" type="button" onclick="adicionarTecnicaTi()">Adicionar técnica</button>
+                    <span id="ti-tecnica-status" aria-live="polite"></span>
+                </div>
+                <div id="ti-mapa" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 0.4rem; font-size: 0.76rem;"></div>
+
+                <h4 style="margin-top: 1.25rem;">4. Pirâmide da Dor</h4>
+                <div id="ti-piramide" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem; font-size: 0.82rem;"></div>
+
+                <h4 style="margin-top: 1.25rem;">5. Compartilhar</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                    <button class="btn-secondary" type="button" id="ti-defang">Lista com defang (TLP:AMBER)</button>
+                    <button class="btn-primary" type="button" onclick="gerarStixTi()">Gerar bundle STIX 2.1</button>
+                </div>
+                <div class="terminal-box" style="margin-top: 0.5rem;">
+                    <div class="terminal-header">
+                        <span class="terminal-title" id="ti-saida-titulo">saída</span>
+                        <button class="terminal-copy-btn" onclick="copyCode(this, 'ti-stix')">Copiar</button>
+                    </div>
+                    <pre style="max-height: 22rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere;"><code id="ti-stix"></code></pre>
+                </div>
+
+                <div style="margin-top: 1.25rem;">
+                    <button class="btn-secondary" type="button" onclick="restaurarTi()">Restaurar laboratório</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Inteligência de Ameaças</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para montar ou revisar um processo de CTI. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="threat-intelligence">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ti-1">
+                <label for="chk-ti-1"><strong>Perguntas definidas:</strong> a empresa sabe quais ameaças e setores quer acompanhar.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ti-2">
+                <label for="chk-ti-2"><strong>Fontes avaliadas:</strong> confiabilidade, atualidade e regras de uso de cada fonte registradas.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ti-3">
+                <label for="chk-ti-3"><strong>Indicadores com validade:</strong> IoCs importados com data de expiração e checados contra serviços legítimos.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ti-4">
+                <label for="chk-ti-4"><strong>TTPs viram detecção:</strong> cada relatório relevante gera ou revisa regras de comportamento.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ti-5">
+                <label for="chk-ti-5"><strong>Cobertura ATT&amp;CK:</strong> mapa das técnicas detectadas, com as lacunas priorizadas.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ti-6">
+                <label for="chk-ti-6"><strong>Compartilhamento:</strong> TLP respeitado, indicadores com defang e formatos padrão (STIX/TAXII ou MISP).</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ti-7">
+                <label for="chk-ti-7"><strong>Retorno:</strong> quem usa a inteligência diz o que serviu, e isso orienta a próxima coleta.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Pirâmide):</strong> Por que bloquear o hash de um malware incomoda pouco o atacante?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque qualquer mudança mínima no arquivo, até recompilar, gera outro hash. Está na base da Pirâmide da Dor: trivial de trocar.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (TTP):</strong> Qual saída de um relatório de inteligência costuma durar mais: a lista de IPs ou uma regra que detecta Kerberoasting?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A regra de comportamento. O grupo troca de IP em dias, mas continua usando a mesma técnica, e a regra também pega outros grupos que a usam.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (ATT&amp;CK):</strong> Qual a diferença entre tática, técnica e subtécnica?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A tática é o objetivo (obter credenciais); a técnica é o modo (roubar ou forjar tickets Kerberos, T1558); a subtécnica é a variação específica (Kerberoasting, T1558.003).</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (TLP):</strong> Um relatório TLP:AMBER pode ser postado no grupo público de uma comunidade de segurança?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. AMBER limita à organização que recebeu e aos clientes que precisam agir. Para a comunidade, o mínimo é TLP:GREEN, e só se quem produziu autorizar.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Defang):</strong> Por que escrever <code>hxxps://dominio[.]example</code> num relatório?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Para que ninguém clique por engano e nenhum cliente de e-mail ou chat transforme o texto em link ativo. As ferramentas de análise revertem o defang antes de usar.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (STIX):</strong> O que é um Relationship no STIX 2.1?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Um objeto que liga dois outros, como "este indicador indica este ator" ou "este ator usa esta técnica". É o que transforma uma lista de itens num grafo de conhecimento.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Pirâmide</h4>
+                <p>Hash, IP e domínio expiram; ferramentas e TTPs doem para trocar.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. ATT&amp;CK</h4>
+                <p>14 táticas, técnicas e subtécnicas para mapear e achar lacunas.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Compartilhar</h4>
+                <p>TLP 2.0, defang, STIX 2.1 e TAXII.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Decidir</h4>
+                <p>Bloquear o que é recente; detectar o comportamento sempre.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>David J. Bianco — The Pyramid of Pain (2013).</li>
+            <li>MITRE ATT&amp;CK for Enterprise (attack.mitre.org).</li>
+            <li>FIRST — Traffic Light Protocol 2.0.</li>
+            <li>OASIS — STIX Version 2.1 e TAXII Version 2.1.</li>
+            <li>Projetos MISP e OpenCTI.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 16 — Operações SOC e SIEM e 20 — Análise Básica de Malware</strong>
+            </div>
+            <p>
+                No Estudo 16, as TTPs deste relatório viram regras Sigma. No Estudo 20, você analisa um executável como o ipelock.exe para extrair indicadores por conta própria.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="ti-dados">
+{
+ "contexto": "Ator, relatório e indicadores fictícios. Os IDs de técnicas e táticas são os do MITRE ATT&CK Enterprise.",
+ "ator": "Sabiá-Negro (fictício)",
+ "tlds": ["example", "com", "net", "org", "br", "io"],
+ "ferramentas": ["Mimikatz", "Cobalt Strike", "rclone", "PsExec"],
+ "taticas": [
+  {"id": "TA0043", "nome": "Reconnaissance"}, {"id": "TA0042", "nome": "Resource Development"}, {"id": "TA0001", "nome": "Initial Access"},
+  {"id": "TA0002", "nome": "Execution"}, {"id": "TA0003", "nome": "Persistence"}, {"id": "TA0004", "nome": "Privilege Escalation"},
+  {"id": "TA0005", "nome": "Defense Evasion"}, {"id": "TA0006", "nome": "Credential Access"}, {"id": "TA0007", "nome": "Discovery"},
+  {"id": "TA0008", "nome": "Lateral Movement"}, {"id": "TA0009", "nome": "Collection"}, {"id": "TA0011", "nome": "Command and Control"},
+  {"id": "TA0010", "nome": "Exfiltration"}, {"id": "TA0040", "nome": "Impact"}
+ ],
+ "catalogo": {
+  "T1595": {"nome": "Active Scanning", "tatica": "TA0043"},
+  "T1583.001": {"nome": "Acquire Infrastructure: Domains", "tatica": "TA0042"},
+  "T1566.002": {"nome": "Phishing: Spearphishing Link", "tatica": "TA0001"},
+  "T1190": {"nome": "Exploit Public-Facing Application", "tatica": "TA0001"},
+  "T1059.001": {"nome": "Command and Scripting Interpreter: PowerShell", "tatica": "TA0002"},
+  "T1505.003": {"nome": "Server Software Component: Web Shell", "tatica": "TA0003"},
+  "T1053.005": {"nome": "Scheduled Task/Job: Scheduled Task", "tatica": "TA0003"},
+  "T1068": {"nome": "Exploitation for Privilege Escalation", "tatica": "TA0004"},
+  "T1070.001": {"nome": "Indicator Removal: Clear Windows Event Logs", "tatica": "TA0005"},
+  "T1110": {"nome": "Brute Force", "tatica": "TA0006"},
+  "T1558.003": {"nome": "Steal or Forge Kerberos Tickets: Kerberoasting", "tatica": "TA0006"},
+  "T1003.006": {"nome": "OS Credential Dumping: DCSync", "tatica": "TA0006"},
+  "T1046": {"nome": "Network Service Discovery", "tatica": "TA0007"},
+  "T1550.002": {"nome": "Use Alternate Authentication Material: Pass the Hash", "tatica": "TA0008"},
+  "T1560": {"nome": "Archive Collected Data", "tatica": "TA0009"},
+  "T1071.001": {"nome": "Application Layer Protocol: Web Protocols", "tatica": "TA0011"},
+  "T1041": {"nome": "Exfiltration Over C2 Channel", "tatica": "TA0010"},
+  "T1490": {"nome": "Inhibit System Recovery", "tatica": "TA0040"},
+  "T1486": {"nome": "Data Encrypted for Impact", "tatica": "TA0040"}
+ },
+ "palavras": [
+  ["registrou o domínio", "T1583.001"],
+  ["varredura de portas na internet", "T1595"],
+  ["CVE-2021-44228", "T1190"],
+  ["força bruta", "T1110"],
+  ["tarefa agendada", "T1053.005"],
+  ["Pass-the-Hash", "T1550.002"],
+  ["mapeou a rede interna", "T1046"],
+  ["compactou", "T1560"],
+  ["limpou os logs", "T1070.001"],
+  ["apagou as cópias de sombra", "T1490"]
+ ],
+ "tecnica_do_aluno": "T1486",
+ "trecho_do_aluno": "criptografou os servidores de arquivos",
+ "relatorio": "TLP:AMBER — Relatório de inteligência IPE-CTI-2026-07 (fictício)\nGrupo: Sabiá-Negro, motivação financeira, foco em varejo on-line no Brasil.\n\nResumo: entre setembro e outubro de 2026, o grupo atacou lojas virtuais com o mesmo roteiro.\n\n1. Preparação: o grupo registrou o domínio ipestore-pagamentos[.]example, parecido com o da vítima, e fez varredura de portas na internet atrás de servidores ainda vulneráveis à CVE-2021-44228.\n2. Acesso inicial: e-mails de financeiro[@]ipestore-pagamentos[.]example com link para hxxps://ipestore-pagamentos[.]example/boleto/2026-10 (T1566.002). Em paralelo, força bruta em SSH a partir de 198.51.100[.]23.\n3. Execução e persistência: um script PowerShell codificado em Base64 (T1059.001) baixou um webshell para /uploads/thumb.php (T1505.003) e criou uma tarefa agendada que roda a cada 15 minutos.\n4. Credenciais e movimento: o grupo usou Mimikatz, fez Kerberoasting (T1558.003) contra contas de serviço com senha fraca, Pass-the-Hash entre estações e, por fim, DCSync (T1003.006) a partir de uma conta de backup com direitos de replicação. Antes, mapeou a rede interna a partir da estação 10.20.5.31.\n5. Comando e controle: Cobalt Strike com beacons HTTPS (T1071.001) para cdn-atualiza[.]example, que resolvia para 203.0.113[.]9.\n6. Coleta e saída: compactou as notas fiscais em arquivos 7z e enviou os dados pelo próprio canal de controle (T1041), às vezes com rclone.\n7. Impacto: apagou as cópias de sombra, limpou os logs de eventos do Windows e criptografou os servidores de arquivos com a extensão .ipelock.\n\nIndicadores de arquivo:\n- loader.ps1, SHA-256 3f9a1c7e5b2d4086a1e9c3b7d5f20e4a6c8b1d3f5e7092a4c6e8b0d2f4a61c3e\n- thumb.php, SHA-1 9b1e4c7a2d5f8e0b3a6c9d2e5f8a1b4c7d0e3f6a\n- ipelock.exe, MD5 4a8c2e6b0d1f3a5c7e9b2d4f6a8c0e1b\n\nRecomendações: bloquear os indicadores, mas priorizar detecções de comportamento (Estudo 16): PowerShell codificado, tickets de serviço pedidos com RC4 e replicação de diretório por contas que não são controladores de domínio (Estudo 39).",
+ "niveis": [
+  {"id": "hash", "nome": "Hash"}, {"id": "ip", "nome": "Endereço IP"}, {"id": "dominio", "nome": "Domínio"},
+  {"id": "artefato", "nome": "Artefatos de rede e de host"}, {"id": "ferramenta", "nome": "Ferramentas"}, {"id": "ttp", "nome": "TTPs"}
+ ],
+ "piramide": [
+  {"id": "p1", "texto": "O SHA-256 do loader.ps1", "nivel": "hash"},
+  {"id": "p2", "texto": "203.0.113.9, para onde os beacons se conectam", "nivel": "ip"},
+  {"id": "p3", "texto": "cdn-atualiza.example", "nivel": "dominio"},
+  {"id": "p4", "texto": "A extensão .ipelock e o caminho /uploads/thumb.php", "nivel": "artefato"},
+  {"id": "p5", "texto": "Cobalt Strike", "nivel": "ferramenta"},
+  {"id": "p6", "texto": "Kerberoasting contra contas de serviço com senha fraca", "nivel": "ttp"}
+ ],
+ "missoes": [
+  {"id": "extrair", "texto": "Extraia os indicadores e as técnicas do relatório."},
+  {"id": "aluno", "texto": "Uma técnica de impacto descrita no relatório ficou sem mapeamento. Encontre-a e adicione o ID certo."},
+  {"id": "piramide", "texto": "Classifique os seis itens na Pirâmide da Dor."},
+  {"id": "defang", "texto": "Gere a lista de indicadores com defang para compartilhar."},
+  {"id": "stix", "texto": "Gere o bundle STIX 2.1 com indicadores, técnicas e relacionamentos."}
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var TI = JSON.parse(document.getElementById("ti-dados").textContent);
+    var CRIADO = "2026-11-02T00:00:00.000Z";
+    var feitas = {}, extras = [], ultimo = null;
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+
+    // ===================================================== extrator (espelhado nos testes)
+    function refang(t) {
+        t = t.replace(/hxxp/gi, "http");
+        [["[.]", "."], ["(.)", "."], ["[:]", ":"], ["[@]", "@"]].forEach(function(p) { t = t.split(p[0]).join(p[1]); });
+        return t;
+    }
+    function defang(v) { return v.split("http").join("hxxp").split(".").join("[.]").split("@").join("[@]"); }
+    function todas(rx, t) { var out = [], m; rx.lastIndex = 0; while ((m = rx.exec(t))) { out.push(m); if (m[0] === "") rx.lastIndex++; } return out; }
+    function interno(ip) {
+        var o = ip.split(".").map(Number);
+        return o[0] === 10 || o[0] === 127 || (o[0] === 172 && o[1] >= 16 && o[1] <= 31) || (o[0] === 192 && o[1] === 168);
+    }
+    window.extrairTi = function(texto) {
+        var t = refang(texto), achados = [], vistos = {};
+        function add(tipo, v, pos) { var k = tipo + "\u0000" + v; if (!vistos[k]) { vistos[k] = true; achados.push([pos, tipo, v]); } }
+        var faixas = [];
+        todas(/https?:\/\/[^\s<>"']+/g, t).forEach(function(m) { var v = m[0].replace(/[.,;:)]+$/, ""); faixas.push([m.index, m.index + v.length]); add("url", v, m.index); });
+        todas(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, t).forEach(function(m) { faixas.push([m.index, m.index + m[0].length]); add("email", m[0].toLowerCase(), m.index); });
+        var dentro = function(a, b) { return faixas.some(function(f) { return f[0] <= a && b <= f[1]; }); };
+        todas(/\b(?:\d{1,3}\.){3}\d{1,3}\b/g, t).forEach(function(m) {
+            if (m[0].split(".").every(function(o) { return Number(o) <= 255 && (o === "0" || o.charAt(0) !== "0"); })) add(interno(m[0]) ? "ip_interno" : "ip", m[0], m.index);
+        });
+        [[64, "sha256"], [40, "sha1"], [32, "md5"]].forEach(function(h) {
+            todas(new RegExp("\\b[a-fA-F0-9]{" + h[0] + "}\\b", "g"), t).forEach(function(m) { add(h[1], m[0].toLowerCase(), m.index); });
+        });
+        todas(/\b(?:[A-Za-z0-9-]+\.)+([A-Za-z]{2,})\b/g, t).forEach(function(m) {
+            if (TI.tlds.indexOf(m[1].toLowerCase()) !== -1 && !dentro(m.index, m.index + m[0].length)) add("dominio", m[0].toLowerCase(), m.index);
+        });
+        todas(/\bCVE-\d{4}-\d{4,7}\b/g, t).forEach(function(m) { add("cve", m[0], m.index); });
+        todas(/\bT\d{4}(?:\.\d{3})?\b/g, t).forEach(function(m) { add("tecnica", m[0], m.index); });
+        var baixo = t.toLowerCase();
+        TI.ferramentas.forEach(function(f) { var i = baixo.indexOf(f.toLowerCase()); if (i >= 0) add("ferramenta", f, i); });
+        achados.sort(function(a, b) { return a[0] - b[0] || (a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0); });
+        return achados.map(function(a) { return [a[1], a[2]]; });
+    };
+    window.tecnicasTi = function(texto, adicionais) {
+        var ids = window.extrairTi(texto).filter(function(x) { return x[0] === "tecnica" && TI.catalogo[x[1]]; }).map(function(x) { return x[1]; });
+        var baixo = refang(texto).toLowerCase();
+        TI.palavras.forEach(function(p) { if (baixo.indexOf(p[0].toLowerCase()) !== -1 && ids.indexOf(p[1]) === -1) ids.push(p[1]); });
+        (adicionais || []).forEach(function(id) { if (TI.catalogo[id] && ids.indexOf(id) === -1) ids.push(id); });
+        return ids;
+    };
+    function mapa(ids) {
+        var c = {}; TI.taticas.forEach(function(t) { c[t.id] = 0; });
+        ids.forEach(function(id) { c[TI.catalogo[id].tatica]++; });
+        return c;
+    }
+    function uid(tipo, n) { var s = String(n); while (s.length < 12) s = "0" + s; return tipo + "--00000000-0000-4000-8000-" + s; }
+    function padrao(tipo, v) {
+        if (tipo === "ip") return "[ipv4-addr:value = '" + v + "']";
+        if (tipo === "dominio") return "[domain-name:value = '" + v + "']";
+        if (tipo === "url") return "[url:value = '" + v + "']";
+        if (tipo === "email") return "[email-addr:value = '" + v + "']";
+        return "[file:hashes.'" + { md5: "MD5", sha1: "SHA-1", sha256: "SHA-256" }[tipo] + "' = '" + v + "']";
+    }
+    window.bundleTi = function(texto, adicionais) {
+        var n = 0, novo = function(tipo) { n++; return uid(tipo, n); };
+        var base = function(tipo) { return { type: tipo, spec_version: "2.1", id: novo(tipo), created: CRIADO, modified: CRIADO }; };
+        var ator = base("threat-actor"); ator.name = TI.ator; ator.threat_actor_types = ["crime-syndicate"];
+        var objs = [ator];
+        window.extrairTi(texto).forEach(function(x) {
+            if (["ip", "dominio", "url", "email", "md5", "sha1", "sha256"].indexOf(x[0]) === -1) return;
+            var ind = base("indicator");
+            ind.name = x[0] + ": " + x[1]; ind.pattern = padrao(x[0], x[1]); ind.pattern_type = "stix"; ind.valid_from = CRIADO;
+            objs.push(ind);
+            var r = base("relationship"); r.relationship_type = "indicates"; r.source_ref = ind.id; r.target_ref = ator.id;
+            objs.push(r);
+        });
+        window.tecnicasTi(texto, adicionais).forEach(function(id) {
+            var ap = base("attack-pattern"); ap.name = TI.catalogo[id].nome;
+            ap.external_references = [{ source_name: "mitre-attack", external_id: id }];
+            objs.push(ap);
+            var r = base("relationship"); r.relationship_type = "uses"; r.source_ref = ator.id; r.target_ref = ap.id;
+            objs.push(r);
+        });
+        return { type: "bundle", id: uid("bundle", 0), objects: objs };
+    };
+
+    // ===================================================== missões
+    function concluir(id) { if (!feitas[id]) { feitas[id] = true; renderizarMissoes(); } }
+    function renderizarMissoes() {
+        var ul = document.getElementById("ti-missoes");
+        ul.replaceChildren();
+        TI.missoes.forEach(function(m) {
+            var li = el("li", (feitas[m.id] ? "✓ " : "○ ") + m.texto, "color: " + (feitas[m.id] ? "var(--tip-color)" : "var(--ink)") + ";");
+            li.setAttribute("data-missao", m.id);
+            li.setAttribute("data-feita", feitas[m.id] ? "sim" : "nao");
+            ul.appendChild(li);
+        });
+    }
+
+    // ===================================================== interface
+    var ROT = { url: "URL", email: "E-mail", ip: "IP", ip_interno: "IP interno (vítima)", dominio: "Domínio", md5: "MD5", sha1: "SHA-1", sha256: "SHA-256", cve: "CVE", tecnica: "Técnica ATT&CK", ferramenta: "Ferramenta" };
+    var NIVEL = { md5: "hash", sha1: "hash", sha256: "hash", ip: "ip", dominio: "dominio", url: "artefato", email: "artefato", ferramenta: "ferramenta", tecnica: "ttp" };
+    window.extrairIocsTi = function() {
+        var texto = document.getElementById("ti-texto").value;
+        ultimo = texto;
+        var r = window.extrairTi(texto), box = document.getElementById("ti-iocs");
+        box.replaceChildren();
+        box.setAttribute("data-total", String(r.length));
+        if (!r.length) box.appendChild(el("p", "Nenhum indicador encontrado.", "margin: 0; color: var(--muted);"));
+        r.forEach(function(x) {
+            var d = el("div", null, "display: grid; grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr); gap: 0.4rem; align-items: baseline; border-bottom: 1px solid var(--rule); padding-bottom: 0.2rem;");
+            d.setAttribute("data-ioc", x[0]);
+            d.appendChild(el("span", ROT[x[0]] + (NIVEL[x[0]] ? "\nPirâmide: " + TI.niveis.filter(function(n) { return n.id === NIVEL[x[0]]; })[0].nome : ""), "color: var(--muted); font-size: 0.74rem; white-space: pre-line;"));
+            var v = x[0] === "tecnica" && TI.catalogo[x[1]] ? x[1] + " " + TI.catalogo[x[1]].nome : x[1];
+            d.appendChild(el("span", v, "font-family: var(--font-mono); overflow-wrap: anywhere;" + (x[0] === "ip_interno" ? " color: var(--muted);" : "")));
+            box.appendChild(d);
+        });
+        if (r.some(function(x) { return x[0] === "ip_interno"; })) box.appendChild(el("p", "IPs internos descrevem a vítima, não o atacante: ficam fora dos indicadores compartilhados.", "margin: 0.2rem 0 0 0; font-size: 0.76rem; color: var(--muted);"));
+        renderizarMapa();
+        if (r.length >= 10) concluir("extrair");
+    };
+    function renderizarMapa() {
+        var box = document.getElementById("ti-mapa");
+        box.replaceChildren();
+        var ids = ultimo === null ? [] : window.tecnicasTi(ultimo, extras), c = mapa(ids);
+        var max = Math.max.apply(null, Object.keys(c).map(function(k) { return c[k]; }).concat([1]));
+        box.setAttribute("data-taticas", String(Object.keys(c).filter(function(k) { return c[k]; }).length));
+        TI.taticas.forEach(function(t) {
+            var n = c[t.id], alfa = n ? 0.2 + 0.6 * n / max : 0;
+            var card = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.4rem 0.5rem; min-width: 0; background: " + (n ? "rgba(220, 38, 38, " + alfa.toFixed(2) + ")" : "transparent") + ";");
+            card.setAttribute("data-tatica", t.id);
+            card.setAttribute("data-quantidade", String(n));
+            card.appendChild(el("strong", t.id + " " + t.nome, "display: block; overflow-wrap: anywhere;"));
+            var lista = ids.filter(function(id) { return TI.catalogo[id].tatica === t.id; });
+            card.appendChild(el("span", lista.length ? lista.join(", ") : "sem técnica mapeada", "display: block; font-family: var(--font-mono); font-size: 0.7rem; color: " + (lista.length ? "inherit" : "var(--muted)") + "; overflow-wrap: anywhere;"));
+            box.appendChild(card);
+        });
+    }
+    window.adicionarTecnicaTi = function() {
+        var id = document.getElementById("ti-nova-tecnica").value.trim().toUpperCase(), st = document.getElementById("ti-tecnica-status");
+        st.replaceChildren();
+        if (ultimo === null) { st.appendChild(el("span", "Extraia o relatório primeiro.", "color: var(--danger-color);")); return false; }
+        if (!/^T\d{4}(\.\d{3})?$/.test(id)) { st.appendChild(el("span", "Use o formato T1234 ou T1234.001.", "color: var(--danger-color);")); return false; }
+        if (!TI.catalogo[id]) { st.appendChild(el("span", id + " não está no catálogo deste laboratório. Releia o trecho de impacto do relatório.", "color: rgb(202, 138, 4);")); return false; }
+        if (window.tecnicasTi(ultimo, extras).indexOf(id) !== -1) { st.appendChild(el("span", id + " já está mapeada.", "color: var(--muted);")); return false; }
+        extras.push(id);
+        st.appendChild(el("span", id + " " + TI.catalogo[id].nome + " adicionada.", "color: var(--tip-color);"));
+        renderizarMapa();
+        if (id === TI.tecnica_do_aluno) concluir("aluno");
+        return true;
+    };
+    function renderizarPiramide() {
+        var box = document.getElementById("ti-piramide");
+        box.replaceChildren();
+        TI.piramide.forEach(function(p) {
+            var l = el("label", null, "display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.2rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.4rem 0.55rem;");
+            l.appendChild(el("span", p.texto));
+            var s = el("select"); s.className = "form-control"; s.setAttribute("data-piramide", p.id);
+            var o0 = el("option", "Escolha o nível"); o0.value = ""; s.appendChild(o0);
+            TI.niveis.forEach(function(n) { var o = el("option", n.nome); o.value = n.id; s.appendChild(o); });
+            l.appendChild(s);
+            box.appendChild(l);
+        });
+        var b = el("button", "Conferir"); b.type = "button"; b.className = "btn-secondary";
+        b.addEventListener("click", conferirPiramideTi);
+        var res = el("div"); res.id = "ti-piramide-resultado"; res.setAttribute("aria-live", "polite");
+        var w = el("div"); w.appendChild(b); box.appendChild(w); box.appendChild(res);
+    }
+    window.conferirPiramideTi = function() {
+        var certos = 0, res = document.getElementById("ti-piramide-resultado");
+        res.replaceChildren();
+        TI.piramide.forEach(function(p) {
+            var s = document.querySelector('[data-piramide="' + p.id + '"]'), ok = s.value === p.nivel;
+            if (ok) certos++;
+            s.style.borderColor = s.value ? (ok ? "var(--tip-color)" : "var(--danger-color)") : "";
+        });
+        res.setAttribute("data-certos", String(certos));
+        res.appendChild(el("span", certos + " de " + TI.piramide.length + " corretos." + (certos === TI.piramide.length ? " Quanto mais alto o nível, mais caro é para o atacante trocar." : " As bordas vermelhas mostram os que precisam de revisão."), "color: " + (certos === TI.piramide.length ? "var(--tip-color)" : "rgb(202, 138, 4)") + ";"));
+        if (certos === TI.piramide.length) concluir("piramide");
+        return certos;
+    };
+    window.gerarStixTi = function() {
+        if (ultimo === null) window.extrairIocsTi();
+        var b = window.bundleTi(ultimo, extras), txt = JSON.stringify(b, null, 2);
+        document.getElementById("ti-saida-titulo").textContent = "bundle-stix21.json";
+        var cod = document.getElementById("ti-stix");
+        cod.textContent = txt;
+        cod.setAttribute("data-objetos", String(b.objects.length));
+        concluir("stix");
+        return txt;
+    };
+    function listaDefang() {
+        if (ultimo === null) window.extrairIocsTi();
+        var linhas = ["TLP:AMBER — indicadores de " + TI.ator + " (com defang)", ""];
+        window.extrairTi(ultimo).forEach(function(x) {
+            if (["ip", "dominio", "url", "email", "md5", "sha1", "sha256"].indexOf(x[0]) === -1) return;
+            linhas.push(ROT[x[0]] + ": " + (x[0].indexOf("sha") === 0 || x[0] === "md5" ? x[1] : defang(x[1])));
+        });
+        document.getElementById("ti-saida-titulo").textContent = "indicadores-tlp-amber.txt";
+        document.getElementById("ti-stix").textContent = linhas.join("\n");
+        concluir("defang");
+    }
+
+    window.restaurarTi = function() {
+        feitas = {}; extras = []; ultimo = null;
+        document.getElementById("ti-texto").value = TI.relatorio;
+        document.getElementById("ti-iocs").replaceChildren(el("p", "Clique em Extrair indicadores e técnicas.", "margin: 0; color: var(--muted);"));
+        document.getElementById("ti-stix").textContent = "";
+        document.getElementById("ti-tecnica-status").replaceChildren();
+        document.getElementById("ti-nova-tecnica").value = "";
+        renderizarMissoes(); renderizarMapa(); renderizarPiramide();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("ti-contexto").textContent = TI.contexto;
+        document.getElementById("ti-defang").addEventListener("click", listaDefang);
+        restaurarTi();
+        if (typeof initChecklist === "function") {
+            initChecklist("threat-intelligence");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
