@@ -1,0 +1,1000 @@
+<!-- Estudo 27: LGPD-e-Privacidade Body Fragment -->
+<article class="study-container" data-slug="lgpd">
+
+    <!-- SEÇÃO 1: FUNDAMENTOS -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: Cada Dado Precisa de um Porquê</h2>
+        </div>
+
+        <p class="lead-text">
+            A Ipê Store trata dados de clientes (pedidos, entregas, crédito, marketing) e de funcionários (folha, atestados, controle de acesso). A Lei Geral de Proteção de Dados Pessoais, a <strong>Lei nº 13.709/2018</strong> (LGPD), não proíbe nada disso: ela exige que cada tratamento tenha finalidade clara, base legal adequada, só os dados necessários e segurança proporcional ao risco. O Estudo 29 tratou da classificação e do DLP; este estudo trata do porquê e do como, do ponto de vista da lei.
+        </p>
+
+        <h3>Conceitos (art. 5º)</h3>
+        <ul>
+            <li><strong>dado pessoal</strong>: informação relacionada a pessoa natural identificada ou identificável (nome, CPF, endereço, IP associado a alguém).</li>
+            <li><strong>dado pessoal sensível</strong>: origem racial ou étnica, convicção religiosa, opinião política, filiação a sindicato ou a organização religiosa, filosófica ou política, saúde, vida sexual, dado genético ou biométrico, quando vinculado a uma pessoa.</li>
+            <li>Dado <strong>anonimizado</strong>: não permite identificar o titular por meios razoáveis; deixa de ser dado pessoal. Dado pseudonimizado continua sendo pessoal.</li>
+            <li>Agentes de tratamento: o <strong>controlador</strong> decide sobre o tratamento; o <strong>operador</strong> trata em nome dele (a transportadora, a plataforma de e-mail). O <strong>encarregado</strong> (DPO) é o canal com os titulares e com a ANPD.</li>
+        </ul>
+
+        <h3>Princípios (art. 6º)</h3>
+        <p>
+            Além da boa-fé: <strong>finalidade</strong> (propósito legítimo e informado), <strong>adequação</strong> (compatível com a finalidade), <strong>necessidade</strong> (o mínimo de dados), livre acesso, qualidade dos dados, transparência, segurança, prevenção, não discriminação e responsabilização e prestação de contas.
+        </p>
+
+        <h3>Bases legais</h3>
+        <p>
+            Todo tratamento precisa de uma hipótese do <strong>art. 7º</strong>. Para dados sensíveis, valem só as hipóteses do <strong>art. 11</strong>, que é mais restrito: não admite o <strong>legítimo interesse</strong> nem a proteção do crédito, e o consentimento precisa ser específico e destacado.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table" id="lg-tabela-bases">
+                <thead>
+                    <tr><th>Base</th><th>Artigo</th><th>Quando cabe</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <p>
+            O legítimo interesse exige um <strong>teste de balanceamento</strong> documentado (LIA): finalidade legítima, necessidade dos dados e equilíbrio com as expectativas e os direitos do titular, com transparência e opção de oposição.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Do Fluxo de Dados ao RIPD</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Do Fluxo de Dados ao RIPD">
+flowchart TD
+    F["Mapear o fluxo<br><small>finalidade, dados, titulares</small>"]
+    B{"Dados sensíveis?"}
+    A7["Base do art. 7º"]
+    A11["Base do art. 11"]
+    R{"Alto risco?<br><small>Res. CD/ANPD nº 2/2022</small>"}
+    S["Salvaguardas proporcionais"]
+    I["RIPD<br><small>art. 38</small>"]
+    O["Registro das operações<br><small>art. 37</small>"]
+    F --> B
+    B -->|"não"| A7
+    B -->|"sim"| A11
+    A7 --> R
+    A11 --> R
+    R -->|"sim"| I
+    R -->|"não"| S
+    I --> S
+    S --> O
+            </pre>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: DIREITOS, RIPD, INCIDENTES E SANÇÕES -->
+    <section class="study-section" id="obrigacoes">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Direitos, RIPD, Incidentes e Sanções</h2>
+        </div>
+
+        <h3>Direitos do titular (art. 18 e art. 20)</h3>
+        <p>
+            O titular pode pedir: confirmação de que há tratamento, acesso, correção, anonimização, bloqueio ou eliminação de dados desnecessários, portabilidade, eliminação dos dados tratados com consentimento, informação sobre com quem os dados foram compartilhados, informação sobre a possibilidade de não consentir e revogação do consentimento (<strong>art. 18</strong>). Pelo <strong>art. 20</strong>, pode pedir revisão de decisões tomadas unicamente por tratamento automatizado, como um score de crédito.
+        </p>
+
+        <h3>Registro e RIPD</h3>
+        <p>
+            O controlador e o operador mantêm registro das operações de tratamento (<strong>art. 37</strong>). O <strong>RIPD</strong> (Relatório de Impacto à Proteção de Dados Pessoais, <strong>art. 38</strong>) descreve os dados tratados, a metodologia de coleta e de segurança e as medidas para mitigar riscos; a ANPD pode exigi-lo, e ele é a ferramenta natural para tratamentos de alto risco.
+        </p>
+        <p>
+            A <strong>Resolução CD/ANPD nº 2/2022</strong> define alto risco como a soma de <strong>um critério geral</strong> (larga escala ou possibilidade de afetar significativamente interesses e direitos fundamentais) com <strong>um critério específico</strong> (tecnologias emergentes, vigilância de zonas acessíveis ao público, decisões unicamente automatizadas, inclusive de perfil e de crédito, ou dados sensíveis, de crianças, de adolescentes e de idosos).
+        </p>
+
+        <h3>Incidentes, transferências e sanções</h3>
+        <ul>
+            <li>Incidente que possa acarretar risco ou dano relevante aos titulares deve ser comunicado à ANPD e aos titulares (<strong>art. 48</strong>). Pela <strong>Resolução CD/ANPD nº 15/2024</strong>, em <strong>3 dias úteis</strong> a partir do conhecimento (o passo a passo está no Estudo 43).</li>
+            <li>A transferência internacional precisa de um mecanismo do art. 33, como as <strong>cláusulas-padrão contratuais</strong> aprovadas pela <strong>Resolução CD/ANPD nº 19/2024</strong>.</li>
+            <li>As sanções do <strong>art. 52</strong> vão de advertência a multa simples de até <strong>2% do faturamento</strong> no Brasil, limitada a <strong>R$ 50 milhões</strong> por infração, além de publicização, bloqueio e eliminação dos dados e suspensão ou proibição do tratamento.</li>
+        </ul>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Registro de uma operação de tratamento (art. 37) — modelo</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-lg-ropa')">Copiar</button>
+            </div>
+            <pre><code id="code-lg-ropa">Operação:         Pedidos e entregas
+Finalidade:       Processar compras e entregar produtos ao cliente
+Titulares:        Clientes
+Dados:            nome, CPF, endereço, telefone, e-mail, forma de pagamento
+Base legal:       art. 7º, V (execução de contrato)
+Compartilhamento: transportadora (operador, com contrato e cláusulas de proteção de dados)
+Transferência:    não
+Retenção:         5 anos após a entrega (obrigações fiscais), depois eliminação
+Segurança:        criptografia em trânsito e em repouso, acesso por perfil, logs
+Encarregado:      dpo@ipestore.example</code></pre>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">👷</span>
+                <strong>Consentimento de funcionários quase nunca é a melhor base</strong>
+            </div>
+            <p>
+                Na relação de emprego, o funcionário dificilmente pode recusar sem receio, então o consentimento não é livre. Atestados, folha e eSocial se apoiam no cumprimento de obrigação legal; o controle de acesso, em geral, em outras hipóteses, avaliadas com o jurídico. O consentimento fica para o que é de fato opcional.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Construtor de Avaliação de Impacto à Privacidade (RIPD)</h2>
+        </div>
+
+        <p class="lead-text">
+            Os cinco fluxos de tratamento da Ipê Store foram mapeados às pressas, e alguns têm problemas. Abra cada um, corrija a base legal e as salvaguardas, cadastre novos fluxos e gere a minuta do RIPD. As regras seguem a LGPD e a Resolução CD/ANPD nº 2/2022 de forma simplificada; uma avaliação real envolve o jurídico.
+        </p>
+
+        <div class="lab-box lg-lab" id="lg-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Programa de Privacidade</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Inventário de tratamentos da Ipê Store</h3>
+                    <p id="lg-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">Missões</h4>
+                <ul id="lg-missoes" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.25rem; font-size: 0.85rem;"></ul>
+
+                <h4 style="margin-top: 1.5rem;">1. Fluxos de tratamento</h4>
+                <div id="lg-fluxos" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.45rem; font-size: 0.82rem;"></div>
+                <div style="margin-top: 0.5rem;"><button class="btn-secondary" type="button" onclick="novoFluxoLgpd()">Cadastrar novo fluxo</button></div>
+
+                <h4 style="margin-top: 1.25rem;">2. Editor</h4>
+                <div id="lg-editor" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.45rem; font-size: 0.82rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.6rem;"></div>
+
+                <h4 style="margin-top: 1.25rem;">3. Matriz de risco ao titular</h4>
+                <div id="lg-matriz" class="table-responsive"></div>
+
+                <h4 style="margin-top: 1.25rem;">4. Minuta do RIPD</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    <button class="btn-primary" type="button" onclick="gerarRipdLgpd()">Gerar RIPD</button>
+                    <button class="btn-secondary" type="button" onclick="restaurarLgpd()">Restaurar laboratório</button>
+                </div>
+                <div class="terminal-box" style="margin-top: 0.6rem;">
+                    <div class="terminal-header">
+                        <span class="terminal-title">ripd-minuta.md</span>
+                        <button class="terminal-copy-btn" onclick="copyCode(this, 'lg-ripd')">Copiar</button>
+                    </div>
+                    <pre style="max-height: 24rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere;"><code id="lg-ripd"></code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist do Programa de Privacidade</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para avaliar a adequação de uma empresa à LGPD. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="lgpd">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lg-1">
+                <label for="chk-lg-1"><strong>Inventário:</strong> registro das operações de tratamento (art. 37) completo e atualizado.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lg-2">
+                <label for="chk-lg-2"><strong>Bases legais:</strong> cada fluxo com base do art. 7º ou 11 justificada; LIA para legítimo interesse.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lg-3">
+                <label for="chk-lg-3"><strong>Minimização e retenção:</strong> só os dados necessários, com prazo de eliminação definido.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lg-4">
+                <label for="chk-lg-4"><strong>Operadores e transferências:</strong> contratos com cláusulas de proteção de dados e cláusulas-padrão para o exterior.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lg-5">
+                <label for="chk-lg-5"><strong>RIPD:</strong> elaborado para os tratamentos de alto risco e revisado quando o tratamento muda.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lg-6">
+                <label for="chk-lg-6"><strong>Direitos do titular:</strong> canal do encarregado publicado e prazos de resposta controlados.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lg-7">
+                <label for="chk-lg-7"><strong>Incidentes:</strong> procedimento para comunicar ANPD e titulares em 3 dias úteis, testado em exercício.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Bases):</strong> A empresa quer tratar atestados médicos com base no legítimo interesse. Pode?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. Dado de saúde é sensível, e o art. 11 não prevê o legítimo interesse. Atestados se apoiam, em regra, no cumprimento de obrigação legal ou regulatória.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Papéis):</strong> A transportadora que recebe nome e endereço para entregar os pedidos é controladora ou operadora?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Operadora, se trata os dados só para cumprir a entrega, nas condições definidas pela Ipê Store. O contrato deve fixar finalidade, segurança e eliminação.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Alto risco):</strong> Um tratamento em larga escala de dados de contato, sem decisão automatizada nem dados sensíveis, é de alto risco pela Resolução 2/2022?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. A resolução exige um critério geral e um específico ao mesmo tempo. Larga escala sozinha é só o critério geral.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Direitos):</strong> O cliente teve o parcelamento negado por um score automático. Que direito ele tem?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Pedir a revisão da decisão tomada unicamente com base em tratamento automatizado (art. 20) e receber informações claras sobre os critérios usados, respeitados os segredos comercial e industrial.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Anonimização):</strong> Trocar o nome por um código e manter a tabela de correspondência é anonimizar?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não, é pseudonimizar: com a tabela, a pessoa é reidentificada. O dado continua pessoal, mas o risco cai, e por isso a pseudonimização é uma boa salvaguarda.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Sanções):</strong> Qual o limite da multa simples prevista no art. 52?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Até 2% do faturamento da empresa no Brasil no último exercício, excluídos os tributos, limitada a R$ 50 milhões por infração. As sanções não monetárias, como suspender o tratamento, podem pesar mais.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Base legal</h4>
+                <p>Art. 7º para dados comuns; art. 11, mais restrito, para sensíveis.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Alto risco</h4>
+                <p>Um critério geral mais um específico (Res. 2/2022) pedem RIPD.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Direitos</h4>
+                <p>Art. 18 e revisão de decisão automatizada no art. 20.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Incidente</h4>
+                <p>ANPD e titulares em 3 dias úteis (Res. 15/2024).</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>Lei nº 13.709/2018 (LGPD), especialmente arts. 5º, 6º, 7º, 11, 18, 20, 33, 37, 38, 48 e 52.</li>
+            <li>Resolução CD/ANPD nº 2/2022 (agentes de pequeno porte e critérios de alto risco).</li>
+            <li>Resolução CD/ANPD nº 15/2024 (comunicação de incidente de segurança).</li>
+            <li>Resolução CD/ANPD nº 19/2024 (transferência internacional de dados).</li>
+            <li>ANPD — Guia orientativo sobre legítimo interesse.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 43 — Gestão de Crise e Comunicação e 29 — Proteção de Dados e Conteúdo</strong>
+            </div>
+            <p>
+                O Estudo 43 conduz a comunicação de um incidente com dados pessoais. O Estudo 29 mostra os controles técnicos (classificação, DLP, criptografia) que sustentam as salvaguardas do RIPD.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="lg-dados">
+{
+ "contexto": "Inventário fictício. As regras seguem a LGPD e a Resolução CD/ANPD nº 2/2022 de forma simplificada.",
+ "controlador": "Ipê Store Comércio Eletrônico Ltda. (fictícia)",
+ "encarregado": "dpo@ipestore.example",
+ "data": "02/11/2026",
+ "bases_art7": [
+  {
+   "id": "consentimento",
+   "nome": "Consentimento",
+   "artigo": "art. 7º, I",
+   "quando": "Manifestação livre, informada e inequívoca, para finalidade determinada."
+  },
+  {
+   "id": "obrigacao_legal",
+   "nome": "Cumprimento de obrigação legal ou regulatória",
+   "artigo": "art. 7º, II",
+   "quando": "A lei ou o regulador exige o tratamento (fiscal, trabalhista)."
+  },
+  {
+   "id": "politicas_publicas",
+   "nome": "Execução de políticas públicas",
+   "artigo": "art. 7º, III",
+   "quando": "Pela administração pública."
+  },
+  {
+   "id": "pesquisa",
+   "nome": "Estudos por órgão de pesquisa",
+   "artigo": "art. 7º, IV",
+   "quando": "Órgão de pesquisa, com anonimização sempre que possível."
+  },
+  {
+   "id": "execucao_contrato",
+   "nome": "Execução de contrato",
+   "artigo": "art. 7º, V",
+   "quando": "Necessário para um contrato com o titular ou procedimentos preliminares a pedido dele."
+  },
+  {
+   "id": "exercicio_direitos",
+   "nome": "Exercício regular de direitos",
+   "artigo": "art. 7º, VI",
+   "quando": "Em processo judicial, administrativo ou arbitral."
+  },
+  {
+   "id": "protecao_vida",
+   "nome": "Proteção da vida ou da incolumidade física",
+   "artigo": "art. 7º, VII",
+   "quando": "Do titular ou de terceiro."
+  },
+  {
+   "id": "tutela_saude",
+   "nome": "Tutela da saúde",
+   "artigo": "art. 7º, VIII",
+   "quando": "Em procedimento por profissionais de saúde, serviços de saúde ou autoridade sanitária."
+  },
+  {
+   "id": "legitimo_interesse",
+   "nome": "Legítimo interesse",
+   "artigo": "art. 7º, IX",
+   "quando": "Do controlador ou de terceiro, com teste de balanceamento e respeito aos direitos do titular."
+  },
+  {
+   "id": "protecao_credito",
+   "nome": "Proteção do crédito",
+   "artigo": "art. 7º, X",
+   "quando": "Análise e concessão de crédito, nos termos da legislação."
+  }
+ ],
+ "bases_art11": [
+  {
+   "id": "consentimento_especifico",
+   "nome": "Consentimento específico e destacado",
+   "artigo": "art. 11, I",
+   "quando": "Para finalidades específicas, separado das demais condições."
+  },
+  {
+   "id": "obrigacao_legal",
+   "nome": "Cumprimento de obrigação legal ou regulatória",
+   "artigo": "art. 11, II, a",
+   "quando": "Também vale para dados sensíveis."
+  },
+  {
+   "id": "politicas_publicas",
+   "nome": "Execução de políticas públicas",
+   "artigo": "art. 11, II, b",
+   "quando": "Pela administração pública."
+  },
+  {
+   "id": "pesquisa",
+   "nome": "Estudos por órgão de pesquisa",
+   "artigo": "art. 11, II, c",
+   "quando": "Com anonimização sempre que possível."
+  },
+  {
+   "id": "exercicio_direitos",
+   "nome": "Exercício regular de direitos, inclusive em contrato",
+   "artigo": "art. 11, II, d",
+   "quando": "Inclui contrato e processos judiciais, administrativos e arbitrais."
+  },
+  {
+   "id": "protecao_vida",
+   "nome": "Proteção da vida ou da incolumidade física",
+   "artigo": "art. 11, II, e",
+   "quando": "Do titular ou de terceiro."
+  },
+  {
+   "id": "tutela_saude",
+   "nome": "Tutela da saúde",
+   "artigo": "art. 11, II, f",
+   "quando": "Por profissionais de saúde, serviços de saúde ou autoridade sanitária."
+  },
+  {
+   "id": "prevencao_fraude",
+   "nome": "Prevenção à fraude e segurança do titular",
+   "artigo": "art. 11, II, g",
+   "quando": "Em identificação e autenticação de cadastro em sistemas eletrônicos."
+  }
+ ],
+ "motivos": {
+  "ok": "base adequada",
+  "politicas": "políticas públicas é base da administração pública, não de empresa privada",
+  "art11_sem_base": "o art. 11 não prevê esta base para dados sensíveis",
+  "so_sensiveis": "prevenção à fraude é hipótese do art. 11 (dados sensíveis); para dados comuns, avalie o legítimo interesse",
+  "consentimento_destacado": "para dados sensíveis, o consentimento deve ser específico e destacado (art. 11, I)",
+  "saude_restrita": "só em procedimento por profissionais de saúde, serviços de saúde ou autoridade sanitária",
+  "orgao_pesquisa": "só para órgão de pesquisa, com anonimização sempre que possível",
+  "lia": "documente o teste de balanceamento (LIA)",
+  "consentimento_emprego": "na relação de emprego o consentimento dificilmente é livre; prefira outra base"
+ },
+ "criterios": {
+  "larga_escala": "larga escala",
+  "afeta_direitos": "pode afetar significativamente direitos",
+  "tecnologia_emergente": "tecnologia emergente",
+  "vigilancia_publica": "vigilância de zonas acessíveis ao público",
+  "decisao_automatizada": "decisão unicamente automatizada",
+  "sensiveis_ou_vulneraveis": "dados sensíveis ou de crianças, adolescentes e idosos"
+ },
+ "salvaguardas": {
+  "criptografia": "criptografia",
+  "controle_acesso": "controle de acesso por perfil",
+  "registro_acesso": "registro de acessos (logs)",
+  "minimizacao": "minimização dos dados",
+  "contrato_operador": "contrato com o operador",
+  "clausulas_padrao": "cláusulas-padrão contratuais (Res. 19/2024)",
+  "retencao_definida": "prazo de retenção definido",
+  "pseudonimizacao": "pseudonimização"
+ },
+ "categorias": {
+  "identificacao": "identificação (nome, CPF)",
+  "contato": "contato",
+  "localizacao": "endereço e localização",
+  "financeiro": "financeiros",
+  "comportamento": "hábitos de consumo",
+  "sensivel_saude": "saúde (sensível)",
+  "sensivel_biometrico": "biometria (sensível)",
+  "sensivel_origem": "origem racial ou étnica (sensível)",
+  "sensivel_religiao": "convicção religiosa (sensível)",
+  "crianca_adolescente": "crianças e adolescentes",
+  "idoso": "idosos"
+ },
+ "titulares": {
+  "clientes": "clientes",
+  "funcionarios": "funcionários",
+  "fornecedores": "fornecedores"
+ },
+ "direitos": {
+  "art18_vi": "eliminação dos dados tratados com consentimento (art. 18, VI)",
+  "art18_ix": "revogação do consentimento (art. 18, IX)",
+  "art18_vii": "informação sobre o compartilhamento (art. 18, VII)",
+  "art20": "revisão de decisão automatizada (art. 20)"
+ },
+ "fluxos": [
+  {
+   "id": "F1",
+   "nome": "Pedidos e entregas",
+   "finalidade": "Processar compras e entregar os produtos",
+   "categorias": [
+    "identificacao",
+    "contato",
+    "localizacao",
+    "financeiro"
+   ],
+   "titulares": [
+    "clientes"
+   ],
+   "base": "execucao_contrato",
+   "lia": false,
+   "larga_escala": true,
+   "afeta_direitos": false,
+   "tecnologia_emergente": false,
+   "vigilancia_publica": false,
+   "decisao_automatizada": false,
+   "operador": true,
+   "terceiros": false,
+   "transferencia": false,
+   "salvaguardas": [
+    "criptografia",
+    "controle_acesso",
+    "retencao_definida"
+   ],
+   "correcao": {
+    "salvaguardas": [
+     "criptografia",
+     "controle_acesso",
+     "retencao_definida",
+     "contrato_operador"
+    ]
+   },
+   "esperado": {
+    "base": "ok",
+    "motivo": "ok",
+    "alto_risco": false,
+    "faltam": [
+     "contrato_operador"
+    ],
+    "nivel": "alto",
+    "ripd": true
+   }
+  },
+  {
+   "id": "F2",
+   "nome": "Atestados médicos dos funcionários",
+   "finalidade": "Abonar faltas e cumprir as obrigações trabalhistas e do eSocial",
+   "categorias": [
+    "identificacao",
+    "sensivel_saude"
+   ],
+   "titulares": [
+    "funcionarios"
+   ],
+   "base": "legitimo_interesse",
+   "lia": false,
+   "larga_escala": false,
+   "afeta_direitos": true,
+   "tecnologia_emergente": false,
+   "vigilancia_publica": false,
+   "decisao_automatizada": false,
+   "operador": true,
+   "terceiros": false,
+   "transferencia": false,
+   "salvaguardas": [
+    "controle_acesso",
+    "retencao_definida"
+   ],
+   "correcao": {
+    "base": "obrigacao_legal",
+    "salvaguardas": [
+     "criptografia",
+     "controle_acesso",
+     "registro_acesso",
+     "minimizacao",
+     "contrato_operador",
+     "retencao_definida"
+    ]
+   },
+   "esperado": {
+    "base": "invalida",
+    "motivo": "art11_sem_base",
+    "alto_risco": true,
+    "faltam": [
+     "criptografia",
+     "registro_acesso",
+     "minimizacao",
+     "contrato_operador"
+    ],
+    "nivel": "alto",
+    "ripd": true
+   }
+  },
+  {
+   "id": "F3",
+   "nome": "Programa de fidelidade",
+   "finalidade": "Oferecer descontos personalizados com base no histórico de compras",
+   "categorias": [
+    "identificacao",
+    "contato",
+    "comportamento"
+   ],
+   "titulares": [
+    "clientes"
+   ],
+   "base": "legitimo_interesse",
+   "lia": false,
+   "larga_escala": true,
+   "afeta_direitos": false,
+   "tecnologia_emergente": false,
+   "vigilancia_publica": false,
+   "decisao_automatizada": true,
+   "operador": true,
+   "terceiros": false,
+   "transferencia": true,
+   "salvaguardas": [
+    "criptografia",
+    "retencao_definida"
+   ],
+   "correcao": {
+    "lia": true,
+    "salvaguardas": [
+     "criptografia",
+     "controle_acesso",
+     "registro_acesso",
+     "minimizacao",
+     "contrato_operador",
+     "clausulas_padrao",
+     "retencao_definida"
+    ]
+   },
+   "esperado": {
+    "base": "alerta",
+    "motivo": "lia",
+    "alto_risco": true,
+    "faltam": [
+     "controle_acesso",
+     "registro_acesso",
+     "minimizacao",
+     "contrato_operador",
+     "clausulas_padrao"
+    ],
+    "nivel": "alto",
+    "ripd": true
+   }
+  },
+  {
+   "id": "F4",
+   "nome": "Crédito para compra parcelada",
+   "finalidade": "Decidir a aprovação do parcelamento com score de crédito",
+   "categorias": [
+    "identificacao",
+    "financeiro"
+   ],
+   "titulares": [
+    "clientes"
+   ],
+   "base": "protecao_credito",
+   "lia": false,
+   "larga_escala": true,
+   "afeta_direitos": false,
+   "tecnologia_emergente": false,
+   "vigilancia_publica": false,
+   "decisao_automatizada": true,
+   "operador": false,
+   "terceiros": true,
+   "transferencia": false,
+   "salvaguardas": [
+    "criptografia",
+    "controle_acesso",
+    "registro_acesso",
+    "minimizacao",
+    "retencao_definida"
+   ],
+   "correcao": {},
+   "esperado": {
+    "base": "ok",
+    "motivo": "ok",
+    "alto_risco": true,
+    "faltam": [],
+    "nivel": "medio",
+    "ripd": true
+   }
+  },
+  {
+   "id": "F5",
+   "nome": "Newsletter de ofertas",
+   "finalidade": "Enviar ofertas por e-mail a quem pediu",
+   "categorias": [
+    "contato"
+   ],
+   "titulares": [
+    "clientes"
+   ],
+   "base": "consentimento",
+   "lia": false,
+   "larga_escala": false,
+   "afeta_direitos": false,
+   "tecnologia_emergente": false,
+   "vigilancia_publica": false,
+   "decisao_automatizada": false,
+   "operador": false,
+   "terceiros": false,
+   "transferencia": false,
+   "salvaguardas": [
+    "retencao_definida"
+   ],
+   "correcao": {},
+   "esperado": {
+    "base": "ok",
+    "motivo": "ok",
+    "alto_risco": false,
+    "faltam": [],
+    "nivel": "baixo",
+    "ripd": false
+   }
+  }
+ ],
+ "missoes": [
+  {
+   "id": "bases",
+   "texto": "Corrija a base legal inválida: nenhum fluxo pode ficar sem base adequada."
+  },
+  {
+   "id": "lia",
+   "texto": "Mantenha o legítimo interesse no programa de fidelidade e documente o teste de balanceamento."
+  },
+  {
+   "id": "salvaguardas",
+   "texto": "Complete as salvaguardas exigidas em todos os fluxos."
+  },
+  {
+   "id": "ripd",
+   "texto": "Gere a minuta do RIPD depois das correções."
+  },
+  {
+   "id": "novo",
+   "texto": "Cadastre e salve um tratamento novo."
+  }
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var LG = JSON.parse(document.getElementById("lg-dados").textContent);
+    var SALV_ALTO = ["criptografia", "controle_acesso", "registro_acesso", "minimizacao"];
+    var fluxos = [], feitas = {}, editando = null, novos = 0;
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function copia(o) { return JSON.parse(JSON.stringify(o)); }
+    function sensivelF(f) { return f.categorias.some(function(c) { return c.indexOf("sensivel_") === 0; }); }
+    function baseInfo(id, sens) { return (sens ? LG.bases_art11.concat(LG.bases_art7) : LG.bases_art7.concat(LG.bases_art11)).filter(function(b) { return b.id === id; })[0]; }
+
+    // ===================================================== avaliador (espelhado nos testes)
+    window.avaliarFluxoLgpd = function(f) {
+        var tem = function(l, x) { return l.indexOf(x) !== -1; };
+        var sens = f.categorias.some(function(c) { return c.indexOf("sensivel_") === 0; });
+        var vuln = f.categorias.some(function(c) { return c === "crianca_adolescente" || c === "idoso"; });
+        var b = f.base, st, mot;
+        if (b === "politicas_publicas") { st = "invalida"; mot = "politicas"; }
+        else if (sens && tem(["legitimo_interesse", "protecao_credito", "execucao_contrato"], b)) { st = "invalida"; mot = "art11_sem_base"; }
+        else if (!sens && b === "prevencao_fraude") { st = "invalida"; mot = "so_sensiveis"; }
+        else if (sens && b === "consentimento") { st = "alerta"; mot = "consentimento_destacado"; }
+        else if (b === "tutela_saude") { st = "alerta"; mot = "saude_restrita"; }
+        else if (b === "pesquisa") { st = "alerta"; mot = "orgao_pesquisa"; }
+        else if (b === "legitimo_interesse" && !f.lia) { st = "alerta"; mot = "lia"; }
+        else if ((b === "consentimento" || b === "consentimento_especifico") && tem(f.titulares, "funcionarios")) { st = "alerta"; mot = "consentimento_emprego"; }
+        else { st = "ok"; mot = "ok"; }
+        var gerais = ["larga_escala", "afeta_direitos"].filter(function(c) { return f[c]; });
+        var esp = ["tecnologia_emergente", "vigilancia_publica", "decisao_automatizada"].filter(function(c) { return f[c]; });
+        if (sens || vuln) esp.push("sensiveis_ou_vulneraveis");
+        var alto = !!(gerais.length && esp.length);
+        var exigidas = (alto ? SALV_ALTO.slice() : []).concat(f.operador ? ["contrato_operador"] : []).concat(f.transferencia ? ["clausulas_padrao"] : []).concat(["retencao_definida"]);
+        var faltam = exigidas.filter(function(s) { return !tem(f.salvaguardas, s); });
+        var impacto = sens || vuln ? 3 : f.categorias.some(function(c) { return tem(["identificacao", "financeiro", "localizacao"], c); }) ? 2 : 1;
+        var prob = Math.min(3, 1 + (f.operador || f.terceiros || f.transferencia ? 1 : 0) + (faltam.length ? 1 : 0));
+        var nivel = impacto * prob >= 6 ? "alto" : impacto * prob >= 3 ? "medio" : "baixo";
+        var direitos = [];
+        if (b === "consentimento" || b === "consentimento_especifico") direitos.push("art18_vi", "art18_ix");
+        if (f.operador || f.terceiros) direitos.push("art18_vii");
+        if (f.decisao_automatizada) direitos.push("art20");
+        return { base: st, motivo: mot, alto_risco: alto, criterios: gerais.concat(esp), faltam: faltam, impacto: impacto, probabilidade: prob, nivel: nivel, ripd: alto || nivel === "alto", direitos: direitos };
+    };
+
+    // ===================================================== missões
+    function concluir(id) { if (!feitas[id]) { feitas[id] = true; renderizarMissoes(); } }
+    function renderizarMissoes() {
+        var ul = document.getElementById("lg-missoes");
+        ul.replaceChildren();
+        LG.missoes.forEach(function(m) {
+            var li = el("li", (feitas[m.id] ? "✓ " : "○ ") + m.texto, "color: " + (feitas[m.id] ? "var(--tip-color)" : "var(--ink)") + ";");
+            li.setAttribute("data-missao", m.id);
+            li.setAttribute("data-feita", feitas[m.id] ? "sim" : "nao");
+            ul.appendChild(li);
+        });
+    }
+    function avaliarMissoes() {
+        var av = fluxos.map(function(f) { return window.avaliarFluxoLgpd(f); });
+        if (av.every(function(a) { return a.base !== "invalida"; })) concluir("bases");
+        var fid = fluxos.filter(function(f) { return f.id === "F3"; })[0];
+        if (fid && window.avaliarFluxoLgpd(fid).motivo !== "lia" && fid.base === "legitimo_interesse") concluir("lia");
+        if (av.every(function(a) { return !a.faltam.length; })) concluir("salvaguardas");
+    }
+
+    // ===================================================== interface
+    var COR = { ok: "var(--tip-color)", alerta: "rgb(202, 138, 4)", invalida: "var(--danger-color)", alto: "var(--danger-color)", medio: "rgb(202, 138, 4)", baixo: "var(--tip-color)" };
+    function renderizarFluxos() {
+        var box = document.getElementById("lg-fluxos");
+        box.replaceChildren();
+        fluxos.forEach(function(f) {
+            var a = window.avaliarFluxoLgpd(f), b = baseInfo(f.base, sensivelF(f));
+            var c = el("div", null, "border: 1px solid " + (editando === f.id ? "var(--accent)" : "var(--rule)") + "; border-radius: var(--radius-sm); padding: 0.5rem 0.6rem; min-width: 0;");
+            c.setAttribute("data-fluxo", f.id);
+            c.setAttribute("data-base", a.base);
+            c.setAttribute("data-faltam", String(a.faltam.length));
+            var topo = el("div", null, "display: flex; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;");
+            topo.appendChild(el("strong", f.id + " · " + f.nome, "min-width: 0;"));
+            var bt = el("button", "Editar", "font-size: 0.75rem; padding: 0.15rem 0.5rem;"); bt.type = "button"; bt.className = "btn-secondary";
+            bt.addEventListener("click", function() { editarFluxoLgpd(f.id); });
+            topo.appendChild(bt);
+            c.appendChild(topo);
+            c.appendChild(el("div", f.finalidade, "color: var(--muted); font-size: 0.76rem;"));
+            c.appendChild(el("div", "Base: " + (b ? b.nome + " (" + b.artigo + ")" : f.base) + " — " + LG.motivos[a.motivo], "color: " + COR[a.base] + "; font-weight: 600; margin-top: 0.2rem;"));
+            c.appendChild(el("div", (a.alto_risco ? "Alto risco (Res. 2/2022): " + a.criterios.map(function(x) { return LG.criterios[x]; }).join(" + ") : "Sem os dois critérios de alto risco da Res. 2/2022") + " · risco ao titular " + a.nivel.replace("medio", "médio") + " (" + a.impacto + "×" + a.probabilidade + ")", "font-size: 0.76rem; color: " + (a.alto_risco ? "var(--danger-color)" : "var(--muted)") + ";"));
+            c.appendChild(el("div", a.faltam.length ? "Faltam salvaguardas: " + a.faltam.map(function(s) { return LG.salvaguardas[s]; }).join(", ") : "Salvaguardas exigidas presentes.", "font-size: 0.76rem; color: " + (a.faltam.length ? "var(--danger-color)" : "var(--tip-color)") + ";"));
+            if (a.direitos.length) c.appendChild(el("div", "Direitos em destaque: " + a.direitos.map(function(x) { return LG.direitos[x]; }).join("; "), "font-size: 0.74rem; color: var(--muted);"));
+            if (a.ripd) c.appendChild(el("div", "Entra no RIPD.", "font-size: 0.74rem; font-weight: 700;"));
+            box.appendChild(c);
+        });
+        renderizarMatriz();
+        avaliarMissoes();
+    }
+    function renderizarMatriz() {
+        var box = document.getElementById("lg-matriz");
+        box.replaceChildren();
+        var t = el("table"); t.className = "data-table";
+        var h = el("tr"); h.appendChild(el("th", "Impacto \\ Probabilidade"));
+        [1, 2, 3].forEach(function(p) { h.appendChild(el("th", ["", "Baixa", "Média", "Alta"][p])); });
+        var th = el("thead"); th.appendChild(h); t.appendChild(th);
+        var tb = el("tbody");
+        [3, 2, 1].forEach(function(i) {
+            var tr = el("tr"); tr.appendChild(el("td", ["", "Baixo", "Médio", "Alto (sensíveis ou vulneráveis)"][i], "font-weight: 600;"));
+            [1, 2, 3].forEach(function(p) {
+                var ids = fluxos.filter(function(f) { var a = window.avaliarFluxoLgpd(f); return a.impacto === i && a.probabilidade === p; }).map(function(f) { return f.id; });
+                var nivel = i * p >= 6 ? "alto" : i * p >= 3 ? "medio" : "baixo";
+                var td = el("td", ids.join(", ") || "—", "text-align: center; background: " + (nivel === "alto" ? "rgba(220, 38, 38, 0.18)" : nivel === "medio" ? "rgba(202, 138, 4, 0.18)" : "rgba(22, 163, 74, 0.12)") + ";");
+                td.setAttribute("data-celula", i + "-" + p);
+                tr.appendChild(td);
+            });
+            tb.appendChild(tr);
+        });
+        t.appendChild(tb); box.appendChild(t);
+    }
+
+    // ===================================================== editor
+    window.editarFluxoLgpd = function(id) {
+        editando = id;
+        var f = fluxos.filter(function(x) { return x.id === id; })[0], box = document.getElementById("lg-editor");
+        box.replaceChildren();
+        box.setAttribute("data-editando", id);
+        var campo = function(rot, filho) { var l = el("label", null, "display: flex; flex-direction: column; gap: 0.2rem; min-width: 0;"); l.appendChild(el("span", rot, "font-weight: 600;")); l.appendChild(filho); return l; };
+        var marcar = function(nome, opcoes, sel) {
+            var d = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.2rem 0.8rem;");
+            Object.keys(opcoes).forEach(function(k) { var l = el("label", null, "display: flex; gap: 0.25rem; align-items: center;"); var cb = el("input"); cb.type = "checkbox"; cb.setAttribute("data-" + nome, k); cb.checked = sel.indexOf(k) !== -1; l.appendChild(cb); l.appendChild(el("span", opcoes[k])); d.appendChild(l); });
+            return d;
+        };
+        var nome = el("input"); nome.className = "form-control"; nome.id = "lg-ed-nome"; nome.value = f.nome;
+        var fin = el("input"); fin.className = "form-control"; fin.id = "lg-ed-finalidade"; fin.value = f.finalidade;
+        box.appendChild(campo("Nome do tratamento", nome));
+        box.appendChild(campo("Finalidade", fin));
+        box.appendChild(campo("Categorias de dados", marcar("cat", LG.categorias, f.categorias)));
+        box.appendChild(campo("Titulares", marcar("tit", LG.titulares, f.titulares)));
+        var s = el("select"); s.className = "form-control"; s.id = "lg-ed-base";
+        [["Art. 7º (dados pessoais)", LG.bases_art7, "7:"], ["Art. 11 (dados sensíveis)", LG.bases_art11, "11:"]].forEach(function(g) {
+            var og = el("optgroup"); og.label = g[0];
+            g[1].forEach(function(b) { var o = el("option", b.nome + " (" + b.artigo + ")"); o.value = g[2] + b.id; og.appendChild(o); });
+            s.appendChild(og);
+        });
+        s.value = (sensivelF(f) && LG.bases_art11.some(function(b) { return b.id === f.base; }) ? "11:" : LG.bases_art7.some(function(b) { return b.id === f.base; }) ? "7:" : "11:") + f.base;
+        box.appendChild(campo("Base legal", s));
+        box.appendChild(marcar("flag", { lia: "Teste de balanceamento (LIA) documentado" }, f.lia ? ["lia"] : []));
+        var crit = {}; ["larga_escala", "afeta_direitos", "tecnologia_emergente", "vigilancia_publica", "decisao_automatizada"].forEach(function(k) { crit[k] = LG.criterios[k]; });
+        box.appendChild(campo("Critérios da Res. 2/2022 (os de dados sensíveis e vulneráveis vêm das categorias)", marcar("crit", crit, Object.keys(crit).filter(function(k) { return f[k]; }))));
+        box.appendChild(campo("Compartilhamento", marcar("comp", { operador: "Com operador", terceiros: "Com terceiros (outro controlador)", transferencia: "Transferência internacional" }, ["operador", "terceiros", "transferencia"].filter(function(k) { return f[k]; }))));
+        box.appendChild(campo("Salvaguardas", marcar("salv", LG.salvaguardas, f.salvaguardas)));
+        var b = el("button", "Salvar fluxo"); b.type = "button"; b.className = "btn-primary";
+        b.addEventListener("click", salvarFluxoLgpd);
+        var w = el("div"); w.appendChild(b); box.appendChild(w);
+        renderizarFluxos();
+    };
+    var marcados = function(nome) { return Array.prototype.map.call(document.querySelectorAll("#lg-editor [data-" + nome + "]:checked"), function(c) { return c.getAttribute("data-" + nome); }); };
+    window.salvarFluxoLgpd = function() {
+        var f = fluxos.filter(function(x) { return x.id === editando; })[0];
+        if (!f) return null;
+        f.nome = document.getElementById("lg-ed-nome").value.trim() || f.nome;
+        f.finalidade = document.getElementById("lg-ed-finalidade").value.trim() || f.finalidade;
+        f.categorias = marcados("cat"); f.titulares = marcados("tit");
+        f.base = document.getElementById("lg-ed-base").value.split(":")[1];
+        f.lia = marcados("flag").indexOf("lia") !== -1;
+        var cr = marcados("crit"); ["larga_escala", "afeta_direitos", "tecnologia_emergente", "vigilancia_publica", "decisao_automatizada"].forEach(function(k) { f[k] = cr.indexOf(k) !== -1; });
+        var cp = marcados("comp"); ["operador", "terceiros", "transferencia"].forEach(function(k) { f[k] = cp.indexOf(k) !== -1; });
+        f.salvaguardas = marcados("salv");
+        if (f.id.indexOf("N") === 0) concluir("novo");
+        renderizarFluxos();
+        return window.avaliarFluxoLgpd(f);
+    };
+    window.novoFluxoLgpd = function() {
+        novos++;
+        var f = { id: "N" + novos, nome: "Novo tratamento " + novos, finalidade: "Descreva a finalidade", categorias: ["contato"], titulares: ["clientes"], base: "consentimento", lia: false,
+            larga_escala: false, afeta_direitos: false, tecnologia_emergente: false, vigilancia_publica: false, decisao_automatizada: false, operador: false, terceiros: false, transferencia: false, salvaguardas: [] };
+        fluxos.push(f);
+        editarFluxoLgpd(f.id);
+        return f.id;
+    };
+
+    // ===================================================== RIPD
+    window.gerarRipdLgpd = function() {
+        var L = ["# Relatório de Impacto à Proteção de Dados Pessoais (RIPD) — minuta", "",
+            "Controlador: " + LG.controlador + " · Encarregado: " + LG.encarregado + " · Data: " + LG.data, "",
+            "Fundamento: art. 38 da Lei nº 13.709/2018; critérios de alto risco da Resolução CD/ANPD nº 2/2022.", ""];
+        var incluidos = fluxos.filter(function(f) { return window.avaliarFluxoLgpd(f).ripd; });
+        if (!incluidos.length) L.push("Nenhum tratamento de alto risco no inventário atual.");
+        incluidos.forEach(function(f) {
+            var a = window.avaliarFluxoLgpd(f), b = baseInfo(f.base, sensivelF(f));
+            L.push("## " + f.id + " — " + f.nome, "",
+                "1. Descrição: " + f.finalidade + ".",
+                "2. Titulares: " + f.titulares.map(function(t) { return LG.titulares[t]; }).join(", ") + ". Dados: " + f.categorias.map(function(c) { return LG.categorias[c]; }).join(", ") + ".",
+                "3. Base legal: " + (b ? b.nome + " (" + b.artigo + ")" : f.base) + ". Avaliação: " + LG.motivos[a.motivo] + ".",
+                "4. Critérios de alto risco: " + (a.alto_risco ? a.criterios.map(function(x) { return LG.criterios[x]; }).join(" + ") : "não se aplicam; incluído pelo nível de risco ao titular") + ".",
+                "5. Compartilhamento: " + (["operador", "terceiros", "transferencia"].filter(function(k) { return f[k]; }).map(function(k) { return { operador: "operador", terceiros: "terceiros", transferencia: "transferência internacional" }[k]; }).join(", ") || "nenhum") + ".",
+                "6. Risco ao titular: impacto " + a.impacto + " × probabilidade " + a.probabilidade + " = nível " + a.nivel.replace("medio", "médio") + ".",
+                "7. Salvaguardas adotadas: " + (f.salvaguardas.map(function(s) { return LG.salvaguardas[s]; }).join(", ") || "nenhuma") + ".",
+                "8. Salvaguardas pendentes: " + (a.faltam.map(function(s) { return LG.salvaguardas[s]; }).join(", ") || "nenhuma") + ".",
+                "9. Direitos em destaque: " + (a.direitos.map(function(x) { return LG.direitos[x]; }).join("; ") || "os do art. 18, pelo canal do encarregado") + ".",
+                "10. Conclusão: " + (a.base === "invalida" ? "tratamento sem base legal adequada: suspender até a correção." : a.faltam.length ? "risco residual inaceitável até implementar as salvaguardas pendentes." : "risco residual aceitável com as salvaguardas adotadas, sujeito a revisão anual."), "");
+        });
+        var texto = L.join("\n") + "\n";
+        var cod = document.getElementById("lg-ripd");
+        cod.textContent = texto;
+        cod.setAttribute("data-fluxos", incluidos.map(function(f) { return f.id; }).join(","));
+        var av = fluxos.map(function(f) { return window.avaliarFluxoLgpd(f); });
+        if (incluidos.length && av.every(function(a) { return a.base !== "invalida" && !a.faltam.length; })) concluir("ripd");
+        return texto;
+    };
+
+    window.restaurarLgpd = function() {
+        fluxos = LG.fluxos.map(function(f) { var c = copia(f); delete c.esperado; delete c.correcao; return c; });
+        feitas = {}; novos = 0; editando = null;
+        renderizarMissoes();
+        editarFluxoLgpd(fluxos[0].id);
+        feitas = {}; renderizarMissoes();
+        document.getElementById("lg-ripd").textContent = "Clique em Gerar RIPD.";
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("lg-contexto").textContent = LG.contexto;
+        var tb = document.querySelector("#lg-tabela-bases tbody");
+        LG.bases_art7.concat(LG.bases_art11).forEach(function(b) {
+            var tr = el("tr"); tr.appendChild(el("td", b.nome, "font-weight: 600;")); tr.appendChild(el("td", b.artigo, "white-space: nowrap;")); tr.appendChild(el("td", b.quando)); tb.appendChild(tr);
+        });
+        restaurarLgpd();
+        if (typeof initChecklist === "function") {
+            initChecklist("lgpd");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
