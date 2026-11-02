@@ -1,11 +1,14 @@
 /* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — DESIGN SYSTEM BASE (base.css)
-   Compatível com temas Claro / Escuro, responsivo e 100% offline-ready.
+   ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
+   Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
+   seções tipadas e placas console em terminal, laboratório e diagrama.
+   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
+   simuladores vêm de laboratorio.css (embutido depois).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   3. Reset e Estilos Globais
+   1. Reset e estilos globais
    -------------------------------------------------------------------------- */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -17,9 +20,14 @@ img, select, input, textarea {
   max-width: 100%;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  scroll-padding-top: 72px;
   color-scheme: light dark;
 }
 
@@ -27,39 +35,44 @@ body {
   background-color: var(--ground);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: 15px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  padding: 0;
-  margin: 0;
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
-/* Tipografia Estrutural */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   font-weight: 700;
   color: var(--ink);
   line-height: 1.25;
-  margin-bottom: 0.75rem;
   letter-spacing: -0.01em;
+  margin-bottom: 0.6rem;
 }
 
-h1 { font-size: 2.25rem; }
-h2 { font-size: 1.75rem; margin-top: 2rem; border-bottom: 2px solid var(--rule); padding-bottom: 0.5rem; }
-h3 { font-size: 1.35rem; margin-top: 1.5rem; }
-h4 { font-size: 1.15rem; }
+h1 { font-size: 34px; line-height: 1.1; }
+h2 { font-size: 26px; line-height: 1.2; }
+h3 { font-size: 19px; line-height: 1.3; margin-top: 1.6rem; }
+h4 { font-size: 16px; margin-top: 1.2rem; }
 
 p {
   margin-bottom: 1rem;
 }
 
+ul, ol {
+  padding-left: 1.4em;
+  margin-bottom: 1rem;
+}
+
+li + li {
+  margin-top: 0.25rem;
+}
+
 a {
-  color: var(--t1-blue);
+  color: var(--accent);
   text-decoration: none;
   font-weight: 500;
-  transition: opacity var(--transition-fast);
 }
 
 a:hover {
@@ -68,11 +81,10 @@ a:hover {
 
 code, kbd, samp {
   font-family: var(--font-mono);
-  font-size: 0.88em;
+  font-size: 0.86em;
   background-color: var(--sunk);
-  padding: 0.15rem 0.35rem;
+  padding: 1px 5px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--rule);
 }
 
 :not(pre) > code {
@@ -81,13 +93,13 @@ code, kbd, samp {
 
 pre {
   font-family: var(--font-mono);
-  font-size: 0.9rem;
-  background-color: #0D1418;
-  color: #E2E8F0;
-  padding: 1rem;
+  font-size: 13px;
+  line-height: 1.6;
+  background-color: var(--console);
+  color: var(--console-ink);
+  padding: 14px 16px;
   border-radius: var(--radius-md);
   overflow-x: auto;
-  line-height: 1.5;
   margin-bottom: 1.25rem;
 }
 
@@ -96,39 +108,46 @@ pre code {
   padding: 0;
   border: none;
   color: inherit;
+  font-size: inherit;
+}
+
+/* Foco visível em todo controle (teclado). */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* --------------------------------------------------------------------------
-   4. Layout do Documento & Barra de Navegação Superior
+   2. Barra superior (.topbar) e progresso de rolagem (.readbar)
    -------------------------------------------------------------------------- */
-.top-nav {
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
+.topbar {
   position: sticky;
   top: 0;
-  z-index: 100;
-  backdrop-filter: blur(8px);
+  z-index: 20;
+  background: var(--surface);
+  border-bottom: 1px solid var(--rule);
 }
 
-.top-nav-inner {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0.75rem 1.25rem;
+.topbar-in {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: 16px;
+  height: 52px;
+  padding: 0 20px;
 }
 
 .nav-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
   color: var(--muted);
   text-decoration: none;
-  font-weight: 600;
-  transition: color var(--transition-fast);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .nav-back:hover {
@@ -136,33 +155,99 @@ pre code {
   text-decoration: none;
 }
 
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+.crumb {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.theme-toggle-btn {
-  background: var(--sunk);
+.crumb b, .crumb strong {
   color: var(--ink);
-  border: 1px solid var(--rule);
-  padding: 0.4rem 0.75rem;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  font-size: 0.85rem;
   font-weight: 600;
-  font-family: var(--font-body);
+}
+
+.tipo-atual {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--soft, var(--sunk));
+  color: var(--c, var(--ink));
 }
 
-.theme-toggle-btn:hover {
+.theme-toggle-btn, .toc-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--rule);
   background: var(--surface);
-  border-color: var(--muted);
+  color: var(--ink);
+  border-radius: var(--radius-md);
+  padding: 5px 10px;
+  font: 500 12px var(--font-body);
+  white-space: nowrap;
+  cursor: pointer;
 }
 
+.theme-toggle-btn:hover, .toc-toggle:hover {
+  border-color: var(--rule-strong);
+  background: var(--sunk);
+}
+
+/* O botão do sumário só aparece quando o sumário vira gaveta (< 1024 px). */
+.toc-toggle {
+  display: none;
+}
+
+/* Barra de progresso: o JS define --progresso (ex.: "40%") ou a largura do filho. */
+.readbar {
+  position: relative;
+  height: 3px;
+  background: transparent;
+}
+
+.readbar::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--progresso, 0%);
+  background: var(--accent);
+  transition: width 0.15s;
+}
+
+.readbar > * {
+  display: block;
+  height: 3px;
+  width: 0;
+  background: var(--accent);
+  transition: width 0.15s;
+}
+
+/* --------------------------------------------------------------------------
+   3. Esqueleto (.shell) e conteúdo (.content)
+   -------------------------------------------------------------------------- */
+.shell {
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr);
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.content {
+  min-width: 0;
+  max-width: 860px;
+  padding: 28px 40px 80px;
+}
+
+/* Contêiner legado de página (corpos e chassi anteriores ao redesenho). */
 .container {
   max-width: 960px;
   margin: 0 auto;
@@ -170,29 +255,976 @@ pre code {
 }
 
 /* --------------------------------------------------------------------------
-   5. Cabeçalho de Destaque (.hero-header) e Metadados
+   4. Sumário lateral (.toc)
    -------------------------------------------------------------------------- */
-.hero-header {
-  background-color: var(--surface);
+.toc {
+  position: sticky;
+  top: 55px;
+  height: calc(100vh - 55px);
+  overflow: auto;
+  border-right: 1px solid var(--rule);
+  padding: 22px 16px 20px 20px;
+  background: var(--ground);
+}
+
+.toc-rotulo {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.toc-modulo {
+  font: 700 17px/1.2 var(--font-display);
+  margin: 4px 0 10px;
+}
+
+/* "% lido": o texto é o percentual; a barra lê --progresso. */
+.toc-progresso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.toc-progresso::before {
+  content: "";
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background:
+    linear-gradient(var(--accent), var(--accent)) 0 0 / var(--progresso, 0%) 100% no-repeat,
+    var(--sunk);
+}
+
+.toc-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.toc-lista li + li {
+  margin-top: 0;
+}
+
+.toc-item {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: start;
+  padding: 7px 8px;
+  border-radius: var(--radius-md);
+  border-left: 3px solid transparent;
+  text-decoration: none;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.toc-item:hover {
+  background: var(--sunk);
+  text-decoration: none;
+}
+
+.toc-icone {
+  text-align: center;
+}
+
+.toc-tipo {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--c, var(--muted));
+}
+
+.toc-contador {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.toc-item.on {
+  background: var(--surface);
+  border-left-color: var(--c, var(--accent));
+  box-shadow: var(--shadow-sm);
+  font-weight: 600;
+}
+
+.toc-item.lida {
+  color: var(--muted);
+}
+
+.toc-item.lida .toc-contador:empty::after {
+  content: "✓";
+  color: var(--ok);
+  font-weight: 700;
+}
+
+.toc-pe {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+}
+
+.toc-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.toc-nav a {
+  color: var(--muted);
+}
+
+.btn-concluir {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  font: 600 13px var(--font-body);
+  cursor: pointer;
+  border: 1px solid var(--rule-strong);
+  background: var(--surface);
+  color: var(--ink);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.btn-concluir:hover {
+  border-color: var(--ok);
+}
+
+.btn-concluir.pronto {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: var(--surface);
+}
+
+.btn-concluir.concluido {
+  background: transparent;
+  border-color: var(--ok);
+  color: var(--ok);
+}
+
+/* --------------------------------------------------------------------------
+   5. Cabeçalho do módulo (.mhead)
+   -------------------------------------------------------------------------- */
+.mhead {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
   border: 1px solid var(--rule);
   border-radius: var(--radius-lg);
-  padding: 2rem;
-  margin-bottom: 2rem;
+  padding: 26px 28px 22px;
+  margin-bottom: 34px;
+}
+
+/* Filete na cor da trilha: o chassi define --track-color (ex.: var(--t11-fuchsia)). */
+.mhead::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: var(--track-color, var(--accent));
+}
+
+.mhead-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--track-color, var(--accent));
+}
+
+.mhead h1 {
+  font: 700 34px/1.1 var(--font-display);
+  letter-spacing: -0.01em;
+  margin: 6px 0 8px;
+}
+
+.mhead-sub {
+  color: var(--muted);
+  margin: 0 0 14px;
+  max-width: 62ch;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  font-size: 12px;
+  background: var(--sunk);
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+  color: var(--ink);
+}
+
+.chip b, .chip strong {
+  font-weight: 600;
+}
+
+.roadmap {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--rule);
+}
+
+.roadmap a {
+  display: block;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--soft, var(--sunk));
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 9px 10px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.roadmap a:hover {
+  border-color: var(--c, var(--rule-strong));
+  text-decoration: none;
+}
+
+.roadmap .toc-tipo {
+  margin-bottom: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   6. Seção tipada (.study-section[data-tipo] + .shead)
+   -------------------------------------------------------------------------- */
+[data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
+[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
+[data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
+[data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
+[data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
+
+.study-section {
+  margin: 0 0 56px;
+  scroll-margin-top: 72px;
+}
+
+.shead {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--c, var(--rule));
+}
+
+.stype {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c, var(--muted));
+  background: var(--soft, var(--sunk));
+  padding: 3px 10px 3px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.stype small {
+  font-size: inherit;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+.shead h2 {
+  font: 700 26px/1.2 var(--font-display);
+  margin: 0;
+}
+
+.study-section h3 {
+  margin: 26px 0 8px;
+}
+
+.lead-text {
+  font-size: 16.5px;
+  line-height: 1.7;
+}
+
+/* --------------------------------------------------------------------------
+   7. Caixas de destaque (.callout + tip | warning | danger | law | key)
+   -------------------------------------------------------------------------- */
+.callout, .callout.tip {
+  --cc: var(--tip-color);
+  --cs: var(--tip-bg);
+}
+
+.callout {
+  background: var(--cs);
+  border: 1px solid color-mix(in srgb, var(--cc) 25%, transparent);
+  border-left: 4px solid var(--cc);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin: 18px 0;
+}
+
+.callout.warning, .callout-warning { --cc: var(--warning-color); --cs: var(--warning-bg); }
+.callout.danger, .callout-danger { --cc: var(--danger-color); --cs: var(--danger-bg); }
+.callout.law, .callout-law { --cc: var(--law-color); --cs: var(--law-bg); }
+.callout.key { --cc: var(--accent); --cs: var(--accent-soft); }
+
+.callout-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--cc);
+  margin-bottom: 3px;
+}
+
+.callout-title strong {
+  font-weight: 700;
+}
+
+.callout-icon {
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.callout p:last-child, .callout ul:last-child, .callout ol:last-child {
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   8. Tabelas (.table-responsive > .data-table)
+   -------------------------------------------------------------------------- */
+.table-responsive {
+  width: 100%;
+  overflow: auto;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  margin: 16px 0;
+  background: var(--surface);
+}
+
+table, .data-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13.5px;
+  text-align: left;
+}
+
+th {
+  background: var(--sunk);
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  padding: 9px 12px;
+  color: var(--ink);
+}
+
+td {
+  padding: 9px 12px;
+  border-top: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+/* --------------------------------------------------------------------------
+   9. Terminal (.terminal-box): placa console nos dois temas
+   -------------------------------------------------------------------------- */
+.terminal-box {
+  background: var(--console);
+  border: 1px solid #1F2C36;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin: 18px 0;
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  background: #111C24;
+  color: #8FA3B1;
+  font: 500 12px var(--font-mono);
+}
+
+/* Três "luzes" da janela de terminal. */
+.terminal-header::before {
+  content: "";
+  flex: none;
+  width: 9px;
+  height: 9px;
+  margin-right: 28px;
+  border-radius: 50%;
+  background: #2A3A46;
+  box-shadow: 14px 0 0 #2A3A46, 28px 0 0 #2A3A46;
+}
+
+.terminal-title {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #8FA3B1;
+}
+
+.terminal-copy-btn, .btn-copy {
+  flex: none;
+  background: transparent;
+  border: 1px solid #2A3A46;
+  color: #8FA3B1;
+  border-radius: var(--radius-sm);
+  font: 500 11px var(--font-mono);
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.terminal-copy-btn:hover, .btn-copy:hover {
+  color: #FFFFFF;
+  border-color: #4B6170;
+}
+
+.terminal-box pre {
+  margin: 0;
+  padding: 14px 16px;
+  background: transparent;
+  border-radius: 0;
+  color: var(--console-ink);
+  font: 13px/1.6 var(--font-mono);
+  overflow: auto;
+}
+
+/* --------------------------------------------------------------------------
+   10. Diagramas (.diagram-box): cabeçalho claro + placa console com o SVG
+   -------------------------------------------------------------------------- */
+.diagram-box {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin: 18px 0;
+}
+
+.diagram-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.diagram-title {
+  color: var(--ink);
+}
+
+.diagram-badge {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Fundo console fixo nos dois temas: os SVGs são gerados com o tema escuro
+   do Mermaid e trazem textos e setas em tons claros. */
+.diagram-svg-wrap {
+  background: var(--console);
+  padding: 18px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  text-align: center;
+}
+
+.diagram-svg-wrap svg {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+  margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
+       Controles e saída internos ficam em laboratorio.css.
+   -------------------------------------------------------------------------- */
+.lab-box {
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin: 18px 0;
   box-shadow: var(--shadow-sm);
-  position: relative;
+}
+
+/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
+   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
+.lab-header {
+  --ink: #F1F7FA;
+  --muted: #9FB3C1;
+  background: var(--console);
+  color: var(--console-ink);
+  padding: 14px 18px;
+}
+
+.lab-header::before {
+  content: "// laboratório interativo";
+  display: block;
+  font: 500 11px var(--font-mono);
+  letter-spacing: 0.04em;
+  color: #2DD4BF;
+}
+
+.lab-header h3, .lab-header h4 {
+  font: 700 19px/1.25 var(--font-display);
+  color: #F1F7FA;
+  margin: 2px 0;
+}
+
+.lab-header p {
+  margin: 0;
+  font-size: 13px;
+  color: #9FB3C1;
+}
+
+.lab-header .lab-badge {
+  display: inline-block;
+  font: 500 11px var(--font-mono);
+  border: 1px solid #2DD4BF;
+  color: #2DD4BF;
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+  margin-top: 4px;
+}
+
+.lab-body {
+  padding: 18px;
+}
+
+/* --------------------------------------------------------------------------
+   12. Checklist (.checklist > .checklist-item)
+   -------------------------------------------------------------------------- */
+.checklist {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
   overflow: hidden;
 }
 
-.hero-header::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5px;
-  background-color: var(--track-color, var(--t1-blue));
+/* "N de M": o texto vem do JS; a barra lê --progresso. */
+.checklist-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--tipo-checklist-bg);
+  border: 1px solid var(--rule);
+  border-bottom: 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  font-size: 13px;
+  font-weight: 700;
 }
 
+.checklist-head::after {
+  content: "";
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background:
+    linear-gradient(var(--tipo-checklist), var(--tipo-checklist)) 0 0 / var(--progresso, 0%) 100% no-repeat,
+    var(--sunk);
+}
+
+.checklist-head + .checklist {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.checklist-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 11px 16px;
+  border-top: 1px solid var(--rule);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.checklist-item + .checklist-item {
+  margin-top: 0;
+}
+
+.checklist-item:first-child {
+  border-top: 0;
+}
+
+.checklist-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  border: 2px solid var(--rule-strong);
+  border-radius: 5px;
+  display: grid;
+  place-content: center;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.checklist-item input[type="checkbox"]:checked {
+  background: var(--tipo-checklist);
+  border-color: var(--tipo-checklist);
+}
+
+.checklist-item input[type="checkbox"]:checked::after {
+  content: "✓";
+  color: var(--surface);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.checklist-item label {
+  cursor: pointer;
+}
+
+.checklist-item.completed label {
+  color: var(--muted);
+}
+
+/* Barra de progresso do checklist legado (Fundamentos-Ciber). */
+.checklist-progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: var(--sunk);
+  border-radius: var(--radius-pill);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.checklist-progress-fill {
+  height: 100%;
+  background-color: var(--tipo-checklist);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+/* --------------------------------------------------------------------------
+   13. Questões de concurso: flashcards (.quiz-item[data-res])
+   -------------------------------------------------------------------------- */
+.quiz-score {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  font-size: 13px;
+}
+
+.quiz-score > span {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--sunk);
+  font-weight: 600;
+}
+
+.quiz-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.quiz-filtros button {
+  border: 1px solid var(--rule-strong);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+  font: 500 12px var(--font-body);
+  cursor: pointer;
+}
+
+.quiz-filtros button.on, .quiz-filtros button[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+
+.quiz-item {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--rule-strong);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin-bottom: 12px;
+}
+
+.quiz-item[data-res="acertei"] { border-left-color: var(--ok); }
+.quiz-item[data-res="errei"] { border-left-color: var(--bad); }
+.quiz-item[data-res="revisar"] { border-left-color: var(--warning-color); }
+
+.quiz-question {
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.quiz-question > strong:first-child {
+  color: var(--tipo-questoes);
+}
+
+.quiz-details > summary {
+  list-style: none;
+}
+
+.quiz-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.quiz-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  border: 1px solid var(--rule-strong);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: var(--radius-md);
+  padding: 6px 14px;
+  font: 600 13px var(--font-body);
+  cursor: pointer;
+}
+
+.quiz-toggle:hover, .quiz-details[open] > .quiz-toggle {
+  background: var(--sunk);
+}
+
+.quiz-answer {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: var(--tipo-questoes-bg);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+}
+
+.quiz-answer > :last-child {
+  margin-bottom: 0;
+}
+
+.quiz-selfeval {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.quiz-selfeval button {
+  border: 1px solid var(--rule-strong);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: var(--radius-md);
+  padding: 5px 12px;
+  font: 600 13px var(--font-body);
+  cursor: pointer;
+}
+
+.quiz-selfeval button[data-v="acertei"].on { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+.quiz-selfeval button[data-v="errei"].on { background: var(--bad); border-color: var(--bad); color: var(--surface); }
+.quiz-selfeval button[data-v="revisar"].on { background: var(--warning-color); border-color: var(--warning-color); color: var(--surface); }
+
+/* Múltipla escolha (Fundamentos-Ciber: quiz-item[data-formato="multipla"]). */
+.quiz-section {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  margin: 2rem 0;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.quiz-btn {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.quiz-btn:hover:not(:disabled) {
+  border-color: var(--tipo-questoes);
+  background-color: var(--tipo-questoes-bg);
+}
+
+.quiz-btn.correct {
+  background-color: var(--tip-bg) !important;
+  border-color: var(--ok) !important;
+  color: var(--ok) !important;
+  font-weight: 600;
+}
+
+.quiz-btn.incorrect {
+  background-color: var(--danger-bg) !important;
+  border-color: var(--bad) !important;
+  color: var(--bad) !important;
+}
+
+.quiz-feedback {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-top: 0.75rem;
+  border-left: 4px solid var(--rule);
+  background-color: var(--sunk);
+}
+
+.quiz-feedback.correct {
+  border-left-color: var(--ok);
+  background-color: var(--tip-bg);
+}
+
+.quiz-feedback.incorrect {
+  border-left-color: var(--bad);
+  background-color: var(--danger-bg);
+}
+
+/* --------------------------------------------------------------------------
+   14. Fatos essenciais (.facts-grid > .facts-card) e fim do módulo
+   -------------------------------------------------------------------------- */
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: 10px;
+  margin: 14px 0 22px;
+}
+
+.facts-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-size: 14px;
+}
+
+.facts-card h4 {
+  font: 700 15px/1.3 var(--font-display);
+  margin: 0 0 2px;
+}
+
+.facts-card p {
+  margin-bottom: 0;
+}
+
+.study-done {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  background: var(--surface);
+  border: 1px dashed var(--ok);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  font-size: 14px;
+}
+
+.study-done .btn-concluir {
+  width: auto;
+  flex: none;
+}
+
+.study-pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.study-pager a {
+  display: block;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+}
+
+.study-pager a:hover {
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+.study-pager a:last-child:not(:first-child) {
+  text-align: right;
+}
+
+.study-pager small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.study-pager b, .study-pager strong {
+  font: 700 16px var(--font-display);
+}
+
+/* --------------------------------------------------------------------------
+   15. Selos e metadados legados (.badge, .meta-bar)
+   -------------------------------------------------------------------------- */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -222,12 +1254,6 @@ pre code {
 .badge-t12 { background-color: rgba(15, 118, 110, 0.15); color: var(--t12-teal); }
 .badge-t13 { background-color: rgba(77, 124, 15, 0.15); color: var(--t13-lime); }
 
-.hero-subtitle {
-  font-size: 1.15rem;
-  color: var(--muted);
-  margin-bottom: 1.25rem;
-}
-
 .meta-bar {
   display: flex;
   flex-wrap: wrap;
@@ -249,791 +1275,74 @@ pre code {
 }
 
 /* --------------------------------------------------------------------------
-   6. Caixas de Destaque (.callout)
+   16. Responsividade, movimento reduzido e impressão (@media)
    -------------------------------------------------------------------------- */
-.callout {
-  padding: 1.1rem 1.35rem;
-  margin: 1.5rem 0;
-  border-radius: var(--radius-md);
-  border-left: 5px solid var(--muted);
-  background-color: var(--sunk);
-  font-size: 0.97rem;
-  line-height: 1.6;
-}
 
-.callout p:last-child {
-  margin-bottom: 0;
-}
-
-.callout strong {
-  display: inline-block;
-  margin-bottom: 0.25rem;
-}
-
-.callout-tip, .callout.tip {
-  border-left-color: var(--tip-color);
-  background-color: var(--tip-bg);
-}
-
-.callout-warning, .callout.warning {
-  border-left-color: var(--warning-color);
-  background-color: var(--warning-bg);
-}
-
-.callout-danger, .callout.danger {
-  border-left-color: var(--danger-color);
-  background-color: var(--danger-bg);
-}
-
-.callout-law, .callout.law {
-  border-left-color: var(--law-color);
-  background-color: var(--law-bg);
-}
-
-/* --------------------------------------------------------------------------
-   7. Bloco Terminal / Comandos (.terminal-box)
-   -------------------------------------------------------------------------- */
-.terminal-box {
-  background-color: #0A0F13;
-  color: #E2E8F0;
-  border: 1px solid #1E293B;
-  border-radius: var(--radius-md);
-  margin: 1.5rem 0;
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
-}
-
-.terminal-header {
-  background-color: #151E27;
-  padding: 0.5rem 0.85rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid #1E2B37;
-}
-
-.terminal-title {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: #94A3B8;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.terminal-title::before {
-  content: "● ● ●";
-  letter-spacing: 0.15rem;
-  color: #475569;
-  font-size: 0.65rem;
-}
-
-.btn-copy {
-  background-color: #243242;
-  color: #CBD5E1;
-  border: 1px solid #334155;
-  border-radius: var(--radius-sm);
-  padding: 0.25rem 0.6rem;
-  font-size: 0.75rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-copy:hover {
-  background-color: #334155;
-  color: #FFFFFF;
-}
-
-.terminal-box pre {
-  margin: 0;
-  background-color: transparent;
-  border-radius: 0;
-  padding: 1rem;
-  color: #E2E8F0;
-}
-
-/* --------------------------------------------------------------------------
-   8. Simulador / Painel de Laboratório (.lab-box)
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background-color: var(--surface);
-  border: 2px solid var(--rule);
-  border-radius: var(--radius-lg);
-  margin: 2rem 0;
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
-}
-
-.lab-header {
-  background-color: var(--sunk);
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--rule);
-}
-
-.lab-header h3 {
-  margin-top: 0;
-  margin-bottom: 0.35rem;
-  font-size: 1.3rem;
-  color: var(--ink);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.lab-header p {
-  color: var(--muted);
-  font-size: 0.95rem;
-  margin-bottom: 0;
-}
-
-.lab-body {
-  padding: 1.5rem;
-}
-
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-}
-
-.lab-output {
-  background-color: #0B1116;
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* Controles e Grid do Laboratório Interativo */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
+/* Abaixo de 1024 px o sumário vira gaveta sobreposta, aberta pelo .toc-toggle. */
+@media (max-width: 1023px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
   }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
+  .content {
+    max-width: none;
+    padding: 22px 24px 64px;
+  }
+  .toc-toggle {
+    display: inline-flex;
+  }
+  .toc {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 40;
+    width: min(300px, 86vw);
+    height: auto;
+    border-right: 1px solid var(--rule);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition: transform 0.2s ease, visibility 0.2s;
+  }
+  body.toc-aberto .toc {
+    transform: none;
+    visibility: visible;
+  }
+  body.toc-aberto::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: rgba(10, 16, 21, 0.45);
   }
 }
 
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-
-/* --------------------------------------------------------------------------
-   9. Botões e Controles Padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   10. Lista de Verificação Interativa (.checklist)
-   -------------------------------------------------------------------------- */
-.checklist {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  margin: 1.75rem 0;
-  box-shadow: var(--shadow-sm);
-}
-
-.checklist h4 {
-  font-size: 1.15rem;
-  margin-bottom: 0.5rem;
-  color: var(--ink);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.checklist-progress-bar {
-  width: 100%;
-  height: 6px;
-  background-color: var(--sunk);
-  border-radius: var(--radius-pill);
-  margin-bottom: 1rem;
-  overflow: hidden;
-}
-
-.checklist-progress-fill {
-  height: 100%;
-  background-color: var(--t2-green);
-  width: 0%;
-  transition: width 0.3s ease;
-}
-
-.check-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 0.65rem 0.75rem;
-  margin: 0.25rem 0;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  user-select: none;
-  transition: background-color var(--transition-fast);
-}
-
-.check-item:hover {
-  background-color: var(--sunk);
-}
-
-.check-item input[type="checkbox"] {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 1.25rem;
-  height: 1.25rem;
-  border: 2px solid var(--muted);
-  border-radius: var(--radius-sm);
-  background-color: var(--surface);
-  cursor: pointer;
-  flex-shrink: 0;
-  margin-top: 0.15rem;
-  position: relative;
-  transition: all var(--transition-fast);
-}
-
-.check-item input[type="checkbox"]:checked {
-  background-color: var(--t2-green);
-  border-color: var(--t2-green);
-}
-
-.check-item input[type="checkbox"]:checked::after {
-  content: "";
-  position: absolute;
-  left: 5px;
-  top: 1px;
-  width: 4px;
-  height: 8px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-.check-item span {
-  font-size: 0.95rem;
-  color: var(--ink);
-  line-height: 1.45;
-  transition: color var(--transition-fast);
-}
-
-.check-item.completed span {
-  text-decoration: line-through;
-  color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   11. Quiz de Fixação (.quiz, .quiz-item, .quiz-section)
-   -------------------------------------------------------------------------- */
-.quiz-section {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-lg);
-  padding: 1.75rem;
-  margin: 2rem 0;
-  box-shadow: var(--shadow-sm);
-}
-
-.quiz-section h3 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-}
-
-.quiz-item {
-  background-color: var(--sunk);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 1.25rem;
-  margin-bottom: 1.25rem;
-}
-
-.quiz-question {
-  font-weight: 600;
-  font-size: 1rem;
-  color: var(--ink);
-  margin-bottom: 0.85rem;
-}
-
-.quiz-options {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.quiz-btn {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.75rem 1rem;
-  text-align: left;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  line-height: 1.4;
-}
-
-.quiz-btn:hover:not(:disabled) {
-  border-color: var(--t1-blue);
-  background-color: var(--ground);
-}
-
-.quiz-btn.correct {
-  background-color: var(--tip-bg) !important;
-  border-color: var(--t2-green) !important;
-  color: var(--t2-green) !important;
-  font-weight: 600;
-}
-
-.quiz-btn.incorrect {
-  background-color: var(--danger-bg) !important;
-  border-color: var(--danger-color) !important;
-  color: var(--danger-color) !important;
-}
-
-.quiz-feedback {
-  padding: 0.85rem 1rem;
-  border-radius: var(--radius-md);
-  font-size: 0.9rem;
-  line-height: 1.5;
-  margin-top: 0.75rem;
-  border-left: 4px solid var(--rule);
-  background-color: var(--surface);
-}
-
-.quiz-feedback.correct {
-  border-left-color: var(--t2-green);
-  background-color: var(--tip-bg);
-  color: var(--ink);
-}
-
-.quiz-feedback.incorrect {
-  border-left-color: var(--danger-color);
-  background-color: var(--danger-bg);
-  color: var(--ink);
-}
-
-/* --------------------------------------------------------------------------
-   12. Grade de Fatos / Cards Comparativos (.facts-grid, .facts-card)
-   -------------------------------------------------------------------------- */
-.facts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  margin: 1.5rem 0;
-}
-
-.facts-card {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 1.25rem;
-  box-shadow: var(--shadow-sm);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.facts-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.facts-card h4 {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-  color: var(--ink);
-}
-
-.facts-card p {
-  color: var(--muted);
-  font-size: 0.92rem;
-  margin-bottom: 0;
-}
-
-/* --------------------------------------------------------------------------
-   13. Tabelas Técnicas Comparativas
-   -------------------------------------------------------------------------- */
-.table-responsive {
-  width: 100%;
-  overflow-x: auto;
-  margin: 1.5rem 0;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.92rem;
-  background-color: var(--surface);
-  text-align: left;
-}
-
-th, td {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--rule);
-}
-
-th {
-  background-color: var(--sunk);
-  font-family: var(--font-display);
-  font-weight: 700;
-  color: var(--ink);
-  letter-spacing: 0.02em;
-}
-
-tr:last-child td {
-  border-bottom: none;
-}
-
-tr:hover td {
-  background-color: var(--ground);
-}
-
-/* --------------------------------------------------------------------------
-   14. Diagramas de Arquitetura e Fluxo (Mermaid pré-compilado em SVG)
-   -------------------------------------------------------------------------- */
-.diagram-box {
-  background: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  margin: 1.5rem 0;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.diagram-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.65rem 1rem;
-  background: var(--ground);
-  border-bottom: 1px solid var(--rule);
-  font-size: 0.825rem;
-  font-weight: 600;
-  color: var(--muted);
-}
-
-.diagram-title {
-  font-family: var(--font-display);
-  font-weight: 700;
-  color: var(--ink);
-  letter-spacing: 0.02em;
-}
-
-.diagram-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: rgba(37, 99, 235, 0.15);
-  color: var(--accent);
-  border: 1px solid rgba(37, 99, 235, 0.3);
-  padding: 0.15rem 0.5rem;
-  border-radius: var(--radius-pill);
-  font-size: 0.725rem;
-  font-family: var(--font-mono);
-}
-
-.diagram-svg-wrap {
-  padding: 1.5rem;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  text-align: center;
-  /* Fundo escuro fixo nos dois temas, como o .terminal-box: os SVGs são gerados
-     com o tema escuro do Mermaid e trazem textos e setas em lightgrey. */
-  background: #172229;
-}
-
-.diagram-svg-wrap svg {
-  max-width: 100%;
-  height: auto;
-  display: inline-block;
-  margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   15. Rodapé e Referências
-   -------------------------------------------------------------------------- */
-.study-footer {
-  margin-top: 3.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--rule);
-  text-align: center;
-  font-size: 0.88rem;
-  color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   16. Responsividade & Impressão (@media)
-   -------------------------------------------------------------------------- */
 @media (max-width: 640px) {
-  h1 { font-size: 1.85rem; }
-  h2 { font-size: 1.45rem; }
-  .hero-header { padding: 1.25rem; }
-  .lab-body { padding: 1rem; }
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .top-nav-inner { padding: 0.5rem 1rem; }
-  .nav-title { display: none; }
-  .nav-actions .badge { display: none; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
+  h1 { font-size: 27px; }
+  h2 { font-size: 22px; }
+  .topbar-in { gap: 8px; padding: 0 12px; }
+  .crumb { display: none; }
+  .tipo-atual { margin-left: auto; }
+  .content { padding: 18px 16px 56px; }
+  .mhead { padding: 20px 18px 18px; }
+  .mhead h1 { font-size: 27px; }
+  .shead h2 { font-size: 22px; }
+  .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lab-body { padding: 14px; }
+  .quiz-filtros { margin-left: 0; }
+  .study-done { flex-direction: column; align-items: stretch; }
+  .study-done .btn-concluir { width: 100%; }
+  .study-pager { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
 @media print {
@@ -1041,14 +1350,18 @@ tr:hover td {
     background-color: #FFFFFF !important;
     color: #000000 !important;
   }
-  .top-nav, .theme-toggle-btn, .btn-copy, .lab-controls button {
+  .topbar, .toc, .theme-toggle-btn, .toc-toggle, .terminal-copy-btn, .btn-copy,
+  .quiz-filtros, .quiz-selfeval, .study-done, .study-pager {
     display: none !important;
   }
-  .container {
+  .shell {
+    display: block;
+  }
+  .content, .container {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .hero-header, .lab-box, .checklist, .quiz-section {
+  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;

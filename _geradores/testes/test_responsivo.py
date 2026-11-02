@@ -1,8 +1,11 @@
 """Testes de regressão da responsividade para celular (portal e treinamentos)."""
 
 import re
+import sys
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
 def bloco_media(css, consulta):
@@ -62,13 +65,13 @@ class TestTreinamentosResponsivos(unittest.TestCase):
     def setUp(self):
         self.root = Path(__file__).resolve().parent.parent.parent
         self.geradores = self.root / "_geradores"
-        self.css = (self.geradores / "base.css").read_text(encoding="utf-8")
+        from montar import carregar_css
+        self.css = carregar_css()
         self.mobile = bloco_media(self.css, "max-width: 640px")
 
     def test_barra_superior_mostra_so_voltar_e_tema(self):
-        """No celular, o título e o selo de trilha saem da barra superior."""
-        self.assertIn("display: none", regra(self.mobile, ".nav-title"))
-        self.assertIn("display: none", regra(self.mobile, ".nav-actions .badge"))
+        """No celular, o caminho Trilha / Estudo sai da barra superior."""
+        self.assertIn("display: none", regra(self.mobile, ".crumb"))
 
     def test_controles_de_laboratorio_encolhem(self):
         """Os filhos de .lab-controls podem encolher e não passam da largura disponível."""

@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from index_dados import TRILHAS  # noqa: E402
 
@@ -102,27 +103,9 @@ class TestAssets(unittest.TestCase):
         self.assertTrue(self.css_file.exists(), "base.css deve existir")
         content = self.css_file.read_text(encoding="utf-8")
 
-        classes_obrigatorias = [
-            ".callout",
-            ".callout-tip",
-            ".callout-warning",
-            ".callout-danger",
-            ".callout-law",
-            ".terminal-box",
-            ".btn-copy",
-            ".lab-box",
-            ".lab-header",
-            ".lab-controls",
-            ".lab-output",
-            ".checklist",
-            ".check-item",
-            ".quiz-item",
-            ".quiz-options",
-            ".quiz-feedback",
-            ".facts-grid",
-            ".facts-card",
-        ]
-        for cls in classes_obrigatorias:
+        from test_componentes_css import CLASSES_T3
+
+        for cls in CLASSES_T3:
             self.assertIn(cls, content, f"Classe de componente ausente no CSS: {cls}")
 
     def test_base_css_supports_dark_mode(self):
