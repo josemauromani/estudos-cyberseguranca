@@ -1,7 +1,7 @@
 # Design Spec: Redesenho de UI/UX — UI Kit, Página de Módulo e Portal
 
 **Data:** 2026-11-02
-**Status:** Em revisão pelo usuário
+**Status:** Aprovada (2026-11-02)
 **Repositório:** `estudos_cyberseguranca`
 **Specs anteriores:** [`2026-10-06-estudos-cyberseguranca-design.md`](2026-10-06-estudos-cyberseguranca-design.md), [`2026-10-17-diagramas-mermaid-design.md`](2026-10-17-diagramas-mermaid-design.md), [`2026-11-02-trilhas-especializacao-design.md`](2026-11-02-trilhas-especializacao-design.md)
 **Referência visual aprovada:** [`assets/2026-11-02-redesenho-ui-ux/mockup-modulo.html`](assets/2026-11-02-redesenho-ui-ux/mockup-modulo.html) e [`assets/2026-11-02-redesenho-ui-ux/mockup-portal.html`](assets/2026-11-02-redesenho-ui-ux/mockup-portal.html) (abrir no navegador; são funcionais)
