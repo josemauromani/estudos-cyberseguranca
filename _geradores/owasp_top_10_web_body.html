@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="owasp-web">
 
     <!-- SEÇÃO 1: O TOP 10 -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: A Aplicação É a Nova Borda</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: A Aplicação É a Nova Borda</h2>
 
         <p class="lead-text">
             Firewall, WAF e EDR protegem em volta da aplicação, mas não corrigem uma consulta montada com texto do usuário nem um endpoint que entrega o pedido de qualquer cliente a quem pedir. As falhas mais exploradas da web nascem no código, e por isso a correção também está no código. Neste estudo você vai atacar e corrigir a loja online da Ipê Store, o mesmo web-loja01 que você investigou no Estudo 34.
@@ -59,11 +56,8 @@ flowchart TD
     </section>
 
     <!-- SEÇÃO 2: INJEÇÃO, XSS, ACESSO E CSRF -->
-    <section class="study-section" id="falhas">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>Injeção, XSS, Controle de Acesso e CSRF</h2>
-        </div>
+    <section class="study-section" id="falhas" data-tipo="teoria">
+        <h2>Injeção, XSS, Controle de Acesso e CSRF</h2>
 
         <h3>Injeção de SQL</h3>
         <p>
@@ -123,11 +117,8 @@ Set-Cookie: sessao=...; Secure; HttpOnly; SameSite=Lax</code></pre>
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Playground de Injeção e Sanitização Web</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Playground de Injeção e Sanitização Web</h2>
 
         <p class="lead-text">
             Três partes da loja, cada uma com um botão para ligar a correção. Cumpra as missões: primeiro explore a falha, depois confirme que a correção a bloqueia. Nada aqui executa código de verdade: o SQL roda num motor de banco em miniatura e o HTML é analisado sem executar scripts.
@@ -194,11 +185,8 @@ Set-Cookie: sessao=...; Secure; HttpOnly; SameSite=Lax</code></pre>
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de Segurança de Aplicação Web</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de Segurança de Aplicação Web</h2>
 
         <p class="lead-text">
             Use esta lista numa revisão de código ou antes de publicar uma aplicação. O estado das caixas fica salvo no seu navegador.
@@ -237,11 +225,8 @@ Set-Cookie: sessao=...; Secure; HttpOnly; SameSite=Lax</code></pre>
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Entrevista</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -323,11 +308,8 @@ Set-Cookie: sessao=...; Secure; HttpOnly; SameSite=Lax</code></pre>
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">

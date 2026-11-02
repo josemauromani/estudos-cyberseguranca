@@ -3,29 +3,17 @@
      Corpo do Treinamento: Criptografia Simétrica, Assimétrica, Hashes e PKI
      ========================================================================== -->
 
-<header class="study-header">
-  <span class="study-track-kicker">Trilha 1: Fundamentos &amp; Redes Seguras &bull; Estudo 03</span>
-  <h1 class="study-title">Criptografia Prática</h1>
-  <p class="study-lead">
+<article class="study-container" data-slug="criptografia-pratica">
+<!-- SEÇÃO 1: INTRODUÇÃO E PILARES CRIPTOGRÁFICOS -->
+<section class="study-section" id="pilares-criptograficos" data-tipo="teoria">
+  <h2>Introdução e Pilares Fundamentais da Criptografia</h2>
+
+  <p class="lead-text">
     A criptografia é a espinha dorsal matemática de toda a segurança da informação contemporânea.
     Compreender a diferença entre cifras de bloco e fluxo, o poder das curvas elípticas, a unidirecionalidade
     das funções hash e a cadeia de confiança X.509 é essencial para garantir confidencialidade, integridade,
     autenticidade e não-repúdio em aplicações modernas.
   </p>
-  <div class="study-meta-bar">
-    <span class="badge blue">NIST CSF 2.0: Protect (PR)</span>
-    <span class="badge slate">MITRE ATT&amp;CK: T1003, T1552, T1557</span>
-    <span class="badge slate">Tempo Estimado: ~45 minutos</span>
-    <span class="badge slate">Carreiras: Blue Team &bull; AppSec &bull; GRC</span>
-  </div>
-</header>
-
-<!-- SEÇÃO 1: INTRODUÇÃO E PILARES CRIPTOGRÁFICOS -->
-<section class="study-section" id="pilares-criptograficos">
-  <div class="section-title-wrap">
-    <span class="section-num">01</span>
-    <h2>Introdução e Pilares Fundamentais da Criptografia</h2>
-  </div>
 
   <p>
     Historicamente vista como a arte de ocultar mensagens militares, a criptografia moderna é uma ciência exata
@@ -73,11 +61,8 @@
 </section>
 
 <!-- SEÇÃO 2: ALGORITMOS, MODOS E ARQUITETURAS -->
-<section class="study-section" id="algoritmos-modos">
-  <div class="section-title-wrap">
-    <span class="section-num">02</span>
-    <h2>Criptografia Simétrica, Assimétrica, Hashes e PKI</h2>
-  </div>
+<section class="study-section" id="algoritmos-modos" data-tipo="teoria">
+  <h2>Criptografia Simétrica, Assimétrica, Hashes e PKI</h2>
 
   <h3>1. Criptografia Simétrica: Velocidade e Cifras Modernas</h3>
   <p>
@@ -147,7 +132,7 @@
     <li><strong>Chave Privada:</strong> Mantida sob sigilo absoluto pelo proprietário. Utilizada para <em>decifrar</em> dados recebidos ou para <em>assinar digitalmente</em> documentos.</li>
   </ul>
 
-  <div class="callout info">
+  <div class="callout key">
     <h4>RSA vs Curvas Elípticas (ECC) e Perfect Forward Secrecy</h4>
     <p>
       O <strong>RSA</strong> baseia sua segurança na dificuldade de fatorar o produto de dois grandes números primos.
@@ -231,11 +216,8 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 3: LABORATÓRIO INTERATIVO -->
-<section class="study-section" id="laboratorio-cripto">
-  <div class="section-title-wrap">
-    <span class="section-num">03</span>
-    <h2>Laboratório Interativo: Web Crypto API Nativa</h2>
-  </div>
+<section class="study-section" id="laboratorio-cripto" data-tipo="laboratorio">
+  <h2>Laboratório Interativo: Web Crypto API Nativa</h2>
 
   <p>
     O laboratório abaixo executa operações criptográficas <strong>reais e matematicamente autênticas</strong>
@@ -361,87 +343,66 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 4: CHECKLIST PRÁTICO -->
-<section class="study-section" id="checklist-cripto">
-  <div class="section-title-wrap">
-    <span class="section-num">04</span>
-    <h2>Checklist de Auditoria e Governança Criptográfica</h2>
-  </div>
+<section class="study-section" id="checklist-cripto" data-tipo="checklist">
+  <h2>Checklist de Auditoria e Governança Criptográfica</h2>
 
   <p>
     Utilize este checklist em análises de arquitetura, testes de intrusão ou auditorias de conformidade (PCI-DSS,
     ISO 27001, LGPD). O estado dos itens é preservado no <code>localStorage</code> do seu navegador.
   </p>
 
-  <div class="checklist">
     <div class="checklist-header">
       <h3>Procedimento de Verificação de Segurança Criptográfica</h3>
-      <div class="checklist-progress-bar"><div class="progress-fill" id="chk-progress"></div></div>
     </div>
-    <ul class="checklist-items">
+    <ul class="checklist">
       <li class="checklist-item">
-        <label>
-          <input type="checkbox" id="chk-c1">
-          <span class="chk-label">
+        <input type="checkbox" id="chk-c1">
+        <label for="chk-c1">
             <strong>1. Banimento Total de Algoritmos Fracos ou Obsoletos:</strong>
             Certifique-se de que algoritmos descontinuados (MD5, SHA-1, DES, 3DES, RC4) e modos inseguros como AES-ECB estejam terminantemente desativados em servidores web, APIs, bancos de dados e código-fonte.
-          </span>
-        </label>
+          </label>
       </li>
       <li class="checklist-item">
-        <label>
-          <input type="checkbox" id="chk-c2">
-          <span class="chk-label">
+        <input type="checkbox" id="chk-c2">
+        <label for="chk-c2">
             <strong>2. Adoção de Suítes de Cifragem com Autenticação (AEAD):</strong>
             Dê preferência estrita ao AES-GCM (AES-128-GCM ou AES-256-GCM) ou ChaCha20-Poly1305 para qualquer nova rotina de cifragem simétrica, garantindo confidencialidade e integridade simultâneas.
-          </span>
-        </label>
+          </label>
       </li>
       <li class="checklist-item">
-        <label>
-          <input type="checkbox" id="chk-c3">
-          <span class="chk-label">
+        <input type="checkbox" id="chk-c3">
+        <label for="chk-c3">
             <strong>3. Configuração Adequada de Hashing de Senhas:</strong>
             Valide que o sistema não armazena credenciais em texto claro nem com funções de hash rápido (MD5, SHA-1, SHA-256 puro). Utilize algoritmos de derivação lentos com salting único por usuário: <em>Argon2id</em> (preferencial), <em>bcrypt</em> (fator de custo &ge; 12) ou <em>PBKDF2-HMAC-SHA256</em> (&ge; 600.000 iterações).
-          </span>
-        </label>
+          </label>
       </li>
       <li class="checklist-item">
-        <label>
-          <input type="checkbox" id="chk-c4">
-          <span class="chk-label">
+        <input type="checkbox" id="chk-c4">
+        <label for="chk-c4">
             <strong>4. Garantia de Perfect Forward Secrecy (PFS) no TLS:</strong>
             Configure servidores HTTPS para priorizar TLS 1.3 ou, no TLS 1.2, desative trocas de chaves RSA estáticas em favor de suítes baseadas em Diffie-Hellman efêmero (ECDHE).
-          </span>
-        </label>
+          </label>
       </li>
       <li class="checklist-item">
-        <label>
-          <input type="checkbox" id="chk-c5">
-          <span class="chk-label">
+        <input type="checkbox" id="chk-c5">
+        <label for="chk-c5">
             <strong>5. Ciclo de Vida e Renovação Automatizada de Certificados X.509:</strong>
             Monitore prazos de validade com alertas prévios (&ge; 30 dias) ou utilize protocolos automatizados como o ACME (Let's Encrypt / Certbot) para evitar interrupções de serviço por certificados expirados.
-          </span>
-        </label>
+          </label>
       </li>
       <li class="checklist-item">
-        <label>
-          <input type="checkbox" id="chk-c6">
-          <span class="chk-label">
+        <input type="checkbox" id="chk-c6">
+        <label for="chk-c6">
             <strong>6. Segregação e Armazenamento Seguro de Chaves Privadas:</strong>
             Assegure que chaves privadas e segredos nunca estejam versionados em repositórios de código (Git). Empregue cofres de segredos (HashiCorp Vault, AWS Secrets Manager, Azure Key Vault) ou Módulos de Segurança de Hardware (HSM).
-          </span>
-        </label>
+          </label>
       </li>
     </ul>
-  </div>
 </section>
 
 <!-- SEÇÃO 5: QUESTÕES DE FIXAÇÃO -->
-<section class="study-section" id="questoes-fixacao">
-  <div class="section-title-wrap">
-    <span class="section-num">05</span>
-    <h2>Questões de Fixação e Concursos Públicos</h2>
-  </div>
+<section class="study-section" id="questoes-fixacao" data-tipo="questoes">
+  <h2>Questões de Fixação e Concursos Públicos</h2>
 
   <p>
     Analise os cenários abaixo, responda mentalmente e expanda para conferir o gabarito fundamentado com foco em
@@ -450,8 +411,8 @@ flowchart TD
 
   <div class="quiz-container">
     <!-- Questão 1 -->
-    <details class="quiz-item">
-      <summary class="quiz-summary">
+    <div class="quiz-item">
+      <div class="quiz-summary">
         <span class="quiz-tag">Questão 1 &bull; TLS &bull; Perfect Forward Secrecy</span>
         <p class="quiz-question">
           Um adversário avançado realizou a captura passiva de terabytes de tráfego HTTPS criptografado entre clientes
@@ -460,7 +421,9 @@ flowchart TD
           TLS 1.3 utilizando a suíte de troca de chaves ECDHE (Elliptic Curve Diffie-Hellman Ephemeral), o atacante
           conseguirá decifrar o tráfego histórico gravado? Justifique.
         </p>
-      </summary>
+      </div>
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta explicada</summary>
       <div class="quiz-answer">
         <div class="answer-badge correct">Resposta Correta: NÃO, o tráfego histórico continuará seguro devido ao Perfect Forward Secrecy (PFS).</div>
         <p><strong>Fundamentação Técnica:</strong></p>
@@ -473,18 +436,21 @@ flowchart TD
           efêmeras de sessão e é matematicamente incapaz de decifrar o histórico capturado.
         </p>
       </div>
-    </details>
+      </details>
+    </div>
 
     <!-- Questão 2 -->
-    <details class="quiz-item">
-      <summary class="quiz-summary">
+    <div class="quiz-item">
+      <div class="quiz-summary">
         <span class="quiz-tag">Questão 2 &bull; Funções Hash &bull; Ataques de Colisão</span>
         <p class="quiz-question">
           Diferencie uma "Colisão de Hash" de um "Ataque de Pré-Imagem" e explique por que a demonstração de colisão prática
           em algoritmos como MD5 e SHA-1 compromete imediatamente a confiabilidade de sistemas de assinatura digital de contratos
           e emissão de certificados digitais.
         </p>
-      </summary>
+      </div>
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta explicada</summary>
       <div class="quiz-answer">
         <div class="answer-badge correct">Resposta Correta: A colisão permite forjar documentos legítimos e maliciosos com o mesmo resumo assinado.</div>
         <p><strong>Fundamentação Técnica:</strong></p>
@@ -495,18 +461,21 @@ flowchart TD
           Em assinaturas digitais, assina-se o hash do documento. Se um atacante consegue gerar um contrato inofensivo <code>M1</code> e um contrato malicioso <code>M2</code> com o mesmo hash, ele pode colher a assinatura legítima em <code>M1</code> e anexá-la a <code>M2</code>, que será validada como perfeitamente autêntica pela vítima.
         </p>
       </div>
-    </details>
+      </details>
+    </div>
 
     <!-- Questão 3 -->
-    <details class="quiz-item">
-      <summary class="quiz-summary">
+    <div class="quiz-item">
+      <div class="quiz-summary">
         <span class="quiz-tag">Questão 3 &bull; Infraestrutura PKI &bull; Validação de Revogação</span>
         <p class="quiz-question">
           Ao acessar um website via HTTPS, o navegador precisa verificar se o certificado do servidor foi revogado antes
           de seu vencimento natural. Quais são as principais limitações das Listas de Revogação de Certificados (CRL) e
           como a tecnologia de OCSP Stapling soluciona os problemas simultâneos de latência e privacidade dos usuários?
         </p>
-      </summary>
+      </div>
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta explicada</summary>
       <div class="quiz-answer">
         <div class="answer-badge correct">Resposta Correta: O OCSP Stapling elimina a consulta do cliente ao servidor da CA, reduzindo latência e protegendo a privacidade.</div>
         <p><strong>Fundamentação Técnica:</strong></p>
@@ -516,16 +485,14 @@ flowchart TD
           O <strong>OCSP Stapling (RFC 6066)</strong> resolve ambos: o próprio servidor web consulta periodicamente a CA, armazena a resposta de status assinada em cache e a "grampeia" (staple) diretamente dentro do handshake TLS enviado ao navegador do usuário.
         </p>
       </div>
-    </details>
+      </details>
+    </div>
   </div>
 </section>
 
 <!-- SEÇÃO 6: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
-<section class="study-section" id="fatos-essenciais">
-  <div class="section-title-wrap">
-    <span class="section-num">06</span>
-    <h2>Fatos Essenciais e Conexões da Trilha</h2>
-  </div>
+<section class="study-section" id="fatos-essenciais" data-tipo="referencias">
+  <h2>Fatos Essenciais e Conexões da Trilha</h2>
 
   <p>
     Tabela de referência rápida de forças criptográficas equivalentes segundo a recomendação oficial do <strong>NIST SP 800-57</strong>:
@@ -579,6 +546,7 @@ flowchart TD
     </div>
   </div>
 </section>
+</article>
 
 <!-- ==========================================================================
      SCRIPT DO LABORATÓRIO INTERATIVO (Web Crypto API Nativa em Vanilla JS)

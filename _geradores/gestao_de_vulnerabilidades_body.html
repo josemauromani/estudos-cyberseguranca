@@ -3,10 +3,12 @@
      Corpo do Treinamento: CVE, CVSS v3.1/v4.0 e Priorização de Patches
      ========================================================================== -->
 
-<header class="study-header">
-  <span class="study-track-kicker">Trilha 2: Segurança Defensiva &bull; Estudo 09</span>
-  <h1 class="study-title">Gestão de Vulnerabilidades: CVE, CVSS v3.1/v4.0 e Priorização com EPSS e KEV</h1>
-  <p class="study-lead">
+<article class="study-container" data-slug="gestao-de-vulnerabilidades">
+<!-- SEÇÃO 1: O CICLO DE VIDA DA VULNERABILIDADE E O ECOSSISTEMA CVE -->
+<section class="study-section" id="ecossistema-cve" data-tipo="teoria">
+  <h2>O Ciclo de Vida da Vulnerabilidade e o Ecossistema Global (CVE / NVD)</h2>
+
+  <p class="lead-text">
     Em uma grande organização, ferramentas de varredura automatizada frequentemente reportam milhares de vulnerabilidades
     abertas em servidores, aplicações e ativos em nuvem. Tentar corrigir todas as falhas indiscriminadamente paralisa
     as equipes de desenvolvimento e infraestrutura. A moderna engenharia de segurança defensiva baseia-se na
@@ -15,20 +17,6 @@
     e correlacionar esses dados com a probabilidade preditiva de exploração do <strong>EPSS</strong> e a confirmação
     irrefutável do catálogo <strong>CISA KEV</strong> é indispensável para priorizar patches críticos com precisão cirúrgica.
   </p>
-  <div class="study-meta-bar">
-    <span class="badge green">NIST CSF 2.0: Identify / Protect (ID.RA / PR.PS)</span>
-    <span class="badge slate">MITRE ATT&amp;CK: TA0001, T1190</span>
-    <span class="badge slate">Tempo Estimado: ~45 minutos</span>
-    <span class="badge slate">Carreiras: Blue Team &bull; GRC &bull; SOC &bull; DevSecOps</span>
-  </div>
-</header>
-
-<!-- SEÇÃO 1: O CICLO DE VIDA DA VULNERABILIDADE E O ECOSSISTEMA CVE -->
-<section class="study-section" id="ecossistema-cve">
-  <div class="section-title-wrap">
-    <span class="section-num">01</span>
-    <h2>O Ciclo de Vida da Vulnerabilidade e o Ecossistema Global (CVE / NVD)</h2>
-  </div>
 
   <p>
     Uma <strong>Vulnerabilidade de Segurança</strong> é uma fraqueza ou falha computacional na lógica, arquitetura,
@@ -91,11 +79,8 @@
 </section>
 
 <!-- SEÇÃO 2: O PADRÃO CVSS V3.1 E AS INOVAÇÕES DO CVSS V4.0 -->
-<section class="study-section" id="padroes-cvss">
-  <div class="section-title-wrap">
-    <span class="section-num">02</span>
-    <h2>O Padrão CVSS v3.1 e as Inovações do CVSS v4.0</h2>
-  </div>
+<section class="study-section" id="padroes-cvss" data-tipo="teoria">
+  <h2>O Padrão CVSS v3.1 e as Inovações do CVSS v4.0</h2>
 
   <p>
     O <strong>Common Vulnerability Scoring System (CVSS)</strong>, mantido pelo consórcio global <strong>FIRST (Forum of Incident Response and Security Teams)</strong>,
@@ -227,11 +212,8 @@ flowchart LR
 </section>
 
 <!-- SEÇÃO 3: A TRÍADE MODERNA DE PRIORIZAÇÃO (CVSS + EPSS + KEV) -->
-<section class="study-section" id="triade-priorizacao">
-  <div class="section-title-wrap">
-    <span class="section-num">03</span>
-    <h2>A Tríade Moderna de Priorização: CVSS + EPSS + CISA KEV</h2>
-  </div>
+<section class="study-section" id="triade-priorizacao" data-tipo="teoria">
+  <h2>A Tríade Moderna de Priorização: CVSS + EPSS + CISA KEV</h2>
 
   <p>
     O maior erro conceitual em gestão de vulnerabilidades é assumir que <em>Severidade Teórica (CVSS)</em> é igual a <em>Risco Real</em>.
@@ -283,11 +265,8 @@ flowchart LR
 </section>
 
 <!-- SEÇÃO 4: REMEDIAÇÃO, MITIGAÇÃO E SLAS -->
-<section class="study-section" id="remediacao-mitigacao-sla">
-  <div class="section-title-wrap">
-    <span class="section-num">04</span>
-    <h2>Remediação, Mitigação e SLAs de Correção Corporativos</h2>
-  </div>
+<section class="study-section" id="remediacao-mitigacao-sla" data-tipo="teoria">
+  <h2>Remediação, Mitigação e SLAs de Correção Corporativos</h2>
 
   <p>
     Diante de uma vulnerabilidade confirmada, a equipe de segurança e sustentação de TI possui três cursos de ação possíveis:
@@ -361,11 +340,8 @@ flowchart LR
 </section>
 
 <!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (CALCULADORA CVSS & PRIORIZADOR) -->
-<section class="study-section" id="laboratorio-pratico">
-  <div class="section-title-wrap">
-    <span class="section-num">05</span>
-    <h2>Laboratório Interativo: Calculadora Vetorial CVSS v3.1 e Priorizador de Risco</h2>
-  </div>
+<section class="study-section" id="laboratorio-pratico" data-tipo="laboratorio">
+  <h2>Laboratório Interativo: Calculadora Vetorial CVSS v3.1 e Priorizador de Risco</h2>
 
   <p>
     Experimente na prática a mecânica matemática oficial do algoritmo CVSS v3.1 e o cruzamento com dados de ameaças ativas.
@@ -522,86 +498,74 @@ flowchart LR
 </section>
 
 <!-- SEÇÃO 6: CHECKLIST PRÁTICO -->
-<section class="study-section" id="checklist-gestao-vulns">
-  <div class="section-title-wrap">
-    <span class="section-num">06</span>
-    <h2>Checklist de Aplicação Prática: Gestão de Vulnerabilidades Baseada em Risco</h2>
-  </div>
+<section class="study-section" id="checklist-gestao-vulns" data-tipo="checklist">
+  <h2>Checklist de Aplicação Prática: Gestão de Vulnerabilidades Baseada em Risco</h2>
 
   <p>
     Utilize este checklist técnico durante revisões de governança, auditorias de conformidade com o NIST CSF 2.0
     ou estruturação de programas de gerenciamento de patches corporativos:
   </p>
 
-  <div class="checklist" id="checklist-gestao-vulnerabilidades">
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+  <ul class="checklist" id="checklist-gestao-vulnerabilidades">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_0">
+      <label for="list_0_0">
         <strong>Integração Obrigatória com o Catálogo CISA KEV:</strong>
         O pipeline de priorização de segurança correlaciona diariamente os achados de varredura com o catálogo KEV,
         disparando fluxo de remediação emergencial de 48 horas para qualquer vulnerabilidade explorada na selva.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_1">
+      <label for="list_0_1">
         <strong>Uso do EPSS para Filtrar Falsas Prioridades:</strong>
         A equipe de segurança avalia a probabilidade preditiva de exploração (EPSS) antes de escalonar alertas para a engenharia,
         evitando paradas emergenciais de trabalho para falhas de alto CVSS teórico mas com probabilidade quase nula de ataque real.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_2">
+      <label for="list_0_2">
         <strong>SLAs de Correção Formalmente Definidos e Monitorados:</strong>
         Existem metas contratuais e corporativas claras de tempo máximo para correção (Crítica KEV &le; 48h, Alta &le; 15 dias, Média &le; 30 dias),
         com acompanhamento contínuo de métricas de MTTR (Mean Time to Remediate).
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_3">
+      <label for="list_0_3">
         <strong>Plano Formal de Mitigações e Controles Compensatórios:</strong>
         Quando um patch do fabricante não puder ser aplicado imediatamente em sistemas legados críticos,
         aplica-se obrigatoriamente um controle compensatório documentado (regras de WAF, isolamento em VLAN/DMZ ou IPS inline).
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_4">
+      <label for="list_0_4">
         <strong>Re-varredura Sistemática Pós-Remediação:</strong>
         Nenhum ticket de vulnerabilidade é encerrado com base na alegação do administrador; o encerramento exige
         uma varredura automatizada subsequente confirmando que o software foi atualizado e que o scanner não detecta mais a falha.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_5">
+      <label for="list_0_5">
         <strong>Programa de Divulgação Coordenada e Canal de Reporte Seguro:</strong>
         A organização mantém um canal seguro documentado (ex: arquivo <code>security.txt</code> na raiz do domínio)
         e uma política clara de Coordinated Vulnerability Disclosure para receber alertas de pesquisadores éticos externos.
-      </span>
-    </label>
-  </div>
+      </label>
+    </li>
+  </ul>
 </section>
 
 <!-- SEÇÃO 7: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
-<section class="study-section" id="questoes-fixacao">
-  <div class="section-title-wrap">
-    <span class="section-num">07</span>
-    <h2>Questões de Fixação e Concursos Públicos</h2>
-  </div>
+<section class="study-section" id="questoes-fixacao" data-tipo="questoes">
+  <h2>Questões de Fixação e Concursos Públicos</h2>
 
   <p>
     Valide sua preparação respondendo a questões baseadas em provas de concursos para Analista de Tecnologia e Segurança
@@ -621,9 +585,9 @@ flowchart LR
           e qual é o impacto direto no cálculo final do score?
         </p>
       </div>
-      <details class="quiz-answer">
-        <summary>Ver resposta comentada</summary>
-        <div class="quiz-explanation">
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
           <p>
             <strong>Gabarito: Métrica de Escopo (Scope - S), definida como "Scope: Changed (S:C)", o que amplia significativamente o multiplicador de impacto e eleva o score final da vulnerabilidade.</strong>
           </p>
@@ -645,9 +609,9 @@ flowchart LR
           <br>Considerando as melhores práticas contemporâneas de Gestão de Vulnerabilidades Baseada em Risco (RBVM), qual vulnerabilidade deve ser corrigida primeiro pela equipe de segurança?
         </p>
       </div>
-      <details class="quiz-answer">
-        <summary>Ver resposta comentada</summary>
-        <div class="quiz-explanation">
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
           <p>
             <strong>Gabarito: A Vulnerabilidade Beta deve ser corrigida em caráter de emergência imediata (SLA &le; 48 horas), antes da Vulnerabilidade Alfa.</strong>
           </p>
@@ -668,9 +632,9 @@ flowchart LR
           em relação ao seu antecessor v3.1?
         </p>
       </div>
-      <details class="quiz-answer">
-        <summary>Ver resposta comentada</summary>
-        <div class="quiz-explanation">
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
           <p>
             <strong>Gabarito: A eliminação da métrica ambígua de "Scope" em prol da divisão explícita do impacto entre o Sistema Vulnerável (VC, VI, VA) e Sistemas Subsequentes (SC, SI, SA), além de novas métricas de segurança física humana (Safety).</strong>
           </p>
@@ -684,11 +648,8 @@ flowchart LR
 </section>
 
 <!-- SEÇÃO 8: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
-<section class="study-section" id="fatos-essenciais">
-  <div class="section-title-wrap">
-    <span class="section-num">08</span>
-    <h2>Fatos Essenciais &bull; Trilha 2: Segurança Defensiva</h2>
-  </div>
+<section class="study-section" id="fatos-essenciais" data-tipo="referencias">
+  <h2>Fatos Essenciais &bull; Trilha 2: Segurança Defensiva</h2>
 
   <div class="facts-grid">
     <div class="facts-card">
@@ -717,6 +678,7 @@ flowchart LR
     </div>
   </div>
 </section>
+</article>
 
 <!-- SCRIPT EMBUTIDO: CALCULADORA CVSS V3.1 E PRIORIZADOR EPSS/KEV -->
 <script>

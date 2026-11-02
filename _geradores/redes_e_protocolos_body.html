@@ -3,28 +3,16 @@
      Corpo do Treinamento: TCP/IP, DNS, Roteamento e Inspeção de Tráfego
      ========================================================================== -->
 
-<header class="study-header">
-  <span class="study-track-kicker">Trilha 1: Fundamentos &amp; Redes Seguras &bull; Estudo 02</span>
-  <h1 class="study-title">Redes e Protocolos</h1>
-  <p class="study-lead">
+<article class="study-container" data-slug="redes-e-protocolos">
+<!-- SEÇÃO 1: INTRODUÇÃO E MODELOS DE REDE -->
+<section class="study-section" id="modelos-rede" data-tipo="teoria">
+  <h2>Modelos de Rede, Camadas e Encapsulamento</h2>
+
+  <p class="lead-text">
     A cibersegurança operacional começa na camada de transporte e roteamento. Compreender a anatomia dos
     cabeçalhos IPv4, o controle de estado do TCP, a leveza do UDP e os mecanismos de resolução do DNS é o
     alicerce indispensável para dissecar ataques, configurar firewalls e identificar anomalias em capturas de tráfego.
   </p>
-  <div class="study-meta-bar">
-    <span class="badge blue">NIST CSF 2.0: Protect (PR) &amp; Detect (DE)</span>
-    <span class="badge slate">MITRE ATT&amp;CK: T1046, T1071, T1557</span>
-    <span class="badge slate">Tempo Estimado: ~50 minutos</span>
-    <span class="badge slate">Carreiras: Blue Team &bull; Red Team &bull; SOC L1/L2</span>
-  </div>
-</header>
-
-<!-- SEÇÃO 1: INTRODUÇÃO E MODELOS DE REDE -->
-<section class="study-section" id="modelos-rede">
-  <div class="section-title-wrap">
-    <span class="section-num">01</span>
-    <h2>Modelos de Rede, Camadas e Encapsulamento</h2>
-  </div>
 
   <p>
     Para proteger ou investigar uma rede, o profissional de segurança deve visualizar como a informação transita
@@ -110,11 +98,8 @@
 </section>
 
 <!-- SEÇÃO 2: DISSECAÇÃO DOS PROTOCOLOS -->
-<section class="study-section" id="dissecacao-protocolos">
-  <div class="section-title-wrap">
-    <span class="section-num">02</span>
-    <h2>Dissecação dos Protocolos: IPv4, TCP, UDP, DNS e ARP</h2>
-  </div>
+<section class="study-section" id="dissecacao-protocolos" data-tipo="teoria">
+  <h2>Dissecação dos Protocolos: IPv4, TCP, UDP, DNS e ARP</h2>
 
   <h3>1. Anatomia do Cabeçalho IPv4</h3>
   <p>
@@ -135,7 +120,7 @@
     Sequência (SEQ)</strong> e <strong>Números de Confirmação (ACK)</strong>, iniciada pelo <strong>3-Way Handshake</strong>:
   </p>
 
-  <div class="callout info">
+  <div class="callout key">
     <h4>O Ciclo do 3-Way Handshake</h4>
     <ol>
       <li><strong>Cliente &rarr; Servidor [SYN]:</strong> O cliente envia uma solicitação de sincronização com seu <em>Initial Sequence Number (ISN_c)</em>. Exemplo: <code>SEQ = 1000</code>, flag <code>SYN=1</code>.</li>
@@ -247,11 +232,8 @@ sequenceDiagram
 </section>
 
 <!-- SEÇÃO 3: LABORATÓRIO / SIMULADOR INTERATIVO -->
-<section class="study-section" id="laboratorio-inspetor">
-  <div class="section-title-wrap">
-    <span class="section-num">03</span>
-    <h2>Laboratório Interativo: Inspetor Visual de Pacotes e Probe de Portas</h2>
-  </div>
+<section class="study-section" id="laboratorio-inspetor" data-tipo="laboratorio">
+  <h2>Laboratório Interativo: Inspetor Visual de Pacotes e Probe de Portas</h2>
 
   <p>
     Utilize o simulador abaixo para manipular cabeçalhos IPv4 e TCP/UDP. Você pode configurar IPs, portas e flags,
@@ -363,87 +345,66 @@ sequenceDiagram
 </section>
 
 <!-- SEÇÃO 4: CHECKLIST PRÁTICO -->
-<section class="study-section" id="checklist-pratico">
-  <div class="section-title-wrap">
-    <span class="section-num">04</span>
-    <h2>Checklist de Triage e Inspeção de Rede</h2>
-  </div>
+<section class="study-section" id="checklist-pratico" data-tipo="checklist">
+  <h2>Checklist de Triage e Inspeção de Rede</h2>
 
   <p>
     Ao investigar um incidente ou realizar a triagem de tráfego anômalo no Wireshark ou tcpdump, execute este
     procedimento metódico. Os itens marcados são salvos automaticamente no seu navegador via <code>localStorage</code>.
   </p>
 
-  <div class="checklist">
     <div class="checklist-header">
       <h3>Procedimento de Análise de Tráfego e Diagnóstico de Protocolos</h3>
-      <div class="checklist-progress-bar"><div class="progress-fill" id="chk-progress"></div></div>
     </div>
-    <ul class="checklist-items">
+    <ul class="checklist">
       <li class="checklist-item">
-        <label>
-          <input type="checkbox" id="chk-1">
-          <span class="chk-label">
+        <input type="checkbox" id="chk-1">
+        <label for="chk-1">
             <strong>1. Mapeamento de Camada 2 e Tabela ARP:</strong>
             Verifique a tabela de vizinhos ARP (<code>arp -a</code> ou <code>ip neigh</code>) em busca de endereços MAC duplicados associados a múltiplos IPs, o que evidencia envenenamento por ARP Spoofing na rede local.
-          </span>
-        </label>
+          </label>
       </li>
       <li class="checklist-item">
-        <label>
-          <input type="checkbox" id="chk-2">
-          <span class="chk-label">
+        <input type="checkbox" id="chk-2">
+        <label for="chk-2">
             <strong>2. Identificação de Padrões Anômalos de Flags TCP:</strong>
             Filtre no Wireshark por combinações ilegítimas de flags que revelam port scanning furtivo, como pacotes sem nenhuma flag ativada (<em>Null Scan</em>: <code>tcp.flags == 0</code>), pacotes com flags conflitantes (<em>Xmas Scan</em>: <code>tcp.flags.fin &amp;&amp; tcp.flags.psh &amp;&amp; tcp.flags.urg</code>) ou enxurrada de <code>[SYN]</code> sem ACK subsequente (SYN Flood).
-          </span>
-        </label>
+          </label>
       </li>
       <li class="checklist-item">
-        <label>
-          <input type="checkbox" id="chk-3">
-          <span class="chk-label">
+        <input type="checkbox" id="chk-3">
+        <label for="chk-3">
             <strong>3. Inspeção de Anomalias de TTL (Time to Live):</strong>
             Avalie discrepâncias drásticas no valor do TTL em conexões com o mesmo IP de origem. Se pacotes legítimos chegam com TTL 128 e repentinamente chegam pacotes com TTL 54 alegando ser o mesmo host, há forte indício de injeção de pacotes ou IP spoofing externo.
-          </span>
-        </label>
+          </label>
       </li>
       <li class="checklist-item">
-        <label>
-          <input type="checkbox" id="chk-4">
-          <span class="chk-label">
+        <input type="checkbox" id="chk-4">
+        <label for="chk-4">
             <strong>4. Auditoria de Tráfego DNS Suspeito:</strong>
             Monitore consultas com nomes de domínio excessivamente longos e randômicos (ex.: subdomínios em Base64 como <code>a1b2c3d4e5.malware.com</code>), indicando canais de comando e controle (C2) ou exfiltração de dados por <em>DNS Tunneling</em>.
-          </span>
-        </label>
+          </label>
       </li>
       <li class="checklist-item">
-        <label>
-          <input type="checkbox" id="chk-5">
-          <span class="chk-label">
+        <input type="checkbox" id="chk-5">
+        <label for="chk-5">
             <strong>5. Verificação de Amplificação e Reflexão UDP:</strong>
             Examine fluxos UDP em portas conhecidas (53/DNS, 123/NTP, 1900/SSDP, 389/CLDAP) onde o tamanho das respostas é desproporcionalmente superior às requisições com destino a um único IP interno.
-          </span>
-        </label>
+          </label>
       </li>
       <li class="checklist-item">
-        <label>
-          <input type="checkbox" id="chk-6">
-          <span class="chk-label">
+        <input type="checkbox" id="chk-6">
+        <label for="chk-6">
             <strong>6. Validação de Conexões RST Anômalas:</strong>
             Analise picos de pacotes com flag <code>[RST]</code> ou <code>[RST, ACK]</code>. Picos concentrados podem significar que uma máquina interna comprometida está escaneando a rede interna contra portas fechadas ou que um IDS/IPS está ativamente resetando sessões maliciosas.
-          </span>
-        </label>
+          </label>
       </li>
     </ul>
-  </div>
 </section>
 
 <!-- SEÇÃO 5: QUESTÕES DE FIXAÇÃO -->
-<section class="study-section" id="questoes-fixacao">
-  <div class="section-title-wrap">
-    <span class="section-num">05</span>
-    <h2>Questões de Fixação e Concursos Públicos</h2>
-  </div>
+<section class="study-section" id="questoes-fixacao" data-tipo="questoes">
+  <h2>Questões de Fixação e Concursos Públicos</h2>
 
   <p>
     Teste seus conhecimentos com questões técnicas concebidas a partir de bancas de concursos de TI (FGV, Cebraspe, FCC)
@@ -452,8 +413,8 @@ sequenceDiagram
 
   <div class="quiz-container">
     <!-- Questão 1 -->
-    <details class="quiz-item">
-      <summary class="quiz-summary">
+    <div class="quiz-item">
+      <div class="quiz-summary">
         <span class="quiz-tag">Questão 1 &bull; Pilha TCP/IP &bull; Flags de Transporte</span>
         <p class="quiz-question">
           Durante uma varredura de portas com o utilitário <em>Nmap</em> utilizando o modo SYN Stealth Scan (<code>-sS</code>),
@@ -461,7 +422,9 @@ sequenceDiagram
           responde com um pacote contendo as flags <code>[SYN, ACK]</code>. Imediatamente após receber essa resposta, qual pacote
           o scanner envia para evitar completar a conexão na aplicação, e qual é o estado reportado para essa porta?
         </p>
-      </summary>
+      </div>
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta explicada</summary>
       <div class="quiz-answer">
         <div class="answer-badge correct">Resposta Correta: O scanner envia um pacote com flag [RST] e classifica a porta como ABERTA (Open).</div>
         <p><strong>Fundamentação Técnica:</strong></p>
@@ -473,11 +436,12 @@ sequenceDiagram
           abortando a transação. Caso a porta estivesse fechada, o servidor responderia com <code>[RST, ACK]</code>.
         </p>
       </div>
-    </details>
+      </details>
+    </div>
 
     <!-- Questão 2 -->
-    <details class="quiz-item">
-      <summary class="quiz-summary">
+    <div class="quiz-item">
+      <div class="quiz-summary">
         <span class="quiz-tag">Questão 2 &bull; Camada de Enlace &bull; Ataques Locais</span>
         <p class="quiz-question">
           Um analista de SOC nota que em um segmento corporativo comutada (switched) um usuário conseguiu capturar
@@ -486,7 +450,9 @@ sequenceDiagram
           para a placa de rede da máquina do invasor. Qual protocolo foi abusado e qual controle de segurança em switches
           mitiga diretamente essa ameaça na Camada 2?
         </p>
-      </summary>
+      </div>
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta explicada</summary>
       <div class="quiz-answer">
         <div class="answer-badge correct">Resposta Correta: Protocolo ARP (ARP Spoofing / Poisoning) &bull; Mitigação via Dynamic ARP Inspection (DAI).</div>
         <p><strong>Fundamentação Técnica:</strong></p>
@@ -499,11 +465,12 @@ sequenceDiagram
           descartando pacotes forjados imediatamente.
         </p>
       </div>
-    </details>
+      </details>
+    </div>
 
     <!-- Questão 3 -->
-    <details class="quiz-item">
-      <summary class="quiz-summary">
+    <div class="quiz-item">
+      <div class="quiz-summary">
         <span class="quiz-tag">Questão 3 &bull; Serviços de Rede &bull; DNS e Spoofing</span>
         <p class="quiz-question">
           O protocolo DNS tradicionalmente utiliza a porta 53 sobre UDP para a maioria de suas consultas recursivas.
@@ -511,7 +478,9 @@ sequenceDiagram
           DNS Spoofing / Cache Poisoning, e qual extensão de segurança foi padronizada pela IETF para garantir a
           autenticidade e integridade das respostas DNS?
         </p>
-      </summary>
+      </div>
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta explicada</summary>
       <div class="quiz-answer">
         <div class="answer-badge correct">Resposta Correta: Ausência de estado e falta de verificação de IP de origem (facilidade de spoofing) &bull; Mitigação via DNSSEC.</div>
         <p><strong>Fundamentação Técnica:</strong></p>
@@ -524,16 +493,14 @@ sequenceDiagram
           valide criptograficamente a autenticidade e a integridade da resposta antes de aceitá-la.
         </p>
       </div>
-    </details>
+      </details>
+    </div>
   </div>
 </section>
 
 <!-- SEÇÃO 6: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
-<section class="study-section" id="fatos-essenciais">
-  <div class="section-title-wrap">
-    <span class="section-num">06</span>
-    <h2>Fatos Essenciais e Conexões da Trilha</h2>
-  </div>
+<section class="study-section" id="fatos-essenciais" data-tipo="referencias">
+  <h2>Fatos Essenciais e Conexões da Trilha</h2>
 
   <p>
     Sintetize os números, portas e convenções operacionais deste estudo que devem estar na ponta da língua em qualquer
@@ -588,6 +555,7 @@ sequenceDiagram
     </div>
   </div>
 </section>
+</article>
 
 <!-- ==========================================================================
      SCRIPT DO LABORATÓRIO INTERATIVO (Vanilla JS puro & autônomo)

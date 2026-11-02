@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="seguranca-apis">
 
     <!-- SEÇÃO 1: O TOP 10 DE APIs -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: A Requisição Perfeita que Não Deveria Passar</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: A Requisição Perfeita que Não Deveria Passar</h2>
 
         <p class="lead-text">
             O aplicativo da Ipê Store, o site e os parceiros conversam com a mesma API. Um firewall vê requisições bem formadas, com token válido, para endpoints que existem; ele não tem como saber que o pedido 1043 não é da Ana, que o campo <code>papel</code> não deveria ser editável ou que vinte tentativas de login por segundo não são um cliente esquecido. Em APIs, as falhas mais graves são de lógica de autorização, e só a própria API pode barrá-las. Este estudo continua o Estudo 12, que mostrou o BOLA numa página web.
@@ -53,11 +50,8 @@ flowchart TD
     </section>
 
     <!-- SEÇÃO 2: TOKENS, AUTORIZAÇÃO E CONSUMO -->
-    <section class="study-section" id="controles">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>Tokens, Autorização em Três Níveis e Limites de Consumo</h2>
-        </div>
+    <section class="study-section" id="controles" data-tipo="teoria">
+        <h2>Tokens, Autorização em Três Níveis e Limites de Consumo</h2>
 
         <h3>JWT: decodificar não é validar</h3>
         <p>
@@ -145,11 +139,8 @@ if claims["papel"] != "admin":
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Simulador de Chamadas de API com Rate Limiter</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Simulador de Chamadas de API com Rate Limiter</h2>
 
         <p class="lead-text">
             Na primeira parte, você chama a API da loja com tokens diferentes e liga as defesas uma a uma. Os tokens são JWTs de verdade, assinados com HMAC-SHA256 e verificados pelo seu navegador. Na segunda, compara quatro algoritmos de rate limiting com o mesmo tráfego.
@@ -222,11 +213,8 @@ if claims["papel"] != "admin":
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de Segurança de API</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de Segurança de API</h2>
 
         <p class="lead-text">
             Use esta lista na revisão de uma API antes de publicá-la. O estado das caixas fica salvo no seu navegador.
@@ -265,11 +253,8 @@ if claims["papel"] != "admin":
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Entrevista</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -345,11 +330,8 @@ if claims["papel"] != "admin":
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">

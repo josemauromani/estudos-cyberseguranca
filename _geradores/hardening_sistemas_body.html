@@ -3,10 +3,12 @@
      Corpo do Treinamento: Bastionamento Linux e Windows (CIS Benchmarks)
      ========================================================================== -->
 
-<header class="study-header">
-  <span class="study-track-kicker">Trilha 2: Segurança Defensiva &bull; Estudo 06</span>
-  <h1 class="study-title">Bastionamento de Sistemas Linux e Windows (CIS Benchmarks)</h1>
-  <p class="study-lead">
+<article class="study-container" data-slug="hardening-sistemas">
+<!-- SEÇÃO 1: O QUE É HARDENING E OS CIS BENCHMARKS -->
+<section class="study-section" id="fundamentos-hardening-cis" data-tipo="teoria">
+  <h2>O que é Hardening e o Padrão Normativo CIS Benchmarks</h2>
+
+  <p class="lead-text">
     Instalações padrão de sistemas operacionais priorizam conveniência e compatibilidade retroativa,
     mantendo portas desnecessárias abertas, serviços legados ativos e configurações permissivas de fábrica.
     O processo metódico de <strong>Hardening (Bastionamento)</strong> reduz drasticamente a superfície de ataque,
@@ -15,20 +17,6 @@
     <code>sysctl.conf</code>, o confinamento com SELinux/AppArmor, a proteção da memória do LSASS no Windows e o
     descarte de protocolos legados (como SMBv1) é a fundação inegociável da defesa em profundidade de host.
   </p>
-  <div class="study-meta-bar">
-    <span class="badge green">NIST CSF 2.0: Protect (PR.PS / PR.AC)</span>
-    <span class="badge slate">MITRE ATT&amp;CK: TA0005, TA0004, T1548, T1053, T1078</span>
-    <span class="badge slate">Tempo Estimado: ~50 minutos</span>
-    <span class="badge slate">Carreiras: Blue Team &bull; SysAdmin &bull; DevSecOps</span>
-  </div>
-</header>
-
-<!-- SEÇÃO 1: O QUE É HARDENING E OS CIS BENCHMARKS -->
-<section class="study-section" id="fundamentos-hardening-cis">
-  <div class="section-title-wrap">
-    <span class="section-num">01</span>
-    <h2>O que é Hardening e o Padrão Normativo CIS Benchmarks</h2>
-  </div>
 
   <p>
     <strong>Hardening (Bastionamento)</strong> é o processo contínuo de engenharia de segurança dedicado a eliminar
@@ -86,11 +74,8 @@
 </section>
 
 <!-- SEÇÃO 2: HARDENING EM AMBIENTES LINUX -->
-<section class="study-section" id="hardening-linux">
-  <div class="section-title-wrap">
-    <span class="section-num">02</span>
-    <h2>Bastionamento Profundo em Ambientes Linux</h2>
-  </div>
+<section class="study-section" id="hardening-linux" data-tipo="teoria">
+  <h2>Bastionamento Profundo em Ambientes Linux</h2>
 
   <p>
     O ecossistema Linux é a espinha dorsal de servidores corporativos e ambientes de nuvem.
@@ -206,11 +191,8 @@
 </section>
 
 <!-- SEÇÃO 3: HARDENING EM AMBIENTES WINDOWS -->
-<section class="study-section" id="hardening-windows">
-  <div class="section-title-wrap">
-    <span class="section-num">03</span>
-    <h2>Bastionamento em Ambientes Windows Server e Active Directory</h2>
-  </div>
+<section class="study-section" id="hardening-windows" data-tipo="teoria">
+  <h2>Bastionamento em Ambientes Windows Server e Active Directory</h2>
 
   <p>
     Em ambientes corporativos baseados em Microsoft Windows Server e domínios de Active Directory (AD),
@@ -266,11 +248,8 @@
 </section>
 
 <!-- SEÇÃO 4: AUTOMAÇÃO E LINHAS DE BASE -->
-<section class="study-section" id="automacao-scap">
-  <div class="section-title-wrap">
-    <span class="section-num">04</span>
-    <h2>Automação Contínua de Conformidade e Linhas de Base</h2>
-  </div>
+<section class="study-section" id="automacao-scap" data-tipo="teoria">
+  <h2>Automação Contínua de Conformidade e Linhas de Base</h2>
 
   <p>
     Executar comandos manuais em centenas de servidores em produção é inviável e sujeito a erros humanos graves.
@@ -314,11 +293,8 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (AUDITOR CIS BENCHMARK) -->
-<section class="study-section" id="laboratorio-pratico">
-  <div class="section-title-wrap">
-    <span class="section-num">05</span>
-    <h2>Laboratório Interativo: Auditor de Configuração de Servidor (CIS Benchmark)</h2>
-  </div>
+<section class="study-section" id="laboratorio-pratico" data-tipo="laboratorio">
+  <h2>Laboratório Interativo: Auditor de Configuração de Servidor (CIS Benchmark)</h2>
 
   <p>
     Avalie na prática o nível de segurança e conformidade de arquivos reais de configuração corporativos.
@@ -399,86 +375,74 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 6: CHECKLIST PRÁTICO -->
-<section class="study-section" id="checklist-hardening">
-  <div class="section-title-wrap">
-    <span class="section-num">06</span>
-    <h2>Checklist de Aplicação Prática: Auditoria de Hardening de Servidores</h2>
-  </div>
+<section class="study-section" id="checklist-hardening" data-tipo="checklist">
+  <h2>Checklist de Aplicação Prática: Auditoria de Hardening de Servidores</h2>
 
   <p>
     Utilize este checklist técnico durante implantações de servidores em produção, homologação de novas imagens douradas
     (<em>Golden Images</em>) ou revisões de auditoria para assegurar que diretrizes fundamentais de bastionamento foram observadas:
   </p>
 
-  <div class="checklist" id="checklist-hardening-sistemas">
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+  <ul class="checklist" id="checklist-hardening-sistemas">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_0">
+      <label for="list_0_0">
         <strong>Acesso SSH Restrito a Chaves Assimétricas e Sem Login Root:</strong>
         Em servidores Linux, <code>PermitRootLogin no</code> e <code>PasswordAuthentication no</code> estão configurados e verificados,
         com chaves públicas autorizadas ed25519 e desativação de X11Forwarding.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_1">
+      <label for="list_0_1">
         <strong>Proteção de Memória e Rede do Kernel via sysctl:</strong>
         Parâmetros <code>kernel.randomize_va_space = 2</code> (ASLR total), <code>net.ipv4.ip_forward = 0</code> e
         <code>net.ipv4.tcp_syncookies = 1</code> estão persistidos em <code>/etc/sysctl.conf</code>.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_2">
+      <label for="list_0_2">
         <strong>Módulos de Controle de Acesso Mandatório Ativos (SELinux/AppArmor):</strong>
         SELinux está em modo <code>Enforcing</code> (ou AppArmor em modo <code>enforce</code>), com políticas aplicadas
         para os principais serviços expostos (Web, Banco de Dados, SSH).
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_3">
+      <label for="list_0_3">
         <strong>Erradicação Total do SMBv1 e Protocolos LLMNR/NetBIOS:</strong>
         Em ambientes Windows, o recurso opcional SMBv1 está desinstalado, e as respostas a broadcasts LLMNR e NetBIOS
         estão desativadas via GPO corporativa.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_4">
+      <label for="list_0_4">
         <strong>Proteção Ativa do Processo LSASS e Credential Guard:</strong>
         LSA Protection habilitado com <code>RunAsPPL = 1</code>, Credential Guard ativo em hardware compatível e
         armazenamento de texto claro no provedor WDigest desativado no Registro.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_5">
+      <label for="list_0_5">
         <strong>Auditoria de Executáveis SUID/SGID e umask Corporativo:</strong>
         Binários com permissões SUID desnecessárias foram auditados e revogados, e o umask padrão do sistema está
         definido em <code>027</code> para impedir privilégios de leitura por terceiros.
-      </span>
-    </label>
-  </div>
+      </label>
+    </li>
+  </ul>
 </section>
 
 <!-- SEÇÃO 7: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
-<section class="study-section" id="questoes-fixacao">
-  <div class="section-title-wrap">
-    <span class="section-num">07</span>
-    <h2>Questões de Fixação e Concursos Públicos</h2>
-  </div>
+<section class="study-section" id="questoes-fixacao" data-tipo="questoes">
+  <h2>Questões de Fixação e Concursos Públicos</h2>
 
   <p>
     Consolide seu conhecimento respondendo a questões baseadas em provas de concursos públicos de alto escalão
@@ -497,9 +461,9 @@ flowchart TD
           assinale a afirmativa correta sobre o escopo do CIS Nível 2:
         </p>
       </div>
-      <details class="quiz-answer">
-        <summary>Ver resposta comentada</summary>
-        <div class="quiz-explanation">
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
           <p>
             <strong>Gabarito: O CIS Nível 2 é voltado para ambientes de alta sensibilidade e defesa em profundidade, aplicando restrições mais agressivas que podem impactar a funcionalidade de softwares caso não haja planejamento de compatibilidade prévio.</strong>
           </p>
@@ -521,9 +485,9 @@ flowchart TD
           foi bloqueada pelo sistema com erro de acesso negado. Qual configuração de hardening implementada na estação impediu essa ação?
         </p>
       </div>
-      <details class="quiz-answer">
-        <summary>Ver resposta comentada</summary>
-        <div class="quiz-explanation">
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
           <p>
             <strong>Gabarito: Habilitação do LSA Protection (Protected Process Light - RunAsPPL), associada à desativação do provedor WDigest e Credential Guard.</strong>
           </p>
@@ -546,9 +510,9 @@ flowchart TD
           Qual parâmetro e valor deve constar no arquivo <code>/etc/sysctl.conf</code> para garantir essa proteção?
         </p>
       </div>
-      <details class="quiz-answer">
-        <summary>Ver resposta comentada</summary>
-        <div class="quiz-explanation">
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
           <p>
             <strong>Gabarito: kernel.randomize_va_space = 2</strong>
           </p>
@@ -562,11 +526,8 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 8: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
-<section class="study-section" id="fatos-essenciais">
-  <div class="section-title-wrap">
-    <span class="section-num">08</span>
-    <h2>Fatos Essenciais &bull; Transição da Trilha 2: Segurança Defensiva</h2>
-  </div>
+<section class="study-section" id="fatos-essenciais" data-tipo="referencias">
+  <h2>Fatos Essenciais &bull; Transição da Trilha 2: Segurança Defensiva</h2>
 
   <div class="facts-grid">
     <div class="facts-card">
@@ -595,6 +556,7 @@ flowchart TD
     </div>
   </div>
 </section>
+</article>
 
 <!-- SCRIPT EMBUTIDO: SIMULADOR DE AUDITORIA CIS BENCHMARK -->
 <script>

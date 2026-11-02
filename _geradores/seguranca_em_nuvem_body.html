@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="seguranca-nuvem">
 
     <!-- SEÇÃO 1: RESPONSABILIDADE COMPARTILHADA -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: A Nuvem É Segura, a Sua Configuração Talvez Não</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: A Nuvem É Segura, a Sua Configuração Talvez Não</h2>
 
         <p class="lead-text">
             A Ipê Store guarda as imagens dos produtos e as notas fiscais dos clientes em buckets na AWS, e a aplicação da loja acessa os dois com uma role. Quase nenhum vazamento em nuvem vem de uma falha do provedor: vem de um bucket público por engano, de uma permissão <code>s3:*</code> "para funcionar" ou de uma instância que entrega as próprias credenciais a quem pedir. Este estudo mostra onde termina a responsabilidade do provedor e como ler, auditar e corrigir as permissões que são suas.
@@ -65,11 +62,8 @@ flowchart TD
     </section>
 
     <!-- SEÇÃO 2: BUCKETS, METADADOS E POSTURA -->
-    <section class="study-section" id="controles">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>Buckets, Metadados de Instância e Gestão de Postura</h2>
-        </div>
+    <section class="study-section" id="controles" data-tipo="teoria">
+        <h2>Buckets, Metadados de Instância e Gestão de Postura</h2>
 
         <h3>Buckets públicos</h3>
         <p>
@@ -126,11 +120,8 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Auditor de Permissões S3 e Políticas IAM Cloud</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Auditor de Permissões S3 e Políticas IAM Cloud</h2>
 
         <p class="lead-text">
             Edite as três políticas em JSON e aplique. A auditoria aponta os riscos de cada uma, e as nove requisições abaixo são reavaliadas na hora, mostrando qual declaração permitiu ou negou cada uma.
@@ -178,11 +169,8 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de Segurança em Nuvem</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de Segurança em Nuvem</h2>
 
         <p class="lead-text">
             Use esta lista para revisar uma conta de nuvem. O estado das caixas fica salvo no seu navegador.
@@ -221,11 +209,8 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Entrevista</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -301,11 +286,8 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">

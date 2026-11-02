@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="backup-imutavel">
 
     <!-- SEÇÃO 1: O BACKUP COMO ALVO -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: O Atacante Procura o Backup Primeiro</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: O Atacante Procura o Backup Primeiro</h2>
 
         <p class="lead-text">
             No Estudo 42, o ransomware só virou extorsão porque o backup sumiu antes. Grupos de ransomware passam dias ou semanas na rede com a credencial de Domain Admin (Estudo 39), localizam o servidor de backup, apagam os pontos de restauração e só então criptografam. No Estudo 28, a cópia imutável era uma linha na planilha; aqui ela precisa sobreviver a esse atacante.
@@ -66,11 +63,8 @@ flowchart TD
     </section>
 
     <!-- SEÇÃO 2: CREDENCIAIS E RECUPERAÇÃO DO AD -->
-    <section class="study-section" id="recuperacao">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>Credenciais Separadas e Recuperação do Active Directory</h2>
-        </div>
+    <section class="study-section" id="recuperacao" data-tipo="teoria">
+        <h2>Credenciais Separadas e Recuperação do Active Directory</h2>
 
         <h3>O console fora do domínio</h3>
         <ul>
@@ -117,11 +111,8 @@ aws s3api put-object-lock-configuration --bucket ipestore-backup-imutavel \
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Teste de Sobrevivência do Backup</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Teste de Sobrevivência do Backup</h2>
 
         <p class="lead-text">
             Monte a arquitetura de backup da Ipê Store e solte um atacante com credencial de Domain Admin. O rápido age em 2 dias; o paciente desativa os jobs e espera 21 dias antes de criptografar. Veja o que sobrevive e por quê.
@@ -156,11 +147,8 @@ aws s3api put-object-lock-configuration --bucket ipestore-backup-imutavel \
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de Backup Resistente a Ransomware</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de Backup Resistente a Ransomware</h2>
 
         <p class="lead-text">
             Use esta lista para revisar a arquitetura de backup de uma empresa. O estado das caixas fica salvo no seu navegador.
@@ -199,11 +187,8 @@ aws s3api put-object-lock-configuration --bucket ipestore-backup-imutavel \
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Entrevista</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -279,11 +264,8 @@ aws s3api put-object-lock-configuration --bucket ipestore-backup-imutavel \
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">

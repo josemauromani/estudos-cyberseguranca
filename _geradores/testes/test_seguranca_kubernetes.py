@@ -372,8 +372,9 @@ class TestSegurancaKubernetes(unittest.TestCase):
         ids = re.findall(r'<section class="study-section" id="([\w-]+)"', body)
         self.assertEqual(len(ids), 6, ids)
         self.assertEqual(ids[2:], ["simulador", "checklist", "quiz", "fatos"])
+        compilado = self.compiled_path.read_text(encoding="utf-8")
         for n in range(1, 7):
-            self.assertIn(f"Seção 0{n}", body)
+            self.assertIn(f"Seção {n} de {len(ids)}", compilado)
         self.assertIn('data-slug="seguranca-em-kubernetes"', body)
 
     def test_coerencia_com_o_catalogo(self):

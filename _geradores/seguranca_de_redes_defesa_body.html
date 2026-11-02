@@ -3,10 +3,12 @@
      Corpo do Treinamento: IDS/IPS, WAF, VPNs e Proxies Reversos
      ========================================================================== -->
 
-<header class="study-header">
-  <span class="study-track-kicker">Trilha 2: Segurança Defensiva &bull; Estudo 07</span>
-  <h1 class="study-title">Segurança de Redes Defensiva: IDS/IPS, WAF, VPNs e Proxies Reversos</h1>
-  <p class="study-lead">
+<article class="study-container" data-slug="seguranca-de-redes-defesa">
+<!-- SEÇÃO 1: IDS VS IPS E MOTORES SNORT/SURICATA -->
+<section class="study-section" id="ids-vs-ips" data-tipo="teoria">
+  <h2>Sistemas de Detecção e Prevenção de Intrusão (IDS vs IPS)</h2>
+
+  <p class="lead-text">
     Enquanto firewalls tradicionais de rede decidem se um fluxo de tráfego é permitido com base apenas em IPs e portas,
     ameaças modernas operam escondidas no interior de conexões legítimas (portas 80 e 443).
     Compreender a atuação e os trade-offs entre sistemas de detecção passiva (IDS) e prevenção inline (IPS),
@@ -15,20 +17,6 @@
     e a arquitetura de túneis criptográficos seguros (WireGuard e IPsec IKEv2) é essencial para interceptar adversários
     antes que alcancem seus objetivos.
   </p>
-  <div class="study-meta-bar">
-    <span class="badge green">NIST CSF 2.0: Protect / Detect (PR.DS / DE.CM)</span>
-    <span class="badge slate">MITRE ATT&amp;CK: TA0011, TA0005, T1071, T1573, T1048</span>
-    <span class="badge slate">Tempo Estimado: ~50 minutos</span>
-    <span class="badge slate">Carreiras: Blue Team &bull; SOC &bull; Engenharia de Redes</span>
-  </div>
-</header>
-
-<!-- SEÇÃO 1: IDS VS IPS E MOTORES SNORT/SURICATA -->
-<section class="study-section" id="ids-vs-ips">
-  <div class="section-title-wrap">
-    <span class="section-num">01</span>
-    <h2>Sistemas de Detecção e Prevenção de Intrusão (IDS vs IPS)</h2>
-  </div>
 
   <p>
     Sistemas de detecção e prevenção de intrusão inspecionam o conteúdo detalhado (cabeçalhos e carga útil / payload)
@@ -148,11 +136,8 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 2: WEB APPLICATION FIREWALLS (WAF) -->
-<section class="study-section" id="waf-camada-7">
-  <div class="section-title-wrap">
-    <span class="section-num">02</span>
-    <h2>Web Application Firewalls (WAF) e Proteção em Camada 7</h2>
-  </div>
+<section class="study-section" id="waf-camada-7" data-tipo="teoria">
+  <h2>Web Application Firewalls (WAF) e Proteção em Camada 7</h2>
 
   <p>
     Um firewall de rede convencional permite tráfego na porta 443 porque sabe que é HTTPS. No entanto, ele não possui
@@ -193,11 +178,8 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 3: PROXIES REVERSOS E MTLS -->
-<section class="study-section" id="proxies-e-mtls">
-  <div class="section-title-wrap">
-    <span class="section-num">03</span>
-    <h2>Proxies Reversos e Autenticação Mútua TLS (mTLS)</h2>
-  </div>
+<section class="study-section" id="proxies-e-mtls" data-tipo="teoria">
+  <h2>Proxies Reversos e Autenticação Mútua TLS (mTLS)</h2>
 
   <p>
     Um <strong>Reverse Proxy (Proxy Reverso)</strong> é um servidor intermediário posicionado na borda da infraestrutura
@@ -244,11 +226,8 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 4: TÚNEIS VPN SEGUROS (WIREGUARD VS IPSEC) -->
-<section class="study-section" id="vpns-seguras">
-  <div class="section-title-wrap">
-    <span class="section-num">04</span>
-    <h2>Túneis VPN Seguros: IPsec IKEv2 vs WireGuard vs OpenVPN</h2>
-  </div>
+<section class="study-section" id="vpns-seguras" data-tipo="teoria">
+  <h2>Túneis VPN Seguros: IPsec IKEv2 vs WireGuard vs OpenVPN</h2>
 
   <p>
     Uma <strong>Rede Virtual Privada (VPN - Virtual Private Network)</strong> estende uma rede corporativa privada através
@@ -288,11 +267,8 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (ANALISADOR SNORT/SURICATA) -->
-<section class="study-section" id="laboratorio-pratico">
-  <div class="section-title-wrap">
-    <span class="section-num">05</span>
-    <h2>Laboratório Interativo: Analisador de Regras Snort/Suricata vs Tráfego</h2>
-  </div>
+<section class="study-section" id="laboratorio-pratico" data-tipo="laboratorio">
+  <h2>Laboratório Interativo: Analisador de Regras Snort/Suricata vs Tráfego</h2>
 
   <p>
     Experimente na prática a mecânica interna de avaliação de regras de sistemas de detecção e prevenção de intrusão.
@@ -367,86 +343,74 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 6: CHECKLIST PRÁTICO -->
-<section class="study-section" id="checklist-defesa-redes">
-  <div class="section-title-wrap">
-    <span class="section-num">06</span>
-    <h2>Checklist de Aplicação Prática: Defesa de Perímetro e Inspeção de Tráfego</h2>
-  </div>
+<section class="study-section" id="checklist-defesa-redes" data-tipo="checklist">
+  <h2>Checklist de Aplicação Prática: Defesa de Perímetro e Inspeção de Tráfego</h2>
 
   <p>
     Utilize este checklist técnico durante implantações de soluções de perímetro, auditorias de segurança
     de rede ou revisões de arquitetura de tráfego corporativo:
   </p>
 
-  <div class="checklist" id="checklist-seguranca-redes-defesa">
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+  <ul class="checklist" id="checklist-seguranca-redes-defesa">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_0">
+      <label for="list_0_0">
         <strong>Atualização Automatizada de Regras de IDS/IPS (ET / Talos):</strong>
         O motor de IDS/IPS possui rotina diária automatizada de atualização de regras (Emerging Threats / Cisco Talos)
         com testes de sintaxe pré-compilação para evitar paradas do serviço.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_1">
+      <label for="list_0_1">
         <strong>WAF com OWASP Core Rule Set em Modo Anomaly Scoring:</strong>
         Todas as aplicações web expostas para a Internet são protegidas por WAF operando com regras CRS afinadas (tuning),
         com supressão de regras ruidosas específicas para evitar falsos positivos.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_2">
+      <label for="list_0_2">
         <strong>Terminação TLS com Cifras Fortes e HSTS Habilitado:</strong>
         Proxies reversos rejeitam protocolos legados (SSLv3, TLS 1.0, TLS 1.1) e cifras CBC, exigindo exclusivamente
         TLS 1.2/TLS 1.3 com Perfect Forward Secrecy (ECDHE) e cabeçalho <code>Strict-Transport-Security</code>.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_3">
+      <label for="list_0_3">
         <strong>Adoção de mTLS para Comunicações Críticas M2M:</strong>
         Microsserviços internos, APIs de alta sensibilidade financeira e canais de ingestão de dados exigem autenticação
         mútua com certificados X.509 de cliente emitidos por uma autoridade certificadora corporativa.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_4">
+      <label for="list_0_4">
         <strong>Túneis VPN com Criptografia Moderna (WireGuard / IKEv2):</strong>
         Conexões VPN ponto a ponto e acesso remoto utilizam WireGuard ou IPsec IKEv2 com algoritmos resistentes a ataques,
         descartando protocolos obsoletos como PPTP e L2TP desprotegido.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_5">
+      <label for="list_0_5">
         <strong>Exportação Estruturada de Telemetria (EVE JSON / CEF):</strong>
         Logs de alertas de IDS/IPS e eventos de bloqueio de WAF são exportados em tempo real em formato estruturado
         para o SIEM corporativo, disparando correlações automáticas de resposta a incidentes.
-      </span>
-    </label>
-  </div>
+      </label>
+    </li>
+  </ul>
 </section>
 
 <!-- SEÇÃO 7: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
-<section class="study-section" id="questoes-fixacao">
-  <div class="section-title-wrap">
-    <span class="section-num">07</span>
-    <h2>Questões de Fixação e Concursos Públicos</h2>
-  </div>
+<section class="study-section" id="questoes-fixacao" data-tipo="questoes">
+  <h2>Questões de Fixação e Concursos Públicos</h2>
 
   <p>
     Valide sua compreensão técnica resolvendo questões baseadas em provas de concursos públicos e certificações
@@ -466,9 +430,9 @@ flowchart TD
           Qual tipo de sistema e modo de posicionamento de rede deve ser adotado para atender a essa exigência?
         </p>
       </div>
-      <details class="quiz-answer">
-        <summary>Ver resposta comentada</summary>
-        <div class="quiz-explanation">
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
           <p>
             <strong>Gabarito: Um IPS (Intrusion Prevention System) posicionado em modo Inline (no caminho direto do tráfego).</strong>
           </p>
@@ -489,9 +453,9 @@ flowchart TD
           Qual é a principal vantagem prática dessa escolha para as operações do comércio eletrônico?
         </p>
       </div>
-      <details class="quiz-answer">
-        <summary>Ver resposta comentada</summary>
-        <div class="quiz-explanation">
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
           <p>
             <strong>Gabarito: Redução drástica da taxa de falsos positivos, bloqueando requisições apenas quando o somatório acumulado de severidades de regras acionadas ultrapassar um limiar configurado.</strong>
           </p>
@@ -512,9 +476,9 @@ flowchart TD
           Entre as características técnicas do WireGuard, qual contribui diretamente para essa redução da superfície de ataque?
         </p>
       </div>
-      <details class="quiz-answer">
-        <summary>Ver resposta comentada</summary>
-        <div class="quiz-explanation">
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
           <p>
             <strong>Gabarito: Utilização de um conjunto fixo de primitivas criptográficas modernas de alta performance (ChaCha20-Poly1305, Curve25519), eliminando a negociação complexa de algoritmos obsoletos e vulneráveis.</strong>
           </p>
@@ -528,11 +492,8 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 8: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
-<section class="study-section" id="fatos-essenciais">
-  <div class="section-title-wrap">
-    <span class="section-num">08</span>
-    <h2>Fatos Essenciais &bull; Trilha 2: Segurança Defensiva</h2>
-  </div>
+<section class="study-section" id="fatos-essenciais" data-tipo="referencias">
+  <h2>Fatos Essenciais &bull; Trilha 2: Segurança Defensiva</h2>
 
   <div class="facts-grid">
     <div class="facts-card">
@@ -561,6 +522,7 @@ flowchart TD
     </div>
   </div>
 </section>
+</article>
 
 <!-- SCRIPT EMBUTIDO: SIMULADOR DE REGRAS SNORT/SURICATA -->
 <script>

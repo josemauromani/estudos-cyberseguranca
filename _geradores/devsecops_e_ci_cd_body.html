@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="devsecops">
 
     <!-- SEÇÃO 1: SHIFT-LEFT -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: Pegar a Falha Antes da Produção</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: Pegar a Falha Antes da Produção</h2>
 
         <p class="lead-text">
             Nos Estudos 12 e 13, você explorou uma SQL injection e um mass assignment na loja da Ipê Store depois que já estavam no ar. Corrigir em produção custa caro: incidente, comunicação, correção às pressas. <strong>Shift-Left</strong> é mover a segurança para o começo do ciclo, de modo que a mesma falha seja apontada no merge request, minutos depois de escrita, por uma ferramenta que roda sozinha a cada mudança. O nome do processo é <strong>SSDLC</strong> (ciclo de desenvolvimento seguro): requisitos, revisão de código, testes automatizados e verificação antes do deploy.
@@ -83,11 +80,8 @@ jobs:
     </section>
 
     <!-- SEÇÃO 2: DEPENDÊNCIAS, CONTAINERS E GATES -->
-    <section class="study-section" id="cadeia">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>Dependências, Containers e Quality Gates</h2>
-        </div>
+    <section class="study-section" id="cadeia" data-tipo="teoria">
+        <h2>Dependências, Containers e Quality Gates</h2>
 
         <h3>SBOM: saber o que está dentro</h3>
         <p>
@@ -157,11 +151,8 @@ cosign verify --key cosign.pub registry.ipestore.example/loja:1.4.2</code></pre>
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Simulador de Pipeline CI/CD com Security Gates</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Simulador de Pipeline CI/CD com Security Gates</h2>
 
         <p class="lead-text">
             O merge request <code>feat/busca-produtos</code> chegou. Escolha as correções que o time aplicou, defina a política de quebra de cada etapa e as exceções aprovadas, e execute o pipeline. As vulnerabilidades de dependências e da imagem têm identificadores fictícios de laboratório.
@@ -204,11 +195,8 @@ cosign verify --key cosign.pub registry.ipestore.example/loja:1.4.2</code></pre>
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de DevSecOps</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de DevSecOps</h2>
 
         <p class="lead-text">
             Use esta lista para avaliar a esteira de um time. O estado das caixas fica salvo no seu navegador.
@@ -247,11 +235,8 @@ cosign verify --key cosign.pub registry.ipestore.example/loja:1.4.2</code></pre>
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Entrevista</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -327,11 +312,8 @@ cosign verify --key cosign.pub registry.ipestore.example/loja:1.4.2</code></pre>
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">

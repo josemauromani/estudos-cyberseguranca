@@ -3,30 +3,18 @@
      Corpo do Treinamento: DMZ, VLANs, Regras de Firewall e Filtragem
      ========================================================================== -->
 
-<header class="study-header">
-  <span class="study-track-kicker">Trilha 1: Fundamentos &amp; Redes Seguras &bull; Estudo 05</span>
-  <h1 class="study-title">Segmentação de Redes, DMZ e Filtragem de Firewall</h1>
-  <p class="study-lead">
+<article class="study-container" data-slug="segmentacao-e-firewall">
+<!-- SEÇÃO 1: SEGMENTAÇÃO DE REDES E DMZ -->
+<section class="study-section" id="zonas-confianca-dmz" data-tipo="teoria">
+  <h2>Zonas de Confiança, Redes Planas e Arquitetura de DMZ</h2>
+
+  <p class="lead-text">
     Em um cenário contemporâneo onde o comprometimento inicial de um endpoint ou servidor web é uma possibilidade
     estatística real, a ausência de segmentação interna transforma qualquer invasão local em um desastre corporativo generalizado.
     Compreender a divisão em zonas de confiança, a criação de DMZs resilientes, o particionamento em Camada 2 via VLANs 802.1Q,
     o funcionamento da tabela de estados <em>conntrack</em> (Stateful Inspection) e a formulação estrita de regras com ordem
     First-Match e Default Drop é indispensável para conter ameaças e impedir o movimento lateral (Lateral Movement).
   </p>
-  <div class="study-meta-bar">
-    <span class="badge blue">NIST CSF 2.0: Protect (PR.AC / PR.DS)</span>
-    <span class="badge slate">MITRE ATT&amp;CK: TA0008, TA0011, T1190, T1021</span>
-    <span class="badge slate">Tempo Estimado: ~40 minutos</span>
-    <span class="badge slate">Carreiras: Blue Team &bull; Infraestrutura &bull; SOC</span>
-  </div>
-</header>
-
-<!-- SEÇÃO 1: SEGMENTAÇÃO DE REDES E DMZ -->
-<section class="study-section" id="zonas-confianca-dmz">
-  <div class="section-title-wrap">
-    <span class="section-num">01</span>
-    <h2>Zonas de Confiança, Redes Planas e Arquitetura de DMZ</h2>
-  </div>
 
   <p>
     Por décadas, muitas redes corporativas foram projetadas como uma "casca de ovo": uma borda externa fortificada
@@ -87,11 +75,8 @@
 </section>
 
 <!-- SEÇÃO 2: SEGREGAÇÃO EM CAMADA 2 (VLANS & 802.1Q) -->
-<section class="study-section" id="vlans-e-8021q">
-  <div class="section-title-wrap">
-    <span class="section-num">02</span>
-    <h2>Segregação em Camada 2: VLANs e Trunking IEEE 802.1Q</h2>
-  </div>
+<section class="study-section" id="vlans-e-8021q" data-tipo="teoria">
+  <h2>Segregação em Camada 2: VLANs e Trunking IEEE 802.1Q</h2>
 
   <p>
     Implementar segmentação física comprando switches e cabos separados para cada departamento corporativo seria
@@ -191,11 +176,8 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 3: ARQUITETURA DE FIREWALLS (STATELESS vs STATEFUL vs NGFW) -->
-<section class="study-section" id="arquiteturas-firewall">
-  <div class="section-title-wrap">
-    <span class="section-num">03</span>
-    <h2>Arquitetura de Firewalls: Stateless, Stateful e NGFW</h2>
-  </div>
+<section class="study-section" id="arquiteturas-firewall" data-tipo="teoria">
+  <h2>Arquitetura de Firewalls: Stateless, Stateful e NGFW</h2>
 
   <p>
     Um firewall é um dispositivo ou software que monitora e controla o tráfego de rede de entrada e saída com base em
@@ -245,11 +227,8 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 4: FORMULAÇÃO DE REGRAS E ORDEM DE PRECEDÊNCIA -->
-<section class="study-section" id="regras-e-precedencia">
-  <div class="section-title-wrap">
-    <span class="section-num">04</span>
-    <h2>Formulação de Políticas e Ordem de Precedência de Regras</h2>
-  </div>
+<section class="study-section" id="regras-e-precedencia" data-tipo="teoria">
+  <h2>Formulação de Políticas e Ordem de Precedência de Regras</h2>
 
   <p>
     Configurar regras de firewall exige precisão matemática. Ao contrário de uma linguagem declarativa genérica,
@@ -301,11 +280,8 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (FIREWALL SIMULATOR & CONNTRACK) -->
-<section class="study-section" id="laboratorio-pratico">
-  <div class="section-title-wrap">
-    <span class="section-num">05</span>
-    <h2>Laboratório Interativo: Simulador de Regras de Firewall e Tabela conntrack</h2>
-  </div>
+<section class="study-section" id="laboratorio-pratico" data-tipo="laboratorio">
+  <h2>Laboratório Interativo: Simulador de Regras de Firewall e Tabela conntrack</h2>
 
   <p>
     Experimente na prática a mecânica de avaliação sequencial <em>First-Match</em> de um firewall corporativo.
@@ -420,80 +396,68 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 6: CHECKLIST PRÁTICO -->
-<section class="study-section" id="checklist-segmentacao">
-  <div class="section-title-wrap">
-    <span class="section-num">06</span>
-    <h2>Checklist de Aplicação Prática: Auditoria de Segmentação e Firewalls</h2>
-  </div>
+<section class="study-section" id="checklist-segmentacao" data-tipo="checklist">
+  <h2>Checklist de Aplicação Prática: Auditoria de Segmentação e Firewalls</h2>
 
   <p>
     Utilize este checklist técnico durante auditorias de rede, implementação de novos perímetros
     ou compliance com normas como ISO 27001 (controles de rede) e PCI DSS (requisito de segmentação de ambiente de dados de cartão - CDE):
   </p>
 
-  <div class="checklist" id="checklist-segmentacao-firewall">
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+  <ul class="checklist" id="checklist-segmentacao-firewall">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_0">
+      <label for="list_0_0">
         <strong>Política Padrão Default Drop Habilitada:</strong>
         Todas as interfaces e zonas de segurança possuem a regra final implícita de descarte sumário (DROP) de qualquer pacote não autorizado, com geração de alertas e logs de auditoria.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_1">
+      <label for="list_0_1">
         <strong>Isolamento Rigoroso da DMZ (Sem Tráfego Inbound para LAN):</strong>
         Servidores posicionados na DMZ são impedidos de iniciar novas conexões para a rede corporativa interna ou servidores de banco de dados, exceto em portas estritamente documentadas originadas da LAN para a DMZ.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_2">
+      <label for="list_0_2">
         <strong>Prevenção Ativa Contra VLAN Hopping em Switches:</strong>
         Todas as portas de acesso possuem negociação DTP desativada (<code>nonegotiate</code>), a VLAN 1 padrão está desabilitada para tráfego operacional e a VLAN nativa dos trunks foi alterada para um ID dedicado não utilizado.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_3">
+      <label for="list_0_3">
         <strong>Auditoria Periódica de Sombreamento de Regras (Rule Shadowing):</strong>
         A ordem das regras no firewall é revisada semestralmente com ferramentas automatizadas para identificar regras obsoletas, duplicadas ou mascaradas por regras mais permissivas acima.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_4">
+      <label for="list_0_4">
         <strong>Filtragem Egress (Tráfego de Saída Restrito):</strong>
         Servidores internos e da DMZ possuem regras estritas de saída, impedindo que conexões em portas não autorizadas (como IRC, canais de C2 ou consultas DNS externas para servidores não autorizados) saiam da organização.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_5">
+      <label for="list_0_5">
         <strong>Inspeção com Estado (Stateful) com Drop de Pacotes Inválidos:</strong>
         O kernel do firewall descarta explicitamente pacotes com estado <code>INVALID</code> (violação da sequência TCP) antes de qualquer avaliação de regras de permissão.
-      </span>
-    </label>
-  </div>
+      </label>
+    </li>
+  </ul>
 </section>
 
 <!-- SEÇÃO 7: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
-<section class="study-section" id="questoes-fixacao">
-  <div class="section-title-wrap">
-    <span class="section-num">07</span>
-    <h2>Questões de Fixação e Concursos Públicos</h2>
-  </div>
+<section class="study-section" id="questoes-fixacao" data-tipo="questoes">
+  <h2>Questões de Fixação e Concursos Públicos</h2>
 
   <p>
     Teste sua preparação respondendo a questões focadas em concursos públicos de alto nível para Perito Criminal da PF,
@@ -513,9 +477,9 @@ flowchart TD
           e qual risco direto ela introduz?
         </p>
       </div>
-      <details class="quiz-answer">
-        <summary>Ver resposta comentada</summary>
-        <div class="quiz-explanation">
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
           <p>
             <strong>Gabarito: Seria necessário abrir todas as portas altas (1024 a 65535) na direção de entrada da Internet para a LAN, permitindo que atacantes externos acessem qualquer serviço em portas altas sem inspeção.</strong>
           </p>
@@ -538,9 +502,9 @@ flowchart TD
           <br>Ao tentar acessar o site HTTPS hospedado no <code>Servidor_Web_DMZ</code>, os usuários da Internet recebem erro de conexão recusada / timeout. Qual a causa desse comportamento?
         </p>
       </div>
-      <details class="quiz-answer">
-        <summary>Ver resposta comentada</summary>
-        <div class="quiz-explanation">
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
           <p>
             <strong>Gabarito: Ocorrência de Rule Shadowing (Sombreamento de Regra), onde a Regra 1 ampla descarta o tráfego antes que a Regra 2 específica seja avaliada.</strong>
           </p>
@@ -561,9 +525,9 @@ flowchart TD
           para invadir o banco de dados principal de produção localizado na rede interna restrita?
         </p>
       </div>
-      <details class="quiz-answer">
-        <summary>Ver resposta comentada</summary>
-        <div class="quiz-explanation">
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
           <p>
             <strong>Gabarito: Proibição estrita de conexões iniciadas na DMZ com destino à rede interna, associada a regras de firewall específicas permitindo apenas portas estritas do serviço (ex: SQL 5432) com controle de origem.</strong>
           </p>
@@ -577,11 +541,8 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 8: FATOS ESSENCIAIS E CONCLUSÃO DA TRILHA 1 -->
-<section class="study-section" id="fatos-essenciais">
-  <div class="section-title-wrap">
-    <span class="section-num">08</span>
-    <h2>Fatos Essenciais &bull; Conclusão da Trilha 1: Fundamentos &amp; Redes Seguras</h2>
-  </div>
+<section class="study-section" id="fatos-essenciais" data-tipo="referencias">
+  <h2>Fatos Essenciais &bull; Conclusão da Trilha 1: Fundamentos &amp; Redes Seguras</h2>
 
   <div class="facts-grid">
     <div class="facts-card">
@@ -610,6 +571,7 @@ flowchart TD
     </div>
   </div>
 </section>
+</article>
 
 <!-- SCRIPT EMBUTIDO: SIMULADOR DE FIREWALL COM FIRST-MATCH E CONNTRACK -->
 <script>

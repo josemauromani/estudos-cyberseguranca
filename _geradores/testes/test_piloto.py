@@ -74,7 +74,7 @@ class TestModuloPiloto(unittest.TestCase):
         content = self.piloto_html.read_text(encoding="utf-8")
 
         componentes = [
-            "hero-header",
+            "mhead",
             "callout",
             "lab-box",
             "checklist",

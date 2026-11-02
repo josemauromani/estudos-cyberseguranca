@@ -3,24 +3,14 @@
      Estruturado conforme GUIA-DO-AUTOR.md e CURRICULO.md (100% Offline-ready)
      ========================================================================== -->
 
-<main class="container">
+<article class="study-container" data-slug="fundamentos-ciber">
 
-  <!-- 1. CABEÇALHO HERO & METADADOS -->
-  <header class="hero-header" style="--track-color: var(--t1-blue);">
-    <div class="badge badge-t1">Trilha 1 &bull; Fundamentos &amp; Redes</div>
-    <h1>Tríade CIA, Ameaças e Modelagem STRIDE</h1>
-    <p class="hero-subtitle">Pilares da segurança da informação, vetores de ameaça e metodologia STRIDE para modelagem defensiva de arquiteturas de software e sistemas.</p>
-    <div class="meta-bar">
-      <span class="meta-item">⏱️ <strong>Tempo Estimado:</strong> 40 minutos</span>
-      <span class="meta-item">🛡️ <strong>NIST CSF 2.0:</strong> Identify (ID.AM, ID.RA)</span>
-      <span class="meta-item">🎯 <strong>Carreiras:</strong> Blue Team, Red Team, AppSec, SOC, GRC</span>
-      <span class="meta-item">🔬 <strong>MITRE ATT&amp;CK:</strong> TA0043 (Reconnaissance) &bull; TA0001 (Initial Access)</span>
-    </div>
-  </header>
 
   <!-- 2. FUNDAMENTAÇÃO TEÓRICA E ARQUITETURA -->
-  <section class="content-section" id="fundamentacao-teorica">
+  <section class="study-section" id="fundamentacao-teorica" data-tipo="teoria">
     <h2>1. Introdução e Contexto Prático da Cibersegurança</h2>
+
+    <p class="lead-text">Pilares da segurança da informação, vetores de ameaça e metodologia STRIDE para modelagem defensiva de arquiteturas de software e sistemas.</p>
     <p>
       Cibersegurança moderna não é um produto de software, uma caixa de firewall ou uma lista estática de regras antivírus; é uma disciplina contínua de gerenciamento de risco e engenharia de resiliência. O objetivo primário de qualquer arquiteto ou analista defensivo é assegurar que a missão do negócio prospere mesmo na presença inevitável de adversários capacitados e falhas estruturais de tecnologia.
     </p>
@@ -29,7 +19,7 @@
       Para estruturar qualquer política, controle ou auditoria, a indústria internacional e normas consagradas — como a <strong>ISO/IEC 27001</strong> e o <strong>NIST SP 800-12</strong> — estabelecem que a segurança da informação sustenta-se sobre três pilares essenciais: a <strong>Tríade CIA</strong> (<em>Confidentiality, Integrity, Availability</em>).
     </p>
 
-    <div class="callout callout-tip">
+    <div class="callout tip">
       <strong>💡 Fundamento Profissional:</strong>
       A segurança não busca eliminar 100% dos riscos — o que é matematicamente impossível —, mas elevar o custo de exploração para o adversário a um patamar tão alto que o ataque se torne inviável econômica e operacionalmente.
     </div>
@@ -119,7 +109,7 @@
       </li>
     </ul>
 
-    <div class="callout callout-warning">
+    <div class="callout warning">
       <strong>⚠️ Atenção Criptográfica:</strong>
       A integridade sem autenticidade não garante segurança contra atacantes ativos: se um adversário puder interceptar uma mensagem e recalcular um hash simples (ex.: SHA-256 sem chave compartilhada), a integridade parecerá válida para a vítima. Para vincular autenticidade à integridade, deve-se usar <strong>HMAC</strong> ou <strong>assinaturas digitais</strong> baseadas em chaves assimétricas.
     </div>
@@ -151,7 +141,7 @@
       </div>
     </div>
 
-    <div class="callout callout-danger">
+    <div class="callout danger">
       <strong>🚨 Perigo Crítico:</strong>
       Executar microsserviços em contêineres como usuário <code>root</code> (UID 0) com o Docker socket montado (<code>/var/run/docker.sock</code>) destrói qualquer proteção de isolamento. Em caso de vulnerabilidade de execução remota de código (RCE) na aplicação, o invasor obtém controle total sobre o servidor hospedeiro.
     </div>
@@ -173,14 +163,14 @@ chmod 600 /etc/app-secrets/credentials.env
 chown -R appuser:appgroup /etc/app-secrets/</code></pre>
     </div>
 
-    <div class="callout callout-law">
+    <div class="callout law">
       <strong>⚖️ Requisito Normativo (LGPD Art. 46):</strong>
       A Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018) estipula que os agentes de tratamento devem adotar medidas de segurança, técnicas e administrativas aptas a proteger os dados pessoais de acessos não autorizados e de situações acidentais ou ilícitas de destruição, perda, alteração, comunicação ou qualquer forma de tratamento inadequado.
     </div>
   </section>
 
   <!-- 3. FUNDAMENTOS DA MODELAGEM DE AMEAÇAS STRIDE -->
-  <section class="content-section" id="modelagem-stride">
+  <section class="study-section" id="modelagem-stride" data-tipo="teoria">
     <h2>2. Fundamentos da Modelagem de Ameaças STRIDE</h2>
     <p>
       A modelagem de ameaças é uma atividade estruturada que permite identificar, quantificar e mitigar fraquezas de segurança na fase de concepção e desenho de um sistema, muito antes de linhas de código serem escritas ou servidores provisionados. Identificar e mitigar uma falha na fase de arquitetura pode ser até <strong>60 vezes mais barato</strong> do que corrigi-la em produção após um incidente cibernético.
@@ -273,7 +263,7 @@ flowchart LR
   </section>
 
   <!-- 4. LABORATÓRIO / SIMULADOR INTERATIVO STRIDE CANVAS -->
-  <section class="content-section" id="simulador-stride">
+  <section class="study-section" id="simulador-stride" data-tipo="laboratorio">
     <h2>3. Laboratório Interativo: STRIDE Canvas</h2>
     <p>
       Utilize o <strong>STRIDE Canvas</strong> abaixo para conduzir um exercício realista de modelagem de ameaças. Selecione um ativo da arquitetura do sistema corporativo, analise as ameaças mapeadas para cada categoria STRIDE, simule a ativação de controles mitigatórios e exporte o relatório executivo de risco residual.
@@ -334,55 +324,51 @@ flowchart LR
   </section>
 
   <!-- 5. CHECKLIST OPERACIONAL DE BOAS PRÁTICAS -->
-  <section class="content-section" id="checklist-pratico">
+  <section class="study-section" id="checklist-pratico" data-tipo="checklist">
     <h2>4. Checklist de Auditoria: Modelagem de Ameaças em Projetos Reais</h2>
     <p>
       Este checklist operacional consolida as etapas mandatórias para a condução de sessões de modelagem de ameaças em squads de desenvolvimento ágil e revisões de arquitetura. O progresso é <strong>salvo automaticamente</strong> no seu navegador (<em>localStorage</em>) para consultas e auditorias futuras.
     </p>
 
-    <div class="checklist" data-checklist-id="fundamentos-ciber">
       <h4>
         <span>Auditoria de Modelagem de Ameaças STRIDE</span>
-        <span class="checklist-counter" style="font-size: 0.85rem; color: var(--muted); font-weight: normal;">0 de 6 itens auditados</span>
       </h4>
-      <div class="checklist-progress-bar">
-        <div class="checklist-progress-fill"></div>
-      </div>
 
-      <label class="check-item">
+      <ul class="checklist" data-checklist-id="fundamentos-ciber">
+      <li class="checklist-item">
         <input type="checkbox" id="chk-fnd-1">
-        <span><strong>1. Inventário de Ativos e Dados:</strong> Identificar e catalogar formalmente todos os ativos críticos, dados sensíveis sob escopo (PII, credenciais, segredos criptográficos) e seus fluxos operacionais.</span>
-      </label>
+        <label for="chk-fnd-1"><strong>1. Inventário de Ativos e Dados:</strong> Identificar e catalogar formalmente todos os ativos críticos, dados sensíveis sob escopo (PII, credenciais, segredos criptográficos) e seus fluxos operacionais.</label>
+      </li>
 
-      <label class="check-item">
+      <li class="checklist-item">
         <input type="checkbox" id="chk-fnd-2">
-        <span><strong>2. Fronteiras de Confiança (Trust Boundaries):</strong> Mapear visualmente no diagrama arquitetural os pontos onde dados transitam entre zonas de diferentes níveis de privilégio (ex.: internet pública vs DMZ vs rede privada).</span>
-      </label>
+        <label for="chk-fnd-2"><strong>2. Fronteiras de Confiança (Trust Boundaries):</strong> Mapear visualmente no diagrama arquitetural os pontos onde dados transitam entre zonas de diferentes níveis de privilégio (ex.: internet pública vs DMZ vs rede privada).</label>
+      </li>
 
-      <label class="check-item">
+      <li class="checklist-item">
         <input type="checkbox" id="chk-fnd-3">
-        <span><strong>3. Aplicação Sistemática da Taxonomia STRIDE:</strong> Analisar exaustivamente cada componente, fluxo de dados, armazenamento e processo do diagrama contra as 6 categorias da metodologia STRIDE.</span>
-      </label>
+        <label for="chk-fnd-3"><strong>3. Aplicação Sistemática da Taxonomia STRIDE:</strong> Analisar exaustivamente cada componente, fluxo de dados, armazenamento e processo do diagrama contra as 6 categorias da metodologia STRIDE.</label>
+      </li>
 
-      <label class="check-item">
+      <li class="checklist-item">
         <input type="checkbox" id="chk-fnd-4">
-        <span><strong>4. Classificação de Severidade e Impacto:</strong> Quantificar a severidade das ameaças identificadas com base no impacto ao negócio e na viabilidade técnica de exploração pelo adversário.</span>
-      </label>
+        <label for="chk-fnd-4"><strong>4. Classificação de Severidade e Impacto:</strong> Quantificar a severidade das ameaças identificadas com base no impacto ao negócio e na viabilidade técnica de exploração pelo adversário.</label>
+      </li>
 
-      <label class="check-item">
+      <li class="checklist-item">
         <input type="checkbox" id="chk-fnd-5">
-        <span><strong>5. Associação de Controles Mitigatórios:</strong> Definir e especificar formalmente pelo menos um controle de engenharia robusto (MFA, mTLS, WORM logs, RBAC, Rate Limiting) para cada ameaça prioritária.</span>
-      </label>
+        <label for="chk-fnd-5"><strong>5. Associação de Controles Mitigatórios:</strong> Definir e especificar formalmente pelo menos um controle de engenharia robusto (MFA, mTLS, WORM logs, RBAC, Rate Limiting) para cada ameaça prioritária.</label>
+      </li>
 
-      <label class="check-item">
+      <li class="checklist-item">
         <input type="checkbox" id="chk-fnd-6">
-        <span><strong>6. Homologação e Security as Code:</strong> Converter os controles mitigatórios em histórias de usuário no backlog dos times de desenvolvimento e em testes automatizados de validação no pipeline CI/CD.</span>
-      </label>
-    </div>
+        <label for="chk-fnd-6"><strong>6. Homologação e Security as Code:</strong> Converter os controles mitigatórios em histórias de usuário no backlog dos times de desenvolvimento e em testes automatizados de validação no pipeline CI/CD.</label>
+      </li>
+      </ul>
   </section>
 
   <!-- 6. QUIZ DE FIXAÇÃO E VALIDAÇÃO -->
-  <section class="content-section" id="quiz-fixacao">
+  <section class="study-section" id="quiz-fixacao" data-tipo="questoes">
     <h2>5. Questões de Fixação e Concursos Públicos</h2>
     <p>
       Valide sua compreensão com questões analíticas baseadas em casos práticos e provas de alto nível em segurança cibernética e certificações internacionais:
@@ -390,7 +376,7 @@ flowchart LR
 
     <div class="quiz-section">
       <!-- Questão 1 -->
-      <div class="quiz-item" data-quiz-id="q1">
+      <div class="quiz-item" data-formato="multipla" data-quiz-id="q1">
         <p class="quiz-question">
           <strong>Questão 1 (Tríade CIA &amp; DAD):</strong> Durante um incidente cibernético contra um centro de saúde, operadores de ransomware utilizaram criptografia simétrica para bloquear todos os discos rígidos dos servidores de prontuário eletrônico dos pacientes, sem efetuar a extração externa prévia dos arquivos. Em termos da Tríade CIA e de sua contrapartida ofensiva (Tríade DAD), qual pilar de segurança foi primariamente violado e qual vetor DAD foi concretizado?
         </p>
@@ -412,7 +398,7 @@ flowchart LR
       </div>
 
       <!-- Questão 2 -->
-      <div class="quiz-item" data-quiz-id="q2">
+      <div class="quiz-item" data-formato="multipla" data-quiz-id="q2">
         <p class="quiz-question">
           <strong>Questão 2 (Taxonomia STRIDE):</strong> Um atacante intercepta a comunicação de rede de uma aplicação financeira desprovida de TLS e altera o campo "valor_transferencia" de um JSON em trânsito antes que o servidor receba a requisição. Simultaneamente, um funcionário desonesto executa um estorno ilegal no sistema e apaga as linhas correspondentes da tabela de log local para evitar que sua ação seja descoberta. Quais categorias STRIDE descrevem com precisão esses dois eventos e quais mitigações são recomendadas?
         </p>
@@ -434,7 +420,7 @@ flowchart LR
       </div>
 
       <!-- Questão 3 -->
-      <div class="quiz-item" data-quiz-id="q3">
+      <div class="quiz-item" data-formato="multipla" data-quiz-id="q3">
         <p class="quiz-question">
           <strong>Questão 3 (Menor Privilégio &amp; Defesa em Profundidade):</strong> Uma empresa expõe uma API pública com WAF na borda, mas o contêiner interno da aplicação executa como usuário root do Linux e possui o socket <code>/var/run/docker.sock</code> montado em seu volume. Sob os princípios de cibersegurança, qual é o diagnóstico arquitetural dessa infraestrutura?
         </p>
@@ -458,7 +444,7 @@ flowchart LR
   </section>
 
   <!-- 7. FATOS ESSENCIAIS, NORMAS E PRÓXIMOS PASSOS -->
-  <section class="content-section" id="fatos-essenciais">
+  <section class="study-section" id="fatos-essenciais" data-tipo="referencias">
     <h2>6. Fatos Essenciais, Normas e Próximos Passos</h2>
     <p>
       Síntese dos conceitos-chave consolidados neste módulo piloto para consulta rápida e alinhamento normativo:
@@ -499,7 +485,7 @@ flowchart LR
     </div>
   </section>
 
-</main>
+</article>
 
 <!-- JAVASCRIPT EXCLUSIVO DO SIMULADOR STRIDE CANVAS (VANILLA JS) -->
 <script>

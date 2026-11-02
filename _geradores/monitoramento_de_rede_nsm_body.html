@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="monitoramento-de-rede-nsm">
 
     <!-- SEÇÃO 1: NSM, FONTES E SENSORES -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: O Implante Precisa Falar com Alguém</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: O Implante Precisa Falar com Alguém</h2>
 
         <p class="lead-text">
             A caçada do Estudo 47 achou o implante <code>OneDriveReport.exe</code> em duas estações da Ipê Store, WS-FIN-03 e WS-VEN-07. A resposta a incidentes quer saber três coisas antes de conter: com quem o implante fala, com que frequência e se algum dado já saiu. O EDR só enxerga as máquinas onde tem agente, e o canal de controle é HTTPS: nenhuma assinatura do IDS olha dentro dele. Mas todo implante precisa se comunicar, e a comunicação deixa metadados na rede, mesmo cifrada. Este módulo ensina a ler esses metadados com o Zeek, a decidir entre PCAP, logs do Zeek e NetFlow, e a achar beaconing e túnel DNS pelo comportamento.
@@ -118,11 +115,8 @@ flowchart TD
     </section>
 
     <!-- SEÇÃO 2: ZEEK, BEACONING, TÚNEL DNS, JA3/JA4 E NETFLOW -->
-    <section class="study-section" id="analise">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>Lendo o Zeek: Beaconing, Túnel DNS e Fingerprints TLS</h2>
-        </div>
+    <section class="study-section" id="analise" data-tipo="teoria">
+        <h2>Lendo o Zeek: Beaconing, Túnel DNS e Fingerprints TLS</h2>
 
         <h3>Os logs do Zeek</h3>
         <p>
@@ -301,11 +295,8 @@ for (orig, resp, porta), conns in pares.items():
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Analisador de Conexões</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Analisador de Conexões</h2>
 
         <p class="lead-text">
             Você recebeu uma hora de conn.log e de dns.log do sensor Zeek da Ipê Store. Na parte 1, agrupe as conexões e ajuste os limiares de intervalo, jitter e tamanho até destacar os dois beacons do implante sem falsos positivos. Na parte 2, ajuste os limiares de comprimento, entropia e volume do DNS até sobrar só o túnel. A cada mudança o analisador recalcula e conta acertos, falsos positivos e beacons perdidos. Os limiares iniciais são de propósito ruins.
@@ -402,11 +393,8 @@ for (orig, resp, porta), conns in pares.items():
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de Monitoramento de Rede</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de Monitoramento de Rede</h2>
 
         <p class="lead-text">
             Use esta lista para avaliar a visibilidade de rede de um ambiente ou antes de promover uma detecção de beaconing ou de túnel DNS. O estado das caixas fica salvo no seu navegador.
@@ -445,11 +433,8 @@ for (orig, resp, porta), conns in pares.items():
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Entrevista</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -537,11 +522,8 @@ for (orig, resp, porta), conns in pares.items():
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">

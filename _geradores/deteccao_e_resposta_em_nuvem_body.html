@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="deteccao-e-resposta-em-nuvem">
 
     <!-- SEÇÃO 1: A CHAVE QUE FICOU NO REPOSITÓRIO -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: A Chave Que Ficou no Repositório</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: A Chave Que Ficou no Repositório</h2>
 
         <p class="lead-text">
             Em 30 de outubro, um desenvolvedor da Ipê Store publicou num repositório público do GitHub um script antigo de deploy. Dentro dele estava a chave de acesso de longa duração <code>AKIAIOSFODNN7EXAMPLE</code> do usuário IAM <code>ci-deploy-legado</code>, na mesma conta AWS <code>111122223333</code> que o Estudo 52 passou a descrever em Terraform. O usuário existia desde antes do pipeline com OIDC e ainda tinha permissões amplas de IAM "para o deploy funcionar". Três dias depois, o GuardDuty levanta um achado de comportamento anômalo e a pergunta cai no colo do SOC. Este módulo ensina a responder com os registros da própria nuvem: quais logs existem por padrão e quais precisam ser ligados antes do incidente, como ler um evento de auditoria (quem, o quê, de onde e com qual credencial), como reconstruir a linha do tempo a partir da chave vazada e como conter sem apagar a evidência de que você vai precisar.
@@ -93,11 +90,8 @@ flowchart TD
     </section>
 
     <!-- SEÇÃO 2: LER, RECONSTRUIR, CONTER -->
-    <section class="study-section" id="eventos-linha-contencao">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>Ler Eventos, Montar a Linha do Tempo e Conter Sem Destruir</h2>
-        </div>
+    <section class="study-section" id="eventos-linha-contencao" data-tipo="teoria">
+        <h2>Ler Eventos, Montar a Linha do Tempo e Conter Sem Destruir</h2>
 
         <h3>Anatomia de um evento do CloudTrail</h3>
         <p>Cada chamada de API vira um registro JSON. Os campos que respondem às quatro perguntas da investigação são sempre os mesmos:</p>
@@ -241,11 +235,8 @@ aws ec2 create-snapshot --volume-id vol-1234567890abcdef0 \
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Conta Comprometida</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Conta Comprometida</h2>
 
         <p class="lead-text">
             Os eventos de auditoria da conta da Ipê Store entre 30 de outubro e 1º de novembro, descritos em dados dentro da página e no formato do CloudTrail. Na fase 1 você filtra pela chave vazada, separa o uso legítimo do CI e segue o pivô para as credenciais que o atacante criou. Na fase 2 monta a linha do tempo do ataque, evento por evento. Na fase 3 escolhe a ordem da contenção e vê o que cada passo preserva ou destrói.
@@ -307,11 +298,8 @@ aws ec2 create-snapshot --volume-id vol-1234567890abcdef0 \
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de Detecção e Resposta em Nuvem</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de Detecção e Resposta em Nuvem</h2>
 
         <p class="lead-text">
             Metade desta lista tem de estar pronta antes do incidente. O estado das caixas fica salvo no seu navegador.
@@ -350,11 +338,8 @@ aws ec2 create-snapshot --volume-id vol-1234567890abcdef0 \
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Entrevista</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -430,11 +415,8 @@ aws ec2 create-snapshot --volume-id vol-1234567890abcdef0 \
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">

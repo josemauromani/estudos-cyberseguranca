@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="engenharia-deteccao">
 
     <!-- SEÇÃO 1: TER REGRA NÃO É DETECTAR -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: "Tenho Regra" Não É "Detecto"</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: "Tenho Regra" Não É "Detecto"</h2>
 
         <p class="lead-text">
             O painel do SOC da Ipê Store mostrava 5 de 8 técnicas ATT&amp;CK prioritárias "cobertas": havia uma regra com a tag de cada uma. Depois do relatório de inteligência do Estudo 17, a equipe emulou essas técnicas num laboratório e olhou a fila de alertas. Nenhuma das cinco regras passou: uma nunca disparava, outra gerava milhares de alertas falsos por dia, as outras perdiam variações óbvias do ataque. Este módulo trata de como produzir, testar e medir um conjunto de detecções para que o número no painel diga a verdade.
@@ -77,11 +74,8 @@ flowchart TD
     </section>
 
     <!-- SEÇÃO 2: SIGMA, TESTES E MÉTRICAS -->
-    <section class="study-section" id="engenharia">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>Regras Sigma Testáveis, Emulação e Métricas</h2>
-        </div>
+    <section class="study-section" id="engenharia" data-tipo="teoria">
+        <h2>Regras Sigma Testáveis, Emulação e Métricas</h2>
 
         <h3>Uma regra Sigma completa</h3>
         <p>
@@ -235,11 +229,8 @@ Invoke-AtomicTest T1003.001 -TestNumbers 2 -Cleanup
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Bancada de Detecções</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Bancada de Detecções</h2>
 
         <p class="lead-text">
             As regras herdadas do SIEM antigo da Ipê Store estão na bancada. Rode-as contra os eventos rotulados, leia o pipeline, corrija o YAML e veja a matriz de cobertura mudar só quando a regra passa. A bancada entende um subconjunto do Sigma: logsource, seleções com os modificadores <code>contains</code>, <code>startswith</code>, <code>endswith</code> e <code>all</code>, e condition com <code>and</code>, <code>or</code>, <code>not</code>, parênteses e <code>1 of</code> / <code>all of</code>.
@@ -291,11 +282,8 @@ Invoke-AtomicTest T1003.001 -TestNumbers 2 -Cleanup
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de Engenharia de Detecção</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de Engenharia de Detecção</h2>
 
         <p class="lead-text">
             Use esta lista para avaliar o processo de detecção de um SOC. O estado das caixas fica salvo no seu navegador.
@@ -334,11 +322,8 @@ Invoke-AtomicTest T1003.001 -TestNumbers 2 -Cleanup
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Entrevista</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -426,11 +411,8 @@ Invoke-AtomicTest T1003.001 -TestNumbers 2 -Cleanup
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">

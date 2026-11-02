@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="ataques-ad">
 
     <!-- SEÇÃO 1: O AD COMO GRAFO -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: Defensores Pensam em Listas, Atacantes em Grafos</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: Defensores Pensam em Listas, Atacantes em Grafos</h2>
 
         <p class="lead-text">
             O administrador olha o AD como listas: usuários, grupos, computadores, GPOs. O atacante olha como um mapa de relações e pergunta só uma coisa: de onde estou, qual é o caminho mais curto até controlar o domínio? Este estudo usa o domínio <code>corp.ipestore.example</code> do Estudo 38 para mostrar três técnicas clássicas, os rastros que cada uma deixa nos logs e as mitigações que quebram o caminho. O conteúdo é conceitual e defensivo: não há comandos de ataque.
@@ -60,11 +57,8 @@ flowchart TD
     </section>
 
     <!-- SEÇÃO 2: TÉCNICAS, SINAIS E MITIGAÇÕES -->
-    <section class="study-section" id="tecnicas">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>Kerberoasting, Pass-the-Hash e DCSync</h2>
-        </div>
+    <section class="study-section" id="tecnicas" data-tipo="teoria">
+        <h2>Kerberoasting, Pass-the-Hash e DCSync</h2>
 
         <h3>Kerberoasting (T1558.003)</h3>
         <p>
@@ -136,11 +130,8 @@ Set-LapsADComputerSelfPermission -Identity "OU=Estacoes,DC=corp,DC=ipestore,DC=e
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Mapa de Caminhos de Ataque</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Mapa de Caminhos de Ataque</h2>
 
         <p class="lead-text">
             Na fase 1, você parte de <code>joao.estagiario</code> e segue as relações do domínio até o controle total; depois aplica mitigações até não sobrar nenhum caminho. Na fase 2, classifica eventos do Windows: alguns são ataques, outros são rotina parecida.
@@ -177,11 +168,8 @@ Set-LapsADComputerSelfPermission -Identity "OU=Estacoes,DC=corp,DC=ipestore,DC=e
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de Defesa do AD</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de Defesa do AD</h2>
 
         <p class="lead-text">
             Use esta lista numa revisão do domínio. O estado das caixas fica salvo no seu navegador.
@@ -220,11 +208,8 @@ Set-LapsADComputerSelfPermission -Identity "OU=Estacoes,DC=corp,DC=ipestore,DC=e
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Entrevista</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -304,11 +289,8 @@ Set-LapsADComputerSelfPermission -Identity "OU=Estacoes,DC=corp,DC=ipestore,DC=e
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">

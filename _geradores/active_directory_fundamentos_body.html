@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="active-directory">
 
     <!-- SEÇÃO 1: ESTRUTURA -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: O Coração da Identidade Corporativa</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: O Coração da Identidade Corporativa</h2>
 
         <p class="lead-text">
             Na maioria das empresas que usam Windows, o Active Directory (AD) decide quem é cada pessoa, em quais máquinas ela entra e quais configurações valem em cada computador. Por isso ele é o alvo preferido de quem invade: quem domina o AD domina a empresa. Antes de estudar os ataques (Estudo 39) e o controle de acessos privilegiados (Estudo 40), é preciso entender três coisas: como o AD se organiza, como as GPOs chegam a cada máquina e como o Kerberos autentica. O exemplo é o domínio <strong>corp.ipestore.example</strong> da Ipê Store.
@@ -49,11 +46,8 @@
     </section>
 
     <!-- SEÇÃO 2: GPO, KERBEROS E ADMINISTRAÇÃO -->
-    <section class="study-section" id="gpo-kerberos">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>GPO, Kerberos, NTLM e Camadas de Administração</h2>
-        </div>
+    <section class="study-section" id="gpo-kerberos" data-tipo="teoria">
+        <h2>GPO, Kerberos, NTLM e Camadas de Administração</h2>
 
         <h3>Como as GPOs se Somam: LSDOU</h3>
         <p>
@@ -136,11 +130,8 @@ PS&gt; New-ADServiceAccount -Name gmsa-sqlerp `
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Kerberos Passo a Passo e Calculadora de GPO</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Kerberos Passo a Passo e Calculadora de GPO</h2>
 
         <p class="lead-text">
             Na primeira parte, clique em cada mensagem Kerberos para ver os campos e o que pode dar errado, e execute a autenticação em cenários de falha. Na segunda, monte a cadeia de GPOs que chega ao SRV-ERP01 e veja qual configuração vence.
@@ -184,11 +175,8 @@ PS&gt; New-ADServiceAccount -Name gmsa-sqlerp `
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de Higiene do Active Directory</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de Higiene do Active Directory</h2>
 
         <p class="lead-text">
             Use esta lista para uma primeira avaliação de um domínio. O estado das caixas fica salvo no seu navegador.
@@ -227,11 +215,8 @@ PS&gt; New-ADServiceAccount -Name gmsa-sqlerp `
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Entrevista</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -313,11 +298,8 @@ PS&gt; New-ADServiceAccount -Name gmsa-sqlerp `
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">

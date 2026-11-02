@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="infraestrutura-como-codigo-segura">
 
     <!-- SEÇÃO 1: DO ACHADO À PREVENÇÃO -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: O Bucket Que Passou na Revisão</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: O Bucket Que Passou na Revisão</h2>
 
         <p class="lead-text">
             A Ipê Store descreve toda a sua conta AWS em Terraform: buckets, redes, bancos, balanceadores e a trilha de auditoria. No pull request #318, o time fiscal criou o bucket das notas fiscais. A revisora leu o diff do HCL, viu um bloco de Block Public Access e aprovou. Ninguém reparou que duas das quatro chaves estavam em <code>false</code> "provisoriamente". Três dias depois, o CSPM do Estudo 21 apontou o bucket como exposto. Nada vazou, mas por sorte. A pergunta deste módulo é outra: por que uma configuração proibida conseguiu ser criada? Aqui você aprende a ler o plano do Terraform em vez do diff, a escrever políticas como código que barram o plano antes do <code>apply</code>, a proteger o <em>state</em> e a descobrir quando o ambiente real deixou de ser o que o código diz.
@@ -79,11 +76,8 @@ flowchart TD
     </section>
 
     <!-- SEÇÃO 2: PLANO, POLÍTICAS, STATE E DRIFT -->
-    <section class="study-section" id="plano-politica-state">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>Plano, Políticas como Código, State e Drift</h2>
-        </div>
+    <section class="study-section" id="plano-politica-state" data-tipo="teoria">
+        <h2>Plano, Políticas como Código, State e Drift</h2>
 
         <h3>Ler o plano, não só o diff</h3>
         <p>
@@ -224,11 +218,8 @@ resource "aws_db_instance" "pedidos" {
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Revisor de Plano Terraform</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Revisor de Plano Terraform</h2>
 
         <p class="lead-text">
             O pull request #318 da Ipê Store, descrito em dados dentro da página. Na fase 1 você lê cada mudança do plano (o trecho de HCL e o JSON de <code>terraform show -json</code>) e marca as que acha arriscadas. Na fase 2 ativa políticas, vê quais mudanças são reprovadas e por quê, aplica correções e registra exceções com prazo e responsável. Na fase 3 olha o state de produção e configura o backend. Na fase 4 compara o código com o ambiente real e decide o que fazer com cada drift.
@@ -317,11 +308,8 @@ resource "aws_db_instance" "pedidos" {
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de IaC Segura</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de IaC Segura</h2>
 
         <p class="lead-text">
             Use esta lista ao revisar um repositório de Terraform ou o pipeline que o aplica. O estado das caixas fica salvo no seu navegador.
@@ -360,11 +348,8 @@ resource "aws_db_instance" "pedidos" {
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Entrevista</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -452,11 +437,8 @@ resource "aws_db_instance" "pedidos" {
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">

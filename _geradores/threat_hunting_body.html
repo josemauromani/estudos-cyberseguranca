@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="threat-hunting">
 
     <!-- SEÇÃO 1: CAÇA POR HIPÓTESE -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: Nenhum Alerta Não Quer Dizer Nenhum Invasor</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: Nenhum Alerta Não Quer Dizer Nenhum Invasor</h2>
 
         <p class="lead-text">
             Na segunda-feira, o SOC da Ipê Store recebeu um relatório de inteligência (o fluxo do Estudo 17): um grupo que ataca varejistas ganha persistência com uma tarefa agendada de nome parecido com as do OneDrive, que executa um binário guardado em <code>C:\Users\Public</code>. O implante é recompilado para cada vítima, então o hash do relatório não serve. A fila de alertas está vazia. Isso é uma boa notícia ou só quer dizer que nenhuma regra enxerga esse comportamento? Este módulo ensina a responder com uma caçada: partir de uma hipótese, escolher a fonte de dados que a confirma ou refuta, achar o raro por contagem e transformar o que se encontrou em detecção.
@@ -116,11 +113,8 @@ flowchart TD
     </section>
 
     <!-- SEÇÃO 2: DADOS, LINHA DE BASE E STACK COUNTING -->
-    <section class="study-section" id="dados">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>Fontes de Dados, Linha de Base e Stack Counting</h2>
-        </div>
+    <section class="study-section" id="dados" data-tipo="teoria">
+        <h2>Fontes de Dados, Linha de Base e Stack Counting</h2>
 
         <h3>Qual fonte responde à hipótese</h3>
         <p>
@@ -276,11 +270,8 @@ SecurityEvent
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Caçada Guiada</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Caçada Guiada</h2>
 
         <p class="lead-text">
             Conduza a caçada do relatório na frota fictícia da Ipê Store. Escolha a hipótese, a fonte de dados que a confirma ou refuta, agrupe os eventos por frequência e aponte o achado. O simulador pontua cada decisão (hipótese, fonte, campo do agrupamento e achado, até 10 pontos), escreve o registro da caçada e sugere a detecção que ela gera. Vale a primeira escolha de cada etapa, como numa caçada real, em que tempo é recurso.
@@ -349,11 +340,8 @@ SecurityEvent
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de uma Caçada</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de uma Caçada</h2>
 
         <p class="lead-text">
             Use esta lista antes de dar uma caçada por encerrada. O estado das caixas fica salvo no seu navegador.
@@ -392,11 +380,8 @@ SecurityEvent
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Entrevista</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -484,11 +469,8 @@ SecurityEvent
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">

@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="soar-e-automacao-de-resposta">
 
     <!-- SEÇÃO 1: SOAR, PLAYBOOK E ANATOMIA -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: O Beacon Disparou às 09:42, o Isolamento Saiu às 11:18</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: O Beacon Disparou às 09:42, o Isolamento Saiu às 11:18</h2>
 
         <p class="lead-text">
             A Trilha 11 deu ao SOC da Ipê Store detecções boas: a regra testada na bancada do Estudo 46, a caçada do Estudo 47 que achou o implante e os alertas de beaconing e de túnel DNS do Estudo 48. Na segunda-feira, o alerta de beacon de WS-FIN-03 entrou na fila às 09:42. O analista de plantão estava com outros onze alertas abertos, assumiu o caso 24 minutos depois, gastou mais meia hora consultando a reputação do IP, o dono da máquina e o histórico, e pediu o isolamento às 11:18. Foram 96 minutos com o canal de controle aberto e as notas fiscais saindo por DNS. Detectar bem não basta: a resposta também precisa ser rápida. Este módulo ensina a codificar a parte repetitiva da resposta num playbook de SOAR, sem deixar a máquina fazer o que só uma pessoa deve decidir.
@@ -114,11 +111,8 @@ flowchart TD
     </section>
 
     <!-- SEÇÃO 2: O QUE AUTOMATIZAR, APROVAÇÃO, EXCEÇÕES, FALHAS E MÉTRICAS -->
-    <section class="study-section" id="automacao">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>Automatizar com Segurança: Aprovação, Exceções, Falhas e Métricas</h2>
-        </div>
+    <section class="study-section" id="automacao" data-tipo="teoria">
+        <h2>Automatizar com Segurança: Aprovação, Exceções, Falhas e Métricas</h2>
 
         <h3>O que automatizar</h3>
         <p>
@@ -246,11 +240,8 @@ passos:
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Montador de Playbook</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Montador de Playbook</h2>
 
         <p class="lead-text">
             Monte o playbook de triagem da Ipê Store encadeando blocos e rode-o contra a fila fixa de dez alertas das 09:42 às 10:12. O simulador mostra, para cada alerta, o passo a passo, o MTTA e o MTTR com e sem automação, e o custo de cada erro: servidor de produção isolado, IP de parceiro bloqueado, conta desativada à toa ou ameaça encerrada como falso positivo. O playbook inicial é de propósito ingênuo. Depois de acertar, ligue as falhas de fonte e veja se ele continua seguro.
@@ -336,11 +327,8 @@ passos:
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de um Playbook de Resposta</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de um Playbook de Resposta</h2>
 
         <p class="lead-text">
             Use esta lista antes de colocar um playbook em produção ou ao revisar os que já rodam. O estado das caixas fica salvo no seu navegador.
@@ -379,11 +367,8 @@ passos:
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Entrevista</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -471,11 +456,8 @@ passos:
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">

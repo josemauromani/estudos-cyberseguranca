@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="python-seguranca">
 
     <!-- SEÇÃO 1: DO GREP AO SCRIPT -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: Do grep ao Script Repetível</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: Do grep ao Script Repetível</h2>
 
         <p class="lead-text">
             No Estudo 34, você investigou o <strong>web-loja01</strong> com <code>grep</code>, <code>awk</code>, <code>sort</code> e <code>uniq -c</code>, e encontrou a força bruta de <code>198.51.100.23</code> terminando num login aceito da conta <code>deploy</code>. Funciona, mas cada analista monta a linha de comando de um jeito, e no próximo incidente tudo recomeça. Um script em Python faz a mesma triagem sempre do mesmo jeito, aceita formatos diferentes de log, consulta serviços de reputação e entrega o resultado em CSV ou JSON para o SIEM.
@@ -82,11 +79,8 @@ for ip, total in falhas.most_common(10):
     </section>
 
     <!-- SEÇÃO 2: APIs, FORMATOS E BOAS PRÁTICAS -->
-    <section class="study-section" id="apis">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>APIs de Reputação, JSON, CSV e Boas Práticas</h2>
-        </div>
+    <section class="study-section" id="apis" data-tipo="teoria">
+        <h2>APIs de Reputação, JSON, CSV e Boas Práticas</h2>
 
         <h3>Consultando reputação com requests</h3>
         <p>
@@ -147,11 +141,8 @@ else:
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Montador de Detector</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Montador de Detector</h2>
 
         <p class="lead-text">
             Primeiro, escreva uma regex no testador e veja as correspondências no log. Depois, encaixe os blocos do detector: a página mostra o script Python completo e o resultado de executá-lo sobre os mesmos logs. O script gerado roda de verdade: copie, salve ao lado dos logs e execute com <code>python3</code>.
@@ -232,11 +223,8 @@ else:
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de um Script de Segurança</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de um Script de Segurança</h2>
 
         <p class="lead-text">
             Use esta lista antes de entregar um script para a equipe usar. O estado das caixas fica salvo no seu navegador.
@@ -275,11 +263,8 @@ else:
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Entrevista</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -355,11 +340,8 @@ else:
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">

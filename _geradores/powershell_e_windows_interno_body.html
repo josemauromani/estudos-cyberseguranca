@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="powershell-windows">
 
     <!-- SEÇÃO 1: POWERSHELL -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: A Mesma Ferramenta dos Dois Lados</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: A Mesma Ferramenta dos Dois Lados</h2>
 
         <p class="lead-text">
             O PowerShell administra o Windows inteiro e, por isso mesmo, é uma das ferramentas favoritas de quem invade (T1059.001). Para o analista, ele é o jeito mais rápido de perguntar a uma máquina o que aconteceu: quais eventos houve, o que está rodando, o que inicia sozinho. Neste estudo você vai aprender o suficiente de PowerShell para investigar a <strong>EST-FIN-07</strong>, uma estação do financeiro da Ipê Store que abriu o anexo errado.
@@ -51,11 +48,8 @@ Get-ScheduledTask | Where-Object TaskPath -notlike '\Microsoft\*'</code></pre>
     </section>
 
     <!-- SEÇÃO 2: EVENTOS E PERSISTÊNCIA -->
-    <section class="study-section" id="eventos">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>Eventos Essenciais, Sysmon, ScriptBlock e Registro</h2>
-        </div>
+    <section class="study-section" id="eventos" data-tipo="teoria">
+        <h2>Eventos Essenciais, Sysmon, ScriptBlock e Registro</h2>
 
         <h3>Eventos que Contam a História</h3>
         <div class="table-responsive">
@@ -122,11 +116,8 @@ flowchart TD
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Visualizador de Eventos no PowerShell</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Visualizador de Eventos no PowerShell</h2>
 
         <p class="lead-text">
             O EDR alertou sobre uma conexão estranha da EST-FIN-07. Use o console para investigar com cmdlets e pipeline de objetos, e responda às perguntas. Digite <code>Get-Command</code> para a lista de comandos e <code>Get-Help nome</code> para exemplos.
@@ -163,11 +154,8 @@ flowchart TD
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de Visibilidade e Defesa no Windows</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de Visibilidade e Defesa no Windows</h2>
 
         <p class="lead-text">
             Use esta lista para avaliar se as estações e servidores Windows deixam rastro suficiente e resistem ao abuso do PowerShell. O estado das caixas fica salvo no seu navegador.
@@ -206,11 +194,8 @@ flowchart TD
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Entrevista</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -292,11 +277,8 @@ flowchart TD
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">

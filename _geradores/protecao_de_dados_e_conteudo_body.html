@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="protecao-dados-conteudo">
 
     <!-- SEÇÃO 1: INTRODUÇÃO -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: O Que Entra e o Que Sai</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: O Que Entra e o Que Sai</h2>
 
         <p class="lead-text">
             Firewall e EDR olham para conexões e processos. Três outros filtros olham para o <strong>conteúdo</strong>: o AntiSpam decide se um e-mail recebido é confiável, o DLP (<em>Data Loss Prevention</em>) impede que dados sensíveis saiam, e o filtro de conteúdo do proxy seguro decide quais sites podem ser acessados. Os três erram nos dois sentidos: deixam passar o que deviam barrar (falso negativo) e barram o trabalho legítimo (falso positivo). Neste estudo você vai entender como cada um decide e configurar as políticas da <strong>Ipê Store</strong>, a loja online fictícia dos Estudos 25 e 31.
@@ -31,11 +28,8 @@
     </section>
 
     <!-- SEÇÃO 2: COMO CADA FILTRO DECIDE -->
-    <section class="study-section" id="filtros">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>DLP, Autenticação de E-mail e Filtro de URL</h2>
-        </div>
+    <section class="study-section" id="filtros" data-tipo="teoria">
+        <h2>DLP, Autenticação de E-mail e Filtro de URL</h2>
 
         <div class="diagram-box">
             <div class="diagram-header">
@@ -194,11 +188,8 @@ Authentication-Results: mx.ipestore.example;
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Gateway de Conteúdo</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Gateway de Conteúdo</h2>
 
         <p class="lead-text">
             Escolha um dos oito itens que chegam ao gateway da Ipê Store: e-mails recebidos, e-mails enviados e uploads. Edite o texto, mude o resultado do SPF e do DKIM ou as políticas, e veja cada estágio justificar a decisão. O veredito final é o mais severo entre os estágios que se aplicam.
@@ -272,11 +263,8 @@ Authentication-Results: mx.ipestore.example;
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de Proteção de Dados e Conteúdo</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de Proteção de Dados e Conteúdo</h2>
 
         <p class="lead-text">
             Use esta lista para revisar a proteção de e-mail, web e dados de uma organização. O estado das caixas fica salvo no seu navegador.
@@ -315,11 +303,8 @@ Authentication-Results: mx.ipestore.example;
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Concursos</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Concursos</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -401,11 +386,8 @@ Authentication-Results: mx.ipestore.example;
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">

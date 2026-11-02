@@ -3,10 +3,12 @@
      Corpo do Treinamento: Princípios Zero Trust e Microsegmentação
      ========================================================================== -->
 
-<header class="study-header">
-  <span class="study-track-kicker">Trilha 2: Segurança Defensiva &bull; Estudo 08</span>
-  <h1 class="study-title">Arquitetura Zero Trust e Microsegmentação</h1>
-  <p class="study-lead">
+<article class="study-container" data-slug="arquitetura-zero-trust">
+<!-- SEÇÃO 1: O COLAPSO DO PERÍMETRO E OS 3 AXIOMAS DO ZERO TRUST -->
+<section class="study-section" id="axiomas-zero-trust" data-tipo="teoria">
+  <h2>O Colapso do Perímetro Tradicional e os Três Axiomas do Zero Trust</h2>
+
+  <p class="lead-text">
     O modelo tradicional de segurança perimetral &mdash; baseado na metáfora do "castelo fortificado cercado por um fosso" &mdash;
     tornou-se obsoleto com a migração massiva para a nuvem, a pulverização de microsserviços e o trabalho remoto descentralizado.
     A <strong>Arquitetura Zero Trust (ZTA)</strong>, formalizada pelo <strong>NIST SP 800-207</strong>, substitui a confiança implícita
@@ -15,20 +17,6 @@
     por ZTNA/SDP, o controle granular por microsegmentação e a avaliação contínua da postura do dispositivo é indispensável
     para desenhar defesas modernas e resilientes.
   </p>
-  <div class="study-meta-bar">
-    <span class="badge green">NIST CSF 2.0: Protect (PR.AA / PR.AC)</span>
-    <span class="badge slate">MITRE ATT&amp;CK: TA0008, TA0004, T1078, T1021</span>
-    <span class="badge slate">Tempo Estimado: ~40 minutos</span>
-    <span class="badge slate">Carreiras: Blue Team &bull; Arquitetura &bull; GRC</span>
-  </div>
-</header>
-
-<!-- SEÇÃO 1: O COLAPSO DO PERÍMETRO E OS 3 AXIOMAS DO ZERO TRUST -->
-<section class="study-section" id="axiomas-zero-trust">
-  <div class="section-title-wrap">
-    <span class="section-num">01</span>
-    <h2>O Colapso do Perímetro Tradicional e os Três Axiomas do Zero Trust</h2>
-  </div>
 
   <p>
     Por mais de duas décadas, a arquitetura de redes corporativas operou sob o dogma da
@@ -83,11 +71,8 @@
 </section>
 
 <!-- SEÇÃO 2: ARQUITETURA FORMAL DO NIST SP 800-207 -->
-<section class="study-section" id="nist-sp-800-207">
-  <div class="section-title-wrap">
-    <span class="section-num">02</span>
-    <h2>A Arquitetura Lógica Formal do NIST SP 800-207</h2>
-  </div>
+<section class="study-section" id="nist-sp-800-207" data-tipo="teoria">
+  <h2>A Arquitetura Lógica Formal do NIST SP 800-207</h2>
 
   <p>
     A publicação especial <strong>NIST SP 800-207 (Zero Trust Architecture)</strong> padronizou o modelo de referência
@@ -145,11 +130,8 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 3: MICROSEGMENTAÇÃO E ZTNA VS VPN -->
-<section class="study-section" id="microsegmentacao-ztna">
-  <div class="section-title-wrap">
-    <span class="section-num">03</span>
-    <h2>Microsegmentação e Perímetro Definido por Software (SDP / ZTNA)</h2>
-  </div>
+<section class="study-section" id="microsegmentacao-ztna" data-tipo="teoria">
+  <h2>Microsegmentação e Perímetro Definido por Software (SDP / ZTNA)</h2>
 
   <p>
     A segmentação de redes tradicional (VLANs e firewalls de borda) opera no nível macro de sub-redes inteiras.
@@ -182,11 +164,8 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 4: ACESSO BASEADO EM CONTEXTO E POSTURA DO DISPOSITIVO -->
-<section class="study-section" id="contexto-postura">
-  <div class="section-title-wrap">
-    <span class="section-num">04</span>
-    <h2>Acesso Baseado em Contexto e Avaliação Contínua de Risco</h2>
-  </div>
+<section class="study-section" id="contexto-postura" data-tipo="teoria">
+  <h2>Acesso Baseado em Contexto e Avaliação Contínua de Risco</h2>
 
   <p>
     No Zero Trust, a autenticação primária (nome de usuário e senha) é apenas o primeiro de dezenas de sinais avaliados.
@@ -233,11 +212,8 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (MOTOR PDP/PEP) -->
-<section class="study-section" id="laboratorio-pratico">
-  <div class="section-title-wrap">
-    <span class="section-num">05</span>
-    <h2>Laboratório Interativo: Motor de Decisão Zero Trust (PDP/PEP)</h2>
-  </div>
+<section class="study-section" id="laboratorio-pratico" data-tipo="laboratorio">
+  <h2>Laboratório Interativo: Motor de Decisão Zero Trust (PDP/PEP)</h2>
 
   <p>
     Experimente na prática como um motor de decisão Policy Engine avalia múltiplos sinais de contexto em tempo real.
@@ -339,86 +315,74 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 6: CHECKLIST PRÁTICO -->
-<section class="study-section" id="checklist-zero-trust">
-  <div class="section-title-wrap">
-    <span class="section-num">06</span>
-    <h2>Checklist de Aplicação Prática: Implementação e Auditoria Zero Trust</h2>
-  </div>
+<section class="study-section" id="checklist-zero-trust" data-tipo="checklist">
+  <h2>Checklist de Aplicação Prática: Implementação e Auditoria Zero Trust</h2>
 
   <p>
     Utilize este checklist técnico durante auditorias de conformidade com o NIST SP 800-207
     ou planejamento de migração de infraestruturas tradicionais para ZTNA:
   </p>
 
-  <div class="checklist" id="checklist-arquitetura-zero-trust">
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+  <ul class="checklist" id="checklist-arquitetura-zero-trust">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_0">
+      <label for="list_0_0">
         <strong>Erradicação da Confiança Implícita em Redes Internas:</strong>
         Dispositivos conectados à rede local cabeada da empresa não possuem privilégios adicionais sobre dispositivos remotos;
         todas as conexões exigem autenticação explícita e criptografia mTLS ponta a ponta.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_1">
+      <label for="list_0_1">
         <strong>Adoção de ZTNA em Substituição a VPNs de Camada 3:</strong>
         O acesso remoto para colaboradores e parceiros é baseado em ZTNA/SDP com acesso granular na Camada 7 por aplicação,
         sem concessão de endereçamento IP interno ou rotas de rede ampla.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_2">
+      <label for="list_0_2">
         <strong>Verificação Estrita da Postura do Dispositivo (Device Health):</strong>
         O Policy Engine valida a criptografia de disco, a presença de agente EDR saudável e o status de patches antes
         de conceder acesso a sistemas corporativos de média ou alta criticidade.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_3">
+      <label for="list_0_3">
         <strong>Reavaliação Contínua de Risco em Tempo Real:</strong>
         Sessões ativas não possuem autorização vitalícia; alterações no contexto (desativação de antivírus, anomalias de rede)
         disparam o Policy Administrator para revogar o acesso imediatamente.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_4">
+      <label for="list_0_4">
         <strong>Microsegmentação entre Cargas de Trabalho (Leste-Oeste):</strong>
         Serviços e bancos de dados em nuvem e containers utilizam políticas de rede estritas (Network Policies)
         que impedem comunicação lateral entre pods e servidores sem necessidade de negócio comprovada.
-      </span>
-    </label>
+      </label>
+    </li>
 
-    <label class="checklist-item">
-      <input type="checkbox" onchange="toggleCheckItem(this)">
-      <span class="check-box"></span>
-      <span class="check-text">
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_5">
+      <label for="list_0_5">
         <strong>Obrigatoriedade de MFA Resistente a Phishing (FIDO2):</strong>
         O acesso ao plano de controle e recursos corporativos críticos exige autenticação multifator FIDO2/WebAuthn,
         rejeitando métodos obsoletos como SMS em sistemas confidenciais.
-      </span>
-    </label>
-  </div>
+      </label>
+    </li>
+  </ul>
 </section>
 
 <!-- SEÇÃO 7: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
-<section class="study-section" id="questoes-fixacao">
-  <div class="section-title-wrap">
-    <span class="section-num">07</span>
-    <h2>Questões de Fixação e Concursos Públicos</h2>
-  </div>
+<section class="study-section" id="questoes-fixacao" data-tipo="questoes">
+  <h2>Questões de Fixação e Concursos Públicos</h2>
 
   <p>
     Valide sua preparação respondendo a questões baseadas em provas de concursos para Analista de Segurança e Tecnologia
@@ -435,9 +399,9 @@ flowchart TD
           estrita do componente denominado Policy Enforcement Point (PEP), e como ele se relaciona com o Policy Decision Point (PDP)?
         </p>
       </div>
-      <details class="quiz-answer">
-        <summary>Ver resposta comentada</summary>
-        <div class="quiz-explanation">
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
           <p>
             <strong>Gabarito: O PEP atua no Plano de Dados, interceptando requisições e aplicando as decisões de permitir, bloquear ou encerrar conexões determinadas pelo PDP (que reside no Plano de Controle).</strong>
           </p>
@@ -458,9 +422,9 @@ flowchart TD
           qual é o diferencial arquitetural primário do ZTNA que fundamenta essa decisão?
         </p>
       </div>
-      <details class="quiz-answer">
-        <summary>Ver resposta comentada</summary>
-        <div class="quiz-explanation">
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
           <p>
             <strong>Gabarito: O ZTNA concede acesso restrito em nível de aplicação (Camada 7), mantendo todas as demais portas e servidores da rede corporativa invisíveis e inacessíveis para o dispositivo do usuário.</strong>
           </p>
@@ -480,9 +444,9 @@ flowchart TD
           Qual decisão de engenharia de segurança reflete diretamente a aplicação desse princípio em um data center moderno?
         </p>
       </div>
-      <details class="quiz-answer">
-        <summary>Ver resposta comentada</summary>
-        <div class="quiz-explanation">
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
           <p>
             <strong>Gabarito: Implementação de microsegmentação estrita e criptografia mTLS obrigatória em todo o tráfego leste-oeste (entre servidores internos), assumindo que um invasor já pode ter comprometido um host na rede local.</strong>
           </p>
@@ -496,11 +460,8 @@ flowchart TD
 </section>
 
 <!-- SEÇÃO 8: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
-<section class="study-section" id="fatos-essenciais">
-  <div class="section-title-wrap">
-    <span class="section-num">08</span>
-    <h2>Fatos Essenciais &bull; Trilha 2: Segurança Defensiva</h2>
-  </div>
+<section class="study-section" id="fatos-essenciais" data-tipo="referencias">
+  <h2>Fatos Essenciais &bull; Trilha 2: Segurança Defensiva</h2>
 
   <div class="facts-grid">
     <div class="facts-card">
@@ -529,6 +490,7 @@ flowchart TD
     </div>
   </div>
 </section>
+</article>
 
 <!-- SCRIPT EMBUTIDO: SIMULADOR DE MOTOR ZERO TRUST PDP/PEP -->
 <script>

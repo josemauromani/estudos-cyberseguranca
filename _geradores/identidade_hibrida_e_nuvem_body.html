@@ -2,11 +2,8 @@
 <article class="study-container" data-slug="identidade-hibrida">
 
     <!-- SEÇÃO 1: IDENTIDADE HÍBRIDA -->
-    <section class="study-section" id="introducao">
-        <div class="section-header">
-            <span class="section-tag">Seção 01</span>
-            <h2>Introdução: O Mesmo Usuário em Dois Mundos</h2>
-        </div>
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: O Mesmo Usuário em Dois Mundos</h2>
 
         <p class="lead-text">
             Na Ipê Store, a Ana entra no computador com a conta do Active Directory (Estudos 38 e 39) e, no mesmo dia, abre o correio e os documentos na nuvem com a mesma senha. Isso é identidade híbrida: o AD local continua sendo a fonte das contas, e o Microsoft Entra ID (antigo Azure AD) autentica o acesso aos serviços em nuvem. A vantagem é uma identidade só; o risco é que um erro de um lado vira acesso do outro.
@@ -78,11 +75,8 @@ flowchart TD
     </section>
 
     <!-- SEÇÃO 2: MFA, ATAQUES E PIM -->
-    <section class="study-section" id="ataques">
-        <div class="section-header">
-            <span class="section-tag">Seção 02</span>
-            <h2>MFA, Ataques à Identidade em Nuvem e PIM</h2>
-        </div>
+    <section class="study-section" id="ataques" data-tipo="teoria">
+        <h2>MFA, Ataques à Identidade em Nuvem e PIM</h2>
 
         <h3>Nem todo MFA é igual</h3>
         <div class="table-responsive">
@@ -137,11 +131,8 @@ Get-MgOauth2PermissionGrant -All | Select-Object ClientId, ConsentType, Scope
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador">
-        <div class="section-header">
-            <span class="section-tag">Seção 03</span>
-            <h2>Laboratório Prático: Avaliador de Acesso Condicional</h2>
-        </div>
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Avaliador de Acesso Condicional</h2>
 
         <p class="lead-text">
             O tenant da Ipê Store tem seis políticas, e algumas têm falhas. Mude o estado das políticas, ajuste exclusões ou crie políticas novas: as oito tentativas de login abaixo são reavaliadas na hora, mostrando o resultado e qual política decidiu.
@@ -177,11 +168,8 @@ Get-MgOauth2PermissionGrant -All | Select-Object ClientId, ConsentType, Scope
     </section>
 
     <!-- SEÇÃO 4: CHECKLIST -->
-    <section class="study-section" id="checklist">
-        <div class="section-header">
-            <span class="section-tag">Seção 04</span>
-            <h2>Checklist de Identidade Híbrida</h2>
-        </div>
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de Identidade Híbrida</h2>
 
         <p class="lead-text">
             Use esta lista para revisar o tenant de uma empresa. O estado das caixas fica salvo no seu navegador.
@@ -220,11 +208,8 @@ Get-MgOauth2PermissionGrant -All | Select-Object ClientId, ConsentType, Scope
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
-    <section class="study-section" id="quiz">
-        <div class="section-header">
-            <span class="section-tag">Seção 05</span>
-            <h2>Questões de Fixação e Entrevista</h2>
-        </div>
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
 
         <div class="quiz-item">
             <div class="quiz-question">
@@ -300,11 +285,8 @@ Get-MgOauth2PermissionGrant -All | Select-Object ClientId, ConsentType, Scope
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
-    <section class="study-section" id="fatos">
-        <div class="section-header">
-            <span class="section-tag">Seção 06</span>
-            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
-        </div>
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
 
         <div class="facts-grid">
             <div class="facts-card">
