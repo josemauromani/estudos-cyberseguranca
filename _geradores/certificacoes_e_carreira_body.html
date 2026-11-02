@@ -444,7 +444,8 @@ flowchart TD
      "nome": "Computação em nuvem",
      "peso": null,
      "modulos": [
-      "Seguranca-em-Nuvem"
+      "Seguranca-em-Nuvem",
+      "Seguranca-em-Kubernetes"
      ]
     },
     {
@@ -477,14 +478,16 @@ flowchart TD
      "modulos": [
       "ISO-27001-e-27002",
       "LGPD-e-Privacidade",
-      "PCI-DSS"
+      "PCI-DSS",
+      "Regulacao-Setor-Financeiro"
      ]
     },
     {
      "nome": "Gestão de riscos de segurança da informação",
      "peso": 20,
      "modulos": [
-      "Gestao-de-Riscos-TI"
+      "Gestao-de-Riscos-TI",
+      "Gestao-de-Riscos-de-Terceiros"
      ]
     },
     {
@@ -532,7 +535,8 @@ flowchart TD
       "Gestao-de-Riscos-TI",
       "ISO-27001-e-27002",
       "LGPD-e-Privacidade",
-      "Continuidade-e-Disaster-Recovery"
+      "Continuidade-e-Disaster-Recovery",
+      "Gestao-de-Riscos-de-Terceiros"
      ]
     },
     {
@@ -560,7 +564,8 @@ flowchart TD
      "modulos": [
       "Redes-e-Protocolos",
       "Segmentacao-e-Firewall",
-      "Seguranca-de-Redes-Defesa"
+      "Seguranca-de-Redes-Defesa",
+      "Monitoramento-de-Rede-NSM"
      ]
     },
     {
@@ -589,7 +594,8 @@ flowchart TD
       "Operacoes-SOC-e-SIEM",
       "Resposta-a-Incidentes",
       "Forense-Digital",
-      "Backup-Imutavel-e-Recuperacao"
+      "Backup-Imutavel-e-Recuperacao",
+      "Deteccao-e-Resposta-em-Nuvem"
      ]
     },
     {
@@ -641,7 +647,10 @@ flowchart TD
      "peso": 17,
      "modulos": [
       "Seguranca-em-Nuvem",
-      "Continuidade-e-Disaster-Recovery"
+      "Continuidade-e-Disaster-Recovery",
+      "Seguranca-de-Containers",
+      "Seguranca-em-Kubernetes",
+      "Infraestrutura-como-Codigo-Segura"
      ]
     },
     {
@@ -659,7 +668,8 @@ flowchart TD
      "modulos": [
       "Operacoes-SOC-e-SIEM",
       "Resposta-a-Incidentes",
-      "Identidade-Hibrida-e-Nuvem"
+      "Identidade-Hibrida-e-Nuvem",
+      "Deteccao-e-Resposta-em-Nuvem"
      ]
     },
     {
@@ -733,7 +743,8 @@ flowchart TD
      "modulos": [
       "Operacoes-SOC-e-SIEM",
       "Resposta-a-Incidentes",
-      "Gestao-de-Vulnerabilidades"
+      "Gestao-de-Vulnerabilidades",
+      "Monitoramento-de-Rede-NSM"
      ]
     },
     {
@@ -741,7 +752,8 @@ flowchart TD
      "peso": null,
      "modulos": [
       "Seguranca-em-Nuvem",
-      "OWASP-Top-10-Web"
+      "OWASP-Top-10-Web",
+      "Seguranca-de-Containers"
      ]
     }
    ]
@@ -776,7 +788,8 @@ flowchart TD
       "Engenharia-Social-e-Phishing",
       "OWASP-Top-10-Web",
       "Analise-Basica-de-Malware",
-      "Ransomware-Prevencao-a-Recuperacao"
+      "Ransomware-Prevencao-a-Recuperacao",
+      "Fraude-em-Pagamentos-e-Pix"
      ]
     },
     {
@@ -800,7 +813,8 @@ flowchart TD
       "Resposta-a-Incidentes",
       "PAM-e-Acessos-Privilegiados",
       "Forense-Digital",
-      "Protecao-de-Dados-e-Conteudo"
+      "Protecao-de-Dados-e-Conteudo",
+      "Engenharia-de-Deteccao"
      ]
     },
     {
@@ -973,6 +987,42 @@ flowchart TD
   "Backup-Imutavel-e-Recuperacao": {
    "numero": 45,
    "titulo": "Backup Imutável e Recuperação de Identidade"
+  },
+  "Engenharia-de-Deteccao": {
+   "numero": 46,
+   "titulo": "Engenharia de Detecção: Detection-as-Code e Cobertura ATT&CK"
+  },
+  "Monitoramento-de-Rede-NSM": {
+   "numero": 48,
+   "titulo": "Monitoramento de Rede: Zeek, PCAP e NetFlow"
+  },
+  "Seguranca-de-Containers": {
+   "numero": 50,
+   "titulo": "Segurança de Containers: Imagens, Build e Runtime"
+  },
+  "Seguranca-em-Kubernetes": {
+   "numero": 51,
+   "titulo": "Segurança em Kubernetes: RBAC, Pod Security e NetworkPolicy"
+  },
+  "Infraestrutura-como-Codigo-Segura": {
+   "numero": 52,
+   "titulo": "Infraestrutura como Código Segura: Terraform e Policy-as-Code"
+  },
+  "Deteccao-e-Resposta-em-Nuvem": {
+   "numero": 53,
+   "titulo": "Detecção e Resposta a Incidentes em Nuvem"
+  },
+  "Regulacao-Setor-Financeiro": {
+   "numero": 54,
+   "titulo": "Regulação Cibernética do Setor Financeiro"
+  },
+  "Fraude-em-Pagamentos-e-Pix": {
+   "numero": 55,
+   "titulo": "Fraude em Pagamentos: Pix, Golpes e Antifraude"
+  },
+  "Gestao-de-Riscos-de-Terceiros": {
+   "numero": 57,
+   "titulo": "Gestão de Riscos de Terceiros e Fornecedores"
   }
  }
 }
