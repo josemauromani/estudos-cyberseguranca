@@ -91,7 +91,7 @@ class TestLigacoesNovas(unittest.TestCase):
         apoio = {c["id"]: c["apoio"] for c in ROTA_VAGA}
         for cid, novos in esperado.items():
             with self.subTest(competencia=cid):
-                self.assertEqual(apoio[cid][-len(novos):], novos)
+                self.assertEqual([m for m in apoio[cid] if m in NOVOS], novos)
         for cid in set(apoio) - set(esperado):
             self.assertFalse(set(apoio[cid]) & set(NOVOS), cid)
 
@@ -125,9 +125,6 @@ class TestLigacoesNovas(unittest.TestCase):
         for c in CERTIFICACOES:
             with self.subTest(sigla=c["sigla"]):
                 self.assertEqual([m for m in c["modulos"] if m in NOVOS], esperado[c["sigla"]])
-                n = len(esperado[c["sigla"]])
-                if n:
-                    self.assertEqual(c["modulos"][-n:], esperado[c["sigla"]])
 
     def test_chips_de_apoio_novos_tem_data_slug(self):
         html = render_rota_vaga(ROTA_VAGA, {})

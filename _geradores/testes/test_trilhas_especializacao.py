@@ -116,5 +116,77 @@ class TestCatalogoEspecializacao(unittest.TestCase):
             self.assertIn(f'data-value="{valor}"', html)
 
 
+class TestLigacoesEspecializacao(unittest.TestCase):
+    def test_principais_da_rota_intactos(self):
+        self.assertEqual({c["id"]: c["principais"] for c in ROTA_VAGA}, {
+            "solucoes": ["Segmentacao-e-Firewall", "Seguranca-em-Endpoints-EDR", "Protecao-de-Dados-e-Conteudo", "Seguranca-de-Redes-Defesa"],
+            "banco_dados": ["Seguranca-de-Bancos-de-Dados"],
+            "ingles": ["Ingles-Tecnico-Ciber"],
+            "normas": ["PCI-DSS", "ISO-27001-e-27002", "Gestao-de-Riscos-TI"],
+            "resposta_incidentes": ["Resposta-a-Incidentes"],
+            "controles": ["ISO-27001-e-27002"],
+            "formacao": ["Certificacoes-e-Carreira"],
+        })
+
+    def test_apoios_novos(self):
+        self.assertEqual({c["id"]: c["apoio"] for c in ROTA_VAGA}, {
+            "solucoes": ["Engenharia-Social-e-Phishing", "Linux-para-Seguranca", "PowerShell-e-Windows-Interno"],
+            "banco_dados": ["OWASP-Top-10-Web"],
+            "ingles": [],
+            "normas": ["Resposta-a-Incidentes", "Regulacao-Setor-Financeiro", "Gestao-de-Riscos-de-Terceiros"],
+            "resposta_incidentes": [
+                "Operacoes-SOC-e-SIEM", "Forense-Digital", "Ransomware-Prevencao-a-Recuperacao",
+                "Gestao-de-Crise-e-Comunicacao", "SOAR-e-Automacao-de-Resposta",
+            ],
+            "controles": ["Hardening-Sistemas", "Arquitetura-Zero-Trust", "Active-Directory-Fundamentos", "PAM-e-Acessos-Privilegiados"],
+            "formacao": ["Laboratorio-Domestico-e-Portfolio"],
+        })
+
+    def test_necessidades_novas(self):
+        esperado = [
+            ("Preciso medir quais técnicas ATT&CK minhas regras realmente detectam", "Engenharia-de-Deteccao", "Detecção", "🎯"),
+            ("Preciso procurar um invasor que nenhum alerta pegou", "Threat-Hunting", "Detecção", "🔦"),
+            ("Preciso achar beaconing e túnel DNS no tráfego de rede", "Monitoramento-de-Rede-NSM", "Detecção", "📡"),
+            ("Preciso automatizar a triagem sem bloquear o que não devia", "SOAR-e-Automacao-de-Resposta", "Detecção", "🤖"),
+            ("Preciso revisar a segurança de uma imagem de container antes do deploy", "Seguranca-de-Containers", "Nuvem", "📦"),
+            ("Preciso fechar o RBAC e isolar os pods de um cluster Kubernetes", "Seguranca-em-Kubernetes", "Nuvem", "☸️"),
+            ("Preciso barrar recurso público ou sem criptografia antes do terraform apply", "Infraestrutura-como-Codigo-Segura", "Nuvem", "🏗️"),
+            ("Preciso investigar uma chave de acesso vazada na nuvem", "Deteccao-e-Resposta-em-Nuvem", "Nuvem", "🔑"),
+            ("Preciso adequar a política de segurança às exigências do Banco Central", "Regulacao-Setor-Financeiro", "Regulação", "🏦"),
+            ("Preciso montar regras antifraude para transações Pix", "Fraude-em-Pagamentos-e-Pix", "Regulação", "💸"),
+            ("Preciso saber o que guardar e como preservar provas de um crime cibernético", "Legislacao-e-Crimes-Ciberneticos", "Regulação", "⚖️"),
+            ("Preciso avaliar o risco de um fornecedor crítico antes de contratar", "Gestao-de-Riscos-de-Terceiros", "Regulação", "🤝"),
+        ]
+        obtido = [(n["desafio"], n["slug"], n["categoria"], n["icone"]) for n in NECESSIDADES[-12:]]
+        self.assertEqual(obtido, esperado)
+
+    def test_certificacoes_novas(self):
+        esperado = {
+            "CCSP": ["Seguranca-de-Containers", "Seguranca-em-Kubernetes", "Infraestrutura-como-Codigo-Segura", "Deteccao-e-Resposta-em-Nuvem"],
+            "GSEC": ["Monitoramento-de-Rede-NSM", "Seguranca-de-Containers"],
+            "CISSP": ["Monitoramento-de-Rede-NSM", "Deteccao-e-Resposta-em-Nuvem", "Gestao-de-Riscos-de-Terceiros"],
+            "CISM": ["Regulacao-Setor-Financeiro", "Gestao-de-Riscos-de-Terceiros"],
+            "Security+": ["Engenharia-de-Deteccao", "Fraude-em-Pagamentos-e-Pix"],
+            "CEH": ["Seguranca-em-Kubernetes"],
+        }
+        por_sigla = {c["sigla"]: c["modulos"] for c in CERTIFICACOES}
+        for sigla, novos in esperado.items():
+            with self.subTest(sigla=sigla):
+                self.assertEqual(por_sigla[sigla][-len(novos):], novos)
+
+    def test_chips_de_apoio_normas_tem_data_slug(self):
+        html = render_rota_vaga(ROTA_VAGA, {})
+
+        def artigo(cid):
+            m = re.search(rf'<article[^>]*id="vaga-{cid}".*?</article>', html, re.S)
+            self.assertIsNotNone(m, cid)
+            return m.group(0)
+
+        normas = artigo("normas")
+        self.assertIn('data-slug="Regulacao-Setor-Financeiro"', normas)
+        self.assertIn('data-slug="Gestao-de-Riscos-de-Terceiros"', normas)
+        self.assertIn('data-slug="SOAR-e-Automacao-de-Resposta"', artigo("resposta_incidentes"))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -469,6 +469,78 @@ NECESSIDADES: List[Dict[str, str]] = [
         "categoria": "Resiliência",
         "icone": "💾",
     },
+    {
+        "desafio": "Preciso medir quais técnicas ATT&CK minhas regras realmente detectam",
+        "slug": "Engenharia-de-Deteccao",
+        "categoria": "Detecção",
+        "icone": "🎯",
+    },
+    {
+        "desafio": "Preciso procurar um invasor que nenhum alerta pegou",
+        "slug": "Threat-Hunting",
+        "categoria": "Detecção",
+        "icone": "🔦",
+    },
+    {
+        "desafio": "Preciso achar beaconing e túnel DNS no tráfego de rede",
+        "slug": "Monitoramento-de-Rede-NSM",
+        "categoria": "Detecção",
+        "icone": "📡",
+    },
+    {
+        "desafio": "Preciso automatizar a triagem sem bloquear o que não devia",
+        "slug": "SOAR-e-Automacao-de-Resposta",
+        "categoria": "Detecção",
+        "icone": "🤖",
+    },
+    {
+        "desafio": "Preciso revisar a segurança de uma imagem de container antes do deploy",
+        "slug": "Seguranca-de-Containers",
+        "categoria": "Nuvem",
+        "icone": "📦",
+    },
+    {
+        "desafio": "Preciso fechar o RBAC e isolar os pods de um cluster Kubernetes",
+        "slug": "Seguranca-em-Kubernetes",
+        "categoria": "Nuvem",
+        "icone": "☸️",
+    },
+    {
+        "desafio": "Preciso barrar recurso público ou sem criptografia antes do terraform apply",
+        "slug": "Infraestrutura-como-Codigo-Segura",
+        "categoria": "Nuvem",
+        "icone": "🏗️",
+    },
+    {
+        "desafio": "Preciso investigar uma chave de acesso vazada na nuvem",
+        "slug": "Deteccao-e-Resposta-em-Nuvem",
+        "categoria": "Nuvem",
+        "icone": "🔑",
+    },
+    {
+        "desafio": "Preciso adequar a política de segurança às exigências do Banco Central",
+        "slug": "Regulacao-Setor-Financeiro",
+        "categoria": "Regulação",
+        "icone": "🏦",
+    },
+    {
+        "desafio": "Preciso montar regras antifraude para transações Pix",
+        "slug": "Fraude-em-Pagamentos-e-Pix",
+        "categoria": "Regulação",
+        "icone": "💸",
+    },
+    {
+        "desafio": "Preciso saber o que guardar e como preservar provas de um crime cibernético",
+        "slug": "Legislacao-e-Crimes-Ciberneticos",
+        "categoria": "Regulação",
+        "icone": "⚖️",
+    },
+    {
+        "desafio": "Preciso avaliar o risco de um fornecedor crítico antes de contratar",
+        "slug": "Gestao-de-Riscos-de-Terceiros",
+        "categoria": "Regulação",
+        "icone": "🤝",
+    },
 ]
 
 # 4b. ROTA DA VAGA: competências exigidas -> módulos
@@ -503,7 +575,7 @@ ROTA_VAGA: List[Dict[str, Any]] = [
         "texto_vaga": "Requisitos PCI-DSS, ISO 27.001 e 27.002, 31.000 e NIST",
         "icone": "📜",
         "principais": ["PCI-DSS", "ISO-27001-e-27002", "Gestao-de-Riscos-TI"],
-        "apoio": ["Resposta-a-Incidentes"],
+        "apoio": ["Resposta-a-Incidentes", "Regulacao-Setor-Financeiro", "Gestao-de-Riscos-de-Terceiros"],
     },
     {
         "id": "resposta_incidentes",
@@ -511,7 +583,7 @@ ROTA_VAGA: List[Dict[str, Any]] = [
         "texto_vaga": "Resposta a incidentes de segurança da informação",
         "icone": "🚨",
         "principais": ["Resposta-a-Incidentes"],
-        "apoio": ["Operacoes-SOC-e-SIEM", "Forense-Digital", "Ransomware-Prevencao-a-Recuperacao", "Gestao-de-Crise-e-Comunicacao"],
+        "apoio": ["Operacoes-SOC-e-SIEM", "Forense-Digital", "Ransomware-Prevencao-a-Recuperacao", "Gestao-de-Crise-e-Comunicacao", "SOAR-e-Automacao-de-Resposta"],
     },
     {
         "id": "controles",
@@ -539,7 +611,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "orgao": "EC-Council",
         "foco": "Técnica / ofensiva",
         "experiencia": "2 anos em SI ou treinamento oficial",
-        "modulos": ["Redes-e-Protocolos", "Reconhecimento-e-OSINT", "OWASP-Top-10-Web", "Seguranca-em-APIs", "Pentest-Metodologias", "Engenharia-Social-e-Phishing", "Analise-Basica-de-Malware", "Ataques-e-Defesa-no-AD"],
+        "modulos": ["Redes-e-Protocolos", "Reconhecimento-e-OSINT", "OWASP-Top-10-Web", "Seguranca-em-APIs", "Pentest-Metodologias", "Engenharia-Social-e-Phishing", "Analise-Basica-de-Malware", "Ataques-e-Defesa-no-AD", "Seguranca-em-Kubernetes"],
     },
     {
         "sigla": "CISM",
@@ -547,7 +619,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "orgao": "ISACA",
         "foco": "Gestão de programa de SI",
         "experiencia": "5 anos em SI, sendo 3 em gestão",
-        "modulos": ["Resposta-a-Incidentes", "Gestao-de-Riscos-TI", "ISO-27001-e-27002", "Continuidade-e-Disaster-Recovery", "PCI-DSS", "Gestao-de-Crise-e-Comunicacao", "Exercicios-Tabletop"],
+        "modulos": ["Resposta-a-Incidentes", "Gestao-de-Riscos-TI", "ISO-27001-e-27002", "Continuidade-e-Disaster-Recovery", "PCI-DSS", "Gestao-de-Crise-e-Comunicacao", "Exercicios-Tabletop", "Regulacao-Setor-Financeiro", "Gestao-de-Riscos-de-Terceiros"],
     },
     {
         "sigla": "CISSP",
@@ -555,7 +627,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "orgao": "ISC2",
         "foco": "Generalista sênior (8 domínios)",
         "experiencia": "5 anos em 2+ domínios (1 ano dispensável por graduação ou certificação aprovada)",
-        "modulos": ["Fundamentos-Ciber", "Criptografia-Pratica", "Autenticacao-e-IAM", "Segmentacao-e-Firewall", "Resposta-a-Incidentes", "DevSecOps-e-CI-CD", "Gestao-de-Riscos-TI", "ISO-27001-e-27002", "Continuidade-e-Disaster-Recovery", "Seguranca-de-Bancos-de-Dados", "Active-Directory-Fundamentos", "PAM-e-Acessos-Privilegiados", "Backup-Imutavel-e-Recuperacao"],
+        "modulos": ["Fundamentos-Ciber", "Criptografia-Pratica", "Autenticacao-e-IAM", "Segmentacao-e-Firewall", "Resposta-a-Incidentes", "DevSecOps-e-CI-CD", "Gestao-de-Riscos-TI", "ISO-27001-e-27002", "Continuidade-e-Disaster-Recovery", "Seguranca-de-Bancos-de-Dados", "Active-Directory-Fundamentos", "PAM-e-Acessos-Privilegiados", "Backup-Imutavel-e-Recuperacao", "Monitoramento-de-Rede-NSM", "Deteccao-e-Resposta-em-Nuvem", "Gestao-de-Riscos-de-Terceiros"],
     },
     {
         "sigla": "CCSP",
@@ -563,7 +635,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "orgao": "ISC2",
         "foco": "Segurança em nuvem (6 domínios)",
         "experiencia": "5 anos em TI, sendo 3 em SI e 1 em nuvem (CISSP substitui)",
-        "modulos": ["Criptografia-Pratica", "Autenticacao-e-IAM", "Seguranca-em-Nuvem", "DevSecOps-e-CI-CD", "LGPD-e-Privacidade", "Seguranca-de-Bancos-de-Dados"],
+        "modulos": ["Criptografia-Pratica", "Autenticacao-e-IAM", "Seguranca-em-Nuvem", "DevSecOps-e-CI-CD", "LGPD-e-Privacidade", "Seguranca-de-Bancos-de-Dados", "Seguranca-de-Containers", "Seguranca-em-Kubernetes", "Infraestrutura-como-Codigo-Segura", "Deteccao-e-Resposta-em-Nuvem"],
     },
     {
         "sigla": "GSEC",
@@ -571,7 +643,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "orgao": "GIAC (SANS)",
         "foco": "Técnica generalista",
         "experiencia": "Sem exigência formal",
-        "modulos": ["Redes-e-Protocolos", "Criptografia-Pratica", "Segmentacao-e-Firewall", "Hardening-Sistemas", "Seguranca-de-Redes-Defesa", "Seguranca-em-Endpoints-EDR", "Operacoes-SOC-e-SIEM", "Linux-para-Seguranca", "PowerShell-e-Windows-Interno", "Active-Directory-Fundamentos"],
+        "modulos": ["Redes-e-Protocolos", "Criptografia-Pratica", "Segmentacao-e-Firewall", "Hardening-Sistemas", "Seguranca-de-Redes-Defesa", "Seguranca-em-Endpoints-EDR", "Operacoes-SOC-e-SIEM", "Linux-para-Seguranca", "PowerShell-e-Windows-Interno", "Active-Directory-Fundamentos", "Monitoramento-de-Rede-NSM", "Seguranca-de-Containers"],
     },
     {
         "sigla": "Security+",
@@ -579,7 +651,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "orgao": "CompTIA",
         "foco": "Entrada / fundamentos",
         "experiencia": "Recomendada, sem exigência formal",
-        "modulos": ["Fundamentos-Ciber", "Redes-e-Protocolos", "Criptografia-Pratica", "Autenticacao-e-IAM", "Segmentacao-e-Firewall", "Gestao-de-Vulnerabilidades", "Seguranca-em-Endpoints-EDR", "Resposta-a-Incidentes", "PAM-e-Acessos-Privilegiados", "Ransomware-Prevencao-a-Recuperacao", "Backup-Imutavel-e-Recuperacao"],
+        "modulos": ["Fundamentos-Ciber", "Redes-e-Protocolos", "Criptografia-Pratica", "Autenticacao-e-IAM", "Segmentacao-e-Firewall", "Gestao-de-Vulnerabilidades", "Seguranca-em-Endpoints-EDR", "Resposta-a-Incidentes", "PAM-e-Acessos-Privilegiados", "Ransomware-Prevencao-a-Recuperacao", "Backup-Imutavel-e-Recuperacao", "Engenharia-de-Deteccao", "Fraude-em-Pagamentos-e-Pix"],
     },
 ]
 
