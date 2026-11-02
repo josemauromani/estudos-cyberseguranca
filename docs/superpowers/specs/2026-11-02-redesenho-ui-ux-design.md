@@ -83,23 +83,25 @@ O usuário pediu uma remodelação da UI e da UX dos módulos para que quem estu
 
 Fonte única de tokens, embutida por `montar.py` e por `build_index.py` antes do CSS específico. `base.css` e `index.css` deixam de declarar tokens.
 
+**Nomes preservados (correção de 2026-11-02, durante o plano):** os corpos usam as variáveis atuais em estilos inline mais de 1.500 vezes (`--muted`, `--rule`, `--danger-color`, `--tip-color`, `--radius-sm`, `--font-mono`, `--t2-green`…). Por isso, **todo token declarado hoje em `base.css` continua existindo com o mesmo nome**. Os nomes curtos do mockup (`--teo`, `--f-body`, `--r-md`…) não são usados; os tokens novos seguem o padrão existente.
+
 | Grupo | Tokens (claro → escuro) |
 |---|---|
-| Superfícies | `--ground` `#F4F6F8`→`#0E151A`; `--surface` `#FFFFFF`→`#152028`; `--sunk` `#EAEFF2`→`#1C2A33`; `--rule` `#D5DCE1`→`#2A3943`; `--rule-strong` `#C4CDD3`→`#364853` |
+| Superfícies | `--ground` `#F4F6F8`→`#0E151A`; `--surface` `#FFFFFF`→`#152028`; `--sunk` `#EAEFF2`→`#1C2A33`; `--rule` `#D5DCE1`→`#2A3943`; novo `--rule-strong` `#C4CDD3`→`#364853` |
 | Texto | `--ink` `#14212B`→`#E4EAED`; `--muted` `#5B6B77`→`#9BABB6` |
-| Ação | `--accent` `#2563EB`→`#60A5FA`; `--accent-soft`; `--ok` `#15803D`→`#4ADE80`; `--bad` `#DC2626`→`#F87171` |
-| Tipos de seção (`--x` / `--x-soft`) | `teo` `#2563EB`; `lab` `#0D9488`; `chk` `#B45309`; `qst` `#C026D3`; `ref` `#64748B` (variantes escuras conforme o mockup) |
-| Callouts (`--x` / `--x-soft`) | `tip` `#059669`; `warn` `#EA580C`; `danger` `#DC2626`; `law` `#6D28D9`; pergunta-chave usa `--accent` |
-| Console | `--console` `#0F1820`→`#0A1015`; `--console-ink` `#D6E2EA` |
-| Trilhas | `--t1` … `--t13`, mantendo os valores atuais de `base.css`/`index.css` e acrescentando a variante escura onde faltar |
-| Tipografia | `--f-display` Barlow Semi Condensed; `--f-body` IBM Plex Sans; `--f-mono` IBM Plex Mono |
-| Forma | `--r-sm` 4px, `--r-md` 8px, `--r-lg` 12px; `--shadow` (nenhuma no escuro) |
+| Ação | `--accent` `#2563EB`→`#60A5FA`; novos `--accent-soft`, `--ok` `#15803D`→`#4ADE80`, `--bad` `#DC2626`→`#F87171` |
+| Tipos de seção (novos, `--tipo-<t>` / `--tipo-<t>-bg`) | `teoria` `#2563EB`; `laboratorio` `#0D9488`; `checklist` `#B45309`; `questoes` `#C026D3`; `referencias` `#64748B` (variantes escuras conforme o mockup) |
+| Callouts (existentes, `-color` / `-bg` / `-border`) | `--tip-*` `#059669`; `--warning-*` `#EA580C`; `--danger-*` `#DC2626`; `--law-*` `#6D28D9`; pergunta-chave usa `--accent` |
+| Console (novos) | `--console` `#0F1820`→`#0A1015`; `--console-ink` `#D6E2EA` |
+| Trilhas (existentes) | `--t1-blue` … `--t13-lime`, com os valores atuais |
+| Tipografia (existentes) | `--font-display` Barlow Semi Condensed; `--font-body` IBM Plex Sans; `--font-mono` IBM Plex Mono |
+| Forma (existentes) | `--radius-sm` 4px, `--radius-md` 8px, `--radius-lg` 12px, `--radius-pill`, `--radius`; `--shadow-sm/md/lg` (nenhuma no escuro); `--transition-fast/normal` |
 
-O tema escuro é aplicado por `:root[data-theme="dark"]`. O tema inicial segue `cs_theme` ou, na ausência dele, `prefers-color-scheme` (comportamento atual de `initTheme`). Os valores exatos de cada variante escura são os do mockup aprovado. Contraste mínimo AA (4,5:1) para texto sobre `--ground`, `--surface` e cada `--x-soft`.
+O tema escuro usa o mecanismo atual de `base.css`: os valores escuros são declarados em `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) }` e repetidos em `:root[data-theme="dark"]`. O tema inicial segue `cs_theme` ou, na ausência dele, `prefers-color-scheme` (comportamento atual de `initTheme`). Os valores exatos de cada variante escura são os do mockup aprovado. Contraste mínimo AA (4,5:1) para texto sobre `--ground`, `--surface` e cada `--x-soft`.
 
 ### 2.2 Fontes embutidas
 
-- Arquivos WOFF2 (subconjunto latino + latino estendido) em `_geradores/fontes/`: IBM Plex Sans 400, 400 itálico, 600; IBM Plex Mono 400; Barlow Semi Condensed 700. Licença SIL OFL 1.1, cujo texto vai junto em `_geradores/fontes/OFL.txt`.
+- Arquivos WOFF2 (subconjunto latino do Fontsource 5.1.0, que cobre todo o português; o latino estendido dobraria o tamanho e estouraria o orçamento) em `_geradores/fontes/`: IBM Plex Sans 400, 400 itálico, 600; IBM Plex Mono 400; Barlow Semi Condensed 700. Licença SIL OFL 1.1, cujo texto vai junto em `_geradores/fontes/OFL.txt`.
 - `montar.py` e `build_index.py` geram `@font-face` com `src: url(data:font/woff2;base64,…)` e `font-display: swap`. O `<link>` para o Google Fonts é removido.
 - Orçamento: até 200 KB de acréscimo por HTML gerado. Se os subconjuntos excederem, corta-se primeiro o itálico.
 
