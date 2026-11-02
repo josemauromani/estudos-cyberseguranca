@@ -146,7 +146,7 @@ Seguem o mockup de módulo aprovado:
 Regras verificadas pelo validador (§3.4):
 
 1. Exatamente um `article.study-container` na raiz do corpo.
-2. Cada filho de `article.study-container` é `section.study-section` com `id` único e `data-tipo` válido, nessa ordem de atributos (`class`, `id`, `data-tipo`), para manter compatíveis os testes que fazem regex sobre `<section class="study-section" id="…"`.
+2. Cada filho de `article.study-container` é `section.study-section` (exceto `<script>` e `<style>` dos simuladores, que podem ficar como filhos diretos; correção de 2026-11-02, durante a execução) com `id` único e `data-tipo` válido, nessa ordem de atributos (`class`, `id`, `data-tipo`), para manter compatíveis os testes que fazem regex sobre `<section class="study-section" id="…"`.
 3. Cada seção tem exatamente um `h2` como primeiro elemento de título.
 4. Sem cabeçalho de módulo (`study-header`, `hero-header`), sem `section-tag`/`section-num` e sem `footer`; o chassi gera esses elementos.
 5. Pelo menos uma seção de cada tipo `laboratorio`, `checklist`, `questoes` e `referencias` (os 57 corpos atuais já têm os quatro).
