@@ -1,6 +1,6 @@
 # Estudos de Cibersegurança
 
-> Plataforma autoinstrucional, prática e enciclopédica sobre segurança da informação, defesa cibernética e governança corporativa, estruturada em **45 módulos temáticos** organizados em **10 trilhas estruturantes**.
+> Plataforma autoinstrucional, prática e enciclopédica sobre segurança da informação, defesa cibernética e governança corporativa, estruturada em **57 módulos temáticos** organizados em **13 trilhas estruturantes**.
 
 ---
 
@@ -43,7 +43,7 @@ O portal `index.html` conta com:
 
 ---
 
-## 📚 Grade Curricular dos 45 Módulos
+## 📚 Grade Curricular dos 57 Módulos
 
 ### Estrutura das Trilhas e Percurso Formativo
 
@@ -149,6 +149,18 @@ flowchart TD
 | **43** | `Gestao-de-Crise-e-Comunicacao` | Gestão de Crise Cibernética e Comunicação de Incidentes | Trilha 10: Resiliência & Ransomware | Respond | Relógio da Crise |
 | **44** | `Exercicios-Tabletop` | Exercícios Tabletop: Planejar, Conduzir e Avaliar | Trilha 10: Resiliência & Ransomware | Respond / Recover | Gerador de Tabletop |
 | **45** | `Backup-Imutavel-e-Recuperacao` | Backup Imutável e Recuperação de Identidade | Trilha 10: Resiliência & Ransomware | Recover | Teste de Sobrevivência do Backup |
+| **46** | `Engenharia-de-Deteccao` | Engenharia de Detecção: Detection-as-Code e Cobertura ATT&CK | Trilha 11: Detecção Avançada | Detect | Bancada de Detecções |
+| **47** | `Threat-Hunting` | Threat Hunting: Caça por Hipótese e Linhas de Base | Trilha 11: Detecção Avançada | Detect | Caçada Guiada |
+| **48** | `Monitoramento-de-Rede-NSM` | Monitoramento de Rede: Zeek, PCAP e NetFlow | Trilha 11: Detecção Avançada | Detect | Analisador de Conexões |
+| **49** | `SOAR-e-Automacao-de-Resposta` | SOAR: Playbooks e Automação de Resposta | Trilha 11: Detecção Avançada | Respond | Montador de Playbook |
+| **50** | `Seguranca-de-Containers` | Segurança de Containers: Imagens, Build e Runtime | Trilha 12: Nuvem & Kubernetes | Protect | Auditor de Dockerfile |
+| **51** | `Seguranca-em-Kubernetes` | Segurança em Kubernetes: RBAC, Pod Security e NetworkPolicy | Trilha 12: Nuvem & Kubernetes | Protect | Cluster em Miniatura |
+| **52** | `Infraestrutura-como-Codigo-Segura` | Infraestrutura como Código Segura: Terraform e Policy-as-Code | Trilha 12: Nuvem & Kubernetes | Protect | Revisor de Plano Terraform |
+| **53** | `Deteccao-e-Resposta-em-Nuvem` | Detecção e Resposta a Incidentes em Nuvem | Trilha 12: Nuvem & Kubernetes | Detect / Respond | Conta Comprometida |
+| **54** | `Regulacao-Setor-Financeiro` | Regulação Cibernética do Setor Financeiro | Trilha 13: Setor Regulado BR | Govern | Verificador de Aderência |
+| **55** | `Fraude-em-Pagamentos-e-Pix` | Fraude em Pagamentos: Pix, Golpes e Antifraude | Trilha 13: Setor Regulado BR | Detect / Protect | Mesa Antifraude |
+| **56** | `Legislacao-e-Crimes-Ciberneticos` | Legislação Brasileira e Crimes Cibernéticos | Trilha 13: Setor Regulado BR | Govern | Enquadramento de Casos |
+| **57** | `Gestao-de-Riscos-de-Terceiros` | Gestão de Riscos de Terceiros e Fornecedores | Trilha 13: Setor Regulado BR | Govern | Avaliador de Fornecedores |
 
 ---
 
@@ -194,7 +206,7 @@ flowchart LR
 
     subgraph Saida["Entrega Offline Standalone"]
         direction TB
-        H["treinamento-*.html<br>(45 Módulos 100% Offline)"]
+        H["treinamento-*.html<br>(57 Módulos 100% Offline)"]
         I["index.html<br>(Portal Central Dinâmico)"]
     end
 
@@ -207,7 +219,7 @@ flowchart LR
 
 ### Estrutura do Pipeline
 
-- `_geradores/estudos.txt`: Catálogo canônico dos 45 estudos com metadados estruturais (slug, título, pasta, arquivo HTML, número da trilha, cor do tema e função NIST CSF 2.0).
+- `_geradores/estudos.txt`: Catálogo canônico dos 57 estudos com metadados estruturais (slug, título, pasta, arquivo HTML, número da trilha, cor do tema e função NIST CSF 2.0).
 - `_geradores/CURRICULO.md`: Matriz pedagógica detalhada com competências, pré-requisitos e especificações de cada simulador interativo.
 - `_geradores/GUIA-DO-AUTOR.md`: Manual editorial e técnico para criação de novos módulos ou expansão de conteúdo.
 - `_geradores/base.css` e `_geradores/base.js`: Design System responsivo com suporte a temas claro e escuro, além de controladores de quizzes, checklists e utilitários de simulação.

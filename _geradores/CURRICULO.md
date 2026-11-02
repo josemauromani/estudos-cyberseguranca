@@ -555,6 +555,143 @@ flowchart LR
 - **Diferença para o módulo 28:** o 28 ensina RTO/RPO e a regra 3-2-1 básica; este trata de como o backup sobrevive a um atacante com privilégio de administrador do domínio.
 - **Simulador Interativo em JS:** *Teste de Sobrevivência do Backup* — O aluno monta a arquitetura de backup de uma empresa fictícia e roda um ataque com credencial de administrador do domínio. O simulador mostra quais cópias sobrevivem e por quê.
 
+### Trilha 11: Detecção Avançada & Threat Hunting (`#A21CAF`)
+
+#### 46. Engenharia-de-Deteccao
+- **Título:** Engenharia de Detecção: Detection-as-Code e Cobertura ATT&CK
+- **Função NIST CSF 2.0:** *Detect (DE)*
+- **Tempo Estimado:** 45 minutos | **Carreiras:** SOC, Blue Team
+- **MITRE ATT&CK:** Cobertura da matriz ATT&CK Enterprise (mapeamento de detecções)
+- **Objetivos de Aprendizagem:** Tratar detecções como código: versionamento, revisão, testes e implantação; escrever e ajustar regras Sigma com condições, filtros e níveis; medir cobertura ATT&CK e distinguir "tenho regra" de "a regra dispara"; calcular precisão e volume de alertas para decidir se uma regra vai para produção.
+- **Pré-requisitos:** Operacoes-SOC-e-SIEM, Threat-Intelligence.
+- **Conceitos-Chave:** ciclo de vida da detecção; Sigma (logsource, detection, condition); falso positivo vs falso negativo; precisão; emulação de adversário para validar regras (Atomic Red Team); matriz de cobertura; débito de detecção.
+- **Diferença para o módulo 16:** o 16 ensina a ler e editar regras na rotina do SOC; este trata de como produzir, testar e medir um conjunto de detecções.
+- **Simulador Interativo em JS:** *Bancada de Detecções* — O aluno edita uma regra Sigma e a roda contra um conjunto de eventos rotulados (maliciosos e benignos). O simulador mostra acertos, falsos positivos e falsos negativos, e atualiza a matriz de cobertura conforme as regras passam no teste.
+
+#### 47. Threat-Hunting
+- **Título:** Threat Hunting: Caça por Hipótese e Linhas de Base
+- **Função NIST CSF 2.0:** *Detect (DE)*
+- **Tempo Estimado:** 45 minutos | **Carreiras:** SOC, Blue Team, Forense
+- **MITRE ATT&CK:** TA0003 Persistence / T1053 Scheduled Task/Job / T1543 Create or Modify System Process (alvos de caça)
+- **Objetivos de Aprendizagem:** Formular hipóteses de caça a partir de inteligência, ATT&CK ou anomalias; escolher a fonte de dados que confirma ou refuta a hipótese; usar linhas de base e contagem de ocorrências (*stack counting*) para achar o raro; transformar uma caça bem-sucedida em detecção automatizada.
+- **Pré-requisitos:** Operacoes-SOC-e-SIEM, PowerShell-e-Windows-Interno.
+- **Conceitos-Chave:** caça por hipótese vs por indicador; ciclo de caça (PEAK); linha de base; *stack counting* e cauda longa; fontes (EDR, Sysmon, logs de autenticação); documentação da caça; saída para engenharia de detecção.
+- **Simulador Interativo em JS:** *Caçada Guiada* — O aluno escolhe uma hipótese (por exemplo, persistência por tarefa agendada), seleciona a fonte de dados e agrupa os eventos por frequência. O implante aparece entre as ocorrências raras; o simulador pontua a hipótese, a fonte escolhida e o achado.
+
+#### 48. Monitoramento-de-Rede-NSM
+- **Título:** Monitoramento de Rede: Zeek, PCAP e NetFlow
+- **Função NIST CSF 2.0:** *Detect (DE)*
+- **Tempo Estimado:** 45 minutos | **Carreiras:** SOC, Blue Team, Forense
+- **MITRE ATT&CK:** T1071 Application Layer Protocol / T1071.004 DNS / T1048 Exfiltration Over Alternative Protocol
+- **Objetivos de Aprendizagem:** Diferenciar PCAP completo, metadados (Zeek) e fluxos (NetFlow/IPFIX) por custo e valor; ler `conn.log`, `dns.log` e `ssl.log` do Zeek; detectar beaconing pela regularidade dos intervalos e pelo tamanho das conexões; reconhecer túnel DNS e usar fingerprints TLS (JA3/JA4) com cautela.
+- **Pré-requisitos:** Redes-e-Protocolos, Seguranca-de-Redes-Defesa.
+- **Conceitos-Chave:** NSM; Zeek e seus logs; NetFlow/IPFIX; beaconing (intervalo e *jitter*); túnel DNS (subdomínios longos, alta entropia, volume); JA3/JA4; tráfego cifrado e o que ainda se vê.
+- **Diferença para o módulo 07:** o 07 trata de IDS/IPS por assinatura; este trata de análise de metadados de rede para achar o que as assinaturas não pegam.
+- **Simulador Interativo em JS:** *Analisador de Conexões* — O aluno recebe um `conn.log` e um `dns.log` fictícios, agrupa as conexões por par origem–destino e ajusta limiares de intervalo e *jitter*. O simulador destaca o beaconing e o túnel DNS e conta os falsos positivos do limiar escolhido.
+
+#### 49. SOAR-e-Automacao-de-Resposta
+- **Título:** SOAR: Playbooks e Automação de Resposta
+- **Função NIST CSF 2.0:** *Respond (RS)*
+- **Tempo Estimado:** 40 minutos | **Carreiras:** SOC, Blue Team, Analista de Segurança da Informação
+- **MITRE ATT&CK:** N/A (orquestração da resposta)
+- **Objetivos de Aprendizagem:** Desenhar um playbook com gatilho, enriquecimento, decisão e ação; separar ações automáticas das que exigem aprovação humana; medir o efeito da automação em tempo de triagem (MTTA/MTTR); prever falhas: fonte de enriquecimento fora do ar, falso positivo, bloqueio de ativo crítico.
+- **Pré-requisitos:** Operacoes-SOC-e-SIEM, Resposta-a-Incidentes, Python-para-Seguranca.
+- **Conceitos-Chave:** SOAR; playbook vs runbook; enriquecimento (reputação, ativo, usuário); *human-in-the-loop*; idempotência; listas de exceção para ativos críticos; métricas MTTA e MTTR.
+- **Simulador Interativo em JS:** *Montador de Playbook* — O aluno encadeia blocos (enriquecer, decidir, isolar host, bloquear IP, abrir chamado, pedir aprovação) e roda o playbook contra uma fila de alertas fictícios. O simulador mostra o tempo economizado e o custo dos erros, como o isolamento indevido de um servidor de produção.
+
+
+### Trilha 12: Nuvem, Containers & Kubernetes (`#0F766E`)
+
+#### 50. Seguranca-de-Containers
+- **Título:** Segurança de Containers: Imagens, Build e Runtime
+- **Função NIST CSF 2.0:** *Protect (PR)*
+- **Tempo Estimado:** 45 minutos | **Carreiras:** AppSec, Blue Team
+- **MITRE ATT&CK:** T1610 Deploy Container / T1611 Escape to Host
+- **Objetivos de Aprendizagem:** Endurecer um Dockerfile: imagem mínima, usuário não root, tag fixa, sem segredos; interpretar a varredura de vulnerabilidades de uma imagem e priorizar o que corrigir; assinar imagens e restringir o registro de origem; reconhecer configurações que permitem escape (privilegiado, socket do Docker, *capabilities*).
+- **Pré-requisitos:** Linux-para-Seguranca, DevSecOps-e-CI-CD.
+- **Conceitos-Chave:** imagem base mínima e *distroless*; build multiestágio; `USER` não root; tag vs *digest*; segredos em camadas; varredura de imagem; assinatura de imagens; namespaces, cgroups e *capabilities*; `--privileged` e `docker.sock`; detecção em runtime.
+- **Diferença para o módulo 22:** o 22 cobre o pipeline (SAST, DAST, SCA) e cita containers; este aprofunda imagem, registro e runtime.
+- **Simulador Interativo em JS:** *Auditor de Dockerfile* — O aluno recebe um Dockerfile e um comando `docker run` fictícios, identifica os achados (root, `latest`, segredo em `ENV`, `ADD` remoto, `--privileged`, socket montado) e aplica correções. O simulador recalcula o risco e explica o caminho de escape que cada achado abria.
+
+#### 51. Seguranca-em-Kubernetes
+- **Título:** Segurança em Kubernetes: RBAC, Pod Security e NetworkPolicy
+- **Função NIST CSF 2.0:** *Protect (PR)*
+- **Tempo Estimado:** 50 minutos | **Carreiras:** AppSec, Blue Team, Red Team
+- **MITRE ATT&CK:** T1609 Container Administration Command / T1613 Container and Resource Discovery / T1611 Escape to Host
+- **Objetivos de Aprendizagem:** Ler Roles, ClusterRoles e bindings e achar caminhos de escalação; aplicar os níveis de Pod Security Standards (privileged, baseline, restricted); restringir tráfego entre pods com NetworkPolicy (negar por padrão); proteger segredos, a API do cluster e as contas de serviço.
+- **Pré-requisitos:** Seguranca-de-Containers, Autenticacao-e-IAM.
+- **Conceitos-Chave:** arquitetura (API server, etcd, kubelet); RBAC e verbos perigosos (`create pods`, `escalate`, `bind`, `impersonate`); token de conta de serviço; Pod Security Admission; NetworkPolicy; Secrets e criptografia no etcd; controle de admissão; logs de auditoria; CIS Kubernetes Benchmark.
+- **Simulador Interativo em JS:** *Cluster em Miniatura* — Um cluster fictício com namespaces, pods e bindings. Fase 1: o aluno avalia manifestos contra o nível *restricted* e corrige as violações. Fase 2: encontra o caminho de escalação no RBAC a partir de uma conta de serviço e o quebra. Fase 3: escreve NetworkPolicies e vê quais pods continuam alcançáveis.
+
+#### 52. Infraestrutura-como-Codigo-Segura
+- **Título:** Infraestrutura como Código Segura: Terraform e Policy-as-Code
+- **Função NIST CSF 2.0:** *Protect (PR)*
+- **Tempo Estimado:** 40 minutos | **Carreiras:** AppSec, GRC
+- **MITRE ATT&CK:** T1578 Modify Cloud Compute Infrastructure / T1530 Data from Cloud Storage (prevenção)
+- **Objetivos de Aprendizagem:** Ler um plano Terraform e identificar mudanças de risco; escrever políticas como código que bloqueiam configurações proibidas; proteger o *state* (segredos, acesso, bloqueio); detectar *drift* entre o código e o ambiente real.
+- **Pré-requisitos:** Seguranca-em-Nuvem, DevSecOps-e-CI-CD.
+- **Conceitos-Chave:** IaC declarativa; `plan` vs `apply`; *state* e seus segredos; módulos aprovados; varredura de IaC (Checkov, tfsec/Trivy); policy-as-code (OPA/Rego); exceções com prazo; *drift*.
+- **Diferença para o módulo 21:** o 21 audita políticas e recursos já criados (CSPM); este impede que a configuração insegura chegue a ser criada.
+- **Simulador Interativo em JS:** *Revisor de Plano Terraform* — O aluno recebe trechos de HCL e o plano resultante, ativa políticas (bucket público, `0.0.0.0/0` em porta administrativa, disco sem criptografia, log desligado) e vê quais mudanças são bloqueadas. Uma etapa final compara o código com o ambiente e aponta o *drift*.
+
+#### 53. Deteccao-e-Resposta-em-Nuvem
+- **Título:** Detecção e Resposta a Incidentes em Nuvem
+- **Função NIST CSF 2.0:** *Detect (DE) / Respond (RS)*
+- **Tempo Estimado:** 50 minutos | **Carreiras:** SOC, Blue Team, Forense, AppSec
+- **MITRE ATT&CK:** T1078.004 Valid Accounts: Cloud Accounts / T1098 Account Manipulation / T1530 Data from Cloud Storage
+- **Objetivos de Aprendizagem:** Saber quais logs existem por padrão e quais precisam ser ligados (trilha de auditoria, logs de dados, logs de fluxo); ler eventos de auditoria de nuvem: quem, o quê, de onde e com qual credencial; reconstruir a linha do tempo de uma credencial vazada; conter na nuvem: revogar sessões e chaves, isolar recursos, preservar evidências.
+- **Pré-requisitos:** Seguranca-em-Nuvem, Resposta-a-Incidentes, Identidade-Hibrida-e-Nuvem.
+- **Conceitos-Chave:** CloudTrail e Azure Activity Log; eventos de gerenciamento vs de dados; detecção nativa (GuardDuty, Defender for Cloud); chave de acesso de longa duração; criação de usuário e de chave como persistência; *snapshot* forense; contenção sem destruir evidência.
+- **Simulador Interativo em JS:** *Conta Comprometida* — O aluno recebe eventos de auditoria fictícios no estilo CloudTrail, filtra pela chave vazada e ordena a linha do tempo (descoberta, criação de usuário, nova chave, leitura de bucket). Depois escolhe a ordem da contenção; o simulador mostra o que cada escolha preserva ou destrói.
+
+
+### Trilha 13: Setor Regulado no Brasil (`#4D7C0F`)
+
+#### 54. Regulacao-Setor-Financeiro
+- **Título:** Regulação Cibernética do Setor Financeiro
+- **Função NIST CSF 2.0:** *Govern (GV)*
+- **Tempo Estimado:** 45 minutos | **Carreiras:** GRC, Analista de Segurança da Informação
+- **MITRE ATT&CK:** Conformidade Regulatória
+- **Objetivos de Aprendizagem:** Identificar quem está sujeito a cada norma (instituições financeiras e de pagamento); listar o que a política de segurança cibernética e o plano de resposta a incidentes devem conter; aplicar os requisitos para contratação de processamento, armazenamento e computação em nuvem; conhecer os controles mínimos e o teste de intrusão anual incluídos em dezembro de 2025.
+- **Pré-requisitos:** ISO-27001-e-27002, Gestao-de-Riscos-TI, PCI-DSS.
+- **Conceitos-Chave:** Res. CMN 4.893/2021 alterada pela Res. CMN 5.274/2025; Res. BCB 85/2021 e sua alteração de dezembro de 2025; política de segurança cibernética; plano de ação e de resposta a incidentes; relatório anual; contratação de nuvem e responsabilidade que não se transfere ao fornecedor; controles mínimos; teste de intrusão anual; segregação de ambientes do Pix e do STR.
+- **Verificações:** as fontes divergem sobre o número da resolução BCB de dezembro de 2025 que alterou a BCB 85 (538 ou 448), e há menção a uma alteração posterior (BCB 552/2026). O módulo cita o número só depois de conferir no site normativos.bcb.gov.br.
+- **Simulador Interativo em JS:** *Verificador de Aderência* — O aluno recebe a política e o contrato de nuvem de uma instituição fictícia e marca, requisito por requisito, se está atendido, parcial ou ausente. O simulador aponta as lacunas, cita o dispositivo correspondente e gera um plano de ação priorizado.
+
+#### 55. Fraude-em-Pagamentos-e-Pix
+- **Título:** Fraude em Pagamentos: Pix, Golpes e Antifraude
+- **Função NIST CSF 2.0:** *Detect (DE) / Protect (PR)*
+- **Tempo Estimado:** 45 minutos | **Carreiras:** SOC, GRC, Analista de Segurança da Informação
+- **MITRE ATT&CK:** T1656 Impersonation / T1566 Phishing (vetores de golpe)
+- **Objetivos de Aprendizagem:** Reconhecer os golpes mais comuns (falsa central, falso parente, conta laranja, sequestro de conta); combinar sinais de risco (conta recém-aberta, valor atípico, horário, dispositivo novo) em uma pontuação; equilibrar fraude evitada e cliente legítimo bloqueado; entender o Mecanismo Especial de Devolução (MED 2.0) e o bloqueio cautelar.
+- **Pré-requisitos:** Engenharia-Social-e-Phishing, Regulacao-Setor-Financeiro.
+- **Conceitos-Chave:** engenharia social financeira; contas laranja; sinais de transação, de conta e de dispositivo; regras vs pontuação; falso positivo e atrito com o cliente; bloqueio cautelar; MED 2.0 (Res. BCB 493/2025), com devolução a partir de contas diferentes da usada na fraude e contestação pelo autoatendimento.
+- **Diferença para o módulo 15:** o 15 trata da defesa humana contra phishing; este trata da detecção da transação fraudulenta do lado da instituição.
+- **Verificações:** prazos do MED 2.0 (por exemplo, "até 11 dias") vêm de fontes secundárias; o módulo usa só prazos confirmados na Resolução BCB 493/2025 ou no guia do MED do Banco Central.
+- **Simulador Interativo em JS:** *Mesa Antifraude* — O aluno recebe uma fila de transações Pix fictícias, ajusta pesos e limiares dos sinais de risco e decide aprovar, segurar ou bloquear. O simulador mostra fraudes evitadas, clientes bloqueados sem motivo e, para as fraudes que passaram, o fluxo do MED.
+
+#### 56. Legislacao-e-Crimes-Ciberneticos
+- **Título:** Legislação Brasileira e Crimes Cibernéticos
+- **Função NIST CSF 2.0:** *Govern (GV)*
+- **Tempo Estimado:** 40 minutos | **Carreiras:** GRC, Forense, Analista de Segurança da Informação
+- **MITRE ATT&CK:** N/A (legislação)
+- **Objetivos de Aprendizagem:** Enquadrar condutas nos tipos penais de invasão de dispositivo, fraude eletrônica e furto mediante fraude eletrônica; aplicar os prazos de guarda de registros do Marco Civil da Internet; preservar provas digitais de forma que sejam aceitas; situar a Política Nacional de Cibersegurança e a E-Ciber.
+- **Pré-requisitos:** LGPD-e-Privacidade, Forense-Digital.
+- **Conceitos-Chave:** Lei 12.737/2012 (art. 154-A do Código Penal); Lei 14.155/2021 (penas maiores, fraude eletrônica no art. 171 §2º-A, furto mediante fraude eletrônica no art. 155 §4º-B); Marco Civil da Internet (Lei 12.965/2014): registros de conexão por 1 ano (art. 13) e de acesso a aplicações por 6 meses (art. 15); requisição judicial de registros; cadeia de custódia (arts. 158-A a 158-F do CPP); PNCiber (Decreto 11.856/2023) e E-Ciber (Decreto 12.573/2025).
+- **Diferença para o módulo 27:** o 27 trata de dados pessoais e da ANPD; este trata da esfera penal e da prova.
+- **Verificações:** penas e redação dos artigos são conferidas no texto consolidado do Código Penal (planalto.gov.br) antes de entrar no módulo.
+- **Simulador Interativo em JS:** *Enquadramento de Casos* — O aluno lê casos fictícios, escolhe o tipo penal, indica quais registros pedir e a quem, e ordena os passos de preservação de provas. O simulador corrige cada escolha com o dispositivo legal correspondente.
+
+#### 57. Gestao-de-Riscos-de-Terceiros
+- **Título:** Gestão de Riscos de Terceiros e Fornecedores
+- **Função NIST CSF 2.0:** *Govern (GV)*
+- **Tempo Estimado:** 40 minutos | **Carreiras:** GRC, Analista de Segurança da Informação
+- **MITRE ATT&CK:** T1195 Supply Chain Compromise / T1199 Trusted Relationship
+- **Objetivos de Aprendizagem:** Classificar fornecedores por criticidade e acesso a dados e sistemas; conduzir due diligence proporcional à criticidade; definir cláusulas mínimas: notificação de incidente, auditoria, subcontratação, devolução de dados; monitorar o fornecedor durante o contrato e planejar a saída.
+- **Pré-requisitos:** Gestao-de-Riscos-TI, ISO-27001-e-27002.
+- **Conceitos-Chave:** ciclo de vida do terceiro; criticidade vs risco inerente e residual; questionários e evidências (ISO 27001, SOC 2); quarta parte (subcontratados); cláusulas de segurança; direito de auditoria; plano de saída; NIST CSF 2.0 GV.SC; controle 5.19–5.23 da ISO 27002:2022; exigências de contratação da Res. CMN 4.893.
+- **Simulador Interativo em JS:** *Avaliador de Fornecedores* — O aluno avalia três fornecedores fictícios (respostas a questionário e evidências), calcula criticidade e risco, escolhe as cláusulas obrigatórias e decide contratar, contratar com condições ou recusar. O simulador mostra o risco residual e o que falta no plano de saída.
+
 ---
 
 ## 4. Matriz de Mapeamento com Frameworks Globais

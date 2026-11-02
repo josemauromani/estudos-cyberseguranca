@@ -26,8 +26,8 @@ class TestCurriculo(unittest.TestCase):
 
     def test_tamanho_da_grade(self):
         """Único ponto com os totais fixos: crescer a grade é decisão explícita."""
-        self.assertEqual(len(self._linhas_catalogo()), 45)
-        self.assertEqual(len(TRILHAS), 10)
+        self.assertEqual(len(self._linhas_catalogo()), 57)
+        self.assertEqual(len(TRILHAS), 13)
 
     def test_estudos_txt_formato_valido(self):
         """Verifica se cada registro de estudos.txt tem 7 campos válidos."""
@@ -65,6 +65,9 @@ class TestCurriculo(unittest.TestCase):
         self.assertIn("Trilha 8: Ferramentas & Automação do Analista", txt)
         self.assertIn("Trilha 9: Identidade Corporativa & Active Directory", txt)
         self.assertIn("Trilha 10: Resiliência, Crise & Ransomware", txt)
+        self.assertIn("Trilha 11: Detecção Avançada & Threat Hunting", txt)
+        self.assertIn("Trilha 12: Nuvem, Containers & Kubernetes", txt)
+        self.assertIn("Trilha 13: Setor Regulado no Brasil", txt)
         self.assertIn("Rota 6: Analista de Segurança da Informação", txt)
         self.assertIn("ISO 31000", txt)
         self.assertIn("CIS Controls v8.1", txt)

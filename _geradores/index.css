@@ -24,6 +24,9 @@
   --t8-slate: #475569;
   --t9-indigo: #4F46E5;
   --t10-orange: #C2410C;
+  --t11-fuchsia: #A21CAF;
+  --t12-teal: #0F766E;
+  --t13-lime: #4D7C0F;
 
   /* Estados de Sucesso / Conclusão */
   --good: #059669;
@@ -62,6 +65,9 @@
     --t8-slate: #94A3B8;
     --t9-indigo: #818CF8;
     --t10-orange: #FB923C;
+    --t11-fuchsia: #E879F9;
+    --t12-teal: #2DD4BF;
+    --t13-lime: #A3E635;
 
     --good: #34D399;
     --good-tint: #064E3B;
@@ -94,6 +100,9 @@
   --t8-slate: #94A3B8;
   --t9-indigo: #818CF8;
   --t10-orange: #FB923C;
+  --t11-fuchsia: #E879F9;
+  --t12-teal: #2DD4BF;
+  --t13-lime: #A3E635;
 
   --good: #34D399;
   --good-tint: #064E3B;
@@ -121,6 +130,9 @@
   --t8-slate: #475569;
   --t9-indigo: #4F46E5;
   --t10-orange: #C2410C;
+  --t11-fuchsia: #A21CAF;
+  --t12-teal: #0F766E;
+  --t13-lime: #4D7C0F;
 
   --good: #059669;
   --good-tint: #D1FAE5;
@@ -704,6 +716,9 @@ h1 {
 .track-tile.t8 { background: var(--t8-slate); }
 .track-tile.t9 { background: var(--t9-indigo); }
 .track-tile.t10 { background: var(--t10-orange); }
+.track-tile.t11 { background: var(--t11-fuchsia); }
+.track-tile.t12 { background: var(--t12-teal); }
+.track-tile.t13 { background: var(--t13-lime); }
 
 .card-badges {
   display: flex;

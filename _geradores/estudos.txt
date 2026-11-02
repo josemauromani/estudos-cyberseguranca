@@ -1,4 +1,4 @@
-# Catálogo Canônico de Estudos em Cibersegurança (45 Módulos)
+# Catálogo Canônico de Estudos em Cibersegurança (57 Módulos)
 # Formato: slug|titulo_curto|pasta|arquivo_html|trilha_num|cor_tema|nist_fn
 #
 # Trilhas:
@@ -12,6 +12,9 @@
 # 8 = Ferramentas & Automação (#475569)
 # 9 = Identidade & AD (#4F46E5)
 # 10 = Resiliência & Ransomware (#C2410C)
+# 11 = Detecção Avançada & Threat Hunting (#A21CAF)
+# 12 = Nuvem, Containers & Kubernetes (#0F766E)
+# 13 = Setor Regulado no Brasil (#4D7C0F)
 
 Fundamentos-Ciber|Tríade CIA, Ameaças e Modelagem STRIDE|Fundamentos-Ciber|treinamento-fundamentos-ciber.html|1|#2563EB|Identify
 Redes-e-Protocolos|TCP/IP, DNS, Roteamento e Inspeção de Tráfego|Redes-e-Protocolos|treinamento-redes-e-protocolos.html|1|#2563EB|Protect / Detect
@@ -58,3 +61,15 @@ Ransomware-Prevencao-a-Recuperacao|Ransomware: Prevenção, Contenção e Recupe
 Gestao-de-Crise-e-Comunicacao|Gestão de Crise Cibernética e Comunicação de Incidentes|Gestao-de-Crise-e-Comunicacao|treinamento-gestao-de-crise-e-comunicacao.html|10|#C2410C|Respond
 Exercicios-Tabletop|Exercícios Tabletop: Planejar, Conduzir e Avaliar|Exercicios-Tabletop|treinamento-exercicios-tabletop.html|10|#C2410C|Respond / Recover
 Backup-Imutavel-e-Recuperacao|Backup Imutável e Recuperação de Identidade|Backup-Imutavel-e-Recuperacao|treinamento-backup-imutavel-e-recuperacao.html|10|#C2410C|Recover
+Engenharia-de-Deteccao|Engenharia de Detecção: Detection-as-Code e Cobertura ATT&CK|Engenharia-de-Deteccao|treinamento-engenharia-de-deteccao.html|11|#A21CAF|Detect
+Threat-Hunting|Threat Hunting: Caça por Hipótese e Linhas de Base|Threat-Hunting|treinamento-threat-hunting.html|11|#A21CAF|Detect
+Monitoramento-de-Rede-NSM|Monitoramento de Rede: Zeek, PCAP e NetFlow|Monitoramento-de-Rede-NSM|treinamento-monitoramento-de-rede-nsm.html|11|#A21CAF|Detect
+SOAR-e-Automacao-de-Resposta|SOAR: Playbooks e Automação de Resposta|SOAR-e-Automacao-de-Resposta|treinamento-soar-e-automacao-de-resposta.html|11|#A21CAF|Respond
+Seguranca-de-Containers|Segurança de Containers: Imagens, Build e Runtime|Seguranca-de-Containers|treinamento-seguranca-de-containers.html|12|#0F766E|Protect
+Seguranca-em-Kubernetes|Segurança em Kubernetes: RBAC, Pod Security e NetworkPolicy|Seguranca-em-Kubernetes|treinamento-seguranca-em-kubernetes.html|12|#0F766E|Protect
+Infraestrutura-como-Codigo-Segura|Infraestrutura como Código Segura: Terraform e Policy-as-Code|Infraestrutura-como-Codigo-Segura|treinamento-infraestrutura-como-codigo-segura.html|12|#0F766E|Protect
+Deteccao-e-Resposta-em-Nuvem|Detecção e Resposta a Incidentes em Nuvem|Deteccao-e-Resposta-em-Nuvem|treinamento-deteccao-e-resposta-em-nuvem.html|12|#0F766E|Detect / Respond
+Regulacao-Setor-Financeiro|Regulação Cibernética do Setor Financeiro|Regulacao-Setor-Financeiro|treinamento-regulacao-setor-financeiro.html|13|#4D7C0F|Govern
+Fraude-em-Pagamentos-e-Pix|Fraude em Pagamentos: Pix, Golpes e Antifraude|Fraude-em-Pagamentos-e-Pix|treinamento-fraude-em-pagamentos-e-pix.html|13|#4D7C0F|Detect / Protect
+Legislacao-e-Crimes-Ciberneticos|Legislação Brasileira e Crimes Cibernéticos|Legislacao-e-Crimes-Ciberneticos|treinamento-legislacao-e-crimes-ciberneticos.html|13|#4D7C0F|Govern
+Gestao-de-Riscos-de-Terceiros|Gestão de Riscos de Terceiros e Fornecedores|Gestao-de-Riscos-de-Terceiros|treinamento-gestao-de-riscos-de-terceiros.html|13|#4D7C0F|Govern

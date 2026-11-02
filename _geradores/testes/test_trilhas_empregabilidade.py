@@ -35,7 +35,7 @@ NOMES_CARREIRAS = {c["nome"] for c in CARREIRAS.values()}
 
 class TestCatalogoNovo(unittest.TestCase):
     def test_posicoes_34_a_45(self):
-        self.assertEqual(list(ESTUDOS_DADOS)[33:], NOVOS)
+        self.assertEqual(list(ESTUDOS_DADOS)[33:45], NOVOS)
         self.assertEqual([ESTUDOS_DADOS[s]["trilha"] for s in NOVOS], [8] * 4 + [9] * 4 + [10] * 4)
 
     def test_trilhas_novas(self):

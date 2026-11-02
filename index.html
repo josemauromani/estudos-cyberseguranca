@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Plataforma de estudos autoinstrucional e prática em cibersegurança com 45 módulos temáticos, 10 trilhas e simuladores interativos em JavaScript.">
+  <meta name="description" content="Plataforma de estudos autoinstrucional e prática em cibersegurança com 57 módulos temáticos, 13 trilhas e simuladores interativos em JavaScript.">
   <title>Estudos de Cibersegurança — Catálogo e Portal Central</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%233b82f6' d='M32 4 8 14v16c0 15 10 26 24 30 14-4 24-15 24-30V14z'/%3E%3Cpath fill='%23ffffff' d='M28 40 19 31l4-4 5 5 13-13 4 4z'/%3E%3C/svg%3E">
 
@@ -39,6 +39,9 @@
   --t8-slate: #475569;
   --t9-indigo: #4F46E5;
   --t10-orange: #C2410C;
+  --t11-fuchsia: #A21CAF;
+  --t12-teal: #0F766E;
+  --t13-lime: #4D7C0F;
 
   /* Estados de Sucesso / Conclusão */
   --good: #059669;
@@ -77,6 +80,9 @@
     --t8-slate: #94A3B8;
     --t9-indigo: #818CF8;
     --t10-orange: #FB923C;
+    --t11-fuchsia: #E879F9;
+    --t12-teal: #2DD4BF;
+    --t13-lime: #A3E635;
 
     --good: #34D399;
     --good-tint: #064E3B;
@@ -109,6 +115,9 @@
   --t8-slate: #94A3B8;
   --t9-indigo: #818CF8;
   --t10-orange: #FB923C;
+  --t11-fuchsia: #E879F9;
+  --t12-teal: #2DD4BF;
+  --t13-lime: #A3E635;
 
   --good: #34D399;
   --good-tint: #064E3B;
@@ -136,6 +145,9 @@
   --t8-slate: #475569;
   --t9-indigo: #4F46E5;
   --t10-orange: #C2410C;
+  --t11-fuchsia: #A21CAF;
+  --t12-teal: #0F766E;
+  --t13-lime: #4D7C0F;
 
   --good: #059669;
   --good-tint: #D1FAE5;
@@ -719,6 +731,9 @@ h1 {
 .track-tile.t8 { background: var(--t8-slate); }
 .track-tile.t9 { background: var(--t9-indigo); }
 .track-tile.t10 { background: var(--t10-orange); }
+.track-tile.t11 { background: var(--t11-fuchsia); }
+.track-tile.t12 { background: var(--t12-teal); }
+.track-tile.t13 { background: var(--t13-lime); }
 
 .card-badges {
   display: flex;
@@ -1186,23 +1201,23 @@ a.vaga-chip:hover {
       <!-- Barra de Estatísticas do Portal -->
       <div class="stats-bar">
         <div class="stat-item">
-          <span class="stat-number">45</span>
+          <span class="stat-number">57</span>
           <span class="stat-label">Estudos Mapeados</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">10</span>
+          <span class="stat-number">13</span>
           <span class="stat-label">Trilhas Temáticas</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">45</span>
+          <span class="stat-number">57</span>
           <span class="stat-label">Simuladores Interativos</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">~2030 min</span>
-          <span class="stat-label">Tempo Total (33.8h)</span>
+          <span class="stat-number">~2560 min</span>
+          <span class="stat-label">Tempo Total (42.7h)</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">45 / 45</span>
+          <span class="stat-number">45 / 57</span>
           <span class="stat-label">Módulos Compilados</span>
         </div>
       </div>
@@ -1212,7 +1227,7 @@ a.vaga-chip:hover {
     <section class="progress-section" aria-label="Progresso global">
       <div class="progress-header">
         <h2 class="progress-title">🎯 Progresso de Conclusão Global</h2>
-        <span class="progress-metrics" id="progress-text">0 de 45 concluídos (0%)</span>
+        <span class="progress-metrics" id="progress-text">0 de 57 concluídos (0%)</span>
       </div>
       <div class="progress-bar-track">
         <div class="progress-bar-fill" id="progress-bar"></div>
@@ -1251,6 +1266,9 @@ a.vaga-chip:hover {
         <button class="filter-badge" data-value="8" onclick="setSubFilter(this.dataset.value, this)">Trilha 8: Ferramentas &amp; Automação do Analista</button>
         <button class="filter-badge" data-value="9" onclick="setSubFilter(this.dataset.value, this)">Trilha 9: Identidade Corporativa &amp; Active Directory</button>
         <button class="filter-badge" data-value="10" onclick="setSubFilter(this.dataset.value, this)">Trilha 10: Resiliência, Crise &amp; Ransomware</button>
+        <button class="filter-badge" data-value="11" onclick="setSubFilter(this.dataset.value, this)">Trilha 11: Detecção Avançada &amp; Threat Hunting</button>
+        <button class="filter-badge" data-value="12" onclick="setSubFilter(this.dataset.value, this)">Trilha 12: Nuvem, Containers &amp; Kubernetes</button>
+        <button class="filter-badge" data-value="13" onclick="setSubFilter(this.dataset.value, this)">Trilha 13: Setor Regulado no Brasil</button>
       </div>
 
       <!-- Painel: Por Perfil Profissional -->
@@ -1277,7 +1295,7 @@ a.vaga-chip:hover {
       </div>
 
       <div class="results-info">
-        <span id="visible-count">Exibindo 45 de 45 estudos</span>
+        <span id="visible-count">Exibindo 57 de 57 estudos</span>
         <span>Atalhos: clique nas tags ou use o campo de busca</span>
       </div>
     </section>
@@ -3685,6 +3703,546 @@ a.vaga-chip:hover {
       </div>
     </article>
 
+    <article class="study-card" id="estudo-Engenharia-de-Deteccao"
+      data-slug="Engenharia-de-Deteccao"
+      data-trilha="11"
+      data-nist="Detect"
+      data-carreiras="Operações SOC &amp; Resposta,Blue Team &amp; Defesa"
+      data-search="engenharia-de-deteccao engenharia de detecção: detection-as-code e cobertura att&amp;amp;ck regras versionadas, testadas e medidas pela cobertura de técnicas quantas técnicas att&amp;amp;ck suas regras realmente detectam, e como você sabe? bancada de detecções detect operações soc &amp; resposta,blue team &amp; defesa detecção como código: versionar, revisar, testar regras sigma com filtros e condições cobertura att&amp;ck medida por teste, não por existência da regra precisão e volume de alertas antes da produção">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t11" title="Trilha 11: Detecção Avançada & Threat Hunting">
+            11
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Detect</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Bancada de Detecções</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Engenharia de Detecção: Detection-as-Code e Cobertura ATT&amp;CK</h3>
+      <p class="study-desc">Regras versionadas, testadas e medidas pela cobertura de técnicas</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Quantas técnicas ATT&amp;CK suas regras realmente detectam, e como você sabe?
+      </div>
+
+      <ul class="study-facts">
+          <li>Detecção como código: versionar, revisar, testar</li>
+          <li>Regras Sigma com filtros e condições</li>
+          <li>Cobertura ATT&amp;CK medida por teste, não por existência da regra</li>
+          <li>Precisão e volume de alertas antes da produção</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Engenharia-de-Deteccao" onchange="toggleDone('Engenharia-de-Deteccao', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Threat-Hunting"
+      data-slug="Threat-Hunting"
+      data-trilha="11"
+      data-nist="Detect"
+      data-carreiras="Operações SOC &amp; Resposta,Blue Team &amp; Defesa,Perícia Forense &amp; Malware"
+      data-search="threat-hunting threat hunting: caça por hipótese e linhas de base procurar o que nenhum alerta pegou, partindo de uma hipótese se um invasor estiver na rede sem disparar alertas, por onde você começa a procurar? caçada guiada detect operações soc &amp; resposta,blue team &amp; defesa,perícia forense &amp; malware caça por hipótese, não por alerta linha de base e contagem de ocorrências raras ciclo de caça peak toda caça bem-sucedida vira detecção">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t11" title="Trilha 11: Detecção Avançada & Threat Hunting">
+            11
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Detect</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Caçada Guiada</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Threat Hunting: Caça por Hipótese e Linhas de Base</h3>
+      <p class="study-desc">Procurar o que nenhum alerta pegou, partindo de uma hipótese</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Se um invasor estiver na rede sem disparar alertas, por onde você começa a procurar?
+      </div>
+
+      <ul class="study-facts">
+          <li>Caça por hipótese, não por alerta</li>
+          <li>Linha de base e contagem de ocorrências raras</li>
+          <li>Ciclo de caça PEAK</li>
+          <li>Toda caça bem-sucedida vira detecção</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Threat-Hunting" onchange="toggleDone('Threat-Hunting', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Monitoramento-de-Rede-NSM"
+      data-slug="Monitoramento-de-Rede-NSM"
+      data-trilha="11"
+      data-nist="Detect"
+      data-carreiras="Operações SOC &amp; Resposta,Blue Team &amp; Defesa,Perícia Forense &amp; Malware"
+      data-search="monitoramento-de-rede-nsm monitoramento de rede: zeek, pcap e netflow logs de conexão, beaconing, túnel dns e fingerprints tls como achar um implante que fala com o atacante a cada 60 segundos, mesmo com o tráfego cifrado? analisador de conexões detect operações soc &amp; resposta,blue team &amp; defesa,perícia forense &amp; malware pcap, zeek e netflow: custo vs valor beaconing pela regularidade dos intervalos túnel dns por entropia e volume de subdomínios ja3/ja4 ajudam, mas não provam sozinhos">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t11" title="Trilha 11: Detecção Avançada & Threat Hunting">
+            11
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Detect</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Analisador de Conexões</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Monitoramento de Rede: Zeek, PCAP e NetFlow</h3>
+      <p class="study-desc">Logs de conexão, beaconing, túnel DNS e fingerprints TLS</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como achar um implante que fala com o atacante a cada 60 segundos, mesmo com o tráfego cifrado?
+      </div>
+
+      <ul class="study-facts">
+          <li>PCAP, Zeek e NetFlow: custo vs valor</li>
+          <li>Beaconing pela regularidade dos intervalos</li>
+          <li>Túnel DNS por entropia e volume de subdomínios</li>
+          <li>JA3/JA4 ajudam, mas não provam sozinhos</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Monitoramento-de-Rede-NSM" onchange="toggleDone('Monitoramento-de-Rede-NSM', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-SOAR-e-Automacao-de-Resposta"
+      data-slug="SOAR-e-Automacao-de-Resposta"
+      data-trilha="11"
+      data-nist="Respond"
+      data-carreiras="Operações SOC &amp; Resposta,Blue Team &amp; Defesa,Analista de Segurança da Informação"
+      data-search="soar-e-automacao-de-resposta soar: playbooks e automação de resposta enriquecer, decidir e conter, com aprovação humana onde o erro custa caro o que o seu playbook deve fazer sozinho, e o que ele nunca deve fazer sem perguntar? montador de playbook respond operações soc &amp; resposta,blue team &amp; defesa,analista de segurança da informação playbook: gatilho, enriquecimento, decisão, ação aprovação humana para ações de alto impacto mtta e mttr como medida da automação exceções para ativos críticos">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t11" title="Trilha 11: Detecção Avançada & Threat Hunting">
+            11
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Respond</span>
+            <span class="badge badge-time">⏱️ 40 min</span>
+            <span class="badge badge-sim">🧪 Montador de Playbook</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">SOAR: Playbooks e Automação de Resposta</h3>
+      <p class="study-desc">Enriquecer, decidir e conter, com aprovação humana onde o erro custa caro</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        O que o seu playbook deve fazer sozinho, e o que ele nunca deve fazer sem perguntar?
+      </div>
+
+      <ul class="study-facts">
+          <li>Playbook: gatilho, enriquecimento, decisão, ação</li>
+          <li>Aprovação humana para ações de alto impacto</li>
+          <li>MTTA e MTTR como medida da automação</li>
+          <li>Exceções para ativos críticos</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="SOAR-e-Automacao-de-Resposta" onchange="toggleDone('SOAR-e-Automacao-de-Resposta', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Seguranca-de-Containers"
+      data-slug="Seguranca-de-Containers"
+      data-trilha="12"
+      data-nist="Protect"
+      data-carreiras="AppSec &amp; DevSecOps,Blue Team &amp; Defesa"
+      data-search="seguranca-de-containers segurança de containers: imagens, build e runtime da imagem base ao processo em execução o que separa um container comprometido do servidor que o hospeda? auditor de dockerfile protect appsec &amp; devsecops,blue team &amp; defesa imagem mínima, usuário não root e tag fixa segredos nunca em camadas da imagem --privileged e docker.sock abrem caminho ao host assinatura e registro confiável">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t12" title="Trilha 12: Nuvem, Containers & Kubernetes">
+            12
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Auditor de Dockerfile</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Segurança de Containers: Imagens, Build e Runtime</h3>
+      <p class="study-desc">Da imagem base ao processo em execução</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        O que separa um container comprometido do servidor que o hospeda?
+      </div>
+
+      <ul class="study-facts">
+          <li>Imagem mínima, usuário não root e tag fixa</li>
+          <li>Segredos nunca em camadas da imagem</li>
+          <li>--privileged e docker.sock abrem caminho ao host</li>
+          <li>Assinatura e registro confiável</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Seguranca-de-Containers" onchange="toggleDone('Seguranca-de-Containers', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Seguranca-em-Kubernetes"
+      data-slug="Seguranca-em-Kubernetes"
+      data-trilha="12"
+      data-nist="Protect"
+      data-carreiras="AppSec &amp; DevSecOps,Blue Team &amp; Defesa,Red Team &amp; Pentest"
+      data-search="seguranca-em-kubernetes segurança em kubernetes: rbac, pod security e networkpolicy quem pode fazer o quê no cluster, e o que cada pod alcança uma conta de serviço comprometida consegue chegar a administrador do cluster? cluster em miniatura protect appsec &amp; devsecops,blue team &amp; defesa,red team &amp; pentest rbac: create pods, bind e escalate são privilégio pod security standards: privileged, baseline, restricted networkpolicy com negação por padrão token de conta de serviço é credencial">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t12" title="Trilha 12: Nuvem, Containers & Kubernetes">
+            12
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 50 min</span>
+            <span class="badge badge-sim">🧪 Cluster em Miniatura</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Segurança em Kubernetes: RBAC, Pod Security e NetworkPolicy</h3>
+      <p class="study-desc">Quem pode fazer o quê no cluster, e o que cada pod alcança</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Uma conta de serviço comprometida consegue chegar a administrador do cluster?
+      </div>
+
+      <ul class="study-facts">
+          <li>RBAC: create pods, bind e escalate são privilégio</li>
+          <li>Pod Security Standards: privileged, baseline, restricted</li>
+          <li>NetworkPolicy com negação por padrão</li>
+          <li>Token de conta de serviço é credencial</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Seguranca-em-Kubernetes" onchange="toggleDone('Seguranca-em-Kubernetes', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Infraestrutura-como-Codigo-Segura"
+      data-slug="Infraestrutura-como-Codigo-Segura"
+      data-trilha="12"
+      data-nist="Protect"
+      data-carreiras="AppSec &amp; DevSecOps,GRC &amp; Auditoria"
+      data-search="infraestrutura-como-codigo-segura infraestrutura como código segura: terraform e policy-as-code barrar a configuração insegura antes do apply como impedir que um bucket público chegue à produção, em vez de achá-lo depois? revisor de plano terraform protect appsec &amp; devsecops,grc &amp; auditoria plano antes do apply, política antes do plano state do terraform contém segredos policy-as-code com exceções com prazo drift: o ambiente diverge do código">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t12" title="Trilha 12: Nuvem, Containers & Kubernetes">
+            12
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Protect</span>
+            <span class="badge badge-time">⏱️ 40 min</span>
+            <span class="badge badge-sim">🧪 Revisor de Plano Terraform</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Infraestrutura como Código Segura: Terraform e Policy-as-Code</h3>
+      <p class="study-desc">Barrar a configuração insegura antes do apply</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Como impedir que um bucket público chegue à produção, em vez de achá-lo depois?
+      </div>
+
+      <ul class="study-facts">
+          <li>Plano antes do apply, política antes do plano</li>
+          <li>State do Terraform contém segredos</li>
+          <li>Policy-as-code com exceções com prazo</li>
+          <li>Drift: o ambiente diverge do código</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Infraestrutura-como-Codigo-Segura" onchange="toggleDone('Infraestrutura-como-Codigo-Segura', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Deteccao-e-Resposta-em-Nuvem"
+      data-slug="Deteccao-e-Resposta-em-Nuvem"
+      data-trilha="12"
+      data-nist="Detect / Respond"
+      data-carreiras="Operações SOC &amp; Resposta,Blue Team &amp; Defesa,Perícia Forense &amp; Malware,AppSec &amp; DevSecOps"
+      data-search="deteccao-e-resposta-em-nuvem detecção e resposta a incidentes em nuvem trilhas de auditoria, detecção nativa e contenção de credencial vazada uma chave de acesso vazou no github há três dias: o que o atacante fez, e como você o tira de lá? conta comprometida detect / respond operações soc &amp; resposta,blue team &amp; defesa,perícia forense &amp; malware,appsec &amp; devsecops eventos de dados não vêm ligados por padrão credencial vazada: revogar, girar, investigar criação de usuário e de chave como persistência snapshot antes de desligar">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t12" title="Trilha 12: Nuvem, Containers & Kubernetes">
+            12
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Detect / Respond</span>
+            <span class="badge badge-time">⏱️ 50 min</span>
+            <span class="badge badge-sim">🧪 Conta Comprometida</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Detecção e Resposta a Incidentes em Nuvem</h3>
+      <p class="study-desc">Trilhas de auditoria, detecção nativa e contenção de credencial vazada</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Uma chave de acesso vazou no GitHub há três dias: o que o atacante fez, e como você o tira de lá?
+      </div>
+
+      <ul class="study-facts">
+          <li>Eventos de dados não vêm ligados por padrão</li>
+          <li>Credencial vazada: revogar, girar, investigar</li>
+          <li>Criação de usuário e de chave como persistência</li>
+          <li>Snapshot antes de desligar</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Deteccao-e-Resposta-em-Nuvem" onchange="toggleDone('Deteccao-e-Resposta-em-Nuvem', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Regulacao-Setor-Financeiro"
+      data-slug="Regulacao-Setor-Financeiro"
+      data-trilha="13"
+      data-nist="Govern"
+      data-carreiras="GRC &amp; Auditoria,Analista de Segurança da Informação"
+      data-search="regulacao-setor-financeiro regulação cibernética do setor financeiro resolução cmn 4.893 e resolução bcb 85, com as alterações de dezembro de 2025 o que o banco central exige da sua política de segurança, e o que muda quando o sistema vai para a nuvem? verificador de aderência govern grc &amp; auditoria,analista de segurança da informação cmn 4.893/2021, alterada pela cmn 5.274/2025 bcb 85/2021 para instituições de pagamento responsabilidade não se transfere ao fornecedor de nuvem teste de intrusão anual e controles mínimos">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t13" title="Trilha 13: Setor Regulado no Brasil">
+            13
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Govern</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Verificador de Aderência</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Regulação Cibernética do Setor Financeiro</h3>
+      <p class="study-desc">Resolução CMN 4.893 e Resolução BCB 85, com as alterações de dezembro de 2025</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        O que o Banco Central exige da sua política de segurança, e o que muda quando o sistema vai para a nuvem?
+      </div>
+
+      <ul class="study-facts">
+          <li>CMN 4.893/2021, alterada pela CMN 5.274/2025</li>
+          <li>BCB 85/2021 para instituições de pagamento</li>
+          <li>Responsabilidade não se transfere ao fornecedor de nuvem</li>
+          <li>Teste de intrusão anual e controles mínimos</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Regulacao-Setor-Financeiro" onchange="toggleDone('Regulacao-Setor-Financeiro', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Fraude-em-Pagamentos-e-Pix"
+      data-slug="Fraude-em-Pagamentos-e-Pix"
+      data-trilha="13"
+      data-nist="Detect / Protect"
+      data-carreiras="Operações SOC &amp; Resposta,GRC &amp; Auditoria,Analista de Segurança da Informação"
+      data-search="fraude-em-pagamentos-e-pix fraude em pagamentos: pix, golpes e antifraude golpes com pix, sinais de risco, regras antifraude e o med 2.0 quais sinais separam um pix legítimo de um golpe, e quanto atrito o cliente honesto aceita? mesa antifraude detect / protect operações soc &amp; resposta,grc &amp; auditoria,analista de segurança da informação golpe de falsa central e conta laranja pontuação de risco com sinais combinados fraude evitada vs cliente bloqueado med 2.0 e bloqueio cautelar">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t13" title="Trilha 13: Setor Regulado no Brasil">
+            13
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Detect / Protect</span>
+            <span class="badge badge-time">⏱️ 45 min</span>
+            <span class="badge badge-sim">🧪 Mesa Antifraude</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Fraude em Pagamentos: Pix, Golpes e Antifraude</h3>
+      <p class="study-desc">Golpes com Pix, sinais de risco, regras antifraude e o MED 2.0</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Quais sinais separam um Pix legítimo de um golpe, e quanto atrito o cliente honesto aceita?
+      </div>
+
+      <ul class="study-facts">
+          <li>Golpe de falsa central e conta laranja</li>
+          <li>Pontuação de risco com sinais combinados</li>
+          <li>Fraude evitada vs cliente bloqueado</li>
+          <li>MED 2.0 e bloqueio cautelar</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Fraude-em-Pagamentos-e-Pix" onchange="toggleDone('Fraude-em-Pagamentos-e-Pix', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Legislacao-e-Crimes-Ciberneticos"
+      data-slug="Legislacao-e-Crimes-Ciberneticos"
+      data-trilha="13"
+      data-nist="Govern"
+      data-carreiras="GRC &amp; Auditoria,Perícia Forense &amp; Malware,Analista de Segurança da Informação"
+      data-search="legislacao-e-crimes-ciberneticos legislação brasileira e crimes cibernéticos tipos penais, guarda de registros e preservação de provas o que guardar, por quanto tempo e como, para que o caso chegue ao processo penal? enquadramento de casos govern grc &amp; auditoria,perícia forense &amp; malware,analista de segurança da informação art. 154-a: invasão de dispositivo informático fraude eletrônica: art. 171 §2º-a (lei 14.155/2021) marco civil: conexão 1 ano, aplicações 6 meses pnciber (2023) e e-ciber (2025)">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t13" title="Trilha 13: Setor Regulado no Brasil">
+            13
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Govern</span>
+            <span class="badge badge-time">⏱️ 40 min</span>
+            <span class="badge badge-sim">🧪 Enquadramento de Casos</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Legislação Brasileira e Crimes Cibernéticos</h3>
+      <p class="study-desc">Tipos penais, guarda de registros e preservação de provas</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        O que guardar, por quanto tempo e como, para que o caso chegue ao processo penal?
+      </div>
+
+      <ul class="study-facts">
+          <li>Art. 154-A: invasão de dispositivo informático</li>
+          <li>Fraude eletrônica: art. 171 §2º-A (Lei 14.155/2021)</li>
+          <li>Marco Civil: conexão 1 ano, aplicações 6 meses</li>
+          <li>PNCiber (2023) e E-Ciber (2025)</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Legislacao-e-Crimes-Ciberneticos" onchange="toggleDone('Legislacao-e-Crimes-Ciberneticos', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
+    <article class="study-card" id="estudo-Gestao-de-Riscos-de-Terceiros"
+      data-slug="Gestao-de-Riscos-de-Terceiros"
+      data-trilha="13"
+      data-nist="Govern"
+      data-carreiras="GRC &amp; Auditoria,Analista de Segurança da Informação"
+      data-search="gestao-de-riscos-de-terceiros gestão de riscos de terceiros e fornecedores due diligence, cláusulas mínimas, monitoramento e plano de saída seu fornecedor crítico tem acesso aos seus dados: como você sabe que ele protege, e como sai do contrato se precisar? avaliador de fornecedores govern grc &amp; auditoria,analista de segurança da informação due diligence proporcional à criticidade cláusulas: incidente, auditoria, subcontratação, saída quarta parte: o fornecedor do fornecedor nist csf 2.0 gv.sc e iso 27002 5.19–5.23">
+      
+      <div class="card-header">
+        <div class="card-tile-group">
+          <div class="track-tile t13" title="Trilha 13: Setor Regulado no Brasil">
+            13
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-nist">🛡️ NIST: Govern</span>
+            <span class="badge badge-time">⏱️ 40 min</span>
+            <span class="badge badge-sim">🧪 Avaliador de Fornecedores</span>
+          </div>
+        </div>
+        <span class="status-badge preparo">Em elaboração</span>
+      </div>
+
+      <h3 class="study-title">Gestão de Riscos de Terceiros e Fornecedores</h3>
+      <p class="study-desc">Due diligence, cláusulas mínimas, monitoramento e plano de saída</p>
+
+      <div class="study-ask">
+        <strong>Responde a:</strong>
+        Seu fornecedor crítico tem acesso aos seus dados: como você sabe que ele protege, e como sai do contrato se precisar?
+      </div>
+
+      <ul class="study-facts">
+          <li>Due diligence proporcional à criticidade</li>
+          <li>Cláusulas: incidente, auditoria, subcontratação, saída</li>
+          <li>Quarta parte: o fornecedor do fornecedor</li>
+          <li>NIST CSF 2.0 GV.SC e ISO 27002 5.19–5.23</li>
+      </ul>
+
+      <div class="card-actions">
+        <span class="btn-disabled">Em elaboração</span>
+        <label class="done-label">
+          <input type="checkbox" data-slug="Gestao-de-Riscos-de-Terceiros" onchange="toggleDone('Gestao-de-Riscos-de-Terceiros', this.checked)">
+          <span>Estudo Concluído</span>
+        </label>
+      </div>
+    </article>
+
         <div class="no-results" id="no-results-msg" style="display: none;">
           <p>Nenhum estudo encontrado com os critérios de busca aplicados.</p>
           <button class="btn-open-study" onclick="clearSearch(); switchTab('todas');">Limpar Filtros e Busca</button>
@@ -3783,7 +4341,7 @@ a.vaga-chip:hover {
   // --------------------------------------------------------------------------
   // 3. Gerenciador de Progresso Global do Estudante
   // --------------------------------------------------------------------------
-  const TOTAL_ESTUDOS = 45;
+  const TOTAL_ESTUDOS = 57;
 
   function initProgress() {
     let concluidos = 0;
