@@ -1,0 +1,704 @@
+<!-- Estudo 22: DevSecOps-e-CI-CD Body Fragment -->
+<article class="study-container" data-slug="devsecops">
+
+    <!-- SEÇÃO 1: SHIFT-LEFT -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: Pegar a Falha Antes da Produção</h2>
+        </div>
+
+        <p class="lead-text">
+            Nos Estudos 12 e 13, você explorou uma SQL injection e um mass assignment na loja da Ipê Store depois que já estavam no ar. Corrigir em produção custa caro: incidente, comunicação, correção às pressas. <strong>Shift-Left</strong> é mover a segurança para o começo do ciclo, de modo que a mesma falha seja apontada no merge request, minutos depois de escrita, por uma ferramenta que roda sozinha a cada mudança. O nome do processo é <strong>SSDLC</strong> (ciclo de desenvolvimento seguro): requisitos, revisão de código, testes automatizados e verificação antes do deploy.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Uma Esteira CI/CD com Security Gates</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Uma Esteira CI/CD com Security Gates">
+flowchart TD
+    MR["Merge request"]
+    S["Segredos<br><small>Gitleaks, inclusive no histórico</small>"]
+    A["SAST<br><small>Semgrep no código</small>"]
+    C["SCA e SBOM<br><small>pip-audit nas dependências</small>"]
+    I["Build e scan da imagem<br><small>Trivy, assinatura com Cosign</small>"]
+    T["Testes automatizados"]
+    D["DAST em staging<br><small>OWASP ZAP</small>"]
+    P["Deploy<br><small>só imagem assinada</small>"]
+    MR --> S
+    S --> A
+    A --> C
+    C --> I
+    I --> T
+    T --> D
+    D --> P
+            </pre>
+        </div>
+
+        <h3>Cada ferramenta vê uma parte</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Tipo</th><th>O que analisa</th><th>Pega bem</th><th>Exemplos</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>SAST</strong></td><td>O código-fonte, sem executar</td><td>SQL montada com texto do usuário, funções perigosas</td><td>Semgrep, CodeQL</td></tr>
+                    <tr><td><strong>DAST</strong></td><td>A aplicação rodando, de fora</td><td>Cabeçalhos ausentes, XSS refletido, configuração</td><td>OWASP ZAP</td></tr>
+                    <tr><td><strong>IAST</strong></td><td>A aplicação rodando, instrumentada por dentro durante os testes</td><td>Confirma se o dado do usuário chega à consulta</td><td>Agentes comerciais</td></tr>
+                    <tr><td><strong>SCA</strong></td><td>As dependências e suas versões</td><td>Bibliotecas com vulnerabilidade conhecida</td><td>pip-audit, Dependency-Check</td></tr>
+                    <tr><td>Segredos</td><td>Código e histórico do Git</td><td>Chaves e senhas escritas no repositório</td><td>Gitleaks</td></tr>
+                    <tr><td>Imagem</td><td>Dockerfile e pacotes da imagem</td><td>Root, imagem sem versão, pacotes vulneráveis</td><td>Trivy</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">.github/workflows/seguranca.yml — gates no merge request</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ds-ci')">Copiar</button>
+            </div>
+            <pre><code id="code-ds-ci">name: seguranca
+on: [pull_request]
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0              # histórico completo para o scan de segredos
+      # (instalação das ferramentas omitida)
+      - name: Segredos
+        run: gitleaks detect --source . --redact
+      - name: SAST
+        run: semgrep scan --config p/python --error
+      - name: SCA
+        run: pip-audit -r requirements.txt
+      - name: Imagem
+        run: |
+          docker build -t loja:${{ github.sha }} .
+          trivy image --severity HIGH,CRITICAL --exit-code 1 loja:${{ github.sha }}</code></pre>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: DEPENDÊNCIAS, CONTAINERS E GATES -->
+    <section class="study-section" id="cadeia">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Dependências, Containers e Quality Gates</h2>
+        </div>
+
+        <h3>SBOM: saber o que está dentro</h3>
+        <p>
+            Em dezembro de 2021, o Log4Shell (CVE-2021-44228, CVSS 10.0, na biblioteca log4j-core) obrigou empresas do mundo todo a responder uma pergunta simples: "onde usamos essa biblioteca?". Quem tinha um <strong>SBOM</strong> (Software Bill of Materials, a lista de componentes de cada software) respondeu em minutos. Os formatos mais usados são o <strong>CycloneDX</strong> (projeto da OWASP) e o <strong>SPDX</strong> (Linux Foundation, norma ISO/IEC 5962).
+        </p>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">sbom.cdx.json — trecho em CycloneDX</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ds-sbom')">Copiar</button>
+            </div>
+            <pre><code id="code-ds-sbom">{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "components": [
+    { "type": "library", "name": "flask", "version": "3.0.3", "purl": "pkg:pypi/flask@3.0.3" },
+    { "type": "library", "name": "pdfgen-lab", "version": "1.2.0", "purl": "pkg:pypi/pdfgen-lab@1.2.0" }
+  ]
+}</code></pre>
+        </div>
+        <p>
+            Para priorizar, a gravidade (CVSS) não basta. O <strong>EPSS</strong> (da FIRST) estima a probabilidade de uma vulnerabilidade ser explorada nos próximos 30 dias, e o catálogo <strong>KEV</strong> (Known Exploited Vulnerabilities, da CISA) lista as que já estão sendo exploradas. Uma falha alta que está no KEV vem antes de uma crítica que ninguém explora.
+        </p>
+
+        <h3>Containers</h3>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Dockerfile e Kubernetes — o essencial</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ds-container')">Copiar</button>
+            </div>
+            <pre><code id="code-ds-container"># Imagem enxuta e fixada pelo digest (não "latest")
+FROM python:3.12-slim@sha256:&lt;digest-conferido&gt;
+RUN useradd --create-home --uid 10001 app
+COPY --chown=app:app . /app
+USER app                      # nunca rodar como root
+# segredos chegam em tempo de execução, nunca em ENV ou ARG do Dockerfile
+
+# No Kubernetes (securityContext do container):
+#   runAsNonRoot: true
+#   readOnlyRootFilesystem: true
+#   allowPrivilegeEscalation: false
+#   privileged: false
+
+# Assinar a imagem no pipeline e verificar antes do deploy
+cosign sign --key cosign.key registry.ipestore.example/loja:1.4.2
+cosign verify --key cosign.pub registry.ipestore.example/loja:1.4.2</code></pre>
+        </div>
+        <p>
+            Imagens <strong>distroless</strong> trazem só a aplicação e o runtime, sem shell nem gerenciador de pacotes: menos vulnerabilidades e menos ferramentas para um invasor. O projeto <strong>Sigstore</strong>, com o <strong>Cosign</strong>, assina imagens com chave própria ou sem chave (<em>keyless</em>, com identidade OIDC e registro público de transparência). O <code>cosign verify</code> antes do deploy garante que só roda o que saiu do pipeline (Estudo 25 trata a mesma ideia como controle de integridade).
+        </p>
+
+        <h3>Quality gates: quando quebrar o build</h3>
+        <ul>
+            <li>Um <strong>quality gate</strong> define o limiar: por exemplo, quebrar com achado alto ou crítico. Limiar baixo demais trava o time em falsos positivos e o pipeline vira algo que todos pulam.</li>
+            <li>Em código antigo, comece com uma <strong>baseline</strong>: os achados que já existiam são registrados, e o gate bloqueia só o que for <strong>novo</strong> no merge request. O legado vira um plano de correção à parte.</li>
+            <li>Exceções existem, mas com justificativa, aprovador e validade: é um aceite de risco formal (Estudo 25). Exceção para achado crítico, ou sem data de fim, não é exceção, é abandono.</li>
+        </ul>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>Segredo vazado se revoga, não se apaga</strong>
+            </div>
+            <p>
+                Apagar a chave do código num novo commit não a tira do <strong>histórico</strong> do Git, nem dos clones e forks que já existem. O único remédio é <strong>revogar</strong> a chave no provedor, gerar outra guardada num cofre e só depois limpar o código. Por isso o scan de segredos olha o histórico inteiro.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Simulador de Pipeline CI/CD com Security Gates</h2>
+        </div>
+
+        <p class="lead-text">
+            O merge request <code>feat/busca-produtos</code> chegou. Escolha as correções que o time aplicou, defina a política de quebra de cada etapa e as exceções aprovadas, e execute o pipeline. As vulnerabilidades de dependências e da imagem têm identificadores fictícios de laboratório.
+        </p>
+
+        <div class="lab-box ds-lab" id="ds-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Esteira de Entrega</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">loja-ipestore · feat/busca-produtos</h3>
+                    <p id="ds-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">Missões</h4>
+                <ul id="ds-missoes" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.25rem; font-size: 0.85rem;"></ul>
+
+                <h4 style="margin-top: 1.5rem;">1. Correções no merge request</h4>
+                <div id="ds-correcoes" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem; font-size: 0.84rem;"></div>
+
+                <h4 style="margin-top: 1.5rem;">2. Política de quebra</h4>
+                <div id="ds-presets" style="display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.5rem;"></div>
+                <div id="ds-politica" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 0.5rem; font-size: 0.84rem;"></div>
+                <label style="display: flex; gap: 0.5rem; align-items: flex-start; margin-top: 0.5rem; font-size: 0.84rem;"><input type="checkbox" id="ds-baseline"> <span><strong>Baseline:</strong> bloquear só achados novos deste merge request (o legado fica registrado e não quebra o build).</span></label>
+
+                <h4 style="margin-top: 1.5rem;">3. Exceções aprovadas</h4>
+                <div id="ds-excecoes" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.4rem; font-size: 0.84rem;"></div>
+
+                <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    <button class="btn-primary" type="button" onclick="executarPipelineDevsecops()">Executar pipeline</button>
+                    <button class="btn-secondary" type="button" onclick="restaurarDevsecops()">Restaurar laboratório</button>
+                </div>
+
+                <h4 style="margin-top: 1.5rem;">4. Execução</h4>
+                <div id="ds-execucao" aria-live="polite" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.4rem; font-size: 0.84rem;"></div>
+                <div id="ds-producao" style="margin-top: 0.6rem; font-size: 0.84rem;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de DevSecOps</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para avaliar a esteira de um time. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="devsecops">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-1">
+                <label for="chk-ds-1"><strong>Segredos:</strong> scan de segredos no merge request e no histórico, com procedimento de revogação para vazamentos.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-2">
+                <label for="chk-ds-2"><strong>SAST e SCA:</strong> rodam em todo merge request, com gate por severidade e baseline para o legado.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-3">
+                <label for="chk-ds-3"><strong>SBOM:</strong> gerado a cada build, guardado com o artefato e consultável quando surge uma nova vulnerabilidade.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-4">
+                <label for="chk-ds-4"><strong>Imagens:</strong> base enxuta fixada por digest, usuário sem root e scan antes do push.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-5">
+                <label for="chk-ds-5"><strong>Assinatura:</strong> imagens assinadas no pipeline e verificadas antes do deploy.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-6">
+                <label for="chk-ds-6"><strong>DAST:</strong> varredura em staging antes de cada liberação.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-7">
+                <label for="chk-ds-7"><strong>Exceções:</strong> com justificativa, aprovador e validade; nenhuma para achado crítico.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (SAST ou DAST):</strong> Qual ferramenta acharia a ausência do cabeçalho Content-Security-Policy, e por quê?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O DAST, porque o cabeçalho costuma ser definido na configuração do servidor ou do proxy, fora do código que o SAST analisa. O DAST vê a resposta HTTP real.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Segredos):</strong> Um desenvolvedor apagou a chave de API no commit seguinte. O incidente acabou?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. A chave continua no histórico e em todos os clones. É preciso revogá-la no provedor e emitir outra, guardada num cofre.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Baseline):</strong> Ao ligar o SAST num sistema de dez anos, apareceram 800 achados e o time parou. O que fazer?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Registrar os achados atuais como baseline e bloquear só os novos. O legado entra num plano de correção priorizado, começando pelos críticos.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (SBOM):</strong> Saiu uma vulnerabilidade crítica numa biblioteca popular. Como o SBOM ajuda?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Com o SBOM de cada aplicação guardado, basta procurar o componente e a versão para saber em minutos quais sistemas são afetados, em vez de abrir projeto por projeto.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Containers):</strong> Por que fixar a imagem base pelo digest em vez de usar <code>python:latest</code>?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque <code>latest</code> muda sem aviso: o mesmo Dockerfile gera imagens diferentes a cada build. O digest identifica exatamente o conteúdo, e a atualização vira uma mudança revisada.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Exceções):</strong> O time pede exceção para uma dependência com falha crítica porque "o fornecedor vai corrigir". Aceitar?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não como exceção de gate. Para crítico, a saída é atualizar, trocar a biblioteca ou mitigar (desligar a função afetada, bloquear a entrada) antes do deploy. Exceções servem para riscos menores, com prazo.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Shift-Left</h4>
+                <p>A falha apontada no merge request custa minutos; em produção, um incidente.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Ferramentas</h4>
+                <p>SAST no código, SCA nas dependências, DAST na aplicação, segredos no histórico.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Cadeia de software</h4>
+                <p>SBOM, imagem enxuta sem root e assinatura verificada antes do deploy.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Gates</h4>
+                <p>Limiar por severidade, baseline para o legado e exceções com prazo.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>NIST SP 800-218 — Secure Software Development Framework (SSDF).</li>
+            <li>OWASP DevSecOps Guideline, OWASP CycloneDX e especificação SPDX (ISO/IEC 5962:2021).</li>
+            <li>FIRST — EPSS; CISA — Known Exploited Vulnerabilities Catalog.</li>
+            <li>Documentação do Sigstore/Cosign, do Trivy, do Semgrep, do Gitleaks, do pip-audit e do OWASP ZAP.</li>
+            <li>Kubernetes — Pod Security Standards e securityContext.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 21 — Segurança em Nuvem e 14 — Pentest e Metodologias</strong>
+            </div>
+            <p>
+                O Estudo 21 leva estes cuidados para a infraestrutura como código e a nuvem. O Estudo 14 mostra o teste manual que complementa as ferramentas automáticas.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="ds-dados">
+{
+ "contexto": "Pipeline simulado no navegador. As falhas de código vêm dos Estudos 12 e 13; as de dependências e da imagem têm identificadores fictícios de laboratório.",
+ "hoje": "2026-11-01",
+ "severidades": {"baixa": "Baixa", "media": "Média", "alta": "Alta", "critica": "Crítica"},
+ "etapas": [
+  {"id": "segredos", "nome": "Segredos", "ferramenta": "Gitleaks"},
+  {"id": "sast", "nome": "SAST", "ferramenta": "Semgrep"},
+  {"id": "sca", "nome": "SCA", "ferramenta": "pip-audit"},
+  {"id": "imagem", "nome": "Build e scan da imagem", "ferramenta": "Trivy"},
+  {"id": "testes", "nome": "Testes automatizados", "ferramenta": "pytest"},
+  {"id": "dast", "nome": "DAST em staging", "ferramenta": "OWASP ZAP"}
+ ],
+ "achados": [
+  {"id": "S1", "etapa": "segredos", "severidade": "critica", "novo": true, "ferramenta": "Gitleaks", "titulo": "Chave da API de pagamentos escrita em config.py",
+   "correcoes": [
+    {"id": "s1_apagar", "resolve": false, "rotulo": "Só trocar no código por variável de ambiente", "nota": "A chave antiga continua no histórico do Git e em todos os clones: o scan do histórico ainda a encontra.", "diff": ["- PAGAMENTOS_API_KEY = \"LAB-NAO-E-SEGREDO-0000\"", "+ PAGAMENTOS_API_KEY = os.environ[\"PAGAMENTOS_API_KEY\"]"]},
+    {"id": "s1_revogar", "resolve": true, "rotulo": "Revogar a chave no provedor, gerar outra no cofre e ler do ambiente", "nota": "A chave do histórico deixa de funcionar; o achado é encerrado como revogado.", "diff": ["- PAGAMENTOS_API_KEY = \"LAB-NAO-E-SEGREDO-0000\"", "+ PAGAMENTOS_API_KEY = os.environ[\"PAGAMENTOS_API_KEY\"]  # chave antiga revogada; nova no cofre"]}
+   ]},
+  {"id": "Q1", "etapa": "sast", "severidade": "alta", "novo": true, "ferramenta": "Semgrep", "titulo": "SQL injection: consulta montada com f-string em busca.py (Estudo 12)",
+   "correcoes": [{"id": "q1_param", "resolve": true, "rotulo": "Consulta parametrizada", "diff": ["- cur.execute(f\"SELECT nome, preco FROM produtos WHERE nome LIKE '%{termo}%'\")", "+ cur.execute(\"SELECT nome, preco FROM produtos WHERE nome LIKE ?\", (f\"%{termo}%\",))"]}]},
+  {"id": "Q2", "etapa": "sast", "severidade": "media", "novo": true, "ferramenta": "Semgrep", "titulo": "Mass assignment: request.json inteiro gravado no perfil (Estudo 13)",
+   "correcoes": [{"id": "q2_allowlist", "resolve": true, "rotulo": "Allowlist de campos editáveis", "diff": ["- usuario.update(request.json)", "+ EDITAVEIS = {\"nome\", \"telefone\"}", "+ usuario.update({k: v for k, v in request.json.items() if k in EDITAVEIS})"]}]},
+  {"id": "L1", "etapa": "sast", "severidade": "baixa", "novo": false, "ferramenta": "Semgrep", "titulo": "MD5 usado como checksum de upload (legado)", "correcoes": []},
+  {"id": "L2", "etapa": "sast", "severidade": "baixa", "novo": false, "ferramenta": "Semgrep", "titulo": "Stack trace devolvido ao usuário no handler de erro (legado)", "correcoes": []},
+  {"id": "D1", "etapa": "sca", "severidade": "critica", "novo": true, "ferramenta": "pip-audit", "titulo": "pdfgen-lab 1.2.0: execução remota de código ao processar PDF (LAB-2026-0001, fictício)",
+   "correcoes": [{"id": "d1_atualizar", "resolve": true, "rotulo": "Atualizar para a versão corrigida", "diff": ["- pdfgen-lab==1.2.0", "+ pdfgen-lab==1.2.4"]}]},
+  {"id": "L3", "etapa": "sca", "severidade": "media", "novo": false, "ferramenta": "pip-audit", "titulo": "dateparse-lab 0.9.3: ReDoS com datas malformadas (LAB-2025-0412, fictício, legado)", "correcoes": []},
+  {"id": "I1", "etapa": "imagem", "severidade": "alta", "novo": true, "ferramenta": "Trivy", "titulo": "Dockerfile sem USER: o container roda como root",
+   "correcoes": [{"id": "i1_user", "resolve": true, "rotulo": "Usuário sem privilégios", "diff": ["  COPY . /app", "+ RUN useradd --create-home --uid 10001 app", "+ USER app"]}]},
+  {"id": "I2", "etapa": "imagem", "severidade": "media", "novo": true, "ferramenta": "Trivy", "titulo": "Imagem base python:latest, sem versão nem digest",
+   "correcoes": [{"id": "i2_digest", "resolve": true, "rotulo": "Imagem enxuta fixada por digest", "diff": ["- FROM python:latest", "+ FROM python:3.12-slim@sha256:<digest-conferido>"]}]},
+  {"id": "L4", "etapa": "imagem", "severidade": "baixa", "novo": false, "ferramenta": "Trivy", "titulo": "Pacote do sistema com falha ainda sem correção (LAB-2025-0977, fictício, legado)", "correcoes": []},
+  {"id": "A1", "etapa": "dast", "severidade": "media", "novo": true, "ferramenta": "OWASP ZAP", "titulo": "Content-Security-Policy ausente na página de busca",
+   "correcoes": [{"id": "a1_csp", "resolve": true, "rotulo": "Cabeçalho CSP na resposta", "diff": ["+ resposta.headers[\"Content-Security-Policy\"] = \"default-src 'self'; object-src 'none'; frame-ancestors 'none'\""]}]},
+  {"id": "L5", "etapa": "dast", "severidade": "baixa", "novo": false, "ferramenta": "OWASP ZAP", "titulo": "Cookie de sessão sem SameSite (legado)", "correcoes": []},
+  {"id": "L6", "etapa": "dast", "severidade": "baixa", "novo": false, "ferramenta": "OWASP ZAP", "titulo": "X-Content-Type-Options ausente (legado)", "correcoes": []}
+ ],
+ "excecoes": [
+  {"id": "E1", "achado": "Q2", "validade": "2026-11-20", "aprovador": "Comitê de riscos de TI", "justificativa": "O endpoint de perfil só é exposto à rede interna até a correção na sprint 47."},
+  {"id": "E2", "achado": "L3", "validade": "2026-10-15", "aprovador": "Comitê de riscos de TI", "justificativa": "Troca da biblioteca de datas planejada para o trimestre."},
+  {"id": "E3", "achado": "D1", "validade": "2026-12-01", "aprovador": "Gerente do produto", "justificativa": "O fornecedor prometeu a correção para dezembro."},
+  {"id": "E4", "achado": "A1", "validade": "2026-11-30", "aprovador": "Comitê de riscos de TI", "justificativa": "A CSP será aplicada no proxy reverso para todo o site na próxima janela de mudança."}
+ ],
+ "presets": [
+  {"id": "sem", "nome": "Sem gates", "limiar": "nunca", "baseline": false},
+  {"id": "estrita", "nome": "Estrita (alta)", "limiar": "alta", "baseline": false},
+  {"id": "baixa", "nome": "Tudo em baixa", "limiar": "baixa", "baseline": false}
+ ],
+ "exemplos": [
+  {"nome": "Sem gates", "estado": {"limiares": {"segredos": "nunca", "sast": "nunca", "sca": "nunca", "imagem": "nunca", "testes": "nunca", "dast": "nunca"}, "baseline": false, "correcoes": [], "excecoes": []},
+   "esperado": {"resultado": "deploy", "bloqueantes": [], "producao": ["S1", "Q1", "Q2", "L1", "L2", "D1", "L3", "I1", "I2", "L4", "A1", "L5", "L6"]}},
+  {"nome": "Limiar alta, nada corrigido", "estado": {"limiares": {"segredos": "alta", "sast": "alta", "sca": "alta", "imagem": "alta", "testes": "alta", "dast": "alta"}, "baseline": false, "correcoes": [], "excecoes": []},
+   "esperado": {"resultado": "segredos", "bloqueantes": ["S1"], "producao": []}},
+  {"nome": "Limiar alta, segredo revogado", "estado": {"limiares": {"segredos": "alta", "sast": "alta", "sca": "alta", "imagem": "alta", "testes": "alta", "dast": "alta"}, "baseline": false, "correcoes": ["s1_revogar"], "excecoes": []},
+   "esperado": {"resultado": "sast", "bloqueantes": ["Q1"], "producao": []}},
+  {"nome": "Tudo em baixa, todo o novo corrigido", "estado": {"limiares": {"segredos": "baixa", "sast": "baixa", "sca": "baixa", "imagem": "baixa", "testes": "baixa", "dast": "baixa"}, "baseline": false, "correcoes": ["s1_revogar", "q1_param", "q2_allowlist", "d1_atualizar", "i1_user", "i2_digest", "a1_csp"], "excecoes": []},
+   "esperado": {"resultado": "sast", "bloqueantes": ["L1", "L2"], "producao": []}},
+  {"nome": "Tudo em baixa com baseline", "estado": {"limiares": {"segredos": "baixa", "sast": "baixa", "sca": "baixa", "imagem": "baixa", "testes": "baixa", "dast": "baixa"}, "baseline": true, "correcoes": ["s1_revogar", "q1_param", "q2_allowlist", "d1_atualizar", "i1_user", "i2_digest", "a1_csp"], "excecoes": []},
+   "esperado": {"resultado": "deploy", "bloqueantes": [], "producao": ["L1", "L2", "L3", "L4", "L5", "L6"]}},
+  {"nome": "Só apagar o segredo do código", "estado": {"limiares": {"segredos": "alta", "sast": "alta", "sca": "alta", "imagem": "alta", "testes": "alta", "dast": "alta"}, "baseline": false, "correcoes": ["s1_apagar", "q1_param", "q2_allowlist", "d1_atualizar", "i1_user", "i2_digest", "a1_csp"], "excecoes": []},
+   "esperado": {"resultado": "segredos", "bloqueantes": ["S1"], "producao": []}},
+  {"nome": "Exceções válidas com baseline", "estado": {"limiares": {"segredos": "media", "sast": "media", "sca": "media", "imagem": "media", "testes": "media", "dast": "media"}, "baseline": true, "correcoes": ["s1_revogar", "q1_param", "d1_atualizar", "i1_user", "i2_digest"], "excecoes": ["E1", "E4"]},
+   "esperado": {"resultado": "deploy", "bloqueantes": [], "producao": ["Q2", "L1", "L2", "L3", "L4", "A1", "L5", "L6"]}},
+  {"nome": "Exceção vencida não vale", "estado": {"limiares": {"segredos": "nunca", "sast": "nunca", "sca": "media", "imagem": "nunca", "testes": "nunca", "dast": "nunca"}, "baseline": false, "correcoes": ["s1_revogar", "q1_param", "q2_allowlist", "d1_atualizar", "i1_user", "i2_digest", "a1_csp"], "excecoes": ["E2"]},
+   "esperado": {"resultado": "sca", "bloqueantes": ["L3"], "producao": []}},
+  {"nome": "Exceção para crítica não vale", "estado": {"limiares": {"segredos": "critica", "sast": "critica", "sca": "critica", "imagem": "critica", "testes": "critica", "dast": "critica"}, "baseline": false, "correcoes": ["s1_revogar"], "excecoes": ["E3"]},
+   "esperado": {"resultado": "sca", "bloqueantes": ["D1"], "producao": []}},
+  {"nome": "Estrita e verde", "estado": {"limiares": {"segredos": "alta", "sast": "alta", "sca": "alta", "imagem": "alta", "testes": "alta", "dast": "alta"}, "baseline": false, "correcoes": ["s1_revogar", "q1_param", "q2_allowlist", "d1_atualizar", "i1_user", "i2_digest", "a1_csp"], "excecoes": []},
+   "esperado": {"resultado": "deploy", "bloqueantes": [], "producao": ["L1", "L2", "L3", "L4", "L5", "L6"]}}
+ ],
+ "missoes": [
+  {"id": "sem_gates", "texto": "Execute sem gates e veja o que chega à produção."},
+  {"id": "sqli", "texto": "Faça o pipeline bloquear a SQL injection na etapa de SAST."},
+  {"id": "baseline", "texto": "Com tudo em \"baixa\", veja o legado travar o build; depois use a baseline para bloquear só o que é novo."},
+  {"id": "segredo", "texto": "Tente só apagar a chave do código; depois resolva o segredo do jeito certo."},
+  {"id": "excecao", "texto": "Passe o pipeline usando uma exceção válida no lugar de uma correção."},
+  {"id": "verde", "texto": "Chegue ao deploy com limiar alta ou mais rigoroso em todas as etapas, sem exceções."}
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var DS = JSON.parse(document.getElementById("ds-dados").textContent);
+    var ORDEM = ["baixa", "media", "alta", "critica"];
+    var feitas = {};
+    var estado = null;
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function nivel(s) { return ORDEM.indexOf(s) + 1; }
+    function achado(id) { return DS.achados.filter(function(a) { return a.id === id; })[0]; }
+
+    // ===================================================== avaliador (espelhado nos testes)
+    function resolvido(a, est) { return a.correcoes.some(function(c) { return c.resolve && est.correcoes.indexOf(c.id) !== -1; }); }
+    function excecaoValida(a, est) {
+        if (a.severidade === "critica") return false;
+        return DS.excecoes.some(function(e) { return e.achado === a.id && est.excecoes.indexOf(e.id) !== -1 && e.validade >= DS.hoje; });
+    }
+    function bloqueia(a, est) {
+        var lim = est.limiares[a.etapa];
+        if (resolvido(a, est) || lim === "nunca") return false;
+        if (nivel(a.severidade) < nivel(lim)) return false;
+        if (est.baseline && !a.novo) return false;
+        return !excecaoValida(a, est);
+    }
+    window.avaliarPipelineDevsecops = function(est) {
+        for (var i = 0; i < DS.etapas.length; i++) {
+            var et = DS.etapas[i].id;
+            var bl = DS.achados.filter(function(a) { return a.etapa === et && bloqueia(a, est); }).map(function(a) { return a.id; });
+            if (bl.length) return { resultado: et, bloqueantes: bl, producao: [] };
+        }
+        return { resultado: "deploy", bloqueantes: [], producao: DS.achados.filter(function(a) { return !resolvido(a, est); }).map(function(a) { return a.id; }) };
+    };
+    function motivo(a, est) {
+        var lim = est.limiares[a.etapa];
+        if (resolvido(a, est)) return ["corrigido", "var(--tip-color)"];
+        if (lim === "nunca") return ["etapa sem gate", "var(--muted)"];
+        if (nivel(a.severidade) < nivel(lim)) return ["abaixo do limiar", "var(--muted)"];
+        if (est.baseline && !a.novo) return ["legado, ignorado pela baseline", "var(--muted)"];
+        var ex = DS.excecoes.filter(function(e) { return e.achado === a.id && est.excecoes.indexOf(e.id) !== -1; })[0];
+        if (ex && excecaoValida(a, est)) return ["exceção " + ex.id + " válida até " + ex.validade, "rgb(202, 138, 4)"];
+        if (ex && a.severidade === "critica") return ["BLOQUEIA: exceção " + ex.id + " não vale para crítica", "var(--danger-color)"];
+        if (ex) return ["BLOQUEIA: exceção " + ex.id + " venceu em " + ex.validade, "var(--danger-color)"];
+        return ["BLOQUEIA", "var(--danger-color)"];
+    }
+
+    // ===================================================== missões
+    function concluir(id) { if (!feitas[id]) { feitas[id] = true; renderizarMissoes(); } }
+    function renderizarMissoes() {
+        var ul = document.getElementById("ds-missoes");
+        ul.replaceChildren();
+        DS.missoes.forEach(function(m) {
+            var li = el("li", (feitas[m.id] ? "✓ " : "○ ") + m.texto, "color: " + (feitas[m.id] ? "var(--tip-color)" : "var(--ink)") + ";");
+            li.setAttribute("data-missao", m.id);
+            li.setAttribute("data-feita", feitas[m.id] ? "sim" : "nao");
+            ul.appendChild(li);
+        });
+    }
+    function avaliarMissoes(est, r) {
+        var lims = ["segredos", "sast", "sca", "imagem", "dast"].map(function(e) { return est.limiares[e]; });
+        var s1 = achado("S1");
+        if (r.resultado === "deploy" && r.producao.some(function(id) { return achado(id).severidade === "critica"; })) concluir("sem_gates");
+        if (r.resultado === "sast" && r.bloqueantes.indexOf("Q1") !== -1) concluir("sqli");
+        if (r.resultado !== "deploy" && r.bloqueantes.every(function(id) { return !achado(id).novo; })) feitas._legado = true;
+        if (feitas._legado && est.baseline && lims.every(function(l) { return l === "baixa"; }) && (r.resultado === "deploy" || r.bloqueantes.every(function(id) { return achado(id).novo; }))) concluir("baseline");
+        if (r.resultado === "segredos" && est.correcoes.indexOf("s1_apagar") !== -1) feitas._apagou = true;
+        if (feitas._apagou && est.limiares.segredos !== "nunca" && resolvido(s1, est) && r.resultado !== "segredos") concluir("segredo");
+        if (r.resultado === "deploy" && est.excecoes.length) {
+            var semExc = window.avaliarPipelineDevsecops({ limiares: est.limiares, baseline: est.baseline, correcoes: est.correcoes, excecoes: [] });
+            if (semExc.resultado !== "deploy") concluir("excecao");
+        }
+        if (r.resultado === "deploy" && !est.excecoes.length && lims.every(function(l) { return l !== "nunca" && l !== "critica"; })) concluir("verde");
+    }
+
+    // ===================================================== interface
+    function lerEstado() {
+        var lim = {};
+        DS.etapas.forEach(function(e) { var s = document.getElementById("ds-lim-" + e.id); lim[e.id] = s ? s.value : "nunca"; });
+        return {
+            limiares: lim,
+            baseline: document.getElementById("ds-baseline").checked,
+            correcoes: Array.prototype.map.call(document.querySelectorAll("#ds-correcoes input[data-correcao]:checked"), function(i) { return i.getAttribute("data-correcao"); }),
+            excecoes: Array.prototype.map.call(document.querySelectorAll("#ds-excecoes input[data-excecao]:checked"), function(i) { return i.getAttribute("data-excecao"); })
+        };
+    }
+    function etiqueta(sev) {
+        var cor = { baixa: "var(--muted)", media: "rgb(202, 138, 4)", alta: "rgb(234, 88, 12)", critica: "var(--danger-color)" }[sev];
+        return el("span", DS.severidades[sev], "display: inline-block; font-size: 0.7rem; font-weight: 700; color: " + cor + "; border: 1px solid " + cor + "; border-radius: var(--radius-pill); padding: 0 0.45rem; margin-right: 0.35rem;");
+    }
+    function renderizarCorrecoes() {
+        var box = document.getElementById("ds-correcoes");
+        box.replaceChildren();
+        DS.achados.filter(function(a) { return a.novo; }).forEach(function(a) {
+            var c = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem 0.6rem; min-width: 0;");
+            var t = el("div", null, "margin-bottom: 0.3rem;");
+            t.appendChild(etiqueta(a.severidade));
+            t.appendChild(el("strong", a.titulo));
+            t.appendChild(el("span", " · " + a.ferramenta, "color: var(--muted); font-size: 0.78rem;"));
+            c.appendChild(t);
+            a.correcoes.forEach(function(k) {
+                var rot = el("label", null, "display: flex; gap: 0.45rem; align-items: flex-start; margin-top: 0.25rem;");
+                var cb = el("input"); cb.type = "checkbox"; cb.setAttribute("data-correcao", k.id);
+                rot.appendChild(cb);
+                var sp = el("span", null, "min-width: 0;");
+                sp.appendChild(el("span", k.rotulo));
+                var diff = el("pre", null, "margin: 0.25rem 0 0 0; font-family: var(--font-mono); font-size: 0.7rem; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--sunk); padding: 0.35rem 0.45rem; border-radius: var(--radius-sm);");
+                k.diff.forEach(function(l) {
+                    diff.appendChild(el("span", l + "\n", "color: " + (l[0] === "+" ? "var(--tip-color)" : l[0] === "-" ? "var(--danger-color)" : "inherit") + ";"));
+                });
+                sp.appendChild(diff);
+                if (k.nota) sp.appendChild(el("span", k.nota, "display: block; font-size: 0.74rem; color: var(--muted); margin-top: 0.2rem;"));
+                rot.appendChild(sp);
+                c.appendChild(rot);
+            });
+            box.appendChild(c);
+        });
+        var leg = el("details", null, "border: 1px dashed var(--rule); border-radius: var(--radius-sm); padding: 0.45rem 0.6rem;");
+        var legados = DS.achados.filter(function(a) { return !a.novo; });
+        leg.appendChild(el("summary", legados.length + " achados antigos (legado), fora deste merge request", "cursor: pointer;"));
+        legados.forEach(function(a) {
+            var d = el("div", null, "margin-top: 0.3rem;");
+            d.appendChild(etiqueta(a.severidade));
+            d.appendChild(el("span", a.titulo + " · " + a.ferramenta));
+            leg.appendChild(d);
+        });
+        box.appendChild(leg);
+    }
+    function renderizarPolitica() {
+        var box = document.getElementById("ds-politica");
+        box.replaceChildren();
+        DS.etapas.filter(function(e) { return e.id !== "testes"; }).forEach(function(e) {
+            var rot = el("label", null, "display: flex; flex-direction: column; gap: 0.2rem; min-width: 0;");
+            rot.appendChild(el("span", e.nome + " (" + e.ferramenta + ")", "font-weight: 600;"));
+            var s = el("select"); s.className = "form-control"; s.id = "ds-lim-" + e.id;
+            [["nunca", "Nunca quebrar"], ["critica", "Quebrar a partir de crítica"], ["alta", "A partir de alta"], ["media", "A partir de média"], ["baixa", "A partir de baixa"]].forEach(function(o) {
+                var op = el("option", o[1]); op.value = o[0]; s.appendChild(op);
+            });
+            rot.appendChild(s);
+            box.appendChild(rot);
+        });
+    }
+    function renderizarExcecoes() {
+        var box = document.getElementById("ds-excecoes");
+        box.replaceChildren();
+        DS.excecoes.forEach(function(e) {
+            var a = achado(e.achado);
+            var rot = el("label", null, "display: flex; gap: 0.45rem; align-items: flex-start; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.4rem 0.55rem; min-width: 0;");
+            var cb = el("input"); cb.type = "checkbox"; cb.setAttribute("data-excecao", e.id);
+            rot.appendChild(cb);
+            var sp = el("span", null, "min-width: 0;");
+            sp.appendChild(el("strong", e.id + " para " + a.id + " (" + DS.severidades[a.severidade] + "): ", null));
+            sp.appendChild(el("span", e.justificativa));
+            sp.appendChild(el("span", "Aprovador: " + e.aprovador + " · válida até " + e.validade, "display: block; font-size: 0.74rem; color: var(--muted);"));
+            rot.appendChild(sp);
+            box.appendChild(rot);
+        });
+    }
+
+    window.executarPipelineDevsecops = function() {
+        estado = lerEstado();
+        var r = window.avaliarPipelineDevsecops(estado);
+        var box = document.getElementById("ds-execucao"), prod = document.getElementById("ds-producao");
+        box.replaceChildren(); prod.replaceChildren();
+        box.setAttribute("data-resultado", r.resultado);
+        box.setAttribute("data-bloqueantes", r.bloqueantes.join(","));
+        var parou = false;
+        DS.etapas.forEach(function(e, i) {
+            var achs = DS.achados.filter(function(a) { return a.etapa === e.id; });
+            var status = parou ? "nao" : (r.resultado === e.id ? "bloqueou" : "ok");
+            var cor = status === "ok" ? "var(--tip-color)" : status === "bloqueou" ? "var(--danger-color)" : "var(--muted)";
+            var c = el("div", null, "border-left: 4px solid " + cor + "; background: var(--sunk); border-radius: var(--radius-sm); padding: 0.4rem 0.6rem; min-width: 0;");
+            c.setAttribute("data-etapa", e.id);
+            c.setAttribute("data-status", status);
+            c.appendChild(el("strong", (i + 1) + ". " + e.nome + " (" + e.ferramenta + "): " + (status === "ok" ? "aprovada" : status === "bloqueou" ? "BLOQUEOU o build" : "não executada"), "color: " + cor + ";"));
+            if (status !== "nao") {
+                if (!achs.length) c.appendChild(el("div", "Nenhum achado.", "font-size: 0.78rem; color: var(--muted);"));
+                achs.forEach(function(a) {
+                    var m = motivo(a, estado);
+                    var d = el("div", null, "font-size: 0.78rem; margin-top: 0.15rem; overflow-wrap: anywhere;");
+                    d.appendChild(etiqueta(a.severidade));
+                    d.appendChild(el("span", a.id + " " + a.titulo + " — "));
+                    d.appendChild(el("span", m[0], "color: " + m[1] + "; font-weight: 600;"));
+                    c.appendChild(d);
+                });
+            }
+            box.appendChild(c);
+            if (status === "bloqueou") parou = true;
+        });
+        var dep = el("div", r.resultado === "deploy" ? "7. Deploy em produção: concluído" : "7. Deploy em produção: não executado", "font-weight: 700; padding: 0.4rem 0.6rem; border-radius: var(--radius-sm); border-left: 4px solid " + (r.resultado === "deploy" ? "var(--accent)" : "var(--muted)") + "; background: var(--sunk);");
+        box.appendChild(dep);
+        if (r.resultado === "deploy") {
+            prod.setAttribute("data-producao", r.producao.join(","));
+            var criticas = r.producao.filter(function(id) { return achado(id).severidade === "critica"; }).length;
+            var altas = r.producao.filter(function(id) { return achado(id).severidade === "alta"; }).length;
+            prod.appendChild(el("strong", "Chegou à produção: " + r.producao.length + " achado(s) em aberto" + (criticas || altas ? " — " + criticas + " crítico(s) e " + altas + " alto(s)." : ", nenhum crítico ou alto."), "display: block; color: " + (criticas || altas ? "var(--danger-color)" : "var(--tip-color)") + ";"));
+            var ul = el("ul", null, "margin: 0.3rem 0 0 0; padding-left: 1.2rem;");
+            r.producao.forEach(function(id) { var a = achado(id); ul.appendChild(el("li", DS.severidades[a.severidade] + ": " + a.titulo)); });
+            prod.appendChild(ul);
+        } else {
+            prod.setAttribute("data-producao", "");
+            prod.appendChild(el("strong", "Build quebrado na etapa " + DS.etapas.filter(function(e) { return e.id === r.resultado; })[0].nome + ": nada foi para produção.", "display: block; color: var(--danger-color);"));
+        }
+        avaliarMissoes(estado, r);
+        return r;
+    };
+    window.aplicarPresetDevsecops = function(id) {
+        var p = DS.presets.filter(function(x) { return x.id === id; })[0];
+        if (!p) return;
+        DS.etapas.forEach(function(e) { var s = document.getElementById("ds-lim-" + e.id); if (s) s.value = p.limiar; });
+        document.getElementById("ds-baseline").checked = p.baseline;
+    };
+    window.restaurarDevsecops = function() {
+        feitas = {};
+        renderizarMissoes();
+        renderizarCorrecoes();
+        renderizarPolitica();
+        renderizarExcecoes();
+        aplicarPresetDevsecops("sem");
+        document.getElementById("ds-execucao").replaceChildren(el("p", "Configure e clique em Executar pipeline.", "margin: 0; color: var(--muted);"));
+        document.getElementById("ds-producao").replaceChildren();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("ds-contexto").textContent = DS.contexto;
+        var pb = document.getElementById("ds-presets");
+        DS.presets.forEach(function(p) {
+            var b = el("button", p.nome, "font-size: 0.78rem;");
+            b.type = "button"; b.className = "btn-secondary";
+            b.addEventListener("click", function() { aplicarPresetDevsecops(p.id); });
+            pb.appendChild(b);
+        });
+        restaurarDevsecops();
+        if (typeof initChecklist === "function") {
+            initChecklist("devsecops");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>

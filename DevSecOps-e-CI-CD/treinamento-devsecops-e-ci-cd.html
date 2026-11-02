@@ -1,0 +1,2405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="study-slug" content="DevSecOps-e-CI-CD">
+  <title>Shift-Left, SAST, DAST, SCA e Containers — Estudos de Cibersegurança</title>
+
+  <!-- Google Fonts: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+/* ==========================================================================
+   ESTUDOS DE CIBERSEGURANÇA — DESIGN SYSTEM BASE (base.css)
+   Compatível com temas Claro / Escuro, responsivo e 100% offline-ready.
+   Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0. Importação de Fontes Web (Google Fonts com Fallbacks Locais Nativos)
+   -------------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+/* --------------------------------------------------------------------------
+   1. Design Tokens & Variáveis CSS (Tema Claro - Padrão)
+   -------------------------------------------------------------------------- */
+:root {
+  /* Paleta Base */
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+
+  /* Cores Temáticas das 10 Trilhas */
+  --t1-blue: #2563EB;     /* Trilha 1: Fundamentos & Princípios */
+  --t2-green: #059669;    /* Trilha 2: Defesa & Operações Blue Team */
+  --t3-red: #DC2626;      /* Trilha 3: Segurança Ofensiva & Red Team */
+  --t4-purple: #7C3AED;   /* Trilha 4: Engenharia, Cloud & AppSec */
+  --t5-cyan: #0891B2;     /* Trilha 5: Criptografia & Identidade */
+  --t6-amber: #D97706;    /* Trilha 6: Governança, Risco & Regulação */
+  --t7-rose: #DB2777;
+  --t8-slate: #475569;
+  --t9-indigo: #4F46E5;
+  --t10-orange: #C2410C;
+
+  /* Cores de Alerta / Callouts */
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+
+  --warning-color: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #F59E0B;
+
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+
+  --law-color: #7C3AED;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+
+  /* Tipografia */
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+
+  /* Espaçamento e Bordas */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+  --radius: var(--radius-md);
+  --accent: var(--t1-blue);
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 28, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 28, 0.08), 0 2px 4px -2px rgba(15, 23, 28, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 28, 0.1), 0 4px 6px -4px rgba(15, 23, 28, 0.05);
+
+  /* Transição */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.25s ease-in-out;
+}
+
+/* --------------------------------------------------------------------------
+   2. Suporte a Tema Escuro (Modo Noturno / Dark Mode)
+   -------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0F171C;
+    --surface: #172229;
+    --sunk: #1E2B33;
+    --ink: #E4EAED;
+    --muted: #9BABB6;
+    --rule: #2B3A44;
+
+    /* Trilhas no Dark Mode (ajuste de saturação e contraste) */
+    --t1-blue: #60A5FA;
+    --t2-green: #34D399;
+    --t3-red: #F87171;
+    --t4-purple: #A78BFA;
+    --t5-cyan: #22D3EE;
+    --t6-amber: #FBBF24;
+    --t7-rose: #F472B6;
+    --t8-slate: #94A3B8;
+    --t9-indigo: #818CF8;
+    --t10-orange: #FB923C;
+
+    /* Alertas no Dark Mode */
+    --tip-color: #34D399;
+    --tip-bg: rgba(5, 150, 105, 0.18);
+    --tip-border: #059669;
+
+    --warning-color: #FBBF24;
+    --warning-bg: rgba(217, 119, 6, 0.18);
+    --warning-border: #D97706;
+
+    --danger-color: #F87171;
+    --danger-bg: rgba(220, 38, 38, 0.20);
+    --danger-border: #DC2626;
+
+    --law-color: #A78BFA;
+    --law-bg: rgba(124, 58, 237, 0.18);
+    --law-border: #7C3AED;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #0F171C;
+  --surface: #172229;
+  --sunk: #1E2B33;
+  --ink: #E4EAED;
+  --muted: #9BABB6;
+  --rule: #2B3A44;
+
+  --t1-blue: #60A5FA;
+  --t2-green: #34D399;
+  --t3-red: #F87171;
+  --t4-purple: #A78BFA;
+  --t5-cyan: #22D3EE;
+  --t6-amber: #FBBF24;
+  --t7-rose: #F472B6;
+  --t8-slate: #94A3B8;
+  --t9-indigo: #818CF8;
+  --t10-orange: #FB923C;
+
+  --tip-color: #34D399;
+  --tip-bg: rgba(5, 150, 105, 0.18);
+  --tip-border: #059669;
+
+  --warning-color: #FBBF24;
+  --warning-bg: rgba(217, 119, 6, 0.18);
+  --warning-border: #D97706;
+
+  --danger-color: #F87171;
+  --danger-bg: rgba(220, 38, 38, 0.20);
+  --danger-border: #DC2626;
+
+  --law-color: #A78BFA;
+  --law-bg: rgba(124, 58, 237, 0.18);
+  --law-border: #7C3AED;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="light"] {
+  --ground: #F3F6F7;
+  --surface: #FFFFFF;
+  --sunk: #E9EEF0;
+  --ink: #16242E;
+  --muted: #566672;
+  --rule: #D3DBE0;
+
+  --t1-blue: #2563EB;
+  --t2-green: #059669;
+  --t3-red: #DC2626;
+  --t4-purple: #7C3AED;
+  --t5-cyan: #0891B2;
+  --t6-amber: #D97706;
+  --t7-rose: #DB2777;
+  --t8-slate: #475569;
+  --t9-indigo: #4F46E5;
+  --t10-orange: #C2410C;
+
+  --tip-color: #059669;
+  --tip-bg: #ECFDF5;
+  --tip-border: #10B981;
+
+  --warning-color: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #F59E0B;
+
+  --danger-color: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #EF4444;
+
+  --law-color: #7C3AED;
+  --law-bg: #F5F3FF;
+  --law-border: #8B5CF6;
+}
+
+/* --------------------------------------------------------------------------
+   3. Reset e Estilos Globais
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+img, select, input, textarea {
+  max-width: 100%;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  color-scheme: light dark;
+}
+
+body {
+  background-color: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  margin: 0;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* Tipografia Estrutural */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.75rem; margin-top: 2rem; border-bottom: 2px solid var(--rule); padding-bottom: 0.5rem; }
+h3 { font-size: 1.35rem; margin-top: 1.5rem; }
+h4 { font-size: 1.15rem; }
+
+p {
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--t1-blue);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity var(--transition-fast);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code, kbd, samp {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background-color: var(--sunk);
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--rule);
+}
+
+:not(pre) > code {
+  overflow-wrap: anywhere;
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  background-color: #0D1418;
+  color: #E2E8F0;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  border: none;
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   4. Layout do Documento & Barra de Navegação Superior
+   -------------------------------------------------------------------------- */
+.top-nav {
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.top-nav-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.nav-back:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.theme-toggle-btn {
+  background: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+  background: var(--surface);
+  border-color: var(--muted);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 4rem 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   5. Cabeçalho de Destaque (.hero-header) e Metadados
+   -------------------------------------------------------------------------- */
+.hero-header {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-color: var(--track-color, var(--t1-blue));
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  background-color: var(--sunk);
+  color: var(--ink);
+}
+
+.badge-t1 { background-color: rgba(37, 99, 235, 0.15); color: var(--t1-blue); }
+.badge-t2 { background-color: rgba(5, 150, 105, 0.15); color: var(--t2-green); }
+.badge-t3 { background-color: rgba(220, 38, 38, 0.15); color: var(--t3-red); }
+.badge-t4 { background-color: rgba(124, 58, 237, 0.15); color: var(--t4-purple); }
+.badge-t5 { background-color: rgba(8, 145, 178, 0.15); color: var(--t5-cyan); }
+.badge-t6 { background-color: rgba(217, 119, 6, 0.15); color: var(--t6-amber); }
+.badge-t7 { background-color: rgba(219, 39, 119, 0.15); color: var(--t7-rose); }
+.badge-t8 { background-color: rgba(71, 85, 105, 0.15); color: var(--t8-slate); }
+.badge-t9 { background-color: rgba(79, 70, 229, 0.15); color: var(--t9-indigo); }
+.badge-t10 { background-color: rgba(194, 65, 12, 0.15); color: var(--t10-orange); }
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+}
+
+.meta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.meta-item strong {
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   6. Caixas de Destaque (.callout)
+   -------------------------------------------------------------------------- */
+.callout {
+  padding: 1.1rem 1.35rem;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  border-left: 5px solid var(--muted);
+  background-color: var(--sunk);
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+}
+
+.callout strong {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+}
+
+.callout-tip, .callout.tip {
+  border-left-color: var(--tip-color);
+  background-color: var(--tip-bg);
+}
+
+.callout-warning, .callout.warning {
+  border-left-color: var(--warning-color);
+  background-color: var(--warning-bg);
+}
+
+.callout-danger, .callout.danger {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg);
+}
+
+.callout-law, .callout.law {
+  border-left-color: var(--law-color);
+  background-color: var(--law-bg);
+}
+
+/* --------------------------------------------------------------------------
+   7. Bloco Terminal / Comandos (.terminal-box)
+   -------------------------------------------------------------------------- */
+.terminal-box {
+  background-color: #0A0F13;
+  color: #E2E8F0;
+  border: 1px solid #1E293B;
+  border-radius: var(--radius-md);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.terminal-header {
+  background-color: #151E27;
+  padding: 0.5rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1E2B37;
+}
+
+.terminal-title {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #94A3B8;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.terminal-title::before {
+  content: "● ● ●";
+  letter-spacing: 0.15rem;
+  color: #475569;
+  font-size: 0.65rem;
+}
+
+.btn-copy {
+  background-color: #243242;
+  color: #CBD5E1;
+  border: 1px solid #334155;
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-copy:hover {
+  background-color: #334155;
+  color: #FFFFFF;
+}
+
+.terminal-box pre {
+  margin: 0;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 1rem;
+  color: #E2E8F0;
+}
+
+/* --------------------------------------------------------------------------
+   8. Simulador / Painel de Laboratório (.lab-box)
+   -------------------------------------------------------------------------- */
+.lab-box {
+  background-color: var(--surface);
+  border: 2px solid var(--rule);
+  border-radius: var(--radius-lg);
+  margin: 2rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.lab-header {
+  background-color: var(--sunk);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.lab-header h3 {
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+  font-size: 1.3rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lab-header p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+.lab-body {
+  padding: 1.5rem;
+}
+
+.lab-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  background-color: var(--ground);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+}
+
+.lab-controls > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.lab-controls label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.lab-controls input[type="text"],
+.lab-controls input[type="number"],
+.lab-controls select,
+.lab-controls textarea {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.lab-controls input:focus,
+.lab-controls select:focus,
+.lab-controls textarea:focus {
+  outline: none;
+  border-color: var(--t1-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.lab-output {
+  background-color: #0B1116;
+  color: #38BDF8;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid #1E293B;
+  min-height: 100px;
+  max-height: 400px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.55;
+}
+
+/* Controles e Grid do Laboratório Interativo */
+.lab-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background-color: var(--ground);
+  border-bottom: 1px solid var(--rule);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.form-control {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--t1-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.form-range {
+  width: 100%;
+  accent-color: var(--t1-blue);
+  cursor: pointer;
+}
+
+.flags-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.flag-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.flag-toggle:hover {
+  border-color: var(--t1-blue);
+}
+
+.flag-toggle input[type="checkbox"] {
+  accent-color: var(--t1-blue);
+  cursor: pointer;
+}
+
+.lab-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--rule);
+}
+
+.packet-display-wrap {
+  padding: 1.5rem;
+  background-color: var(--surface);
+}
+
+.packet-display-wrap h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.packet-header-grid {
+  display: grid;
+  grid-template-columns: repeat(32, 1fr);
+  gap: 4px;
+  background-color: var(--ground);
+  padding: 0.75rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.header-field-cell {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-width: 75px;
+}
+
+.header-field-cell.span-8 {
+  grid-column: span 8;
+}
+
+.header-field-cell.span-16 {
+  grid-column: span 16;
+}
+
+.header-field-cell.span-32 {
+  grid-column: span 32;
+}
+
+.header-field-cell .field-title {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.2rem;
+}
+
+.header-field-cell .field-val {
+  font-size: 0.88rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.header-field-cell .field-val.highlight {
+  color: var(--t1-blue);
+}
+
+.header-field-cell .field-val.flag-badge {
+  background-color: var(--sunk);
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+  .packet-header-grid {
+    grid-template-columns: repeat(16, 1fr);
+  }
+  .header-field-cell.span-8 {
+    grid-column: span 16;
+  }
+}
+
+.edr-grid-container {
+  grid-template-columns: 1fr 1fr;
+}
+
+
+/* --------------------------------------------------------------------------
+   9. Botões e Controles Padrão
+   -------------------------------------------------------------------------- */
+.btn-primary {
+  background-color: var(--t1-blue);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: var(--sunk);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface);
+  border-color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   10. Lista de Verificação Interativa (.checklist)
+   -------------------------------------------------------------------------- */
+.checklist {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin: 1.75rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.checklist h4 {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.checklist-progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: var(--sunk);
+  border-radius: var(--radius-pill);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.checklist-progress-fill {
+  height: 100%;
+  background-color: var(--t2-green);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  margin: 0.25rem 0;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast);
+}
+
+.check-item:hover {
+  background-color: var(--sunk);
+}
+
+.check-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--muted);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.check-item input[type="checkbox"]:checked {
+  background-color: var(--t2-green);
+  border-color: var(--t2-green);
+}
+
+.check-item input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.check-item span {
+  font-size: 0.95rem;
+  color: var(--ink);
+  line-height: 1.45;
+  transition: color var(--transition-fast);
+}
+
+.check-item.completed span {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   11. Quiz de Fixação (.quiz, .quiz-item, .quiz-section)
+   -------------------------------------------------------------------------- */
+.quiz-section {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  margin: 2rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.quiz-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.quiz-item {
+  background-color: var(--sunk);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.quiz-question {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 0.85rem;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.quiz-btn {
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1.4;
+}
+
+.quiz-btn:hover:not(:disabled) {
+  border-color: var(--t1-blue);
+  background-color: var(--ground);
+}
+
+.quiz-btn.correct {
+  background-color: var(--tip-bg) !important;
+  border-color: var(--t2-green) !important;
+  color: var(--t2-green) !important;
+  font-weight: 600;
+}
+
+.quiz-btn.incorrect {
+  background-color: var(--danger-bg) !important;
+  border-color: var(--danger-color) !important;
+  color: var(--danger-color) !important;
+}
+
+.quiz-feedback {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-top: 0.75rem;
+  border-left: 4px solid var(--rule);
+  background-color: var(--surface);
+}
+
+.quiz-feedback.correct {
+  border-left-color: var(--t2-green);
+  background-color: var(--tip-bg);
+  color: var(--ink);
+}
+
+.quiz-feedback.incorrect {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg);
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   12. Grade de Fatos / Cards Comparativos (.facts-grid, .facts-card)
+   -------------------------------------------------------------------------- */
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.facts-card {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.facts-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.facts-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+}
+
+.facts-card p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   13. Tabelas Técnicas Comparativas
+   -------------------------------------------------------------------------- */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  background-color: var(--surface);
+  text-align: left;
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+th {
+  background-color: var(--sunk);
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: var(--ground);
+}
+
+/* --------------------------------------------------------------------------
+   14. Diagramas de Arquitetura e Fluxo (Mermaid pré-compilado em SVG)
+   -------------------------------------------------------------------------- */
+.diagram-box {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.diagram-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 1rem;
+  background: var(--ground);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.diagram-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.diagram-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.725rem;
+  font-family: var(--font-mono);
+}
+
+.diagram-svg-wrap {
+  padding: 1.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  text-align: center;
+  background: var(--surface);
+}
+
+.diagram-svg-wrap svg {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+  margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   15. Rodapé e Referências
+   -------------------------------------------------------------------------- */
+.study-footer {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   16. Responsividade & Impressão (@media)
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  h1 { font-size: 1.85rem; }
+  h2 { font-size: 1.45rem; }
+  .hero-header { padding: 1.25rem; }
+  .lab-body { padding: 1rem; }
+  .lab-controls { flex-direction: column; align-items: stretch; }
+  .top-nav-inner { padding: 0.5rem 1rem; }
+  .nav-title { display: none; }
+  .nav-actions .badge { display: none; }
+  .btn { overflow-wrap: anywhere; }
+  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media print {
+  body {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  .top-nav, .theme-toggle-btn, .btn-copy, .lab-controls button {
+    display: none !important;
+  }
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+  .hero-header, .lab-box, .checklist, .quiz-section {
+    border: 1px solid #CCC !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+}
+
+  </style>
+</head>
+<body data-slug="DevSecOps-e-CI-CD">
+
+  <!-- Barra de Navegação Superior e Breadcrumbs -->
+  <header class="top-nav">
+    <div class="top-nav-inner">
+      <a href="../index.html" class="nav-back">← Painel de Estudos</a>
+      <span class="nav-title">Shift-Left, SAST, DAST, SCA e Containers</span>
+      <div class="nav-actions">
+        <span class="badge badge-t5">Trilha 5</span>
+        <button class="theme-toggle-btn" aria-label="Alternar tema" onclick="toggleTheme()">
+          <span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal do Treinamento -->
+  <main class="container">
+<!-- Estudo 22: DevSecOps-e-CI-CD Body Fragment -->
+<article class="study-container" data-slug="devsecops">
+
+    <!-- SEÇÃO 1: SHIFT-LEFT -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: Pegar a Falha Antes da Produção</h2>
+        </div>
+
+        <p class="lead-text">
+            Nos Estudos 12 e 13, você explorou uma SQL injection e um mass assignment na loja da Ipê Store depois que já estavam no ar. Corrigir em produção custa caro: incidente, comunicação, correção às pressas. <strong>Shift-Left</strong> é mover a segurança para o começo do ciclo, de modo que a mesma falha seja apontada no merge request, minutos depois de escrita, por uma ferramenta que roda sozinha a cada mudança. O nome do processo é <strong>SSDLC</strong> (ciclo de desenvolvimento seguro): requisitos, revisão de código, testes automatizados e verificação antes do deploy.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Uma Esteira CI/CD com Security Gates</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <div class="diagram-box">
+  <div class="diagram-header">
+    <span class="diagram-title">Uma Esteira CI/CD com Security Gates</span>
+    <span class="diagram-badge">Mermaid Arquitetura</span>
+  </div>
+  <div class="diagram-svg-wrap" role="img" aria-label="Uma Esteira CI/CD com Security Gates">
+    <svg id="my-svg" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 168px; background-color: transparent;" viewBox="4 4 168 944" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#my-svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#ccc;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#a44141;}#my-svg .error-text{fill:#ddd;stroke:#ddd;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:lightgrey;stroke:lightgrey;}#my-svg .marker.cross{stroke:lightgrey;}#my-svg svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#my-svg p{margin:0;}#my-svg .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#ccc;}#my-svg .cluster-label text{fill:#F9FFFE;}#my-svg .cluster-label span{color:#F9FFFE;}#my-svg .cluster-label span p{background-color:transparent;}#my-svg .label text,#my-svg span{fill:#ccc;color:#ccc;}#my-svg .node rect,#my-svg .node circle,#my-svg .node ellipse,#my-svg .node polygon,#my-svg .node path{fill:#1f2020;stroke:#ccc;stroke-width:1px;}#my-svg .rough-node .label text,#my-svg .node .label text,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-anchor:middle;}#my-svg .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#my-svg .rough-node .label,#my-svg .node .label,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-align:center;}#my-svg .node.clickable{cursor:pointer;}#my-svg .root .anchor path{fill:lightgrey!important;stroke-width:0;stroke:lightgrey;}#my-svg .arrowheadPath{fill:lightgrey;}#my-svg .edgePaths .path{stroke:lightgrey;stroke-width:1px;}#my-svg .flowchart-link{stroke:lightgrey;fill:none;}#my-svg .edgeLabel{background-color:hsl(0, 0%, 34.4117647059%);text-align:center;}#my-svg .edgeLabel p{background-color:hsl(0, 0%, 34.4117647059%);}#my-svg .edgeLabel rect{opacity:0.5;background-color:hsl(0, 0%, 34.4117647059%);fill:hsl(0, 0%, 34.4117647059%);}#my-svg .labelBkg{background-color:rgba(87.75, 87.75, 87.75, 0.5);}#my-svg .cluster rect{fill:hsl(180, 1.5873015873%, 28.3529411765%);stroke:rgba(255, 255, 255, 0.25);stroke-width:1px;}#my-svg .cluster text{fill:#F9FFFE;}#my-svg .cluster span{color:#F9FFFE;}#my-svg .node .collapsed-indicator{fill:rgba(255, 255, 255, 0.25);stroke:none;opacity:0.6;}#my-svg .node .collapsed-separator{stroke:rgba(255, 255, 255, 0.25);stroke-width:0.75px;}#my-svg div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(20, 1.5873015873%, 12.3529411765%);border:1px solid rgba(255, 255, 255, 0.25);border-radius:2px;pointer-events:none;z-index:100;}#my-svg .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#ccc;}#my-svg rect.text{fill:none;stroke-width:0;}#my-svg .icon-shape,#my-svg .image-shape{background-color:hsl(0, 0%, 34.4117647059%);text-align:center;}#my-svg .icon-shape p,#my-svg .image-shape p{background-color:hsl(0, 0%, 34.4117647059%);padding:2px;}#my-svg .icon-shape .label rect,#my-svg .image-shape .label rect{opacity:0.5;background-color:hsl(0, 0%, 34.4117647059%);fill:hsl(0, 0%, 34.4117647059%);}#my-svg .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#my-svg .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#my-svg .node .neo-node{stroke:#ccc;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#my-svg [data-look="neo"].node path{stroke:url(#my-svg-gradient);stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#ccc;filter:none;}#my-svg [data-look="neo"].node circle{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].node circle .state-start{fill:#000000;}#my-svg [data-look="neo"].icon-shape .icon{fill:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:url(#my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="my-svg_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"/></marker><marker id="my-svg_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"/></marker><g class="root"><g class="clusters"/><g class="edges edgePaths"><path d="M88,60L88,96" id="my-svg-L_MR_S_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_MR_S_0" data-points="W3sieCI6ODgsInkiOjYwfSx7IngiOjg4LCJ5IjoxMDB9XQ==" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M88,196L88,232" id="my-svg-L_S_A_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_S_A_0" data-points="W3sieCI6ODgsInkiOjE5Nn0seyJ4Ijo4OCwieSI6MjM2fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M88,308L88,344" id="my-svg-L_A_C_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_A_C_0" data-points="W3sieCI6ODgsInkiOjMwOH0seyJ4Ijo4OCwieSI6MzQ4fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M88,444L88,480" id="my-svg-L_C_I_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_C_I_0" data-points="W3sieCI6ODgsInkiOjQ0NH0seyJ4Ijo4OCwieSI6NDg0fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M88,604L88,640" id="my-svg-L_I_T_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_I_T_0" data-points="W3sieCI6ODgsInkiOjYwNH0seyJ4Ijo4OCwieSI6NjQ0fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M88,716L88,752" id="my-svg-L_T_D_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_T_D_0" data-points="W3sieCI6ODgsInkiOjcxNn0seyJ4Ijo4OCwieSI6NzU2fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/><path d="M88,828L88,864" id="my-svg-L_D_P_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_D_P_0" data-points="W3sieCI6ODgsInkiOjgyOH0seyJ4Ijo4OCwieSI6ODY4fV0=" data-look="neo" marker-end="url(#my-svg_flowchart-v2-pointEnd-margin)"/></g><g class="edgeLabels"/><g class="nodes"><g class="node default" id="my-svg-flowchart-MR-0" data-look="neo" transform="translate(88, 36)"><rect class="basic label-container" style="" x="-76" y="-24" width="152" height="48"/><g class="label" style="" transform="translate(-60, -12)"><rect/><foreignObject width="120" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: nowrap; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Merge request</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-S-1" data-look="neo" transform="translate(88, 148)"><rect class="basic label-container" style="" x="-76" y="-48" width="152" height="96"/><g class="label" style="" transform="translate(-60, -36)"><rect/><foreignObject width="120" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Segredos<br /><small>Gitleaks, inclusive no histórico</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-A-2" data-look="neo" transform="translate(88, 272)"><rect class="basic label-container" style="" x="-76" y="-36" width="152" height="72"/><g class="label" style="" transform="translate(-60, -24)"><rect/><foreignObject width="120" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: nowrap; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>SAST<br /><small>Semgrep no código</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-C-3" data-look="neo" transform="translate(88, 396)"><rect class="basic label-container" style="" x="-76" y="-48" width="152" height="96"/><g class="label" style="" transform="translate(-60, -36)"><rect/><foreignObject width="120" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>SCA e SBOM<br /><small>pip-audit nas dependências</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-I-4" data-look="neo" transform="translate(88, 544)"><rect class="basic label-container" style="" x="-76" y="-60" width="152" height="120"/><g class="label" style="" transform="translate(-60, -48)"><rect/><foreignObject width="120" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Build e scan da imagem<br /><small>Trivy, assinatura com Cosign</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-T-5" data-look="neo" transform="translate(88, 680)"><rect class="basic label-container" style="" x="-76" y="-36" width="152" height="72"/><g class="label" style="" transform="translate(-60, -24)"><rect/><foreignObject width="120" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Testes automatizados</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-D-6" data-look="neo" transform="translate(88, 792)"><rect class="basic label-container" style="" x="-76" y="-36" width="152" height="72"/><g class="label" style="" transform="translate(-60, -24)"><rect/><foreignObject width="120" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: nowrap; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>DAST em staging<br /><small>OWASP ZAP</small></p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-P-7" data-look="neo" transform="translate(88, 904)"><rect class="basic label-container" style="" x="-76" y="-36" width="152" height="72"/><g class="label" style="" transform="translate(-60, -24)"><rect/><foreignObject width="120" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: nowrap; line-height: 1.5; max-width: 120px; text-align: center; width: 120px;"><span class="nodeLabel"><p>Deploy<br /><small>só imagem assinada</small></p></span></div></foreignObject></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#FFFFFF"/></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#FFFFFF"/></filter></defs><linearGradient id="my-svg-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#cccccc" stop-opacity="1"/><stop offset="100%" stop-color="hsl(180, 0%, 18.3529411765%)" stop-opacity="1"/></linearGradient></svg>
+  </div>
+</div>
+        </div>
+
+        <h3>Cada ferramenta vê uma parte</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Tipo</th><th>O que analisa</th><th>Pega bem</th><th>Exemplos</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>SAST</strong></td><td>O código-fonte, sem executar</td><td>SQL montada com texto do usuário, funções perigosas</td><td>Semgrep, CodeQL</td></tr>
+                    <tr><td><strong>DAST</strong></td><td>A aplicação rodando, de fora</td><td>Cabeçalhos ausentes, XSS refletido, configuração</td><td>OWASP ZAP</td></tr>
+                    <tr><td><strong>IAST</strong></td><td>A aplicação rodando, instrumentada por dentro durante os testes</td><td>Confirma se o dado do usuário chega à consulta</td><td>Agentes comerciais</td></tr>
+                    <tr><td><strong>SCA</strong></td><td>As dependências e suas versões</td><td>Bibliotecas com vulnerabilidade conhecida</td><td>pip-audit, Dependency-Check</td></tr>
+                    <tr><td>Segredos</td><td>Código e histórico do Git</td><td>Chaves e senhas escritas no repositório</td><td>Gitleaks</td></tr>
+                    <tr><td>Imagem</td><td>Dockerfile e pacotes da imagem</td><td>Root, imagem sem versão, pacotes vulneráveis</td><td>Trivy</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">.github/workflows/seguranca.yml — gates no merge request</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ds-ci')">Copiar</button>
+            </div>
+            <pre><code id="code-ds-ci">name: seguranca
+on: [pull_request]
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0              # histórico completo para o scan de segredos
+      # (instalação das ferramentas omitida)
+      - name: Segredos
+        run: gitleaks detect --source . --redact
+      - name: SAST
+        run: semgrep scan --config p/python --error
+      - name: SCA
+        run: pip-audit -r requirements.txt
+      - name: Imagem
+        run: |
+          docker build -t loja:${{ github.sha }} .
+          trivy image --severity HIGH,CRITICAL --exit-code 1 loja:${{ github.sha }}</code></pre>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: DEPENDÊNCIAS, CONTAINERS E GATES -->
+    <section class="study-section" id="cadeia">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Dependências, Containers e Quality Gates</h2>
+        </div>
+
+        <h3>SBOM: saber o que está dentro</h3>
+        <p>
+            Em dezembro de 2021, o Log4Shell (CVE-2021-44228, CVSS 10.0, na biblioteca log4j-core) obrigou empresas do mundo todo a responder uma pergunta simples: "onde usamos essa biblioteca?". Quem tinha um <strong>SBOM</strong> (Software Bill of Materials, a lista de componentes de cada software) respondeu em minutos. Os formatos mais usados são o <strong>CycloneDX</strong> (projeto da OWASP) e o <strong>SPDX</strong> (Linux Foundation, norma ISO/IEC 5962).
+        </p>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">sbom.cdx.json — trecho em CycloneDX</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ds-sbom')">Copiar</button>
+            </div>
+            <pre><code id="code-ds-sbom">{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "components": [
+    { "type": "library", "name": "flask", "version": "3.0.3", "purl": "pkg:pypi/flask@3.0.3" },
+    { "type": "library", "name": "pdfgen-lab", "version": "1.2.0", "purl": "pkg:pypi/pdfgen-lab@1.2.0" }
+  ]
+}</code></pre>
+        </div>
+        <p>
+            Para priorizar, a gravidade (CVSS) não basta. O <strong>EPSS</strong> (da FIRST) estima a probabilidade de uma vulnerabilidade ser explorada nos próximos 30 dias, e o catálogo <strong>KEV</strong> (Known Exploited Vulnerabilities, da CISA) lista as que já estão sendo exploradas. Uma falha alta que está no KEV vem antes de uma crítica que ninguém explora.
+        </p>
+
+        <h3>Containers</h3>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Dockerfile e Kubernetes — o essencial</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ds-container')">Copiar</button>
+            </div>
+            <pre><code id="code-ds-container"># Imagem enxuta e fixada pelo digest (não "latest")
+FROM python:3.12-slim@sha256:&lt;digest-conferido&gt;
+RUN useradd --create-home --uid 10001 app
+COPY --chown=app:app . /app
+USER app                      # nunca rodar como root
+# segredos chegam em tempo de execução, nunca em ENV ou ARG do Dockerfile
+
+# No Kubernetes (securityContext do container):
+#   runAsNonRoot: true
+#   readOnlyRootFilesystem: true
+#   allowPrivilegeEscalation: false
+#   privileged: false
+
+# Assinar a imagem no pipeline e verificar antes do deploy
+cosign sign --key cosign.key registry.ipestore.example/loja:1.4.2
+cosign verify --key cosign.pub registry.ipestore.example/loja:1.4.2</code></pre>
+        </div>
+        <p>
+            Imagens <strong>distroless</strong> trazem só a aplicação e o runtime, sem shell nem gerenciador de pacotes: menos vulnerabilidades e menos ferramentas para um invasor. O projeto <strong>Sigstore</strong>, com o <strong>Cosign</strong>, assina imagens com chave própria ou sem chave (<em>keyless</em>, com identidade OIDC e registro público de transparência). O <code>cosign verify</code> antes do deploy garante que só roda o que saiu do pipeline (Estudo 25 trata a mesma ideia como controle de integridade).
+        </p>
+
+        <h3>Quality gates: quando quebrar o build</h3>
+        <ul>
+            <li>Um <strong>quality gate</strong> define o limiar: por exemplo, quebrar com achado alto ou crítico. Limiar baixo demais trava o time em falsos positivos e o pipeline vira algo que todos pulam.</li>
+            <li>Em código antigo, comece com uma <strong>baseline</strong>: os achados que já existiam são registrados, e o gate bloqueia só o que for <strong>novo</strong> no merge request. O legado vira um plano de correção à parte.</li>
+            <li>Exceções existem, mas com justificativa, aprovador e validade: é um aceite de risco formal (Estudo 25). Exceção para achado crítico, ou sem data de fim, não é exceção, é abandono.</li>
+        </ul>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>Segredo vazado se revoga, não se apaga</strong>
+            </div>
+            <p>
+                Apagar a chave do código num novo commit não a tira do <strong>histórico</strong> do Git, nem dos clones e forks que já existem. O único remédio é <strong>revogar</strong> a chave no provedor, gerar outra guardada num cofre e só depois limpar o código. Por isso o scan de segredos olha o histórico inteiro.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Simulador de Pipeline CI/CD com Security Gates</h2>
+        </div>
+
+        <p class="lead-text">
+            O merge request <code>feat/busca-produtos</code> chegou. Escolha as correções que o time aplicou, defina a política de quebra de cada etapa e as exceções aprovadas, e execute o pipeline. As vulnerabilidades de dependências e da imagem têm identificadores fictícios de laboratório.
+        </p>
+
+        <div class="lab-box ds-lab" id="ds-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Esteira de Entrega</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">loja-ipestore · feat/busca-produtos</h3>
+                    <p id="ds-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">Missões</h4>
+                <ul id="ds-missoes" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.25rem; font-size: 0.85rem;"></ul>
+
+                <h4 style="margin-top: 1.5rem;">1. Correções no merge request</h4>
+                <div id="ds-correcoes" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem; font-size: 0.84rem;"></div>
+
+                <h4 style="margin-top: 1.5rem;">2. Política de quebra</h4>
+                <div id="ds-presets" style="display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.5rem;"></div>
+                <div id="ds-politica" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 0.5rem; font-size: 0.84rem;"></div>
+                <label style="display: flex; gap: 0.5rem; align-items: flex-start; margin-top: 0.5rem; font-size: 0.84rem;"><input type="checkbox" id="ds-baseline"> <span><strong>Baseline:</strong> bloquear só achados novos deste merge request (o legado fica registrado e não quebra o build).</span></label>
+
+                <h4 style="margin-top: 1.5rem;">3. Exceções aprovadas</h4>
+                <div id="ds-excecoes" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.4rem; font-size: 0.84rem;"></div>
+
+                <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    <button class="btn-primary" type="button" onclick="executarPipelineDevsecops()">Executar pipeline</button>
+                    <button class="btn-secondary" type="button" onclick="restaurarDevsecops()">Restaurar laboratório</button>
+                </div>
+
+                <h4 style="margin-top: 1.5rem;">4. Execução</h4>
+                <div id="ds-execucao" aria-live="polite" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.4rem; font-size: 0.84rem;"></div>
+                <div id="ds-producao" style="margin-top: 0.6rem; font-size: 0.84rem;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de DevSecOps</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para avaliar a esteira de um time. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="devsecops">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-1">
+                <label for="chk-ds-1"><strong>Segredos:</strong> scan de segredos no merge request e no histórico, com procedimento de revogação para vazamentos.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-2">
+                <label for="chk-ds-2"><strong>SAST e SCA:</strong> rodam em todo merge request, com gate por severidade e baseline para o legado.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-3">
+                <label for="chk-ds-3"><strong>SBOM:</strong> gerado a cada build, guardado com o artefato e consultável quando surge uma nova vulnerabilidade.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-4">
+                <label for="chk-ds-4"><strong>Imagens:</strong> base enxuta fixada por digest, usuário sem root e scan antes do push.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-5">
+                <label for="chk-ds-5"><strong>Assinatura:</strong> imagens assinadas no pipeline e verificadas antes do deploy.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-6">
+                <label for="chk-ds-6"><strong>DAST:</strong> varredura em staging antes de cada liberação.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-7">
+                <label for="chk-ds-7"><strong>Exceções:</strong> com justificativa, aprovador e validade; nenhuma para achado crítico.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (SAST ou DAST):</strong> Qual ferramenta acharia a ausência do cabeçalho Content-Security-Policy, e por quê?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O DAST, porque o cabeçalho costuma ser definido na configuração do servidor ou do proxy, fora do código que o SAST analisa. O DAST vê a resposta HTTP real.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Segredos):</strong> Um desenvolvedor apagou a chave de API no commit seguinte. O incidente acabou?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. A chave continua no histórico e em todos os clones. É preciso revogá-la no provedor e emitir outra, guardada num cofre.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Baseline):</strong> Ao ligar o SAST num sistema de dez anos, apareceram 800 achados e o time parou. O que fazer?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Registrar os achados atuais como baseline e bloquear só os novos. O legado entra num plano de correção priorizado, começando pelos críticos.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (SBOM):</strong> Saiu uma vulnerabilidade crítica numa biblioteca popular. Como o SBOM ajuda?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Com o SBOM de cada aplicação guardado, basta procurar o componente e a versão para saber em minutos quais sistemas são afetados, em vez de abrir projeto por projeto.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Containers):</strong> Por que fixar a imagem base pelo digest em vez de usar <code>python:latest</code>?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque <code>latest</code> muda sem aviso: o mesmo Dockerfile gera imagens diferentes a cada build. O digest identifica exatamente o conteúdo, e a atualização vira uma mudança revisada.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Exceções):</strong> O time pede exceção para uma dependência com falha crítica porque "o fornecedor vai corrigir". Aceitar?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não como exceção de gate. Para crítico, a saída é atualizar, trocar a biblioteca ou mitigar (desligar a função afetada, bloquear a entrada) antes do deploy. Exceções servem para riscos menores, com prazo.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Shift-Left</h4>
+                <p>A falha apontada no merge request custa minutos; em produção, um incidente.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Ferramentas</h4>
+                <p>SAST no código, SCA nas dependências, DAST na aplicação, segredos no histórico.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Cadeia de software</h4>
+                <p>SBOM, imagem enxuta sem root e assinatura verificada antes do deploy.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Gates</h4>
+                <p>Limiar por severidade, baseline para o legado e exceções com prazo.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>NIST SP 800-218 — Secure Software Development Framework (SSDF).</li>
+            <li>OWASP DevSecOps Guideline, OWASP CycloneDX e especificação SPDX (ISO/IEC 5962:2021).</li>
+            <li>FIRST — EPSS; CISA — Known Exploited Vulnerabilities Catalog.</li>
+            <li>Documentação do Sigstore/Cosign, do Trivy, do Semgrep, do Gitleaks, do pip-audit e do OWASP ZAP.</li>
+            <li>Kubernetes — Pod Security Standards e securityContext.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 21 — Segurança em Nuvem e 14 — Pentest e Metodologias</strong>
+            </div>
+            <p>
+                O Estudo 21 leva estes cuidados para a infraestrutura como código e a nuvem. O Estudo 14 mostra o teste manual que complementa as ferramentas automáticas.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="ds-dados">
+{
+ "contexto": "Pipeline simulado no navegador. As falhas de código vêm dos Estudos 12 e 13; as de dependências e da imagem têm identificadores fictícios de laboratório.",
+ "hoje": "2026-11-01",
+ "severidades": {"baixa": "Baixa", "media": "Média", "alta": "Alta", "critica": "Crítica"},
+ "etapas": [
+  {"id": "segredos", "nome": "Segredos", "ferramenta": "Gitleaks"},
+  {"id": "sast", "nome": "SAST", "ferramenta": "Semgrep"},
+  {"id": "sca", "nome": "SCA", "ferramenta": "pip-audit"},
+  {"id": "imagem", "nome": "Build e scan da imagem", "ferramenta": "Trivy"},
+  {"id": "testes", "nome": "Testes automatizados", "ferramenta": "pytest"},
+  {"id": "dast", "nome": "DAST em staging", "ferramenta": "OWASP ZAP"}
+ ],
+ "achados": [
+  {"id": "S1", "etapa": "segredos", "severidade": "critica", "novo": true, "ferramenta": "Gitleaks", "titulo": "Chave da API de pagamentos escrita em config.py",
+   "correcoes": [
+    {"id": "s1_apagar", "resolve": false, "rotulo": "Só trocar no código por variável de ambiente", "nota": "A chave antiga continua no histórico do Git e em todos os clones: o scan do histórico ainda a encontra.", "diff": ["- PAGAMENTOS_API_KEY = \"LAB-NAO-E-SEGREDO-0000\"", "+ PAGAMENTOS_API_KEY = os.environ[\"PAGAMENTOS_API_KEY\"]"]},
+    {"id": "s1_revogar", "resolve": true, "rotulo": "Revogar a chave no provedor, gerar outra no cofre e ler do ambiente", "nota": "A chave do histórico deixa de funcionar; o achado é encerrado como revogado.", "diff": ["- PAGAMENTOS_API_KEY = \"LAB-NAO-E-SEGREDO-0000\"", "+ PAGAMENTOS_API_KEY = os.environ[\"PAGAMENTOS_API_KEY\"]  # chave antiga revogada; nova no cofre"]}
+   ]},
+  {"id": "Q1", "etapa": "sast", "severidade": "alta", "novo": true, "ferramenta": "Semgrep", "titulo": "SQL injection: consulta montada com f-string em busca.py (Estudo 12)",
+   "correcoes": [{"id": "q1_param", "resolve": true, "rotulo": "Consulta parametrizada", "diff": ["- cur.execute(f\"SELECT nome, preco FROM produtos WHERE nome LIKE '%{termo}%'\")", "+ cur.execute(\"SELECT nome, preco FROM produtos WHERE nome LIKE ?\", (f\"%{termo}%\",))"]}]},
+  {"id": "Q2", "etapa": "sast", "severidade": "media", "novo": true, "ferramenta": "Semgrep", "titulo": "Mass assignment: request.json inteiro gravado no perfil (Estudo 13)",
+   "correcoes": [{"id": "q2_allowlist", "resolve": true, "rotulo": "Allowlist de campos editáveis", "diff": ["- usuario.update(request.json)", "+ EDITAVEIS = {\"nome\", \"telefone\"}", "+ usuario.update({k: v for k, v in request.json.items() if k in EDITAVEIS})"]}]},
+  {"id": "L1", "etapa": "sast", "severidade": "baixa", "novo": false, "ferramenta": "Semgrep", "titulo": "MD5 usado como checksum de upload (legado)", "correcoes": []},
+  {"id": "L2", "etapa": "sast", "severidade": "baixa", "novo": false, "ferramenta": "Semgrep", "titulo": "Stack trace devolvido ao usuário no handler de erro (legado)", "correcoes": []},
+  {"id": "D1", "etapa": "sca", "severidade": "critica", "novo": true, "ferramenta": "pip-audit", "titulo": "pdfgen-lab 1.2.0: execução remota de código ao processar PDF (LAB-2026-0001, fictício)",
+   "correcoes": [{"id": "d1_atualizar", "resolve": true, "rotulo": "Atualizar para a versão corrigida", "diff": ["- pdfgen-lab==1.2.0", "+ pdfgen-lab==1.2.4"]}]},
+  {"id": "L3", "etapa": "sca", "severidade": "media", "novo": false, "ferramenta": "pip-audit", "titulo": "dateparse-lab 0.9.3: ReDoS com datas malformadas (LAB-2025-0412, fictício, legado)", "correcoes": []},
+  {"id": "I1", "etapa": "imagem", "severidade": "alta", "novo": true, "ferramenta": "Trivy", "titulo": "Dockerfile sem USER: o container roda como root",
+   "correcoes": [{"id": "i1_user", "resolve": true, "rotulo": "Usuário sem privilégios", "diff": ["  COPY . /app", "+ RUN useradd --create-home --uid 10001 app", "+ USER app"]}]},
+  {"id": "I2", "etapa": "imagem", "severidade": "media", "novo": true, "ferramenta": "Trivy", "titulo": "Imagem base python:latest, sem versão nem digest",
+   "correcoes": [{"id": "i2_digest", "resolve": true, "rotulo": "Imagem enxuta fixada por digest", "diff": ["- FROM python:latest", "+ FROM python:3.12-slim@sha256:<digest-conferido>"]}]},
+  {"id": "L4", "etapa": "imagem", "severidade": "baixa", "novo": false, "ferramenta": "Trivy", "titulo": "Pacote do sistema com falha ainda sem correção (LAB-2025-0977, fictício, legado)", "correcoes": []},
+  {"id": "A1", "etapa": "dast", "severidade": "media", "novo": true, "ferramenta": "OWASP ZAP", "titulo": "Content-Security-Policy ausente na página de busca",
+   "correcoes": [{"id": "a1_csp", "resolve": true, "rotulo": "Cabeçalho CSP na resposta", "diff": ["+ resposta.headers[\"Content-Security-Policy\"] = \"default-src 'self'; object-src 'none'; frame-ancestors 'none'\""]}]},
+  {"id": "L5", "etapa": "dast", "severidade": "baixa", "novo": false, "ferramenta": "OWASP ZAP", "titulo": "Cookie de sessão sem SameSite (legado)", "correcoes": []},
+  {"id": "L6", "etapa": "dast", "severidade": "baixa", "novo": false, "ferramenta": "OWASP ZAP", "titulo": "X-Content-Type-Options ausente (legado)", "correcoes": []}
+ ],
+ "excecoes": [
+  {"id": "E1", "achado": "Q2", "validade": "2026-11-20", "aprovador": "Comitê de riscos de TI", "justificativa": "O endpoint de perfil só é exposto à rede interna até a correção na sprint 47."},
+  {"id": "E2", "achado": "L3", "validade": "2026-10-15", "aprovador": "Comitê de riscos de TI", "justificativa": "Troca da biblioteca de datas planejada para o trimestre."},
+  {"id": "E3", "achado": "D1", "validade": "2026-12-01", "aprovador": "Gerente do produto", "justificativa": "O fornecedor prometeu a correção para dezembro."},
+  {"id": "E4", "achado": "A1", "validade": "2026-11-30", "aprovador": "Comitê de riscos de TI", "justificativa": "A CSP será aplicada no proxy reverso para todo o site na próxima janela de mudança."}
+ ],
+ "presets": [
+  {"id": "sem", "nome": "Sem gates", "limiar": "nunca", "baseline": false},
+  {"id": "estrita", "nome": "Estrita (alta)", "limiar": "alta", "baseline": false},
+  {"id": "baixa", "nome": "Tudo em baixa", "limiar": "baixa", "baseline": false}
+ ],
+ "exemplos": [
+  {"nome": "Sem gates", "estado": {"limiares": {"segredos": "nunca", "sast": "nunca", "sca": "nunca", "imagem": "nunca", "testes": "nunca", "dast": "nunca"}, "baseline": false, "correcoes": [], "excecoes": []},
+   "esperado": {"resultado": "deploy", "bloqueantes": [], "producao": ["S1", "Q1", "Q2", "L1", "L2", "D1", "L3", "I1", "I2", "L4", "A1", "L5", "L6"]}},
+  {"nome": "Limiar alta, nada corrigido", "estado": {"limiares": {"segredos": "alta", "sast": "alta", "sca": "alta", "imagem": "alta", "testes": "alta", "dast": "alta"}, "baseline": false, "correcoes": [], "excecoes": []},
+   "esperado": {"resultado": "segredos", "bloqueantes": ["S1"], "producao": []}},
+  {"nome": "Limiar alta, segredo revogado", "estado": {"limiares": {"segredos": "alta", "sast": "alta", "sca": "alta", "imagem": "alta", "testes": "alta", "dast": "alta"}, "baseline": false, "correcoes": ["s1_revogar"], "excecoes": []},
+   "esperado": {"resultado": "sast", "bloqueantes": ["Q1"], "producao": []}},
+  {"nome": "Tudo em baixa, todo o novo corrigido", "estado": {"limiares": {"segredos": "baixa", "sast": "baixa", "sca": "baixa", "imagem": "baixa", "testes": "baixa", "dast": "baixa"}, "baseline": false, "correcoes": ["s1_revogar", "q1_param", "q2_allowlist", "d1_atualizar", "i1_user", "i2_digest", "a1_csp"], "excecoes": []},
+   "esperado": {"resultado": "sast", "bloqueantes": ["L1", "L2"], "producao": []}},
+  {"nome": "Tudo em baixa com baseline", "estado": {"limiares": {"segredos": "baixa", "sast": "baixa", "sca": "baixa", "imagem": "baixa", "testes": "baixa", "dast": "baixa"}, "baseline": true, "correcoes": ["s1_revogar", "q1_param", "q2_allowlist", "d1_atualizar", "i1_user", "i2_digest", "a1_csp"], "excecoes": []},
+   "esperado": {"resultado": "deploy", "bloqueantes": [], "producao": ["L1", "L2", "L3", "L4", "L5", "L6"]}},
+  {"nome": "Só apagar o segredo do código", "estado": {"limiares": {"segredos": "alta", "sast": "alta", "sca": "alta", "imagem": "alta", "testes": "alta", "dast": "alta"}, "baseline": false, "correcoes": ["s1_apagar", "q1_param", "q2_allowlist", "d1_atualizar", "i1_user", "i2_digest", "a1_csp"], "excecoes": []},
+   "esperado": {"resultado": "segredos", "bloqueantes": ["S1"], "producao": []}},
+  {"nome": "Exceções válidas com baseline", "estado": {"limiares": {"segredos": "media", "sast": "media", "sca": "media", "imagem": "media", "testes": "media", "dast": "media"}, "baseline": true, "correcoes": ["s1_revogar", "q1_param", "d1_atualizar", "i1_user", "i2_digest"], "excecoes": ["E1", "E4"]},
+   "esperado": {"resultado": "deploy", "bloqueantes": [], "producao": ["Q2", "L1", "L2", "L3", "L4", "A1", "L5", "L6"]}},
+  {"nome": "Exceção vencida não vale", "estado": {"limiares": {"segredos": "nunca", "sast": "nunca", "sca": "media", "imagem": "nunca", "testes": "nunca", "dast": "nunca"}, "baseline": false, "correcoes": ["s1_revogar", "q1_param", "q2_allowlist", "d1_atualizar", "i1_user", "i2_digest", "a1_csp"], "excecoes": ["E2"]},
+   "esperado": {"resultado": "sca", "bloqueantes": ["L3"], "producao": []}},
+  {"nome": "Exceção para crítica não vale", "estado": {"limiares": {"segredos": "critica", "sast": "critica", "sca": "critica", "imagem": "critica", "testes": "critica", "dast": "critica"}, "baseline": false, "correcoes": ["s1_revogar"], "excecoes": ["E3"]},
+   "esperado": {"resultado": "sca", "bloqueantes": ["D1"], "producao": []}},
+  {"nome": "Estrita e verde", "estado": {"limiares": {"segredos": "alta", "sast": "alta", "sca": "alta", "imagem": "alta", "testes": "alta", "dast": "alta"}, "baseline": false, "correcoes": ["s1_revogar", "q1_param", "q2_allowlist", "d1_atualizar", "i1_user", "i2_digest", "a1_csp"], "excecoes": []},
+   "esperado": {"resultado": "deploy", "bloqueantes": [], "producao": ["L1", "L2", "L3", "L4", "L5", "L6"]}}
+ ],
+ "missoes": [
+  {"id": "sem_gates", "texto": "Execute sem gates e veja o que chega à produção."},
+  {"id": "sqli", "texto": "Faça o pipeline bloquear a SQL injection na etapa de SAST."},
+  {"id": "baseline", "texto": "Com tudo em \"baixa\", veja o legado travar o build; depois use a baseline para bloquear só o que é novo."},
+  {"id": "segredo", "texto": "Tente só apagar a chave do código; depois resolva o segredo do jeito certo."},
+  {"id": "excecao", "texto": "Passe o pipeline usando uma exceção válida no lugar de uma correção."},
+  {"id": "verde", "texto": "Chegue ao deploy com limiar alta ou mais rigoroso em todas as etapas, sem exceções."}
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var DS = JSON.parse(document.getElementById("ds-dados").textContent);
+    var ORDEM = ["baixa", "media", "alta", "critica"];
+    var feitas = {};
+    var estado = null;
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function nivel(s) { return ORDEM.indexOf(s) + 1; }
+    function achado(id) { return DS.achados.filter(function(a) { return a.id === id; })[0]; }
+
+    // ===================================================== avaliador (espelhado nos testes)
+    function resolvido(a, est) { return a.correcoes.some(function(c) { return c.resolve && est.correcoes.indexOf(c.id) !== -1; }); }
+    function excecaoValida(a, est) {
+        if (a.severidade === "critica") return false;
+        return DS.excecoes.some(function(e) { return e.achado === a.id && est.excecoes.indexOf(e.id) !== -1 && e.validade >= DS.hoje; });
+    }
+    function bloqueia(a, est) {
+        var lim = est.limiares[a.etapa];
+        if (resolvido(a, est) || lim === "nunca") return false;
+        if (nivel(a.severidade) < nivel(lim)) return false;
+        if (est.baseline && !a.novo) return false;
+        return !excecaoValida(a, est);
+    }
+    window.avaliarPipelineDevsecops = function(est) {
+        for (var i = 0; i < DS.etapas.length; i++) {
+            var et = DS.etapas[i].id;
+            var bl = DS.achados.filter(function(a) { return a.etapa === et && bloqueia(a, est); }).map(function(a) { return a.id; });
+            if (bl.length) return { resultado: et, bloqueantes: bl, producao: [] };
+        }
+        return { resultado: "deploy", bloqueantes: [], producao: DS.achados.filter(function(a) { return !resolvido(a, est); }).map(function(a) { return a.id; }) };
+    };
+    function motivo(a, est) {
+        var lim = est.limiares[a.etapa];
+        if (resolvido(a, est)) return ["corrigido", "var(--tip-color)"];
+        if (lim === "nunca") return ["etapa sem gate", "var(--muted)"];
+        if (nivel(a.severidade) < nivel(lim)) return ["abaixo do limiar", "var(--muted)"];
+        if (est.baseline && !a.novo) return ["legado, ignorado pela baseline", "var(--muted)"];
+        var ex = DS.excecoes.filter(function(e) { return e.achado === a.id && est.excecoes.indexOf(e.id) !== -1; })[0];
+        if (ex && excecaoValida(a, est)) return ["exceção " + ex.id + " válida até " + ex.validade, "rgb(202, 138, 4)"];
+        if (ex && a.severidade === "critica") return ["BLOQUEIA: exceção " + ex.id + " não vale para crítica", "var(--danger-color)"];
+        if (ex) return ["BLOQUEIA: exceção " + ex.id + " venceu em " + ex.validade, "var(--danger-color)"];
+        return ["BLOQUEIA", "var(--danger-color)"];
+    }
+
+    // ===================================================== missões
+    function concluir(id) { if (!feitas[id]) { feitas[id] = true; renderizarMissoes(); } }
+    function renderizarMissoes() {
+        var ul = document.getElementById("ds-missoes");
+        ul.replaceChildren();
+        DS.missoes.forEach(function(m) {
+            var li = el("li", (feitas[m.id] ? "✓ " : "○ ") + m.texto, "color: " + (feitas[m.id] ? "var(--tip-color)" : "var(--ink)") + ";");
+            li.setAttribute("data-missao", m.id);
+            li.setAttribute("data-feita", feitas[m.id] ? "sim" : "nao");
+            ul.appendChild(li);
+        });
+    }
+    function avaliarMissoes(est, r) {
+        var lims = ["segredos", "sast", "sca", "imagem", "dast"].map(function(e) { return est.limiares[e]; });
+        var s1 = achado("S1");
+        if (r.resultado === "deploy" && r.producao.some(function(id) { return achado(id).severidade === "critica"; })) concluir("sem_gates");
+        if (r.resultado === "sast" && r.bloqueantes.indexOf("Q1") !== -1) concluir("sqli");
+        if (r.resultado !== "deploy" && r.bloqueantes.every(function(id) { return !achado(id).novo; })) feitas._legado = true;
+        if (feitas._legado && est.baseline && lims.every(function(l) { return l === "baixa"; }) && (r.resultado === "deploy" || r.bloqueantes.every(function(id) { return achado(id).novo; }))) concluir("baseline");
+        if (r.resultado === "segredos" && est.correcoes.indexOf("s1_apagar") !== -1) feitas._apagou = true;
+        if (feitas._apagou && est.limiares.segredos !== "nunca" && resolvido(s1, est) && r.resultado !== "segredos") concluir("segredo");
+        if (r.resultado === "deploy" && est.excecoes.length) {
+            var semExc = window.avaliarPipelineDevsecops({ limiares: est.limiares, baseline: est.baseline, correcoes: est.correcoes, excecoes: [] });
+            if (semExc.resultado !== "deploy") concluir("excecao");
+        }
+        if (r.resultado === "deploy" && !est.excecoes.length && lims.every(function(l) { return l !== "nunca" && l !== "critica"; })) concluir("verde");
+    }
+
+    // ===================================================== interface
+    function lerEstado() {
+        var lim = {};
+        DS.etapas.forEach(function(e) { var s = document.getElementById("ds-lim-" + e.id); lim[e.id] = s ? s.value : "nunca"; });
+        return {
+            limiares: lim,
+            baseline: document.getElementById("ds-baseline").checked,
+            correcoes: Array.prototype.map.call(document.querySelectorAll("#ds-correcoes input[data-correcao]:checked"), function(i) { return i.getAttribute("data-correcao"); }),
+            excecoes: Array.prototype.map.call(document.querySelectorAll("#ds-excecoes input[data-excecao]:checked"), function(i) { return i.getAttribute("data-excecao"); })
+        };
+    }
+    function etiqueta(sev) {
+        var cor = { baixa: "var(--muted)", media: "rgb(202, 138, 4)", alta: "rgb(234, 88, 12)", critica: "var(--danger-color)" }[sev];
+        return el("span", DS.severidades[sev], "display: inline-block; font-size: 0.7rem; font-weight: 700; color: " + cor + "; border: 1px solid " + cor + "; border-radius: var(--radius-pill); padding: 0 0.45rem; margin-right: 0.35rem;");
+    }
+    function renderizarCorrecoes() {
+        var box = document.getElementById("ds-correcoes");
+        box.replaceChildren();
+        DS.achados.filter(function(a) { return a.novo; }).forEach(function(a) {
+            var c = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem 0.6rem; min-width: 0;");
+            var t = el("div", null, "margin-bottom: 0.3rem;");
+            t.appendChild(etiqueta(a.severidade));
+            t.appendChild(el("strong", a.titulo));
+            t.appendChild(el("span", " · " + a.ferramenta, "color: var(--muted); font-size: 0.78rem;"));
+            c.appendChild(t);
+            a.correcoes.forEach(function(k) {
+                var rot = el("label", null, "display: flex; gap: 0.45rem; align-items: flex-start; margin-top: 0.25rem;");
+                var cb = el("input"); cb.type = "checkbox"; cb.setAttribute("data-correcao", k.id);
+                rot.appendChild(cb);
+                var sp = el("span", null, "min-width: 0;");
+                sp.appendChild(el("span", k.rotulo));
+                var diff = el("pre", null, "margin: 0.25rem 0 0 0; font-family: var(--font-mono); font-size: 0.7rem; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--sunk); padding: 0.35rem 0.45rem; border-radius: var(--radius-sm);");
+                k.diff.forEach(function(l) {
+                    diff.appendChild(el("span", l + "\n", "color: " + (l[0] === "+" ? "var(--tip-color)" : l[0] === "-" ? "var(--danger-color)" : "inherit") + ";"));
+                });
+                sp.appendChild(diff);
+                if (k.nota) sp.appendChild(el("span", k.nota, "display: block; font-size: 0.74rem; color: var(--muted); margin-top: 0.2rem;"));
+                rot.appendChild(sp);
+                c.appendChild(rot);
+            });
+            box.appendChild(c);
+        });
+        var leg = el("details", null, "border: 1px dashed var(--rule); border-radius: var(--radius-sm); padding: 0.45rem 0.6rem;");
+        var legados = DS.achados.filter(function(a) { return !a.novo; });
+        leg.appendChild(el("summary", legados.length + " achados antigos (legado), fora deste merge request", "cursor: pointer;"));
+        legados.forEach(function(a) {
+            var d = el("div", null, "margin-top: 0.3rem;");
+            d.appendChild(etiqueta(a.severidade));
+            d.appendChild(el("span", a.titulo + " · " + a.ferramenta));
+            leg.appendChild(d);
+        });
+        box.appendChild(leg);
+    }
+    function renderizarPolitica() {
+        var box = document.getElementById("ds-politica");
+        box.replaceChildren();
+        DS.etapas.filter(function(e) { return e.id !== "testes"; }).forEach(function(e) {
+            var rot = el("label", null, "display: flex; flex-direction: column; gap: 0.2rem; min-width: 0;");
+            rot.appendChild(el("span", e.nome + " (" + e.ferramenta + ")", "font-weight: 600;"));
+            var s = el("select"); s.className = "form-control"; s.id = "ds-lim-" + e.id;
+            [["nunca", "Nunca quebrar"], ["critica", "Quebrar a partir de crítica"], ["alta", "A partir de alta"], ["media", "A partir de média"], ["baixa", "A partir de baixa"]].forEach(function(o) {
+                var op = el("option", o[1]); op.value = o[0]; s.appendChild(op);
+            });
+            rot.appendChild(s);
+            box.appendChild(rot);
+        });
+    }
+    function renderizarExcecoes() {
+        var box = document.getElementById("ds-excecoes");
+        box.replaceChildren();
+        DS.excecoes.forEach(function(e) {
+            var a = achado(e.achado);
+            var rot = el("label", null, "display: flex; gap: 0.45rem; align-items: flex-start; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.4rem 0.55rem; min-width: 0;");
+            var cb = el("input"); cb.type = "checkbox"; cb.setAttribute("data-excecao", e.id);
+            rot.appendChild(cb);
+            var sp = el("span", null, "min-width: 0;");
+            sp.appendChild(el("strong", e.id + " para " + a.id + " (" + DS.severidades[a.severidade] + "): ", null));
+            sp.appendChild(el("span", e.justificativa));
+            sp.appendChild(el("span", "Aprovador: " + e.aprovador + " · válida até " + e.validade, "display: block; font-size: 0.74rem; color: var(--muted);"));
+            rot.appendChild(sp);
+            box.appendChild(rot);
+        });
+    }
+
+    window.executarPipelineDevsecops = function() {
+        estado = lerEstado();
+        var r = window.avaliarPipelineDevsecops(estado);
+        var box = document.getElementById("ds-execucao"), prod = document.getElementById("ds-producao");
+        box.replaceChildren(); prod.replaceChildren();
+        box.setAttribute("data-resultado", r.resultado);
+        box.setAttribute("data-bloqueantes", r.bloqueantes.join(","));
+        var parou = false;
+        DS.etapas.forEach(function(e, i) {
+            var achs = DS.achados.filter(function(a) { return a.etapa === e.id; });
+            var status = parou ? "nao" : (r.resultado === e.id ? "bloqueou" : "ok");
+            var cor = status === "ok" ? "var(--tip-color)" : status === "bloqueou" ? "var(--danger-color)" : "var(--muted)";
+            var c = el("div", null, "border-left: 4px solid " + cor + "; background: var(--sunk); border-radius: var(--radius-sm); padding: 0.4rem 0.6rem; min-width: 0;");
+            c.setAttribute("data-etapa", e.id);
+            c.setAttribute("data-status", status);
+            c.appendChild(el("strong", (i + 1) + ". " + e.nome + " (" + e.ferramenta + "): " + (status === "ok" ? "aprovada" : status === "bloqueou" ? "BLOQUEOU o build" : "não executada"), "color: " + cor + ";"));
+            if (status !== "nao") {
+                if (!achs.length) c.appendChild(el("div", "Nenhum achado.", "font-size: 0.78rem; color: var(--muted);"));
+                achs.forEach(function(a) {
+                    var m = motivo(a, estado);
+                    var d = el("div", null, "font-size: 0.78rem; margin-top: 0.15rem; overflow-wrap: anywhere;");
+                    d.appendChild(etiqueta(a.severidade));
+                    d.appendChild(el("span", a.id + " " + a.titulo + " — "));
+                    d.appendChild(el("span", m[0], "color: " + m[1] + "; font-weight: 600;"));
+                    c.appendChild(d);
+                });
+            }
+            box.appendChild(c);
+            if (status === "bloqueou") parou = true;
+        });
+        var dep = el("div", r.resultado === "deploy" ? "7. Deploy em produção: concluído" : "7. Deploy em produção: não executado", "font-weight: 700; padding: 0.4rem 0.6rem; border-radius: var(--radius-sm); border-left: 4px solid " + (r.resultado === "deploy" ? "var(--accent)" : "var(--muted)") + "; background: var(--sunk);");
+        box.appendChild(dep);
+        if (r.resultado === "deploy") {
+            prod.setAttribute("data-producao", r.producao.join(","));
+            var criticas = r.producao.filter(function(id) { return achado(id).severidade === "critica"; }).length;
+            var altas = r.producao.filter(function(id) { return achado(id).severidade === "alta"; }).length;
+            prod.appendChild(el("strong", "Chegou à produção: " + r.producao.length + " achado(s) em aberto" + (criticas || altas ? " — " + criticas + " crítico(s) e " + altas + " alto(s)." : ", nenhum crítico ou alto."), "display: block; color: " + (criticas || altas ? "var(--danger-color)" : "var(--tip-color)") + ";"));
+            var ul = el("ul", null, "margin: 0.3rem 0 0 0; padding-left: 1.2rem;");
+            r.producao.forEach(function(id) { var a = achado(id); ul.appendChild(el("li", DS.severidades[a.severidade] + ": " + a.titulo)); });
+            prod.appendChild(ul);
+        } else {
+            prod.setAttribute("data-producao", "");
+            prod.appendChild(el("strong", "Build quebrado na etapa " + DS.etapas.filter(function(e) { return e.id === r.resultado; })[0].nome + ": nada foi para produção.", "display: block; color: var(--danger-color);"));
+        }
+        avaliarMissoes(estado, r);
+        return r;
+    };
+    window.aplicarPresetDevsecops = function(id) {
+        var p = DS.presets.filter(function(x) { return x.id === id; })[0];
+        if (!p) return;
+        DS.etapas.forEach(function(e) { var s = document.getElementById("ds-lim-" + e.id); if (s) s.value = p.limiar; });
+        document.getElementById("ds-baseline").checked = p.baseline;
+    };
+    window.restaurarDevsecops = function() {
+        feitas = {};
+        renderizarMissoes();
+        renderizarCorrecoes();
+        renderizarPolitica();
+        renderizarExcecoes();
+        aplicarPresetDevsecops("sem");
+        document.getElementById("ds-execucao").replaceChildren(el("p", "Configure e clique em Executar pipeline.", "margin: 0; color: var(--muted);"));
+        document.getElementById("ds-producao").replaceChildren();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("ds-contexto").textContent = DS.contexto;
+        var pb = document.getElementById("ds-presets");
+        DS.presets.forEach(function(p) {
+            var b = el("button", p.nome, "font-size: 0.78rem;");
+            b.type = "button"; b.className = "btn-secondary";
+            b.addEventListener("click", function() { aplicarPresetDevsecops(p.id); });
+            pb.appendChild(b);
+        });
+        restaurarDevsecops();
+        if (typeof initChecklist === "function") {
+            initChecklist("devsecops");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
+    <footer class="study-footer">
+      <p>&copy; 2026 Estudos em Cibersegurança &bull; Material Autoinstrucional e Prático 100% Offline</p>
+      <p><a href="../index.html">← Painel de Estudos</a> &bull; Curadoria e Desenvolvimento por José Mauro da Silva Brandão</p>
+    </footer>
+  </main>
+
+  <!-- Scripts Interativos Embutidos -->
+  <script>
+/**
+ * ============================================================================
+ * ESTUDOS DE CIBERSEGURANÇA — BIBLIOTECA BASE COMPARTILHADA (base.js)
+ * Utilitários reativos, persistência local segura, acessibilidade e interatividade.
+ * Vanilla JavaScript (Zero dependências externas, 100% offline-ready).
+ * ============================================================================
+ */
+
+(function (window, document) {
+  'use strict';
+
+  // --------------------------------------------------------------------------
+  // 0. Utilitários Seguros de Armazenamento Local (localStorage)
+  // --------------------------------------------------------------------------
+  function safeStorageGet(key) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.localStorage.getItem(key);
+      }
+    } catch (e) {
+      console.warn(`[CS] Falha ao ler localStorage chave "${key}":`, e);
+    }
+    return null;
+  }
+
+  function safeStorageSet(key, value) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, String(value));
+        return true;
+      }
+    } catch (e) {
+      console.warn(`[CS] Falha ao gravar localStorage chave "${key}":`, e);
+    }
+    return false;
+  }
+
+  // --------------------------------------------------------------------------
+  // 1. Gerenciamento de Tema (Claro / Escuro)
+  // --------------------------------------------------------------------------
+  const THEME_STORAGE_KEY = 'cs_theme';
+
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    updateThemeButtons(theme);
+  }
+
+  function getSystemTheme() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  }
+
+  function getCurrentTheme() {
+    const saved = safeStorageGet(THEME_STORAGE_KEY);
+    return saved || getSystemTheme();
+  }
+
+  function updateThemeButtons(currentTheme) {
+    const effectiveTheme = currentTheme === 'dark' || (!currentTheme && getSystemTheme() === 'dark') ? 'dark' : 'light';
+    const buttons = document.querySelectorAll('.theme-toggle-btn, [data-theme-toggle]');
+    buttons.forEach((btn) => {
+      btn.setAttribute('aria-label', effectiveTheme === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro');
+      btn.innerHTML = effectiveTheme === 'dark'
+        ? '<span class="theme-icon">☀️</span> <span class="theme-label">Claro</span>'
+        : '<span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>';
+    });
+  }
+
+  function toggleTheme() {
+    const current = getCurrentTheme();
+    const next = current === 'dark' ? 'light' : 'dark';
+    safeStorageSet(THEME_STORAGE_KEY, next);
+    applyTheme(next);
+    return next;
+  }
+
+  function initTheme() {
+    const saved = safeStorageGet(THEME_STORAGE_KEY);
+    if (saved) {
+      applyTheme(saved);
+    } else {
+      updateThemeButtons(getSystemTheme());
+    }
+
+    // Monitora preferência do sistema operacional caso usuário não tenha fixado
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!safeStorageGet(THEME_STORAGE_KEY)) {
+          updateThemeButtons(e.matches ? 'dark' : 'light');
+        }
+      });
+    }
+
+    // Vincula cliques em botões de tema
+    document.querySelectorAll('.theme-toggle-btn, [data-theme-toggle]').forEach((btn) => {
+      btn.onclick = toggleTheme;
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 2. Checklist Operacional Interativo & Status de Conclusão de Estudo
+  // --------------------------------------------------------------------------
+  function extractSlug() {
+    if (document.body && document.body.dataset && document.body.dataset.slug) {
+      return document.body.dataset.slug;
+    }
+    const metaSlug = document.querySelector('meta[name="study-slug"]');
+    if (metaSlug && metaSlug.content) {
+      return metaSlug.content;
+    }
+    // Fallback: tenta obter do pathname
+    const match = window.location.pathname.match(/treinamento-([^.]+)\.html/);
+    if (match) {
+      return match[1];
+    }
+    return 'default';
+  }
+
+  function updateChecklistProgress(checklistEl) {
+    const checkboxes = checklistEl.querySelectorAll('input[type="checkbox"]');
+    if (!checkboxes.length) return;
+
+    let checkedCount = 0;
+    checkboxes.forEach((cb) => {
+      if (cb.checked) checkedCount++;
+    });
+
+    const progressFill = checklistEl.querySelector('.checklist-progress-fill');
+    if (progressFill) {
+      const pct = Math.round((checkedCount / checkboxes.length) * 100);
+      progressFill.style.width = `${pct}%`;
+    }
+
+    const counterEl = checklistEl.querySelector('.checklist-counter');
+    if (counterEl) {
+      counterEl.textContent = `${checkedCount} de ${checkboxes.length} itens auditados`;
+    }
+  }
+
+  function initChecklist(slug) {
+    const activeSlug = slug || extractSlug();
+    const checklists = document.querySelectorAll('.checklist');
+
+    checklists.forEach((checklist, listIdx) => {
+      const listId = checklist.dataset.checklistId || `list_${listIdx}`;
+      const items = checklist.querySelectorAll('.check-item');
+
+      items.forEach((item, itemIdx) => {
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        if (!checkbox) return;
+
+        const itemId = checkbox.id || checkbox.getAttribute('data-id') || `${listId}_${itemIdx}`;
+        const storageKey = `cs_check_${activeSlug}_${itemId}`;
+
+        // Restaura estado
+        const savedState = safeStorageGet(storageKey);
+        if (savedState === 'true') {
+          checkbox.checked = true;
+          item.classList.add('completed');
+        } else {
+          checkbox.checked = false;
+          item.classList.remove('completed');
+        }
+
+        // Event listener
+        checkbox.onchange = function () {
+          safeStorageSet(storageKey, checkbox.checked ? 'true' : 'false');
+          if (checkbox.checked) {
+            item.classList.add('completed');
+          } else {
+            item.classList.remove('completed');
+          }
+          updateChecklistProgress(checklist);
+        };
+      });
+
+      updateChecklistProgress(checklist);
+    });
+  }
+
+  function isStudyDone(slug) {
+    const activeSlug = slug || extractSlug();
+    return safeStorageGet(`cs_done_${activeSlug}`) === 'true';
+  }
+
+  function setStudyDone(slug, isDone) {
+    const activeSlug = slug || extractSlug();
+    const doneValue = isDone !== false;
+    return safeStorageSet(`cs_done_${activeSlug}`, doneValue ? 'true' : 'false');
+  }
+
+  // --------------------------------------------------------------------------
+  // 3. Sistema de Quiz com Feedback Explicativo
+  // --------------------------------------------------------------------------
+  function checkQuiz(btn, isCorrect, explanation) {
+    const quizItem = btn.closest('.quiz-item');
+    if (!quizItem) return;
+
+    // Desabilita botões para registrar a tentativa
+    const buttons = quizItem.querySelectorAll('.quiz-btn');
+    buttons.forEach((b) => {
+      b.disabled = true;
+      b.classList.remove('selected');
+    });
+
+    // Destaca o botão clicado
+    btn.classList.add('selected');
+    if (isCorrect) {
+      btn.classList.add('correct');
+    } else {
+      btn.classList.add('incorrect');
+    }
+
+    // Exibe ou atualiza o painel de feedback
+    let feedbackEl = quizItem.querySelector('.quiz-feedback');
+    if (!feedbackEl) {
+      feedbackEl = document.createElement('div');
+      feedbackEl.className = 'quiz-feedback';
+      quizItem.appendChild(feedbackEl);
+    }
+
+    feedbackEl.className = `quiz-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+    const icon = isCorrect ? '✅' : '❌';
+    const statusText = isCorrect ? 'Correto!' : 'Incorreto.';
+    feedbackEl.innerHTML = `<strong>${icon} ${statusText}</strong> ${escapeHtml(explanation || '')}`;
+    feedbackEl.style.display = 'block';
+  }
+
+  function initQuiz() {
+    const quizItems = document.querySelectorAll('.quiz-item');
+    quizItems.forEach((quiz, idx) => {
+      const qId = quiz.dataset.quizId || `quiz_${idx}`;
+      quiz.setAttribute('data-initialized', 'true');
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 4. Copiar Código para Área de Transferência
+  // --------------------------------------------------------------------------
+  function copyCode(button, targetId) {
+    let textToCopy = '';
+
+    if (targetId) {
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        textToCopy = targetEl.innerText || targetEl.textContent;
+      }
+    } else if (button) {
+      const terminalBox = button.closest('.terminal-box') || button.parentElement;
+      const codeEl = terminalBox ? terminalBox.querySelector('pre code, pre, code') : null;
+      if (codeEl) {
+        textToCopy = codeEl.innerText || codeEl.textContent;
+      }
+    }
+
+    if (!textToCopy) return;
+
+    const originalText = button ? button.innerText : 'Copiar';
+
+    function setSuccess() {
+      if (button) {
+        button.innerText = '✓ Copiado!';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.innerText = originalText;
+          button.classList.remove('copied');
+        }, 2000);
+      }
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textToCopy.trim()).then(setSuccess).catch(() => {
+        fallbackCopy(textToCopy.trim(), setSuccess);
+      });
+    } else {
+      fallbackCopy(textToCopy.trim(), setSuccess);
+    }
+  }
+
+  function fallbackCopy(text, callback) {
+    if (!document.body) {
+      console.warn('document.body não está pronto para cópia via textarea.');
+      return;
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      const successful = document.execCommand('copy');
+      if (successful && callback) {
+        callback();
+      }
+    } catch (e) {
+      console.warn('Falha ao copiar texto:', e);
+    } finally {
+      if (textarea.parentNode) {
+        textarea.parentNode.removeChild(textarea);
+      }
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 5. Utilitários Reutilizáveis para Simuladores e Laboratórios
+  // --------------------------------------------------------------------------
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function formatBytes(bytes, decimals = 2) {
+    if (!+bytes || bytes < 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  }
+
+  function formatNumber(num) {
+    if (isNaN(num)) return '0';
+    return new Intl.NumberFormat('pt-BR').format(num);
+  }
+
+  function bytesToHex(uint8Array) {
+    return Array.from(uint8Array)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  function hexToBytes(hexString) {
+    let cleaned = String(hexString || '').replace(/\s+/g, '');
+    if (cleaned.length % 2 !== 0) {
+      cleaned = '0' + cleaned;
+    }
+    const bytes = new Uint8Array(cleaned.length / 2);
+    for (let i = 0; i < cleaned.length; i += 2) {
+      bytes[i / 2] = parseInt(cleaned.substring(i, i + 2), 16);
+    }
+    return bytes;
+  }
+
+  async function sha256Hex(message) {
+    if (!window.crypto || !window.crypto.subtle) {
+      throw new Error('Web Cryptography API não suportada neste ambiente.');
+    }
+    const msgUint8 = new TextEncoder().encode(message);
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // --------------------------------------------------------------------------
+  // 6. Exposição Global de Funções & Inicialização Automática
+  // --------------------------------------------------------------------------
+  window.safeStorageGet = safeStorageGet;
+  window.safeStorageSet = safeStorageSet;
+  window.initTheme = initTheme;
+  window.toggleTheme = toggleTheme;
+  window.initChecklist = initChecklist;
+  window.isStudyDone = isStudyDone;
+  window.setStudyDone = setStudyDone;
+  window.initQuiz = initQuiz;
+  window.checkQuiz = checkQuiz;
+  window.copyCode = copyCode;
+  window.escapeHtml = escapeHtml;
+  window.formatBytes = formatBytes;
+  window.formatNumber = formatNumber;
+  window.bytesToHex = bytesToHex;
+  window.hexToBytes = hexToBytes;
+  window.sha256Hex = sha256Hex;
+
+  // Namespace unificado
+  window.CS = {
+    safeStorageGet,
+    safeStorageSet,
+    initTheme,
+    toggleTheme,
+    initChecklist,
+    isStudyDone,
+    setStudyDone,
+    initQuiz,
+    checkQuiz,
+    copyCode,
+    escapeHtml,
+    formatBytes,
+    formatNumber,
+    bytesToHex,
+    hexToBytes,
+    sha256Hex,
+  };
+
+  // Auto-inicialização na carga do DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      initChecklist();
+      initQuiz();
+    });
+  } else {
+    initTheme();
+    initChecklist();
+    initQuiz();
+  }
+})(window, document);
+
+  </script>
+</body>
+</html>
