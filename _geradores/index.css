@@ -1080,6 +1080,130 @@ a.vaga-chip:hover {
    Responsividade Mobile (Menor que 768px)
    ========================================================================== */
 
+/* --------------------------------------------------------------------------
+   Rotas Sugeridas (aba): passos em ordem, progresso e próximo módulo
+   -------------------------------------------------------------------------- */
+.rota-sugerida-section {
+  margin-top: 36px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.rota-sugerida-section[hidden],
+.rota-sugerida[hidden] {
+  display: none;
+}
+
+.rota-cabecalho h2 {
+  border-left: 4px solid var(--accent);
+  padding-left: 10px;
+  margin: 0 0 6px;
+}
+
+.rota-cabecalho p {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
+.rota-progresso {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rota-progresso-barra {
+  flex: 1 1 200px;
+  height: 8px;
+  background: var(--sunk);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.rota-progresso-preenchido {
+  width: 0;
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.rota-progresso-texto {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.rota-proximo {
+  margin: 14px 0;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.rota-passos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.rota-passo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--ground);
+  min-width: 0;
+}
+
+.rota-passo-num {
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--muted);
+  flex: 0 0 auto;
+}
+
+.rota-passo-link {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+}
+
+.rota-passo-link.pendente {
+  color: var(--muted);
+}
+
+.rota-passo-check {
+  visibility: hidden;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.rota-passo.feito .rota-passo-check {
+  visibility: visible;
+}
+
+.rota-passo.feito .rota-passo-link {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.rota-passo.proximo {
+  border-color: var(--accent);
+  box-shadow: inset 4px 0 0 var(--accent);
+}
+
+@media (max-width: 640px) {
+  .rota-sugerida-section {
+    padding: 16px;
+  }
+}
+
 @media (max-width: 768px) {
   .portal-container {
     padding: 20px 14px 60px;

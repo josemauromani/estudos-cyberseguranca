@@ -32,6 +32,7 @@ from index_dados import (
     FUNCOES_NIST,
     NECESSIDADES,
     ROTA_VAGA,
+    ROTAS_PERFIL,
     TRILHAS,
 )
 from montar import carregar_catalogo_estudos
@@ -123,6 +124,7 @@ def render_study_cards(
         nist = escape(d["nist"])
         tempo = d["tempo_minutos"]
         carreiras_str = ",".join(d["carreiras"])
+        rotas_str = " ".join(r["id"] for r in ROTAS_PERFIL if slug in r["modulos"])
 
         # Lista de termos para busca em tempo real
         fatos_texto = " ".join(d["fatos"])
@@ -146,6 +148,7 @@ def render_study_cards(
       data-trilha="{trilha_id}"
       data-nist="{nist}"
       data-carreiras="{escape(carreiras_str)}"
+      data-rotas="{rotas_str}"
       data-search="{search_terms}">
       
       <div class="card-header">
@@ -211,6 +214,60 @@ def render_filtros_carreira(carreiras: Dict[str, dict]) -> str:
         nome = escape(info["nome"])
         botoes.append(_botao_filtro(nome, f"{info['icone']} {nome}"))
     return "\n        ".join(botoes)
+
+
+def render_filtros_rota(rotas: List[dict]) -> str:
+    """Gera os botões da aba Rotas Sugeridas a partir de ROTAS_PERFIL."""
+    botoes = [_botao_filtro("all", "Escolha uma rota", ativo=True)]
+    for r in rotas:
+        botoes.append(_botao_filtro(escape(r["id"]), f"{r['icone']} {escape(r['nome'])}"))
+    return "\n        ".join(botoes)
+
+
+def render_painel_rotas(rotas: List[dict], status_map: Dict[str, dict]) -> str:
+    """Painel da rota escolhida: passos na ordem de estudo, progresso e próximo módulo.
+
+    Começa oculto; o JavaScript do portal mostra a rota ativa e calcula o progresso
+    a partir das chaves cs_done_<slug> salvas no navegador.
+    """
+    ordem = list(ESTUDOS_DADOS)
+    blocos = []
+    for r in rotas:
+        passos = []
+        for slug in r["modulos"]:
+            numero = ordem.index(slug) + 1
+            titulo = escape(ESTUDOS_DADOS[slug]["titulo"])
+            rotulo = f"{numero:02d} · {titulo}"
+            info = status_map.get(slug, {"disponivel": False, "caminho_relativo": ""})
+            if info["disponivel"]:
+                href = escape(info["caminho_relativo"], quote=True)
+                alvo = f'<a href="{href}" class="rota-passo-link">{titulo}</a>'
+            else:
+                alvo = f'<span class="rota-passo-link pendente" title="Em construção">⏳ {titulo}</span>'
+            passos.append(
+                f'<li class="rota-passo" data-slug="{escape(slug, quote=True)}" data-rotulo="{rotulo}">'
+                f'<span class="rota-passo-num">{numero:02d}</span> {alvo}'
+                f'<span class="rota-passo-check" aria-label="concluído">✓</span></li>'
+            )
+        total = len(r["modulos"])
+        blocos.append(f"""      <div class="rota-sugerida" data-rota="{escape(r['id'], quote=True)}" hidden>
+        <div class="rota-cabecalho">
+          <h2>{r['icone']} Rota: {escape(r['nome'])}</h2>
+          <p>{escape(r['descricao'])}</p>
+        </div>
+        <div class="rota-progresso">
+          <div class="rota-progresso-barra" role="progressbar" aria-label="Progresso da rota" aria-valuemin="0" aria-valuemax="{total}" aria-valuenow="0"><div class="rota-progresso-preenchido"></div></div>
+          <span class="rota-progresso-texto">0 de {total} concluídos (0%)</span>
+        </div>
+        <p class="rota-proximo"></p>
+        <ol class="rota-passos">
+          {chr(10).join("          " + p for p in passos).lstrip()}
+        </ol>
+      </div>""")
+    return f"""    <!-- Seção: Rota Sugerida (aba Rotas Sugeridas) -->
+    <section class="rota-sugerida-section" id="secao-rota-sugerida" hidden aria-live="polite">
+{chr(10).join(blocos)}
+    </section>"""
 
 
 def render_chip_modulo(slug: str, status_map: Dict[str, dict], apoio: bool = False) -> str:
@@ -315,6 +372,8 @@ def gerar_index_html(
 
     filtros_trilha_html = render_filtros_trilha(TRILHAS)
     filtros_carreira_html = render_filtros_carreira(CARREIRAS)
+    filtros_rota_html = render_filtros_rota(ROTAS_PERFIL)
+    painel_rotas_html = render_painel_rotas(ROTAS_PERFIL, stats["status_map"])
 
     # JavaScript do Portal Central
     portal_js = """
@@ -421,6 +480,40 @@ def gerar_index_html(
     });
 
     updateProgressUI(concluidos);
+    atualizarPainelRota();
+  }
+
+  // Painel da aba Rotas Sugeridas: mostra a rota escolhida, marca os passos
+  // concluídos (mesmas chaves cs_done_<slug>) e destaca o próximo módulo.
+  function atualizarPainelRota() {
+    const secao = document.getElementById('secao-rota-sugerida');
+    if (!secao) return;
+    const ativa = (typeof currentFacet !== 'undefined' && currentFacet === 'rotas' && currentFilterValue !== 'all') ? currentFilterValue : null;
+    secao.hidden = !ativa;
+    secao.querySelectorAll('.rota-sugerida').forEach(div => {
+      const selecionada = div.getAttribute('data-rota') === ativa;
+      div.hidden = !selecionada;
+      if (!selecionada) return;
+      const passos = Array.from(div.querySelectorAll('.rota-passo'));
+      let feitos = 0;
+      let proximo = null;
+      passos.forEach(li => {
+        const feito = safeStorageGet('cs_done_' + li.getAttribute('data-slug')) === 'true';
+        li.classList.toggle('feito', feito);
+        li.classList.remove('proximo');
+        if (feito) feitos++;
+        else if (!proximo) proximo = li;
+      });
+      if (proximo) proximo.classList.add('proximo');
+      const pct = passos.length ? Math.round((feitos / passos.length) * 100) : 0;
+      const barra = div.querySelector('.rota-progresso-barra');
+      barra.setAttribute('aria-valuenow', String(feitos));
+      div.querySelector('.rota-progresso-preenchido').style.width = pct + '%';
+      div.querySelector('.rota-progresso-texto').textContent = feitos + ' de ' + passos.length + ' concluídos (' + pct + '%)';
+      div.querySelector('.rota-proximo').textContent = proximo
+        ? 'Próximo módulo: ' + proximo.getAttribute('data-rotulo')
+        : 'Rota concluída! Todos os módulos foram marcados como estudados.';
+    });
   }
 
   function toggleDone(slug, isDone) {
@@ -523,6 +616,9 @@ def gerar_index_html(
         matchFacet = cardNist.includes(currentFilterValue);
       } else if (currentFacet === 'carreiras' && currentFilterValue !== 'all') {
         matchFacet = cardCarreiras.includes(currentFilterValue);
+      } else if (currentFacet === 'rotas' && currentFilterValue !== 'all') {
+        const cardRotas = ' ' + (card.getAttribute('data-rotas') || '') + ' ';
+        matchFacet = cardRotas.includes(' ' + currentFilterValue + ' ');
       }
 
       if (matchSearch && matchFacet) {
@@ -536,6 +632,7 @@ def gerar_index_html(
 
     const filtroAtivo = query.length > 0 || (currentFacet !== 'todas' && currentFilterValue !== 'all');
     filtrarSecoesRelacionadas(slugsVisiveis, filtroAtivo);
+    atualizarPainelRota();
 
     const info = document.getElementById('visible-count');
     if (info) {
@@ -711,6 +808,7 @@ def gerar_index_html(
         <button class="tab-btn active" data-facet="todas" onclick="switchTab('todas')">Todas as Trilhas</button>
         <button class="tab-btn" data-facet="trilhas" onclick="switchTab('trilhas')">Por Trilha Temática</button>
         <button class="tab-btn" data-facet="carreiras" onclick="switchTab('carreiras')">Por Perfil Profissional</button>
+        <button class="tab-btn" data-facet="rotas" onclick="switchTab('rotas')">Rotas Sugeridas</button>
         <button class="tab-btn" data-facet="nist" onclick="switchTab('nist')">Por Função NIST CSF 2.0</button>
       </nav>
 
@@ -722,6 +820,11 @@ def gerar_index_html(
       <!-- Painel: Por Perfil Profissional -->
       <div class="filter-subpanel" data-panel="carreiras" style="display: none;">
         {filtros_carreira_html}
+      </div>
+
+      <!-- Painel: Rotas Sugeridas -->
+      <div class="filter-subpanel" data-panel="rotas" style="display: none;">
+        {filtros_rota_html}
       </div>
 
       <!-- Painel: Por Função NIST CSF 2.0 -->
@@ -755,6 +858,8 @@ def gerar_index_html(
 {rota_vaga_html}
 
 {certificacoes_html}
+
+{painel_rotas_html}
 
     <!-- Seção Principal: Catálogo dos Estudos -->
     <main class="studies-section" id="secao-catalogo">

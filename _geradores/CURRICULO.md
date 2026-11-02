@@ -745,3 +745,5 @@ Para orientar estudantes e profissionais com focos específicos, a matriz curric
 6. **Rota 6: Analista de Segurança da Informação (vaga):**  
    `01 -> 34 -> 36 -> 05 -> 06 -> 07 -> 10 -> 29 -> 30 -> 38 -> 40 -> 25 -> 26 -> 31 -> 54 -> 57 -> 18 -> 49 -> 42 -> 43 -> 32 -> 37 -> 33`  
    Cada competência da vaga também aparece, com os módulos principais e de apoio, na seção "Rota por Vaga" do portal (`index.html`).
+
+No portal, a aba **Rotas Sugeridas** mostra cada rota como sequência numerada, com o progresso salvo no navegador e o próximo módulo a estudar. As sequências vêm de `ROTAS_PERFIL` em `_geradores/index_dados.py`, que é a fonte única; um teste (`test_rotas_sugeridas.py`) garante que esta seção continue igual aos dados.
