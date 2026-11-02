@@ -1,0 +1,865 @@
+<!-- Estudo 55: Fraude-em-Pagamentos-e-Pix Body Fragment -->
+<article class="study-container" data-slug="fraude-em-pagamentos-e-pix">
+
+    <!-- SEÇÃO 1: A MESA ANTIFRAUDE -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: O Pix Que o Próprio Cliente Autorizou</h2>
+        </div>
+
+        <p class="lead-text">
+            Às 15h55, Antônio, cliente da Ipê Pay (instituição de pagamento fictícia), faz um Pix de R$ 15.000 para uma conta que nunca pagou. Senha certa, celular de sempre, biometria válida. Do ponto de vista técnico, tudo está correto. Do outro lado da linha, porém, um falso funcionário da "central de segurança" acabou de convencê-lo de que a conta dele foi invadida e de que precisa "proteger o dinheiro" numa conta segura. Nenhum controle de autenticação vai parar essa transação, porque quem autoriza é o próprio cliente. Quem pode pará-la é a mesa antifraude: os sinais da transação, da conta recebedora e do dispositivo, combinados numa pontuação, e a decisão de aprovar, segurar ou bloquear em segundos.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>Pergunta-chave do módulo</strong>
+            </div>
+            <p>Quais sinais separam um Pix legítimo de um golpe, e quanto atrito o cliente honesto aceita?</p>
+        </div>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🧭</span>
+                <strong>O que vem dos Estudos 15, 46, 49 e 54</strong>
+            </div>
+            <p>
+                O Estudo 15 tratou da engenharia social do lado da pessoa: gatilhos, phishing e conscientização. Aqui o golpe já funcionou e a defesa passa para a instituição, que precisa reconhecer a transação fraudulenta mesmo autenticada. O Estudo 46 ensinou a escrever regras de detecção e a medir falso positivo; uma regra antifraude é uma regra de detecção que decide sobre dinheiro em tempo real. O Estudo 49 mostrou que toda ação automática tem custo quando erra: lá era um servidor isolado sem motivo, aqui é um cliente honesto com o Pix bloqueado. E o Estudo 54 apresentou a Ipê Pay e a regulação que ela segue; este módulo desce ao ambiente Pix que a Res. BCB 85 manda proteger.
+            </p>
+        </div>
+
+        <h3>Os golpes que chegam à mesa</h3>
+        <p>
+            Quase todo golpe com Pix tem a mesma estrutura: <strong>engenharia social</strong> para fazer a vítima pagar (ou para tomar a conta dela) e uma <strong>conta laranja</strong> para receber e espalhar o dinheiro antes que alguém reaja. No MITRE ATT&amp;CK, o vetor aparece como T1656 (Impersonation, se passar por alguém de confiança) e T1566 (Phishing). O que muda de um golpe para outro é o roteiro, e cada roteiro deixa sinais diferentes.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Golpe</th><th>Roteiro</th><th>Sinais que costuma deixar</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Falsa central</strong></td><td>Ligação de um suposto funcionário do banco ou da "central de segurança": a conta "foi invadida" e o dinheiro precisa ir para uma "conta segura".</td><td>Valor atípico, primeiro Pix para o recebedor, cliente em ligação durante a transação, recebedor que é conta nova.</td></tr>
+                    <tr><td><strong>Falso parente</strong></td><td>Mensagem de "filho" ou "sobrinho" com número novo pedindo um Pix urgente para pagar uma conta.</td><td>Primeiro Pix para o recebedor, chave cadastrada há poucos dias, conta recebedora recém-aberta, valor médio.</td></tr>
+                    <tr><td><strong>Conta laranja</strong></td><td>Conta aberta (com documentos reais ou emprestados) só para receber dinheiro de golpes e repassá-lo depressa para outras contas.</td><td>Conta recebedora nova, muitos pagadores diferentes em pouco tempo, denúncias anteriores contra o recebedor.</td></tr>
+                    <tr><td><strong>Sequestro de conta</strong></td><td>O golpista toma a conta da vítima (senha vazada, troca de chip, aplicativo instalado em outro aparelho) e faz o Pix ele mesmo.</td><td>Dispositivo novo, senha redefinida ou limite aumentado há pouco, horário incomum, valor atípico.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>O outro lado: o cliente honesto que parece golpe</strong>
+            </div>
+            <p>A mesma combinação de sinais aparece em transações legítimas: o cliente antigo que compra um carro usado (valor atípico, primeiro Pix para a loja), o primeiro Pix para um irmão que acabou de cadastrar a chave, o médico de plantão que paga um hotel à meia-noite, o food truck aberto há dez dias que recebe de muita gente. Bloquear essas transações é um <strong>falso positivo</strong> com custo real: cliente sem dinheiro na hora em que precisa, reclamação, perda de confiança e, às vezes, perda do cliente.</p>
+        </div>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🛡️</span>
+                <strong>Escopo do módulo</strong>
+            </div>
+            <p>O foco é o lado da defesa: que sinais observar, como decidir e como responder. Os casos e as pessoas do simulador são fictícios, sem chaves, documentos ou contas reais, e o módulo não descreve como abrir contas, contornar controles ou montar um golpe.</p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: SINAIS, PONTUAÇÃO E MED 2.0 -->
+    <section class="study-section" id="sinais-e-med">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Sinais de Risco, Pontuação, Atrito e o MED 2.0</h2>
+        </div>
+
+        <h3>Três famílias de sinais</h3>
+        <p>
+            Um sinal isolado quase nunca basta: primeiro Pix para alguém acontece todo dia. O que separa o golpe é a combinação. Por isso a mesa olha para três famílias de sinais ao mesmo tempo.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Família</th><th>Exemplos</th><th>De onde vem</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Transação</strong></td><td>Valor muito acima da média do pagador, horário incomum, primeiro Pix para aquele recebedor, recebedor recorrente (sinal que reduz o risco).</td><td>Histórico do próprio pagador na instituição.</td></tr>
+                    <tr><td><strong>Conta recebedora</strong></td><td>Conta aberta há poucos dias, chave Pix cadastrada há pouco, muitos pagadores diferentes na última hora, denúncias anteriores.</td><td>Base interna, informações de fraude compartilhadas entre participantes e consultas ao DICT (Diretório de Identificadores de Contas Transacionais, a base de chaves Pix).</td></tr>
+                    <tr><td><strong>Dispositivo e sessão</strong></td><td>Aparelho habilitado há menos de 24 h, senha redefinida ou limite aumentado há pouco, cliente em ligação durante a transação.</td><td>Aplicativo da instituição (identificação do aparelho, eventos de segurança da conta).</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Regras ou pontuação?</h3>
+        <p>
+            Uma <strong>regra</strong> é binária: "bloquear se a conta recebedora tiver menos de 30 dias e o valor passar de R$ 5.000". É fácil de explicar e de auditar, mas tem bordas duras: o golpe de R$ 4.900 passa e a loja nova com uma venda de R$ 5.100 é bloqueada. Na <strong>pontuação</strong>, cada sinal soma um peso e a decisão sai da comparação com limiares. Sinais fracos se somam, um sinal forte sozinho pode bastar, e um sinal de confiança (recebedor recorrente) desconta pontos. Na prática, as mesas usam as duas: regras para o que é inegociável (recebedor com denúncia confirmada, por exemplo) e pontuação, muitas vezes alimentada por modelos estatísticos, para o resto.
+        </p>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">python — pontuação de risco da mesa (pseudocódigo)</span>
+                <button class="btn-copy" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <pre><code>PESOS = {"valor_atipico": 25, "conta_nova": 25, "denuncias": 35, "dispositivo_novo": 20,
+         "em_ligacao": 15, "primeiro_pix": 10, "recebedor_recorrente": -15}
+LIMIAR_SEGURAR, LIMIAR_BLOQUEAR = 40, 70
+
+def decidir(sinais):
+    pontos = sum(PESOS.get(s, 0) for s in sinais)
+    if pontos &gt;= LIMIAR_BLOQUEAR:
+        return pontos, "bloquear"      # não liquida; cliente avisado pelo canal oficial
+    if pontos &gt;= LIMIAR_SEGURAR:
+        return pontos, "segurar"       # analista confirma com o cliente antes de liberar
+    return pontos, "aprovar"
+
+decidir(["valor_atipico", "em_ligacao", "primeiro_pix"])   # (50, 'segurar')</code></pre>
+        </div>
+
+        <h3>Fraude evitada, cliente bloqueado e o meio-termo de segurar</h3>
+        <p>
+            Baixar os limiares pega mais golpes e bloqueia mais clientes honestos; subir faz o contrário. Não existe configuração que zere os dois, porque alguns golpes e algumas compras legítimas têm exatamente os mesmos sinais. A saída é ter três decisões, e não duas:
+        </p>
+        <ul>
+            <li><strong>Aprovar:</strong> o Pix liquida na hora. Se for golpe, o dinheiro sai e só resta o MED.</li>
+            <li><strong>Segurar:</strong> a transação espera um analista, que confirma com o cliente por um canal oficial. Custa um <strong>atrito</strong> leve para o cliente honesto e tempo de analista. Falha quando a vítima está sendo orientada pelo golpista na outra linha e confirma tudo.</li>
+            <li><strong>Bloquear:</strong> a transação não acontece. Evita o golpe com certeza e é o maior atrito quando o cliente é honesto.</li>
+        </ul>
+        <p>
+            Meça sempre os dois lados juntos, como no Estudo 49: fraudes evitadas e prejuízo evitado de um lado; clientes legítimos bloqueados e segurados do outro. Uma mesa que mostra só o primeiro número está escondendo o custo do segundo.
+        </p>
+
+        <h3>Quando a fraude passa: o MED 2.0</h3>
+        <p>
+            O <strong>Mecanismo Especial de Devolução (MED)</strong> é o procedimento do Pix para devolver valores em caso de fraude ou golpe, ou de falha operacional. A versão atual, o <strong>MED 2.0</strong>, foi instituída pela <strong>Res. BCB 493, de 28/08/2025</strong>, que alterou o Regulamento do Pix. As mudanças principais:
+        </p>
+        <ul>
+            <li><strong>Contestação pelo autoatendimento:</strong> desde <strong>01/10/2025</strong> a vítima pode contestar de forma 100% digital, pelo aplicativo da instituição, sem depender de atendimento humano.</li>
+            <li><strong>Rastreio e devolução a partir de contas diferentes</strong> da usada na fraude: o golpista costuma espalhar o dinheiro da conta laranja para outras contas em minutos. O MED 2.0 permite seguir esse caminho e devolver a partir das contas para onde o dinheiro foi. Foi facultativo a partir de novembro de 2025 e é obrigatório desde <strong>fevereiro de 2026</strong>.</li>
+            <li><strong>Prazos:</strong> a vítima tem <strong>80 dias corridos</strong> contados da transação para contestar. A análise pelas instituições no fluxo de fraude leva até <strong>7 dias</strong>, e a devolução acontece em <strong>até 11 dias</strong> após a contestação.</li>
+            <li><strong>Devolução limitada ao saldo:</strong> só volta o que ainda estiver nas contas rastreadas. A devolução pode ser total ou <strong>parcial</strong>; se o dinheiro já saiu do sistema, não há o que devolver.</li>
+            <li><strong>Defesa de quem recebeu:</strong> quem recebeu e teve a devolução contestada passou de 30 para 80 dias, contados da devolução, para se manifestar, pela <strong>IN BCB 766</strong> (Manual Operacional do DICT), vigente desde <strong>01/09/2026</strong>.</li>
+        </ul>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Fluxo do MED 2.0 Depois de um Pix Fraudulento</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Fluxo do MED 2.0 Depois de um Pix Fraudulento">
+flowchart TD
+    P["Pix fraudulento liquidado<br><small>golpe que a mesa deixou passar</small>"]
+    V["Vítima contesta no autoatendimento<br><small>até 80 dias corridos da transação</small>"]
+    BC["Bloqueio cautelar<br><small>recursos retidos durante a análise</small>"]
+    A{"Análise pelas instituições<br><small>fluxo de fraude: até 7 dias</small>"}
+    E["Contestação recusada<br><small>sem indício de golpe</small>"]
+    R["Rastreio do dinheiro<br><small>conta laranja e contas diferentes</small>"]
+    D["Devolução até 11 dias após a contestação<br><small>limitada ao saldo: total ou parcial</small>"]
+    C["Recebedor pode contestar a devolução<br><small>80 dias da devolução, IN BCB 766</small>"]
+    P --> V
+    V --> BC
+    BC --> A
+    A -->|"Golpe não caracterizado"| E
+    A -->|"Golpe caracterizado"| R
+    R --> D
+    D --> C
+            </pre>
+        </div>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Bloqueio cautelar e o que este módulo não afirma</strong>
+            </div>
+            <p>Além do MED, a instituição pode reter os recursos de uma transação suspeita enquanto analisa, o chamado bloqueio cautelar. O módulo trata o tema de forma genérica, sem prazos, porque eles não foram confirmados nas fontes conferidas. Os prazos do MED citados acima foram conferidos na Res. BCB 493, em comunicados do Banco Central e na IN BCB 766; antes de escrever um procedimento interno, confira o Regulamento do Pix vigente em normativos.bcb.gov.br.</p>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">↩️</span>
+                <strong>Pix por engano não é caso de MED</strong>
+            </div>
+            <p>O MED serve para fraude ou golpe e para falha operacional da instituição. O Pix enviado por engano, porque o próprio usuário digitou a chave errada ou escolheu o destinatário errado, não entra: o caminho é pedir a devolução ao recebedor, com ajuda da instituição para fazer o contato. Explicar isso no atendimento evita contestações que serão recusadas e frustração do cliente.</p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Mesa Antifraude</h2>
+        </div>
+
+        <p class="lead-text">
+            Você assume a mesa antifraude da Ipê Pay num turno de 14 transações Pix. Ajuste os pesos dos sinais e os limiares de segurar e bloquear; a pontuação e a decisão automática de cada transação mudam na hora. Se discordar da regra, troque a decisão de uma transação na mão. Quando estiver satisfeito, feche o turno: o simulador revela quais eram golpes, mostra fraudes evitadas, prejuízo evitado, clientes honestos bloqueados ou segurados e, para cada golpe que passou, o caminho no MED 2.0.
+        </p>
+
+        <div class="lab-box fpx-lab" id="fpx-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Sinais, limiares, decisão e MED 2.0</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Mesa Antifraude: Ipê Pay</h3>
+                    <p id="fpx-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body" style="min-width: 0;">
+                <h4 style="margin-top: 0.4rem;">1. Pesos dos sinais de risco</h4>
+                <div id="fpx-sinais" role="group" aria-label="Pesos dos sinais de risco" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 0.6rem 1rem; font-size: 0.82rem;"></div>
+
+                <h4 style="margin-top: 1.2rem;">2. Limiares de decisão</h4>
+                <div id="fpx-limiares" role="group" aria-label="Limiares de segurar e bloquear" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 0.6rem 1rem; font-size: 0.82rem;"></div>
+                <p style="font-size: 0.76rem; color: var(--muted); margin: 0.4rem 0 0 0;">Pontuação a partir do limiar de bloquear: bloqueia. Entre o de segurar e o de bloquear: segura para análise. Abaixo: aprova. Se o limiar de bloquear ficar abaixo do de segurar, a faixa de segurar desaparece.</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem;">
+                    <button class="btn-secondary" type="button" onclick="presetFpx('padrao')">Configuração padrão</button>
+                    <button class="btn-secondary" type="button" onclick="presetFpx('rigida')">Mesa rígida (20 / 40)</button>
+                    <button class="btn-secondary" type="button" onclick="presetFpx('frouxa')">Mesa frouxa (80 / 100)</button>
+                </div>
+
+                <h4 style="margin-top: 1.2rem;">3. Fila do turno</h4>
+                <div id="fpx-fila" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.55rem;"></div>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem;">
+                    <button class="btn-primary" type="button" onclick="fecharTurnoFpx()">Fechar o turno e ver o resultado</button>
+                    <button class="btn-secondary" type="button" onclick="limparManuaisFpx()">Voltar todas para a decisão automática</button>
+                </div>
+
+                <div id="fpx-resultado" role="region" aria-label="Resultado do turno" tabindex="0" style="margin-top: 0.9rem; min-width: 0; overflow-wrap: anywhere;">
+                    <div id="fpx-placar" aria-live="polite" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); gap: 0.5rem;"></div>
+                    <div id="fpx-med" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem; font-size: 0.8rem; margin-top: 0.8rem;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist da Mesa Antifraude</h2>
+        </div>
+
+        <p class="lead-text">
+            Use como roteiro para revisar a operação antifraude de Pix. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="fraude-em-pagamentos-e-pix">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-fpx-1">
+                <label for="chk-fpx-1"><strong>Sinais nas três famílias:</strong> a pontuação usa sinais de transação, de conta recebedora e de dispositivo, e não só valor e horário.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-fpx-2">
+                <label for="chk-fpx-2"><strong>Dois lados medidos:</strong> o painel mostra fraudes evitadas e prejuízo evitado junto com clientes legítimos bloqueados e segurados, por período e por regra.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-fpx-3">
+                <label for="chk-fpx-3"><strong>Análise humana preparada:</strong> o analista confirma por um canal oficial iniciado pela instituição e sabe reconhecer o cliente orientado por um golpista na outra linha.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-fpx-4">
+                <label for="chk-fpx-4"><strong>Contas laranja do lado recebedor:</strong> contas novas que recebem de muitos pagadores e repassam depressa são monitoradas, e denúncias contra recebedores entram na pontuação.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-fpx-5">
+                <label for="chk-fpx-5"><strong>Sequestro de conta:</strong> dispositivo novo, senha redefinida ou limite aumentado há pouco reforçam a pontuação de qualquer Pix nas horas seguintes.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-fpx-6">
+                <label for="chk-fpx-6"><strong>MED 2.0 operando:</strong> contestação pelo autoatendimento, análise no prazo, rastreio para contas diferentes da usada na fraude e devolução conforme o saldo, com prazos conferidos no Regulamento do Pix vigente.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-fpx-7">
+                <label for="chk-fpx-7"><strong>Retroalimentação:</strong> cada contestação confirmada e cada cliente bloqueado sem motivo voltam como caso para recalibrar pesos e limiares.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Autenticação não basta):</strong> O Pix de R$ 15.000 da falsa central foi feito com senha, biometria e o celular de sempre do cliente. Por que o MFA não ajudou, e o que poderia ter ajudado?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque quem autorizou foi o próprio cliente, manipulado por engenharia social: a autenticação prova quem está pagando, não por que está pagando. O que pode ajudar são sinais de contexto: valor muito acima da média, primeiro Pix para o recebedor, cliente em ligação durante a transação, recebedor que é conta nova ou com muitos pagadores. Combinados, levam a transação para segurar ou bloquear.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Segurar não basta):</strong> A mesa segurou o Pix, o analista ligou e o cliente confirmou que queria pagar. Uma hora depois, ele contesta: era golpe. O que falhou?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Na falsa central, o golpista costuma orientar a vítima a confirmar qualquer contato do banco ("vão ligar para testar você"). Segurar ajuda contra o golpe em que a vítima tem dúvida, mas não contra a vítima coagida. A análise precisa de perguntas abertas, de atenção a uma ligação em andamento e, para as pontuações mais altas, de bloqueio com orientação explícita sobre o golpe.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Falso positivo):</strong> Depois de um mês de golpes, a diretoria manda baixar o limiar de bloqueio de 70 para 40. Qual é o custo que ninguém está medindo?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Os clientes legítimos bloqueados: o cliente antigo comprando um carro, o pequeno comerciante com conta nova, o pagamento feito ao telefone com a imobiliária. Cada bloqueio indevido gera atrito, reclamação e risco de perder o cliente. A decisão certa mede os dois lados na mesma fila e prefere segurar, e não bloquear, na faixa em que golpe e compra legítima se confundem.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (MED 2.0):</strong> A vítima contestou no aplicativo, mas o golpista já tinha passado o dinheiro da conta laranja para outras duas contas. O que muda com o MED 2.0?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O MED 2.0 (Res. BCB 493/2025) permite rastrear e devolver a partir de contas diferentes da usada na fraude, o que é obrigatório desde fevereiro de 2026. Antes, a devolução se limitava ao saldo da conta que recebeu o Pix, quase sempre já esvaziada. Mesmo assim a devolução depende do saldo encontrado e pode ser parcial.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Prazo):</strong> Uma cliente comprou um celular anunciado numa rede social, pagou por Pix e esperou a entrega por três meses antes de contestar. O MED ainda serve?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. A vítima tem 80 dias corridos contados da transação para contestar; três meses passam desse prazo. Restam as vias comuns (boletim de ocorrência, ação contra o recebedor). Por isso a orientação ao cliente deve ser contestar assim que perceber o golpe, e não esperar.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Engano):</strong> Um cliente digitou errado a chave e mandou R$ 500 para um desconhecido. Ele quer abrir um MED. O que você orienta?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O MED cobre fraude ou golpe e falha operacional, não o Pix enviado por engano pelo próprio usuário. O caminho é pedir a devolução ao recebedor, com apoio da instituição para fazer o contato. Abrir um MED nesse caso leva a uma contestação recusada e a um cliente ainda mais frustrado.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>Golpe de falsa central e conta laranja</h4>
+                <p>Engenharia social faz o próprio cliente autorizar o Pix; a conta laranja recebe e espalha o dinheiro em minutos. Autenticação forte não impede.</p>
+            </div>
+            <div class="facts-card">
+                <h4>Pontuação de risco com sinais combinados</h4>
+                <p>Sinais de transação, de conta recebedora e de dispositivo somam pesos; limiares decidem aprovar, segurar ou bloquear. Regras cuidam do inegociável.</p>
+            </div>
+            <div class="facts-card">
+                <h4>Fraude evitada vs cliente bloqueado</h4>
+                <p>Golpes e compras legítimas podem ter os mesmos sinais. Meça os dois lados juntos e use segurar para análise na faixa ambígua.</p>
+            </div>
+            <div class="facts-card">
+                <h4>MED 2.0 e bloqueio cautelar</h4>
+                <p>Res. BCB 493/2025: contestação digital, rastreio para outras contas, 80 dias corridos para a vítima, devolução até 11 dias após a contestação, limitada ao saldo.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>Resolução BCB nº 493, de 28/08/2025 (MED 2.0, alteração do Regulamento do Pix): texto em normativos.bcb.gov.br.</li>
+            <li>Instrução Normativa BCB nº 766 (Manual Operacional do DICT), vigente desde 01/09/2026: prazo de contestação da devolução pelo recebedor.</li>
+            <li>Banco Central do Brasil: material de divulgação do MED 2.0 (Circuito Pix) e página do Pix sobre segurança e devolução.</li>
+            <li>Agência Brasil: notícias de agosto de 2025 (novas regras de devolução) e setembro de 2026 (ampliação do prazo do recebedor).</li>
+            <li>MITRE ATT&amp;CK: T1656 Impersonation e T1566 Phishing.</li>
+            <li>NIST Cybersecurity Framework 2.0: funções Detect (DE.CM, DE.AE) e Protect (PR.AA).</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos passos na Trilha 13</strong>
+            </div>
+            <p>
+                Este é o segundo estudo da Trilha 13 (Setor Regulado no Brasil). O Estudo 56 leva o golpe para a esfera penal: o enquadramento como fraude eletrônica, os registros a pedir e a preservação das provas que a mesa antifraude acabou de gerar. O Estudo 57 trata da gestão de riscos de terceiros, incluindo os fornecedores de antifraude e de identificação de dispositivo de que a mesa depende.
+            </p>
+        </div>
+    </section>
+
+</article>
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="fpx-dados">
+{
+ "contexto": "Ipê Pay Instituição de Pagamento S.A. (fictícia), parceira da Ipê Store. Turno da mesa antifraude de 02/11/2026, das 08h às 08h do dia seguinte, com 14 transações Pix fictícias: pessoas, chaves e contas inventadas.",
+ "grupos": {
+  "transacao": "Transação",
+  "conta": "Conta recebedora",
+  "dispositivo": "Dispositivo e sessão"
+ },
+ "golpes": {
+  "falsa_central": "Falsa central",
+  "falso_parente": "Falso parente",
+  "conta_laranja": "Conta laranja",
+  "sequestro_conta": "Sequestro de conta"
+ },
+ "decisoes": {
+  "aprovar": "Aprovar",
+  "segurar": "Segurar para análise",
+  "bloquear": "Bloquear"
+ },
+ "limiares": {"segurar": 40, "bloquear": 70},
+ "limiar_max": 150,
+ "sinais": [
+  {"id": "valor_atipico", "grupo": "transacao", "peso": 25, "min": 0, "max": 50, "nome": "Valor atípico",
+   "descricao": "Pelo menos 3 vezes a média dos Pix do pagador nos últimos 90 dias."},
+  {"id": "madrugada", "grupo": "transacao", "peso": 10, "min": 0, "max": 50, "nome": "Horário incomum",
+   "descricao": "Entre 22h e 6h, fora do padrão do pagador."},
+  {"id": "primeiro_pix", "grupo": "transacao", "peso": 10, "min": 0, "max": 50, "nome": "Primeiro Pix para o recebedor",
+   "descricao": "O pagador nunca enviou Pix para esta conta."},
+  {"id": "recebedor_recorrente", "grupo": "transacao", "peso": -15, "min": -30, "max": 0, "nome": "Recebedor recorrente",
+   "descricao": "O pagador já pagou esta conta várias vezes. Sinal de confiança: desconta pontos."},
+  {"id": "conta_nova", "grupo": "conta", "peso": 25, "min": 0, "max": 50, "nome": "Conta recebedora nova",
+   "descricao": "Aberta há menos de 30 dias."},
+  {"id": "chave_nova", "grupo": "conta", "peso": 10, "min": 0, "max": 50, "nome": "Chave cadastrada há pouco",
+   "descricao": "Chave Pix do recebedor registrada há menos de 7 dias."},
+  {"id": "muitos_pagadores", "grupo": "conta", "peso": 20, "min": 0, "max": 50, "nome": "Muitos pagadores na última hora",
+   "descricao": "O recebedor recebeu Pix de muitos pagadores diferentes em pouco tempo."},
+  {"id": "denuncias", "grupo": "conta", "peso": 35, "min": 0, "max": 50, "nome": "Denúncias contra o recebedor",
+   "descricao": "Outras contestações de golpe contra esta conta na base antifraude."},
+  {"id": "dispositivo_novo", "grupo": "dispositivo", "peso": 20, "min": 0, "max": 50, "nome": "Dispositivo novo",
+   "descricao": "Aparelho do pagador habilitado há menos de 24 h."},
+  {"id": "limite_alterado", "grupo": "dispositivo", "peso": 20, "min": 0, "max": 50, "nome": "Senha ou limite alterado",
+   "descricao": "Senha redefinida ou limite Pix aumentado nas últimas 24 h."},
+  {"id": "em_ligacao", "grupo": "dispositivo", "peso": 15, "min": 0, "max": 50, "nome": "Cliente em ligação",
+   "descricao": "O aplicativo detectou uma chamada de voz ativa durante o Pix."}
+ ],
+ "transacoes": [
+  {"id": "T01", "hora": "08:12", "valor": 38000, "fraude": false,
+   "pagador": "Carla M., cliente há 12 anos", "recebedor": "Revenda de veículos aberta há 9 anos",
+   "descricao": "Compra de um carro usado, à vista, depois de visitar a loja.",
+   "sinais": ["valor_atipico", "primeiro_pix"],
+   "explicacao": "Legítima. Compra grande de cliente antigo para uma empresa estabelecida: valor atípico e primeiro Pix, mas conta recebedora antiga e sem denúncias.",
+   "atrito": "Bloquear a compra do carro na frente do vendedor é o tipo de atrito que faz o cliente levar a conta para outra instituição."},
+  {"id": "T02", "hora": "09:05", "valor": 2300, "fraude": true, "golpe": "falso_parente", "analise_evita": true,
+   "pagador": "Osvaldo P., 68 anos", "recebedor": "Conta de pessoa física aberta há 6 dias",
+   "descricao": "Pagamento de uma conta \"da filha\", que escreveu de um número novo pedindo urgência.",
+   "sinais": ["primeiro_pix", "chave_nova", "conta_nova"],
+   "explicacao": "Golpe do falso parente. Conta nova, chave recém-cadastrada e primeiro Pix. Na análise, o analista sugere ligar para a filha no número antigo e o golpe se desfaz.",
+   "med": {"dias_para_contestar": 6, "saldo_recebedora": 2300, "rastreio": []}},
+  {"id": "T03", "hora": "09:40", "valor": 8500, "fraude": true, "golpe": "falsa_central", "analise_evita": false,
+   "pagador": "Marlene S., 72 anos", "recebedor": "Conta de pessoa física aberta há 11 dias",
+   "descricao": "Transferência para uma \"conta segura\" indicada pela central de segurança ao telefone.",
+   "sinais": ["valor_atipico", "em_ligacao", "primeiro_pix", "conta_nova", "muitos_pagadores"],
+   "explicacao": "Golpe da falsa central. Cinco sinais ao mesmo tempo, inclusive ligação ativa e recebedor com muitos pagadores. A vítima está sendo orientada ao telefone: se o Pix for só segurado, ela confirma ao analista.",
+   "med": {"dias_para_contestar": 1, "saldo_recebedora": 3000, "rastreio": [{"conta": "Segunda conta laranja (pessoa física)", "saldo": 4000}]}},
+  {"id": "T04", "hora": "10:15", "valor": 1500, "fraude": false,
+   "pagador": "João R., cliente há 4 anos", "recebedor": "Irmão do pagador, conta antiga em outra instituição",
+   "descricao": "Primeiro Pix para um parente de verdade: o irmão cadastrou a chave ontem.",
+   "sinais": ["primeiro_pix", "chave_nova"],
+   "explicacao": "Legítima. Primeiro Pix e chave nova, mas a conta do irmão é antiga e sem denúncias. Sozinhos, esses dois sinais não justificam segurar.",
+   "atrito": "Segurar o primeiro Pix para cada parente treina o cliente a achar que o banco atrapalha, e ele passa a ignorar os alertas que importam."},
+  {"id": "T05", "hora": "11:30", "valor": 1200, "fraude": true, "golpe": "conta_laranja", "analise_evita": true,
+   "pagador": "Lúcia F., cliente há 2 anos", "recebedor": "Conta de pessoa física com contestações anteriores",
+   "descricao": "Compra de um celular \"em oferta\" anunciado numa rede social.",
+   "sinais": ["primeiro_pix", "muitos_pagadores", "denuncias"],
+   "explicacao": "Conta laranja usada num golpe de falsa venda: muitos pagadores e denúncias anteriores. Na análise, o analista mostra à cliente as contestações contra o recebedor e ela desiste.",
+   "med": {"dias_para_contestar": 85, "saldo_recebedora": 900, "rastreio": []}},
+  {"id": "T06", "hora": "12:10", "valor": 2100, "fraude": false,
+   "pagador": "Beatriz A., cliente há 6 anos", "recebedor": "Proprietária do apartamento alugado",
+   "descricao": "Aluguel do mês, pago do celular novo que a cliente habilitou ontem.",
+   "sinais": ["dispositivo_novo", "recebedor_recorrente"],
+   "explicacao": "Legítima. Dispositivo novo, mas recebedor recorrente há anos: o sinal de confiança compensa.",
+   "atrito": "Bloquear o aluguel no dia do vencimento gera multa para a cliente e uma reclamação difícil de responder."},
+  {"id": "T07", "hora": "13:25", "valor": 950, "fraude": true, "golpe": "falso_parente", "analise_evita": true,
+   "pagador": "Teresa N., 59 anos", "recebedor": "Conta de pessoa física aberta há 4 dias",
+   "descricao": "Pix para o \"sobrinho\", que trocou de número e precisa pagar um boleto hoje.",
+   "sinais": ["primeiro_pix", "conta_nova"],
+   "explicacao": "Golpe do falso parente com valor baixo e poucos sinais: com os pesos padrão passa direto. Se fosse segurado, o analista sugeriria confirmar com o sobrinho pelo número antigo.",
+   "med": {"dias_para_contestar": 1, "saldo_recebedora": 0, "rastreio": [{"conta": "Conta de passagem 1", "saldo": 600}, {"conta": "Conta de passagem 2", "saldo": 0}]}},
+  {"id": "T08", "hora": "14:40", "valor": 6200, "fraude": false,
+   "pagador": "Helena C., cliente há 8 anos", "recebedor": "Imobiliária aberta há 15 anos",
+   "descricao": "Sinal de compra de um apartamento, pago enquanto fala ao telefone com o corretor.",
+   "sinais": ["em_ligacao", "valor_atipico", "primeiro_pix"],
+   "explicacao": "Legítima, com exatamente os mesmos sinais do golpe da falsa central das 15h55. Só a análise humana separa os dois casos.",
+   "atrito": "Bloqueada, a cliente perde a vez na compra do imóvel; segurada, espera alguns minutos por uma confirmação."},
+  {"id": "T09", "hora": "15:55", "valor": 15000, "fraude": true, "golpe": "falsa_central", "analise_evita": false,
+   "pagador": "Antônio L., 66 anos", "recebedor": "Conta de pessoa física aberta há 2 anos",
+   "descricao": "Transferência para \"proteger o dinheiro\", orientada por uma suposta central de segurança.",
+   "sinais": ["em_ligacao", "valor_atipico", "primeiro_pix"],
+   "explicacao": "Golpe da falsa central com vítima coagida: o golpista na linha manda confirmar tudo ao banco, e ela confirma na análise. Só o bloqueio evita. Mesmos sinais da compra legítima das 14h40.",
+   "med": {"dias_para_contestar": 4, "saldo_recebedora": 1200, "rastreio": [{"conta": "Conta de passagem A", "saldo": 5000}, {"conta": "Conta de passagem B", "saldo": 2300}]}},
+  {"id": "T10", "hora": "17:20", "valor": 85, "fraude": false,
+   "pagador": "Diego S., cliente há 3 anos", "recebedor": "Food truck (MEI aberto há 10 dias)",
+   "descricao": "Almoço num food truck que acabou de abrir e recebe de muita gente.",
+   "sinais": ["conta_nova", "muitos_pagadores", "primeiro_pix"],
+   "explicacao": "Legítima. Para o lado recebedor, um comércio novo parece uma conta laranja: conta nova e muitos pagadores. A diferença está no valor baixo, na ausência de denúncias e no repasse que não acontece.",
+   "atrito": "Bloquear pagamentos para um comércio novo prejudica o comerciante e todos os clientes dele na fila."},
+  {"id": "T11", "hora": "18:45", "valor": 380, "fraude": true, "golpe": "conta_laranja", "analise_evita": true,
+   "pagador": "Paulo V., cliente há 1 ano", "recebedor": "Conta de pessoa física com chave criada há 2 dias",
+   "descricao": "Reserva de um ingresso de show anunciado numa rede social.",
+   "sinais": ["primeiro_pix", "chave_nova"],
+   "explicacao": "Conta laranja recém-ativada, ainda sem denúncias e com valor baixo: passa abaixo do radar. Caso típico em que só o MED resolve.",
+   "med": {"dias_para_contestar": 2, "saldo_recebedora": 380, "rastreio": []}},
+  {"id": "T12", "hora": "23:10", "valor": 3900, "fraude": false,
+   "pagador": "Rodrigo T., médico, cliente há 5 anos", "recebedor": "Hotel aberto há 20 anos",
+   "descricao": "Hospedagem paga ao sair de um plantão, perto da meia-noite.",
+   "sinais": ["madrugada", "valor_atipico", "primeiro_pix"],
+   "explicacao": "Legítima. Horário incomum, valor atípico e primeiro Pix, mas recebedor antigo e sem denúncias.",
+   "atrito": "Segurado, o cliente espera no balcão do hotel; bloqueado, fica sem quarto."},
+  {"id": "T13", "hora": "03:20", "valor": 4800, "fraude": true, "golpe": "sequestro_conta", "analise_evita": true,
+   "pagador": "Rafael B., cliente há 7 anos", "recebedor": "Conta de pessoa física aberta há 5 meses",
+   "descricao": "Pix de madrugada, de um aparelho habilitado há 2 horas, logo depois de uma redefinição de senha.",
+   "sinais": ["dispositivo_novo", "limite_alterado", "madrugada", "valor_atipico", "primeiro_pix"],
+   "explicacao": "Sequestro de conta: o golpista habilitou o aplicativo em outro aparelho e aumentou o limite. Na análise, o cliente verdadeiro, contatado pelo canal oficial, nega a transação.",
+   "med": {"dias_para_contestar": 1, "saldo_recebedora": 0, "rastreio": [{"conta": "Conta de passagem X", "saldo": 1500}, {"conta": "Conta de passagem Y", "saldo": 0}]}},
+  {"id": "T14", "hora": "07:50", "valor": 300, "fraude": false,
+   "pagador": "Marcos D., cliente há 9 anos", "recebedor": "Escola de inglês do filho, paga todo mês",
+   "descricao": "Mensalidade paga do celular novo, depois de perder o antigo e redefinir a senha.",
+   "sinais": ["dispositivo_novo", "limite_alterado", "recebedor_recorrente"],
+   "explicacao": "Legítima. Os sinais de sequestro de conta aparecem, mas o recebedor recorrente e o valor baixo indicam o próprio cliente reconstruindo o acesso.",
+   "atrito": "Bloquear o cliente que acabou de recuperar a conta repete o transtorno da perda do celular."}
+ ]
+}
+</script>
+<script>
+(function() {
+    var D = JSON.parse(document.getElementById("fpx-dados").textContent);
+    var PRAZO_CONTESTACAO = 80;
+    var PRESETS = {
+        padrao: { segurar: D.limiares.segurar, bloquear: D.limiares.bloquear },
+        rigida: { segurar: 20, bloquear: 40 },
+        frouxa: { segurar: 80, bloquear: 100 }
+    };
+    var COR_DECISAO = { aprovar: "var(--tip-color)", segurar: "var(--warning-color)", bloquear: "var(--danger-color)" };
+    var estado = { pesos: {}, limiares: { segurar: D.limiares.segurar, bloquear: D.limiares.bloquear }, manuais: {}, revelado: false };
+    var refs = { pesos: {}, limiares: {}, fila: {} };
+
+    function $(id) { return document.getElementById(id); }
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function has(o, k) { return o !== null && typeof o === "object" && Object.prototype.hasOwnProperty.call(o, k); }
+    function reais(v) { return "R$ " + Math.round(v).toLocaleString("pt-BR"); }
+    function sinalPorId(id) {
+        for (var i = 0; i < D.sinais.length; i++) if (D.sinais[i].id === id) return D.sinais[i];
+        return null;
+    }
+    function transacaoPorId(id) {
+        for (var i = 0; i < D.transacoes.length; i++) if (D.transacoes[i].id === id) return D.transacoes[i];
+        return null;
+    }
+
+    // ================================================ regras (espelhadas nos testes)
+    window.pontuarRisco = function(t, pesos) {
+        return t.sinais.reduce(function(soma, s) { return soma + (has(pesos, s) ? pesos[s] : 0); }, 0);
+    };
+
+    window.decidirTransacao = function(pontos, limiares) {
+        if (pontos >= limiares.bloquear) return "bloquear";
+        if (pontos >= limiares.segurar) return "segurar";
+        return "aprovar";
+    };
+
+    window.simularMed = function(t) {
+        var med = t.med;
+        if (med.dias_para_contestar > PRAZO_CONTESTACAO) return { no_prazo: false, so_original: 0, med2: 0 };
+        var rastreado = med.rastreio.reduce(function(s, c) { return s + c.saldo; }, 0);
+        return {
+            no_prazo: true,
+            so_original: Math.min(t.valor, med.saldo_recebedora),
+            med2: Math.min(t.valor, med.saldo_recebedora + rastreado)
+        };
+    };
+
+    function desfecho(t, decisao) {
+        if (t.fraude) {
+            return (decisao === "bloquear" || (decisao === "segurar" && t.analise_evita)) ? "fraude_evitada" : "fraude_passou";
+        }
+        return { aprovar: "legitima_aprovada", segurar: "legitima_segurada", bloquear: "legitima_bloqueada" }[decisao];
+    }
+
+    window.avaliarMesa = function(pesos, limiares, manuais) {
+        manuais = manuais || {};
+        var r = { itens: [], fraudes: 0, fraudes_evitadas: 0, prejuizo_evitado: 0, fraudes_passaram: 0, prejuizo_passou: 0,
+                  legitimas: 0, legitimas_bloqueadas: 0, legitimas_seguradas: 0, seguradas: 0,
+                  recuperado_med2: 0, recuperado_so_original: 0 };
+        D.transacoes.forEach(function(t) {
+            var pontos = window.pontuarRisco(t, pesos);
+            var auto = window.decidirTransacao(pontos, limiares);
+            var dec = has(D.decisoes, manuais[t.id]) ? manuais[t.id] : auto;
+            var res = desfecho(t, dec);
+            var item = { id: t.id, pontos: pontos, automatica: auto, decisao: dec, desfecho: res };
+            if (dec === "segurar") r.seguradas++;
+            if (t.fraude) {
+                r.fraudes++;
+                if (res === "fraude_evitada") {
+                    r.fraudes_evitadas++;
+                    r.prejuizo_evitado += t.valor;
+                } else {
+                    r.fraudes_passaram++;
+                    r.prejuizo_passou += t.valor;
+                    item.med = window.simularMed(t);
+                    r.recuperado_med2 += item.med.med2;
+                    r.recuperado_so_original += item.med.so_original;
+                }
+            } else {
+                r.legitimas++;
+                if (res === "legitima_bloqueada") r.legitimas_bloqueadas++;
+                else if (res === "legitima_segurada") r.legitimas_seguradas++;
+            }
+            r.itens.push(item);
+        });
+        return r;
+    };
+
+    // ================================================ controles
+    function controleDeslizante(box, id, rotulo, valor, min, max, passo, ajuda, onChange) {
+        var linha = el("div", null, "display: flex; flex-direction: column; gap: 0.15rem; min-width: 0;");
+        var topo = el("div", null, "display: flex; justify-content: space-between; gap: 0.5rem; align-items: baseline;");
+        var lb = el("label", rotulo, "font-weight: 600;");
+        lb.setAttribute("for", id);
+        var saida = el("output", String(valor), "font-family: var(--font-mono); font-weight: 700;");
+        saida.setAttribute("for", id);
+        topo.appendChild(lb);
+        topo.appendChild(saida);
+        var inp = document.createElement("input");
+        inp.type = "range";
+        inp.className = "form-range";
+        inp.id = id;
+        inp.min = String(min);
+        inp.max = String(max);
+        inp.step = String(passo);
+        inp.value = String(valor);
+        inp.setAttribute("aria-label", rotulo + " (" + min + " a " + max + ")");
+        inp.addEventListener("input", function() {
+            var v = parseInt(inp.value, 10);
+            saida.textContent = String(v);
+            onChange(v);
+        });
+        linha.appendChild(topo);
+        linha.appendChild(inp);
+        if (ajuda) linha.appendChild(el("span", ajuda, "font-size: 0.74rem; color: var(--muted);"));
+        box.appendChild(linha);
+        return { input: inp, saida: saida };
+    }
+
+    function montarSinais() {
+        var box = $("fpx-sinais");
+        Object.keys(D.grupos).forEach(function(g) {
+            box.appendChild(el("h5", D.grupos[g], "grid-column: 1 / -1; margin: 0.4rem 0 0 0; font-size: 0.86rem;"));
+            D.sinais.forEach(function(s) {
+                if (s.grupo !== g) return;
+                estado.pesos[s.id] = s.peso;
+                refs.pesos[s.id] = controleDeslizante(box, "fpx-peso-" + s.id, s.nome, s.peso, s.min, s.max, 5, s.descricao,
+                    function(v) { estado.pesos[s.id] = v; atualizar(); });
+            });
+        });
+    }
+
+    function montarLimiares() {
+        var box = $("fpx-limiares");
+        refs.limiares.segurar = controleDeslizante(box, "fpx-limiar-segurar", "Limiar para segurar", estado.limiares.segurar,
+            0, D.limiar_max, 5, null, function(v) { estado.limiares.segurar = v; atualizar(); });
+        refs.limiares.bloquear = controleDeslizante(box, "fpx-limiar-bloquear", "Limiar para bloquear", estado.limiares.bloquear,
+            0, D.limiar_max, 5, null, function(v) { estado.limiares.bloquear = v; atualizar(); });
+    }
+
+    function montarFila() {
+        var box = $("fpx-fila");
+        D.transacoes.forEach(function(t) {
+            var card = el("div", null, "border: 1px solid var(--rule); border-left: 4px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem 0.7rem; min-width: 0;");
+            card.id = "fpx-tx-" + t.id;
+            var topo = el("div", null, "display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.3rem 0.8rem; align-items: baseline;");
+            topo.appendChild(el("strong", t.id + " · " + t.hora + " · " + reais(t.valor), "font-size: 0.88rem;"));
+            var pontos = el("span", "", "font-family: var(--font-mono); font-size: 0.8rem;");
+            topo.appendChild(pontos);
+            card.appendChild(topo);
+            card.appendChild(el("div", t.pagador + " → " + t.recebedor, "font-size: 0.8rem; margin-top: 0.15rem;"));
+            card.appendChild(el("div", t.descricao, "font-size: 0.8rem; color: var(--muted); margin-top: 0.1rem;"));
+            var chips = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.3rem;");
+            t.sinais.forEach(function(sid) {
+                var s = sinalPorId(sid);
+                var chip = el("span", s.nome, "font-size: 0.7rem; padding: 0.05rem 0.45rem; border: 1px solid var(--rule); border-radius: 999px; background: var(--sunk);");
+                chip.setAttribute("data-sinal", sid);
+                chips.appendChild(chip);
+            });
+            card.appendChild(chips);
+            var linha = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.3rem 0.8rem; align-items: center; margin-top: 0.4rem; font-size: 0.8rem;");
+            var auto = el("span", "", "font-weight: 600;");
+            linha.appendChild(auto);
+            var sel = el("select", null, "min-width: 0; max-width: 100%; font-size: 0.8rem;");
+            sel.className = "form-control";
+            sel.id = "fpx-decisao-" + t.id;
+            sel.setAttribute("aria-label", "Decisão para a transação " + t.id + " de " + reais(t.valor));
+            var o = el("option", "Seguir a pontuação");
+            o.value = "";
+            sel.appendChild(o);
+            Object.keys(D.decisoes).forEach(function(k) {
+                var op = el("option", D.decisoes[k] + " (manual)");
+                op.value = k;
+                sel.appendChild(op);
+            });
+            sel.addEventListener("change", function() {
+                if (sel.value) estado.manuais[t.id] = sel.value; else delete estado.manuais[t.id];
+                atualizar();
+            });
+            linha.appendChild(sel);
+            card.appendChild(linha);
+            var res = el("div", null, "font-size: 0.8rem; margin-top: 0.35rem;");
+            card.appendChild(res);
+            box.appendChild(card);
+            refs.fila[t.id] = { card: card, pontos: pontos, auto: auto, sel: sel, res: res };
+        });
+    }
+
+    // ================================================ saída
+    var ROTULO_DESFECHO = {
+        fraude_evitada: "Golpe evitado",
+        fraude_passou: "Golpe passou",
+        legitima_aprovada: "Legítima aprovada",
+        legitima_segurada: "Legítima segurada (atrito leve)",
+        legitima_bloqueada: "Cliente legítimo bloqueado"
+    };
+    var COR_DESFECHO = {
+        fraude_evitada: "var(--tip-color)", fraude_passou: "var(--danger-color)", legitima_aprovada: "var(--tip-color)",
+        legitima_segurada: "var(--warning-color)", legitima_bloqueada: "var(--danger-color)"
+    };
+
+    function tile(rotulo, valor, cor) {
+        var t = el("div", null, "border: 1px solid var(--rule); border-top: 3px solid " + cor + "; border-radius: var(--radius-sm); padding: 0.45rem 0.6rem; min-width: 0;");
+        t.appendChild(el("div", valor, "font-size: 1.05rem; font-weight: 700; font-family: var(--font-mono);"));
+        t.appendChild(el("div", rotulo, "font-size: 0.74rem; color: var(--muted);"));
+        return t;
+    }
+
+    function renderMed(r) {
+        var box = $("fpx-med");
+        box.replaceChildren();
+        var passaram = r.itens.filter(function(i) { return i.desfecho === "fraude_passou"; });
+        box.appendChild(el("h4", "Golpes que passaram: o caminho no MED 2.0", "margin: 0.3rem 0 0 0;"));
+        if (!passaram.length) {
+            box.appendChild(el("p", "Nenhum golpe passou neste turno. Confira quantos clientes honestos pagaram por isso no placar acima.", "margin: 0; color: var(--muted);"));
+            return;
+        }
+        box.appendChild(el("p", "Recuperado pelo MED 2.0: " + reais(r.recuperado_med2) + " de " + reais(r.prejuizo_passou) +
+            ". Se a devolução ficasse só na conta que recebeu o Pix: " + reais(r.recuperado_so_original) + ".", "margin: 0; font-weight: 600;"));
+        passaram.forEach(function(i) {
+            var t = transacaoPorId(i.id), m = i.med;
+            var card = el("div", null, "border: 1px solid var(--rule); border-left: 4px solid var(--danger-color); border-radius: var(--radius-sm); padding: 0.45rem 0.6rem; min-width: 0;");
+            card.setAttribute("data-med", i.id);
+            card.appendChild(el("strong", t.id + " · " + D.golpes[t.golpe] + " · " + reais(t.valor)));
+            var passos = el("ol", null, "margin: 0.3rem 0 0 0; padding-left: 1.3rem;");
+            if (!m.no_prazo) {
+                passos.appendChild(el("li", "A vítima só contestou " + t.med.dias_para_contestar + " dias depois da transação, além dos 80 dias corridos: fora do MED. Restam as vias comuns."));
+            } else {
+                passos.appendChild(el("li", "Contestação pelo autoatendimento " + t.med.dias_para_contestar + " dia(s) depois da transação (prazo: 80 dias corridos)."));
+                passos.appendChild(el("li", "Bloqueio dos recursos encontrados e análise pelas instituições (fluxo de fraude: até 7 dias)."));
+                var rastro = "Saldo na conta que recebeu o Pix: " + reais(t.med.saldo_recebedora) + ".";
+                if (t.med.rastreio.length) {
+                    rastro += " Rastreio para contas diferentes: " + t.med.rastreio.map(function(c) { return c.conta + " (" + reais(c.saldo) + ")"; }).join("; ") + ".";
+                }
+                passos.appendChild(el("li", rastro));
+                var tipo = m.med2 >= t.valor ? "integral" : (m.med2 > 0 ? "parcial" : "sem saldo para devolver");
+                passos.appendChild(el("li", "Devolução em até 11 dias após a contestação: " + reais(m.med2) + " (" + tipo + ")." +
+                    (m.med2 > m.so_original ? " Sem o rastreio do MED 2.0, seriam " + reais(m.so_original) + "." : "")));
+                passos.appendChild(el("li", "Quem recebeu pode contestar a devolução em até 80 dias contados dela (IN BCB 766)."));
+            }
+            card.appendChild(passos);
+            box.appendChild(card);
+        });
+    }
+
+    function atualizar() {
+        var r = window.avaliarMesa(estado.pesos, estado.limiares, estado.manuais);
+        r.itens.forEach(function(i) {
+            var f = refs.fila[i.id], t = transacaoPorId(i.id);
+            f.pontos.textContent = i.pontos + " pts";
+            f.auto.textContent = "Pela pontuação: " + D.decisoes[i.automatica] + (i.decisao !== i.automatica ? " · Sua decisão: " + D.decisoes[i.decisao] : "");
+            f.auto.style.color = COR_DECISAO[i.decisao];
+            f.card.style.borderLeftColor = COR_DECISAO[i.decisao];
+            f.card.setAttribute("data-decisao", i.decisao);
+            f.res.replaceChildren();
+            if (estado.revelado) {
+                f.card.setAttribute("data-desfecho", i.desfecho);
+                f.res.appendChild(el("strong", ROTULO_DESFECHO[i.desfecho] + ". ", "color: " + COR_DESFECHO[i.desfecho] + ";"));
+                f.res.appendChild(el("span", t.explicacao));
+                if (!t.fraude && i.desfecho !== "legitima_aprovada") f.res.appendChild(el("div", "Custo do atrito: " + t.atrito, "color: var(--muted); margin-top: 0.15rem;"));
+            }
+        });
+        var placar = $("fpx-placar");
+        placar.replaceChildren();
+        if (!estado.revelado) {
+            $("fpx-med").replaceChildren();
+            placar.appendChild(el("p", r.seguradas + " transações iriam para análise humana. Feche o turno para ver quais eram golpes.", "grid-column: 1 / -1; margin: 0; font-size: 0.85rem; color: var(--muted);"));
+            return r;
+        }
+        placar.appendChild(tile("golpes evitados de " + r.fraudes, String(r.fraudes_evitadas), "var(--tip-color)"));
+        placar.appendChild(tile("prejuízo evitado", reais(r.prejuizo_evitado), "var(--tip-color)"));
+        placar.appendChild(tile("golpes que passaram (" + reais(r.prejuizo_passou) + ")", String(r.fraudes_passaram), "var(--danger-color)"));
+        placar.appendChild(tile("clientes legítimos bloqueados", String(r.legitimas_bloqueadas), "var(--danger-color)"));
+        placar.appendChild(tile("clientes legítimos segurados", String(r.legitimas_seguradas), "var(--warning-color)"));
+        placar.appendChild(tile("transações na fila de análise", String(r.seguradas), "var(--muted)"));
+        renderMed(r);
+        return r;
+    }
+
+    window.presetFpx = function(nome) {
+        var p = PRESETS[nome] || PRESETS.padrao;
+        D.sinais.forEach(function(s) {
+            estado.pesos[s.id] = s.peso;
+            refs.pesos[s.id].input.value = String(s.peso);
+            refs.pesos[s.id].saida.textContent = String(s.peso);
+        });
+        ["segurar", "bloquear"].forEach(function(k) {
+            estado.limiares[k] = p[k];
+            refs.limiares[k].input.value = String(p[k]);
+            refs.limiares[k].saida.textContent = String(p[k]);
+        });
+        return atualizar();
+    };
+
+    window.limparManuaisFpx = function() {
+        estado.manuais = {};
+        Object.keys(refs.fila).forEach(function(id) { refs.fila[id].sel.value = ""; });
+        return atualizar();
+    };
+
+    window.fecharTurnoFpx = function() {
+        estado.revelado = true;
+        var r = atualizar();
+        $("fpx-resultado").focus();
+        return r;
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        $("fpx-contexto").textContent = D.contexto;
+        montarSinais();
+        montarLimiares();
+        montarFila();
+        atualizar();
+
+        if (typeof initChecklist === "function") {
+            initChecklist("fraude-em-pagamentos-e-pix");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
