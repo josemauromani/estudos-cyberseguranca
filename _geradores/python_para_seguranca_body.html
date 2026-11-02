@@ -1,0 +1,1099 @@
+<!-- Estudo 35: Python-para-Seguranca Body Fragment -->
+<article class="study-container" data-slug="python-seguranca">
+
+    <!-- SEÇÃO 1: DO GREP AO SCRIPT -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: Do grep ao Script Repetível</h2>
+        </div>
+
+        <p class="lead-text">
+            No Estudo 34, você investigou o <strong>web-loja01</strong> com <code>grep</code>, <code>awk</code>, <code>sort</code> e <code>uniq -c</code>, e encontrou a força bruta de <code>198.51.100.23</code> terminando num login aceito da conta <code>deploy</code>. Funciona, mas cada analista monta a linha de comando de um jeito, e no próximo incidente tudo recomeça. Um script em Python faz a mesma triagem sempre do mesmo jeito, aceita formatos diferentes de log, consulta serviços de reputação e entrega o resultado em CSV ou JSON para o SIEM.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Pipeline de um Detector em Python</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Pipeline de um Detector em Python">
+flowchart LR
+    A["Ler o log<br><small>with open</small>"]
+    B["Filtrar linhas<br><small>texto in linha</small>"]
+    C["Extrair campos<br><small>re.search e grupos nomeados</small>"]
+    D["Contar<br><small>Counter</small>"]
+    E["Limiar<br><small>most_common</small>"]
+    F["Enriquecer<br><small>API de reputação</small>"]
+    G["Saída<br><small>alerta, CSV ou JSON</small>"]
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+            </pre>
+        </div>
+
+        <h3>Expressões regulares com o módulo re</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Função</th><th>O que faz</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>re.search</code></td><td>Procura a primeira correspondência em qualquer ponto da linha</td></tr>
+                    <tr><td><code>re.match</code></td><td>Só aceita correspondência que começa no início da linha</td></tr>
+                    <tr><td><code>re.finditer</code></td><td>Percorre todas as correspondências, uma a uma, com os grupos de cada</td></tr>
+                    <tr><td><code>re.compile</code></td><td>Compila o padrão uma vez, para usar em milhares de linhas</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <ul>
+            <li><strong>Grupos nomeados</strong> <code>(?P&lt;ip&gt;...)</code> deixam o código legível: <code>m.group("ip")</code> em vez de <code>m.group(3)</code>.</li>
+            <li>Um <strong>quantificador</strong> diz quantas vezes repetir: <code>\d{1,3}</code> (de 1 a 3 dígitos), <code>\S+</code> (um ou mais caracteres que não são espaço), <code>?</code> (opcional).</li>
+            <li>Uma <strong>âncora</strong> fixa a posição: <code>^</code> no início, <code>$</code> no fim, <code>\b</code> na fronteira de palavra.</li>
+            <li>O grupo opcional <code>(?:invalid user )?</code> resolve o problema do Estudo 34: com ele, a mesma regex pega o IP com e sem "invalid user", sem depender da posição da coluna.</li>
+        </ul>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">python — falhas de SSH por IP</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-py-base')">Copiar</button>
+            </div>
+            <pre><code id="code-py-base">import re
+from collections import Counter
+
+FALHA = re.compile(
+    r"Failed password for (?:invalid user )?(?P&lt;usuario&gt;\S+) "
+    r"from (?P&lt;ip&gt;\d{1,3}(?:\.\d{1,3}){3}) port (?P&lt;porta&gt;\d+)"
+)
+
+falhas = Counter()
+with open("/var/log/auth.log", encoding="utf-8", errors="replace") as arquivo:
+    for linha in arquivo:
+        m = FALHA.search(linha)
+        if m:
+            falhas[m.group("ip")] += 1
+
+for ip, total in falhas.most_common(10):
+    print(ip, total)</code></pre>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: APIs, FORMATOS E BOAS PRÁTICAS -->
+    <section class="study-section" id="apis">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>APIs de Reputação, JSON, CSV e Boas Práticas</h2>
+        </div>
+
+        <h3>Consultando reputação com requests</h3>
+        <p>
+            Serviços como o <strong>AbuseIPDB</strong> (pontuação de abuso de um IP) e o <strong>VirusTotal</strong> (análises de arquivos, domínios e IPs) têm APIs HTTP que respondem em <strong>JSON</strong>. A biblioteca <code>requests</code> faz a chamada; o script precisa:
+        </p>
+        <ul>
+            <li>passar sempre um <code>timeout</code>, para não travar esperando um servidor que não responde;</li>
+            <li>chamar <code>raise_for_status</code> para transformar respostas de erro (4xx, 5xx) em exceção tratável;</li>
+            <li>respeitar o limite de consultas: uma resposta <strong>429</strong> vem com o cabeçalho <strong>Retry-After</strong> dizendo quanto esperar (Estudo 13);</li>
+            <li>ler a chave de uma <strong>variável de ambiente</strong> ou de um cofre, nunca escrita no código que vai para o Git.</li>
+        </ul>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">python — reputação de um IP no AbuseIPDB</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-py-api')">Copiar</button>
+            </div>
+            <pre><code id="code-py-api">import os
+import requests
+
+CHAVE = os.environ["ABUSEIPDB_KEY"]   # defina fora do código: export ABUSEIPDB_KEY=...
+
+resposta = requests.get(
+    "https://api.abuseipdb.com/api/v2/check",
+    headers={"Key": CHAVE, "Accept": "application/json"},
+    params={"ipAddress": "198.51.100.23", "maxAgeInDays": 90},
+    timeout=10,
+)
+if resposta.status_code == 429:
+    print("Limite atingido; espere", resposta.headers.get("Retry-After"), "s")
+else:
+    resposta.raise_for_status()
+    print(resposta.json()["data"]["abuseConfidenceScore"])
+
+# VirusTotal: GET https://www.virustotal.com/api/v3/ip_addresses/{ip}
+# com o cabeçalho x-apikey; o resumo fica em data.attributes.last_analysis_stats</code></pre>
+        </div>
+
+        <h3>Saída para pessoas e para máquinas</h3>
+        <p>
+            Um alerta em texto serve para o analista; para o SIEM ou uma planilha, gere <strong>CSV</strong> com o módulo <code>csv</code> (ele cuida das aspas e vírgulas dentro dos valores) ou <strong>JSON</strong> com <code>json.dumps</code>. Montar CSV concatenando strings quebra no primeiro valor com vírgula.
+        </p>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">🔐</span>
+                <strong>O que sai do script também é dado</strong>
+            </div>
+            <p>
+                Enviar um IP público a um serviço de reputação costuma ser aceitável; enviar nomes de clientes, e-mails ou arquivos internos não é. Antes de automatizar consultas a terceiros, confira o que a política da empresa e a LGPD permitem (Estudo 29), e trate erros para que uma falha no meio não deixe o resultado pela metade sem aviso.
+            </p>
+        </div>
+
+        <h3>Python do outro lado (T1059.006)</h3>
+        <p>
+            Atacantes também usam Python: scripts de varredura, clientes de webshell (o <code>python-requests</code> no access.log do web-loja01 é um exemplo) e cargas executadas em servidores com o interpretador instalado. Para a defesa, isso significa registrar a execução de interpretadores em servidores que não deveriam usá-los e desconfiar de agentes de usuário de bibliotecas em rotas sensíveis.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Montador de Detector</h2>
+        </div>
+
+        <p class="lead-text">
+            Primeiro, escreva uma regex no testador e veja as correspondências no log. Depois, encaixe os blocos do detector: a página mostra o script Python completo e o resultado de executá-lo sobre os mesmos logs. O script gerado roda de verdade: copie, salve ao lado dos logs e execute com <code>python3</code>.
+        </p>
+
+        <div class="lab-box py-lab" id="py-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Automação de Triagem</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Logs do web-loja01</h3>
+                    <p id="py-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">Missões</h4>
+                <ul id="py-missoes" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.25rem; font-size: 0.85rem;"></ul>
+
+                <h4 style="margin-top: 1.5rem;">1. Testador de regex (sintaxe do Python)</h4>
+                <div id="py-testador" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem; font-size: 0.85rem;">
+                    <label style="display: flex; flex-direction: column; gap: 0.25rem;">Log
+                        <select class="form-control" id="py-testador-log"></select>
+                    </label>
+                    <label style="display: flex; flex-direction: column; gap: 0.25rem;">Padrão
+                        <input class="form-control" type="text" id="py-regex" autocomplete="off" spellcheck="false" style="font-family: var(--font-mono); font-size: 0.78rem; min-width: 0;">
+                    </label>
+                    <div id="py-regex-exemplos" style="display: flex; flex-wrap: wrap; gap: 0.35rem;"></div>
+                    <div id="py-regex-status" aria-live="polite" style="font-size: 0.82rem;"></div>
+                    <div id="py-correspondencias" style="font-family: var(--font-mono); font-size: 0.72rem; background: var(--sunk); padding: 0.5rem; border-radius: var(--radius-sm); max-height: 18rem; overflow-y: auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem;"></div>
+                </div>
+
+                <h4 style="margin-top: 1.5rem;">2. Montador</h4>
+                <div id="py-montador" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 0.5rem; font-size: 0.84rem;">
+                    <label class="py-bloco" style="display: flex; flex-direction: column; gap: 0.25rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem; min-width: 0;"><strong>1. Ler</strong>
+                        <select class="form-control" id="py-fonte"></select>
+                    </label>
+                    <label class="py-bloco" style="display: flex; flex-direction: column; gap: 0.25rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem; min-width: 0;"><strong>2. Filtrar: linha contém</strong>
+                        <input class="form-control" type="text" id="py-filtro" list="py-filtros" autocomplete="off" spellcheck="false" style="font-family: var(--font-mono); font-size: 0.78rem; min-width: 0;">
+                        <datalist id="py-filtros"></datalist>
+                    </label>
+                    <label class="py-bloco" style="display: flex; flex-direction: column; gap: 0.25rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem; min-width: 0;"><strong>3. Extrair com regex</strong>
+                        <select class="form-control" id="py-padrao"></select>
+                    </label>
+                    <label class="py-bloco" style="display: flex; flex-direction: column; gap: 0.25rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem; min-width: 0;"><strong>4. Contar por</strong>
+                        <select class="form-control" id="py-campo"></select>
+                    </label>
+                    <label class="py-bloco" style="display: flex; flex-direction: column; gap: 0.25rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem; min-width: 0;"><strong>5. Limiar (mínimo)</strong>
+                        <input class="form-control" type="number" min="1" max="1000" id="py-limiar">
+                    </label>
+                    <label class="py-bloco" style="display: flex; flex-direction: column; gap: 0.25rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem; min-width: 0;"><strong>6. Saída</strong>
+                        <select class="form-control" id="py-formato">
+                            <option value="alerta">Alerta em texto</option>
+                            <option value="csv">CSV</option>
+                            <option value="json">JSON</option>
+                        </select>
+                    </label>
+                    <label class="py-bloco" style="display: flex; gap: 0.5rem; align-items: flex-start; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem; min-width: 0;">
+                        <input type="checkbox" id="py-reputacao">
+                        <span><strong>7. Enriquecer com reputação</strong><span id="py-reputacao-nota" style="display: block; font-size: 0.74rem; color: var(--muted);"></span></span>
+                    </label>
+                </div>
+
+                <div class="terminal-box" style="margin-top: 0.75rem;">
+                    <div class="terminal-header">
+                        <span class="terminal-title">detector.py — gerado</span>
+                        <button class="terminal-copy-btn" onclick="copyCode(this, 'py-codigo')">Copiar</button>
+                    </div>
+                    <pre style="max-height: 22rem; overflow: auto;"><code id="py-codigo"></code></pre>
+                </div>
+                <h4 style="margin: 0.75rem 0 0.3rem 0;">Saída de <code>python3 detector.py</code></h4>
+                <pre id="py-saida" aria-live="polite" style="margin: 0; font-family: var(--font-mono); font-size: 0.75rem; background: var(--sunk); padding: 0.5rem; border-radius: var(--radius-sm); white-space: pre-wrap; overflow-wrap: anywhere;"></pre>
+
+                <div style="margin-top: 1.25rem;">
+                    <button class="btn-secondary" type="button" onclick="restaurarPython()">Restaurar laboratório</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de um Script de Segurança</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista antes de entregar um script para a equipe usar. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="python-seguranca">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-py-1">
+                <label for="chk-py-1"><strong>Regex testada:</strong> o padrão foi conferido contra linhas reais, inclusive as variações (como "invalid user") e as linhas que não devem casar.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-py-2">
+                <label for="chk-py-2"><strong>Leitura robusta:</strong> arquivos abertos com <code>with</code>, codificação definida e linhas malformadas ignoradas sem derrubar o script.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-py-3">
+                <label for="chk-py-3"><strong>Limiares documentados:</strong> o motivo de cada limiar está escrito no código e foi validado contra o tráfego normal.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-py-4">
+                <label for="chk-py-4"><strong>Segredos fora do código:</strong> chaves de API em variável de ambiente ou cofre, nunca no repositório.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-py-5">
+                <label for="chk-py-5"><strong>Chamadas externas seguras:</strong> timeout, tratamento de erros HTTP e respeito ao 429 com Retry-After.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-py-6">
+                <label for="chk-py-6"><strong>Saída estruturada:</strong> CSV com o módulo <code>csv</code> e JSON com <code>json</code>, prontos para o SIEM.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-py-7">
+                <label for="chk-py-7"><strong>Dados protegidos:</strong> nada de dados pessoais ou internos enviados a serviços de terceiros sem autorização.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (search ou match):</strong> Por que <code>re.match(r"Failed password", linha)</code> não encontra nada no auth.log?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque <code>re.match</code> só aceita correspondência no início da linha, e as linhas do auth.log começam pela data e pelo nome do servidor. Use <code>re.search</code>.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Regex):</strong> Como a mesma regex pega o IP em "Failed password for root from ..." e em "Failed password for invalid user admin from ..."?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Com um grupo opcional sem captura, <code>(?:invalid user )?</code>, antes do usuário. Assim o IP é localizado pelo texto ao redor ("from ... port"), e não pela posição da coluna, que muda entre as duas formas.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Counter):</strong> O que <code>Counter.most_common(5)</code> devolve?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Uma lista com os 5 pares (valor, contagem) mais frequentes, do maior para o menor. Valores empatados mantêm a ordem em que apareceram.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Segredos):</strong> Onde guardar a chave da API do AbuseIPDB usada pelo script da equipe?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Fora do código: numa variável de ambiente ou num cofre de segredos, lida com <code>os.environ</code>. Uma chave escrita no script vaza no primeiro commit.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (requests):</strong> O script de reputação travou por horas numa madrugada. Qual parâmetro faltou?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O <code>timeout</code>. Sem ele, <code>requests</code> pode esperar indefinidamente por um servidor que não responde.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (CSV):</strong> Por que não montar o CSV com <code>print(valor + "," + str(total))</code>?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque um valor com vírgula ou aspas quebra as colunas. O módulo <code>csv</code> coloca os valores entre aspas e duplica as aspas internas quando necessário.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Regex</h4>
+                <p>search, grupos nomeados e grupos opcionais; teste contra linhas reais.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Contagem</h4>
+                <p>Counter e most_common com limiar documentado.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. APIs</h4>
+                <p>timeout, raise_for_status, 429 e chave fora do código.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Saída</h4>
+                <p>csv e json para máquinas, alerta em texto para pessoas.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>Documentação do Python — módulos <code>re</code>, <code>collections</code>, <code>csv</code> e <code>json</code>, e o Regular Expression HOWTO.</li>
+            <li>Documentação da biblioteca requests.</li>
+            <li>Documentação das APIs do AbuseIPDB (v2) e do VirusTotal (v3).</li>
+            <li>MITRE ATT&amp;CK — T1059.006.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 16 — Operações SOC e SIEM e 37 — Laboratório Doméstico e Portfólio</strong>
+            </div>
+            <p>
+                No Estudo 16, a mesma lógica de limiar vira regra Sigma no SIEM. No Estudo 37, o detector deste estudo é um dos projetos sugeridos para o portfólio no GitHub.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="py-dados">
+{
+ "contexto": "Os mesmos logs do incidente do Estudo 34, com IPs de documentação. O testador usa o motor de regex do navegador com a sintaxe do Python traduzida; o script gerado roda no Python de verdade.",
+ "logs": {
+  "auth.log": [
+   "Oct 28 02:58:11 web-loja01 sshd[1987]: Accepted publickey for ana from 10.20.5.31 port 51522 ssh2: ED25519 SHA256:k3YdQ0pLm2Vx9sTzR4aW8nB1cE6fH7jK",
+   "Oct 28 02:58:11 web-loja01 sshd[1987]: pam_unix(sshd:session): session opened for user ana(uid=1001) by (uid=0)",
+   "Oct 28 03:03:07 web-loja01 sshd[2101]: Failed password for root from 198.51.100.23 port 50100 ssh2",
+   "Oct 28 03:03:14 web-loja01 sshd[2102]: Failed password for root from 198.51.100.23 port 50101 ssh2",
+   "Oct 28 03:03:21 web-loja01 sshd[2103]: Failed password for root from 198.51.100.23 port 50102 ssh2",
+   "Oct 28 03:03:21 web-loja01 sshd[2103]: Connection closed by authenticating user root 198.51.100.23 port 50102 [preauth]",
+   "Oct 28 03:03:28 web-loja01 sshd[2104]: Invalid user oracle from 203.0.113.77 port 50503",
+   "Oct 28 03:03:28 web-loja01 sshd[2104]: Failed password for invalid user oracle from 203.0.113.77 port 50503 ssh2",
+   "Oct 28 03:03:35 web-loja01 sshd[2105]: Invalid user admin from 198.51.100.23 port 50104",
+   "Oct 28 03:03:35 web-loja01 sshd[2105]: Failed password for invalid user admin from 198.51.100.23 port 50104 ssh2",
+   "Oct 28 03:03:42 web-loja01 sshd[2106]: Invalid user admin from 198.51.100.23 port 50105",
+   "Oct 28 03:03:42 web-loja01 sshd[2106]: Failed password for invalid user admin from 198.51.100.23 port 50105 ssh2",
+   "Oct 28 03:03:49 web-loja01 sshd[2107]: Invalid user admin from 198.51.100.23 port 50106",
+   "Oct 28 03:03:49 web-loja01 sshd[2107]: Failed password for invalid user admin from 198.51.100.23 port 50106 ssh2",
+   "Oct 28 03:03:56 web-loja01 sshd[2108]: Invalid user oracle from 203.0.113.77 port 50507",
+   "Oct 28 03:03:56 web-loja01 sshd[2108]: Failed password for invalid user oracle from 203.0.113.77 port 50507 ssh2",
+   "Oct 28 03:04:03 web-loja01 sshd[2109]: Invalid user postgres from 203.0.113.77 port 50508",
+   "Oct 28 03:04:03 web-loja01 sshd[2109]: Failed password for invalid user postgres from 203.0.113.77 port 50508 ssh2",
+   "Oct 28 03:04:10 web-loja01 sshd[2110]: Failed password for root from 198.51.100.23 port 50109 ssh2",
+   "Oct 28 03:04:17 web-loja01 sshd[2111]: Failed password for root from 198.51.100.23 port 50110 ssh2",
+   "Oct 28 03:04:24 web-loja01 sshd[2112]: Failed password for joao from 10.20.5.40 port 52010 ssh2",
+   "Oct 28 03:04:31 web-loja01 sshd[2113]: Failed password for deploy from 198.51.100.23 port 50112 ssh2",
+   "Oct 28 03:04:38 web-loja01 sshd[2114]: Failed password for deploy from 198.51.100.23 port 50113 ssh2",
+   "Oct 28 03:04:45 web-loja01 sshd[2115]: Invalid user postgres from 203.0.113.77 port 50514",
+   "Oct 28 03:04:45 web-loja01 sshd[2115]: Failed password for invalid user postgres from 203.0.113.77 port 50514 ssh2",
+   "Oct 28 03:04:52 web-loja01 sshd[2116]: Invalid user test from 198.51.100.23 port 50115",
+   "Oct 28 03:04:52 web-loja01 sshd[2116]: Failed password for invalid user test from 198.51.100.23 port 50115 ssh2",
+   "Oct 28 03:04:59 web-loja01 sshd[2117]: Invalid user test from 198.51.100.23 port 50116",
+   "Oct 28 03:04:59 web-loja01 sshd[2117]: Failed password for invalid user test from 198.51.100.23 port 50116 ssh2",
+   "Oct 28 03:05:06 web-loja01 sshd[2118]: Failed password for root from 203.0.113.77 port 50517 ssh2",
+   "Oct 28 03:05:13 web-loja01 sshd[2119]: Failed password for root from 203.0.113.77 port 50518 ssh2",
+   "Oct 28 03:05:20 web-loja01 sshd[2120]: Failed password for joao from 10.20.5.40 port 52010 ssh2",
+   "Oct 28 03:05:20 web-loja01 sshd[2121]: Accepted password for joao from 10.20.5.40 port 52011 ssh2",
+   "Oct 28 03:05:27 web-loja01 sshd[2121]: Failed password for deploy from 198.51.100.23 port 50120 ssh2",
+   "Oct 28 03:05:34 web-loja01 sshd[2122]: Failed password for deploy from 198.51.100.23 port 50121 ssh2",
+   "Oct 28 03:06:12 web-loja01 sshd[2190]: Accepted password for deploy from 198.51.100.23 port 50140 ssh2",
+   "Oct 28 03:06:12 web-loja01 sshd[2190]: pam_unix(sshd:session): session opened for user deploy(uid=1002) by (uid=0)",
+   "Oct 28 03:41:55 web-loja01 sshd[1987]: Disconnected from user ana 10.20.5.31 port 51522"
+  ],
+  "access.log": [
+   "10.20.5.31 - - [28/Oct/2026:09:10:02 +0000] \"GET / HTTP/1.1\" 200 5120 \"-\" \"Mozilla/5.0 (X11; Linux x86_64)\"",
+   "198.51.100.140 - - [28/Oct/2026:09:12:40 +0000] \"GET /produtos/caixa-media HTTP/1.1\" 200 8421 \"-\" \"Mozilla/5.0 (X11; Linux x86_64)\"",
+   "198.51.100.140 - - [28/Oct/2026:09:12:41 +0000] \"GET /favicon.ico HTTP/1.1\" 404 153 \"-\" \"Mozilla/5.0 (X11; Linux x86_64)\"",
+   "203.0.113.50 - - [28/Oct/2026:09:20:01 +0000] \"GET /wp-login.php HTTP/1.1\" 404 153 \"-\" \"Mozilla/5.0 (compatible; scanner)\"",
+   "203.0.113.50 - - [28/Oct/2026:09:20:01 +0000] \"GET /.env HTTP/1.1\" 404 153 \"-\" \"Mozilla/5.0 (compatible; scanner)\"",
+   "203.0.113.50 - - [28/Oct/2026:09:20:02 +0000] \"GET /phpmyadmin/ HTTP/1.1\" 404 153 \"-\" \"Mozilla/5.0 (compatible; scanner)\"",
+   "203.0.113.50 - - [28/Oct/2026:09:20:02 +0000] \"GET /.git/config HTTP/1.1\" 404 153 \"-\" \"Mozilla/5.0 (compatible; scanner)\"",
+   "198.51.100.141 - - [28/Oct/2026:09:20:03 +0000] \"GET /produtos/fita-adesiva HTTP/1.1\" 200 7710 \"-\" \"Mozilla/5.0 (X11; Linux x86_64)\"",
+   "203.0.113.50 - - [28/Oct/2026:09:20:03 +0000] \"GET /admin.php HTTP/1.1\" 404 153 \"-\" \"Mozilla/5.0 (compatible; scanner)\"",
+   "203.0.113.50 - - [28/Oct/2026:09:20:04 +0000] \"GET /server-status HTTP/1.1\" 403 162 \"-\" \"Mozilla/5.0 (compatible; scanner)\"",
+   "203.0.113.50 - - [28/Oct/2026:09:20:04 +0000] \"GET /backup.zip HTTP/1.1\" 404 153 \"-\" \"Mozilla/5.0 (compatible; scanner)\"",
+   "203.0.113.50 - - [28/Oct/2026:09:20:05 +0000] \"GET /wp-admin/ HTTP/1.1\" 404 153 \"-\" \"Mozilla/5.0 (compatible; scanner)\"",
+   "198.51.100.141 - - [28/Oct/2026:09:21:10 +0000] \"POST /carrinho/adicionar HTTP/1.1\" 200 512 \"-\" \"Mozilla/5.0 (X11; Linux x86_64)\"",
+   "203.0.113.9 - - [28/Oct/2026:10:02:17 +0000] \"POST /uploads/thumb.php HTTP/1.1\" 200 38 \"-\" \"python-requests/2.31.0\"",
+   "203.0.113.9 - - [28/Oct/2026:10:02:48 +0000] \"POST /uploads/thumb.php HTTP/1.1\" 200 1204 \"-\" \"python-requests/2.31.0\"",
+   "203.0.113.9 - - [28/Oct/2026:10:05:03 +0000] \"POST /uploads/thumb.php HTTP/1.1\" 200 96 \"-\" \"python-requests/2.31.0\"",
+   "10.20.5.31 - - [28/Oct/2026:10:30:00 +0000] \"GET /painel/pedidos HTTP/1.1\" 200 9930 \"-\" \"Mozilla/5.0 (X11; Linux x86_64)\""
+  ]
+ },
+ "regex_referencia": "Failed password for (?:invalid user )?(?P<usuario>\\S+) from (?P<ip>\\d{1,3}(?:\\.\\d{1,3}){3}) port (?P<porta>\\d+)",
+ "ips_falhas": [
+  "198.51.100.23",
+  "198.51.100.23",
+  "198.51.100.23",
+  "203.0.113.77",
+  "198.51.100.23",
+  "198.51.100.23",
+  "198.51.100.23",
+  "203.0.113.77",
+  "203.0.113.77",
+  "198.51.100.23",
+  "198.51.100.23",
+  "10.20.5.40",
+  "198.51.100.23",
+  "198.51.100.23",
+  "203.0.113.77",
+  "198.51.100.23",
+  "198.51.100.23",
+  "203.0.113.77",
+  "203.0.113.77",
+  "10.20.5.40",
+  "198.51.100.23",
+  "198.51.100.23"
+ ],
+ "forca_bruta_esperado": [
+  "198.51.100.23",
+  "203.0.113.77"
+ ],
+ "reputacao_lab": {
+  "198.51.100.23": 100,
+  "203.0.113.77": 87,
+  "203.0.113.50": 64,
+  "203.0.113.9": 92
+ },
+ "regex_inicial": "Failed password for \\S+ from (?P<ip>\\S+)",
+ "regex_exemplos": [
+  {
+   "rotulo": "Ingênua (perde o invalid user)",
+   "log": "auth.log",
+   "padrao": "Failed password for \\S+ from (?P<ip>\\S+)"
+  },
+  {
+   "rotulo": "Falhas com grupo opcional",
+   "log": "auth.log",
+   "padrao": "Failed password for (?:invalid user )?(?P<usuario>\\S+) from (?P<ip>\\d{1,3}(?:\\.\\d{1,3}){3}) port (?P<porta>\\d+)"
+  },
+  {
+   "rotulo": "nginx: IP e status",
+   "log": "access.log",
+   "padrao": "^(?P<ip>\\S+) .*\" (?P<status>\\d{3}) "
+  },
+  {
+   "rotulo": "Sintaxe de JavaScript (erro)",
+   "log": "auth.log",
+   "padrao": "(?<ip>\\d{1,3}(?:\\.\\d{1,3}){3})"
+  },
+  {
+   "rotulo": "Referência (?P=nome)",
+   "log": "auth.log",
+   "padrao": "port (?P<d>\\d)\\d*(?P=d) "
+  }
+ ],
+ "filtros": {
+  "auth.log": [
+   "Failed password",
+   "Accepted",
+   "Invalid user",
+   ""
+  ],
+  "access.log": [
+   "\" 404 ",
+   "\"POST ",
+   "thumb.php",
+   ""
+  ]
+ },
+ "regex_prontas": [
+  {
+   "id": "falhas",
+   "fonte": "auth.log",
+   "nome": "Falhas de senha (usuário, IP e porta)",
+   "padrao": "Failed password for (?:invalid user )?(?P<usuario>\\S+) from (?P<ip>\\d{1,3}(?:\\.\\d{1,3}){3}) port (?P<porta>\\d+)"
+  },
+  {
+   "id": "aceitos",
+   "fonte": "auth.log",
+   "nome": "Logins aceitos (método, usuário e IP)",
+   "padrao": "Accepted (?P<metodo>\\w+) for (?P<usuario>\\S+) from (?P<ip>\\d{1,3}(?:\\.\\d{1,3}){3})"
+  },
+  {
+   "id": "ip_ssh",
+   "fonte": "auth.log",
+   "nome": "Qualquer IPv4 da linha",
+   "padrao": "(?P<ip>\\b\\d{1,3}(?:\\.\\d{1,3}){3}\\b)"
+  },
+  {
+   "id": "web",
+   "fonte": "access.log",
+   "nome": "Linha do nginx (IP, data, método, caminho, status, bytes)",
+   "padrao": "^(?P<ip>\\S+) \\S+ \\S+ \\[(?P<data>[^\\]]+)\\] \"(?P<metodo>[A-Z]+) (?P<caminho>\\S+) [^\"]*\" (?P<status>\\d{3}) (?P<bytes>\\d+|-)"
+  },
+  {
+   "id": "post",
+   "fonte": "access.log",
+   "nome": "Envios POST (caminho)",
+   "padrao": "\"POST (?P<caminho>\\S+)"
+  }
+ ],
+ "exemplos": [
+  {
+   "id": "forca_bruta",
+   "nome": "Força bruta: falhas por IP, limiar 5",
+   "cfg": {
+    "fonte": "auth.log",
+    "filtro": "Failed password",
+    "padrao": "Failed password for (?:invalid user )?(?P<usuario>\\S+) from (?P<ip>\\d{1,3}(?:\\.\\d{1,3}){3}) port (?P<porta>\\d+)",
+    "campo": "ip",
+    "limiar": 5,
+    "saida": "alerta",
+    "reputacao": false
+   },
+   "saida": "ALERTA 198.51.100.23: 14 ocorrência(s)\nALERTA 203.0.113.77: 6 ocorrência(s)\n"
+  },
+  {
+   "id": "usuarios",
+   "nome": "Usuários mais tentados em CSV",
+   "cfg": {
+    "fonte": "auth.log",
+    "filtro": "Failed password",
+    "padrao": "Failed password for (?:invalid user )?(?P<usuario>\\S+) from (?P<ip>\\d{1,3}(?:\\.\\d{1,3}){3}) port (?P<porta>\\d+)",
+    "campo": "usuario",
+    "limiar": 2,
+    "saida": "csv",
+    "reputacao": false
+   },
+   "saida": "usuario,total\nroot,7\ndeploy,4\nadmin,3\noracle,2\npostgres,2\njoao,2\ntest,2\n"
+  },
+  {
+   "id": "invasao",
+   "nome": "Quem entrou: logins aceitos por IP em JSON",
+   "cfg": {
+    "fonte": "auth.log",
+    "filtro": "Accepted",
+    "padrao": "Accepted (?P<metodo>\\w+) for (?P<usuario>\\S+) from (?P<ip>\\d{1,3}(?:\\.\\d{1,3}){3})",
+    "campo": "ip",
+    "limiar": 1,
+    "saida": "json",
+    "reputacao": false
+   },
+   "saida": "[\n  {\n    \"ip\": \"10.20.5.31\",\n    \"total\": 1\n  },\n  {\n    \"ip\": \"10.20.5.40\",\n    \"total\": 1\n  },\n  {\n    \"ip\": \"198.51.100.23\",\n    \"total\": 1\n  }\n]\n"
+  },
+  {
+   "id": "varredura",
+   "nome": "Varredura: respostas 404 por IP",
+   "cfg": {
+    "fonte": "access.log",
+    "filtro": "\" 404 ",
+    "padrao": "^(?P<ip>\\S+) \\S+ \\S+ \\[(?P<data>[^\\]]+)\\] \"(?P<metodo>[A-Z]+) (?P<caminho>\\S+) [^\"]*\" (?P<status>\\d{3}) (?P<bytes>\\d+|-)",
+    "campo": "ip",
+    "limiar": 3,
+    "saida": "alerta",
+    "reputacao": false
+   },
+   "saida": "ALERTA 203.0.113.50: 7 ocorrência(s)\n"
+  },
+  {
+   "id": "reputacao",
+   "nome": "Força bruta com reputação em CSV",
+   "cfg": {
+    "fonte": "auth.log",
+    "filtro": "Failed password",
+    "padrao": "Failed password for (?:invalid user )?(?P<usuario>\\S+) from (?P<ip>\\d{1,3}(?:\\.\\d{1,3}){3}) port (?P<porta>\\d+)",
+    "campo": "ip",
+    "limiar": 5,
+    "saida": "csv",
+    "reputacao": true
+   },
+   "saida": "ip,total,reputacao\n198.51.100.23,14,100\n203.0.113.77,6,87\n"
+  },
+  {
+   "id": "nada",
+   "nome": "Limiar alto demais",
+   "cfg": {
+    "fonte": "auth.log",
+    "filtro": "Failed password",
+    "padrao": "Failed password for (?:invalid user )?(?P<usuario>\\S+) from (?P<ip>\\d{1,3}(?:\\.\\d{1,3}){3}) port (?P<porta>\\d+)",
+    "campo": "ip",
+    "limiar": 50,
+    "saida": "alerta",
+    "reputacao": false
+   },
+   "saida": "Nenhum valor atingiu o limiar.\n"
+  },
+  {
+   "id": "linha",
+   "nome": "Linha inteira da correspondência em CSV",
+   "cfg": {
+    "fonte": "access.log",
+    "filtro": "thumb.php",
+    "padrao": "\"POST (?P<caminho>\\S+)",
+    "campo": "",
+    "limiar": 2,
+    "saida": "csv",
+    "reputacao": false
+   },
+   "saida": "linha,total\n\"\"\"POST /uploads/thumb.php\",3\n"
+  },
+  {
+   "id": "rep_json",
+   "nome": "Webshell: POST por IP com reputação em JSON",
+   "cfg": {
+    "fonte": "access.log",
+    "filtro": "\"POST ",
+    "padrao": "^(?P<ip>\\S+) \\S+ \\S+ \\[(?P<data>[^\\]]+)\\] \"(?P<metodo>[A-Z]+) (?P<caminho>\\S+) [^\"]*\" (?P<status>\\d{3}) (?P<bytes>\\d+|-)",
+    "campo": "ip",
+    "limiar": 2,
+    "saida": "json",
+    "reputacao": true
+   },
+   "saida": "[\n  {\n    \"ip\": \"203.0.113.9\",\n    \"total\": 3,\n    \"reputacao\": 92\n  }\n]\n"
+  }
+ ],
+ "missoes": [
+  {
+   "id": "regex_ip",
+   "texto": "No testador, corrija a regex para capturar o grupo ip de todas as falhas, com e sem \"invalid user\"."
+  },
+  {
+   "id": "forca_bruta",
+   "texto": "Monte o detector de força bruta: falhas de senha por IP, limiar 5 (devem sobrar 2 IPs)."
+  },
+  {
+   "id": "usuarios",
+   "texto": "Descubra quais usuários foram mais tentados."
+  },
+  {
+   "id": "invasao",
+   "texto": "Descubra se o IP da força bruta conseguiu entrar."
+  },
+  {
+   "id": "varredura",
+   "texto": "No access.log, encontre o IP que varreu o site, sem pegar o cliente que só pediu o favicon."
+  },
+  {
+   "id": "reputacao",
+   "texto": "Enriqueça os IPs suspeitos com reputação."
+  },
+  {
+   "id": "json",
+   "texto": "Exporte os suspeitos em JSON para o SIEM."
+  }
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var PY = JSON.parse(document.getElementById("py-dados").textContent);
+    var feitas = {};
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+
+    // ===================================================== regex: sintaxe do Python -> motor do navegador
+    var ESCAPES_OK = "bBdDfnrsStvwWx";
+    window.traduzirRegexPython = function(p) {
+        var flags = "", ini = 0;
+        var inline = p.match(/^\(\?([a-zA-Z]+)\)/);
+        if (inline) {
+            for (var f = 0; f < inline[1].length; f++) {
+                var c = inline[1][f];
+                if ("ims".indexOf(c) === -1) return { erro: "A flag (?" + c + ") não é suportada no testador." };
+                if (flags.indexOf(c) === -1) flags += c;
+            }
+            ini = inline[0].length;
+        }
+        var out = "", i = ini;
+        while (i < p.length) {
+            var ch = p[i];
+            if (ch === "\\") {
+                var nx = p[i + 1];
+                if (nx === undefined) return { erro: "O padrão termina com uma barra invertida solta." };
+                if (/[A-Za-z]/.test(nx)) {
+                    if (nx === "A") { out += "^"; i += 2; continue; }
+                    if (nx === "Z") { out += "$"; i += 2; continue; }
+                    if (nx === "a") { out += "\\x07"; i += 2; continue; }
+                    if (nx === "u") {
+                        if (!/^[0-9a-fA-F]{4}$/.test(p.substr(i + 2, 4))) return { erro: "\\u precisa de 4 dígitos hexadecimais." };
+                        out += p.substr(i, 6); i += 6; continue;
+                    }
+                    if (ESCAPES_OK.indexOf(nx) === -1) return { erro: "Escape \\" + nx + " não existe em Python (ou não é suportado no testador)." };
+                }
+                out += ch + nx; i += 2; continue;
+            }
+            if (p.substr(i, 4) === "(?P<") { out += "(?<"; i += 4; continue; }
+            if (p.substr(i, 4) === "(?P=") {
+                var fim = p.indexOf(")", i);
+                if (fim === -1) return { erro: "Referência (?P=nome) sem fechar." };
+                out += "\\k<" + p.slice(i + 4, fim) + ">"; i = fim + 1; continue;
+            }
+            if (p.substr(i, 3) === "(?<" && p[i + 3] !== "=" && p[i + 3] !== "!") return { erro: "Em Python, grupo nomeado se escreve (?P<nome>...); (?<nome>...) é sintaxe do JavaScript." };
+            out += ch; i++;
+        }
+        try { return { re: new RegExp(out, flags), fonte: out, flags: flags }; }
+        catch (e) { return { erro: "Padrão inválido: " + e.message }; }
+    };
+    function grupos(p) {
+        var g = [], re = /\(\?P<([A-Za-z_]\w*)>/g, m;
+        while ((m = re.exec(p))) g.push(m[1]);
+        return g;
+    }
+
+    // Todas as correspondências de cada linha, como re.finditer.
+    window.finditerPython = function(p, linhas) {
+        var t = window.traduzirRegexPython(p);
+        if (t.erro) return { erro: t.erro };
+        var g = new RegExp(t.re.source, t.flags + "g");
+        return { linhas: linhas.map(function(l) {
+            var ms = [], m;
+            g.lastIndex = 0;
+            while ((m = g.exec(l))) {
+                ms.push({ ini: m.index, fim: m.index + m[0].length, texto: m[0], grupos: m.groups ? Object.keys(m.groups).map(function(k) { return [k, m.groups[k] === undefined ? null : m.groups[k]]; }) : [] });
+                if (m[0] === "") g.lastIndex++;
+            }
+            return ms;
+        }) };
+    };
+
+    // ===================================================== gerador de código (espelhado nos testes)
+    function literalRegex(p) {
+        var barras = p.length - p.replace(/\\+$/, "").length;
+        if (p.indexOf("\n") === -1 && barras % 2 === 0) {
+            if (p.indexOf('"') === -1) return 'r"' + p + '"';
+            if (p.indexOf("'") === -1) return "r'" + p + "'";
+        }
+        return JSON.stringify(p);
+    }
+    function literalTexto(s) {
+        if (s.indexOf('"') !== -1 && s.indexOf("'") === -1 && s.indexOf("\\") === -1 && s.indexOf("\n") === -1) return "'" + s + "'";
+        return JSON.stringify(s);
+    }
+    window.gerarCodigoPython = function(cfg) {
+        var rep = !!cfg.reputacao && cfg.campo === "ip";
+        var coluna = cfg.campo || "linha";
+        var L = ["# Detector gerado pelo Montador do Estudo 35", "import re"];
+        if (cfg.saida === "csv") L.push("import csv");
+        if (cfg.saida === "json") L.push("import json");
+        if (rep) L.push("import os");
+        if (cfg.saida === "csv") L.push("import sys");
+        L.push("from collections import Counter", "",
+            "PADRAO = re.compile(" + literalRegex(cfg.padrao) + ")",
+            "LIMIAR = " + cfg.limiar);
+        if (rep) {
+            var lab = "{" + Object.keys(PY.reputacao_lab).map(function(k) { return JSON.stringify(k) + ": " + PY.reputacao_lab[k]; }).join(", ") + "}";
+            L.push('CHAVE = os.environ.get("ABUSEIPDB_KEY")  # nunca escreva a chave no código',
+                "REPUTACAO_LAB = " + lab,
+                "",
+                "",
+                "def reputacao(ip):",
+                '    """Pontuação de abuso de 0 a 100. Sem chave, usa os dados do laboratório."""',
+                "    if not CHAVE:",
+                "        return REPUTACAO_LAB.get(ip, 0)",
+                "    import requests",
+                "    resposta = requests.get(",
+                '        "https://api.abuseipdb.com/api/v2/check",',
+                '        headers={"Key": CHAVE, "Accept": "application/json"},',
+                '        params={"ipAddress": ip, "maxAgeInDays": 90},',
+                "        timeout=10,",
+                "    )",
+                "    if resposta.status_code == 429:",
+                '        espera = resposta.headers.get("Retry-After", "60")',
+                '        raise SystemExit(f"Limite da API atingido; tente de novo em {espera} s.")',
+                "    resposta.raise_for_status()",
+                '    return resposta.json()["data"]["abuseConfidenceScore"]',
+                "");
+        }
+        L.push("",
+            "contagem = Counter()",
+            'with open("' + cfg.fonte + '", encoding="utf-8") as arquivo:',
+            "    for linha in arquivo:",
+            '        linha = linha.rstrip("\\n")');
+        if (cfg.filtro) L.push("        if " + literalTexto(cfg.filtro) + " not in linha:", "            continue");
+        L.push("        m = PADRAO.search(linha)",
+            "        if m is None:",
+            "            continue",
+            "        valor = " + (cfg.campo ? 'm.group("' + cfg.campo + '")' : "m.group(0)"),
+            "        if valor is not None:",
+            "            contagem[valor] += 1",
+            "",
+            "suspeitos = [(valor, total) for valor, total in contagem.most_common() if total >= LIMIAR]",
+            "");
+        if (cfg.saida === "alerta") {
+            L.push("if not suspeitos:", '    print("Nenhum valor atingiu o limiar.")', "for valor, total in suspeitos:");
+            L.push(rep ? '    print(f"ALERTA {valor}: {total} ocorrência(s), reputação {reputacao(valor)}/100")' : '    print(f"ALERTA {valor}: {total} ocorrência(s)")');
+        } else if (cfg.saida === "csv") {
+            var cab = '["' + coluna + '", "total"' + (rep ? ', "reputacao"' : "") + "]";
+            L.push('saida = csv.writer(sys.stdout, lineterminator="\\n")',
+                "saida.writerow(" + cab + ")",
+                "for valor, total in suspeitos:",
+                "    saida.writerow([valor, total" + (rep ? ", reputacao(valor)" : "") + "])");
+        } else {
+            var item = '{"' + coluna + '": valor, "total": total' + (rep ? ', "reputacao": reputacao(valor)' : "") + "}";
+            L.push("print(json.dumps(",
+                "    [" + item + " for valor, total in suspeitos],",
+                "    ensure_ascii=False, indent=2,",
+                "))");
+        }
+        return L.join("\n") + "\n";
+    };
+
+    // ===================================================== execução da mesma lógica (saída igual à do script)
+    function campoCsv(v) {
+        var s = String(v);
+        return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    }
+    window.executarDetectorPython = function(cfg) {
+        var t = window.traduzirRegexPython(cfg.padrao);
+        if (t.erro) return { erro: t.erro };
+        var cont = new Map();
+        PY.logs[cfg.fonte].forEach(function(l) {
+            if (cfg.filtro && l.indexOf(cfg.filtro) === -1) return;
+            var m = t.re.exec(l);
+            if (!m) return;
+            var v = cfg.campo ? (m.groups ? m.groups[cfg.campo] : undefined) : m[0];
+            if (v === undefined) return;
+            cont.set(v, (cont.get(v) || 0) + 1);
+        });
+        var lista = Array.from(cont.entries()).map(function(e, i) { return { valor: e[0], total: e[1], i: i }; });
+        lista.sort(function(a, b) { return b.total - a.total || a.i - b.i; });
+        var susp = lista.filter(function(x) { return x.total >= cfg.limiar; });
+        var rep = !!cfg.reputacao && cfg.campo === "ip";
+        var nota = function(v) { return Object.prototype.hasOwnProperty.call(PY.reputacao_lab, v) ? PY.reputacao_lab[v] : 0; };
+        var coluna = cfg.campo || "linha", out;
+        if (cfg.saida === "alerta") {
+            out = (susp.length ? "" : "Nenhum valor atingiu o limiar.\n") + susp.map(function(x) {
+                return "ALERTA " + x.valor + ": " + x.total + " ocorrência(s)" + (rep ? ", reputação " + nota(x.valor) + "/100" : "") + "\n";
+            }).join("");
+        } else if (cfg.saida === "csv") {
+            out = [coluna, "total"].concat(rep ? ["reputacao"] : []).join(",") + "\n" + susp.map(function(x) {
+                return [campoCsv(x.valor), x.total].concat(rep ? [nota(x.valor)] : []).join(",") + "\n";
+            }).join("");
+        } else {
+            out = JSON.stringify(susp.map(function(x) { var o = {}; o[coluna] = x.valor; o.total = x.total; if (rep) o.reputacao = nota(x.valor); return o; }), null, 2) + "\n";
+        }
+        return { saida: out, valores: susp.map(function(x) { return x.valor; }) };
+    };
+
+    // ===================================================== missões
+    function concluir(id) { if (!feitas[id]) { feitas[id] = true; renderizarMissoes(); } }
+    function renderizarMissoes() {
+        var ul = document.getElementById("py-missoes");
+        ul.replaceChildren();
+        PY.missoes.forEach(function(m) {
+            var li = el("li", (feitas[m.id] ? "✓ " : "○ ") + m.texto, "color: " + (feitas[m.id] ? "var(--tip-color)" : "var(--ink)") + ";");
+            li.setAttribute("data-missao", m.id);
+            li.setAttribute("data-feita", feitas[m.id] ? "sim" : "nao");
+            ul.appendChild(li);
+        });
+    }
+
+    // ===================================================== testador
+    window.testarRegexPython = function() {
+        var p = document.getElementById("py-regex").value;
+        var log = document.getElementById("py-testador-log").value;
+        var linhas = PY.logs[log];
+        var st = document.getElementById("py-regex-status"), box = document.getElementById("py-correspondencias");
+        st.replaceChildren(); box.replaceChildren();
+        var r = window.finditerPython(p, linhas);
+        if (r.erro) {
+            st.setAttribute("data-erro", "sim");
+            st.appendChild(el("strong", r.erro, "color: var(--danger-color);"));
+            atualizarPadroes();
+            return;
+        }
+        st.setAttribute("data-erro", "nao");
+        var com = r.linhas.filter(function(ms) { return ms.length; }).length;
+        st.setAttribute("data-linhas", String(com));
+        st.appendChild(el("span", com + " de " + linhas.length + " linhas com correspondência. Grupos nomeados: " + (grupos(p).join(", ") || "nenhum") + ".", "font-weight: 600;"));
+        r.linhas.forEach(function(ms, i) {
+            if (!ms.length) return;
+            var l = linhas[i], d = el("div", null, "overflow-wrap: anywhere;"), pos = 0;
+            ms.forEach(function(m) {
+                if (m.ini > pos) d.appendChild(document.createTextNode(l.slice(pos, m.ini)));
+                var mk = el("mark", m.texto || "∅", "background: rgba(234, 179, 8, 0.35); color: inherit; border-radius: 2px;");
+                d.appendChild(mk);
+                pos = Math.max(pos, m.fim);
+            });
+            if (pos < l.length) d.appendChild(document.createTextNode(l.slice(pos)));
+            var g = ms[0].grupos.filter(function(x) { return x[1] !== null; });
+            if (g.length) d.appendChild(el("div", "→ " + g.map(function(x) { return x[0] + "=" + x[1]; }).join("  "), "color: var(--muted);"));
+            box.appendChild(d);
+        });
+        // missão: capturar o IP de todas as falhas, com e sem "invalid user"
+        if (log === "auth.log" && grupos(p).indexOf("ip") !== -1) {
+            var ips = [];
+            linhas.forEach(function(l, i) {
+                if (l.indexOf("Failed password") === -1) return;
+                var m = r.linhas[i][0];
+                ips.push(m ? (m.grupos.filter(function(x) { return x[0] === "ip"; })[0] || [0, null])[1] : null);
+            });
+            if (JSON.stringify(ips) === JSON.stringify(PY.ips_falhas)) concluir("regex_ip");
+        }
+        atualizarPadroes();
+    };
+
+    // ===================================================== montador
+    function padroesDisponiveis() {
+        var fonte = document.getElementById("py-fonte").value;
+        var lista = PY.regex_prontas.filter(function(r) { return r.fonte === fonte; }).map(function(r) { return { id: r.id, nome: r.nome, padrao: r.padrao }; });
+        var t = document.getElementById("py-regex").value;
+        if (t && !window.traduzirRegexPython(t).erro) lista.push({ id: "testador", nome: "A regex do testador", padrao: t });
+        return lista;
+    }
+    function atualizarPadroes(novaFonte) {
+        var sel = document.getElementById("py-padrao"), atual = sel.value;
+        sel.replaceChildren();
+        padroesDisponiveis().forEach(function(r) { var o = el("option", r.nome); o.value = r.id; sel.appendChild(o); });
+        var manteve = Array.prototype.some.call(sel.options, function(o) { return o.value === atual; });
+        if (manteve) sel.value = atual;
+        atualizarCampos(!manteve || (atual === "testador" && novaFonte === true));
+    }
+    // novaRegex: a regex escolhida mudou, então o campo volta ao padrão (ip, se existir; senão o primeiro grupo).
+    function atualizarCampos(novaRegex) {
+        var r = padroesDisponiveis().filter(function(x) { return x.id === document.getElementById("py-padrao").value; })[0];
+        var sel = document.getElementById("py-campo"), atual = sel.value, gs = r ? grupos(r.padrao) : [];
+        sel.replaceChildren();
+        gs.forEach(function(g) { var o = el("option", g); o.value = g; sel.appendChild(o); });
+        var o = el("option", "(correspondência inteira)"); o.value = ""; sel.appendChild(o);
+        var existe = Array.prototype.some.call(sel.options, function(x) { return x.value === atual; });
+        if (existe && novaRegex !== true) sel.value = atual;
+        else sel.value = gs.indexOf("ip") !== -1 ? "ip" : (gs[0] || "");
+        montarDetectorPython();
+    }
+    function configAtual() {
+        var r = padroesDisponiveis().filter(function(x) { return x.id === document.getElementById("py-padrao").value; })[0];
+        var lim = Math.round(Number(document.getElementById("py-limiar").value));
+        return {
+            fonte: document.getElementById("py-fonte").value,
+            filtro: document.getElementById("py-filtro").value,
+            padrao: r ? r.padrao : "",
+            campo: document.getElementById("py-campo").value,
+            limiar: isFinite(lim) && lim >= 1 ? lim : 1,
+            saida: document.getElementById("py-formato").value,
+            reputacao: document.getElementById("py-reputacao").checked
+        };
+    }
+    window.montarDetectorPython = function() {
+        var cfg = configAtual();
+        var nota = document.getElementById("py-reputacao-nota");
+        nota.textContent = cfg.campo === "ip" ? "Sem ABUSEIPDB_KEY, o script usa os dados do laboratório e não acessa a rede." : "Disponível ao contar por ip.";
+        document.getElementById("py-reputacao").disabled = cfg.campo !== "ip";
+        var codigo = document.getElementById("py-codigo"), saida = document.getElementById("py-saida");
+        if (!cfg.padrao) { codigo.textContent = ""; saida.textContent = "Escolha uma regex."; return; }
+        codigo.textContent = window.gerarCodigoPython(cfg);
+        var r = window.executarDetectorPython(cfg);
+        saida.textContent = r.erro ? "Erro: " + r.erro : r.saida;
+        saida.setAttribute("data-valores", r.erro ? "" : r.valores.join(","));
+        if (r.erro) return;
+        var tem = function(v) { return r.valores.indexOf(v) !== -1; };
+        var falhas = cfg.fonte === "auth.log" && cfg.filtro.indexOf("Failed") !== -1;
+        if (falhas && cfg.campo === "ip" && JSON.stringify(r.valores) === JSON.stringify(PY.forca_bruta_esperado)) concluir("forca_bruta");
+        if (falhas && cfg.campo === "usuario" && tem("root")) concluir("usuarios");
+        if (cfg.fonte === "auth.log" && cfg.filtro.indexOf("Accepted") !== -1 && cfg.campo === "ip" && tem("198.51.100.23")) concluir("invasao");
+        if (cfg.fonte === "access.log" && cfg.filtro.indexOf("404") !== -1 && cfg.campo === "ip" && tem("203.0.113.50") && !tem("198.51.100.140")) concluir("varredura");
+        if (cfg.reputacao && cfg.campo === "ip" && r.valores.length) concluir("reputacao");
+        if (cfg.saida === "json" && r.valores.length) concluir("json");
+    };
+    function trocarFonte() {
+        var fonte = document.getElementById("py-fonte").value;
+        var dl = document.getElementById("py-filtros");
+        dl.replaceChildren();
+        PY.filtros[fonte].forEach(function(f) { var o = el("option"); o.value = f; dl.appendChild(o); });
+        document.getElementById("py-filtro").value = PY.filtros[fonte][0];
+        document.getElementById("py-padrao").value = "";
+        atualizarPadroes(true);
+    }
+
+    // ===================================================== geral
+    window.restaurarPython = function() {
+        feitas = {};
+        renderizarMissoes();
+        document.getElementById("py-testador-log").value = "auth.log";
+        document.getElementById("py-regex").value = PY.regex_inicial;
+        document.getElementById("py-fonte").value = "auth.log";
+        document.getElementById("py-limiar").value = "1";
+        document.getElementById("py-formato").value = "alerta";
+        document.getElementById("py-reputacao").checked = false;
+        trocarFonte();
+        testarRegexPython();
+        feitas = {};
+        renderizarMissoes();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("py-contexto").textContent = PY.contexto;
+        ["py-testador-log", "py-fonte"].forEach(function(id) {
+            var s = document.getElementById(id);
+            Object.keys(PY.logs).forEach(function(k) { var o = el("option", k + " (" + PY.logs[k].length + " linhas)"); o.value = k; s.appendChild(o); });
+        });
+        var ex = document.getElementById("py-regex-exemplos");
+        PY.regex_exemplos.forEach(function(x) {
+            var b = el("button", x.rotulo, "font-size: 0.72rem; padding: 0.2rem 0.5rem; text-align: left;");
+            b.type = "button"; b.className = "btn-secondary"; b.title = x.padrao;
+            b.addEventListener("click", function() {
+                document.getElementById("py-testador-log").value = x.log;
+                document.getElementById("py-regex").value = x.padrao;
+                testarRegexPython();
+            });
+            ex.appendChild(b);
+        });
+        document.getElementById("py-regex").addEventListener("input", testarRegexPython);
+        document.getElementById("py-testador-log").addEventListener("change", testarRegexPython);
+        document.getElementById("py-fonte").addEventListener("change", trocarFonte);
+        document.getElementById("py-padrao").addEventListener("change", function() { atualizarCampos(true); });
+        ["py-filtro", "py-limiar"].forEach(function(id) { document.getElementById(id).addEventListener("input", montarDetectorPython); });
+        ["py-campo", "py-formato", "py-reputacao"].forEach(function(id) { document.getElementById(id).addEventListener("change", montarDetectorPython); });
+        restaurarPython();
+        if (typeof initChecklist === "function") {
+            initChecklist("python-seguranca");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
