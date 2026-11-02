@@ -28,7 +28,6 @@ html {
   font-size: 16px;
   scroll-behavior: smooth;
   scroll-padding-top: 72px;
-  color-scheme: light dark;
 }
 
 body {
@@ -110,10 +109,6 @@ pre code {
   color: inherit;
   font-size: inherit;
 }
-
-/* Contraste AA (4,5:1) em rótulos pequenos coloridos: a cor do tipo, da trilha
-   ou do callout é misturada com 25% de --ink. No claro isso escurece a cor; no
-   escuro, clareia. Coberto por test_componentes_css.TestContrasteAA. */
 
 /* Foco visível em todo controle (teclado). */
 a:focus-visible,

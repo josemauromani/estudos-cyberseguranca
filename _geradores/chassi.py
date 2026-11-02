@@ -9,12 +9,10 @@ from dataclasses import dataclass, field
 from html import escape
 from typing import List, Optional, Tuple
 
-from contrato import ROTULOS, TIPOS, Secao, posicoes_corpo
+from contrato import ROTULOS, TIPOS, Secao, fim_ultima_secao, posicoes_corpo
 from index_dados import ESTUDOS_DADOS, NIVEIS, TRILHAS
 
 Vizinho = Tuple[str, str, str]  # (slug, titulo, caminho_rel)
-
-TIPOS_COM_CONTADOR = ("laboratorio", "checklist", "questoes")
 
 
 @dataclass
@@ -231,8 +229,8 @@ def numerar_questoes(body: str) -> str:
 
 
 def inserir_fim(body: str, fim: str) -> str:
-    """Insere o bloco de fim ao final da última seção (antes do último </section>)."""
-    i = body.rfind("</section>")
-    if i < 0:
+    """Insere o bloco de fim ao final da última seção de primeiro nível (antes do seu </section>)."""
+    i = fim_ultima_secao(body)
+    if i is None:
         return body + fim
     return body[:i] + fim + "\n" + body[i:]

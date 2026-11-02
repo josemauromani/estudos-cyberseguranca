@@ -194,7 +194,7 @@ O portal (`index.html`) traz a visão **Rota por Vaga**, que liga cada requisito
 | Controles de segurança da informação | 26 | 06, 08, 38, 40 |
 | Formação e certificações | 33 | 37 |
 
-O portal também exibe a visão **Por certificação**, (CEH, CISM, CISSP, CCSP, GSEC e Security+), com os módulos que cobrem cada uma.
+O portal também exibe a visão **Por certificação** (CEH, CISM, CISSP, CCSP, GSEC e Security+), com os módulos que cobrem cada uma.
 
 ---
 

@@ -2,7 +2,9 @@
 
 import html as html_lib
 import json
+import os
 import re
+import signal
 import shutil
 import subprocess
 import tempfile
@@ -24,10 +26,15 @@ window.addEventListener('unhandledrejection', function (e) { window.__erros.push
 })();
 window.__fim = function (valor) {
   if (document.getElementById('__saida')) return;
+  var saida = valor === undefined ? null : valor;
   var pre = document.createElement('pre');
   pre.id = '__saida';
-  pre.textContent = JSON.stringify({ saida: valor === undefined ? null : valor, erros: window.__erros });
+  pre.textContent = JSON.stringify({ saida: saida, erros: window.__erros });
   document.documentElement.appendChild(pre);
+  // Erros assíncronos tardios: reescreve a saída com os erros acumulados depois do __fim.
+  setTimeout(function () {
+    pre.textContent = JSON.stringify({ saida: saida, erros: window.__erros });
+  }, 300);
 };
 </script>"""
 
@@ -79,11 +86,25 @@ def executar(
                 "--dump-dom",
                 arquivo.as_uri(),
             ]
-            proc = subprocess.run(comando, capture_output=True, text=True, timeout=90)
+            # Sessão própria: no timeout, mata o grupo inteiro (o Chrome gera vários processos).
+            proc = subprocess.Popen(
+                comando, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True
+            )
+            try:
+                saida_chrome, erro_chrome = proc.communicate(timeout=90)
+            except subprocess.TimeoutExpired:
+                os.killpg(proc.pid, signal.SIGKILL)
+                proc.communicate()
+                raise
+            finally:
+                try:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                except (ProcessLookupError, PermissionError):
+                    pass
 
-    achado = _SAIDA.search(proc.stdout)
+    achado = _SAIDA.search(saida_chrome)
     if not achado:
         raise RuntimeError(
-            "O script de teste não chamou __fim(); saída do Chrome:\n" + proc.stdout[-800:] + proc.stderr[-400:]
+            "O script de teste não chamou __fim(); saída do Chrome:\n" + saida_chrome[-800:] + erro_chrome[-400:]
         )
     return json.loads(html_lib.unescape(achado.group(1)))

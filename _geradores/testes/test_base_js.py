@@ -130,13 +130,18 @@ class TestBaseJs(unittest.TestCase):
         r = executar(pagina_fixture(), "__fim(1)")
         self.assertEqual(r["erros"], [])
 
+    SCRIPT_PASSO = """
+          const ir = (id) => { document.getElementById(id).scrollIntoView(); window.dispatchEvent(new Event('scroll')); };
+          const lidas = () => JSON.parse(localStorage.getItem('cs_read_Teste'));
+    """
+
     def test_secao_atual_e_leitura(self):
-        r = executar(pagina_fixture(), """
-          document.getElementById('s3').scrollIntoView(); window.dispatchEvent(new Event('scroll'));
+        r = executar(pagina_fixture(), self.SCRIPT_PASSO + """
+          ['s1', 's2', 's3'].forEach(ir);
           setTimeout(() => __fim({on: document.querySelector('.toc-item.on').getAttribute('href'),
             atual: document.querySelector('.toc-item.on').getAttribute('aria-current'),
             tipo: document.querySelector('.tipo-atual').textContent,
-            lidas: JSON.parse(localStorage.getItem('cs_read_Teste')),
+            lidas: lidas(),
             pct: document.querySelector('.toc-progresso').textContent,
             lida: document.querySelector('a[href="#s1"]').classList.contains('lida'),
             barra: document.querySelector('.toc-progresso').style.getPropertyValue('--progresso')}), 300);""")
@@ -148,13 +153,39 @@ class TestBaseJs(unittest.TestCase):
         self.assertEqual(r["saida"]["pct"], "40%")
         self.assertEqual(r["saida"]["barra"], "40%")
 
-    def test_fim_da_pagina_marca_tudo_como_lido(self):
-        r = executar(pagina_fixture(), """
+    def test_rolagem_sequencial_ate_o_fim_marca_tudo(self):
+        r = executar(pagina_fixture(), self.SCRIPT_PASSO + """
+          ['s1', 's2', 's3', 's4', 's5'].forEach(ir);
           window.scrollTo(0, document.documentElement.scrollHeight); window.dispatchEvent(new Event('scroll'));
-          setTimeout(() => __fim({lidas: JSON.parse(localStorage.getItem('cs_read_Teste')),
+          setTimeout(() => __fim({lidas: lidas(),
             pronto: document.querySelector('.btn-concluir').classList.contains('pronto')}), 300);""")
         self.assertEqual(r["saida"]["lidas"], ["s1", "s2", "s3", "s4", "s5"])
         self.assertTrue(r["saida"]["pronto"])
+
+    def test_salto_do_sumario_nao_marca_secoes_puladas(self):
+        r = executar(pagina_fixture(), self.SCRIPT_PASSO + """
+          ir('s1'); ir('s5');
+          window.scrollTo(0, document.documentElement.scrollHeight); window.dispatchEvent(new Event('scroll'));
+          setTimeout(() => __fim({lidas: lidas(),
+            pronto: document.querySelector('.btn-concluir').classList.contains('pronto')}), 300);""")
+        self.assertEqual(r["saida"]["lidas"], ["s1", "s5"])
+        self.assertFalse(r["saida"]["pronto"])
+
+    def test_salto_so_conta_secoes_que_foram_atuais(self):
+        r = executar(pagina_fixture(), self.SCRIPT_PASSO + """
+          ir('s1'); ir('s3'); ir('s5');
+          setTimeout(() => __fim({lidas: lidas()}), 300);""")
+        self.assertNotIn("s2", r["saida"]["lidas"])
+        self.assertNotIn("s4", r["saida"]["lidas"])
+        self.assertIn("s3", r["saida"]["lidas"])
+
+    def test_initchecklist_ignora_argumento_com_data_slug(self):
+        r = executar(pagina_fixture(), """
+          initChecklist('outro-slug');
+          const cb = document.getElementById('c1'); cb.checked = true; cb.dispatchEvent(new Event('change', {bubbles: true}));
+          __fim({certo: localStorage.getItem('cs_check_Teste_c1'), errado: localStorage.getItem('cs_check_outro-slug_c1')});""")
+        self.assertEqual(r["erros"], [])
+        self.assertEqual(r["saida"], {"certo": "true", "errado": None})
 
     def test_checklist_salva_e_restaura(self):
         with tempfile.TemporaryDirectory() as perfil:

@@ -13,7 +13,7 @@ GERADORES = TESTES.parent
 sys.path.insert(0, str(GERADORES))
 sys.path.insert(0, str(TESTES))
 
-from chassi import aplicar_cabecalhos_de_secao, info_modulo, numerar_questoes  # noqa: E402
+from chassi import aplicar_cabecalhos_de_secao, info_modulo, inserir_fim, numerar_questoes  # noqa: E402
 from contrato import extrair_secoes  # noqa: E402
 from contrato import ContratoInvalido  # noqa: E402
 from index_dados import ESTUDOS_DADOS  # noqa: E402
@@ -192,3 +192,18 @@ class TestChassi(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestInserirFim(unittest.TestCase):
+    def test_script_com_fecha_section_nao_recebe_o_fim(self):
+        corpo = (
+            '<article class="study-container">\n'
+            '<section class="study-section" id="s1" data-tipo="teoria"><h2>A</h2></section>\n'
+            '<section class="study-section" id="s2" data-tipo="referencias"><h2>B</h2><p>x</p></section>\n'
+            "</article>\n<script>var t = '</section>';</script>"
+        )
+        r = inserir_fim(corpo, "<!--FIM-->")
+        self.assertLess(r.index("<!--FIM-->"), r.index("<script>"))
+        ultima = r.index('id="s2"')
+        self.assertGreater(r.index("<!--FIM-->"), ultima)
+        self.assertLess(r.index("<!--FIM-->"), r.index("</section>", ultima))

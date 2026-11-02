@@ -29,7 +29,7 @@ Cada módulo é redigido em um arquivo fragmento `_geradores/<slug_snake_case>_b
 | Cada `<section class="study-section">` com seu `<h2>` | Rodapé, navegação lateral/sumário e botão "Concluir módulo" |
 | Componentes do conteúdo (callouts, tabelas, terminais, diagramas, laboratório, checklist, questões) | Rótulo e numeração das seções ("Seção 0X", ícone e tipo) |
 
-**Metadados do módulo** (título, subtítulo, tempo, nível, NIST, MITRE, carreiras) ficam em `ESTUDOS_DADOS`, em `_geradores/index_dados.py`, e são renderizados por `_geradores/chassi.py`. Nunca os escreva no corpo. Não escreva cabeçalho, rodapé, "Seção 0X" nem marcações de etiqueta de seção: o validador rejeita esses elementos.
+**Metadados do módulo** (título, subtítulo, tempo, nível, NIST, MITRE, carreiras) ficam em `ESTUDOS_DADOS`, em `_geradores/index_dados.py`, e são renderizados por `_geradores/chassi.py`. Nunca os escreva no corpo. Ao adicionar, remover ou reordenar módulos, rode `./_geradores/gerar.sh todos` (cada página traz "Estudo NN de <total>" e anterior/próximo). Não escreva cabeçalho, rodapé, "Seção 0X" nem marcações de etiqueta de seção: o validador rejeita esses elementos.
 
 ### 2.2 As regras do corpo
 
@@ -189,10 +189,10 @@ O simulador mora na seção `data-tipo="laboratorio"`:
 
 Opcional: o simulador pode informar o progresso ao sumário lateral com `CS.labProgress(feitos, total)` (por exemplo `CS.labProgress(3, 5)` mostra "3/5" ao lado do laboratório). Valores inválidos limpam o contador.
 
-O checklist é uma lista não ordenada; cada item tem checkbox com `id` e `label` ligado por `for`:
+O checklist é uma lista não ordenada; cada item tem checkbox com `id` e `label` ligado por `for`. Não é preciso chamar `initChecklist` nem informar `data-checklist-slug` (opcional e ignorado nas páginas geradas): o `base.js` usa o slug do módulo (`ESTUDOS_DADOS`) como chave `cs_check_<slug>_<id>`.
 
 ```html
-<ul class="checklist" data-checklist-slug="threat-hunting">
+<ul class="checklist">
     <li class="checklist-item">
         <input type="checkbox" id="chk-th-1">
         <label for="chk-th-1"><strong>Hipótese:</strong> escrita antes da busca, testável e com técnica mapeada.</label>
@@ -309,7 +309,7 @@ flowchart TD
 
 Antes de publicar ou compilar um novo estudo, confirme se todos os critérios abaixo foram atendidos:
 
-- [ ] O slug e título constam exatamente como registrados em `_geradores/estudos.txt` e os metadados em `ESTUDOS_DADOS` (`_geradores/index_dados.py`).
+- [ ] O slug e título constam exatamente como registrados em `_geradores/estudos.txt` e os metadados em `ESTUDOS_DADOS` (`_geradores/index_dados.py`). Ao adicionar, remover ou reordenar módulos, rode `./_geradores/gerar.sh todos`: cada página traz "Estudo NN de <total>" e os links anterior/próximo.
 - [ ] O arquivo `_geradores/<slug>_body.html` foi criado e passa no `contrato.validar_corpo` (o `montar.py` não aborta), com ao menos uma seção de cada tipo obrigatório.
 - [ ] O corpo não traz cabeçalho, rodapé, "Seção 0X" nem etiquetas de seção escritas à mão.
 - [ ] O simulador prático em JS funciona sem disparar erros no console do navegador (`F12`).

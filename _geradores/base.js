@@ -209,7 +209,10 @@
   }
 
   function initChecklist(slug) {
-    const activeSlug = slug || extractSlug();
+    // O slug canônico é o de body[data-slug]; o argumento só vale como reserva
+    // para páginas sem ele (módulos antigos chamavam initChecklist("<slug-kebab>")).
+    const comDataSlug = document.body && document.body.dataset && document.body.dataset.slug;
+    const activeSlug = comDataSlug ? comDataSlug : (slug || extractSlug());
     const checklists = document.querySelectorAll('.checklist');
 
     checklists.forEach((checklist, listIdx) => {
@@ -568,7 +571,7 @@
   // --------------------------------------------------------------------------
   // 6. Sumário, leitura, conclusão, último acesso e gaveta
   // --------------------------------------------------------------------------
-  const estado = { lidas: new Set(), atual: null, ultimaGravada: null };
+  const estado = { lidas: new Set(), vistas: new Set(), atual: null, ultimaGravada: null };
 
   function atualizarSumario() {
     const lista = secoes();
@@ -579,12 +582,18 @@
     // Seção atual: a última cujo topo passou de 35% da janela.
     let atual = lista[0];
     lista.forEach((s) => {
-      const r = s.getBoundingClientRect();
-      if (r.top < alt * 0.35) atual = s;
-      if (r.bottom < alt * 0.6) estado.lidas.add(s.id);
+      if (s.getBoundingClientRect().top < alt * 0.35) atual = s;
+    });
+    // Uma seção só conta como lida se já foi a atual em algum momento (um salto pelo
+    // sumário não marca as puladas) e se seu fim passou de 60% da janela.
+    estado.vistas.add(atual.id);
+    lista.forEach((s) => {
+      if (estado.vistas.has(s.id) && s.getBoundingClientRect().bottom < alt * 0.6) estado.lidas.add(s.id);
     });
     if (window.scrollY + alt >= doc.scrollHeight - 4) {
-      lista.forEach((s) => estado.lidas.add(s.id));
+      // Fim da página: só a seção atual e a última (que pode ser curta demais para virar "atual").
+      estado.lidas.add(atual.id);
+      estado.lidas.add(lista[lista.length - 1].id);
     }
 
     // Barra de leitura no topo

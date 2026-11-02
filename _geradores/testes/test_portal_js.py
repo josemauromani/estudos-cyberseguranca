@@ -193,6 +193,31 @@ class TestPortalJs(unittest.TestCase):
         self.assertEqual(r["erros"], [])
         self.assertEqual(r["saida"], {"v": ["rotas"], "h": "#v-rotas", "cur": "rotas"})
 
+    def test_voltar_ao_catalogo_ao_limpar_o_hash(self):
+        r = self.rodar("document.querySelector('a[data-view=\"rotas\"]').click();"
+                       "const vis=()=>[...document.querySelectorAll('section.view')].filter(s=>!s.hidden).map(s=>s.dataset.view);"
+                       "const antes=vis();location.hash='';"
+                       "setTimeout(()=>{const a=vis();location.hash='#estudo-x';"
+                       "setTimeout(()=>__fim({antes,depois:a,outro:vis()}),200)},200)")
+        self.assertEqual(r["erros"], [])
+        self.assertEqual(r["saida"], {"antes": ["rotas"], "depois": ["catalogo"], "outro": ["catalogo"]})
+
+    def test_todos_concluidos_com_so_pendentes_explica_e_limpar_desmarca(self):
+        antes = semear(**{f"cs_done_{s}": "true" for s in ESTUDOS_DADOS})
+        r = self.rodar("const cb=document.getElementById('so-pendentes');cb.checked=true;cb.dispatchEvent(new Event('change',{bubbles:true}));"
+                       "const vazio=document.querySelector('.vazio, #vazio, [data-vazio]');"
+                       "const msg=document.body.innerText;"
+                       "const btn=[...document.querySelectorAll('button')].find(b=>/Limpar/.test(b.textContent)&&b.offsetParent);"
+                       "const ok1=/Todos os módulos deste filtro estão concluídos/.test(msg);"
+                       "const ruim=/Nenhum módulo encontrado com essa busca/.test(msg);"
+                       "btn.click();"
+                       "__fim({ok1,ruim,marcado:cb.checked,n:[...document.querySelectorAll('.mc')].filter(c=>!c.hidden).length})", antes)
+        self.assertEqual(r["erros"], [])
+        self.assertEqual(r["saida"]["ok1"], True)
+        self.assertEqual(r["saida"]["ruim"], False)
+        self.assertEqual(r["saida"]["marcado"], False)
+        self.assertEqual(r["saida"]["n"], len(ESTUDOS_DADOS))
+
     def test_visao_restaurada_do_hash(self):
         r = executar(self.portal, "__fim([...document.querySelectorAll('section.view')].filter(s=>!s.hidden).map(s=>s.dataset.view))",
                      script_antes="history.replaceState(null,'','#v-progresso')")

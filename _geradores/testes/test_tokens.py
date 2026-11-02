@@ -67,6 +67,15 @@ class TestTokens(unittest.TestCase):
                 self.assertIn(t + ":", b)
         self.assertEqual(declaracoes(sistema), declaracoes(escuro))
 
+    def test_color_scheme_acompanha_o_tema(self):
+        claro = bloco(self.css, ":root {")
+        sistema = bloco(self.css, ':root:not([data-theme="light"])')
+        escuro = bloco(self.css, ':root[data-theme="dark"]')
+        self.assertIn("color-scheme: light;", claro)
+        self.assertIn("color-scheme: dark;", sistema)
+        self.assertIn("color-scheme: dark;", escuro)
+        self.assertNotIn("color-scheme: light dark", self.css)
+
     def test_claro_forcado_igual_ao_claro(self):
         claro = declaracoes(bloco(self.css, ":root {"))
         forcado = declaracoes(bloco(self.css, ':root[data-theme="light"]'))

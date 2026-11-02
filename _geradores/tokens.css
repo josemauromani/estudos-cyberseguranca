@@ -6,6 +6,8 @@
    ========================================================================== */
 
 :root {
+  color-scheme: light;
+
   /* Superfícies */
   --ground: #F4F6F8;
   --surface: #FFFFFF;
@@ -92,6 +94,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
     /* Superfícies */
     --ground: #0E151A;
     --surface: #152028;
@@ -162,6 +166,8 @@
 }
 
 :root[data-theme="dark"] {
+  color-scheme: dark;
+
   /* Superfícies */
   --ground: #0E151A;
   --surface: #152028;
@@ -231,6 +237,8 @@
 }
 
 :root[data-theme="light"] {
+  color-scheme: light;
+
   /* Superfícies */
   --ground: #F4F6F8;
   --surface: #FFFFFF;

@@ -317,3 +317,14 @@ def posicoes_corpo(html):
                 h2s.append((h2.ini, fim))
     quizzes = [(d.ini, d.fim_abertura) for d in arvore.raiz.descendentes() if _e_quiz_item(d)]
     return h2s, quizzes
+
+
+def fim_ultima_secao(html):
+    """Offset do '<' do fechamento da última section.study-section de primeiro nível (ou None)."""
+    arvore = _Arvore(html)
+    ultimo = None
+    for article in _secoes_de_primeiro_nivel(arvore.raiz):
+        for filho in article.filhos:
+            if _e_secao(filho) and filho.ini_fechamento is not None:
+                ultimo = filho.ini_fechamento
+    return ultimo

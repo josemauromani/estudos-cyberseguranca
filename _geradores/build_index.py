@@ -582,6 +582,12 @@ PORTAL_JS = """
     if (contagem) contagem.textContent = visiveis + (visiveis === 1 ? ' módulo' : ' módulos');
     const vazio = document.getElementById('sem-resultados');
     if (vazio) vazio.hidden = visiveis > 0;
+    const msgVazio = document.getElementById('sem-resultados-msg');
+    if (msgVazio) {
+      msgVazio.textContent = (!query && apenasPendentes)
+        ? 'Todos os módulos deste filtro estão concluídos.'
+        : 'Nenhum módulo encontrado com essa busca.';
+    }
 
     filtrarSecoesRelacionadas(slugsVisiveis, query.length > 0);
   }
@@ -619,8 +625,10 @@ PORTAL_JS = """
     if (input) {
       input.value = '';
       input.focus();
-      filtrarCards();
     }
+    const soPend = document.getElementById('so-pendentes');
+    if (soPend) soPend.checked = false;
+    filtrarCards();
   }
 
   // --------------------------------------------------------------------------
@@ -1042,8 +1050,7 @@ PORTAL_JS = """
       });
     });
     window.addEventListener('hashchange', () => {
-      const v = visaoDoHash();
-      if (v) mostrarVisao(v);
+      mostrarVisao(visaoDoHash() || 'catalogo');
     });
     const inicial = visaoDoHash();
     if (inicial) mostrarVisao(inicial);
@@ -1222,8 +1229,8 @@ def gerar_index_html(
 {grupos_html}
         </div>
         <div class="sem-resultados" id="sem-resultados" hidden>
-          <p>Nenhum módulo encontrado com essa busca.</p>
-          <button type="button" class="btn" id="limpar-busca">Limpar busca</button>
+          <p id="sem-resultados-msg">Nenhum módulo encontrado com essa busca.</p>
+          <button type="button" class="btn" id="limpar-busca">Limpar busca e filtros</button>
         </div>
       </div>
     </section>
