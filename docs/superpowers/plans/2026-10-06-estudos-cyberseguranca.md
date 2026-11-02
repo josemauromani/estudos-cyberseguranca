@@ -1,5 +1,7 @@
 # Estudos de Cibersegurança: Infraestrutura e Módulo Piloto Implementation Plan
 
+**Status:** Concluído em 2026-10-06 (commits `b73ab47`..`2c30a98`).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Construir a infraestrutura completa do pipeline `_geradores/`, o portal central responsivo `index.html` para os 28 módulos com duplo mapeamento NIST/MITRE, e implementar o estudo piloto completo `Fundamentos-Ciber` com o simulador interativo STRIDE.

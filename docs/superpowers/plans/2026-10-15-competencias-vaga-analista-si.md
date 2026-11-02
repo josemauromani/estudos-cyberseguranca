@@ -1,5 +1,7 @@
 # Competências da Vaga "Analista de SI" — Implementation Plan
 
+**Status:** Concluído em 2026-10-15 (commits `ecd737a`..`6dba8bd`).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Ampliar o catálogo de 28 para 33 módulos em 7 trilhas e acrescentar ao portal a "Rota por Vaga: Analista de Segurança da Informação" e a "Matriz de Certificações".

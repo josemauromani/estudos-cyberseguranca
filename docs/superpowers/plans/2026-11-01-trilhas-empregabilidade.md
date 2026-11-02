@@ -1,5 +1,7 @@
 # Trilhas de Empregabilidade (8, 9 e 10) — Implementation Plan
 
+**Status:** Concluído em 2026-11-01 (commits `b757453`..`83eacd1`, mais `770ace4`).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Ampliar o catálogo de 33 para 45 módulos em 10 trilhas (Ferramentas & Automação, Identidade & AD, Resiliência & Ransomware), ligar os módulos novos às rotas, à Rota da Vaga (como apoio), às necessidades e às certificações, e fazer os testes derivarem os totais dos dados.

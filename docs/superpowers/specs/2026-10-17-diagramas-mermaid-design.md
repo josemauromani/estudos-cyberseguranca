@@ -1,7 +1,7 @@
 # Design Spec: Padronização e Pré-compilação de Diagramas com Mermaid
 
 **Data:** 2026-10-17  
-**Status:** Em Revisão (Aguardando Aprovação do Usuário)  
+**Status:** Implementada (commits `9cb3ce9`..`924e723`)  
 **Autor:** Antigravity & Equipe  
 **Repositório:** `estudos_cyberseguranca`  
 **Referência Metodológica:** Superpowers Spec-Driven Development (SDD)
