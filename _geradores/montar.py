@@ -17,6 +17,7 @@ Uso como módulo:
 
 import argparse
 import sys
+from html import escape
 from pathlib import Path
 from typing import Dict, Optional, Union
 
@@ -35,6 +36,19 @@ try:
     from diagramas import processar_diagramas_html
 except ImportError:
     from _geradores.diagramas import processar_diagramas_html
+
+from chassi import (
+    aplicar_cabecalhos_de_secao,
+    gerar_cabecalho,
+    gerar_fim,
+    gerar_sumario,
+    gerar_topbar,
+    info_modulo,
+    inserir_fim,
+    numerar_questoes,
+)
+from contrato import ContratoInvalido, extrair_secoes, validar_corpo
+from index_dados import TRILHAS
 
 
 def carregar_css(base_css: Optional[Path] = None) -> str:
@@ -159,40 +173,36 @@ def montar_treinamento(
         or meta_dict.get("titulo")
         or (estudo_info["titulo"] if estudo_info else slug.replace("-", " "))
     )
-    trilha = str(
-        meta_dict.get("trilha")
-        or (estudo_info["trilha_num"] if estudo_info else "1")
-    )
 
-    # Leitura do conteúdo do corpo
+    # Leitura e validação do corpo contra o contrato de markup
     body_content = body_path.read_text(encoding="utf-8").strip()
+    erros = validar_corpo(body_content, slug)
+    if erros:
+        raise ContratoInvalido(erros)
+    secoes = extrair_secoes(body_content)
 
     # Processamento e pré-compilação de diagramas Mermaid embutidos
     body_content = processar_diagramas_html(
         body_content, cache_dir=cache_diagramas, forcar=recompilar_diagramas
     )
 
-    # Montagem do rodapé padronizado
-    footer_html = """    <footer class="study-footer">
-      <p>&copy; 2026 Estudos em Cibersegurança &bull; Material Autoinstrucional e Prático 100% Offline</p>
-      <p><a href="../index.html">← Painel de Estudos</a> &bull; Curadoria e Desenvolvimento por José Mauro da Silva Brandão</p>
-    </footer>"""
-
-    # Estruturação do bloco de conteúdo
-    if "<main" in body_content:
-        if "study-footer" not in body_content and "<footer" not in body_content:
-            if "</main>" in body_content:
-                main_html = body_content.replace("</main>", f"{footer_html}\n  </main>")
-            else:
-                main_html = f"{body_content}\n{footer_html}"
-        else:
-            main_html = body_content
-    else:
-        conteudo_interno = [f"  <main class=\"container\">", body_content]
-        if "study-footer" not in body_content and "<footer" not in body_content:
-            conteudo_interno.append(footer_html)
-        conteudo_interno.append("  </main>")
-        main_html = "\n".join(conteudo_interno)
+    # Chassi: dados do módulo, cabeçalhos de seção, questões numeradas e fim do módulo
+    info = info_modulo(slug)
+    if meta_dict.get("trilha") and str(meta_dict["trilha"]).isdigit() and int(meta_dict["trilha"]) in TRILHAS:
+        info.trilha_num = int(meta_dict["trilha"])
+        info.trilha_nome = TRILHAS[info.trilha_num]["nome"]
+        info.trilha_cor = TRILHAS[info.trilha_num]["cor"]
+    body_content = aplicar_cabecalhos_de_secao(body_content, secoes)
+    body_content = numerar_questoes(body_content)
+    body_content = inserir_fim(body_content, gerar_fim(info))
+    main_html = (
+        '<div class="shell">\n'
+        f"{gerar_sumario(info, secoes)}\n"
+        '<main class="content">\n'
+        f"{gerar_cabecalho(info, secoes)}\n"
+        f"{body_content}\n"
+        "</main>\n</div>"
+    )
 
     # Shell HTML5 semântico completo
     html_template = f"""<!DOCTYPE html>
@@ -201,7 +211,7 @@ def montar_treinamento(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="study-slug" content="{slug}">
-  <title>{titulo_final} — Estudos de Cibersegurança</title>
+  <title>{escape(titulo_final)} — Estudos de Cibersegurança</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%233b82f6' d='M32 4 8 14v16c0 15 10 26 24 30 14-4 24-15 24-30V14z'/%3E%3Cpath fill='%23ffffff' d='M28 40 19 31l4-4 5 5 13-13 4 4z'/%3E%3C/svg%3E">
 
 
@@ -211,21 +221,8 @@ def montar_treinamento(
 </head>
 <body data-slug="{slug}">
 
-  <!-- Barra de Navegação Superior e Breadcrumbs -->
-  <header class="top-nav">
-    <div class="top-nav-inner">
-      <a href="../index.html" class="nav-back">← Painel de Estudos</a>
-      <span class="nav-title">{titulo_final}</span>
-      <div class="nav-actions">
-        <span class="badge badge-t{trilha}">Trilha {trilha}</span>
-        <button class="theme-toggle-btn" aria-label="Alternar tema" onclick="toggleTheme()">
-          <span class="theme-icon">🌙</span> <span class="theme-label">Escuro</span>
-        </button>
-      </div>
-    </div>
-  </header>
+  {gerar_topbar(info)}
 
-  <!-- Conteúdo Principal do Treinamento -->
 {main_html}
 
   <!-- Scripts Interativos Embutidos -->
@@ -303,14 +300,22 @@ def main(argv=None):
     if args.trilha:
         meta["trilha"] = args.trilha
 
-    caminho_final = montar_treinamento(
-        body_html_path=body_path,
-        output_path=output_path,
-        titulo=args.titulo,
-        meta=meta,
-        recompilar_diagramas=args.recompilar_diagramas,
-        cache_diagramas=Path(args.cache_diagramas) if args.cache_diagramas else None,
-    )
+    try:
+        caminho_final = montar_treinamento(
+            body_html_path=body_path,
+            output_path=output_path,
+            titulo=args.titulo,
+            meta=meta,
+            recompilar_diagramas=args.recompilar_diagramas,
+            cache_diagramas=Path(args.cache_diagramas) if args.cache_diagramas else None,
+        )
+    except ContratoInvalido as e:
+        for msg in e.erros:
+            print(msg, file=sys.stderr)
+        sys.exit(1)
+    except KeyError as e:
+        print(f"Slug sem dados em ESTUDOS_DADOS: {e}", file=sys.stderr)
+        sys.exit(1)
 
     print(f"[OK] Treinamento compilado com sucesso em: {caminho_final}")
 

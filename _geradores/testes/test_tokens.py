@@ -99,11 +99,13 @@ class TestTokens(unittest.TestCase):
 
     def test_html_gerado_sem_google_fonts(self):
         from montar import montar_treinamento
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from test_chassi import corpo_valido
         with tempfile.TemporaryDirectory() as tmp:
             corpo = Path(tmp) / "teste_body.html"
-            corpo.write_text("<section><h1>Teste</h1></section>", encoding="utf-8")
+            corpo.write_text(corpo_valido(), encoding="utf-8")
             saida = Path(tmp) / "saida.html"
-            montar_treinamento(corpo, saida, titulo="Teste", meta={"slug": "teste-ciber", "trilha": "1"})
+            montar_treinamento(corpo, saida, titulo="Teste", meta={"slug": "Fundamentos-Ciber", "trilha": "1"})
             html = saida.read_text(encoding="utf-8")
         self.assertNotIn("fonts.googleapis.com", html)
         self.assertNotIn("fonts.gstatic.com", html)

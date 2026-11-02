@@ -8,6 +8,9 @@ from pathlib import Path
 
 # Adiciona o diretório _geradores ao sys.path para importação
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from test_chassi import corpo_valido  # noqa: E402
 
 try:
     from montar import (
@@ -19,6 +22,10 @@ except ImportError:
     carregar_catalogo_estudos = None
     encontrar_estudo_por_slug_ou_arquivo = None
     montar_treinamento = None
+
+
+def _com_diagrama(diagrama: str) -> str:
+    return corpo_valido().replace("<p>Texto.</p>", diagrama, 1)
 
 
 class TestMontar(unittest.TestCase):
@@ -34,17 +41,14 @@ class TestMontar(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = Path(tmpdir)
             body = tmp_path / "teste_body.html"
-            body.write_text(
-                "<section class=\"intro\"><h1>Conteúdo de Teste</h1><p>Parágrafo de teste prático.</p></section>",
-                encoding="utf-8",
-            )
+            body.write_text(corpo_valido("Conteúdo de Teste"), encoding="utf-8")
 
             output = tmp_path / "treinamento-teste.html"
             res = montar_treinamento(
                 body_html_path=body,
                 output_path=output,
                 titulo="Treinamento Teste",
-                meta={"slug": "teste-ciber", "trilha": "1"},
+                meta={"slug": "Fundamentos-Ciber", "trilha": "1"},
             )
 
             self.assertIsInstance(res, Path, "montar_treinamento deve retornar uma instância de Path")
@@ -73,15 +77,16 @@ class TestMontar(unittest.TestCase):
             self.assertIn("initChecklist", content)
 
             # Elementos de navegação e acessibilidade
-            self.assertIn('data-slug="teste-ciber"', content)
+            self.assertIn('data-slug="Fundamentos-Ciber"', content)
             self.assertIn('href="../index.html"', content)
-            self.assertIn("← Painel de Estudos", content)
+            self.assertIn("← Painel", content)
             self.assertIn("theme-toggle-btn", content)
             self.assertIn("Trilha 1", content)
 
-            # Rodapé com créditos
-            self.assertIn("study-footer", content)
-            self.assertIn("José Mauro da Silva Brandão", content)
+            # Chassi novo: sem rodapé nem barra legados
+            self.assertNotIn("study-footer", content)
+            self.assertNotIn("top-nav", content)
+            self.assertIn("study-pager", content)
 
     def test_montar_treinamento_creates_missing_parent_dirs(self):
         """Verifica se o compilador cria automaticamente diretórios pais inexistentes."""
@@ -90,10 +95,10 @@ class TestMontar(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = Path(tmpdir)
             body = tmp_path / "teste_body.html"
-            body.write_text("<p>Teste de diretório aninhado.</p>", encoding="utf-8")
+            body.write_text(corpo_valido(), encoding="utf-8")
 
             nested_output = tmp_path / "nova_pasta" / "subpasta" / "treinamento.html"
-            res = montar_treinamento(body, nested_output, titulo="Treinamento Aninhado")
+            res = montar_treinamento(body, nested_output, titulo="Treinamento Aninhado", meta={"slug": "Fundamentos-Ciber"})
 
             self.assertTrue(res.exists())
             self.assertTrue(res.parent.exists())
@@ -139,7 +144,7 @@ class TestMontar(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = Path(tmpdir)
             body = tmp_path / "fundamentos_ciber_body.html"
-            body.write_text("<p>Fragmento de teste para Fundamentos-Ciber.</p>", encoding="utf-8")
+            body.write_text(corpo_valido(), encoding="utf-8")
 
             output = tmp_path / "treinamento-fundamentos-ciber.html"
             res = montar_treinamento(body, output)
@@ -154,7 +159,7 @@ class TestMontar(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = Path(tmpdir)
             body = tmp_path / "criptografia_pratica_body.html"
-            body.write_text("<section><h1>Criptografia</h1></section>", encoding="utf-8")
+            body.write_text(corpo_valido(), encoding="utf-8")
 
             output = tmp_path / "saida-cli.html"
 
@@ -179,7 +184,7 @@ class TestMontar(unittest.TestCase):
             tmp_path = Path(tmpdir)
             body = tmp_path / "diagrama_body.html"
             body.write_text(
-                '<div class="diagram-box"><div class="diagram-header"><span class="diagram-title">Teste</span><span class="diagram-badge">Mermaid</span></div><pre class="mermaid" data-title="Teste">flowchart TD\nA-->B</pre></div>',
+                _com_diagrama('<div class="diagram-box"><div class="diagram-header"><span class="diagram-title">Teste</span><span class="diagram-badge">Mermaid</span></div><pre class="mermaid" data-title="Teste">flowchart TD\nA-->B</pre></div>'),
                 encoding="utf-8",
             )
 
@@ -188,6 +193,7 @@ class TestMontar(unittest.TestCase):
                 body_html_path=body,
                 output_path=output,
                 titulo="Treinamento com Diagrama",
+                meta={"slug": "Fundamentos-Ciber"},
                 cache_diagramas=tmp_path / "cache",
             )
 
@@ -205,9 +211,9 @@ class TestMontar(unittest.TestCase):
         """Verifica a execução do CLI com flag --recompilar-diagramas."""
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = Path(tmpdir)
-            body = tmp_path / "diagrama_cli_body.html"
+            body = tmp_path / "fundamentos_ciber_body.html"
             body.write_text(
-                '<div class="diagram-box"><div class="diagram-header"><span class="diagram-title">CLI Teste</span><span class="diagram-badge">Mermaid</span></div><pre class="mermaid" data-title="CLI Teste">flowchart LR\nA-->B</pre></div>',
+                _com_diagrama('<div class="diagram-box"><div class="diagram-header"><span class="diagram-title">CLI Teste</span><span class="diagram-badge">Mermaid</span></div><pre class="mermaid" data-title="CLI Teste">flowchart LR\nA-->B</pre></div>'),
                 encoding="utf-8",
             )
             output = tmp_path / "saida-cli-diagrama.html"
