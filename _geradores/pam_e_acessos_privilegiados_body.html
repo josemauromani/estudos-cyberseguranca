@@ -1,0 +1,654 @@
+<!-- Estudo 40: PAM-e-Acessos-Privilegiados Body Fragment -->
+<article class="study-container" data-slug="pam-acessos-privilegiados">
+
+    <!-- SEÇÃO 1: INTRODUÇÃO E INVENTÁRIO -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: Quem Tem as Chaves, e por Quanto Tempo</h2>
+        </div>
+
+        <p class="lead-text">
+            Quase todo ataque grave passa por uma conta privilegiada: o atacante entra com uma conta comum e procura a senha de um administrador, de uma conta de serviço ou de um administrador local repetido em todas as máquinas (T1078.002). A gestão de acessos privilegiados, o <strong>PAM</strong> (<em>Privileged Access Management</em>), responde a duas perguntas: quem tem poder de administrador hoje e por quanto tempo deveria ter. Neste estudo você vai auditar as contas privilegiadas da Ipê Store, cujo domínio conheceu no Estudo 38.
+        </p>
+
+        <h3>O Que Entra no Inventário</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Tipo de conta</th><th>Exemplo</th><th>Risco típico</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Administradores nominais</strong></td><td><code>adm.carlos</code>, separada da conta de e-mail dele</td><td>Privilégio permanente, sem MFA</td></tr>
+                    <tr><td><strong>Contas embutidas</strong></td><td>Administrator do domínio, <code>root</code>, <code>sa</code> do SQL Server</td><td>Senha compartilhada pela equipe e nunca trocada</td></tr>
+                    <tr><td><strong>Contas de serviço</strong></td><td><code>svc_sqlerp</code>, <code>svc_backup</code></td><td>Senha antiga, privilégio demais, uso interativo por pessoas</td></tr>
+                    <tr><td><strong>Administrador local</strong></td><td>O administrador de cada estação e servidor</td><td>A mesma senha em todas as máquinas: uma vazou, todas vazaram</td></tr>
+                    <tr><td><strong>Contas de nuvem e de aplicação</strong></td><td>Administrador global do Entra ID, chaves de API, segredos em código</td><td>Ninguém lembra que existem</td></tr>
+                    <tr><td><strong>Contas de emergência</strong> (<em>break-glass</em>)</td><td><code>emergencia01</code></td><td>Mal guardadas ou nunca testadas</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            Uma <strong>conta órfã</strong> é a que continua ativa depois que o dono saiu da empresa ou do contrato, ou que ninguém usa há meses. Ela não aparece em nenhuma reunião e é perfeita para um atacante. A <strong>recertificação</strong> periódica, em que o gestor confirma conta por conta quem ainda precisa de cada acesso, é o controle que as encontra. Ela fecha o ciclo de entrada, mudança e saída de pessoas.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 2: CONTROLES -->
+    <section class="study-section" id="controles">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Cofre, Rotação, Sessão Gravada, JIT e JEA</h2>
+        </div>
+
+        <h3>Os Componentes de uma Solução de PAM</h3>
+        <ul>
+            <li><strong>cofre</strong> de credenciais: as senhas privilegiadas ficam guardadas e cifradas; o administrador faz o <strong>checkout</strong> da credencial com justificativa, e cada retirada fica registrada em nome de uma pessoa, mesmo quando a conta é embutida e compartilhada.</li>
+            <li><strong>rotação</strong> automática: o cofre troca a senha depois de cada uso ou num intervalo definido. Quem viu a senha ontem não a conhece hoje.</li>
+            <li><strong>gravação de sessão</strong>: o acesso passa por um bastion ou proxy que grava a sessão (vídeo ou comandos). É um controle detectivo: não impede o abuso, mas mostra o que foi feito.</li>
+            <li><strong>just-in-time</strong> (<strong>JIT</strong>): ninguém é administrador o tempo todo. O privilégio é pedido, aprovado e concedido por algumas horas, como no PIM (<em>Privileged Identity Management</em>) do Entra ID ou em grupos com tempo de vida no AD.</li>
+            <li><strong>JEA</strong> (<em>Just Enough Administration</em>): um endpoint do PowerShell que só permite os comandos de uma tarefa, como desbloquear contas e redefinir senhas, sem dar Domain Admins ao helpdesk.</li>
+            <li><strong>Windows LAPS</strong>: gera uma senha diferente para o administrador local de cada máquina, troca periodicamente e guarda no AD ou no Entra ID.</li>
+        </ul>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Acesso Privilegiado Just-in-Time com Cofre</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Acesso Privilegiado Just-in-Time com Cofre">
+flowchart TD
+    P["1. Pedido de acesso<br><small>com justificativa e chamado</small>"]
+    A["2. Aprovação<br><small>por outra pessoa</small>"]
+    J["3. Privilégio concedido por tempo limitado<br><small>JIT, por exemplo 2 horas</small>"]
+    C["4. Checkout da credencial no cofre"]
+    S["5. Sessão pelo bastion<br><small>gravada</small>"]
+    R["6. Check-in e rotação automática da senha"]
+    E["7. Privilégio expira sozinho"]
+    P --> A
+    A --> J
+    J --> C
+    C --> S
+    S --> R
+    R --> E
+            </pre>
+        </div>
+
+        <h3>Princípios que Sustentam os Controles</h3>
+        <p>
+            <strong>menor privilégio</strong>: cada conta tem só o que a tarefa exige, e só enquanto exige. <strong>segregação de funções</strong>: quem pede o acesso não aprova; quem administra não apaga o próprio log. Uma conta de serviço não é usada por pessoas, e uma pessoa não usa a conta de administrador para ler e-mail.
+        </p>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">🧯</span>
+                <strong>Break-glass é exceção desenhada, não descuido</strong>
+            </div>
+            <p>
+                As contas de emergência existem para quando o MFA, a federação ou o próprio PAM falham. Por desenho, elas são permanentes, ficam fora das regras de acesso condicional e quase nunca são usadas. Os controles são outros: pelo menos duas contas, senha longa guardada em cofre físico ou dividida entre pessoas, alerta imediato a cada uso, troca da senha depois do uso e teste periódico. Numa auditoria, a pergunta não é "por que está sem MFA?", e sim "quem é avisado quando ela é usada?".
+            </p>
+        </div>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">PowerShell — inventário e controles</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-pam-comandos')">Copiar</button>
+            </div>
+            <pre><code id="code-pam-comandos"># Quem é Domain Admins, inclusive por grupos aninhados
+PS&gt; Get-ADGroupMember "Domain Admins" -Recursive | Select-Object SamAccountName
+
+# Contas habilitadas sem logon há 90 dias (candidatas a órfãs)
+PS&gt; Search-ADAccount -AccountInactive -TimeSpan 90.00:00:00 -UsersOnly |
+      Where-Object Enabled
+
+# Senha do administrador local gerenciada pelo Windows LAPS
+PS&gt; Get-LapsADPassword -Identity SRV-ERP01 -AsPlainText
+
+# JEA: o helpdesk só pode desbloquear contas e redefinir senhas
+PS&gt; New-PSRoleCapabilityFile -Path .\Helpdesk.psrc `
+      -VisibleCmdlets 'Unlock-ADAccount','Set-ADAccountPassword'
+# (depois: New-PSSessionConfigurationFile e Register-PSSessionConfiguration)</code></pre>
+        </div>
+
+        <h3>O Que as Normas Pedem</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Referência</th><th>Exigência</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>ISO/IEC 27002:2022, controle <strong>8.2</strong></td><td>Direitos de acesso privilegiado restritos, concedidos por necessidade, com contas separadas e revisão periódica</td></tr>
+                    <tr><td>ISO/IEC 27002:2022, controle <strong>5.18</strong></td><td>Concessão, revisão e remoção de direitos de acesso</td></tr>
+                    <tr><td>PCI DSS v4.0.1, <strong>7.2.4</strong></td><td>Revisão de todas as contas de usuário e seus privilégios ao menos a cada 6 meses</td></tr>
+                    <tr><td>PCI DSS v4.0.1, <strong>8.2.2</strong></td><td>Contas compartilhadas ou genéricas só por exceção, com justificativa e confirmação de identidade a cada uso</td></tr>
+                    <tr><td>PCI DSS v4.0.1, <strong>8.6</strong></td><td>Contas de sistema e de aplicação: uso interativo controlado e senhas trocadas periodicamente</td></tr>
+                    <tr><td><strong>CIS Controls</strong> v8.1, controles 5 e 6</td><td>Gestão de contas e gestão do controle de acesso, inclusive inventário e contas dedicadas de administração</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Do lado do atacante, o MITRE ATT&amp;CK descreve o uso de contas de domínio válidas (T1078.002) e a manipulação de contas (T1098), como incluir uma conta nova em Domain Admins, que você viu no Estudo 16.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Auditor de Contas Privilegiadas</h2>
+        </div>
+
+        <p class="lead-text">
+            Você recebeu o inventário de contas privilegiadas da Ipê Store. Primeiro, marque os problemas de cada conta e confira. Depois, ligue os controles e veja o risco residual cair. Cuidado: nem toda conta estranha é um problema.
+        </p>
+
+        <div class="lab-box pam-lab" id="pam-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Laboratório de PAM</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Inventário de Contas Privilegiadas</h3>
+                    <p id="pam-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">1. Marque os problemas de cada conta</h4>
+                <div id="pam-legenda" style="font-size: 0.82rem; margin-bottom: 0.75rem;"></div>
+                <div id="pam-inventario" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 0.75rem;"></div>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                    <button class="btn-primary" type="button" onclick="conferirAchadosPam()">Conferir achados</button>
+                </div>
+                <div id="pam-conferencia" aria-live="polite" style="margin-top: 0.75rem; font-size: 0.9rem;"></div>
+
+                <h4 style="margin-top: 1.5rem;">2. Aplique controles e acompanhe o risco</h4>
+                <div id="pam-controles" style="display: grid; gap: 0.5rem; font-size: 0.85rem;"></div>
+                <div id="pam-risco" aria-live="polite" style="margin-top: 1rem; font-size: 0.9rem;"></div>
+
+                <div style="margin-top: 1.25rem;">
+                    <button class="btn-secondary" type="button" onclick="restaurarPam()">Restaurar laboratório</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Acessos Privilegiados</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para revisar as contas privilegiadas de uma organização. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="pam-acessos-privilegiados">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-pam-1">
+                <label for="chk-pam-1"><strong>Inventário completo:</strong> administradores nominais, contas embutidas, de serviço, de nuvem, de aplicação e de emergência estão listados, cada um com dono.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-pam-2">
+                <label for="chk-pam-2"><strong>Contas separadas:</strong> cada administrador tem uma conta privilegiada nominal, diferente da conta de uso diário.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-pam-3">
+                <label for="chk-pam-3"><strong>Credenciais no cofre:</strong> senhas de contas embutidas e compartilhadas ficam no cofre, com checkout registrado e rotação automática.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-pam-4">
+                <label for="chk-pam-4"><strong>Sem privilégio permanente:</strong> a participação em grupos de Tier 0 é concedida just-in-time, com aprovação e prazo.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-pam-5">
+                <label for="chk-pam-5"><strong>MFA e sessão gravada:</strong> todo acesso privilegiado usa MFA resistente a phishing e passa por bastion com gravação.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-pam-6">
+                <label for="chk-pam-6"><strong>Serviços e administradores locais:</strong> contas de serviço são gMSA ou estão no cofre sem logon interativo, e o Windows LAPS gerencia os administradores locais.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-pam-7">
+                <label for="chk-pam-7"><strong>Recertificação e emergência:</strong> os acessos são recertificados ao menos a cada 6 meses, e as contas de emergência têm alerta a cada uso e teste periódico.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Conta compartilhada):</strong> A senha do Administrator do domínio é conhecida por quatro pessoas da infraestrutura. Qual é o problema principal, e qual é o controle?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não há responsabilização individual: os logs mostram "Administrator", não quem foi. O controle é o cofre com checkout registrado e rotação depois de cada uso.</p>
+                    <p>Contas embutidas não podem ser eliminadas, então o objetivo é que cada uso tenha um nome e que a senha conhecida deixe de valer logo depois.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (JIT):</strong> Por que tirar um administrador de Domain Admins e conceder o privilégio por 2 horas, quando ele precisar, reduz o risco, se a pessoa é a mesma?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque o atacante que rouba a credencial fora daquela janela não ganha nada, e cada concessão passa por pedido e aprovação registrados.</p>
+                    <p>Privilégio permanente fica disponível 24 horas por dia para quem comprometer a conta. O JIT reduz a janela de exposição.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (JEA):</strong> O helpdesk está em Domain Admins só para desbloquear contas e redefinir senhas. Qual é a melhor correção?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Remover o grupo e delegar só essas tarefas, com JEA ou delegação de permissões na OU dos usuários.</p>
+                    <p>A tarefa é restrita e repetitiva; não precisa de privilégio de domínio nem de JIT. Menor privilégio aqui é tirar o poder, não limitar o tempo.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Break-glass):</strong> Na auditoria, a conta <code>emergencia01</code> aparece sem MFA, com privilégio permanente e sem logon há 8 meses. É um achado?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não, se ela for uma conta de emergência documentada, com senha em cofre físico, alerta a cada uso e teste periódico.</p>
+                    <p>Essas características são o desenho de uma break-glass. O achado seria a falta de alerta, de teste ou de guarda adequada.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Gravação de sessão):</strong> A empresa já grava todas as sessões administrativas. Isso dispensa o JIT?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. A gravação é detectiva: mostra o que foi feito depois. O JIT é preventivo: reduz quando o privilégio existe.</p>
+                    <p>Os dois se complementam. A gravação também ajuda na investigação e inibe abuso interno, mas não impede que uma credencial roubada seja usada.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (PCI DSS):</strong> Com que frequência mínima o PCI DSS v4.0.1 exige a revisão das contas de usuário e seus privilégios?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Ao menos a cada 6 meses (requisito 7.2.4).</p>
+                    <p>A revisão confirma que cada acesso continua necessário e remove o que sobrou, inclusive contas órfãs. Ela precisa de evidência: quem revisou, quando e o que mudou.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Inventário primeiro</h4>
+                <p>Humanos, embutidas, serviço, local, nuvem, aplicação e emergência, cada uma com dono.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Cofre e rotação</h4>
+                <p>Checkout registrado dá nome a cada uso; rotação invalida a senha vista.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. JIT e JEA</h4>
+                <p>JIT limita o tempo; JEA limita o que pode ser feito. Gravação de sessão é detectiva.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Recertificar</h4>
+                <p>PCI 7.2.4: ao menos a cada 6 meses. É assim que se acham as contas órfãs.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>ISO/IEC 27002:2022 — controles 5.15, 5.18 e 8.2.</li>
+            <li>PCI DSS v4.0.1 — requisitos 7 e 8.</li>
+            <li>CIS Controls v8.1 — controles 5 (Gestão de Contas) e 6 (Gestão do Controle de Acesso).</li>
+            <li>Microsoft Learn — Privileged Identity Management, Just Enough Administration, Windows LAPS e contas de acesso de emergência.</li>
+            <li>NIST SP 800-53 Rev. 5 — AC-2 (Account Management) e AC-6 (Least Privilege).</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 39 — Ataques e Defesa no AD e 41 — Identidade Híbrida e Nuvem</strong>
+            </div>
+            <p>
+                O Estudo 39 mostra o que um atacante faz com uma conta privilegiada mal protegida. O Estudo 41 leva os mesmos controles para o Entra ID, com acesso condicional e PIM.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="pam-dados">
+{
+ "contexto": "Contas fictícias do domínio corp.ipestore.example. Política: senhas privilegiadas trocadas a cada 90 dias; contas sem uso há mais de 90 dias são revisadas.",
+ "politica": {"rotacao_dias": 90, "inatividade_dias": 90},
+ "pesos_tier": {"0": 3, "1": 2, "2": 1},
+ "risco_inicial": 126,
+ "problemas": {
+  "compartilhada": {"nome": "Conta compartilhada", "severidade": 3, "descricao": "Mais de uma pessoa usa a mesma credencial: ninguém responde pelo que foi feito."},
+  "sem_rotacao": {"nome": "Senha sem rotação", "severidade": 2, "descricao": "A senha passou do prazo de troca de 90 dias."},
+  "permanente": {"nome": "Administrador permanente", "severidade": 3, "descricao": "Uma pessoa tem privilégio o tempo todo, sem pedido nem prazo."},
+  "orfa": {"nome": "Conta órfã", "severidade": 3, "descricao": "Ativa depois da saída do dono ou sem uso há mais de 90 dias."},
+  "sem_mfa": {"nome": "Sem MFA", "severidade": 3, "descricao": "Conta de pessoa com privilégio de Tier 0 ou 1 sem segundo fator."},
+  "servico": {"nome": "Conta de serviço mal configurada", "severidade": 2, "descricao": "Usada por pessoas em logon interativo ou com privilégio de Tier 0."}
+ },
+ "contas": [
+  {"id": "administrator", "nome": "Administrator (CORP)", "tipo": "builtin", "tier": 0, "dono": "Equipe de infraestrutura",
+   "grupos": ["Domain Admins", "Enterprise Admins"], "senha_idade_dias": 400, "ultimo_logon_dias": 3, "mfa": false,
+   "compartilhada": true, "privilegio_permanente": true, "dono_desligado": false, "logon_interativo": true, "tarefa_restrita": false, "ativa": true,
+   "problemas": ["compartilhada", "sem_rotacao"],
+   "nota": "A conta embutida não pode ser apagada nem receber MFA nativo. A senha é conhecida por quatro pessoas e não muda há mais de um ano: o controle é o cofre com checkout registrado e rotação a cada uso."},
+  {"id": "adm-carlos", "nome": "adm.carlos", "tipo": "humana", "tier": 0, "dono": "Carlos Mendes (infraestrutura)",
+   "grupos": ["Domain Admins"], "senha_idade_dias": 60, "ultimo_logon_dias": 1, "mfa": false,
+   "compartilhada": false, "privilegio_permanente": true, "dono_desligado": false, "logon_interativo": true, "tarefa_restrita": false, "ativa": true,
+   "problemas": ["permanente", "sem_mfa"],
+   "nota": "Conta nominal e senha em dia, mas Domain Admins o tempo todo e sem MFA: a credencial de Tier 0 mais exposta do inventário."},
+  {"id": "adm-ana", "nome": "adm.ana", "tipo": "humana", "tier": 1, "dono": "Ana Souza (sistemas)",
+   "grupos": ["Administradores de Servidores (concedido via JIT)"], "senha_idade_dias": 30, "ultimo_logon_dias": 2, "mfa": true,
+   "compartilhada": false, "privilegio_permanente": false, "dono_desligado": false, "logon_interativo": true, "tarefa_restrita": false, "ativa": true,
+   "problemas": [],
+   "nota": "Exemplo do que se espera: conta nominal separada, MFA, senha em dia e privilégio concedido só quando pedido."},
+  {"id": "adm-roberto", "nome": "adm.roberto", "tipo": "humana", "tier": 0, "dono": "Roberto Lima (desligado em agosto)",
+   "grupos": ["Domain Admins"], "senha_idade_dias": 120, "ultimo_logon_dias": 75, "mfa": true,
+   "compartilhada": false, "privilegio_permanente": true, "dono_desligado": true, "logon_interativo": true, "tarefa_restrita": false, "ativa": true,
+   "problemas": ["sem_rotacao", "permanente", "orfa"],
+   "nota": "O dono saiu da empresa e a conta de Domain Admins continua ativa. O logon há 75 dias, depois do desligamento, merece investigação."},
+  {"id": "svc-sqlerp", "nome": "svc_sqlerp", "tipo": "servico", "tier": 1, "dono": "Equipe de banco de dados",
+   "grupos": ["sysadmin do SQL Server do ERP"], "senha_idade_dias": 900, "ultimo_logon_dias": 0, "mfa": false,
+   "compartilhada": false, "privilegio_permanente": true, "dono_desligado": false, "logon_interativo": true, "tarefa_restrita": false, "ativa": true,
+   "problemas": ["sem_rotacao", "servico"],
+   "nota": "Os DBAs usam a conta de serviço para entrar no servidor, e a senha tem quase 3 anos: alvo clássico de Kerberoasting (Estudo 38)."},
+  {"id": "svc-backup", "nome": "svc_backup", "tipo": "servico", "tier": 0, "dono": "Equipe de infraestrutura",
+   "grupos": ["Backup Operators", "Domain Admins"], "senha_idade_dias": 200, "ultimo_logon_dias": 0, "mfa": false,
+   "compartilhada": false, "privilegio_permanente": true, "dono_desligado": false, "logon_interativo": false, "tarefa_restrita": false, "ativa": true,
+   "problemas": ["sem_rotacao", "servico"],
+   "nota": "O backup roda com Domain Admins \"porque foi mais fácil\". Backup Operators e permissões específicas bastam; Domain Admins faz dela uma conta de Tier 0."},
+  {"id": "gmsa-sqlerp", "nome": "gmsa-sqlerp$", "tipo": "gmsa", "tier": 1, "dono": "Equipe de banco de dados",
+   "grupos": ["Serviço do SQL Server de relatórios"], "senha_idade_dias": 12, "ultimo_logon_dias": 0, "mfa": false,
+   "compartilhada": false, "privilegio_permanente": true, "dono_desligado": false, "logon_interativo": false, "tarefa_restrita": false, "ativa": true,
+   "problemas": [],
+   "nota": "gMSA: a senha é gerada e trocada pelo próprio AD e ninguém a conhece. Não precisa de MFA nem de rotação manual."},
+  {"id": "helpdesk-adm", "nome": "helpdesk.adm", "tipo": "humana", "tier": 0, "dono": "Equipe de helpdesk (6 pessoas)",
+   "grupos": ["Domain Admins"], "senha_idade_dias": 45, "ultimo_logon_dias": 0, "mfa": false,
+   "compartilhada": true, "privilegio_permanente": true, "dono_desligado": false, "logon_interativo": true, "tarefa_restrita": true, "ativa": true,
+   "problemas": ["compartilhada", "permanente", "sem_mfa"],
+   "nota": "Seis pessoas usam uma conta de Domain Admins para desbloquear usuários e redefinir senhas. A tarefa é restrita: JEA ou delegação na OU resolvem sem privilégio de domínio."},
+  {"id": "emergencia01", "nome": "emergencia01", "tipo": "emergencia", "tier": 0, "dono": "Diretoria de TI (envelope lacrado no cofre)",
+   "grupos": ["Domain Admins"], "senha_idade_dias": 60, "ultimo_logon_dias": 240, "mfa": false,
+   "compartilhada": false, "privilegio_permanente": true, "dono_desligado": false, "logon_interativo": true, "tarefa_restrita": false, "ativa": true,
+   "problemas": [],
+   "nota": "Conta de emergência: permanente, fora do MFA e sem uso por desenho. Tem senha em cofre físico, alerta no SIEM a cada logon e teste semestral. Não é achado."},
+  {"id": "fornecedor-erp", "nome": "fornecedor.erp", "tipo": "humana", "tier": 1, "dono": "Consultoria do ERP (contrato encerrado em junho)",
+   "grupos": ["Administradores do ERP"], "senha_idade_dias": 300, "ultimo_logon_dias": 150, "mfa": false,
+   "compartilhada": false, "privilegio_permanente": true, "dono_desligado": false, "logon_interativo": true, "tarefa_restrita": false, "ativa": true,
+   "problemas": ["sem_rotacao", "permanente", "orfa", "sem_mfa"],
+   "nota": "Acesso de terceiro que sobreviveu ao contrato: sem uso há 5 meses, sem MFA e com senha antiga. A recertificação teria pego."}
+ ],
+ "controles": [
+  {"id": "cofre", "nome": "Cofre com checkout registrado e rotação automática", "tipo": "preventivo", "corrige": ["compartilhada", "sem_rotacao"], "apenas_se": null,
+   "descricao": "Cada uso de conta compartilhada ganha um nome e a senha muda depois do uso."},
+  {"id": "jit", "nome": "Privilégio just-in-time (PIM) com aprovação", "tipo": "preventivo", "corrige": ["permanente"], "apenas_se": null,
+   "descricao": "Pessoas deixam de ser administradoras permanentes; o privilégio é pedido e expira."},
+  {"id": "jea", "nome": "JEA para tarefas restritas do helpdesk", "tipo": "preventivo", "corrige": ["permanente"], "apenas_se": "tarefa_restrita",
+   "descricao": "Só vale para contas cuja tarefa cabe num endpoint restrito; tira o privilégio em vez de limitar o tempo."},
+  {"id": "mfa", "nome": "MFA obrigatório para acesso privilegiado", "tipo": "preventivo", "corrige": ["sem_mfa"], "apenas_se": null,
+   "descricao": "Segundo fator, de preferência resistente a phishing, para contas de pessoas com privilégio."},
+  {"id": "recertificacao", "nome": "Recertificação semestral de acessos", "tipo": "corretivo", "corrige": ["orfa"], "apenas_se": null,
+   "descricao": "Gestores confirmam cada acesso; contas sem dono ou sem uso são desativadas."},
+  {"id": "gmsa", "nome": "Migrar contas de serviço para gMSA com privilégio mínimo", "tipo": "preventivo", "corrige": ["servico"], "apenas_se": null,
+   "descricao": "Senha gerenciada pelo AD, sem logon interativo e sem grupos de Tier 0 desnecessários."},
+  {"id": "gravacao", "nome": "Gravação de sessão via bastion", "tipo": "detectivo", "corrige": [], "apenas_se": null,
+   "descricao": "Registra o que cada administrador fez. Não reduz os achados: ajuda a investigar e inibe abuso."}
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var PAM = JSON.parse(document.getElementById("pam-dados").textContent);
+    var TIPOS = Object.keys(PAM.problemas);
+    var ROTULO_TIPO = { humana: "Pessoa", builtin: "Conta embutida", servico: "Conta de serviço", gmsa: "gMSA", emergencia: "Emergência (break-glass)" };
+    var marcados = {};
+    var ativos = {};
+    var conferido = false;
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function plural(n, um, varios) { return n + " " + (n === 1 ? um : varios); }
+
+    // Regras de auditoria (espelhadas nos testes em Python).
+    function achados(c) {
+        var pol = PAM.politica, out = [];
+        if (c.compartilhada) out.push("compartilhada");
+        if (c.tipo !== "gmsa" && c.senha_idade_dias > pol.rotacao_dias) out.push("sem_rotacao");
+        if (c.tipo === "humana" && c.privilegio_permanente) out.push("permanente");
+        if (c.tipo !== "emergencia" && c.ativa && (c.dono_desligado || c.ultimo_logon_dias > pol.inatividade_dias)) out.push("orfa");
+        if (c.tipo === "humana" && (c.tier === 0 || c.tier === 1) && !c.mfa) out.push("sem_mfa");
+        if (c.tipo === "servico" && (c.logon_interativo || c.tier === 0)) out.push("servico");
+        return out;
+    }
+    function corrigidoPor(c, p) {
+        return PAM.controles.filter(function(k) {
+            return ativos[k.id] && k.corrige.indexOf(p) !== -1 && (!k.apenas_se || c[k.apenas_se]);
+        }).map(function(k) { return k.nome; });
+    }
+    function calcularRisco() {
+        var total = 0, restantes = [];
+        PAM.contas.forEach(function(c) {
+            achados(c).forEach(function(p) {
+                var pts = PAM.pesos_tier[String(c.tier)] * PAM.problemas[p].severidade;
+                if (!corrigidoPor(c, p).length) { total += pts; restantes.push({ conta: c, problema: p, pontos: pts }); }
+            });
+        });
+        return { total: total, restantes: restantes };
+    }
+
+    function renderizarLegenda() {
+        var box = document.getElementById("pam-legenda");
+        box.replaceChildren();
+        var ul = el("ul", null, "margin: 0; padding-left: 1.2rem;");
+        TIPOS.forEach(function(t) {
+            var li = el("li");
+            li.appendChild(el("strong", PAM.problemas[t].nome + ": "));
+            li.appendChild(document.createTextNode(PAM.problemas[t].descricao));
+            ul.appendChild(li);
+        });
+        box.appendChild(ul);
+    }
+
+    function renderizarInventario() {
+        var box = document.getElementById("pam-inventario");
+        box.replaceChildren();
+        PAM.contas.forEach(function(c) {
+            var card = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 0.75rem; background: var(--surface); min-width: 0;");
+            card.setAttribute("data-conta", c.id);
+            var topo = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.3rem 0.6rem; justify-content: space-between; align-items: baseline;");
+            topo.appendChild(el("strong", c.nome, "font-family: var(--font-mono);"));
+            topo.appendChild(el("span", ROTULO_TIPO[c.tipo] + " · Tier " + c.tier, "font-size: 0.78rem; font-weight: 600;"));
+            card.appendChild(topo);
+            var fatos = [
+                "Dono: " + c.dono,
+                "Grupos: " + c.grupos.join(", "),
+                "Senha trocada há " + plural(c.senha_idade_dias, "dia", "dias") + " · último logon há " + plural(c.ultimo_logon_dias, "dia", "dias"),
+                "MFA: " + (c.mfa ? "sim" : "não") + " · compartilhada: " + (c.compartilhada ? "sim" : "não") + " · logon interativo: " + (c.logon_interativo ? "sim" : "não")
+            ];
+            var ul = el("ul", null, "margin: 0.4rem 0 0.6rem 0; padding-left: 1.1rem; font-size: 0.8rem; overflow-wrap: anywhere;");
+            fatos.forEach(function(f) { ul.appendChild(el("li", f)); });
+            card.appendChild(ul);
+            var chips = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.3rem;");
+            chips.setAttribute("role", "group");
+            chips.setAttribute("aria-label", "Problemas de " + c.nome);
+            TIPOS.forEach(function(t) {
+                var on = !!(marcados[c.id] && marcados[c.id][t]);
+                var b = el("button", PAM.problemas[t].nome, "font-size: 0.75rem; padding: 0.2rem 0.55rem; border-radius: var(--radius-pill); border: 1px solid var(--rule); cursor: pointer; font-family: inherit; " +
+                    (on ? "background: rgba(220, 38, 38, 0.3); color: var(--ink); font-weight: 600;" : "background: transparent; color: var(--ink);"));
+                b.type = "button";
+                b.setAttribute("aria-pressed", on ? "true" : "false");
+                b.setAttribute("data-problema", t);
+                b.addEventListener("click", function() { alternarAchadoPam(c.id, t); });
+                chips.appendChild(b);
+            });
+            card.appendChild(chips);
+            if (conferido) card.appendChild(feedbackConta(c));
+            box.appendChild(card);
+        });
+    }
+
+    function feedbackConta(c) {
+        var certos = achados(c), m = marcados[c.id] || {};
+        var acertos = certos.filter(function(p) { return m[p]; });
+        var faltaram = certos.filter(function(p) { return !m[p]; });
+        var sobrando = TIPOS.filter(function(p) { return m[p] && certos.indexOf(p) === -1; });
+        var ok = !faltaram.length && !sobrando.length;
+        var box = el("div", null, "margin-top: 0.6rem; padding: 0.5rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.8rem; background: " + (ok ? "rgba(22, 163, 74, 0.2)" : "rgba(202, 138, 4, 0.25)") + ";");
+        box.appendChild(el("strong", ok ? "✓ Correto" : "Revise esta conta", "display: block;"));
+        if (faltaram.length) box.appendChild(el("div", "Faltou marcar: " + faltaram.map(function(p) { return PAM.problemas[p].nome; }).join(", ") + "."));
+        if (sobrando.length) box.appendChild(el("div", "Marcado sem motivo: " + sobrando.map(function(p) { return PAM.problemas[p].nome; }).join(", ") + "."));
+        if (!certos.length && !sobrando.length) box.appendChild(el("div", "Nenhum problema nesta conta."));
+        box.appendChild(el("div", c.nota, "margin-top: 0.3rem;"));
+        return box;
+    }
+
+    window.alternarAchadoPam = function(contaId, tipo) {
+        if (TIPOS.indexOf(tipo) === -1) return;
+        marcados[contaId] = marcados[contaId] || {};
+        marcados[contaId][tipo] = !marcados[contaId][tipo];
+        renderizarInventario();
+        if (conferido) renderizarConferencia();
+    };
+
+    function renderizarConferencia() {
+        var box = document.getElementById("pam-conferencia");
+        box.replaceChildren();
+        var total = 0, acertos = 0, indevidos = 0, contasOk = 0;
+        PAM.contas.forEach(function(c) {
+            var certos = achados(c), m = marcados[c.id] || {};
+            total += certos.length;
+            acertos += certos.filter(function(p) { return m[p]; }).length;
+            var sobra = TIPOS.filter(function(p) { return m[p] && certos.indexOf(p) === -1; }).length;
+            indevidos += sobra;
+            if (certos.every(function(p) { return m[p]; }) && !sobra) contasOk++;
+        });
+        box.appendChild(el("p", "Você encontrou " + acertos + " de " + total + " problemas, com " + plural(indevidos, "marcação indevida", "marcações indevidas") +
+            ". Contas totalmente corretas: " + contasOk + " de " + PAM.contas.length + ".", "margin: 0; font-weight: 600;"));
+        box.setAttribute("data-acertos", String(acertos));
+        box.setAttribute("data-indevidos", String(indevidos));
+    }
+
+    window.conferirAchadosPam = function() {
+        conferido = true;
+        renderizarInventario();
+        renderizarConferencia();
+    };
+
+    function renderizarControles() {
+        var box = document.getElementById("pam-controles");
+        box.replaceChildren();
+        PAM.controles.forEach(function(k) {
+            var rot = el("label", null, "display: flex; gap: 0.5rem; align-items: flex-start; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.45rem 0.6rem;");
+            var cb = el("input");
+            cb.type = "checkbox";
+            cb.checked = !!ativos[k.id];
+            cb.setAttribute("data-controle", k.id);
+            cb.addEventListener("change", function() { alternarControlePam(k.id, cb.checked); });
+            rot.appendChild(cb);
+            var txt = el("span");
+            txt.appendChild(el("strong", k.nome));
+            txt.appendChild(el("span", " (" + k.tipo + ") — " + k.descricao, "color: var(--muted);"));
+            rot.appendChild(txt);
+            box.appendChild(rot);
+        });
+    }
+
+    function renderizarRisco() {
+        var r = calcularRisco(), ini = PAM.risco_inicial;
+        var box = document.getElementById("pam-risco");
+        box.replaceChildren();
+        box.setAttribute("data-risco", String(r.total));
+        box.appendChild(el("p", "Risco inicial: " + ini + " pontos · risco residual: " + r.total + " pontos (" + Math.round((1 - r.total / ini) * 100) + "% de redução).", "margin: 0 0 0.4rem 0; font-weight: 600;"));
+        var barra = el("div", null, "height: 0.7rem; background: var(--sunk); border-radius: var(--radius-pill); overflow: hidden;");
+        barra.setAttribute("role", "img");
+        barra.setAttribute("aria-label", "Risco residual de " + r.total + " de " + ini + " pontos");
+        barra.appendChild(el("div", null, "height: 100%; width: " + (r.total / ini * 100) + "%; background: " + (r.total ? "var(--danger-color)" : "var(--tip-color)") + ";"));
+        box.appendChild(barra);
+        box.appendChild(el("p", "Pontos = peso do Tier (0: 3, 1: 2, 2: 1) × severidade do problema.", "margin: 0.4rem 0 0.6rem 0; font-size: 0.8rem; color: var(--muted);"));
+        if (ativos.gravacao) {
+            box.appendChild(el("p", "A gravação de sessão está ligada, mas não reduziu nenhum ponto: é um controle detectivo, que registra o que foi feito sem impedir o abuso.", "margin: 0 0 0.6rem 0; font-size: 0.85rem;"));
+        }
+        if (!r.restantes.length) {
+            box.appendChild(el("p", "Nenhum achado do inventário sem controle. O risco não é zero: ele agora depende de os controles funcionarem e de a próxima recertificação acontecer.", "margin: 0; color: var(--tip-color);"));
+            return;
+        }
+        box.appendChild(el("strong", "Ainda sem controle:", "display: block; margin-bottom: 0.25rem;"));
+        var ul = el("ul", null, "margin: 0; padding-left: 1.2rem; font-size: 0.85rem;");
+        r.restantes.sort(function(a, b) { return b.pontos - a.pontos; }).forEach(function(x) {
+            ul.appendChild(el("li", x.conta.nome + ": " + PAM.problemas[x.problema].nome + " (" + x.pontos + " pontos)"));
+        });
+        box.appendChild(ul);
+    }
+
+    window.alternarControlePam = function(id, ligado) {
+        if (!PAM.controles.some(function(k) { return k.id === id; })) return;
+        ativos[id] = !!ligado;
+        renderizarControles();
+        renderizarRisco();
+    };
+
+    window.restaurarPam = function() {
+        marcados = {};
+        ativos = {};
+        conferido = false;
+        document.getElementById("pam-conferencia").replaceChildren();
+        renderizarInventario();
+        renderizarControles();
+        renderizarRisco();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("pam-contexto").textContent = PAM.contexto;
+        renderizarLegenda();
+        restaurarPam();
+        if (typeof initChecklist === "function") {
+            initChecklist("pam-acessos-privilegiados");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
