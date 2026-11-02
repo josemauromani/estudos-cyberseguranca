@@ -124,15 +124,14 @@ class TestCLI(unittest.TestCase):
         self.assertIn("ERRO", result.stderr)
 
     def test_gerar_sh_slug_compilacao(self):
-        """Verifica a compilação de um estudo específico quando seu fragmento body existe."""
-        dummy_body = GERADORES_DIR / "dummy_teste_body.html"
-        dummy_out = ROOT_DIR / "treinamento-dummy_teste.html"
-        dummy_body.write_text("<section><h2>Teste Dummy</h2><p>Conteúdo de teste</p></section>", encoding="utf-8")
-        self.addCleanup(lambda: dummy_body.unlink(missing_ok=True))
-        self.addCleanup(lambda: dummy_out.unlink(missing_ok=True))
+        """Verifica a compilação de um estudo específico quando seu fragmento body existe.
 
+        Usa um estudo real do catálogo: o montar.py exige corpo no contrato de markup e
+        slug presente em ESTUDOS_DADOS, então um corpo avulso não compila mais.
+        """
+        self.assertTrue((GERADORES_DIR / "threat_hunting_body.html").exists())
         result = subprocess.run(
-            [str(GERAR_SH), "dummy_teste"],
+            [str(GERAR_SH), "Threat-Hunting"],
             cwd=str(ROOT_DIR),
             capture_output=True,
             text=True,

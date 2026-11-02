@@ -266,9 +266,18 @@ class TestFundoDoQuadroDeDiagrama(unittest.TestCase):
         fundo = re.search(r"background(?:-color)?\s*:\s*([^;]+);", regra.group(1))
         self.assertIsNotNone(fundo, ".diagram-svg-wrap precisa declarar fundo")
         valor = fundo.group(1).strip()
-        self.assertRegex(valor, r"^#[0-9A-Fa-f]{6}$", "fundo fixo, não um token que muda com o tema")
-        r, g, b = (int(valor[i:i + 2], 16) for i in (1, 3, 5))
-        self.assertLess(0.2126 * r + 0.7152 * g + 0.0722 * b, 60, "fundo precisa ser escuro")
+        token = re.fullmatch(r"var\((--[\w-]+)\)", valor)
+        if token:
+            # Token de tema: precisa ser escuro em todos os blocos de tema (claro e escuro).
+            tokens = (GERADORES / "tokens.css").read_text(encoding="utf-8")
+            valores = re.findall(re.escape(token.group(1)) + r"\s*:\s*([^;]+);", tokens)
+            self.assertTrue(valores, f"{token.group(1)} não declarado em tokens.css")
+        else:
+            valores = [valor]
+        for v in (v.strip() for v in valores):
+            self.assertRegex(v, r"^#[0-9A-Fa-f]{6}$", "fundo precisa ser uma cor fixa por tema")
+            r, g, b = (int(v[i:i + 2], 16) for i in (1, 3, 5))
+            self.assertLess(0.2126 * r + 0.7152 * g + 0.0722 * b, 60, f"fundo precisa ser escuro: {v}")
 
 
 if __name__ == "__main__":
