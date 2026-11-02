@@ -179,7 +179,7 @@ class TestMontar(unittest.TestCase):
             tmp_path = Path(tmpdir)
             body = tmp_path / "diagrama_body.html"
             body.write_text(
-                '<pre class="mermaid" data-title="Teste">flowchart TD\nA-->B</pre>',
+                '<div class="diagram-box"><div class="diagram-header"><span class="diagram-title">Teste</span><span class="diagram-badge">Mermaid</span></div><pre class="mermaid" data-title="Teste">flowchart TD\nA-->B</pre></div>',
                 encoding="utf-8",
             )
 
@@ -188,16 +188,18 @@ class TestMontar(unittest.TestCase):
                 body_html_path=body,
                 output_path=output,
                 titulo="Treinamento com Diagrama",
+                cache_diagramas=tmp_path / "cache",
             )
 
             self.assertTrue(res.exists())
             content = res.read_text(encoding="utf-8")
 
-            self.assertIn("diagram-box", content)
-            self.assertIn("diagram-header", content)
-            self.assertIn("Teste", content)
-            self.assertIn("diagram-svg-wrap", content)
+            self.assertEqual(content.count('class="diagram-box"'), 1)
+            self.assertEqual(content.count('class="diagram-header"'), 1)
+            self.assertEqual(content.count('class="diagram-svg-wrap"'), 1)
             self.assertIn("<svg", content)
+            # O cache real do repositório não é tocado pelo teste
+            self.assertEqual(len(list((tmp_path / "cache").glob("*.svg"))), 1)
 
     def test_cli_com_recompilar_diagramas(self):
         """Verifica a execução do CLI com flag --recompilar-diagramas."""
@@ -205,7 +207,7 @@ class TestMontar(unittest.TestCase):
             tmp_path = Path(tmpdir)
             body = tmp_path / "diagrama_cli_body.html"
             body.write_text(
-                '<pre class="mermaid" data-title="CLI Teste">flowchart LR\nA-->B</pre>',
+                '<div class="diagram-box"><div class="diagram-header"><span class="diagram-title">CLI Teste</span><span class="diagram-badge">Mermaid</span></div><pre class="mermaid" data-title="CLI Teste">flowchart LR\nA-->B</pre></div>',
                 encoding="utf-8",
             )
             output = tmp_path / "saida-cli-diagrama.html"
@@ -216,14 +218,17 @@ class TestMontar(unittest.TestCase):
                 str(body),
                 str(output),
                 "--recompilar-diagramas",
+                "--cache-diagramas",
+                str(tmp_path / "cache"),
             ]
             result = subprocess.run(cmd, capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, f"CLI falhou: {result.stderr}")
             self.assertTrue(output.exists())
             content = output.read_text(encoding="utf-8")
-            self.assertIn("diagram-box", content)
-            self.assertIn("CLI Teste", content)
+            self.assertEqual(content.count('class="diagram-header"'), 1)
+            self.assertEqual(content.count('class="diagram-svg-wrap"'), 1)
             self.assertIn("<svg", content)
+            self.assertEqual(len(list((tmp_path / "cache").glob("*.svg"))), 1)
 
 
 if __name__ == "__main__":

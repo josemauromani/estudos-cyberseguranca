@@ -205,7 +205,12 @@
     <li><strong>Certificado Final / Folha (End-Entity / Leaf):</strong> Emitido para o domínio corporativo no padrão <strong>X.509</strong>, contendo a chave pública do servidor, período de validade, nome do domínio e <em>SAN (Subject Alternative Name)</em>, assinado digitalmente pela autoridade intermediária.</li>
   </ol>
 
-  <pre class="mermaid" data-title="Cadeia de Confiança PKI X.509">
+  <div class="diagram-box">
+    <div class="diagram-header">
+      <span class="diagram-title">Cadeia de Confiança PKI X.509</span>
+      <span class="diagram-badge">Mermaid</span>
+    </div>
+    <pre class="mermaid" data-title="Cadeia de Confiança PKI X.509">
 flowchart TD
     R["Root CA<br><small>autoassinada, pré-instalada no SO ou navegador</small>"]
     I["CA Intermediária<br><small>emite os certificados do dia a dia</small>"]
@@ -216,6 +221,7 @@ flowchart TD
     F -->|"enviado no handshake TLS<br>junto com a intermediária"| N
     N -.->|"confere assinaturas até uma raiz confiável,<br>validade, nome do domínio e revogação (OCSP)"| R
   </pre>
+  </div>
   <p>
     Para revogar certificados vazados antes da expiração, utilizavam-se listas de revogação volumosas (<strong>CRL</strong>).
     O padrão moderno substituiu esse modelo por consultas em tempo real via <strong>OCSP (Online Certificate Status Protocol)</strong>

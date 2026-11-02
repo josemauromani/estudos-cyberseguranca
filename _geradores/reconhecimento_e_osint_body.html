@@ -142,7 +142,12 @@ site:alvo.com.br filetype:pdf | filetype:xlsx "confidencial" OR "interno"</code>
             <li><strong>Metadados com ExifTool:</strong> Arquivos PDF e imagens disponibilizados publicamente contêm metadados (nomes de usuários do Active Directory, versões de softwares, caminhos de rede UNC). A ferramenta <strong>ExifTool</strong> extrai esses dados sem esforço.</li>
         </ul>
 
-        <pre class="mermaid" data-title="Do Domínio à Superfície de Ataque Externa">
+        <div class="diagram-box">
+          <div class="diagram-header">
+            <span class="diagram-title">Do Domínio à Superfície de Ataque Externa</span>
+            <span class="diagram-badge">Mermaid</span>
+          </div>
+          <pre class="mermaid" data-title="Do Domínio à Superfície de Ataque Externa">
 flowchart TD
     D["Domínio-alvo<br><small>empresa.com.br</small>"]
     W["WHOIS e ASN/BGP<br><small>blocos de IP da organização</small>"]
@@ -161,6 +166,7 @@ flowchart TD
     G --> SA
     TK --> SA
         </pre>
+        </div>
     </section>
 
     <!-- SEÇÃO 3: LABORATÓRIO / SIMULADOR INTERATIVO -->

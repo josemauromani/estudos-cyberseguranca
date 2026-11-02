@@ -123,7 +123,12 @@
     </div>
   </div>
 
-  <pre class="mermaid" data-title="Estrutura da Tag IEEE 802.1Q">
+  <div class="diagram-box">
+    <div class="diagram-header">
+      <span class="diagram-title">Estrutura da Tag IEEE 802.1Q</span>
+      <span class="diagram-badge">Mermaid</span>
+    </div>
+    <pre class="mermaid" data-title="Estrutura da Tag IEEE 802.1Q">
 flowchart TD
     subgraph QUADRO["Quadro Ethernet com Tag 802.1Q (Camada 2)"]
         direction LR
@@ -153,6 +158,7 @@ flowchart TD
 
     TAG ==>|"Decomposição"| TAG_EXP
   </pre>
+  </div>
 
   <div class="callout warning">
     <h4>Ataques de Salto de VLAN (VLAN Hopping) e Mitigações de Hardening</h4>

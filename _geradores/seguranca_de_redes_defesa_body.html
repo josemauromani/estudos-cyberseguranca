@@ -57,7 +57,12 @@
     </div>
   </div>
 
-  <pre class="mermaid" data-title="Topologia Comparativa: IDS vs IPS e Proxies Reversos">
+  <div class="diagram-box">
+    <div class="diagram-header">
+      <span class="diagram-title">Topologia Comparativa: IDS vs IPS e Proxies Reversos</span>
+      <span class="diagram-badge">Mermaid</span>
+    </div>
+    <pre class="mermaid" data-title="Topologia Comparativa: IDS vs IPS e Proxies Reversos">
 flowchart TD
     subgraph WAN["Origem do Tráfego"]
         CLI["Clientes & Atacantes<br><small>Internet / Rede Externa</small>"]
@@ -90,6 +95,7 @@ flowchart TD
     CLI ==> MODO_IDS
     CLI ==> MODO_WAF
   </pre>
+  </div>
 
   <h3>Motores de Inspeção: Snort vs Suricata</h3>
   <p>

@@ -187,7 +187,12 @@
             Muitas campanhas não trazem malwares compilados externos; elas utilizam <strong>LOLBins (Living off the Land Binaries)</strong> — ferramentas legítimas e assinadas pelo fabricante presentes no sistema operacional para fins administrativos que são abusadas por invasores:
         </p>
 
-        <pre class="mermaid" data-title="Árvore de Processos Suspeita: do Anexo ao LOLBin">
+        <div class="diagram-box">
+          <div class="diagram-header">
+            <span class="diagram-title">Árvore de Processos Suspeita: do Anexo ao LOLBin</span>
+            <span class="diagram-badge">Mermaid</span>
+          </div>
+          <pre class="mermaid" data-title="Árvore de Processos Suspeita: do Anexo ao LOLBin">
 flowchart TD
     E["explorer.exe<br><small>sessão do usuário</small>"]
     W["WINWORD.EXE<br><small>abre anexo .docm com macro</small>"]
@@ -199,6 +204,7 @@ flowchart TD
     PS --> CU
     PS --> RD
         </pre>
+        </div>
 
         <div class="facts-grid">
             <div class="facts-card">

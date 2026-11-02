@@ -251,7 +251,12 @@
     </p>
   </div>
 
-  <pre class="mermaid" data-title="Authorization Code Flow com PKCE">
+  <div class="diagram-box">
+    <div class="diagram-header">
+      <span class="diagram-title">Authorization Code Flow com PKCE</span>
+      <span class="diagram-badge">Mermaid</span>
+    </div>
+    <pre class="mermaid" data-title="Authorization Code Flow com PKCE">
 sequenceDiagram
     actor U as Resource Owner (usuário)
     participant C as Client (aplicação)
@@ -267,6 +272,7 @@ sequenceDiagram
     C->>R: requisição com o Access Token
     R-->>C: recurso protegido
   </pre>
+  </div>
 </section>
 
 <!-- SEÇÃO 4: ANATOMIA E ATAQUES A TOKENS JWT -->

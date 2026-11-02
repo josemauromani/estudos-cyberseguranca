@@ -104,6 +104,7 @@ def montar_treinamento(
     css_path: Optional[Path] = None,
     js_path: Optional[Path] = None,
     recompilar_diagramas: bool = False,
+    cache_diagramas: Optional[Path] = None,
 ) -> Path:
     """Compila um fragmento HTML em um arquivo de treinamento standalone completo.
 
@@ -115,6 +116,7 @@ def montar_treinamento(
         css_path: Caminho customizado para base.css (padrão: _geradores/base.css).
         js_path: Caminho customizado para base.js (padrão: _geradores/base.js).
         recompilar_diagramas: Se True, força a recompilação dos diagramas Mermaid ignorando cache.
+        cache_diagramas: Diretório do cache de SVGs (padrão: _geradores/cache_diagramas).
 
     Returns:
         Path para o arquivo gerado.
@@ -153,7 +155,9 @@ def montar_treinamento(
     body_content = body_path.read_text(encoding="utf-8").strip()
 
     # Processamento e pré-compilação de diagramas Mermaid embutidos
-    body_content = processar_diagramas_html(body_content, forcar=recompilar_diagramas)
+    body_content = processar_diagramas_html(
+        body_content, cache_dir=cache_diagramas, forcar=recompilar_diagramas
+    )
 
     # Montagem do rodapé padronizado
     footer_html = """    <footer class="study-footer">
@@ -259,6 +263,11 @@ def main(argv=None):
         default=False,
         help="Força a recompilação de diagramas Mermaid mesmo se estiverem em cache.",
     )
+    parser.add_argument(
+        "--cache-diagramas",
+        default=None,
+        help="Diretório do cache de SVGs dos diagramas (padrão: _geradores/cache_diagramas).",
+    )
 
     args = parser.parse_args(argv)
 
@@ -291,6 +300,7 @@ def main(argv=None):
         titulo=args.titulo,
         meta=meta,
         recompilar_diagramas=args.recompilar_diagramas,
+        cache_diagramas=Path(args.cache_diagramas) if args.cache_diagramas else None,
     )
 
     print(f"[OK] Treinamento compilado com sucesso em: {caminho_final}")

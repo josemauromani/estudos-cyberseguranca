@@ -144,7 +144,12 @@
     </ol>
   </div>
 
-  <pre class="mermaid" data-title="3-Way Handshake TCP e Estados da Conexão">
+  <div class="diagram-box">
+    <div class="diagram-header">
+      <span class="diagram-title">3-Way Handshake TCP e Estados da Conexão</span>
+      <span class="diagram-badge">Mermaid</span>
+    </div>
+    <pre class="mermaid" data-title="3-Way Handshake TCP e Estados da Conexão">
 sequenceDiagram
     participant C as Cliente
     participant S as Servidor
@@ -156,6 +161,7 @@ sequenceDiagram
     C->>S: ACK (SEQ=1001, ACK=5001)
     Note over C,S: ESTABLISHED
   </pre>
+  </div>
 
   <p>As 6 flags primárias de controle do cabeçalho TCP desempenham papéis fundamentais na análise de tráfego:</p>
   <div class="cards-grid">

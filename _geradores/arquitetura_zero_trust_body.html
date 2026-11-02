@@ -119,7 +119,12 @@
     </div>
   </div>
 
-  <pre class="mermaid" data-title="Fluxo Lógico de Decisão NIST SP 800-207">
+  <div class="diagram-box">
+    <div class="diagram-header">
+      <span class="diagram-title">Fluxo Lógico de Decisão NIST SP 800-207</span>
+      <span class="diagram-badge">Mermaid</span>
+    </div>
+    <pre class="mermaid" data-title="Fluxo Lógico de Decisão NIST SP 800-207">
 flowchart TD
     subgraph PDP["PLANO DE CONTROLE (PDP)"]
         PE["Policy Engine (PE)<br><small>Avaliação e Cálculo de Risco</small>"]
@@ -136,6 +141,7 @@ flowchart TD
     Subject -.->|"Telemetria & Contexto"| PE
     PA -->|"2. Comando de Acesso"| PEP
   </pre>
+  </div>
 </section>
 
 <!-- SEÇÃO 3: MICROSEGMENTAÇÃO E ZTNA VS VPN -->

@@ -159,7 +159,7 @@ def processar_diagramas_html(
     forcar: bool = False
 ) -> str:
     """
-    Substitui todos os blocos <pre class="mermaid"> por contêineres .diagram-box com SVG inline.
+    Substitui todos os blocos <pre class="mermaid"> pelo .diagram-svg-wrap com o SVG inline (o .diagram-box vem do autor).
     Se a compilação falhar e não houver cache, preserva o bloco original como fallback.
     """
     if cache_dir is None:
@@ -182,16 +182,12 @@ def processar_diagramas_html(
         titulo_escapado = html_lib.escape(titulo_puro, quote=True)
         svg_inline = svg_content.strip()
 
+        # Só o <pre> é trocado: o .diagram-box e o cabeçalho vêm do autor
+        # (spec 2026-10-17 §3.1 e §6; GUIA-DO-AUTOR §3.6).
         markup_substituto = (
-            f'<div class="diagram-box">\n'
-            f'  <div class="diagram-header">\n'
-            f'    <span class="diagram-title">{titulo_escapado}</span>\n'
-            f'    <span class="diagram-badge">Mermaid Arquitetura</span>\n'
-            f'  </div>\n'
-            f'  <div class="diagram-svg-wrap" role="img" aria-label="{titulo_escapado}">\n'
+            f'<div class="diagram-svg-wrap" role="img" aria-label="{titulo_escapado}">\n'
             f'    {svg_inline}\n'
-            f'  </div>\n'
-            f'</div>'
+            f'  </div>'
         )
 
         resultado = resultado.replace(bloco["bloco_completo"], markup_substituto, 1)

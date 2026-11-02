@@ -1185,7 +1185,9 @@ tr:hover td {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   text-align: center;
-  background: var(--surface);
+  /* Fundo escuro fixo nos dois temas, como o .terminal-box: os SVGs são gerados
+     com o tema escuro do Mermaid e trazem textos e setas em lightgrey. */
+  background: #172229;
 }
 
 .diagram-svg-wrap svg {

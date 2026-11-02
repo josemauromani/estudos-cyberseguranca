@@ -291,7 +291,12 @@
     </li>
   </ul>
 
-  <pre class="mermaid" data-title="Ciclo Contínuo de Conformidade (Compliance-as-Code)">
+  <div class="diagram-box">
+    <div class="diagram-header">
+      <span class="diagram-title">Ciclo Contínuo de Conformidade (Compliance-as-Code)</span>
+      <span class="diagram-badge">Mermaid</span>
+    </div>
+    <pre class="mermaid" data-title="Ciclo Contínuo de Conformidade (Compliance-as-Code)">
 flowchart TD
     B["Linha de base<br><small>perfil CIS Nível 1 ou 2</small>"]
     A["Aplicar<br><small>playbooks Ansible, GPO</small>"]
@@ -305,6 +310,7 @@ flowchart TD
     D -->|"não"| M
     M -.->|"agendado"| V
   </pre>
+  </div>
 </section>
 
 <!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (AUDITOR CIS BENCHMARK) -->
