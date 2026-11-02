@@ -13,7 +13,7 @@ O projeto **Estudos de Cibersegurança** foi desenvolvido para oferecer uma tril
 1. **Zero Dependências Pesadas:**
    - Não requer servidores locais, containers Docker, bancos de dados ou dependências externas como LibreOffice (`soffice`).
 2. **100% Offline e Standalone:**
-   - Cada módulo compila em um único arquivo HTML5 autocontido, com Design System CSS e utilitários JavaScript totalmente embutidos (*inlined*). Funciona instantaneamente em qualquer navegador, mesmo sem conexão à internet.
+   - Cada módulo compila em um único arquivo HTML5 autocontido, com Design System CSS, utilitários JavaScript e fontes (licença OFL, em `_geradores/fontes/`) totalmente embutidos (*inlined*). Não há CDN nem requisição externa. Funciona instantaneamente em qualquer navegador, mesmo sem conexão à internet.
 3. **Interatividade Prática em Cada Módulo:**
    - Teoria pragmática e direta ao ponto (sem jargões desnecessários).
    - **Simuladores práticos em JavaScript Vanilla:** ferramentas interativas reais (analisadores de regras, decodificadores JWT, laboratórios de criptografia, calculadoras CVSS e terminais simulados).
@@ -35,11 +35,15 @@ xdg-open index.html          # No Linux
 # ou abra 'index.html' pelo seu gerenciador de arquivos / navegador
 ```
 
-O portal `index.html` conta com:
-- **Estatísticas em Tempo Real:** contagem de módulos disponíveis, horas estimadas e progresso individual de conclusão gravado no navegador.
-- **Filtros Dinâmicos:** visualização por trilha temática, perfil profissional (Blue Team, Red Team, AppSec, GRC, Cloud/DevSecOps, Analista de Segurança da Informação) e função do NIST CSF 2.0.
-- **Matriz "Escolha pela Necessidade":** atalhos para os módulos com base em problemas práticos reais do dia a dia corporativo.
-- **Busca Instantânea:** pesquisa rápida por título, termos técnicos ou conceitos-chave.
+O portal `index.html` tem um **menu lateral** com seis visões:
+- **Catálogo:** tela inicial, com os 57 módulos, o bloco **Continuar estudando** (último módulo aberto) e o **status** de cada módulo (não iniciado, em andamento, concluído). Permite **Agrupar por** Trilha, Nível, Perfil ou NIST, marcar **Só não concluídos** e buscar por título, termo técnico ou conceito (atalho `/`).
+- **Rotas sugeridas:** a rota de cada perfil profissional (Blue Team, Red Team, AppSec, GRC, Cloud/DevSecOps, Analista de Segurança da Informação) como sequência numerada, com progresso e o próximo módulo.
+- **Por certificação:** os módulos que cobrem cada prova (CEH, CISM, CISSP, CCSP, GSEC e Security+).
+- **Pela necessidade:** atalhos para os módulos com base em problemas práticos do dia a dia corporativo.
+- **Rota por vaga:** requisitos de uma vaga de Analista de Segurança da Informação ligados aos módulos que os cobrem.
+- **Meu progresso:** módulos concluídos e os que faltam, gravados no navegador (`localStorage`).
+
+Cada módulo tem navegação lateral por seções, tema claro e escuro, checklist e questões com progresso salvo.
 
 ---
 
@@ -178,7 +182,7 @@ flowchart TD
 
 ## 🎯 Rota por Vaga: Analista de Segurança da Informação
 
-O portal (`index.html`) traz a seção **Rota por Vaga**, que liga cada requisito de uma vaga de Analista de Segurança da Informação aos módulos que o cobrem (principais e de apoio):
+O portal (`index.html`) traz a visão **Rota por Vaga**, que liga cada requisito de uma vaga de Analista de Segurança da Informação aos módulos que o cobrem (principais e de apoio):
 
 | Competência da vaga | Módulos principais | Módulos de apoio |
 |---|---|---|
@@ -190,7 +194,7 @@ O portal (`index.html`) traz a seção **Rota por Vaga**, que liga cada requisit
 | Controles de segurança da informação | 26 | 06, 08, 38, 40 |
 | Formação e certificações | 33 | 37 |
 
-O portal também exibe a **Matriz de Certificações** (CEH, CISM, CISSP, CCSP, GSEC e Security+), com os módulos que cobrem cada uma.
+O portal também exibe a visão **Por certificação**, (CEH, CISM, CISSP, CCSP, GSEC e Security+), com os módulos que cobrem cada uma.
 
 ---
 
@@ -265,7 +269,7 @@ O repositório inclui uma suíte abrangente de testes automatizados com `unittes
 
 ```bash
 # Executa todos os testes do pipeline:
-python3 -m unittest discover -s _geradores/testes -v
+python3 -m unittest discover -s _geradores/testes
 ```
 
 ---
@@ -274,9 +278,7 @@ python3 -m unittest discover -s _geradores/testes -v
 
 O currículo é estruturado de forma a atender diferentes objetivos e momentos de carreira:
 
-> No portal, a aba **Rotas Sugeridas** mostra a rota de cada perfil como sequência numerada, com progresso e o próximo módulo a estudar.
-> A aba **Por Certificação** reúne os módulos que cobrem cada prova (CEH, CISM, CISSP, CCSP, GSEC e Security+), com progresso e próximo módulo, e a aba **Meu Progresso** separa os módulos concluídos dos que faltam estudar.
-> A aba **Por Nível** classifica os 57 módulos em iniciante (12), intermediário (31) e avançado (14), e cada card mostra o seu nível.
+> No portal, a visão **Rotas sugeridas** mostra a rota de cada perfil como sequência numerada, com progresso e o próximo módulo a estudar; **Por certificação** reúne os módulos que cobrem cada prova; **Meu progresso** separa os concluídos dos que faltam; e o **Catálogo** agrupa os 57 módulos por nível (iniciante 12, intermediário 31, avançado 14), trilha, perfil ou função NIST.
 
 - **Blue Team & Defesa Ativa:** Módulos de redes, bastionamento Linux/Windows, firewalls, Zero Trust, EDR e detecção de ameaças; Linux e PowerShell para investigação (Trilha 8), Active Directory e detecção de ataques ao AD (Trilha 9) e ransomware (Trilha 10); engenharia de detecção, threat hunting, monitoramento de rede e SOAR (Trilha 11).
 - **Red Team & Testes de Invasão:** Técnicas de reconhecimento OSINT, OWASP Top 10 Web, segurança de APIs e metodologias de pentest; Linux e caminhos de ataque no Active Directory (Trilhas 8 e 9); escalação de privilégio em Kubernetes (Trilha 12).

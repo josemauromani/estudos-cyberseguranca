@@ -1,6 +1,6 @@
 # Guia do Autor: Diretrizes Pedagógicas e Padrões de Conteúdo
 
-Este documento estabelece as diretrizes de redação técnica, arquitetura de informação e padrões de código HTML/JS para a elaboração dos 28 módulos da plataforma **Estudos de Cibersegurança**.
+Este documento estabelece as diretrizes de redação técnica, arquitetura de informação e padrões de código HTML/JS para a elaboração dos 57 módulos da plataforma **Estudos de Cibersegurança**.
 
 ---
 
@@ -17,151 +17,222 @@ Este documento estabelece as diretrizes de redação técnica, arquitetura de in
 
 ---
 
-## 2. Estrutura Canônica de um Treinamento
+## 2. Estrutura de um Treinamento: o Contrato do Corpo
 
-Cada módulo é redigido em um arquivo fragmento `_geradores/<slug_snake_case>_body.html` e compilado pelo script `montar.py` para gerar `<Pasta>/treinamento-<slug_kebab_case>.html`.
+Cada módulo é redigido em um arquivo fragmento `_geradores/<slug_snake_case>_body.html` (o **corpo**) e compilado pelo `montar.py` para gerar `<Pasta>/treinamento-<slug_kebab_case>.html`.
 
-Todo treinamento deve conter obrigatoriamente as 6 seções a seguir:
+### 2.1 O que o autor escreve e o que o gerador cria
 
-```mermaid
-flowchart TD
-    A["1. Cabeçalho e Metadados"] --> B["2. Fundamentação Teórica e Arquitetura"]
-    B --> C["3. Laboratório / Simulador Interativo em JS"]
-    C --> D["4. Checklist Operacional de Boas Práticas"]
-    D --> E["5. Quiz de Fixação e Validação"]
-    E --> F["6. Referências Normativas e Leitura"]
+| O autor escreve (no `_body.html`) | O gerador cria (não escreva) |
+|---|---|
+| `<article class="study-container">` com as seções de conteúdo | Cabeçalho do estudo (trilha, título, subtítulo, tempo, nível, NIST, MITRE, carreiras) |
+| Cada `<section class="study-section">` com seu `<h2>` | Rodapé, navegação lateral/sumário e botão "Concluir módulo" |
+| Componentes do conteúdo (callouts, tabelas, terminais, diagramas, laboratório, checklist, questões) | Rótulo e numeração das seções ("Seção 0X", ícone e tipo) |
+
+**Metadados do módulo** (título, subtítulo, tempo, nível, NIST, MITRE, carreiras) ficam em `ESTUDOS_DADOS`, em `_geradores/index_dados.py`, e são renderizados por `_geradores/chassi.py`. Nunca os escreva no corpo. Não escreva cabeçalho, rodapé, "Seção 0X" nem marcações de etiqueta de seção: o validador rejeita esses elementos.
+
+### 2.2 As regras do corpo
+
+1. Há exatamente um `<article class="study-container" data-slug="...">`, na raiz do arquivo.
+2. Os filhos diretos do `article` são `<section class="study-section" id="..." data-tipo="...">`, com os atributos nessa ordem (`class`, `id`, `data-tipo`). Os `<script>` e `<style>` do simulador também podem ser filhos diretos do `article`.
+3. Cada seção começa com um `<h2>`, e o `id` é único.
+4. Não há `<footer>` nem classes de cabeçalho ou etiqueta de seção (o chassi as gera).
+5. Existe ao menos uma seção de cada tipo: `laboratorio`, `checklist`, `questoes` e `referencias`.
+6. O checklist usa `ul.checklist > li.checklist-item`, cada item com `input[type=checkbox][id]` e `label[for]` correspondente.
+7. Cada `.quiz-item` tem `.quiz-question` e a resposta no formato aberto (3.5), ou o formato de múltipla escolha.
+8. Todo `div.callout` tem um modificador: `tip`, `warning`, `danger`, `law` ou `key`.
+
+### 2.3 Tipos de seção e rótulos
+
+O `data-tipo` define o ícone e o rótulo que o chassi mostra na navegação. O módulo costuma ter várias seções de teoria; os demais tipos aparecem ao menos uma vez.
+
+| `data-tipo` | Rótulo gerado | Conteúdo |
+|---|---|---|
+| `data-tipo="teoria"` | 📘 Teoria | Fundamentação, arquitetura, tabelas, diagramas, terminais e callouts |
+| `data-tipo="laboratorio"` | 🧪 Laboratório | Simulador interativo em JavaScript puro (`.lab-box`) |
+| `data-tipo="checklist"` | ☑️ Checklist | Lista de 4 a 8 itens práticos de verificação ou auditoria |
+| `data-tipo="questoes"` | ❓ Questões de concurso | Questões de fixação com resposta comentada |
+| `data-tipo="referencias"` | 📚 Referências | Padrões oficiais (RFCs, NIST SPs, CIS Benchmarks, OWASP, fabricantes) e leituras |
+
+Esqueleto mínimo (copiado do padrão de `_geradores/threat_hunting_body.html`):
+
+```html
+<article class="study-container" data-slug="threat-hunting">
+
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: Nenhum Alerta Não Quer Dizer Nenhum Invasor</h2>
+        <p class="lead-text">Parágrafo de abertura: o problema real e o que o estudante vai resolver.</p>
+        ...
+    </section>
+
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Caçada Guiada</h2>
+        ...
+    </section>
+
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de uma Caçada</h2>
+        ...
+    </section>
+
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
+        ...
+    </section>
+
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        ...
+    </section>
+
+    <script>/* JavaScript do simulador, filho direto do article */</script>
+</article>
 ```
 
-### Seção 1: Cabeçalho e Metadados (`.hero-header`)
-- **Badge da Trilha:** Identificador visual da trilha com a respectiva cor temática.
-- **Título do Estudo:** Direto e memorável.
-- **Subtítulo Descritivo:** 1 a 2 frases resumindo a proposta de valor técnica.
-- **Barra de Metadados:**
-  - Tempo estimado de estudo (ex.: `⏱️ 40 minutos`).
-  - Mapeamento NIST CSF 2.0 (ex.: `🛡️ NIST: Identify`).
-  - Carreiras-alvo (ex.: `🎯 Blue Team | SOC | GRC`).
+### 2.4 Validação
 
-### Seção 2: Fundamentação Teórica e Arquitetura
-- Explicação clara dos princípios, protocolos ou metodologias.
-- Uso de diagramas conceituais (tabelas comparativas, fluxos).
-- Destaque de boas práticas e armadilhas comuns através de caixas `.callout`.
-- Exemplos de comandos e configurações reais através de blocos `.terminal-box`.
+O `montar.py` valida o corpo antes de compilar (`contrato.validar_corpo(html, slug)`). Se alguma regra falhar, a compilação **aborta com código de saída 1** e imprime mensagens no formato `"<slug> §<n>: <onde>: <descrição>"`, em que `<n>` é o número da regra da seção 2.2:
 
-### Seção 3: Laboratório Prático / Simulador Interativo (`.lab-box`)
-- Cada módulo **deve conter um simulador interativo em JavaScript puro (Vanilla JS)**.
-- O simulador não é um mero elemento estético: ele deve permitir manipulação ativa pelo aluno (ex.: alterar parâmetros, acionar filtros, inspecionar pacotes, validar hashes).
-- Não deve exigir requisições externas para funcionar — deve operar 100% offline.
+```bash
+python3 _geradores/montar.py _geradores/threat_hunting_body.html
+```
 
-### Seção 4: Checklist Operacional de Boas Práticas (`.checklist`)
-- Lista de 4 a 8 itens práticos de verificação ou auditoria.
-- Cada item utiliza caixas de seleção que persistem seu estado no `localStorage` do navegador via `initChecklist()`.
-- O estudante deve conseguir utilizar esse checklist como modelo de trabalho real em suas auditorias corporativas.
+Corrija o corpo e compile de novo; não há opção para ignorar o validador.
 
-### Seção 5: Quiz de Fixação e Validação (`.quiz-section`)
-- No mínimo 3 a 4 questões de múltipla escolha com foco analítico (estilo casos de certificação ou concurso público).
-- Cada opção de resposta deve oferecer feedback explicativo detalhado, justificando o porquê de estar correta ou incorreta.
+### 2.5 Orientações editoriais por tipo de seção
 
-### Seção 6: Referências Normativas e Leituras Complementares
-- Lista concisa de padrões oficiais (links para RFCs, NIST SPs, guias CIS Benchmarks, artigos da OWASP ou documentações de fabricantes).
+- **Teoria:** explique princípios, protocolos e metodologias com clareza. Use tabelas comparativas, diagramas, callouts para boas práticas e armadilhas, e `.terminal-box` para comandos e configurações reais. Abra com o problema de segurança real.
+- **Laboratório:** cada módulo **deve conter um simulador interativo em JavaScript puro (Vanilla JS)**. Ele deve permitir manipulação ativa (alterar parâmetros, acionar filtros, inspecionar pacotes, validar hashes) e operar 100% offline.
+- **Checklist:** 4 a 8 itens que o estudante possa reutilizar como modelo de trabalho em auditorias reais. O estado das caixas é gravado no `localStorage` pelo `base.js`.
+- **Questões:** no mínimo 3 a 4 questões com foco analítico (estilo certificação ou concurso). Toda resposta traz explicação pedagógica que justifica o porquê de estar correta ou incorreta.
+- **Referências:** lista concisa de fontes oficiais.
 
 ---
 
 ## 3. Componentes HTML e Padrões CSS do Design System
 
-Todos os módulos utilizam as classes CSS padronizadas em `base.css`:
+### 3.0 Estilo: tokens, fontes e arquivos CSS
 
-### 3.1 Caixas de Destaque (`.callout`)
+- `tokens.css`: variáveis de design. Os nomes antigos foram preservados; os novos incluem a escala tipográfica `--tipo-*` e as cores de console `--console*`. Use sempre as variáveis, nunca cores fixas.
+- `base.css`: os componentes descritos abaixo.
+- `laboratorio.css`: regras específicas dos simuladores.
+- `index.css`: o portal.
+- Fontes: ficam embutidas no HTML a partir de `_geradores/fontes/` (licença OFL, texto em `OFL.txt`). Não há CDN nem requisição externa.
+
+Os temas claro e escuro são automáticos; teste o simulador nos dois.
+
+### 3.1 Texto de abertura (`p.lead-text`)
+
+Opcional. Um parágrafo de abertura logo após o `<h2>` da seção:
 
 ```html
-<!-- Dica operacional ou recomendação -->
-<div class="callout callout-tip">
-  <strong>💡 Dica Prática:</strong> Sempre desabilite o login direto de root no arquivo /etc/ssh/sshd_config.
-</div>
+<p class="lead-text">
+    Conduza a caçada do relatório na frota fictícia da Ipê Store. Escolha a hipótese, a fonte de dados e aponte o achado.
+</p>
+```
 
-<!-- Aviso importante de segurança -->
-<div class="callout callout-warning">
-  <strong>⚠️ Atenção:</strong> O uso de algoritmos legados como MD5 e SHA-1 não garante mais integridade contra colisões.
-</div>
+### 3.2 Caixas de Destaque (`div.callout`)
 
-<!-- Alerta de perigo ou vulnerabilidade crítica -->
-<div class="callout callout-danger">
-  <strong>🚨 Perigo Crítico:</strong> Nunca desative a validação de certificados SSL/TLS em código de produção.
-</div>
+A classe `callout` recebe **um** modificador (`tip`, `warning`, `danger`, `law` ou `key`) e traz um `.callout-title`:
 
-<!-- Requisito regulatório ou jurídico (LGPD, ISO) -->
-<div class="callout callout-law">
-  <strong>⚖️ Requisito Normativo:</strong> O art. 48 da LGPD exige a comunicação de incidentes relevantes à ANPD em prazo razoável.
+```html
+<div class="callout tip">
+    <div class="callout-title">
+        <span class="callout-icon">🔦</span>
+        <strong>Pergunta-chave do módulo</strong>
+    </div>
+    <p>
+        Se um invasor estiver na rede sem disparar alertas, por onde você começa a procurar?
+    </p>
 </div>
 ```
 
-### 3.2 Terminal de Comandos (`.terminal-box`)
+| Modificador | Uso |
+|---|---|
+| `tip` | Dica operacional ou recomendação |
+| `warning` | Aviso importante de segurança |
+| `danger` | Perigo ou vulnerabilidade crítica |
+| `law` | Requisito regulatório ou jurídico (LGPD, ISO) |
+| `key` | Ideia central a memorizar |
+
+### 3.3 Terminal de Comandos (`.terminal-box`)
 
 ```html
 <div class="terminal-box">
-  <div class="terminal-header">
-    <span class="terminal-title">bash — inspeção de certificados</span>
-    <button class="btn-copy" onclick="copyCode(this)">Copiar</button>
-  </div>
-  <pre><code>openssl x509 -in cert.pem -text -noout | grep "Validity" -A 2</code></pre>
-</div>
-```
-
-### 3.3 Painel do Simulador Prático (`.lab-box`)
-
-```html
-<div class="lab-box">
-  <div class="lab-header">
-    <h3>🧪 Laboratório Interativo: Inspetor de Cabeçalhos</h3>
-    <p>Altere os parâmetros do cabeçalho abaixo e observe a reação do host de destino.</p>
-  </div>
-  <div class="lab-body">
-    <!-- Controles interativos -->
-    <div class="lab-controls">
-      <label>Porta Destino: <input type="number" id="labPort" value="443"></label>
-      <button class="btn-primary" onclick="executarSimulacao()">Testar Conexão</button>
+    <div class="terminal-header">
+        <span class="terminal-title">PowerShell — inventário de tarefas da frota</span>
+        <button class="terminal-copy-btn" onclick="copyCode(this, 'code-th-stack')">Copiar</button>
     </div>
-    <!-- Área de saída -->
-    <div class="lab-output" id="labResultado">
-      Aguardando execução...
+    <pre><code id="code-th-stack">$estacoes = Get-Content .\estacoes.txt</code></pre>
+</div>
+```
+
+O segundo argumento de `copyCode` é o `id` do `<code>` a copiar.
+
+### 3.4 Painel do Simulador (`.lab-box`) e checklist
+
+O simulador mora na seção `data-tipo="laboratorio"`:
+
+```html
+<div class="lab-box" id="th-lab">
+    <div class="lab-header">
+        <div>
+            <span class="lab-badge">Caça por hipótese</span>
+            <h3>Caçada Guiada na frota da Ipê Store</h3>
+        </div>
     </div>
-  </div>
+    <div class="lab-body">
+        <!-- controles e saída do simulador -->
+    </div>
 </div>
 ```
 
-### 3.4 Lista de Verificação Interativa (`.checklist`)
+Opcional: o simulador pode informar o progresso ao sumário lateral com `CS.labProgress(feitos, total)` (por exemplo `CS.labProgress(3, 5)` mostra "3/5" ao lado do laboratório). Valores inválidos limpam o contador.
+
+O checklist é uma lista não ordenada; cada item tem checkbox com `id` e `label` ligado por `for`:
 
 ```html
-<div class="checklist" data-checklist-id="hardening-ssh">
-  <h4>Checklist de Auditoria SSH</h4>
-  <label class="check-item">
-    <input type="checkbox" id="chk-ssh-root">
-    <span>PermitRootLogin configurado explicitamente como 'no'</span>
-  </label>
-  <label class="check-item">
-    <input type="checkbox" id="chk-ssh-pubkey">
-    <span>PasswordAuthentication desabilitado em favor de chaves públicas</span>
-  </label>
-</div>
+<ul class="checklist" data-checklist-slug="threat-hunting">
+    <li class="checklist-item">
+        <input type="checkbox" id="chk-th-1">
+        <label for="chk-th-1"><strong>Hipótese:</strong> escrita antes da busca, testável e com técnica mapeada.</label>
+    </li>
+    <li class="checklist-item">
+        <input type="checkbox" id="chk-th-2">
+        <label for="chk-th-2"><strong>Visibilidade:</strong> a fonte escolhida enxerga o comportamento em toda a população.</label>
+    </li>
+</ul>
 ```
 
-### 3.5 Quiz com Revelação Explicativa (`.quiz-item`)
+### 3.5 Questões com resposta revelável (`.quiz-item`)
+
+Formato padrão (resposta aberta): `div.quiz-item > .quiz-question + details.quiz-details > summary.quiz-toggle + .quiz-answer`.
 
 ```html
-<div class="quiz-item" data-quiz-id="q1">
-  <p class="quiz-question"><strong>Questão 1:</strong> Qual é a principal diferença entre um ataque de DoS e um DDoS?</p>
-  <div class="quiz-options">
-    <button class="quiz-btn" onclick="checkQuiz(this, false, 'Incorreto. O protocolo utilizado não é a distinção definidora.')">
-      A) DoS usa UDP e DDoS usa apenas TCP.
-    </button>
-    <button class="quiz-btn" onclick="checkQuiz(this, true, 'Correto! No DDoS o tráfego se origina de múltiplos nós distribuídos.')">
-      B) No DoS o ataque parte de uma única origem; no DDoS, de múltiplas origens distribuídas (botnet).
-    </button>
-  </div>
-  <div class="quiz-feedback" style="display: none;"></div>
+<div class="quiz-item">
+    <div class="quiz-question">
+        <strong>Questão 1 (Indicador):</strong> O relatório traz o hash do implante. A varredura no EDR deu zero resultados. Dá para encerrar dizendo que a empresa não foi atingida?
+    </div>
+    <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta explicada</summary>
+        <div class="quiz-answer">
+            <p><strong>Resposta:</strong> Não. O hash fica na base da Pirâmide da Dor: o grupo recompila o implante para cada vítima.</p>
+        </div>
+    </details>
 </div>
 ```
 
-### 3.6 Diagramas Arquiteturais e Lógicos (`.diagram-box` e `<pre class="mermaid">`)
+Variante de múltipla escolha: `div.quiz-item` com `data-formato="multipla"`, em que as alternativas são botões de opção de classe própria do `base.css`, como validado em `_geradores/contrato.py` (regra 7). Prefira o formato aberto acima, que é o usado pelos módulos migrados; consulte `contrato.py` antes de usar a variante.
+
+### 3.6 Tabelas e fatos
+
+Tabelas largas ficam em `div.table-responsive > table.data-table`, para rolar dentro do componente em telas estreitas. Resumos de fim de módulo usam `div.facts-grid > div.facts-card`.
+
+### 3.7 Responsividade
+
+O layout deve funcionar de 360 px a 1920 px **sem rolagem horizontal da página**. Conteúdo largo (tabelas, terminais, diagramas) rola dentro do próprio componente.
+
+### 3.8 Diagramas Arquiteturais e Lógicos (`.diagram-box` e `<pre class="mermaid">`)
 
 Para esquemas arquiteturais, fluxos de decisão e dissecção de protocolos, utilize a sintaxe canônica **Mermaid** encapsulada no container `.diagram-box`:
 
@@ -224,10 +295,13 @@ flowchart TD
 1. **Nomes dos Slugs:** Utilizar formato Kebab-Case com iniciais maiúsculas nas palavras para o nome de pasta e slug canônico (ex.: `Fundamentos-Ciber`, `Redes-e-Protocolos`, `OWASP-Top-10-Web`).
 2. **Nomes dos Arquivos de Entrada:** Salvos em `_geradores/` no formato `<slug_em_snake_case>_body.html` (ex.: `_geradores/fundamentos_ciber_body.html`).
 3. **Nomes dos Arquivos de Saída:** Salvos na pasta do estudo no formato `<Pasta>/treinamento-<slug_em_kebab_case_minusculo>.html` (ex.: `Fundamentos-Ciber/treinamento-fundamentos-ciber.html`).
-4. **Chaves de `localStorage`:**
+4. **Chaves de `localStorage`** (todas com prefixo `cs_`):
    - Tema global: `cs_theme` (`light` | `dark`).
-   - Checkboxes de estudos: `cs_check_<slug>_<item_id>`.
-   - Status de conclusão de estudo: `cs_done_<slug>`.
+   - Estudo concluído: `cs_done_<slug>`.
+   - Itens de checklist: `cs_check_<slug>_<inputId>`, em que `inputId` é o `id` do checkbox.
+   - Seções lidas: `cs_read_<slug>`.
+   - Respostas das questões: `cs_quiz_<slug>_<qid>`.
+   - Último estudo aberto (usado em "Continuar estudando" no portal): `cs_last`.
 
 ---
 
@@ -235,11 +309,14 @@ flowchart TD
 
 Antes de publicar ou compilar um novo estudo, confirme se todos os critérios abaixo foram atendidos:
 
-- [ ] O slug e título constam exatamente como registrados em `_geradores/estudos.txt`.
-- [ ] O arquivo `_geradores/<slug>_body.html` foi criado e contém as 6 seções obrigatórias.
+- [ ] O slug e título constam exatamente como registrados em `_geradores/estudos.txt` e os metadados em `ESTUDOS_DADOS` (`_geradores/index_dados.py`).
+- [ ] O arquivo `_geradores/<slug>_body.html` foi criado e passa no `contrato.validar_corpo` (o `montar.py` não aborta), com ao menos uma seção de cada tipo obrigatório.
+- [ ] O corpo não traz cabeçalho, rodapé, "Seção 0X" nem etiquetas de seção escritas à mão.
 - [ ] O simulador prático em JS funciona sem disparar erros no console do navegador (`F12`).
 - [ ] Os checklists gravam o estado no `localStorage` e o restauram ao recarregar a página.
-- [ ] Todas as questões do quiz possuem feedback pedagógico justificando as alternativas.
+- [ ] Todas as questões possuem resposta comentada com justificativa pedagógica.
+- [ ] Todo `div.callout` tem modificador (`tip`, `warning`, `danger`, `law` ou `key`).
 - [ ] Diagramas arquiteturais utilizam `<pre class="mermaid">` e compilam para SVG sem quebra visual.
+- [ ] A página não tem rolagem horizontal a 400 px de largura, nos temas claro e escuro.
 - [ ] A compilação via `./_geradores/gerar.sh <slug>` executa com sucesso (`exit code 0`).
 - [ ] O arquivo gerado funciona 100% offline via protocolo `file:///`.
