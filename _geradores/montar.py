@@ -43,12 +43,12 @@ from chassi import (
     gerar_fim,
     gerar_sumario,
     gerar_topbar,
+    SlugSemDados,
     info_modulo,
     inserir_fim,
     numerar_questoes,
 )
 from contrato import ContratoInvalido, extrair_secoes, validar_corpo
-from index_dados import TRILHAS
 
 
 def carregar_css(base_css: Optional[Path] = None) -> str:
@@ -140,7 +140,7 @@ def montar_treinamento(
         body_html_path: Caminho para o arquivo contendo o corpo HTML (_body.html).
         output_path: Caminho de destino para gravação do HTML compilado.
         titulo: Título da página/treinamento (opcional, extraído do catálogo se omitido).
-        meta: Metadados contextuais opcionais (slug, trilha, nist, etc.).
+        meta: Metadados contextuais opcionais (slug, titulo).
         css_path: Caminho customizado para base.css (padrão: _geradores/base.css; tokens e fontes são sempre incluídos).
         js_path: Caminho customizado para base.js (padrão: _geradores/base.js).
         recompilar_diagramas: Se True, força a recompilação dos diagramas Mermaid ignorando cache.
@@ -188,10 +188,6 @@ def montar_treinamento(
 
     # Chassi: dados do módulo, cabeçalhos de seção, questões numeradas e fim do módulo
     info = info_modulo(slug)
-    if meta_dict.get("trilha") and str(meta_dict["trilha"]).isdigit() and int(meta_dict["trilha"]) in TRILHAS:
-        info.trilha_num = int(meta_dict["trilha"])
-        info.trilha_nome = TRILHAS[info.trilha_num]["nome"]
-        info.trilha_cor = TRILHAS[info.trilha_num]["cor"]
     body_content = aplicar_cabecalhos_de_secao(body_content, secoes)
     body_content = numerar_questoes(body_content)
     body_content = inserir_fim(body_content, gerar_fim(info))
@@ -259,11 +255,6 @@ def main(argv=None):
         help="Título opcional para sobrescrever o valor do catálogo.",
     )
     parser.add_argument(
-        "--trilha",
-        default=None,
-        help="Número da trilha, conforme o catálogo (estudos.txt), para sobrescrever o valor do catálogo.",
-    )
-    parser.add_argument(
         "--recompilar-diagramas",
         action="store_true",
         default=False,
@@ -297,8 +288,6 @@ def main(argv=None):
         output_path = Path(f"treinamento-{nome_base}.html")
 
     meta = {}
-    if args.trilha:
-        meta["trilha"] = args.trilha
 
     try:
         caminho_final = montar_treinamento(
@@ -313,7 +302,7 @@ def main(argv=None):
         for msg in e.erros:
             print(msg, file=sys.stderr)
         sys.exit(1)
-    except KeyError as e:
+    except SlugSemDados as e:
         print(f"Slug sem dados em ESTUDOS_DADOS: {e}", file=sys.stderr)
         sys.exit(1)
 

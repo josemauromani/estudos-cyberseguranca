@@ -105,7 +105,7 @@ class TestTokens(unittest.TestCase):
             corpo = Path(tmp) / "teste_body.html"
             corpo.write_text(corpo_valido(), encoding="utf-8")
             saida = Path(tmp) / "saida.html"
-            montar_treinamento(corpo, saida, titulo="Teste", meta={"slug": "Fundamentos-Ciber", "trilha": "1"})
+            montar_treinamento(corpo, saida, titulo="Teste", meta={"slug": "Fundamentos-Ciber"})
             html = saida.read_text(encoding="utf-8")
         self.assertNotIn("fonts.googleapis.com", html)
         self.assertNotIn("fonts.gstatic.com", html)

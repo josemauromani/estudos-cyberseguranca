@@ -48,7 +48,7 @@ class TestMontar(unittest.TestCase):
                 body_html_path=body,
                 output_path=output,
                 titulo="Treinamento Teste",
-                meta={"slug": "Fundamentos-Ciber", "trilha": "1"},
+                meta={"slug": "Fundamentos-Ciber"},
             )
 
             self.assertIsInstance(res, Path, "montar_treinamento deve retornar uma instância de Path")

@@ -13,7 +13,8 @@ GERADORES = TESTES.parent
 sys.path.insert(0, str(GERADORES))
 sys.path.insert(0, str(TESTES))
 
-from chassi import info_modulo, numerar_questoes  # noqa: E402
+from chassi import aplicar_cabecalhos_de_secao, info_modulo, numerar_questoes  # noqa: E402
+from contrato import extrair_secoes  # noqa: E402
 from contrato import ContratoInvalido  # noqa: E402
 from index_dados import ESTUDOS_DADOS  # noqa: E402
 from montar import montar_treinamento  # noqa: E402
@@ -114,6 +115,64 @@ class TestChassi(unittest.TestCase):
                                capture_output=True, text=True)
         self.assertEqual(r.returncode, 1)
         self.assertIn("§5", r.stderr)
+
+    def test_numerar_ignora_script_classes_extras_e_data_q_anterior(self):
+        corpo = (
+            '<script>var t = \'<div class="quiz-item">falso</div>\';</script>'
+            '<div class="quiz-item-foo">nao</div>'
+            '<div data-q="velho" class="quiz-item extra">a</div>'
+            '<div id="x" class="outra quiz-item" data-q="q9">b</div>'
+        )
+        saida = numerar_questoes(corpo)
+        self.assertIn('<div class="quiz-item">falso</div>', saida)
+        self.assertIn('<div class="quiz-item-foo">nao</div>', saida)
+        self.assertIn('<div class="quiz-item extra" data-q="q1">a</div>', saida)
+        self.assertIn('<div id="x" class="outra quiz-item" data-q="q2">b</div>', saida)
+        self.assertEqual(saida.count("data-q="), 2)
+
+    def test_cabecalho_h2_com_atributos_e_multilinha(self):
+        corpo = corpo_valido().replace("<h2>Fundamentos</h2>", '<h2 class="x"\n id="h">Fundamentos\n e mais</h2>')
+        saida = aplicar_cabecalhos_de_secao(corpo, extrair_secoes(corpo))
+        self.assertIn('<span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2 class="x"\n id="h">Fundamentos\n e mais</h2></div>', saida)
+        self.assertEqual(saida.count('class="shead"'), 6)
+
+    def test_cabecalho_ignora_secao_em_script(self):
+        corpo = corpo_valido().replace(
+            "</article>", '<script>var h = \'<section class="study-section" id="x"><h2>fake</h2></section>\';</script></article>')
+        saida = aplicar_cabecalhos_de_secao(corpo, extrair_secoes(corpo))
+        self.assertEqual(saida.count('class="shead"'), 6)
+        self.assertIn("Seção 6 de 6", saida)
+        self.assertIn("<section class=\"study-section\" id=\"x\"><h2>fake</h2>", saida)
+
+    def test_cabecalho_levanta_com_contagem_divergente(self):
+        corpo = corpo_valido()
+        with self.assertRaises(ValueError):
+            aplicar_cabecalhos_de_secao(corpo, extrair_secoes(corpo)[:-1])
+
+    def test_cabecalho_levanta_secao_sem_h2(self):
+        corpo = corpo_valido().replace("<h2>Referências</h2>", "")
+        with self.assertRaises(ValueError):
+            aplicar_cabecalhos_de_secao(corpo, extrair_secoes(corpo))
+
+    def test_keyerror_alheio_nao_vira_slug_sem_dados(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            body = Path(tmp) / "threat_hunting_body.html"
+            body.write_text(corpo_valido(), encoding="utf-8")
+            r = subprocess.run(
+                [sys.executable, "-c",
+                 "import sys; sys.path.insert(0, %r); import montar; "
+                 "montar.gerar_fim = lambda i: {}['x']; montar.main([%r, %r])"
+                 % (str(GERADORES), str(body), str(Path(tmp) / "o.html"))],
+                capture_output=True, text=True)
+        self.assertNotEqual(r.returncode, 0)
+        self.assertNotIn("Slug sem dados", r.stderr)
+        self.assertIn("KeyError", r.stderr)
+
+    def test_cli_nao_aceita_trilha(self):
+        r = subprocess.run([sys.executable, str(GERADORES / "montar.py"), "x", "--trilha", "1"],
+                           capture_output=True, text=True)
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("unrecognized", r.stderr)
 
     def test_slug_sem_dados(self):
         with self.assertRaisesRegex(KeyError, "Nao-Existe"):

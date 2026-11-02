@@ -293,3 +293,27 @@ def validar_corpo(html, slug):
                 erro(8, _onde(d), "div.callout sem modificador (" + ", ".join(MODIFICADORES_CALLOUT) + ")")
 
     return erros
+
+
+def posicoes_corpo(html):
+    """Posições (offsets em `html`) obtidas na mesma varredura do parser que extrair_secoes.
+
+    Devolve (h2s, quizzes): h2s é uma lista com (inicio, fim) do primeiro h2 de cada
+    section.study-section filha do article (None se a seção não tem h2 fechado); quizzes é a
+    lista, em ordem de documento, de (inicio, fim) da tag de abertura de cada .quiz-item.
+    Conteúdo de <script>/<style> e texto escapado nunca vira tag, então não entra aqui.
+    """
+    arvore = _Arvore(html)
+    h2s = []
+    for article in _secoes_de_primeiro_nivel(arvore.raiz):
+        for filho in article.filhos:
+            if not _e_secao(filho):
+                continue
+            h2 = _primeiro_h2(filho)
+            if h2 is None or h2.ini_fechamento is None:
+                h2s.append(None)
+            else:
+                fim = html.index(">", h2.ini_fechamento) + 1
+                h2s.append((h2.ini, fim))
+    quizzes = [(d.ini, d.fim_abertura) for d in arvore.raiz.descendentes() if _e_quiz_item(d)]
+    return h2s, quizzes

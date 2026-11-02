@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from html import escape
 from typing import List, Optional, Tuple
 
-from contrato import ROTULOS, TIPOS, Secao
+from contrato import ROTULOS, TIPOS, Secao, posicoes_corpo
 from index_dados import ESTUDOS_DADOS, NIVEIS, TRILHAS
 
 Vizinho = Tuple[str, str, str]  # (slug, titulo, caminho_rel)
@@ -47,7 +47,7 @@ def _caminho_rel(catalogo: dict, slug: str) -> str:
 
 def info_modulo(slug: str) -> InfoModulo:
     if slug not in ESTUDOS_DADOS:
-        raise KeyError(slug)
+        raise SlugSemDados(slug)
     from montar import carregar_catalogo_estudos
 
     catalogo = carregar_catalogo_estudos()
@@ -193,41 +193,41 @@ def gerar_fim(info: InfoModulo) -> str:
 <div class="study-pager">{anterior}{proximo}</div>"""
 
 
-_RE_SECAO = re.compile(r'<section\b[^>]*\bclass="study-section"[^>]*>')
-_RE_H2 = re.compile(r"<h2\b[^>]*>.*?</h2>", re.S)
+class SlugSemDados(KeyError):
+    """O slug não existe em ESTUDOS_DADOS."""
 
 
 def aplicar_cabecalhos_de_secao(body: str, secoes: List[Secao]) -> str:
-    inicios = [m.start() for m in _RE_SECAO.finditer(body)]
-    partes, cursor = [], 0
-    for idx, ini in enumerate(inicios[: len(secoes)]):
-        limite = inicios[idx + 1] if idx + 1 < len(inicios) else len(body)
-        m = _RE_H2.search(body, ini, limite)
-        if not m:
-            continue
+    h2s, _ = posicoes_corpo(body)
+    if len(h2s) != len(secoes):
+        raise ValueError(f"{len(h2s)} seções no corpo, {len(secoes)} esperadas")
+    for sec, pos in zip(secoes, h2s):
+        if pos is None:
+            raise ValueError(f"seção {sec.id!r} sem h2")
+    for idx in range(len(secoes) - 1, -1, -1):
+        ini, fim = h2s[idx]
         icone, rotulo = ROTULOS[secoes[idx].tipo]
         shead = (f'<div class="shead"><span class="stype">{icone} {rotulo} '
-                 f'<small>· Seção {idx + 1} de {len(secoes)}</small></span>{m.group(0)}</div>')
-        partes.append(body[cursor:m.start()])
-        partes.append(shead)
-        cursor = m.end()
-    partes.append(body[cursor:])
-    return "".join(partes)
+                 f'<small>· Seção {idx + 1} de {len(secoes)}</small></span>{body[ini:fim]}</div>')
+        body = body[:ini] + shead + body[fim:]
+    return body
 
 
-_RE_QUIZ = re.compile(r'(<div\b[^>]*\bclass="[^"]*\bquiz-item\b[^"]*")([^>]*>)')
+_RE_DATA_Q = re.compile(r"\s+data-q\s*=\s*(?:\"[^\"]*\"|'[^']*'|[^\s>]+)")
+_RE_CLASS = re.compile(r"(?<![\w-])class\s*=\s*(?:\"[^\"]*\"|'[^']*'|[^\s>]+)")
 
 
 def numerar_questoes(body: str) -> str:
-    n = 0
-
-    def troca(m):
-        nonlocal n
-        n += 1
-        resto = re.sub(r'\s+data-q="[^"]*"', "", m.group(2))
-        return f'{m.group(1)} data-q="q{n}"{resto}'
-
-    return _RE_QUIZ.sub(troca, body)
+    _, quizzes = posicoes_corpo(body)
+    for n in range(len(quizzes), 0, -1):
+        ini, fim = quizzes[n - 1]
+        tag = _RE_DATA_Q.sub("", body[ini:fim])
+        m = _RE_CLASS.search(tag)
+        if not m:
+            raise ValueError(f"quiz-item {n} sem atributo class")
+        tag = tag[:m.end()] + f' data-q="q{n}"' + tag[m.end():]
+        body = body[:ini] + tag + body[fim:]
+    return body
 
 
 def inserir_fim(body: str, fim: str) -> str:
