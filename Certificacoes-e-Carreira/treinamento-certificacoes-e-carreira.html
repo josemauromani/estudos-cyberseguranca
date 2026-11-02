@@ -2274,39 +2274,48 @@ tr:hover td {
   },
   "Engenharia-de-Deteccao": {
    "numero": 46,
-   "titulo": "Engenharia de Detecção: Detection-as-Code e Cobertura ATT&CK"
+   "titulo": "Engenharia de Detecção: Detection-as-Code e Cobertura ATT&CK",
+   "pendente": true
   },
   "Monitoramento-de-Rede-NSM": {
    "numero": 48,
-   "titulo": "Monitoramento de Rede: Zeek, PCAP e NetFlow"
+   "titulo": "Monitoramento de Rede: Zeek, PCAP e NetFlow",
+   "pendente": true
   },
   "Seguranca-de-Containers": {
    "numero": 50,
-   "titulo": "Segurança de Containers: Imagens, Build e Runtime"
+   "titulo": "Segurança de Containers: Imagens, Build e Runtime",
+   "pendente": true
   },
   "Seguranca-em-Kubernetes": {
    "numero": 51,
-   "titulo": "Segurança em Kubernetes: RBAC, Pod Security e NetworkPolicy"
+   "titulo": "Segurança em Kubernetes: RBAC, Pod Security e NetworkPolicy",
+   "pendente": true
   },
   "Infraestrutura-como-Codigo-Segura": {
    "numero": 52,
-   "titulo": "Infraestrutura como Código Segura: Terraform e Policy-as-Code"
+   "titulo": "Infraestrutura como Código Segura: Terraform e Policy-as-Code",
+   "pendente": true
   },
   "Deteccao-e-Resposta-em-Nuvem": {
    "numero": 53,
-   "titulo": "Detecção e Resposta a Incidentes em Nuvem"
+   "titulo": "Detecção e Resposta a Incidentes em Nuvem",
+   "pendente": true
   },
   "Regulacao-Setor-Financeiro": {
    "numero": 54,
-   "titulo": "Regulação Cibernética do Setor Financeiro"
+   "titulo": "Regulação Cibernética do Setor Financeiro",
+   "pendente": true
   },
   "Fraude-em-Pagamentos-e-Pix": {
    "numero": 55,
-   "titulo": "Fraude em Pagamentos: Pix, Golpes e Antifraude"
+   "titulo": "Fraude em Pagamentos: Pix, Golpes e Antifraude",
+   "pendente": true
   },
   "Gestao-de-Riscos-de-Terceiros": {
    "numero": 57,
-   "titulo": "Gestão de Riscos de Terceiros e Fornecedores"
+   "titulo": "Gestão de Riscos de Terceiros e Fornecedores",
+   "pendente": true
   }
  }
 }
@@ -2353,7 +2362,7 @@ tr:hover td {
     }
     function rotuloModulo(slug) {
         var m = CERT.modulos[slug];
-        return (m.numero < 10 ? "0" : "") + m.numero + " · " + m.titulo;
+        return (m.numero < 10 ? "0" : "") + m.numero + " · " + m.titulo + (m.pendente ? " (⏳ em elaboração)" : "");
     }
     function cobertura(dom) {
         if (!dom.modulos.length) return "lacuna";

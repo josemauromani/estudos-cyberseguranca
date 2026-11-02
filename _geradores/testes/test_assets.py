@@ -61,6 +61,40 @@ class TestAssets(unittest.TestCase):
                 self.assertIn(f".badge-t{tid} ", base)
                 self.assertIn(f".track-tile.t{tid} ", index)
 
+    def test_numero_do_bloco_de_trilha_legivel_nos_dois_temas(self):
+        """O número no .track-tile identifica a trilha sem depender da cor: contraste >= 3:1 em cada tema."""
+        import re
+
+        def luminancia(hexa):
+            canais = [int(hexa[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+            canais = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in canais]
+            return 0.2126 * canais[0] + 0.7152 * canais[1] + 0.0722 * canais[2]
+
+        def contraste(a, b):
+            la, lb = sorted([luminancia(a), luminancia(b)], reverse=True)
+            return (la + 0.05) / (lb + 0.05)
+
+        index = (self.root / "_geradores" / "index.css").read_text(encoding="utf-8")
+        regra = re.search(r"\.track-tile \{([^}]*)\}", index)
+        self.assertIsNotNone(regra)
+        self.assertIn("color: var(--track-tile-ink);", regra.group(1))
+        blocos = {
+            "claro": r"^:root \{(.*?)^\}",
+            "escuro (preferência)": r"^  :root:not\(\[data-theme=\"light\"\]\) \{(.*?)^  \}",
+            "escuro": r"^:root\[data-theme=\"dark\"\] \{(.*?)^\}",
+            "claro (forçado)": r"^:root\[data-theme=\"light\"\] \{(.*?)^\}",
+        }
+        for nome, padrao in blocos.items():
+            bloco = re.search(padrao, index, re.S | re.M)
+            self.assertIsNotNone(bloco, nome)
+            tinta = re.search(r"--track-tile-ink:\s*(#[0-9A-Fa-f]{6});", bloco.group(1))
+            self.assertIsNotNone(tinta, f"--track-tile-ink ausente no bloco {nome}")
+            for tid, info in TRILHAS.items():
+                cor = re.search(rf"--t{tid}-{info['cor_nome']}:\s*(#[0-9A-Fa-f]{{6}});", bloco.group(1))
+                with self.subTest(bloco=nome, trilha=tid):
+                    self.assertIsNotNone(cor)
+                    self.assertGreaterEqual(contraste(tinta.group(1), cor.group(1)), 3.0)
+
     def test_base_css_contains_component_classes(self):
         """Verifica as classes de componentes do Design System."""
         self.assertTrue(self.css_file.exists(), "base.css deve existir")

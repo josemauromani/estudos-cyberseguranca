@@ -101,6 +101,23 @@ class TestCertificacoesCarreira(unittest.TestCase):
                 faltando = set(portal["modulos"]) - cobertos
                 self.assertFalse(faltando, f"módulos do portal sem domínio: {faltando}")
 
+    def test_modulos_pendentes_sinalizados(self):
+        """Módulo sem página compilada aparece como pendente no planejador, como no portal."""
+        paginas = {}
+        for linha in (GERADORES / "estudos.txt").read_text(encoding="utf-8").splitlines():
+            if linha.strip() and not linha.startswith("#"):
+                campos = linha.split("|")
+                paginas[campos[0]] = self.root / campos[2] / campos[3]
+        d = self._dados()
+        for slug, info in d["modulos"].items():
+            with self.subTest(modulo=slug):
+                self.assertEqual(info.get("pendente", False), not paginas[slug].exists())
+        body = self.body_path.read_text(encoding="utf-8")
+        rotulo = re.search(r"function rotuloModulo\(slug\) \{(.*?)\n    \}", body, re.S)
+        self.assertIsNotNone(rotulo)
+        self.assertIn("m.pendente", rotulo.group(1))
+        self.assertIn("em elaboração", rotulo.group(1))
+
     def test_modulos_batem_com_o_catalogo(self):
         d = self._dados()
         numeros = catalogo()
