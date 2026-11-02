@@ -1,0 +1,1807 @@
+<!-- Estudo 50: Seguranca-de-Containers Body Fragment -->
+<article class="study-container" data-slug="seguranca-de-containers">
+
+    <!-- SEÇÃO 1: O QUE ISOLA UM CONTAINER -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: A Falha Era na API, o Estrago Foi no Servidor</h2>
+        </div>
+
+        <p class="lead-text">
+            Na Ipê Store, a API de pedidos roda num container no servidor DOCKER-01. Uma dependência desatualizada permitiu execução remota de código, e o invasor ganhou um shell dentro do container. Até aí, o estrago deveria ficar contido: um processo sem privilégio, num sistema de arquivos descartável. Só que o time tinha montado o socket do Docker no container "para a API reiniciar o worker de e-mails", e o container rodava como root com <code>--privileged</code>. Em minutos o invasor controlava o servidor inteiro e os outros seis containers que rodavam nele. A vulnerabilidade era da aplicação; o que transformou um incidente pequeno em um grande foi a configuração do container. Este módulo ensina a ler um Dockerfile e um <code>docker run</code> como um auditor e a fechar o que separa o container do host.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">📦</span>
+                <strong>Pergunta-chave do módulo</strong>
+            </div>
+            <p>O que separa um container comprometido do servidor que o hospeda?</p>
+        </div>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🧭</span>
+                <strong>Diferença para o Estudo 22 e o que vem do Estudo 34</strong>
+            </div>
+            <p>
+                O Estudo 22 cobriu o pipeline: SAST, DAST, SCA, a varredura da imagem como um portão do CI e a assinatura com Cosign em poucas linhas. Aqui o foco desce para a própria imagem (camadas, base, usuário, origem), para o registro e para o tempo de execução: o que cada opção do <code>docker run</code> devolve de poder ao processo. Do Estudo 34 vêm usuários, permissões, processos e o UID 0; aqui você verá como o kernel do Linux separa um processo do resto do sistema e o que acontece quando essa separação é desligada.
+            </p>
+        </div>
+
+        <h3>Container não é máquina virtual</h3>
+        <p>
+            Uma máquina virtual tem o próprio kernel, isolado pelo hipervisor. Um container é só um processo comum do host, com uma visão restrita do sistema: o <strong>kernel compartilhado</strong> é o mesmo para todos os containers e para o host. O isolamento vem de recursos do kernel que o runtime (Docker, containerd, Podman) liga ao criar o processo. Cada camada desliga um tipo de acesso; nenhuma, sozinha, é uma fronteira completa.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Mecanismo</th><th>O que faz</th><th>O que desliga a proteção</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>namespaces</strong></td><td>Dão ao processo a própria visão de PIDs, rede, montagens, hostname, IPC e usuários</td><td><code>--pid=host</code>, <code>--network host</code>, volumes do host</td></tr>
+                    <tr><td><strong>cgroups</strong></td><td>Limitam CPU, memória e número de processos (<code>--memory</code>, <code>--pids-limit</code>)</td><td>Ausência de limites: um container esgota o host</td></tr>
+                    <tr><td><strong>capabilities</strong></td><td>Dividem o poder do root em pedaços (<code>NET_ADMIN</code>, <code>SYS_ADMIN</code>, <code>SYS_PTRACE</code>...); o Docker já remove várias por padrão</td><td><code>--cap-add</code>, <code>--privileged</code></td></tr>
+                    <tr><td><strong>seccomp</strong></td><td>Filtra chamadas de sistema perigosas com um perfil padrão</td><td><code>--privileged</code>, <code>--security-opt seccomp=unconfined</code></td></tr>
+                    <tr><td><strong>AppArmor / SELinux</strong></td><td>Política de acesso obrigatória sobre arquivos e operações</td><td><code>--privileged</code>, perfil desativado</td></tr>
+                    <tr><td><strong>Usuário não root</strong></td><td>O processo não é UID 0; com <strong>rootless</strong> ou <code>userns-remap</code>, nem o root do container é root no host</td><td>Dockerfile sem <code>USER</code>, <code>--user 0</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Barreiras entre o Container e o Host</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Barreiras entre o Container e o Host">
+flowchart TD
+    APP["Processo da aplicação<br><small>shell obtido por falha na API</small>"]
+    subgraph Barreiras["Camadas de isolamento"]
+        U["Usuário não root<br><small>USER 10001, rootless</small>"]
+        C["Capabilities mínimas<br><small>--cap-drop ALL</small>"]
+        S["seccomp e AppArmor<br><small>perfis padrão ligados</small>"]
+        N["namespaces e cgroups<br><small>visão e recursos próprios</small>"]
+    end
+    K["Kernel compartilhado"]
+    H["Host<br><small>disco, outros containers, credenciais</small>"]
+    APP --> U --> C --> S --> N --> K --> H
+    X1["--user 0"] -.->|"anula"| U
+    X2["--cap-add SYS_ADMIN"] -.->|"anula"| C
+    X3["--privileged"] -.->|"anula todas"| S
+    X4["docker.sock montado<br><small>contorna tudo pelo daemon</small>"] -.->|"atalho"| H
+    X5["--pid=host, --network host,<br>volume de / ou /etc"] -.->|"anula"| N
+            </pre>
+        </div>
+
+        <p>
+            No MITRE ATT&amp;CK, duas técnicas resumem o risco: <strong>T1610 Deploy Container</strong> (o adversário cria um container para executar código ou contornar defesas, tipicamente por uma API do daemon exposta) e <strong>T1611 Escape to Host</strong> (sair do container para o host). Quase todo caminho de saída depende de uma configuração que você controla: privilégio a mais, socket montado, namespace do host compartilhado. A <strong>NIST SP 800-190</strong> (<em>Application Container Security Guide</em>) e o <strong>CIS Docker Benchmark</strong> organizam essas recomendações em imagem, registro, orquestrador, container e host.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 2: IMAGEM, REGISTRO E RUNTIME -->
+    <section class="study-section" id="imagem-e-runtime">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>Imagem, Build, Registro e Runtime</h2>
+        </div>
+
+        <h3>Camadas: segredos nunca em camadas da imagem</h3>
+        <p>
+            Cada instrução <code>RUN</code>, <code>COPY</code> e <code>ADD</code> gera uma camada imutável, e <code>ENV</code> e <code>ARG</code> ficam registrados nos metadados. Apagar um arquivo num passo seguinte só cria outra camada que o esconde: o conteúdo continua extraível da camada anterior. O comando <code>docker history</code> mostra os comandos e argumentos de build de qualquer imagem que você conseguiu puxar. Por isso um token em <code>ENV</code>, uma senha em <code>ARG</code> ou um <code>.npmrc</code> copiado vazam para todo mundo que tem acesso à imagem: registro, cache do CI, backup.
+        </p>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">bash — o que a imagem conta sobre si mesma (saída ilustrativa)</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ctr-history')">Copiar</button>
+            </div>
+            <pre><code id="code-ctr-history">$ docker history --no-trunc docker.io/ipestore-dev/api-pedidos:latest
+CREATED BY
+CMD ["node" "server.js"]
+COPY . .
+RUN npm ci --omit=dev &amp;&amp; rm -f .npmrc        # o .npmrc continua na camada de baixo
+COPY .npmrc package.json package-lock.json ./
+ENV NPM_TOKEN=npm_LAB0ficticio0000000000000000   # token legível por qualquer um
+...
+
+# Segredo de build do BuildKit: o arquivo existe só durante o comando, em nenhuma camada
+RUN --mount=type=secret,id=npmrc,target=/app/.npmrc npm ci --omit=dev
+$ docker build --secret id=npmrc,src=$HOME/.npmrc -t api-pedidos .</code></pre>
+        </div>
+        <p>
+            Se um segredo já foi publicado numa imagem, a correção não é só um Dockerfile novo: <strong>revogue a credencial</strong>, porque as imagens antigas continuam nos registros e caches. Liste <code>.env</code>, <code>.npmrc</code>, <code>.git</code> e chaves no <code>.dockerignore</code>: um <code>COPY . .</code> copia tudo o que não estiver lá.
+        </p>
+
+        <h3>Imagem mínima, usuário não root e tag fixa</h3>
+        <ul>
+            <li><strong>Base mínima e distroless:</strong> uma imagem completa (<code>node:20</code>, <code>python:3.12</code>) traz shell, gerenciador de pacotes, compiladores e centenas de pacotes. As variantes <code>-slim</code> e <code>alpine</code> cortam boa parte; as imagens <strong>distroless</strong> trazem só o runtime da linguagem, sem shell. Menos pacotes significa menos vulnerabilidades na varredura e menos ferramentas para quem invadir.</li>
+            <li><strong>Build multiestágio:</strong> compile e instale dependências num estágio com o toolchain completo e copie só o resultado para um estágio final mínimo. O compilador do Go ou o npm nunca chegam à produção.</li>
+            <li><strong><code>USER</code> não root:</strong> declare um UID numérico no estágio final. Mesmo quando a base já define usuário (distroless <code>:nonroot</code>), deixar <code>USER</code> explícito facilita auditoria e as políticas que exigem <code>runAsNonRoot</code>.</li>
+            <li><strong>Tag vs digest:</strong> a tag é um rótulo mutável; o <strong>digest</strong> (<code>@sha256:</code> seguido de 64 caracteres hexadecimais) identifica exatamente um conteúdo. Fixe a base pelo digest e deixe um robô (Renovate, Dependabot) abrir o pull request de atualização, que passa pela varredura.</li>
+            <li><strong>Origem do que entra no build:</strong> <code>ADD https://...</code> e <code>curl ... | sh</code> confiam no servidor no momento do build. Use <code>ADD --checksum=sha256:...</code> ou confira o hash antes de instalar.</li>
+        </ul>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Dockerfile — build multiestágio da vitrine (Go) com distroless</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ctr-multi')">Copiar</button>
+            </div>
+            <pre><code id="code-ctr-multi"># Estágio 1: compila com o toolchain completo do Go
+FROM golang:1.23.2-bookworm@sha256:&lt;digest-conferido&gt; AS build
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/vitrine ./cmd/vitrine
+
+# Estágio 2: só o binário, sem shell nem gerenciador de pacotes
+FROM gcr.io/distroless/static-debian12:nonroot@sha256:&lt;digest-conferido&gt;
+COPY --from=build /out/vitrine /vitrine
+USER 65532:65532
+ENTRYPOINT ["/vitrine"]</code></pre>
+        </div>
+
+        <h3>Varredura de imagem: ler o relatório e priorizar</h3>
+        <p>
+            Ferramentas como <strong>Trivy</strong> e Grype comparam os pacotes da imagem (do sistema e da linguagem) com bases de vulnerabilidades. O relatório de uma imagem completa costuma ter centenas de linhas, e corrigir na ordem do CVSS desperdiça esforço. Leia cada achado com quatro perguntas: há versão corrigida? Está no catálogo <strong>KEV</strong> da CISA (já explorada)? Qual o <strong>EPSS</strong> (probabilidade de exploração em 30 dias, da FIRST)? O pacote é da base ou da aplicação? Vulnerabilidades da base somem em bloco quando você troca para uma base mínima; as da aplicação só saem atualizando a dependência (SCA, Estudo 22). Sem correção publicada, registre o aceite com prazo e mitigação (Estudo 9).
+        </p>
+
+        <h3>Assinatura e registro confiável</h3>
+        <p>
+            O projeto <strong>Sigstore</strong>, com o <strong>Cosign</strong>, assina a imagem no pipeline (com chave ou <em>keyless</em>, via identidade OIDC e registro de transparência); o Notation, do projeto Notary, é a alternativa no ecossistema OCI. Assinar não basta: quem roda precisa verificar, e verificar a mesma imagem que vai rodar. Restrinja também a origem: só imagens do registro da empresa, alimentado pelo pipeline, e nada de contas pessoais em registros públicos. Em Kubernetes, uma política de admissão aplica as duas regras (Estudo 51).
+        </p>
+
+        <h3>Runtime: o que o <code>docker run</code> devolve ao processo</h3>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">bash — implantação endurecida da API de pedidos</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ctr-run')">Copiar</button>
+            </div>
+            <pre><code id="code-ctr-run">cosign verify --key cosign.pub registry.ipestore.example/loja/api-pedidos:1.8.0
+docker run -d --name api-pedidos \
+  --read-only --tmpfs /tmp \
+  --cap-drop ALL \
+  --security-opt no-new-privileges:true \
+  --memory 512m --pids-limit 200 \
+  -p 3000:3000 \
+  registry.ipestore.example/loja/api-pedidos:1.8.0</code></pre>
+        </div>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🚨</span>
+                <strong>--privileged e docker.sock abrem caminho ao host</strong>
+            </div>
+            <p>
+                <code>--privileged</code> devolve todas as capabilities, libera os dispositivos do host e desliga seccomp e AppArmor: o container deixa de ser fronteira. Montar <code>/var/run/docker.sock</code> é pior, porque nem precisa de falha no isolamento: o socket é a API do daemon, que roda como root, e quem fala com ele cria o container que quiser. Nos dois casos, uma falha na aplicação vira controle do host. Trate ambos como achados críticos, sempre.
+            </p>
+        </div>
+
+        <p>
+            Para reduzir o impacto mesmo quando algo escapar, rode o daemon em modo <strong>rootless</strong> ou com <code>userns-remap</code>: o UID 0 dentro do container passa a ser um UID sem privilégio no host.
+        </p>
+
+        <h3>Detecção em runtime</h3>
+        <p>
+            Prevenção falha; o que sobra é perceber rápido. Ferramentas como <strong>Falco</strong> (CNCF) observam chamadas de sistema dos containers e alertam sobre comportamentos que uma aplicação não deveria ter: shell interativo num container de API, gravação em <code>/etc</code>, acesso ao <code>docker.sock</code>, criação de container privilegiado. O alerta vai para o SIEM e entra no fluxo da Trilha 11.
+        </p>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">YAML — regra Falco: shell em container de aplicação (simplificada)</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ctr-falco')">Copiar</button>
+            </div>
+            <pre><code id="code-ctr-falco">- rule: Shell em container da loja
+  desc: Um shell iniciado num container de aplicação da Ipê Store
+  condition: >
+    spawned_process and container
+    and proc.name in (sh, bash, ash)
+    and container.image.repository startswith "registry.ipestore.example/loja/"
+  output: "Shell em container (imagem=%container.image.repository usuario=%user.name cmd=%proc.cmdline)"
+  priority: WARNING
+  tags: [container, mitre_execution]</code></pre>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Auditor de Dockerfile</h2>
+        </div>
+
+        <p class="lead-text">
+            Escolha um serviço da Ipê Store, leia o Dockerfile e a implantação, marque os achados que você encontrou e confira. Depois corrija: edite o texto à vontade ou use o botão de cada achado. O risco é recalculado a cada mudança, e cada achado explica o caminho de exposição ou de escape que abria. No fim, priorize o relatório de vulnerabilidades da imagem e veja como a troca da base muda o relatório.
+        </p>
+
+        <div class="lab-box ctr-lab" id="ctr-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Imagem, build e runtime</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Auditor de Dockerfile da Ipê Store</h3>
+                    <p id="ctr-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body" style="min-width: 0;">
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; font-size: 0.85rem;">
+                    <label for="ctr-cenario">Serviço</label>
+                    <select class="form-control" id="ctr-cenario" style="min-width: 0; max-width: 100%; flex: 1 1 14rem;"></select>
+                    <button class="btn-secondary" type="button" onclick="carregarCenarioCtr()">Carregar original</button>
+                    <button class="btn-secondary" type="button" onclick="carregarReferenciaCtr()">Ver versão de referência</button>
+                </div>
+                <p id="ctr-historia" style="font-size: 0.85rem; margin: 0.6rem 0 0 0;"></p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 0.8rem; margin-top: 0.8rem;">
+                    <div style="min-width: 0;">
+                        <label for="ctr-dockerfile" style="font-weight: 600; font-size: 0.88rem;">Dockerfile</label>
+                        <textarea id="ctr-dockerfile" spellcheck="false" rows="16" style="width: 100%; max-width: 100%; box-sizing: border-box; font-family: var(--font-mono, monospace); font-size: 0.76rem; white-space: pre; overflow-x: auto; background: var(--sunk); color: var(--ink); border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem;"></textarea>
+                    </div>
+                    <div style="min-width: 0;">
+                        <label for="ctr-implantacao" style="font-weight: 600; font-size: 0.88rem;">Implantação (cosign e docker run)</label>
+                        <textarea id="ctr-implantacao" spellcheck="false" rows="16" style="width: 100%; max-width: 100%; box-sizing: border-box; font-family: var(--font-mono, monospace); font-size: 0.76rem; white-space: pre; overflow-x: auto; background: var(--sunk); color: var(--ink); border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem;"></textarea>
+                    </div>
+                </div>
+
+                <div id="ctr-risco" aria-live="polite" style="margin-top: 0.8rem; font-size: 0.85rem;"></div>
+
+                <h4 style="margin-top: 1.3rem;">1. Quais achados você vê?</h4>
+                <div id="ctr-palpites" role="group" aria-label="Achados que você identificou" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.3rem 0.9rem; font-size: 0.82rem;"></div>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem;">
+                    <button class="btn-primary" type="button" onclick="conferirAchadosCtr()">Conferir meus achados</button>
+                </div>
+                <div id="ctr-conferencia" aria-live="polite" style="font-size: 0.85rem; margin-top: 0.6rem;"></div>
+
+                <h4 style="margin-top: 1.3rem;">2. Achados, caminhos e correções</h4>
+                <div id="ctr-achados" role="region" aria-label="Achados do auditor" tabindex="0" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.4rem; font-size: 0.8rem;"></div>
+
+                <h4 style="margin-top: 1.3rem;">3. Relatório de varredura da imagem</h4>
+                <div id="ctr-varredura" role="region" aria-label="Relatório de vulnerabilidades" tabindex="0" style="font-size: 0.8rem;"></div>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem;">
+                    <button class="btn-primary" type="button" onclick="conferirPrioridadeCtr()">Conferir priorização</button>
+                </div>
+                <div id="ctr-prioridade" aria-live="polite" style="font-size: 0.85rem; margin-top: 0.6rem;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Revisão de Imagem e Implantação</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista ao revisar um Dockerfile ou uma implantação antes do deploy. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="seguranca-de-containers">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ctr-1">
+                <label for="chk-ctr-1"><strong>Base:</strong> estágio final em imagem mínima ou distroless, com build multiestágio para o que precisa de compilador ou gerenciador de pacotes.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ctr-2">
+                <label for="chk-ctr-2"><strong>Versão:</strong> nenhuma imagem em <code>latest</code>; base fixada por digest e atualizada por pull request que passa pela varredura.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ctr-3">
+                <label for="chk-ctr-3"><strong>Usuário:</strong> <code>USER</code> numérico não root no estágio final e nenhum <code>--user 0</code> na implantação.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ctr-4">
+                <label for="chk-ctr-4"><strong>Segredos:</strong> nada em <code>ENV</code>, <code>ARG</code> ou arquivo copiado; segredos de build com <code>--mount=type=secret</code>, de execução por arquivo montado; <code>.dockerignore</code> revisado.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ctr-5">
+                <label for="chk-ctr-5"><strong>Varredura:</strong> relatório lido com KEV, EPSS e versão corrigida; críticas exploradas corrigidas antes do deploy; aceites com prazo registrados.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ctr-6">
+                <label for="chk-ctr-6"><strong>Origem:</strong> imagem só do registro da empresa, assinada no pipeline e verificada antes de rodar.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ctr-7">
+                <label for="chk-ctr-7"><strong>Runtime:</strong> sem <code>--privileged</code>, <code>docker.sock</code>, namespaces ou diretórios sensíveis do host; <code>--cap-drop ALL</code>, <code>--read-only</code>, <code>no-new-privileges</code>, limites de memória e processos, e detecção em runtime ligada.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Segredo em camada):</strong> Um desenvolvedor percebeu um token em <code>ENV</code>, apagou a linha e publicou a imagem nova com a mesma tag. O problema acabou?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. As imagens antigas continuam no registro, nos caches do CI e nas máquinas que já as puxaram, e qualquer uma delas mostra o token nos metadados e no <code>docker history</code>. O primeiro passo é revogar o token e emitir outro; depois, passar o segredo pelo BuildKit (<code>--mount=type=secret</code>) ou em tempo de execução, e varrer o histórico do registro em busca de outras versões expostas.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (docker.sock):</strong> O time diz que montar o <code>docker.sock</code> é seguro porque o container roda com usuário não root e sem <code>--privileged</code>. Você concorda?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. O socket é a API do daemon Docker, que roda como root no host; quem consegue escrever nele pede ao daemon um container novo com qualquer configuração. As restrições do container original não valem para o que o daemon cria. Se a aplicação precisa reiniciar outro serviço, use o orquestrador com permissão mínima ou uma fila; ferramentas que exigem o daemon ficam isoladas e monitoradas (T1610).</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Priorização):</strong> A varredura mostra uma crítica sem correção no ImageMagick da base, que a aplicação não usa, e uma alta corrigível numa biblioteca de token da aplicação, presente no KEV. Qual vem primeiro?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A da biblioteca de token: está sendo explorada, tem correção e fica no caminho de autenticação da API. A crítica sem correção entra em aceite com prazo, e a melhor mitigação é sair da base completa: numa base mínima ou distroless o pacote nem existe. CVSS sozinho não ordena a fila; KEV, EPSS, existência de correção e origem do pacote, sim.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Capabilities):</strong> Para depurar um travamento, um analista acrescentou <code>--cap-add SYS_ADMIN</code> e <code>--pid=host</code> ao gerador de relatórios. O problema foi resolvido, mas a configuração ficou. Por que isso é grave?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> <code>SYS_ADMIN</code> concentra tanta coisa que equivale quase a <code>--privileged</code>, e <code>--pid=host</code> faz o container enxergar todos os processos do host. Juntos, desmontam duas camadas de isolamento de um serviço que lê arquivos externos. Depuração é feita num container temporário, aprovado e removido em seguida; a configuração de produção volta ao <code>--cap-drop ALL</code>.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Tag e digest):</strong> O Dockerfile usa <code>FROM python:3.12</code>. Um colega diz que isso já é "versão fixa". O que falta?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A tag <code>3.12</code> é republicada a cada correção do Python e do Debian: dois builds do mesmo Dockerfile podem usar bases diferentes. Fixar o digest (<code>@sha256:</code>) torna o build reprodutível e auditável; a atualização vira um pull request automático que passa pela varredura antes de entrar. Vale também trocar para a variante slim ou para um estágio final distroless.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Assinatura):</strong> O pipeline assina todas as imagens com Cosign, mas o servidor roda <code>docker run</code> direto da tag, sem verificar nada. A assinatura protege alguma coisa?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Quase nada. Assinatura só vale se alguém verifica antes de rodar, e verifica a mesma imagem que vai rodar. Sem <code>cosign verify</code> (ou uma política de admissão no Kubernetes), uma credencial de push vazada basta para pôr uma imagem adulterada em produção. Some a isso a restrição de origem: só o registro da empresa.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 7 (Detecção):</strong> A imagem da API é distroless, sem shell. Ainda faz sentido uma regra Falco de "shell em container"?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Sim, e com alta confiança: se um shell aparecer num container que não tem shell, alguém o trouxe. A regra quase não gera falso positivo nessas imagens e cobre também os containers legados que ainda usam base completa. Detecção em runtime é a camada que funciona quando a prevenção falhou.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Imagem</h4>
+                <p>Imagem mínima, usuário não root e tag fixa, com o digest conferido e build multiestágio.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Camadas</h4>
+                <p>Segredos nunca em camadas da imagem: apagar depois não remove, e o segredo exposto deve ser revogado.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Runtime</h4>
+                <p>--privileged e docker.sock abrem caminho ao host; comece de cap-drop ALL e somente leitura.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Origem</h4>
+                <p>Assinatura e registro confiável: assinar no pipeline e verificar a imagem que realmente vai rodar.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>NIST SP 800-190 — Application Container Security Guide.</li>
+            <li>CIS Docker Benchmark (Center for Internet Security).</li>
+            <li>MITRE ATT&amp;CK — T1610 Deploy Container e T1611 Escape to Host.</li>
+            <li>Documentação do Docker: Dockerfile best practices, BuildKit build secrets, rootless mode, seccomp e AppArmor.</li>
+            <li>Sigstore/Cosign e Notary Project (Notation); Trivy e Grype; Falco (CNCF).</li>
+            <li>FIRST — EPSS; CISA — Known Exploited Vulnerabilities (KEV) Catalog.</li>
+            <li>man 7 capabilities, man 7 namespaces e man 7 cgroups (Linux man-pages).</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Abrindo a Trilha 12</strong>
+            </div>
+            <p>
+                Este é o primeiro estudo da Trilha 12 (Nuvem, Containers e Kubernetes). O Estudo 51 leva as mesmas ideias para o cluster: Pod Security Standards no lugar das opções do <code>docker run</code>, RBAC no lugar do acesso ao daemon e política de admissão para exigir imagem assinada e de registro confiável. O Estudo 52 barra a configuração insegura antes de ela existir, com infraestrutura como código, e o Estudo 53 investiga o que acontece quando uma credencial de nuvem vaza.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="ctr-dados">
+{
+ "contexto": "Ipê Store: a equipe de desenvolvimento publica a API de pedidos, o gerador de relatórios e a vitrine em containers. Dockerfiles, comandos, digests, pacotes e vulnerabilidades (LAB-2026-xxxx) são fictícios; registros e sites usam domínios .example e IPs privados. O auditor só lê texto: nada é executado e nada sai do seu navegador.",
+ "registro_confiavel": "registry.ipestore.example/",
+ "pesos": {
+  "critica": 25,
+  "alta": 15,
+  "media": 8,
+  "baixa": 3
+ },
+ "rotulo_sev": {
+  "critica": "crítica",
+  "alta": "alta",
+  "media": "média",
+  "baixa": "baixa"
+ },
+ "imagens_grandes": [
+  "node",
+  "python",
+  "golang",
+  "ubuntu",
+  "debian",
+  "openjdk",
+  "ruby",
+  "php"
+ ],
+ "padrao_segredo": "PASS|SENHA|SECRET|TOKEN|API_?KEY|PRIVATE_?KEY|CREDENTIAL",
+ "arquivos_segredo": [
+  ".env",
+  ".npmrc",
+  ".pypirc",
+  "id_rsa",
+  "id_ed25519",
+  "credentials.json"
+ ],
+ "sufixos_segredo": [
+  ".pem",
+  ".key"
+ ],
+ "sockets": [
+  "/var/run/docker.sock",
+  "/run/docker.sock"
+ ],
+ "montagens_sensiveis": [
+  "/",
+  "/etc",
+  "/root",
+  "/proc",
+  "/sys",
+  "/dev",
+  "/boot",
+  "/var/lib/docker"
+ ],
+ "caps_permitidas": [
+  "NET_BIND_SERVICE"
+ ],
+ "caps_escape": [
+  "SYS_ADMIN",
+  "SYS_MODULE",
+  "SYS_PTRACE",
+  "DAC_READ_SEARCH",
+  "ALL"
+ ],
+ "opcoes_com_valor": [
+  "-v",
+  "--volume",
+  "--mount",
+  "-p",
+  "--publish",
+  "-e",
+  "--env",
+  "--env-file",
+  "--name",
+  "--network",
+  "--net",
+  "-u",
+  "--user",
+  "--cap-add",
+  "--cap-drop",
+  "--security-opt",
+  "--pid",
+  "-w",
+  "--workdir",
+  "--memory",
+  "-m",
+  "--pids-limit",
+  "--restart",
+  "--tmpfs",
+  "-l",
+  "--label",
+  "--entrypoint",
+  "--device",
+  "--cpus",
+  "-h",
+  "--hostname"
+ ],
+ "regras": {
+  "root": {
+   "titulo": "Processo como root (Dockerfile sem USER ou docker run com --user 0)",
+   "grupo": "imagem",
+   "sev": "alta",
+   "escape": false,
+   "caminho": "O processo da aplicação é UID 0 dentro do container e, sem user namespace, é o mesmo UID 0 do kernel do host. Sozinho, o isolamento ainda segura; mas qualquer outra brecha (volume do host, capability a mais, falha de kernel) passa a valer com poder de root, e os arquivos que ele grava em volumes ficam como root no host.",
+   "correcao": "Crie um usuário sem privilégio e declare USER com UID numérico no estágio final (ex.: USER 10001:10001); não sobrescreva com --user 0 no docker run.",
+   "mitre": "T1611"
+  },
+  "tag_latest": {
+   "titulo": "Imagem sem versão (tag latest ou ausente)",
+   "grupo": "imagem",
+   "sev": "media",
+   "escape": false,
+   "caminho": "latest é só um rótulo que muda a cada publicação: o build de amanhã usa outra base, sem revisão. Se a conta do publicador for comprometida, a imagem adulterada entra no próximo build ou deploy sem ninguém perceber.",
+   "correcao": "Fixe a versão e, de preferência, o digest (FROM imagem:versão@sha256:...); atualize por pull request automático (Renovate, Dependabot) que passa pela varredura."
+  },
+  "sem_digest": {
+   "titulo": "Base com versão fixa, mas sem digest",
+   "grupo": "imagem",
+   "sev": "baixa",
+   "escape": false,
+   "caminho": "A tag 3.12 é mutável: o mantenedor republica a mesma tag com outro conteúdo. Sem o digest, duas compilações do mesmo Dockerfile podem gerar imagens diferentes e você não consegue provar qual base entrou.",
+   "correcao": "Acrescente o digest conferido: FROM imagem:versão@sha256:... com os 64 caracteres hexadecimais conferidos."
+  },
+  "segredo_build": {
+   "titulo": "Segredo em ENV ou ARG",
+   "grupo": "imagem",
+   "sev": "critica",
+   "escape": false,
+   "caminho": "ENV fica gravado na configuração da imagem e ARG aparece no docker history. Quem puxa a imagem (do registro, de um cache, de um backup) lê o token ou a senha sem executar nada. Camadas são imutáveis: apagar depois não remove (T1552).",
+   "correcao": "Remova o segredo do Dockerfile, revogue a credencial exposta e use segredo de build do BuildKit (RUN --mount=type=secret) ou segredo entregue em tempo de execução (arquivo montado pelo orquestrador).",
+   "mitre": "T1552.001"
+  },
+  "arquivo_segredo": {
+   "titulo": "Arquivo de credencial copiado para a imagem",
+   "grupo": "imagem",
+   "sev": "alta",
+   "escape": false,
+   "caminho": "COPY .npmrc (ou .env, id_rsa, *.pem) grava o arquivo numa camada. O rm -f num RUN seguinte cria outra camada que só esconde o arquivo: ele continua extraível da camada anterior.",
+   "correcao": "Não copie o arquivo: monte-o só durante o comando com RUN --mount=type=secret,id=...; e liste .env, .npmrc e chaves no .dockerignore."
+  },
+  "add_remoto": {
+   "titulo": "Conteúdo remoto sem verificação de integridade (ADD de URL ou curl | sh)",
+   "grupo": "imagem",
+   "sev": "media",
+   "escape": false,
+   "caminho": "O build confia no servidor e no DNS no momento da compilação. Se o site do fornecedor for comprometido, o binário ou o script adulterado entra na imagem e vai para produção assinado pelo seu próprio pipeline (cadeia de suprimentos).",
+   "correcao": "Use ADD --checksum=sha256:... (o build falha se o arquivo mudar), ou baixe, confira o hash e só então instale; prefira copiar do repositório o que foi revisado."
+  },
+  "imagem_grande": {
+   "titulo": "Estágio final em imagem base completa",
+   "grupo": "imagem",
+   "sev": "media",
+   "escape": false,
+   "caminho": "A imagem completa traz shell, gerenciador de pacotes, compiladores, curl e centenas de pacotes que a aplicação não usa: mais vulnerabilidades na varredura e mais ferramentas prontas para quem conseguir executar código no container.",
+   "correcao": "Use uma base mínima (slim, alpine) ou distroless no estágio final; compile e instale dependências num estágio de build separado (build multiestágio) e copie só o resultado."
+  },
+  "privileged": {
+   "titulo": "Container privilegiado (--privileged)",
+   "grupo": "execucao",
+   "sev": "critica",
+   "escape": true,
+   "caminho": "--privileged desliga de uma vez as barreiras do isolamento: todas as capabilities, acesso aos dispositivos do host e nenhum perfil seccomp ou AppArmor. Quem obtém um shell na aplicação passa a ter acesso ao disco e ao kernel do host, e o container deixa de ser uma fronteira de segurança (T1611).",
+   "correcao": "Remova --privileged. Se a aplicação precisa de algo específico, conceda só aquilo (um dispositivo com --device, uma capability), e documente por quê.",
+   "mitre": "T1611"
+  },
+  "docker_sock": {
+   "titulo": "Socket do Docker montado no container",
+   "grupo": "execucao",
+   "sev": "critica",
+   "escape": true,
+   "caminho": "O docker.sock é a API do daemon Docker, que roda como root no host. Quem fala com ele pode criar containers com qualquer configuração, inclusive privilegiados e com o disco do host: na prática, controle total do host a partir de uma falha na aplicação (T1610 e T1611).",
+   "correcao": "Não monte o socket em containers de aplicação. Para reiniciar serviços, use o orquestrador com permissão mínima ou uma fila de tarefas; ferramentas que realmente precisam do daemon ficam isoladas e monitoradas.",
+   "mitre": "T1610"
+  },
+  "montagem_sensivel": {
+   "titulo": "Diretório sensível do host montado (/, /etc, /proc, /var/lib/docker...)",
+   "grupo": "execucao",
+   "sev": "critica",
+   "escape": true,
+   "caminho": "O volume expõe ao container arquivos de configuração e credenciais do host. Mesmo com :ro, segredos ficam legíveis; com escrita, a configuração do host pode ser alterada. Em ambos os casos o isolamento de arquivos que o namespace de montagem dava deixa de existir.",
+   "correcao": "Monte só o arquivo ou diretório estritamente necessário, de preferência somente leitura (ex.: fuso horário por -e TZ em vez de montar /etc)."
+  },
+  "pid_host": {
+   "titulo": "Namespace de processos do host (--pid=host)",
+   "grupo": "execucao",
+   "sev": "alta",
+   "escape": true,
+   "caminho": "Com --pid=host o container vê todos os processos do host, com suas linhas de comando e variáveis. Combinado com root ou com capabilities de depuração, deixa de existir a separação entre processos do container e do host.",
+   "correcao": "Remova --pid=host. Depuração com ferramentas como py-spy roda num container temporário e controlado, nunca na configuração de produção."
+  },
+  "cap_add": {
+   "titulo": "Capabilities além do necessário (--cap-add)",
+   "grupo": "execucao",
+   "sev": "alta",
+   "escape": false,
+   "caminho": "Cada capability devolve um pedaço do poder de root. SYS_ADMIN é quase um --privileged; SYS_PTRACE permite inspecionar outros processos; NET_ADMIN e NET_RAW mexem na rede. Quanto mais capabilities, mais caminhos do container para o host (com SYS_ADMIN, SYS_MODULE, SYS_PTRACE, DAC_READ_SEARCH ou ALL a gravidade sobe para crítica).",
+   "correcao": "Comece de --cap-drop ALL e acrescente só o que a aplicação comprova precisar (em geral nenhuma; NET_BIND_SERVICE para porta abaixo de 1024)."
+  },
+  "rede_host": {
+   "titulo": "Rede do host (--network host)",
+   "grupo": "execucao",
+   "sev": "alta",
+   "escape": false,
+   "caminho": "O container usa a pilha de rede do host: alcança serviços que escutam só em 127.0.0.1 do host (painéis, bancos sem senha, a API do Docker se exposta em TCP), e o que ele expõe fica em todas as interfaces, sem o filtro do mapeamento de portas.",
+   "correcao": "Use a rede padrão ou uma rede dedicada e publique só a porta necessária (-p 8080:8080); para métricas, o coletor acessa a porta publicada."
+  },
+  "registro": {
+   "titulo": "Imagem de registro não confiável",
+   "grupo": "execucao",
+   "sev": "media",
+   "escape": false,
+   "caminho": "A imagem vem de uma conta pessoal num registro público: qualquer pessoa com a senha dessa conta publica uma versão nova, e um nome parecido (typosquatting) engana o deploy.",
+   "correcao": "Rode só imagens do registro da empresa (registry.ipestore.example), alimentado pelo pipeline, e bloqueie outras origens na política de admissão."
+  },
+  "sem_assinatura": {
+   "titulo": "Assinatura da imagem não verificada antes de rodar",
+   "grupo": "execucao",
+   "sev": "alta",
+   "escape": false,
+   "caminho": "Sem verificação, o servidor roda o que estiver na tag. Uma credencial de push vazada basta para colocar uma imagem adulterada em produção, e ninguém consegue provar que a imagem saiu do pipeline.",
+   "correcao": "Assine no pipeline (cosign sign) e verifique antes de rodar (cosign verify) a mesma imagem que o docker run usa; em Kubernetes, a política de admissão faz isso (Estudo 51)."
+  },
+  "sem_endurecimento": {
+   "titulo": "docker run sem o endurecimento básico",
+   "grupo": "execucao",
+   "sev": "baixa",
+   "escape": false,
+   "caminho": "Sem --read-only, quem invade grava ferramentas no sistema de arquivos; sem --cap-drop ALL, fica com as capabilities padrão do Docker; sem no-new-privileges, um binário setuid dentro da imagem ainda pode elevar privilégio.",
+   "correcao": "Acrescente --read-only (com --tmpfs /tmp se precisar), --cap-drop ALL e --security-opt no-new-privileges:true."
+  }
+ },
+ "ordem_regras": [
+  "root",
+  "tag_latest",
+  "sem_digest",
+  "segredo_build",
+  "arquivo_segredo",
+  "add_remoto",
+  "imagem_grande",
+  "privileged",
+  "docker_sock",
+  "montagem_sensivel",
+  "pid_host",
+  "cap_add",
+  "rede_host",
+  "registro",
+  "sem_assinatura",
+  "sem_endurecimento"
+ ],
+ "prioridades": {
+  "agora": "Corrigir já",
+  "janela": "Próxima janela",
+  "aceitar": "Aceitar com prazo"
+ },
+ "cenarios": [
+  {
+   "id": "api-pedidos",
+   "nome": "API de pedidos (Node.js)",
+   "historia": "A API que recebe os pedidos do site. O time montou o socket do Docker para a API reiniciar o worker de e-mails e usou a rede do host porque a porta não respondia. A imagem é publicada na conta pessoal de um desenvolvedor.",
+   "dockerfile": "FROM node:latest\nWORKDIR /app\nENV NODE_ENV=production\nENV NPM_TOKEN=npm_LAB0ficticio0000000000000000\nCOPY .npmrc package.json package-lock.json ./\nRUN npm ci --omit=dev && rm -f .npmrc\nADD https://downloads.pdfkit.example/v4.2/pdfkit-linux-amd64 /usr/local/bin/pdfkit\nCOPY . .\nEXPOSE 3000\nCMD [\"node\", \"server.js\"]",
+   "implantacao": "docker run -d --name api-pedidos \\\n  --privileged \\\n  --network host \\\n  -v /var/run/docker.sock:/var/run/docker.sock \\\n  -e DB_URL=postgres://pedidos@10.20.1.30/pedidos \\\n  docker.io/ipestore-dev/api-pedidos:latest",
+   "referencia": {
+    "dockerfile": "# Estágio 1: instala as dependências (o npm não vai para produção)\nFROM node:20.18.0-bookworm-slim@sha256:66abef25028edbf19b3e6fa5d293a19adfdfe6cc2e8fd9ca7392c3f6f0c64615 AS build\nWORKDIR /app\nCOPY package.json package-lock.json ./\nRUN --mount=type=secret,id=npmrc,target=/app/.npmrc npm ci --omit=dev\nCOPY . .\nADD --checksum=sha256:cad366ae888a1005faf2393f79ef99f3e94a31e6a5992992b0de8f775acff2a8 --chmod=755 https://downloads.pdfkit.example/v4.2/pdfkit-linux-amd64 /out/pdfkit\n\n# Estágio 2: só o runtime do Node, sem shell, npm ou apt\nFROM gcr.io/distroless/nodejs20-debian12:nonroot@sha256:2db76fa7f866c2e39c276e32f75c3c832f6e94f9ac890b79ba3c0ed63e568cab\nWORKDIR /app\nCOPY --from=build /app /app\nCOPY --from=build /out/pdfkit /usr/local/bin/pdfkit\nUSER 65532:65532\nEXPOSE 3000\nCMD [\"server.js\"]",
+    "implantacao": "cosign verify --key cosign.pub registry.ipestore.example/loja/api-pedidos:1.8.0\ndocker run -d --name api-pedidos \\\n  --read-only \\\n  --cap-drop ALL \\\n  --security-opt no-new-privileges:true \\\n  -p 3000:3000 \\\n  -e DB_URL=postgres://pedidos@10.20.1.30/pedidos \\\n  registry.ipestore.example/loja/api-pedidos:1.8.0"
+   },
+   "esperado": [
+    "root",
+    "tag_latest",
+    "segredo_build",
+    "arquivo_segredo",
+    "add_remoto",
+    "imagem_grande",
+    "privileged",
+    "docker_sock",
+    "rede_host",
+    "registro",
+    "sem_assinatura",
+    "sem_endurecimento"
+   ],
+   "correcoes": {
+    "root": [
+     {
+      "arquivo": "dockerfile",
+      "de": "CMD [\"node\", \"server.js\"]",
+      "para": "USER node\nCMD [\"node\", \"server.js\"]"
+     }
+    ],
+    "tag_latest": [
+     {
+      "arquivo": "dockerfile",
+      "de": "FROM node:latest",
+      "para": "FROM node:20.18.0-bookworm@sha256:794ca42d40a8e37da16f433767eb73d85b654497760bd95ad40acf32f505c285"
+     },
+     {
+      "arquivo": "implantacao",
+      "de": "docker.io/ipestore-dev/api-pedidos:latest",
+      "para": "  docker.io/ipestore-dev/api-pedidos:1.8.0"
+     }
+    ],
+    "imagem_grande": [
+     {
+      "arquivo": "dockerfile",
+      "de": "FROM node:latest",
+      "para": "FROM node:20.18.0-bookworm-slim@sha256:66abef25028edbf19b3e6fa5d293a19adfdfe6cc2e8fd9ca7392c3f6f0c64615"
+     },
+     {
+      "arquivo": "dockerfile",
+      "de": "FROM node:20.18.0-bookworm@sha256:794ca42d40a8e37da16f433767eb73d85b654497760bd95ad40acf32f505c285",
+      "para": "FROM node:20.18.0-bookworm-slim@sha256:66abef25028edbf19b3e6fa5d293a19adfdfe6cc2e8fd9ca7392c3f6f0c64615"
+     }
+    ],
+    "segredo_build": [
+     {
+      "arquivo": "dockerfile",
+      "de": "ENV NPM_TOKEN=npm_LAB0ficticio0000000000000000",
+      "para": ""
+     }
+    ],
+    "arquivo_segredo": [
+     {
+      "arquivo": "dockerfile",
+      "de": "COPY .npmrc package.json package-lock.json ./",
+      "para": "COPY package.json package-lock.json ./"
+     },
+     {
+      "arquivo": "dockerfile",
+      "de": "RUN npm ci --omit=dev && rm -f .npmrc",
+      "para": "RUN --mount=type=secret,id=npmrc,target=/app/.npmrc npm ci --omit=dev"
+     }
+    ],
+    "add_remoto": [
+     {
+      "arquivo": "dockerfile",
+      "de": "ADD https://downloads.pdfkit.example/v4.2/pdfkit-linux-amd64 /usr/local/bin/pdfkit",
+      "para": "ADD --checksum=sha256:cad366ae888a1005faf2393f79ef99f3e94a31e6a5992992b0de8f775acff2a8 --chmod=755 https://downloads.pdfkit.example/v4.2/pdfkit-linux-amd64 /usr/local/bin/pdfkit"
+     }
+    ],
+    "privileged": [
+     {
+      "arquivo": "implantacao",
+      "de": "--privileged \\",
+      "para": ""
+     }
+    ],
+    "rede_host": [
+     {
+      "arquivo": "implantacao",
+      "de": "--network host \\",
+      "para": "  -p 3000:3000 \\"
+     }
+    ],
+    "docker_sock": [
+     {
+      "arquivo": "implantacao",
+      "de": "-v /var/run/docker.sock:/var/run/docker.sock \\",
+      "para": ""
+     }
+    ],
+    "registro": [
+     {
+      "arquivo": "implantacao",
+      "de": "docker.io/ipestore-dev/api-pedidos:latest",
+      "para": "  registry.ipestore.example/loja/api-pedidos:1.8.0"
+     },
+     {
+      "arquivo": "implantacao",
+      "de": "docker.io/ipestore-dev/api-pedidos:1.8.0",
+      "para": "  registry.ipestore.example/loja/api-pedidos:1.8.0"
+     }
+    ],
+    "sem_assinatura": [
+     {
+      "arquivo": "implantacao",
+      "de": "docker run -d --name api-pedidos \\",
+      "para": "cosign verify --key cosign.pub registry.ipestore.example/loja/api-pedidos:1.8.0\ndocker run -d --name api-pedidos \\"
+     }
+    ],
+    "sem_endurecimento": [
+     {
+      "arquivo": "implantacao",
+      "de": "docker run -d --name api-pedidos \\",
+      "para": "docker run -d --name api-pedidos \\\n  --read-only \\\n  --cap-drop ALL \\\n  --security-opt no-new-privileges:true \\"
+     }
+    ]
+   },
+   "varredura": [
+    {
+     "id": "LAB-2026-0101",
+     "pacote": "openssl (sistema)",
+     "instalada": "3.0.11-1",
+     "corrigida": "3.0.15-1",
+     "severidade": "alta",
+     "epss": 0.42,
+     "kev": false,
+     "bases": [
+      "completa",
+      "slim"
+     ],
+     "nota": "Biblioteca TLS da base; correção publicada e exploração provável.",
+     "prioridade": "agora"
+    },
+    {
+     "id": "LAB-2026-0102",
+     "pacote": "glibc (sistema)",
+     "instalada": "2.36-9",
+     "corrigida": "2.36-9+deb12u9",
+     "severidade": "alta",
+     "epss": 0.03,
+     "kev": false,
+     "bases": [
+      "completa",
+      "slim"
+     ],
+     "nota": "Grave no papel, mas exige condição local rara: entra na janela.",
+     "prioridade": "janela"
+    },
+    {
+     "id": "LAB-2026-0103",
+     "pacote": "imagemagick (sistema)",
+     "instalada": "6.9.11-60",
+     "corrigida": null,
+     "severidade": "critica",
+     "epss": 0.08,
+     "kev": false,
+     "bases": [
+      "completa"
+     ],
+     "nota": "Sem correção do fornecedor; a aplicação nem usa. Some ao trocar a base.",
+     "prioridade": "aceitar"
+    },
+    {
+     "id": "LAB-2026-0104",
+     "pacote": "curl (sistema)",
+     "instalada": "7.88.1-10",
+     "corrigida": "7.88.1-10+deb12u8",
+     "severidade": "media",
+     "epss": 0.02,
+     "kev": false,
+     "bases": [
+      "completa"
+     ],
+     "nota": "Ferramenta que a aplicação não usa; só existe na imagem completa.",
+     "prioridade": "janela"
+    },
+    {
+     "id": "LAB-2026-0105",
+     "pacote": "git (sistema)",
+     "instalada": "2.39.2-1",
+     "corrigida": "2.39.5-0+deb12u1",
+     "severidade": "alta",
+     "epss": 0.21,
+     "kev": false,
+     "bases": [
+      "completa"
+     ],
+     "nota": "Outro pacote que só existe porque a base é completa.",
+     "prioridade": "agora"
+    },
+    {
+     "id": "LAB-2026-0106",
+     "pacote": "express (npm)",
+     "instalada": "4.17.1",
+     "corrigida": "4.20.0",
+     "severidade": "alta",
+     "epss": 0.12,
+     "kev": false,
+     "bases": [
+      "completa",
+      "slim",
+      "distroless"
+     ],
+     "nota": "Dependência da própria API: nenhuma troca de base resolve, só atualizar (SCA, Estudo 22).",
+     "prioridade": "agora"
+    },
+    {
+     "id": "LAB-2026-0107",
+     "pacote": "jsonwebtoken (npm)",
+     "instalada": "8.5.1",
+     "corrigida": "9.0.0",
+     "severidade": "critica",
+     "epss": 0.64,
+     "kev": true,
+     "bases": [
+      "completa",
+      "slim",
+      "distroless"
+     ],
+     "nota": "Explorada ativamente (no KEV simulado) e atinge a validação de token da API.",
+     "prioridade": "agora"
+    },
+    {
+     "id": "LAB-2026-0108",
+     "pacote": "perl (sistema)",
+     "instalada": "5.36.0-7",
+     "corrigida": null,
+     "severidade": "media",
+     "epss": 0.01,
+     "kev": false,
+     "bases": [
+      "completa",
+      "slim"
+     ],
+     "nota": "Sem correção e pouco provável: aceitar com prazo de revisão.",
+     "prioridade": "aceitar"
+    },
+    {
+     "id": "LAB-2026-0109",
+     "pacote": "semver (npm)",
+     "instalada": "5.7.1",
+     "corrigida": "5.7.2",
+     "severidade": "media",
+     "epss": 0.04,
+     "kev": false,
+     "bases": [
+      "completa",
+      "slim",
+      "distroless"
+     ],
+     "nota": "Correção simples, sem urgência: próxima janela.",
+     "prioridade": "janela"
+    }
+   ],
+   "ruido": {
+    "completa": 187,
+    "slim": 24,
+    "distroless": 2
+   }
+  },
+  {
+   "id": "relatorios",
+   "nome": "Gerador de relatórios (Python)",
+   "historia": "O worker que gera os PDFs de vendas. A imagem já roda com usuário próprio e vem do registro da empresa, assinada; mas um analista acrescentou --user 0, SYS_ADMIN, SYS_PTRACE e --pid=host para depurar um travamento com py-spy, e montou /etc para ler o fuso horário.",
+   "dockerfile": "FROM python:3.12\nARG DB_PASSWORD\nENV DB_PASSWORD=${DB_PASSWORD}\nWORKDIR /srv/relatorios\nRUN curl -fsSL https://get.fontes.example/instalar.sh | sh\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\nCOPY . .\nRUN useradd --uid 10001 --create-home relat\nUSER relat\nCMD [\"python\", \"-m\", \"relatorios\"]",
+   "implantacao": "cosign verify --key cosign.pub registry.ipestore.example/loja/relatorios:2.3.1\ndocker run -d --name relatorios \\\n  --user 0 \\\n  --cap-add SYS_ADMIN \\\n  --cap-add SYS_PTRACE \\\n  --pid=host \\\n  -v /etc:/host/etc:ro \\\n  -e DB_HOST=10.20.1.30 \\\n  registry.ipestore.example/loja/relatorios:2.3.1",
+   "referencia": {
+    "dockerfile": "# Estágio 1: instala as dependências com pip\nFROM python:3.12.7-slim-bookworm@sha256:a1675fc29cc86b8e915c1c48a9583c1b43a834615147fcbaa59676e2e39476a4 AS build\nWORKDIR /srv/relatorios\nCOPY requirements.txt .\nRUN pip install --no-cache-dir --prefix=/install -r requirements.txt\n\n# Estágio 2: só o necessário para rodar\nFROM python:3.12.7-slim-bookworm@sha256:a1675fc29cc86b8e915c1c48a9583c1b43a834615147fcbaa59676e2e39476a4\nWORKDIR /srv/relatorios\nCOPY --from=build /install /usr/local\nCOPY fontes/ /usr/share/fonts/truetype/ipe/\nCOPY . .\nRUN useradd --uid 10001 --no-create-home relat\nUSER 10001:10001\nCMD [\"python\", \"-m\", \"relatorios\"]",
+    "implantacao": "cosign verify --key cosign.pub registry.ipestore.example/loja/relatorios:2.3.1\ndocker run -d --name relatorios \\\n  --read-only --tmpfs /tmp \\\n  --cap-drop ALL \\\n  --security-opt no-new-privileges:true \\\n  -e TZ=America/Sao_Paulo \\\n  -e DB_HOST=10.20.1.30 \\\n  -v /run/ipe-secrets/relatorios-db:/run/secrets/db_password:ro \\\n  registry.ipestore.example/loja/relatorios:2.3.1"
+   },
+   "esperado": [
+    "root",
+    "sem_digest",
+    "segredo_build",
+    "add_remoto",
+    "imagem_grande",
+    "montagem_sensivel",
+    "pid_host",
+    "cap_add",
+    "sem_endurecimento"
+   ],
+   "correcoes": {
+    "root": [
+     {
+      "arquivo": "implantacao",
+      "de": "--user 0 \\",
+      "para": ""
+     }
+    ],
+    "sem_digest": [
+     {
+      "arquivo": "dockerfile",
+      "de": "FROM python:3.12",
+      "para": "FROM python:3.12.7-bookworm@sha256:4019cead9483d0c879fcb964fc5cf4165e29fad6ab11f2627bc3f58685912166"
+     },
+     {
+      "arquivo": "dockerfile",
+      "de": "FROM python:3.12.7-slim-bookworm",
+      "para": "FROM python:3.12.7-slim-bookworm@sha256:a1675fc29cc86b8e915c1c48a9583c1b43a834615147fcbaa59676e2e39476a4"
+     }
+    ],
+    "imagem_grande": [
+     {
+      "arquivo": "dockerfile",
+      "de": "FROM python:3.12",
+      "para": "FROM python:3.12.7-slim-bookworm"
+     },
+     {
+      "arquivo": "dockerfile",
+      "de": "FROM python:3.12.7-bookworm@sha256:4019cead9483d0c879fcb964fc5cf4165e29fad6ab11f2627bc3f58685912166",
+      "para": "FROM python:3.12.7-slim-bookworm@sha256:a1675fc29cc86b8e915c1c48a9583c1b43a834615147fcbaa59676e2e39476a4"
+     }
+    ],
+    "segredo_build": [
+     {
+      "arquivo": "dockerfile",
+      "de": "ARG DB_PASSWORD",
+      "para": ""
+     },
+     {
+      "arquivo": "dockerfile",
+      "de": "ENV DB_PASSWORD=${DB_PASSWORD}",
+      "para": ""
+     },
+     {
+      "arquivo": "implantacao",
+      "de": "-e DB_HOST=10.20.1.30 \\",
+      "para": "  -e DB_HOST=10.20.1.30 \\\n  -v /run/ipe-secrets/relatorios-db:/run/secrets/db_password:ro \\"
+     }
+    ],
+    "add_remoto": [
+     {
+      "arquivo": "dockerfile",
+      "de": "RUN curl -fsSL https://get.fontes.example/instalar.sh | sh",
+      "para": "COPY fontes/ /usr/share/fonts/truetype/ipe/"
+     }
+    ],
+    "montagem_sensivel": [
+     {
+      "arquivo": "implantacao",
+      "de": "-v /etc:/host/etc:ro \\",
+      "para": "  -e TZ=America/Sao_Paulo \\"
+     }
+    ],
+    "pid_host": [
+     {
+      "arquivo": "implantacao",
+      "de": "--pid=host \\",
+      "para": ""
+     }
+    ],
+    "cap_add": [
+     {
+      "arquivo": "implantacao",
+      "de": "--cap-add SYS_ADMIN \\",
+      "para": ""
+     },
+     {
+      "arquivo": "implantacao",
+      "de": "--cap-add SYS_PTRACE \\",
+      "para": ""
+     }
+    ],
+    "sem_endurecimento": [
+     {
+      "arquivo": "implantacao",
+      "de": "docker run -d --name relatorios \\",
+      "para": "docker run -d --name relatorios \\\n  --read-only --tmpfs /tmp \\\n  --cap-drop ALL \\\n  --security-opt no-new-privileges:true \\"
+     }
+    ]
+   },
+   "varredura": [
+    {
+     "id": "LAB-2026-0201",
+     "pacote": "libxml2 (sistema)",
+     "instalada": "2.9.14",
+     "corrigida": "2.9.14+dfsg-1.3~deb12u1",
+     "severidade": "alta",
+     "epss": 0.15,
+     "kev": false,
+     "bases": [
+      "completa",
+      "slim"
+     ],
+     "nota": "Usada pelo gerador de relatórios para ler XML de fornecedores.",
+     "prioridade": "agora"
+    },
+    {
+     "id": "LAB-2026-0202",
+     "pacote": "sqlite3 (sistema)",
+     "instalada": "3.40.1-2",
+     "corrigida": null,
+     "severidade": "alta",
+     "epss": 0.02,
+     "kev": false,
+     "bases": [
+      "completa",
+      "slim"
+     ],
+     "nota": "Sem correção publicada e exploração improvável: aceitar com prazo.",
+     "prioridade": "aceitar"
+    },
+    {
+     "id": "LAB-2026-0203",
+     "pacote": "imagemagick (sistema)",
+     "instalada": "6.9.11-60",
+     "corrigida": "6.9.11-60+dfsg-1.6+deb12u2",
+     "severidade": "critica",
+     "epss": 0.55,
+     "kev": true,
+     "bases": [
+      "completa"
+     ],
+     "nota": "No KEV simulado: corrigir já, ou melhor, sair da base completa.",
+     "prioridade": "agora"
+    },
+    {
+     "id": "LAB-2026-0204",
+     "pacote": "linux-libc-dev (sistema)",
+     "instalada": "6.1.106-3",
+     "corrigida": null,
+     "severidade": "media",
+     "epss": 0.01,
+     "kev": false,
+     "bases": [
+      "completa"
+     ],
+     "nota": "Cabeçalhos do kernel que nem são usados em execução.",
+     "prioridade": "aceitar"
+    },
+    {
+     "id": "LAB-2026-0205",
+     "pacote": "pillow (pip)",
+     "instalada": "9.5.0",
+     "corrigida": "10.3.0",
+     "severidade": "alta",
+     "epss": 0.31,
+     "kev": false,
+     "bases": [
+      "completa",
+      "slim",
+      "distroless"
+     ],
+     "nota": "Biblioteca de imagem que processa arquivos enviados: corrigir já.",
+     "prioridade": "agora"
+    },
+    {
+     "id": "LAB-2026-0206",
+     "pacote": "jinja2 (pip)",
+     "instalada": "3.1.2",
+     "corrigida": "3.1.4",
+     "severidade": "media",
+     "epss": 0.05,
+     "kev": false,
+     "bases": [
+      "completa",
+      "slim",
+      "distroless"
+     ],
+     "nota": "Correção disponível, sem urgência.",
+     "prioridade": "janela"
+    },
+    {
+     "id": "LAB-2026-0207",
+     "pacote": "setuptools (pip)",
+     "instalada": "65.5.0",
+     "corrigida": "70.0.0",
+     "severidade": "alta",
+     "epss": 0.04,
+     "kev": false,
+     "bases": [
+      "completa",
+      "slim",
+      "distroless"
+     ],
+     "nota": "Alta, mas só no momento da instalação: próxima janela.",
+     "prioridade": "janela"
+    }
+   ],
+   "ruido": {
+    "completa": 243,
+    "slim": 38,
+    "distroless": 3
+   }
+  },
+  {
+   "id": "vitrine",
+   "nome": "Vitrine do catálogo (Go)",
+   "historia": "O serviço do catálogo, refeito no último trimestre: build multiestágio, distroless, digest, usuário sem privilégio, assinatura verificada e docker run endurecido. Só que alguém trocou a rede para a do host, para o Prometheus coletar métricas em localhost.",
+   "dockerfile": "# Estágio 1: compila com o toolchain completo do Go\nFROM golang:1.23.2-bookworm@sha256:d754ed9f64ac293b10268157f283ee23256fb32a4f8dedb25c8446ca5bcb0bb3 AS build\nWORKDIR /src\nCOPY go.mod go.sum ./\nRUN go mod download\nCOPY . .\nRUN CGO_ENABLED=0 go build -trimpath -ldflags=\"-s -w\" -o /out/vitrine ./cmd/vitrine\n\n# Estágio 2: só o binário, sem shell nem gerenciador de pacotes\nFROM gcr.io/distroless/static-debian12:nonroot@sha256:2053dbbf6ec7135c4e994d3464c478db6f48d3ca21052c8f44915edc96e02c39\nCOPY --from=build /out/vitrine /vitrine\nUSER 65532:65532\nEXPOSE 8080\nENTRYPOINT [\"/vitrine\"]",
+   "implantacao": "cosign verify --key cosign.pub registry.ipestore.example/loja/vitrine:3.0.4\ndocker run -d --name vitrine \\\n  --read-only \\\n  --cap-drop ALL \\\n  --security-opt no-new-privileges:true \\\n  --network host \\\n  registry.ipestore.example/loja/vitrine:3.0.4",
+   "referencia": {
+    "dockerfile": "# Estágio 1: compila com o toolchain completo do Go\nFROM golang:1.23.2-bookworm@sha256:d754ed9f64ac293b10268157f283ee23256fb32a4f8dedb25c8446ca5bcb0bb3 AS build\nWORKDIR /src\nCOPY go.mod go.sum ./\nRUN go mod download\nCOPY . .\nRUN CGO_ENABLED=0 go build -trimpath -ldflags=\"-s -w\" -o /out/vitrine ./cmd/vitrine\n\n# Estágio 2: só o binário, sem shell nem gerenciador de pacotes\nFROM gcr.io/distroless/static-debian12:nonroot@sha256:2053dbbf6ec7135c4e994d3464c478db6f48d3ca21052c8f44915edc96e02c39\nCOPY --from=build /out/vitrine /vitrine\nUSER 65532:65532\nEXPOSE 8080\nENTRYPOINT [\"/vitrine\"]",
+    "implantacao": "cosign verify --key cosign.pub registry.ipestore.example/loja/vitrine:3.0.4\ndocker run -d --name vitrine \\\n  --read-only \\\n  --cap-drop ALL \\\n  --security-opt no-new-privileges:true \\\n  -p 8080:8080 \\\n  registry.ipestore.example/loja/vitrine:3.0.4"
+   },
+   "esperado": [
+    "rede_host"
+   ],
+   "correcoes": {
+    "rede_host": [
+     {
+      "arquivo": "implantacao",
+      "de": "--network host \\",
+      "para": "  -p 8080:8080 \\"
+     }
+    ]
+   },
+   "varredura": [
+    {
+     "id": "LAB-2026-0301",
+     "pacote": "golang.org/x/net (Go)",
+     "instalada": "0.23.0",
+     "corrigida": "0.33.0",
+     "severidade": "media",
+     "epss": 0.09,
+     "kev": false,
+     "bases": [
+      "completa",
+      "slim",
+      "distroless"
+     ],
+     "nota": "Dependência do binário: próxima janela.",
+     "prioridade": "janela"
+    },
+    {
+     "id": "LAB-2026-0302",
+     "pacote": "stdlib (Go 1.23.2)",
+     "instalada": "1.23.2",
+     "corrigida": "1.23.3",
+     "severidade": "alta",
+     "epss": 0.11,
+     "kev": false,
+     "bases": [
+      "completa",
+      "slim",
+      "distroless"
+     ],
+     "nota": "Compilar com o Go corrigido e republicar.",
+     "prioridade": "agora"
+    },
+    {
+     "id": "LAB-2026-0303",
+     "pacote": "tzdata (sistema)",
+     "instalada": "2024a-0+deb12u1",
+     "corrigida": "2024b-0+deb12u1",
+     "severidade": "baixa",
+     "epss": 0.0,
+     "kev": false,
+     "bases": [
+      "completa",
+      "slim",
+      "distroless"
+     ],
+     "nota": "Atualização de fuso horário, sem risco.",
+     "prioridade": "janela"
+    }
+   ],
+   "ruido": {
+    "completa": 160,
+    "slim": 20,
+    "distroless": 0
+   }
+  }
+ ],
+ "casos": [
+  {
+   "nome": "ADD com --checksum e base alpine fixada",
+   "dockerfile": "FROM alpine:3.20@sha256:54c5b3dd459d5ef778bb2fa1e23a5fb0e1b62ae66970bcb436e8f81a1a1a8e41\nADD --checksum=sha256:2696dc6bd91f14b743fd3fcde73efc529cc45e5e7c9a0033e6200c63b4b7d58f https://a.example/ferramenta /usr/local/bin/ferramenta\nUSER 1000",
+   "implantacao": "",
+   "esperado": []
+  },
+  {
+   "nome": "golang só no estágio de build",
+   "dockerfile": "# Estágio 1: compila com o toolchain completo do Go\nFROM golang:1.23.2-bookworm@sha256:d754ed9f64ac293b10268157f283ee23256fb32a4f8dedb25c8446ca5bcb0bb3 AS build\nWORKDIR /src\nCOPY go.mod go.sum ./\nRUN go mod download\nCOPY . .\nRUN CGO_ENABLED=0 go build -trimpath -ldflags=\"-s -w\" -o /out/vitrine ./cmd/vitrine\n\n# Estágio 2: só o binário, sem shell nem gerenciador de pacotes\nFROM gcr.io/distroless/static-debian12:nonroot@sha256:2053dbbf6ec7135c4e994d3464c478db6f48d3ca21052c8f44915edc96e02c39\nCOPY --from=build /out/vitrine /vitrine\nUSER 65532:65532\nEXPOSE 8080\nENTRYPOINT [\"/vitrine\"]",
+   "implantacao": "",
+   "esperado": []
+  },
+  {
+   "nome": "USER root no fim desfaz o USER anterior",
+   "dockerfile": "FROM debian:12-slim@sha256:195d1fb8cd3ed21da08fae519384284d7aeadc485dcbefbc9f949e4dc899e15a\nUSER app\nRUN echo ok\nUSER root",
+   "implantacao": "",
+   "esperado": [
+    "root"
+   ]
+  },
+  {
+   "nome": "continuação de linha, comentário e curl | bash",
+   "dockerfile": "# base de ferramentas\nFROM ubuntu:24.04@sha256:7804a56a5c7636cc05814736f44139e32920810d3bd51aa099a5df932e754ce9\nRUN apt-get update && \\\n    curl -fsSL https://a.example/instalar.sh \\\n    | bash\nUSER 1000",
+   "implantacao": "",
+   "esperado": [
+    "add_remoto",
+    "imagem_grande"
+   ]
+  },
+  {
+   "nome": "ENV na forma antiga e chave privada copiada",
+   "dockerfile": "FROM alpine:3.20@sha256:54c5b3dd459d5ef778bb2fa1e23a5fb0e1b62ae66970bcb436e8f81a1a1a8e41\nENV API_KEY abc123\nCOPY id_rsa /home/app/.ssh/id_rsa\nUSER 1000",
+   "implantacao": "",
+   "esperado": [
+    "segredo_build",
+    "arquivo_segredo"
+   ]
+  },
+  {
+   "nome": "opções na forma --opção=valor e usuário 0:0",
+   "dockerfile": "FROM gcr.io/distroless/static-debian12:nonroot@sha256:2053dbbf6ec7135c4e994d3464c478db6f48d3ca21052c8f44915edc96e02c39\nUSER 65532:65532",
+   "implantacao": "docker run --network=host --pid=host --cap-add=cap_sys_admin --security-opt=no-new-privileges --read-only --cap-drop=ALL -u 0:0 registry.ipestore.example/loja/x@sha256:2053dbbf6ec7135c4e994d3464c478db6f48d3ca21052c8f44915edc96e02c39",
+   "esperado": [
+    "root",
+    "pid_host",
+    "cap_add",
+    "rede_host",
+    "sem_assinatura"
+   ]
+  },
+  {
+   "nome": "socket via --mount; NET_BIND_SERVICE é permitido",
+   "dockerfile": "FROM gcr.io/distroless/static-debian12:nonroot@sha256:2053dbbf6ec7135c4e994d3464c478db6f48d3ca21052c8f44915edc96e02c39\nUSER 65532:65532",
+   "implantacao": "cosign verify --key cosign.pub registry.ipestore.example/loja/y:1.0\ndocker run --read-only --cap-drop ALL --cap-add NET_BIND_SERVICE --security-opt no-new-privileges:true --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock registry.ipestore.example/loja/y:1.0",
+   "esperado": [
+    "docker_sock"
+   ]
+  },
+  {
+   "nome": "sem docker run, só o Dockerfile é auditado",
+   "dockerfile": "FROM gcr.io/distroless/static-debian12:nonroot@sha256:2053dbbf6ec7135c4e994d3464c478db6f48d3ca21052c8f44915edc96e02c39\nUSER 65532:65532",
+   "implantacao": "cosign verify --key cosign.pub registry.ipestore.example/loja/z:1.0",
+   "esperado": []
+  }
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var CTR = JSON.parse(document.getElementById("ctr-dados").textContent);
+    var URL_RE = /^https?:\/\//;
+    var CURL_SH = /(curl|wget)\b[^|]*\|\s*(sudo\s+)?(ba)?sh\b/;
+    var estado = { cenario: null, aplicadas: {}, revelado: false };
+
+    function $(id) { return document.getElementById(id); }
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function has(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
+    function palavras(s) { return s.split(/\s+/).filter(function(t) { return t.length > 0; }); }
+    function termina(s, sufixos) { return sufixos.some(function(x) { return s.slice(-x.length) === x; }); }
+    function primeiroUser(v) { return v.split(":")[0]; }
+
+    // ===================================================== motor (espelhado nos testes)
+    window.juntarLinhas = function(texto) {
+        var out = [], buf = "", ini = null;
+        texto.split("\n").forEach(function(bruta, i) {
+            var s = bruta.trim();
+            if (!s || s.charAt(0) === "#") return;
+            if (ini === null) ini = i + 1;
+            if (s.slice(-1) === "\\") { buf += s.slice(0, -1).trim() + " "; return; }
+            buf += s;
+            out.push([ini, buf.trim()]);
+            buf = ""; ini = null;
+        });
+        if (buf.trim()) out.push([ini, buf.trim()]);
+        return out;
+    };
+    function parseImagem(ref) {
+        var at = ref.indexOf("@"), nome = at === -1 ? ref : ref.slice(0, at), digest = at === -1 ? "" : ref.slice(at + 1), tag = "";
+        var i = nome.lastIndexOf(":");
+        if (i > nome.lastIndexOf("/")) { tag = nome.slice(i + 1); nome = nome.slice(0, i); }
+        var partes = nome.split("/");
+        return { nome: nome, tag: tag, digest: digest, base: partes[partes.length - 1].toLowerCase() };
+    }
+    function lerDockerfile(texto) {
+        var est = [];
+        window.juntarLinhas(texto).forEach(function(l) {
+            var n = l[0], c = l[1], primeiro = palavras(c)[0], instr = primeiro.toUpperCase(), args = c.slice(primeiro.length).trim();
+            if (instr === "FROM") {
+                var toks = palavras(args).filter(function(t) { return t.indexOf("--") !== 0; });
+                var alias = toks.length >= 3 && toks[1].toUpperCase() === "AS" ? toks[2].toLowerCase() : null;
+                est.push({ linha: n, ref: toks.length ? toks[0] : "", alias: alias, instr: [] });
+            } else if (est.length) {
+                est[est.length - 1].instr.push([n, instr, args]);
+            }
+        });
+        return est;
+    }
+    function ehGrande(im) {
+        return CTR.imagens_grandes.indexOf(im.base) !== -1 && im.tag.indexOf("slim") === -1 && im.tag.indexOf("alpine") === -1;
+    }
+    function achadosDockerfile(texto, add) {
+        var est = lerDockerfile(texto);
+        if (!est.length) return "desconhecida";
+        var aliases = {}, pad = new RegExp(CTR.padrao_segredo, "i");
+        est.forEach(function(e) {
+            var ref = e.ref, low = ref.toLowerCase();
+            if (!has(aliases, low) && low !== "scratch") {
+                var im = parseImagem(ref);
+                if (!im.digest && (im.tag === "" || im.tag === "latest")) add("tag_latest", "linha " + e.linha + ": FROM " + ref);
+                else if (!im.digest) add("sem_digest", "linha " + e.linha + ": FROM " + ref);
+            }
+            if (e.alias) aliases[e.alias] = ref;
+            e.instr.forEach(function(x) {
+                var n = x[0], instr = x[1], args = x[2], toks = palavras(args);
+                if ((instr === "ENV" || instr === "ARG") && toks.length) {
+                    var chaves = (instr === "ENV" && toks[0].indexOf("=") === -1) ? [toks[0]]
+                        : toks.filter(function(t) { return instr === "ARG" || t.indexOf("=") !== -1; }).map(function(t) { return t.split("=")[0]; });
+                    chaves.forEach(function(k) { if (pad.test(k)) add("segredo_build", "linha " + n + ": " + instr + " " + k); });
+                } else if (instr === "COPY" || instr === "ADD") {
+                    var flags = toks.filter(function(t) { return t.indexOf("--") === 0; });
+                    var fontes = toks.filter(function(t) { return t.indexOf("--") !== 0; }).slice(0, -1);
+                    if (instr === "ADD" && fontes.some(function(f) { return URL_RE.test(f); }) && !flags.some(function(f) { return f.indexOf("--checksum=") === 0; }))
+                        add("add_remoto", "linha " + n + ": ADD de URL sem --checksum");
+                    if (!flags.some(function(f) { return f.indexOf("--from=") === 0; })) {
+                        fontes.forEach(function(f) {
+                            if (URL_RE.test(f)) return;
+                            var p = f.replace(/\/+$/, "").split("/"), b = p[p.length - 1];
+                            if (CTR.arquivos_segredo.indexOf(b) !== -1 || termina(b, CTR.sufixos_segredo)) add("arquivo_segredo", "linha " + n + ": " + instr + " " + b);
+                        });
+                    }
+                } else if (instr === "RUN" && CURL_SH.test(args)) {
+                    add("add_remoto", "linha " + n + ": script baixado e executado direto no shell");
+                }
+            });
+        });
+        var final = est[est.length - 1];
+        var usuarios = final.instr.filter(function(x) { return x[1] === "USER"; });
+        if (!usuarios.length) add("root", "Dockerfile: o estágio final não tem USER (roda como root)");
+        else {
+            var u = usuarios[usuarios.length - 1], uv = u[2].trim();
+            if (primeiroUser(uv) === "root" || primeiroUser(uv) === "0") add("root", "linha " + u[0] + ": USER " + uv);
+        }
+        var ref = final.ref, vistos = 0;
+        while (has(aliases, ref.toLowerCase()) && vistos < 10) { ref = aliases[ref.toLowerCase()]; vistos++; }
+        if (ref.toLowerCase() === "scratch") return "distroless";
+        var im = parseImagem(ref);
+        if (ehGrande(im)) { add("imagem_grande", "linha " + final.linha + ": estágio final em " + ref); return "completa"; }
+        return im.nome.toLowerCase().indexOf("distroless") !== -1 ? "distroless" : "slim";
+    }
+    function parseRun(toks) {
+        var opts = [], imagem = null, i = 2;
+        while (i < toks.length) {
+            var t = toks[i];
+            if (t.charAt(0) === "-") {
+                if (t.indexOf("--") === 0 && t.indexOf("=") !== -1) {
+                    var j = t.indexOf("=");
+                    opts.push([t.slice(0, j), t.slice(j + 1)]);
+                } else if (CTR.opcoes_com_valor.indexOf(t) !== -1 && i + 1 < toks.length) {
+                    opts.push([t, toks[i + 1]]); i++;
+                } else {
+                    opts.push([t, null]);
+                }
+            } else { imagem = t; break; }
+            i++;
+        }
+        return { opts: opts, imagem: imagem };
+    }
+    function achadosImplantacao(texto, add) {
+        var run = null, outras = [];
+        window.juntarLinhas(texto).forEach(function(l) {
+            var toks = palavras(l[1]).map(function(t) { return t.replace(/^['"]+|['"]+$/g, ""); });
+            if (run === null && toks.length >= 2 && toks[0] === "docker" && toks[1] === "run") run = toks;
+            else outras.push(toks);
+        });
+        if (run === null) return;
+        var p = parseRun(run), caps = [], ro = false, drop = false, nnp = false;
+        p.opts.forEach(function(o) {
+            var k = o[0], v = o[1];
+            if (k === "--privileged" && (v === null || v === "true")) add("privileged", "--privileged");
+            else if ((k === "-v" || k === "--volume" || k === "--mount") && v) {
+                var src;
+                if (k === "--mount") {
+                    var campos = {};
+                    v.split(",").forEach(function(par) { var q = par.indexOf("="); if (q !== -1) campos[par.slice(0, q)] = par.slice(q + 1); });
+                    src = has(campos, "source") ? campos.source : (has(campos, "src") ? campos.src : "");
+                } else src = v.split(":")[0];
+                if (src !== "/") src = src.replace(/\/+$/, "");
+                if (CTR.sockets.indexOf(src) !== -1) add("docker_sock", k + " " + v);
+                else if (CTR.montagens_sensiveis.indexOf(src) !== -1) add("montagem_sensivel", k + " " + v);
+            }
+            else if (k === "--pid" && v === "host") add("pid_host", "--pid=host");
+            else if ((k === "--network" || k === "--net") && v === "host") add("rede_host", k + " host");
+            else if (k === "--cap-add" && v) {
+                var cap = v.toUpperCase();
+                if (cap.indexOf("CAP_") === 0) cap = cap.slice(4);
+                if (CTR.caps_permitidas.indexOf(cap) === -1) caps.push(cap);
+            }
+            else if (k === "--cap-drop" && v && v.toUpperCase() === "ALL") drop = true;
+            else if ((k === "-u" || k === "--user") && v && (primeiroUser(v) === "root" || primeiroUser(v) === "0")) add("root", "docker run " + k + " " + v);
+            else if (k === "--read-only" && (v === null || v === "true")) ro = true;
+            else if (k === "--security-opt" && v && v.indexOf("no-new-privileges") === 0 && v.slice(-5) !== "false") nnp = true;
+        });
+        caps.forEach(function(c) { add("cap_add", "--cap-add " + c); });
+        if (p.imagem) {
+            var im = parseImagem(p.imagem);
+            if (!im.digest && (im.tag === "" || im.tag === "latest")) add("tag_latest", "docker run: imagem " + p.imagem);
+            if (p.imagem.indexOf(CTR.registro_confiavel) !== 0) add("registro", "imagem fora de " + CTR.registro_confiavel);
+            var assinada = outras.some(function(t) {
+                return t.length >= 2 && t[0] === "cosign" && t[1] === "verify" && t.slice(2).some(function(x) { return parseImagem(x).nome === im.nome; });
+            });
+            if (!assinada) add("sem_assinatura", "nenhum cosign verify para " + im.nome);
+        }
+        var faltam = [["--read-only", ro], ["--cap-drop ALL", drop], ["--security-opt no-new-privileges", nnp]]
+            .filter(function(x) { return !x[1]; }).map(function(x) { return x[0]; });
+        if (faltam.length) add("sem_endurecimento", "faltam: " + faltam.join(", "));
+    }
+
+    window.auditarContainer = function(dockerfile, implantacao) {
+        var ev = {};
+        function add(rid, texto) { (ev[rid] = ev[rid] || []).push(texto); }
+        var base = achadosDockerfile(dockerfile, add);
+        achadosImplantacao(implantacao, add);
+        var achados = [];
+        CTR.ordem_regras.forEach(function(rid) {
+            if (!has(ev, rid)) return;
+            var r = CTR.regras[rid], sev = r.sev, escape = r.escape;
+            if (rid === "cap_add") {
+                var caps = ev[rid].map(function(e) { var p = e.split(" "); return p[p.length - 1]; });
+                if (caps.some(function(c) { return CTR.caps_escape.indexOf(c) !== -1; })) { sev = "critica"; escape = true; }
+            }
+            achados.push({ id: rid, sev: sev, escape: escape, evidencias: ev[rid] });
+        });
+        var risco = achados.reduce(function(acc, a) { return acc + CTR.pesos[a.sev]; }, 0);
+        var escapeAberto = achados.some(function(a) { return a.escape; });
+        var nivel = (escapeAberto || risco >= 80) ? "crítico" : risco >= 40 ? "alto" : risco >= 15 ? "médio" : risco > 0 ? "baixo" : "mínimo";
+        return { achados: achados, ids: achados.map(function(a) { return a.id; }), base: base, risco: risco, nivel: nivel, escape: escapeAberto };
+    };
+
+    window.aplicarItensCtr = function(textos, itens) {
+        var t = { dockerfile: textos.dockerfile, implantacao: textos.implantacao };
+        itens.forEach(function(it) {
+            var arq = t[it.arquivo];
+            if (it.para && arq.indexOf(it.para) !== -1) return;
+            var linhas = arq.split("\n");
+            for (var i = 0; i < linhas.length; i++) {
+                if (linhas[i].trim() === it.de.trim()) {
+                    if (it.para === "") linhas.splice(i, 1); else linhas[i] = it.para;
+                    break;
+                }
+            }
+            t[it.arquivo] = linhas.join("\n");
+        });
+        return t;
+    };
+
+    window.prioridadeVuln = function(v) {
+        if (v.kev) return "agora";
+        if (v.corrigida === null) return "aceitar";
+        if ((v.severidade === "critica" || v.severidade === "alta") && v.epss >= 0.10) return "agora";
+        return "janela";
+    };
+    window.varreduraCtr = function(cenario, base) {
+        return cenario.varredura.filter(function(v) { return v.bases.indexOf(base) !== -1; });
+    };
+
+    // ===================================================== interface
+    var COR_SEV = { critica: "var(--danger-color)", alta: "var(--warning-color)", media: "var(--accent)", baixa: "var(--muted)" };
+    var COR_NIVEL = { "crítico": "var(--danger-color)", "alto": "var(--warning-color)", "médio": "var(--accent)", "baixo": "var(--tip-color)", "mínimo": "var(--tip-color)" };
+    var ROT_BASE = { completa: "completa", slim: "mínima (slim/alpine)", distroless: "distroless", desconhecida: "não identificada" };
+
+    function cenarioAtual() { return CTR.cenarios.filter(function(c) { return c.id === estado.cenario; })[0]; }
+    function textos() { return { dockerfile: $("ctr-dockerfile").value, implantacao: $("ctr-implantacao").value }; }
+
+    function renderRisco(r) {
+        var box = $("ctr-risco");
+        box.replaceChildren();
+        box.setAttribute("data-risco", r.risco);
+        box.setAttribute("data-nivel", r.nivel);
+        box.setAttribute("data-achados", r.ids.length);
+        var grade = el("div", null, "display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); gap: 0.4rem;");
+        [["Risco", r.risco + " pontos", COR_NIVEL[r.nivel]], ["Nível", r.nivel, COR_NIVEL[r.nivel]],
+         ["Achados", String(r.ids.length), r.ids.length ? "var(--warning-color)" : "var(--tip-color)"],
+         ["Caminho ao host", r.escape ? "aberto" : "fechado", r.escape ? "var(--danger-color)" : "var(--tip-color)"],
+         ["Base do estágio final", ROT_BASE[r.base], "var(--accent)"]].forEach(function(it) {
+            var c = el("div", null, "border: 1px solid " + it[2] + "; border-radius: var(--radius-sm); padding: 0.4rem 0.55rem; background: var(--surface); min-width: 0;");
+            c.appendChild(el("div", it[0], "font-size: 0.74rem; color: var(--muted);"));
+            c.appendChild(el("strong", it[1], "font-size: 1.05rem; color: " + it[2] + "; overflow-wrap: anywhere;"));
+            grade.appendChild(c);
+        });
+        box.appendChild(grade);
+    }
+
+    function cartaoAchado(a, c) {
+        var r = CTR.regras[a.id];
+        var d = el("div", null, "border-left: 4px solid " + COR_SEV[a.sev] + "; background: var(--sunk); border-radius: var(--radius-sm); padding: 0.45rem 0.6rem; min-width: 0;");
+        d.setAttribute("data-achado", a.id);
+        var cab = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.2rem 0.7rem; align-items: baseline;");
+        cab.appendChild(el("strong", r.titulo, "overflow-wrap: anywhere;"));
+        cab.appendChild(el("span", "gravidade " + CTR.rotulo_sev[a.sev] + (a.escape ? " · caminho ao host" : "") + (r.mitre ? " · " + r.mitre : ""), "color: " + COR_SEV[a.sev] + "; font-weight: 700;"));
+        d.appendChild(cab);
+        d.appendChild(el("div", "Evidência: " + a.evidencias.join("; "), "font-family: var(--font-mono, monospace); font-size: 0.74rem; overflow-wrap: anywhere; margin-top: 0.15rem;"));
+        var cam = el("div", null, "margin-top: 0.25rem; overflow-wrap: anywhere;");
+        cam.appendChild(el("strong", "Caminho que abria: "));
+        cam.appendChild(document.createTextNode(r.caminho));
+        d.appendChild(cam);
+        var cor = el("div", null, "margin-top: 0.2rem; overflow-wrap: anywhere;");
+        cor.appendChild(el("strong", "Correção: "));
+        cor.appendChild(document.createTextNode(r.correcao));
+        d.appendChild(cor);
+        if (c && has(c.correcoes, a.id)) {
+            if (estado.aplicadas[a.id]) {
+                d.appendChild(el("div", "Correção pronta já aplicada; o achado continua por causa da evidência acima. Ajuste o texto à mão.", "margin-top: 0.25rem; font-size: 0.76rem; color: var(--warning-color);"));
+            } else {
+                var b = el("button", "Aplicar correção", "margin-top: 0.35rem; font-size: 0.8rem; padding: 0.25rem 0.6rem;");
+                b.type = "button";
+                b.className = "btn-secondary";
+                b.setAttribute("aria-label", "Aplicar correção: " + r.titulo);
+                b.addEventListener("click", function() { window.aplicarCorrecaoCtr(a.id); });
+                d.appendChild(b);
+            }
+        }
+        return d;
+    }
+
+    function renderAchados(r) {
+        var box = $("ctr-achados");
+        box.replaceChildren();
+        if (!estado.revelado) {
+            box.appendChild(el("div", "Marque os achados que você encontrou e clique em \"Conferir meus achados\" para ver a lista do auditor.", "color: var(--muted);"));
+            return;
+        }
+        if (!r.achados.length) {
+            box.appendChild(el("div", "✓ Nenhum achado. Compare com a versão de referência: ela usa build multiestágio e uma base distroless quando a linguagem permite.", "color: var(--tip-color); font-weight: 600;"));
+            return;
+        }
+        var c = cenarioAtual();
+        r.achados.forEach(function(a) { box.appendChild(cartaoAchado(a, c)); });
+    }
+
+    function renderVarredura(r) {
+        var c = cenarioAtual(), box = $("ctr-varredura");
+        box.replaceChildren();
+        $("ctr-prioridade").replaceChildren();
+        if (r.base === "desconhecida") { box.appendChild(el("div", "Sem FROM no Dockerfile: não há imagem para varrer.", "color: var(--muted);")); return; }
+        var lista = window.varreduraCtr(c, r.base);
+        var cont = { critica: 0, alta: 0, media: 0, baixa: 0 };
+        lista.forEach(function(v) { cont[v.severidade]++; });
+        box.setAttribute("data-total", lista.length);
+        var resumo = "Trivy (fictício) · base " + ROT_BASE[r.base] + ": " + lista.length + " achados listados (" + cont.critica + " crítica, " + cont.alta + " alta, " + cont.media + " média, " + cont.baixa + " baixa) e mais " + c.ruido[r.base] + " de severidade baixa ou sem correção nos pacotes do sistema.";
+        box.appendChild(el("p", resumo, "margin: 0 0 0.4rem 0; overflow-wrap: anywhere;"));
+        var comparar = ["completa", "slim", "distroless"].map(function(b) { return ROT_BASE[b] + ": " + (window.varreduraCtr(c, b).length + c.ruido[b]); }).join(" · ");
+        box.appendChild(el("p", "Total por base, para a mesma aplicação: " + comparar + ". Trocar a base remove em bloco o que é do sistema; o que é da aplicação só sai atualizando a dependência.", "margin: 0 0 0.6rem 0; font-size: 0.76rem; color: var(--muted); overflow-wrap: anywhere;"));
+        var grade = el("div", null, "display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem;");
+        lista.forEach(function(v) {
+            var linha = el("div", null, "border-left: 4px solid " + COR_SEV[v.severidade] + "; background: var(--sunk); border-radius: var(--radius-sm); padding: 0.4rem 0.55rem; display: flex; flex-wrap: wrap; gap: 0.3rem 0.7rem; align-items: center; min-width: 0;");
+            linha.setAttribute("data-vuln", v.id);
+            var info = el("div", null, "flex: 1 1 15rem; min-width: 0; overflow-wrap: anywhere;");
+            info.appendChild(el("strong", v.id + " · " + v.pacote));
+            info.appendChild(el("div", v.instalada + " → " + (v.corrigida || "sem correção") + " · " + CTR.rotulo_sev[v.severidade] + " · EPSS " + Math.round(v.epss * 100) + "%" + (v.kev ? " · no KEV" : ""), "font-size: 0.76rem;"));
+            linha.appendChild(info);
+            var s = el("select", null, "min-width: 0; max-width: 100%; flex: 0 1 11rem; font-size: 0.8rem;");
+            s.className = "form-control";
+            s.setAttribute("aria-label", "Prioridade de " + v.id + " (" + v.pacote + ")");
+            s.setAttribute("data-vuln-select", v.id);
+            s.appendChild(el("option", "Escolha a prioridade")).value = "";
+            Object.keys(CTR.prioridades).forEach(function(k) { var o = el("option", CTR.prioridades[k]); o.value = k; s.appendChild(o); });
+            linha.appendChild(s);
+            grade.appendChild(linha);
+        });
+        box.appendChild(grade);
+    }
+
+    function atualizar() {
+        var t = textos();
+        var r = window.auditarContainer(t.dockerfile, t.implantacao);
+        renderRisco(r);
+        renderAchados(r);
+        renderVarredura(r);
+        return r;
+    }
+
+    function montarPalpites() {
+        var box = $("ctr-palpites");
+        box.replaceChildren();
+        CTR.ordem_regras.forEach(function(rid) {
+            var linha = el("div", null, "display: flex; gap: 0.45rem; align-items: flex-start; min-width: 0;");
+            var cb = el("input");
+            cb.type = "checkbox";
+            cb.id = "ctr-palpite-" + rid;
+            cb.value = rid;
+            cb.setAttribute("style", "margin-top: 0.2rem;");
+            var lb = el("label", CTR.regras[rid].titulo, "overflow-wrap: anywhere;");
+            lb.htmlFor = cb.id;
+            linha.appendChild(cb);
+            linha.appendChild(lb);
+            box.appendChild(linha);
+        });
+    }
+
+    window.conferirAchadosCtr = function() {
+        var t = textos(), r = window.auditarContainer(t.dockerfile, t.implantacao);
+        var marcados = CTR.ordem_regras.filter(function(rid) { return $("ctr-palpite-" + rid).checked; });
+        var acertos = marcados.filter(function(x) { return r.ids.indexOf(x) !== -1; });
+        var faltaram = r.ids.filter(function(x) { return marcados.indexOf(x) === -1; });
+        var aToa = marcados.filter(function(x) { return r.ids.indexOf(x) === -1; });
+        var box = $("ctr-conferencia");
+        box.replaceChildren();
+        box.setAttribute("data-acertos", acertos.length);
+        box.setAttribute("data-faltaram", faltaram.length);
+        box.setAttribute("data-a-toa", aToa.length);
+        var ok = !faltaram.length && !aToa.length;
+        box.appendChild(el("p", (ok ? "✓ " : "") + "Você encontrou " + acertos.length + " de " + r.ids.length + " achados." + (aToa.length ? " Marcou " + aToa.length + " que não se aplicam a este texto." : ""), "margin: 0; font-weight: 600; color: " + (ok ? "var(--tip-color)" : "var(--ink)") + ";"));
+        function linhaLista(rot, ids, cor) {
+            if (!ids.length) return;
+            box.appendChild(el("p", rot + ids.map(function(x) { return CTR.regras[x].titulo; }).join("; ") + ".", "margin: 0.25rem 0 0 0; color: " + cor + "; overflow-wrap: anywhere;"));
+        }
+        linhaLista("Faltaram: ", faltaram, "var(--danger-color)");
+        linhaLista("Não se aplicam: ", aToa, "var(--warning-color)");
+        estado.revelado = true;
+        atualizar();
+        return { acertos: acertos, faltaram: faltaram, aToa: aToa };
+    };
+
+    window.aplicarCorrecaoCtr = function(rid) {
+        var c = cenarioAtual();
+        if (!c || !has(c.correcoes, rid)) return null;
+        var t = window.aplicarItensCtr(textos(), c.correcoes[rid]);
+        $("ctr-dockerfile").value = t.dockerfile;
+        $("ctr-implantacao").value = t.implantacao;
+        estado.aplicadas[rid] = true;
+        return atualizar();
+    };
+
+    window.conferirPrioridadeCtr = function() {
+        var t = textos(), r = window.auditarContainer(t.dockerfile, t.implantacao);
+        var c = cenarioAtual(), lista = r.base === "desconhecida" ? [] : window.varreduraCtr(c, r.base);
+        var box = $("ctr-prioridade");
+        box.replaceChildren();
+        var certos = 0, respondidos = 0;
+        var ul = el("ul", null, "margin: 0.3rem 0 0 0; padding-left: 1.1rem;");
+        lista.forEach(function(v) {
+            var s = document.querySelector('[data-vuln-select="' + v.id + '"]');
+            var escolha = s ? s.value : "", certa = window.prioridadeVuln(v);
+            if (escolha) respondidos++;
+            if (escolha === certa) certos++;
+            var motivo = v.kev ? "está no KEV (explorada)" : v.corrigida === null ? "não há correção: aceite com prazo e mitigação" : (certa === "agora" ? "grave, com correção e EPSS alto" : "tem correção, mas exploração improvável agora");
+            var li = el("li", (escolha === certa ? "✓ " : "✗ ") + v.id + " (" + v.pacote + "): " + CTR.prioridades[certa] + ", porque " + motivo + ". " + v.nota, "overflow-wrap: anywhere; color: " + (escolha === certa ? "var(--tip-color)" : "var(--danger-color)") + ";");
+            ul.appendChild(li);
+        });
+        box.setAttribute("data-certos", certos);
+        box.setAttribute("data-total", lista.length);
+        box.appendChild(el("p", "Priorização: " + certos + " de " + lista.length + " corretas" + (respondidos < lista.length ? " (" + (lista.length - respondidos) + " sem resposta)" : "") + ".", "margin: 0; font-weight: 600;"));
+        box.appendChild(ul);
+        return { certos: certos, total: lista.length };
+    };
+
+    function carregarTextos(c, df, imp) {
+        estado.cenario = c.id;
+        estado.aplicadas = {};
+        $("ctr-cenario").value = c.id;
+        $("ctr-historia").textContent = c.historia;
+        $("ctr-dockerfile").value = df;
+        $("ctr-implantacao").value = imp;
+        $("ctr-conferencia").replaceChildren();
+        return atualizar();
+    }
+    window.carregarCenarioCtr = function(id) {
+        var c = CTR.cenarios.filter(function(x) { return x.id === (id || $("ctr-cenario").value); })[0];
+        if (!c) return null;
+        estado.revelado = false;
+        CTR.ordem_regras.forEach(function(rid) { $("ctr-palpite-" + rid).checked = false; });
+        return carregarTextos(c, c.dockerfile, c.implantacao);
+    };
+    window.carregarReferenciaCtr = function() {
+        var c = CTR.cenarios.filter(function(x) { return x.id === $("ctr-cenario").value; })[0];
+        if (!c) return null;
+        estado.revelado = true;
+        return carregarTextos(c, c.referencia.dockerfile, c.referencia.implantacao);
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        $("ctr-contexto").textContent = CTR.contexto;
+        var sel = $("ctr-cenario");
+        CTR.cenarios.forEach(function(c) { var o = el("option", c.nome); o.value = c.id; sel.appendChild(o); });
+        sel.addEventListener("change", function() { window.carregarCenarioCtr(sel.value); });
+        montarPalpites();
+        ["ctr-dockerfile", "ctr-implantacao"].forEach(function(id) { $(id).addEventListener("input", atualizar); });
+        window.carregarCenarioCtr(CTR.cenarios[0].id);
+        if (typeof initChecklist === "function") {
+            initChecklist("seguranca-de-containers");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
