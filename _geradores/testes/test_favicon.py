@@ -18,7 +18,13 @@ class TestFavicon(unittest.TestCase):
 
     def test_todas_as_paginas_tem_icone_embutido(self):
         paginas = self._paginas()
-        self.assertEqual(len(paginas), 46, "portal + 45 módulos")
+        catalogo = [
+            linha.split("|")
+            for linha in (self.root / "_geradores" / "estudos.txt").read_text(encoding="utf-8").splitlines()
+            if linha.strip() and not linha.startswith("#")
+        ]
+        compilados = [c for c in catalogo if (self.root / c[2] / c[3]).exists()]
+        self.assertEqual(len(paginas), 1 + len(compilados), "portal + módulos do catálogo já compilados, sem páginas avulsas")
         for p in paginas:
             with self.subTest(pagina=p.parent.name if p.name != "index.html" else "portal"):
                 html = p.read_text(encoding="utf-8")
