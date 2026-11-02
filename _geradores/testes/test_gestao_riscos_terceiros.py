@@ -252,6 +252,12 @@ class TestGestaoRiscosTerceiros(unittest.TestCase):
             self.assertIn(ref, fim, ref)
 
     # ------------------------------------------------- fatos normativos
+    def test_aviso_da_redacao_de_2021(self):
+        """Requisitos descritos no nível da redação original de 2021 da CMN 4.893 trazem o aviso de conferir a redação de dez/2025."""
+        body = self._body()
+        self.assertIn("redação original de 2021", body)
+        self.assertIn("confira a redação vigente", body)
+
     def test_referencias_normativas(self):
         body = self._body()
         for termo in ("GV.SC", "NIST CSF 2.0", "ISO/IEC 27002:2022", "5.19", "5.20", "5.21", "5.22", "5.23",

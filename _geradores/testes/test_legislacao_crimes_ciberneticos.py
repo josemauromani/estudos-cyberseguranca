@@ -102,7 +102,8 @@ def corrigir_caso(caso, catalogo, tipo, escolhas, ordem):
     t = corrigir_tipo(caso, tipo)
     r = classificar_registros(caso, escolhas, catalogo)
     o = corrigir_ordem(caso, ordem)
-    reg_ok = all(s == "acerto" for s in r.values())
+    # "vencido" é alerta: o prazo do Marco Civil é mínimo, então pedir não custa e não tira ponto
+    reg_ok = all(s in ("acerto", "vencido") for s in r.values())
     return {"tipo_ok": t, "registros": r, "registros_ok": reg_ok, "ordem": o,
             "pontos": int(t) + int(reg_ok) + int(o["ok"])}
 
@@ -301,9 +302,12 @@ class TestLegislacaoCrimesCiberneticos(unittest.TestCase):
         esc["aplicacao"] = "provedor_aplicacao"
         res = corrigir_caso(c5, d["registros"], "invasao", esc, c5["ordem_correta"])
         self.assertEqual(res["registros"]["aplicacao"], "vencido")
-        self.assertFalse(res["registros_ok"])
-        self.assertEqual(res["pontos"], 2)
+        self.assertTrue(res["registros_ok"], "o prazo de guarda é mínimo: pedir depois dele é alerta, não erro")
+        self.assertEqual(res["pontos"], 3)
         self.assertIn("6 meses", c5["explicacao_registros"])
+        body = self._body()
+        self.assertIn('r[k] === "vencido"', body, "o JS também não pode tirar ponto pelo alerta de prazo")
+        self.assertNotIn("Prazo de guarda obrigatória vencido", body)
 
     def test_pedido_desnecessario_de_conteudo(self):
         d = self._dados()

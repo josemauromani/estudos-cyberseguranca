@@ -523,7 +523,8 @@ sha256sum analise/copia-trabalho.jsonl
         var t = window.corrigirTipo(caso, tipo);
         var r = window.classificarRegistros(caso, escolhas);
         var o = window.corrigirOrdem(caso, ordem);
-        var regOk = Object.keys(r).every(function(k) { return r[k] === "acerto"; });
+        // "vencido" é só alerta: o prazo do Marco Civil é mínimo, o registro pode ainda existir
+        var regOk = Object.keys(r).every(function(k) { return r[k] === "acerto" || r[k] === "vencido"; });
         return { tipo_ok: t, registros: r, registros_ok: regOk, ordem: o,
                  pontos: (t ? 1 : 0) + (regOk ? 1 : 0) + (o.ok ? 1 : 0) };
     };
@@ -534,7 +535,7 @@ sha256sum analise/copia-trabalho.jsonl
         faltou: "Faltou pedir",
         destinatario_errado: "Pedido ao destinatário errado",
         desnecessario: "Desnecessário neste caso",
-        vencido: "Prazo de guarda obrigatória vencido"
+        vencido: "Alerta: passou o prazo mínimo de guarda"
     };
     var COR_STATUS = {
         acerto: "var(--tip-color)", faltou: "var(--danger-color)", destinatario_errado: "var(--danger-color)",
@@ -688,7 +689,7 @@ sha256sum analise/copia-trabalho.jsonl
             li.setAttribute("data-status", s);
             li.appendChild(el("strong", ROTULO_STATUS[s] + ": ", "color: " + COR_STATUS[s] + ";"));
             var txt = reg.nome + " → " + D.destinos[reg.destino] + ". " + reg.fundamento;
-            if (s === "vencido") txt += " Passaram " + caso.dias_desde_fato + " dias desde o fato, além dos " + reg.prazo_dias + " dias de guarda obrigatória.";
+            if (s === "vencido") txt += " Passaram " + caso.dias_desde_fato + " dias desde o fato, além dos " + reg.prazo_dias + " dias de guarda obrigatória: o registro pode já ter sido apagado, mas o provedor pode ter guardado por mais tempo. Pedir a preservação não custa e não tira ponto; só não conte com ele.";
             li.appendChild(el("span", txt));
             ul.appendChild(li);
         });

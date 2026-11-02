@@ -236,6 +236,12 @@ class TestMonitoramentoRedeNSM(unittest.TestCase):
         self.assertIn("Estudo 49", fim)
 
     # ---------------------------------------------------------------- dados
+    def test_pcap_rotativo_nao_para_apos_48_arquivos(self):
+        """Com -G, o -W encerra o tcpdump ao atingir o limite: a retenção de 48 h vem da limpeza por idade."""
+        body = self.body_path.read_text(encoding="utf-8")
+        self.assertNotIn("-W 48", body)
+        self.assertIn("-mmin +2880 -delete", body)
+
     def test_dados_ficticios_e_bem_formados(self):
         d = self._dados()
         self.assertIn(".example", d["contexto"])

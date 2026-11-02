@@ -172,8 +172,11 @@ flowchart TD
                 <span class="terminal-title">bash — PCAP rotativo, Zeek offline e consultas com zeek-cut</span>
                 <button class="terminal-copy-btn" onclick="copyCode(this, 'code-nsm-cli')">Copiar</button>
             </div>
-            <pre><code id="code-nsm-cli"># PCAP rotativo: um arquivo por hora, guarda as últimas 48 horas
-sudo tcpdump -i eth1 -G 3600 -W 48 -w '/pcap/saida-%Y%m%d%H.pcap'
+            <pre><code id="code-nsm-cli"># PCAP rotativo: um arquivo por hora (-G 3600), nome com data e hora
+# (não use -W junto com -G para "reter": ao atingir o limite de arquivos, o tcpdump encerra)
+sudo tcpdump -i eth1 -G 3600 -w '/pcap/saida-%Y%m%d%H.pcap'
+# Retenção de 48 horas: apaga, a cada hora (cron), os arquivos com mais de 2880 minutos
+find /pcap -name 'saida-*.pcap' -mmin +2880 -delete
 
 # Zeek sobre uma captura (gera conn.log, dns.log, ssl.log... no diretório atual)
 zeek -C -r /pcap/saida-2026110209.pcap

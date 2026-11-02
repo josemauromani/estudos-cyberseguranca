@@ -199,6 +199,13 @@ class TestFraudePagamentosPix(unittest.TestCase):
                           "bloqueio cautelar sem prazo")
         self.assertIsNone(re.search(r"\bart(?:igo|\.)?\s*\d", body, re.I), "não citar número de artigo não conferido")
 
+    def test_fontes_dos_prazos_do_med_sao_as_conferidas(self):
+        """Os prazos vieram de comunicados do BCB e da IN BCB 766, não do texto da Res. BCB 493."""
+        body = self._body()
+        self.assertNotIn("foram conferidos na Res. BCB 493", body)
+        self.assertIn("comunicados do Banco Central", body)
+        self.assertIn("IN BCB 766", body)
+
     def test_med_nao_cobre_pix_por_engano(self):
         body = self._body()
         self.assertIn("por engano", body)

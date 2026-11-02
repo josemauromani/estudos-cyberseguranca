@@ -236,6 +236,12 @@ class TestRegulacaoSetorFinanceiro(unittest.TestCase):
         self.assertIn("não se transfere", nuv["explicacao"])
 
     # ------------------------------------------------------------ sujeição
+    def test_aviso_da_redacao_de_2021(self):
+        """Requisitos descritos no nível da redação original de 2021 da CMN 4.893 trazem o aviso de conferir a redação de dez/2025."""
+        body = self._body()
+        self.assertIn("redação original de 2021", body)
+        self.assertIn("confira a redação vigente", body)
+
     def test_quem_se_sujeita_a_cada_norma(self):
         d = self._dados()
         self.assertEqual({e["id"]: e["norma"] for e in d["entidades"]}, SUJEICAO)
