@@ -1,0 +1,629 @@
+<!-- Estudo 41: Identidade-Hibrida-e-Nuvem Body Fragment -->
+<article class="study-container" data-slug="identidade-hibrida">
+
+    <!-- SEÇÃO 1: IDENTIDADE HÍBRIDA -->
+    <section class="study-section" id="introducao">
+        <div class="section-header">
+            <span class="section-tag">Seção 01</span>
+            <h2>Introdução: O Mesmo Usuário em Dois Mundos</h2>
+        </div>
+
+        <p class="lead-text">
+            Na Ipê Store, a Ana entra no computador com a conta do Active Directory (Estudos 38 e 39) e, no mesmo dia, abre o correio e os documentos na nuvem com a mesma senha. Isso é identidade híbrida: o AD local continua sendo a fonte das contas, e o Microsoft Entra ID (antigo Azure AD) autentica o acesso aos serviços em nuvem. A vantagem é uma identidade só; o risco é que um erro de um lado vira acesso do outro.
+        </p>
+
+        <h3>Como a senha chega à nuvem</h3>
+        <p>
+            O <strong>Entra Connect</strong> (ou o Cloud Sync, mais leve) sincroniza usuários e grupos do AD para o Entra ID. A autenticação pode funcionar de três jeitos:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Modo</th><th>Como funciona</th><th>Pontos de atenção</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>PHS</strong> (Password Hash Sync)</td><td>Sincroniza um hash derivado do hash da senha, nunca a senha; a nuvem valida sozinha</td><td>Continua funcionando se o AD cair e permite detectar credenciais vazadas. É o modo recomendado na maioria dos casos</td></tr>
+                    <tr><td><strong>PTA</strong> (Pass-through Authentication)</td><td>Agentes instalados na rede local validam a senha no AD a cada login</td><td>Se os agentes ou o AD caírem, ninguém entra na nuvem</td></tr>
+                    <tr><td><strong>federação</strong> (AD FS)</td><td>A nuvem confia em tokens emitidos por um servidor de federação local</td><td>Mais infraestrutura para proteger; quem rouba a chave de assinatura forja tokens para qualquer usuário</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🏰</span>
+                <strong>O servidor do Entra Connect é Tier 0</strong>
+            </div>
+            <p>
+                Ele tem permissões fortes no AD e no Entra ID ao mesmo tempo. Quem o controla pode alterar contas dos dois lados. Trate-o como um controlador de domínio: administração só por contas do Tier 0, sem uso para outras tarefas (tiering no Estudo 39 e acesso privilegiado no Estudo 40).
+            </p>
+        </div>
+
+        <h3>Acesso condicional</h3>
+        <p>
+            O <strong>acesso condicional</strong> é o motor de decisão do Entra ID: depois da senha, ele avalia quem está entrando, em qual aplicativo, de onde e com qual dispositivo, e decide se concede, pede mais prova ou bloqueia. Cada política tem três partes:
+        </p>
+        <ul>
+            <li><strong>atribuições:</strong> usuários e grupos incluídos e excluídos, e os aplicativos protegidos;</li>
+            <li><strong>condições:</strong> local (rede confiável ou não), risco de entrada, plataforma do dispositivo, tipo de cliente (navegador, aplicativo moderno, <strong>autenticação legada</strong>);</li>
+            <li><strong>controles:</strong> bloquear, ou conceder exigindo MFA, MFA resistente a phishing, <strong>dispositivo em conformidade</strong> (gerenciado e dentro das regras da empresa), com "todos" ou "um" dos requisitos.</li>
+        </ul>
+        <p>
+            Várias políticas se aplicam ao mesmo login. As regras de combinação são duas: <strong>um bloqueio vence tudo</strong>, e os requisitos de todas as políticas aplicáveis se somam. Se nenhuma política se aplica, basta a senha. Uma política nova deve começar em <strong>somente relatório</strong>: ela registra o que teria feito, sem aplicar, e mostra quem seria afetado antes de trancar alguém do lado de fora.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Como o Acesso Condicional Decide</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Como o Acesso Condicional Decide">
+flowchart TD
+    L["Login: usuário, app, local,<br>dispositivo, cliente, risco"]
+    A["Quais políticas ativas se aplicam?<br><small>atribuições e condições</small>"]
+    N["Nenhuma: só a senha"]
+    B{"Alguma bloqueia?"}
+    X["Bloqueado"]
+    R{"Os requisitos somados<br>podem ser cumpridos?"}
+    M["Concedido, com MFA<br>ou dispositivo em conformidade"]
+    L --> A
+    A -->|"nenhuma"| N
+    A --> B
+    B -->|"sim"| X
+    B -->|"não"| R
+    R -->|"não"| X
+    R -->|"sim"| M
+            </pre>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: MFA, ATAQUES E PIM -->
+    <section class="study-section" id="ataques">
+        <div class="section-header">
+            <span class="section-tag">Seção 02</span>
+            <h2>MFA, Ataques à Identidade em Nuvem e PIM</h2>
+        </div>
+
+        <h3>Nem todo MFA é igual</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Método</th><th>Resiste a</th><th>Cai com</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>SMS e ligação</td><td>Senha vazada</td><td>Troca de chip, phishing em tempo real</td></tr>
+                    <tr><td>Aplicativo com notificação e <strong>number matching</strong></td><td>Fadiga de MFA (aprovar por cansaço)</td><td>Phishing com proxy (AiTM, Estudo 15)</td></tr>
+                    <tr><td><strong>FIDO2</strong>, <strong>passkey</strong>, Windows Hello, certificado</td><td>Phishing, inclusive AiTM: a credencial só funciona no domínio verdadeiro</td><td>Roubo do dispositivo junto com o PIN ou a biometria</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Ataques e defesas</h3>
+        <ul>
+            <li><strong>password spraying</strong> (T1110.003): poucas senhas comuns contra muitas contas, para não bloquear nenhuma. Funciona melhor por <strong>autenticação legada</strong> (IMAP, POP, SMTP básico), que não suporta MFA. Defesa: bloquear a autenticação legada e exigir MFA em todos os clientes.</li>
+            <li><strong>consent phishing</strong> (T1528): o usuário recebe um link para "autorizar o aplicativo de assinatura de documentos", que pede, via <strong>OAuth</strong>, permissão para ler o correio. O atacante não precisa da senha: o aplicativo recebe um token. Defesa: impedir que usuários consintam sozinhos, usar fluxo de aprovação por administrador e revisar os aplicativos com permissões.</li>
+            <li>Roubo de token e sessão (T1539): um proxy AiTM ou um malware rouba o cookie de sessão depois do MFA. Defesa: MFA resistente a phishing, dispositivo em conformidade, risco de entrada e revogação das sessões no incidente.</li>
+        </ul>
+
+        <h3>Contas de emergência</h3>
+        <p>
+            Toda organização precisa de pelo menos duas <strong>contas de emergência</strong> (<em>break-glass</em>), exclusivas da nuvem, protegidas por passkey FIDO2 guardada em cofre e com alerta a cada uso. Elas ficam fora das políticas que poderiam trancar todos os administradores, como "bloquear administradores fora do escritório". Quando o escritório ou a federação caem, são elas que permitem consertar.
+        </p>
+
+        <h3>PIM: privilégio na hora certa</h3>
+        <p>
+            O <strong>PIM</strong> (Privileged Identity Management) aplica ao Entra ID a ideia de acesso just-in-time do Estudo 40: o administrador é elegível para o papel, mas só o ativa por algumas horas, com MFA, justificativa e, nos papéis críticos, aprovação. Fora disso, a conta não tem privilégio para ser roubado.
+        </p>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">PowerShell (Microsoft Graph) — revisar políticas e consentimentos</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ca-graph')">Copiar</button>
+            </div>
+            <pre><code id="code-ca-graph">Connect-MgGraph -Scopes "Policy.Read.All", "Application.Read.All"
+
+# Políticas e estado: enabled, disabled ou enabledForReportingButNotEnforced (somente relatório)
+Get-MgIdentityConditionalAccessPolicy | Select-Object DisplayName, State
+
+# Permissões OAuth concedidas a aplicativos (procure leitura de correio dada por usuários)
+Get-MgOauth2PermissionGrant -All | Select-Object ClientId, ConsentType, Scope
+
+# Trecho de uma política (esquema do Graph): bloquear autenticação legada
+# "conditions": { "clientAppTypes": ["exchangeActiveSync", "other"],
+#                 "users": { "includeUsers": ["All"] },
+#                 "applications": { "includeApplications": ["All"] } },
+# "grantControls": { "operator": "OR", "builtInControls": ["block"] }</code></pre>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: SIMULADOR -->
+    <section class="study-section" id="simulador">
+        <div class="section-header">
+            <span class="section-tag">Seção 03</span>
+            <h2>Laboratório Prático: Avaliador de Acesso Condicional</h2>
+        </div>
+
+        <p class="lead-text">
+            O tenant da Ipê Store tem seis políticas, e algumas têm falhas. Mude o estado das políticas, ajuste exclusões ou crie políticas novas: as oito tentativas de login abaixo são reavaliadas na hora, mostrando o resultado e qual política decidiu.
+        </p>
+
+        <div class="lab-box ca-lab" id="ca-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Entra ID (simulado)</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">ipestore.example — acesso condicional</h3>
+                    <p id="ca-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body">
+                <h4 style="margin-top: 0;">Missões</h4>
+                <ul id="ca-missoes" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.25rem; font-size: 0.85rem;"></ul>
+
+                <h4 style="margin-top: 1.5rem;">1. Políticas</h4>
+                <div id="ca-politicas" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem; font-size: 0.83rem;"></div>
+
+                <h4 style="margin-top: 1.25rem;">2. Nova política</h4>
+                <div id="ca-editor" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem; font-size: 0.83rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.6rem;"></div>
+
+                <h4 style="margin-top: 1.5rem;">3. Tentativas de login</h4>
+                <div id="ca-tentativas" aria-live="polite" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem; font-size: 0.83rem;"></div>
+
+                <div style="margin-top: 1.25rem;">
+                    <button class="btn-secondary" type="button" onclick="restaurarAcesso()">Restaurar laboratório</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: CHECKLIST -->
+    <section class="study-section" id="checklist">
+        <div class="section-header">
+            <span class="section-tag">Seção 04</span>
+            <h2>Checklist de Identidade Híbrida</h2>
+        </div>
+
+        <p class="lead-text">
+            Use esta lista para revisar o tenant de uma empresa. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="identidade-hibrida">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ca-1">
+                <label for="chk-ca-1"><strong>Sincronização:</strong> modo escolhido conscientemente (de preferência PHS) e servidor do Entra Connect tratado como Tier 0.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ca-2">
+                <label for="chk-ca-2"><strong>Autenticação legada:</strong> bloqueada para todos os usuários.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ca-3">
+                <label for="chk-ca-3"><strong>MFA:</strong> exigido em todos os clientes e aplicativos; resistente a phishing para administradores.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ca-4">
+                <label for="chk-ca-4"><strong>Risco:</strong> entradas de risco alto bloqueadas ou com reautenticação forte.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ca-5">
+                <label for="chk-ca-5"><strong>Contas de emergência:</strong> duas, com passkey, excluídas das políticas de bloqueio e com alerta de uso.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ca-6">
+                <label for="chk-ca-6"><strong>Mudanças seguras:</strong> políticas novas começam em somente relatório e são revisadas antes de ativar.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ca-7">
+                <label for="chk-ca-7"><strong>Privilégios e aplicativos:</strong> papéis administrativos via PIM e consentimento de aplicativos restrito a administradores.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 5: QUIZ -->
+    <section class="study-section" id="quiz">
+        <div class="section-header">
+            <span class="section-tag">Seção 05</span>
+            <h2>Questões de Fixação e Entrevista</h2>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Legado):</strong> A política exige MFA para todos no navegador e nos aplicativos modernos, mas o password spraying funcionou. Por onde ele entrou?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Pela autenticação legada (IMAP, POP, SMTP básico), que a política não cobria e que não consegue fazer MFA. A correção é bloquear a autenticação legada para todos.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Combinação):</strong> Uma política exige MFA e outra bloqueia o mesmo login. Qual prevalece?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O bloqueio. Entre políticas aplicáveis, bloquear vence; quando nenhuma bloqueia, os requisitos de todas se somam.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Emergência):</strong> Por que excluir as contas de emergência da política "administradores só do escritório"?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque, se o escritório ficar inacessível, nenhum administrador conseguiria entrar para corrigir nada. As contas de emergência são protegidas de outro jeito: passkey em cofre e alerta a cada uso.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Consentimento):</strong> Um usuário autorizou um aplicativo desconhecido a ler o correio. Trocar a senha dele resolve?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. O aplicativo tem um token OAuth próprio, que não depende da senha. É preciso remover a permissão concedida, investigar o que foi lido e restringir o consentimento de usuários.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Sincronização):</strong> Qual modo de autenticação híbrida continua funcionando se o AD local ficar fora do ar?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O PHS, porque a nuvem valida o login com o hash sincronizado. No PTA e na federação, a validação depende de componentes locais.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Mudança):</strong> Por que ativar uma política nova primeiro em somente relatório?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Para ver nos registros quem ela bloquearia ou obrigaria a mais prova, antes de aplicar. Assim se descobre, por exemplo, um administrador sem FIDO2 registrado antes de trancá-lo do lado de fora.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos">
+        <div class="section-header">
+            <span class="section-tag">Seção 06</span>
+            <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+        </div>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Híbrido</h4>
+                <p>PHS, PTA ou federação; o Entra Connect é Tier 0.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. Decisão</h4>
+                <p>Bloquear vence; requisitos se somam; somente relatório antes de ativar.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. MFA</h4>
+                <p>FIDO2 e passkeys resistem a phishing; autenticação legada fica bloqueada.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. Ataques</h4>
+                <p>Spraying, consent phishing e roubo de sessão têm defesas diferentes.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>Microsoft Learn — Microsoft Entra Connect (PHS, PTA e federação) e Cloud Sync.</li>
+            <li>Microsoft Learn — Conditional Access: políticas, modo somente relatório e contas de acesso de emergência.</li>
+            <li>Microsoft Learn — Authentication strengths e Privileged Identity Management.</li>
+            <li>MITRE ATT&amp;CK — T1110.003, T1528, T1539 e T1078.004.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos: 21 — Segurança em Nuvem e 10 — Arquitetura Zero Trust</strong>
+            </div>
+            <p>
+                O Estudo 21 leva o mínimo privilégio para as permissões de infraestrutura em nuvem. O Estudo 10 mostra o acesso condicional como o ponto de decisão de uma arquitetura Zero Trust.
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="ca-dados">
+{
+ "contexto": "Tenant fictício. As regras seguem o comportamento documentado do acesso condicional, de forma simplificada: sem sessões, sem papéis de diretório e com risco já calculado.",
+ "usuarios": {
+  "ana.souza": {"nome": "Ana Souza (Financeiro)", "grupos": ["funcionarios", "financeiro"]},
+  "bruno.lima": {"nome": "Bruno Lima (Vendas)", "grupos": ["funcionarios", "vendas"]},
+  "carla.dias": {"nome": "Carla Dias (Vendas)", "grupos": ["funcionarios", "vendas"]},
+  "adm-ana": {"nome": "adm-ana (administradora)", "grupos": ["administradores"]},
+  "emergencia": {"nome": "Conta de emergência", "grupos": ["administradores", "contas-emergencia"]}
+ },
+ "grupos": {"funcionarios": "Funcionários", "financeiro": "Financeiro", "vendas": "Vendas", "administradores": "Administradores", "contas-emergencia": "Contas de emergência"},
+ "apps": {"correio": "Correio e documentos", "erp": "ERP financeiro", "portal_admin": "Portal de administração"},
+ "rotulos": {
+  "local": {"qualquer": "qualquer local", "fora_confiavel": "fora da rede confiável", "confiavel": "rede do escritório", "externo": "fora do escritório"},
+  "risco": {"nenhum": "sem risco", "baixo": "baixo", "medio": "médio", "alto": "alto"},
+  "plataforma": {"windows": "Windows", "macos": "macOS", "ios": "iOS", "android": "Android"},
+  "cliente": {"navegador": "navegador", "app_moderno": "aplicativo moderno", "legado": "autenticação legada"},
+  "requisito": {"mfa": "MFA", "mfa_resistente": "MFA resistente a phishing", "dispositivo_conforme": "dispositivo em conformidade"},
+  "resultado": {"concedido": "Concedido só com a senha", "mfa": "Concedido após MFA", "mfa_resistente": "Concedido após MFA resistente a phishing", "bloqueado": "Bloqueado"},
+  "estado": {"ativa": "Ativada", "relatorio": "Somente relatório", "desativada": "Desativada"}
+ },
+ "politicas": [
+  {"id": "P1", "nome": "Bloquear autenticação legada", "estado": "desativada", "usuarios": {"incluir": ["todos"], "excluir": []}, "apps": ["todas"],
+   "condicoes": {"local": "qualquer", "risco": [], "plataformas": [], "clientes": ["legado"]}, "controle": {"tipo": "bloquear", "requisitos": [], "operador": "todos"}},
+  {"id": "P2", "nome": "MFA para todos (navegador e aplicativos modernos)", "estado": "ativa", "usuarios": {"incluir": ["todos"], "excluir": []}, "apps": ["todas"],
+   "condicoes": {"local": "qualquer", "risco": [], "plataformas": [], "clientes": ["navegador", "app_moderno"]}, "controle": {"tipo": "conceder", "requisitos": ["mfa"], "operador": "todos"}},
+  {"id": "P3", "nome": "Administradores com MFA resistente a phishing", "estado": "relatorio", "usuarios": {"incluir": ["administradores"], "excluir": []}, "apps": ["todas"],
+   "condicoes": {"local": "qualquer", "risco": [], "plataformas": [], "clientes": []}, "controle": {"tipo": "conceder", "requisitos": ["mfa_resistente"], "operador": "todos"}},
+  {"id": "P4", "nome": "Bloquear entradas de risco alto", "estado": "desativada", "usuarios": {"incluir": ["todos"], "excluir": ["contas-emergencia"]}, "apps": ["todas"],
+   "condicoes": {"local": "qualquer", "risco": ["alto"], "plataformas": [], "clientes": []}, "controle": {"tipo": "bloquear", "requisitos": [], "operador": "todos"}},
+  {"id": "P5", "nome": "ERP financeiro só em dispositivo em conformidade", "estado": "ativa", "usuarios": {"incluir": ["financeiro"], "excluir": []}, "apps": ["erp"],
+   "condicoes": {"local": "qualquer", "risco": [], "plataformas": [], "clientes": []}, "controle": {"tipo": "conceder", "requisitos": ["dispositivo_conforme"], "operador": "todos"}},
+  {"id": "P6", "nome": "Administradores só a partir do escritório", "estado": "ativa", "usuarios": {"incluir": ["administradores"], "excluir": []}, "apps": ["todas"],
+   "condicoes": {"local": "fora_confiavel", "risco": [], "plataformas": [], "clientes": []}, "controle": {"tipo": "bloquear", "requisitos": [], "operador": "todos"}}
+ ],
+ "correcao": {"P1": {"estado": "ativa"}, "P3": {"estado": "ativa"}, "P4": {"estado": "ativa"}, "P6": {"excluir": ["contas-emergencia"]}},
+ "tentativas": [
+  {"id": "t1", "descricao": "Ana abre o correio no notebook da empresa, no escritório", "usuario": "ana.souza", "app": "correio", "local": "confiavel", "ip": "10.20.30.57", "risco": "nenhum", "plataforma": "windows", "cliente": "navegador", "dispositivo_conforme": true, "metodos": ["senha", "app"], "esperado_inicial": "mfa", "esperado_corrigido": "mfa"},
+  {"id": "t2", "descricao": "Password spraying por IMAP na conta do Bruno, de fora do país", "usuario": "bruno.lima", "app": "correio", "local": "externo", "ip": "203.0.113.77", "risco": "medio", "plataforma": "windows", "cliente": "legado", "dispositivo_conforme": false, "metodos": ["senha", "app"], "esperado_inicial": "concedido", "esperado_corrigido": "bloqueado"},
+  {"id": "t3", "descricao": "adm-ana abre o portal de administração no escritório, só com aplicativo autenticador", "usuario": "adm-ana", "app": "portal_admin", "local": "confiavel", "ip": "10.20.5.31", "risco": "nenhum", "plataforma": "windows", "cliente": "navegador", "dispositivo_conforme": true, "metodos": ["senha", "app"], "esperado_inicial": "mfa", "esperado_corrigido": "bloqueado"},
+  {"id": "t4", "descricao": "adm-ana abre o portal de administração no escritório, com chave FIDO2 registrada", "usuario": "adm-ana", "app": "portal_admin", "local": "confiavel", "ip": "10.20.5.31", "risco": "nenhum", "plataforma": "windows", "cliente": "navegador", "dispositivo_conforme": true, "metodos": ["senha", "fido2"], "esperado_inicial": "mfa", "esperado_corrigido": "mfa_resistente"},
+  {"id": "t5", "descricao": "Login da Carla com senha certa, de outro país, uma hora depois de ela entrar em São Paulo (risco alto)", "usuario": "carla.dias", "app": "correio", "local": "externo", "ip": "198.51.100.77", "risco": "alto", "plataforma": "macos", "cliente": "navegador", "dispositivo_conforme": false, "metodos": ["senha", "app"], "esperado_inicial": "mfa", "esperado_corrigido": "bloqueado"},
+  {"id": "t6", "descricao": "Ana tenta abrir o ERP no celular pessoal", "usuario": "ana.souza", "app": "erp", "local": "externo", "ip": "192.0.2.44", "risco": "nenhum", "plataforma": "android", "cliente": "navegador", "dispositivo_conforme": false, "metodos": ["senha", "app"], "esperado_inicial": "bloqueado", "esperado_corrigido": "bloqueado"},
+  {"id": "t7", "descricao": "Ana abre o ERP na estação EST-FIN-07", "usuario": "ana.souza", "app": "erp", "local": "confiavel", "ip": "10.20.30.57", "risco": "nenhum", "plataforma": "windows", "cliente": "navegador", "dispositivo_conforme": true, "metodos": ["senha", "app"], "esperado_inicial": "mfa", "esperado_corrigido": "mfa"},
+  {"id": "t8", "descricao": "Escritório sem acesso após uma enchente: a conta de emergência entra de casa", "usuario": "emergencia", "app": "portal_admin", "local": "externo", "ip": "192.0.2.80", "risco": "nenhum", "plataforma": "windows", "cliente": "navegador", "dispositivo_conforme": false, "metodos": ["senha", "fido2"], "esperado_inicial": "bloqueado", "esperado_corrigido": "mfa_resistente"}
+ ],
+ "missoes": [
+  {"id": "legado", "texto": "Barre o password spraying por IMAP da tentativa 2."},
+  {"id": "risco", "texto": "Bloqueie o login de risco alto da tentativa 5."},
+  {"id": "resistente", "texto": "Exija MFA resistente a phishing dos administradores, depois de ver no modo somente relatório quem seria afetado."},
+  {"id": "emergencia", "texto": "Mantenha os administradores restritos ao escritório sem trancar a conta de emergência."},
+  {"id": "nova", "texto": "Crie uma política nova pelo editor."}
+ ]
+}
+</script>
+
+<script>
+(function() {
+    var CA = JSON.parse(document.getElementById("ca-dados").textContent);
+    var R = CA.rotulos;
+    var INTERATIVOS = ["mfa", "mfa_resistente"];
+    var ORDEM = ["concedido", "mfa", "mfa_resistente", "bloqueado"];
+    var politicas = [], feitas = {}, novas = 0;
+
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function copia(o) { return JSON.parse(JSON.stringify(o)); }
+
+    // ===================================================== avaliador (espelhado nos testes)
+    function satisfaz(req, t) {
+        if (req === "dispositivo_conforme") return !!t.dispositivo_conforme;
+        if (t.cliente === "legado") return false;
+        if (req === "mfa") return ["app", "fido2", "sms"].some(function(m) { return t.metodos.indexOf(m) !== -1; });
+        if (req === "mfa_resistente") return t.metodos.indexOf("fido2") !== -1;
+        return false;
+    }
+    function aplica(p, t) {
+        var u = CA.usuarios[t.usuario], marcas = u.grupos.concat([t.usuario]);
+        var tem = function(lista) { return lista.some(function(x) { return marcas.indexOf(x) !== -1; }); };
+        if (!(p.usuarios.incluir.indexOf("todos") !== -1 || tem(p.usuarios.incluir))) return false;
+        if (tem(p.usuarios.excluir)) return false;
+        if (p.apps.indexOf("todas") === -1 && p.apps.indexOf(t.app) === -1) return false;
+        var c = p.condicoes;
+        if (c.local === "fora_confiavel" && t.local === "confiavel") return false;
+        if (c.risco.length && c.risco.indexOf(t.risco) === -1) return false;
+        if (c.plataformas.length && c.plataformas.indexOf(t.plataforma) === -1) return false;
+        if (c.clientes.length && c.clientes.indexOf(t.cliente) === -1) return false;
+        return true;
+    }
+    function efeito(p, t) {
+        var ctl = p.controle;
+        if (ctl.tipo === "bloquear") return "bloqueado";
+        var reqs = ctl.requisitos, ok = reqs.filter(function(r) { return satisfaz(r, t); });
+        if (ctl.operador === "todos") {
+            if (ok.length !== reqs.length) return "bloqueado";
+            return reqs.indexOf("mfa_resistente") !== -1 ? "mfa_resistente" : reqs.indexOf("mfa") !== -1 ? "mfa" : "concedido";
+        }
+        if (ok.some(function(r) { return INTERATIVOS.indexOf(r) === -1; })) return "concedido";
+        if (ok.indexOf("mfa") !== -1) return "mfa";
+        if (ok.indexOf("mfa_resistente") !== -1) return "mfa_resistente";
+        return "bloqueado";
+    }
+    window.avaliarAcessoCondicional = function(ps, t) {
+        var ativas = ps.filter(function(p) { return p.estado === "ativa" && aplica(p, t); });
+        var relat = ps.filter(function(p) { return p.estado === "relatorio" && aplica(p, t); }).map(function(p) { return [p.id, efeito(p, t)]; });
+        var res = "concedido", decisivas = [];
+        ativas.forEach(function(p) {
+            var e = efeito(p, t);
+            if (ORDEM.indexOf(e) > ORDEM.indexOf(res)) { res = e; decisivas = [p.id]; }
+            else if (e === res && e !== "concedido") decisivas.push(p.id);
+        });
+        return { resultado: res, aplicadas: ativas.map(function(p) { return p.id; }), decisivas: decisivas, relatorio: relat };
+    };
+
+    // ===================================================== missões
+    function concluir(id) { if (!feitas[id]) { feitas[id] = true; renderizarMissoes(); } }
+    function renderizarMissoes() {
+        var ul = document.getElementById("ca-missoes");
+        ul.replaceChildren();
+        CA.missoes.forEach(function(m) {
+            var li = el("li", (feitas[m.id] ? "✓ " : "○ ") + m.texto, "color: " + (feitas[m.id] ? "var(--tip-color)" : "var(--ink)") + ";");
+            li.setAttribute("data-missao", m.id);
+            li.setAttribute("data-feita", feitas[m.id] ? "sim" : "nao");
+            ul.appendChild(li);
+        });
+    }
+    function avaliarMissoes(r) {
+        var p = function(id) { return politicas.filter(function(x) { return x.id === id; })[0]; };
+        if (r.t2.resultado === "bloqueado") concluir("legado");
+        if (r.t5.resultado === "bloqueado") concluir("risco");
+        if (r.t3.relatorio.some(function(x) { return x[1] === "bloqueado"; })) feitas._viuRelatorio = true;
+        if (feitas._viuRelatorio && r.t4.resultado === "mfa_resistente" && r.t3.resultado === "bloqueado") concluir("resistente");
+        if (p("P6") && p("P6").estado === "ativa" && r.t8.resultado !== "bloqueado") concluir("emergencia");
+    }
+
+    // ===================================================== interface
+    function resumo(p) {
+        var g = function(l) { return l.map(function(x) { return x === "todos" ? "todos os usuários" : (CA.grupos[x] || x); }).join(", "); };
+        var partes = ["Usuários: " + g(p.usuarios.incluir) + (p.usuarios.excluir.length ? " (exceto " + g(p.usuarios.excluir) + ")" : "")];
+        partes.push("Apps: " + (p.apps.indexOf("todas") !== -1 ? "todos" : p.apps.map(function(a) { return CA.apps[a]; }).join(", ")));
+        var c = p.condicoes, cond = [];
+        if (c.local !== "qualquer") cond.push(R.local[c.local]);
+        if (c.risco.length) cond.push("risco " + c.risco.map(function(x) { return R.risco[x]; }).join("/"));
+        if (c.plataformas.length) cond.push(c.plataformas.map(function(x) { return R.plataforma[x]; }).join("/"));
+        if (c.clientes.length) cond.push(c.clientes.map(function(x) { return R.cliente[x]; }).join("/"));
+        partes.push("Condições: " + (cond.join("; ") || "nenhuma"));
+        partes.push("Controle: " + (p.controle.tipo === "bloquear" ? "bloquear" : "exigir " + p.controle.requisitos.map(function(x) { return R.requisito[x]; }).join(p.controle.operador === "todos" ? " e " : " ou ")));
+        return partes;
+    }
+    function renderizarPoliticas() {
+        var box = document.getElementById("ca-politicas");
+        box.replaceChildren();
+        politicas.forEach(function(p) {
+            var c = el("div", null, "border: 1px solid " + (p.estado === "ativa" ? "var(--accent)" : "var(--rule)") + "; border-radius: var(--radius-sm); padding: 0.5rem 0.6rem; min-width: 0;");
+            c.setAttribute("data-politica", p.id);
+            var topo = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; justify-content: space-between;");
+            topo.appendChild(el("strong", p.id + " " + p.nome, "min-width: 0;"));
+            var s = el("select"); s.className = "form-control"; s.style.maxWidth = "12rem"; s.setAttribute("data-estado", p.id);
+            Object.keys(R.estado).forEach(function(k) { var o = el("option", R.estado[k]); o.value = k; s.appendChild(o); });
+            s.value = p.estado;
+            s.addEventListener("change", function() { alterarPoliticaAcesso(p.id, "estado", s.value); });
+            topo.appendChild(s);
+            c.appendChild(topo);
+            resumo(p).forEach(function(l) { c.appendChild(el("div", l, "font-size: 0.78rem; color: var(--muted); overflow-wrap: anywhere;")); });
+            var exc = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.2rem 0.8rem; margin-top: 0.3rem; font-size: 0.76rem;");
+            exc.appendChild(el("span", "Excluir:", "font-weight: 600;"));
+            Object.keys(CA.grupos).forEach(function(gid) {
+                var l = el("label", null, "display: flex; gap: 0.25rem; align-items: center;");
+                var cb = el("input"); cb.type = "checkbox"; cb.checked = p.usuarios.excluir.indexOf(gid) !== -1;
+                cb.setAttribute("data-excluir", p.id + ":" + gid);
+                cb.addEventListener("change", function() {
+                    var lista = p.usuarios.excluir.filter(function(x) { return x !== gid; });
+                    if (cb.checked) lista.push(gid);
+                    alterarPoliticaAcesso(p.id, "excluir", lista);
+                });
+                l.appendChild(cb); l.appendChild(el("span", CA.grupos[gid]));
+                exc.appendChild(l);
+            });
+            c.appendChild(exc);
+            box.appendChild(c);
+        });
+    }
+    function renderizarTentativas() {
+        var box = document.getElementById("ca-tentativas");
+        box.replaceChildren();
+        var todos = {};
+        CA.tentativas.forEach(function(t) {
+            var r = window.avaliarAcessoCondicional(politicas, t);
+            todos[t.id] = r;
+            var cor = { concedido: "rgb(202, 138, 4)", mfa: "var(--tip-color)", mfa_resistente: "var(--tip-color)", bloqueado: "var(--danger-color)" }[r.resultado];
+            var c = el("div", null, "border-left: 4px solid " + cor + "; background: var(--sunk); border-radius: var(--radius-sm); padding: 0.45rem 0.6rem; min-width: 0;");
+            c.setAttribute("data-tentativa", t.id);
+            c.setAttribute("data-resultado", r.resultado);
+            c.appendChild(el("strong", t.id + ". " + t.descricao, "display: block;"));
+            c.appendChild(el("div", CA.usuarios[t.usuario].nome + " · " + CA.apps[t.app] + " · " + R.local[t.local] + " (" + t.ip + ") · risco " + R.risco[t.risco] + " · " + R.plataforma[t.plataforma] + " · " + R.cliente[t.cliente] + " · " + (t.dispositivo_conforme ? "dispositivo em conformidade" : "dispositivo não gerenciado") + " · métodos: " + t.metodos.join(", "),
+                "font-size: 0.74rem; color: var(--muted); overflow-wrap: anywhere;"));
+            c.appendChild(el("div", R.resultado[r.resultado] + (r.decisivas.length ? " — decidido por " + r.decisivas.join(", ") : r.aplicadas.length ? "" : " — nenhuma política ativa se aplica"), "font-weight: 700; color: " + cor + "; margin-top: 0.2rem;"));
+            if (r.relatorio.length) {
+                c.appendChild(el("div", "Somente relatório: " + r.relatorio.map(function(x) { return x[1] === "concedido" ? x[0] + " não exigiria nada além do que já foi apresentado" : x[0] + " teria resultado em \"" + R.resultado[x[1]].toLowerCase() + "\""; }).join("; ") + ".", "font-size: 0.76rem; color: rgb(202, 138, 4);"));
+            }
+            box.appendChild(c);
+        });
+        avaliarMissoes(todos);
+    }
+    window.alterarPoliticaAcesso = function(id, campo, valor) {
+        var p = politicas.filter(function(x) { return x.id === id; })[0];
+        if (!p) return;
+        if (campo === "excluir") p.usuarios.excluir = valor; else p[campo] = valor;
+        renderizarPoliticas();
+        renderizarTentativas();
+    };
+
+    function renderizarEditor() {
+        var box = document.getElementById("ca-editor");
+        box.replaceChildren();
+        var linha = function(rotulo, filho) { var l = el("label", null, "display: flex; flex-direction: column; gap: 0.2rem; min-width: 0;"); l.appendChild(el("span", rotulo, "font-weight: 600;")); l.appendChild(filho); return l; };
+        var sel = function(id, opcoes) { var s = el("select"); s.className = "form-control"; s.id = id; opcoes.forEach(function(o) { var op = el("option", o[1]); op.value = o[0]; s.appendChild(op); }); return s; };
+        var marcar = function(nome, opcoes) {
+            var d = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.2rem 0.8rem;");
+            opcoes.forEach(function(o) { var l = el("label", null, "display: flex; gap: 0.25rem; align-items: center;"); var cb = el("input"); cb.type = "checkbox"; cb.setAttribute("data-" + nome, o[0]); l.appendChild(cb); l.appendChild(el("span", o[1])); d.appendChild(l); });
+            return d;
+        };
+        var nome = el("input"); nome.className = "form-control"; nome.id = "ca-novo-nome"; nome.placeholder = "Nome da política";
+        box.appendChild(linha("Nome", nome));
+        box.appendChild(linha("Usuários incluídos", sel("ca-novo-incluir", [["todos", "Todos os usuários"]].concat(Object.keys(CA.grupos).map(function(g) { return [g, CA.grupos[g]]; })))));
+        box.appendChild(linha("Excluir grupos", marcar("novo-excluir", Object.keys(CA.grupos).map(function(g) { return [g, CA.grupos[g]]; }))));
+        box.appendChild(linha("Aplicativo", sel("ca-novo-app", [["todas", "Todos"]].concat(Object.keys(CA.apps).map(function(a) { return [a, CA.apps[a]]; })))));
+        box.appendChild(linha("Local", sel("ca-novo-local", [["qualquer", "Qualquer local"], ["fora_confiavel", "Fora da rede confiável"]])));
+        box.appendChild(linha("Risco de entrada (nenhum marcado = qualquer)", marcar("novo-risco", Object.keys(R.risco).map(function(k) { return [k, R.risco[k]]; }))));
+        box.appendChild(linha("Clientes (nenhum marcado = todos)", marcar("novo-cliente", Object.keys(R.cliente).map(function(k) { return [k, R.cliente[k]]; }))));
+        box.appendChild(linha("Controle", sel("ca-novo-controle", [["bloquear", "Bloquear"], ["todos", "Conceder exigindo todos os marcados"], ["um", "Conceder exigindo um dos marcados"]])));
+        box.appendChild(linha("Requisitos", marcar("novo-req", Object.keys(R.requisito).map(function(k) { return [k, R.requisito[k]]; }))));
+        box.appendChild(linha("Estado inicial", sel("ca-novo-estado", [["relatorio", "Somente relatório (recomendado)"], ["ativa", "Ativada"]])));
+        var b = el("button", "Criar política"); b.type = "button"; b.className = "btn-secondary";
+        b.addEventListener("click", criarPoliticaAcesso);
+        var st = el("div"); st.id = "ca-novo-status"; st.setAttribute("aria-live", "polite");
+        var w = el("div"); w.appendChild(b); box.appendChild(w); box.appendChild(st);
+    }
+    var marcados = function(nome) { return Array.prototype.map.call(document.querySelectorAll("#ca-editor [data-" + nome + "]:checked"), function(c) { return c.getAttribute("data-" + nome); }); };
+    window.criarPoliticaAcesso = function() {
+        var st = document.getElementById("ca-novo-status"), ctl = document.getElementById("ca-novo-controle").value, reqs = marcados("novo-req");
+        st.replaceChildren();
+        if (ctl !== "bloquear" && !reqs.length) { st.appendChild(el("span", "Marque pelo menos um requisito ou escolha bloquear.", "color: var(--danger-color);")); return null; }
+        novas++;
+        var app = document.getElementById("ca-novo-app").value;
+        var p = {
+            id: "N" + novas, nome: document.getElementById("ca-novo-nome").value.trim() || "Política nova " + novas,
+            estado: document.getElementById("ca-novo-estado").value,
+            usuarios: { incluir: [document.getElementById("ca-novo-incluir").value], excluir: marcados("novo-excluir") },
+            apps: [app], condicoes: { local: document.getElementById("ca-novo-local").value, risco: marcados("novo-risco"), plataformas: [], clientes: marcados("novo-cliente") },
+            controle: ctl === "bloquear" ? { tipo: "bloquear", requisitos: [], operador: "todos" } : { tipo: "conceder", requisitos: reqs, operador: ctl }
+        };
+        politicas.push(p);
+        st.appendChild(el("span", p.id + " criada em \"" + R.estado[p.estado].toLowerCase() + "\".", "color: var(--tip-color);"));
+        renderizarPoliticas(); renderizarTentativas();
+        concluir("nova");
+        return p;
+    };
+
+    window.restaurarAcesso = function() {
+        politicas = copia(CA.politicas); feitas = {}; novas = 0;
+        renderizarMissoes(); renderizarEditor(); renderizarPoliticas(); renderizarTentativas();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("ca-contexto").textContent = CA.contexto;
+        restaurarAcesso();
+        if (typeof initChecklist === "function") {
+            initChecklist("identidade-hibrida");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
