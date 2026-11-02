@@ -24,6 +24,7 @@ SLUG = "Seguranca-de-Containers"
 REDES_PRIVADAS = [ipaddress.ip_network(n) for n in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "127.0.0.0/8")]
 URL_RE = re.compile(r"^https?://")
 CURL_SH = re.compile(r"(curl|wget)\b[^|]*\|\s*(sudo\s+)?(ba)?sh\b")
+EVID_TAG = "a verificação por tag não garante a mesma imagem; verifique e rode pelo mesmo digest"
 
 
 # ----------------------------------------------------- espelho do motor JS
@@ -204,10 +205,17 @@ def achados_implantacao(d, texto, add):
             add("tag_latest", f"docker run: imagem {imagem}")
         if not imagem.startswith(d["registro_confiavel"]):
             add("registro", f"imagem fora de {d['registro_confiavel']}")
-        assinada = any(len(t) >= 2 and t[0] == "cosign" and t[1] == "verify"
-                       and any(parse_imagem(x)["nome"] == im["nome"] for x in t[2:]) for t in outras)
-        if not assinada:
-            add("sem_assinatura", "nenhum cosign verify para " + im["nome"])
+        # Só conta como verificada a mesma referência do docker run (nome, tag e digest);
+        # por tag, a imagem pode mudar entre o cosign verify e o docker run.
+        def mesma(x):
+            o = parse_imagem(x)
+            return (o["nome"], o["tag"], o["digest"]) == (im["nome"], im["tag"], im["digest"])
+        assinada = any(len(t) >= 2 and t[0] == "cosign" and t[1] == "verify" and any(mesma(x) for x in t[2:])
+                       for t in outras)
+        if not im["digest"]:
+            add("sem_assinatura", f"docker run por tag ({imagem}): {EVID_TAG}")
+        elif not assinada:
+            add("sem_assinatura", "nenhum cosign verify para " + imagem)
     faltam = [r for r, ok in (("--read-only", ro), ("--cap-drop ALL", drop), ("--security-opt no-new-privileges", nnp)) if not ok]
     if faltam:
         add("sem_endurecimento", "faltam: " + ", ".join(faltam))
@@ -299,8 +307,8 @@ ESPERADO = {
     "api-pedidos": ["root", "tag_latest", "segredo_build", "arquivo_segredo", "add_remoto", "imagem_grande",
                     "privileged", "docker_sock", "rede_host", "registro", "sem_assinatura", "sem_endurecimento"],
     "relatorios": ["root", "sem_digest", "segredo_build", "add_remoto", "imagem_grande", "montagem_sensivel",
-                   "pid_host", "cap_add", "sem_endurecimento"],
-    "vitrine": ["rede_host"],
+                   "pid_host", "cap_add", "sem_assinatura", "sem_endurecimento"],
+    "vitrine": ["rede_host", "sem_assinatura"],
 }
 
 
@@ -394,8 +402,8 @@ class TestSegurancaContainers(unittest.TestCase):
         r = {c["id"]: auditar(d, c["dockerfile"], c["implantacao"]) for c in d["cenarios"]}
         self.assertEqual(d["pesos"], {"critica": 25, "alta": 15, "media": 8, "baixa": 3})
         self.assertEqual((r["api-pedidos"]["risco"], r["api-pedidos"]["nivel"]), (170, "crítico"))
-        self.assertEqual((r["relatorios"]["risco"], r["relatorios"]["nivel"]), (127, "crítico"))
-        self.assertEqual((r["vitrine"]["risco"], r["vitrine"]["nivel"], r["vitrine"]["escape"]), (15, "médio", False))
+        self.assertEqual((r["relatorios"]["risco"], r["relatorios"]["nivel"]), (142, "crítico"))
+        self.assertEqual((r["vitrine"]["risco"], r["vitrine"]["nivel"], r["vitrine"]["escape"]), (30, "médio", False))
         cap = next(a for a in r["relatorios"]["achados"] if a["id"] == "cap_add")
         self.assertEqual((cap["sev"], cap["escape"]), ("critica", True), "SYS_ADMIN eleva a gravidade")
         self.assertEqual([r[k]["base"] for k in ESPERADO], ["completa", "completa", "distroless"])
@@ -440,6 +448,37 @@ class TestSegurancaContainers(unittest.TestCase):
                     t = aplicar_itens(t0, itens)
                     self.assertNotIn(rid, auditar(d, t["dockerfile"], t["implantacao"])["ids"])
                     self.assertEqual(aplicar_itens(t, itens), t, "aplicar de novo não muda nada")
+
+    def test_assinatura_exige_a_mesma_imagem(self):
+        d = self._dados()
+        df = "FROM gcr.io/distroless/static-debian12:nonroot@sha256:" + "a" * 64 + "\nUSER 65532:65532"
+        dig1, dig2 = "@sha256:" + "1" * 64, "@sha256:" + "2" * 64
+        reg = "registry.ipestore.example/loja/w"
+        endurecido = "docker run --read-only --cap-drop ALL --security-opt no-new-privileges:true "
+
+        def assinatura(verify, imagem):
+            impl = (f"cosign verify --key cosign.pub {verify}\n" if verify else "") + endurecido + imagem
+            return [a for a in auditar(d, df, impl)["achados"] if a["id"] == "sem_assinatura"]
+
+        self.assertEqual(assinatura(reg + dig1, reg + dig1), [], "mesmo digest nos dois comandos")
+        por_tag = assinatura(reg + ":1.0", reg + ":1.0")
+        self.assertEqual(len(por_tag), 1, "tag nos dois comandos não garante a mesma imagem")
+        self.assertIn("a verificação por tag não garante a mesma imagem", por_tag[0]["evidencias"][0])
+        self.assertEqual(len(assinatura(reg + dig2, reg + dig1)), 1, "digest diferente")
+        self.assertEqual(len(assinatura(reg + ":1.0", reg + dig1)), 1, "verificou a tag, rodou o digest")
+        self.assertEqual(len(assinatura(reg + "-teste" + dig1, reg + dig1)), 1, "outro nome")
+        self.assertEqual(len(assinatura(None, reg + dig1)), 1, "sem cosign verify")
+        body = self._body()
+        self.assertIn(EVID_TAG, body, "o motor JS usa a mesma evidência do espelho")
+
+    def test_exemplo_de_runtime_verifica_e_roda_o_mesmo_digest(self):
+        m = re.search(r'<code id="code-ctr-run">(.*?)</code>', self._body(), re.S)
+        linhas = [l for _, l in juntar_linhas(m.group(1))]
+        verify = next(l for l in linhas if l.startswith("cosign verify")).split()[-1]
+        run = next(l for l in linhas if l.startswith("docker run")).split()[-1]
+        self.assertEqual(verify, run)
+        self.assertIn("@sha256:&lt;digest-conferido&gt;", run)
+        self.assertRegex(m.group(1), r"#[^\n]*digest", "um comentário explica por que usar o digest")
 
     def test_varredura_e_priorizacao(self):
         d = self._dados()

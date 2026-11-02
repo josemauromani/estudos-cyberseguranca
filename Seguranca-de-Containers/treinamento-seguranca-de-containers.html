@@ -1438,14 +1438,15 @@ ENTRYPOINT ["/vitrine"]</code></pre>
                 <span class="terminal-title">bash — implantação endurecida da API de pedidos</span>
                 <button class="terminal-copy-btn" onclick="copyCode(this, 'code-ctr-run')">Copiar</button>
             </div>
-            <pre><code id="code-ctr-run">cosign verify --key cosign.pub registry.ipestore.example/loja/api-pedidos:1.8.0
+            <pre><code id="code-ctr-run"># verifique e rode pelo mesmo digest: a tag pode apontar para outra imagem entre os dois comandos
+cosign verify --key cosign.pub registry.ipestore.example/loja/api-pedidos@sha256:&lt;digest-conferido&gt;
 docker run -d --name api-pedidos \
   --read-only --tmpfs /tmp \
   --cap-drop ALL \
   --security-opt no-new-privileges:true \
   --memory 512m --pids-limit 200 \
   -p 3000:3000 \
-  registry.ipestore.example/loja/api-pedidos:1.8.0</code></pre>
+  registry.ipestore.example/loja/api-pedidos@sha256:&lt;digest-conferido&gt;</code></pre>
         </div>
 
         <div class="callout danger">
@@ -1949,8 +1950,8 @@ docker run -d --name api-pedidos \
    "grupo": "execucao",
    "sev": "alta",
    "escape": false,
-   "caminho": "Sem verificação, o servidor roda o que estiver na tag. Uma credencial de push vazada basta para colocar uma imagem adulterada em produção, e ninguém consegue provar que a imagem saiu do pipeline.",
-   "correcao": "Assine no pipeline (cosign sign) e verifique antes de rodar (cosign verify) a mesma imagem que o docker run usa; em Kubernetes, a política de admissão faz isso (Estudo 51)."
+   "caminho": "Sem verificação, o servidor roda o que estiver na tag; e verificar só a tag não basta, porque ela pode passar a apontar para outra imagem entre o cosign verify e o docker run. Uma credencial de push vazada basta para colocar uma imagem adulterada em produção, e ninguém consegue provar que a imagem saiu do pipeline.",
+   "correcao": "Assine no pipeline (cosign sign) e verifique antes de rodar (cosign verify) a mesma imagem que o docker run usa, com o mesmo digest (imagem@sha256:...) nos dois comandos; em Kubernetes, a política de admissão faz isso (Estudo 51)."
   },
   "sem_endurecimento": {
    "titulo": "docker run sem o endurecimento básico",
@@ -1993,7 +1994,7 @@ docker run -d --name api-pedidos \
    "implantacao": "docker run -d --name api-pedidos \\\n  --privileged \\\n  --network host \\\n  -v /var/run/docker.sock:/var/run/docker.sock \\\n  -e DB_URL=postgres://pedidos@10.20.1.30/pedidos \\\n  docker.io/ipestore-dev/api-pedidos:latest",
    "referencia": {
     "dockerfile": "# Estágio 1: instala as dependências (o npm não vai para produção)\nFROM node:20.18.0-bookworm-slim@sha256:66abef25028edbf19b3e6fa5d293a19adfdfe6cc2e8fd9ca7392c3f6f0c64615 AS build\nWORKDIR /app\nCOPY package.json package-lock.json ./\nRUN --mount=type=secret,id=npmrc,target=/app/.npmrc npm ci --omit=dev\nCOPY . .\nADD --checksum=sha256:cad366ae888a1005faf2393f79ef99f3e94a31e6a5992992b0de8f775acff2a8 --chmod=755 https://downloads.pdfkit.example/v4.2/pdfkit-linux-amd64 /out/pdfkit\n\n# Estágio 2: só o runtime do Node, sem shell, npm ou apt\nFROM gcr.io/distroless/nodejs20-debian12:nonroot@sha256:2db76fa7f866c2e39c276e32f75c3c832f6e94f9ac890b79ba3c0ed63e568cab\nWORKDIR /app\nCOPY --from=build /app /app\nCOPY --from=build /out/pdfkit /usr/local/bin/pdfkit\nUSER 65532:65532\nEXPOSE 3000\nCMD [\"server.js\"]",
-    "implantacao": "cosign verify --key cosign.pub registry.ipestore.example/loja/api-pedidos:1.8.0\ndocker run -d --name api-pedidos \\\n  --read-only \\\n  --cap-drop ALL \\\n  --security-opt no-new-privileges:true \\\n  -p 3000:3000 \\\n  -e DB_URL=postgres://pedidos@10.20.1.30/pedidos \\\n  registry.ipestore.example/loja/api-pedidos:1.8.0"
+    "implantacao": "cosign verify --key cosign.pub registry.ipestore.example/loja/api-pedidos@sha256:d63fb8bf995db6e044b7c1be371bfe43075ff747a280ed2c5cd1d7b8f06c42aa\ndocker run -d --name api-pedidos \\\n  --read-only \\\n  --cap-drop ALL \\\n  --security-opt no-new-privileges:true \\\n  -p 3000:3000 \\\n  -e DB_URL=postgres://pedidos@10.20.1.30/pedidos \\\n  registry.ipestore.example/loja/api-pedidos@sha256:d63fb8bf995db6e044b7c1be371bfe43075ff747a280ed2c5cd1d7b8f06c42aa"
    },
    "esperado": [
     "root",
@@ -2092,19 +2093,19 @@ docker run -d --name api-pedidos \
      {
       "arquivo": "implantacao",
       "de": "docker.io/ipestore-dev/api-pedidos:latest",
-      "para": "  registry.ipestore.example/loja/api-pedidos:1.8.0"
+      "para": "  registry.ipestore.example/loja/api-pedidos@sha256:d63fb8bf995db6e044b7c1be371bfe43075ff747a280ed2c5cd1d7b8f06c42aa"
      },
      {
       "arquivo": "implantacao",
       "de": "docker.io/ipestore-dev/api-pedidos:1.8.0",
-      "para": "  registry.ipestore.example/loja/api-pedidos:1.8.0"
+      "para": "  registry.ipestore.example/loja/api-pedidos@sha256:d63fb8bf995db6e044b7c1be371bfe43075ff747a280ed2c5cd1d7b8f06c42aa"
      }
     ],
     "sem_assinatura": [
      {
       "arquivo": "implantacao",
       "de": "docker run -d --name api-pedidos \\",
-      "para": "cosign verify --key cosign.pub registry.ipestore.example/loja/api-pedidos:1.8.0\ndocker run -d --name api-pedidos \\"
+      "para": "cosign verify --key cosign.pub registry.ipestore.example/loja/api-pedidos@sha256:d63fb8bf995db6e044b7c1be371bfe43075ff747a280ed2c5cd1d7b8f06c42aa\ndocker run -d --name api-pedidos \\"
      }
     ],
     "sem_endurecimento": [
@@ -2266,7 +2267,7 @@ docker run -d --name api-pedidos \
    "implantacao": "cosign verify --key cosign.pub registry.ipestore.example/loja/relatorios:2.3.1\ndocker run -d --name relatorios \\\n  --user 0 \\\n  --cap-add SYS_ADMIN \\\n  --cap-add SYS_PTRACE \\\n  --pid=host \\\n  -v /etc:/host/etc:ro \\\n  -e DB_HOST=10.20.1.30 \\\n  registry.ipestore.example/loja/relatorios:2.3.1",
    "referencia": {
     "dockerfile": "# Estágio 1: instala as dependências com pip\nFROM python:3.12.7-slim-bookworm@sha256:a1675fc29cc86b8e915c1c48a9583c1b43a834615147fcbaa59676e2e39476a4 AS build\nWORKDIR /srv/relatorios\nCOPY requirements.txt .\nRUN pip install --no-cache-dir --prefix=/install -r requirements.txt\n\n# Estágio 2: só o necessário para rodar\nFROM python:3.12.7-slim-bookworm@sha256:a1675fc29cc86b8e915c1c48a9583c1b43a834615147fcbaa59676e2e39476a4\nWORKDIR /srv/relatorios\nCOPY --from=build /install /usr/local\nCOPY fontes/ /usr/share/fonts/truetype/ipe/\nCOPY . .\nRUN useradd --uid 10001 --no-create-home relat\nUSER 10001:10001\nCMD [\"python\", \"-m\", \"relatorios\"]",
-    "implantacao": "cosign verify --key cosign.pub registry.ipestore.example/loja/relatorios:2.3.1\ndocker run -d --name relatorios \\\n  --read-only --tmpfs /tmp \\\n  --cap-drop ALL \\\n  --security-opt no-new-privileges:true \\\n  -e TZ=America/Sao_Paulo \\\n  -e DB_HOST=10.20.1.30 \\\n  -v /run/ipe-secrets/relatorios-db:/run/secrets/db_password:ro \\\n  registry.ipestore.example/loja/relatorios:2.3.1"
+    "implantacao": "cosign verify --key cosign.pub registry.ipestore.example/loja/relatorios@sha256:56e83ab3ef91bc31fa2516363317c8861a3ae6e14a3cb4603ce8342a03d0ce8d\ndocker run -d --name relatorios \\\n  --read-only --tmpfs /tmp \\\n  --cap-drop ALL \\\n  --security-opt no-new-privileges:true \\\n  -e TZ=America/Sao_Paulo \\\n  -e DB_HOST=10.20.1.30 \\\n  -v /run/ipe-secrets/relatorios-db:/run/secrets/db_password:ro \\\n  registry.ipestore.example/loja/relatorios@sha256:56e83ab3ef91bc31fa2516363317c8861a3ae6e14a3cb4603ce8342a03d0ce8d"
    },
    "esperado": [
     "root",
@@ -2277,6 +2278,7 @@ docker run -d --name api-pedidos \
     "montagem_sensivel",
     "pid_host",
     "cap_add",
+    "sem_assinatura",
     "sem_endurecimento"
    ],
    "correcoes": {
@@ -2359,6 +2361,18 @@ docker run -d --name api-pedidos \
       "arquivo": "implantacao",
       "de": "--cap-add SYS_PTRACE \\",
       "para": ""
+     }
+    ],
+    "sem_assinatura": [
+     {
+      "arquivo": "implantacao",
+      "de": "cosign verify --key cosign.pub registry.ipestore.example/loja/relatorios:2.3.1",
+      "para": "cosign verify --key cosign.pub registry.ipestore.example/loja/relatorios@sha256:56e83ab3ef91bc31fa2516363317c8861a3ae6e14a3cb4603ce8342a03d0ce8d"
+     },
+     {
+      "arquivo": "implantacao",
+      "de": "registry.ipestore.example/loja/relatorios:2.3.1",
+      "para": "  registry.ipestore.example/loja/relatorios@sha256:56e83ab3ef91bc31fa2516363317c8861a3ae6e14a3cb4603ce8342a03d0ce8d"
      }
     ],
     "sem_endurecimento": [
@@ -2486,15 +2500,16 @@ docker run -d --name api-pedidos \
   {
    "id": "vitrine",
    "nome": "Vitrine do catálogo (Go)",
-   "historia": "O serviço do catálogo, refeito no último trimestre: build multiestágio, distroless, digest, usuário sem privilégio, assinatura verificada e docker run endurecido. Só que alguém trocou a rede para a do host, para o Prometheus coletar métricas em localhost.",
+   "historia": "O serviço do catálogo, refeito no último trimestre: build multiestágio, distroless, base fixada por digest, usuário sem privilégio, cosign verify antes de rodar e docker run endurecido. Só que alguém trocou a rede para a do host, para o Prometheus coletar métricas em localhost.",
    "dockerfile": "# Estágio 1: compila com o toolchain completo do Go\nFROM golang:1.23.2-bookworm@sha256:d754ed9f64ac293b10268157f283ee23256fb32a4f8dedb25c8446ca5bcb0bb3 AS build\nWORKDIR /src\nCOPY go.mod go.sum ./\nRUN go mod download\nCOPY . .\nRUN CGO_ENABLED=0 go build -trimpath -ldflags=\"-s -w\" -o /out/vitrine ./cmd/vitrine\n\n# Estágio 2: só o binário, sem shell nem gerenciador de pacotes\nFROM gcr.io/distroless/static-debian12:nonroot@sha256:2053dbbf6ec7135c4e994d3464c478db6f48d3ca21052c8f44915edc96e02c39\nCOPY --from=build /out/vitrine /vitrine\nUSER 65532:65532\nEXPOSE 8080\nENTRYPOINT [\"/vitrine\"]",
    "implantacao": "cosign verify --key cosign.pub registry.ipestore.example/loja/vitrine:3.0.4\ndocker run -d --name vitrine \\\n  --read-only \\\n  --cap-drop ALL \\\n  --security-opt no-new-privileges:true \\\n  --network host \\\n  registry.ipestore.example/loja/vitrine:3.0.4",
    "referencia": {
     "dockerfile": "# Estágio 1: compila com o toolchain completo do Go\nFROM golang:1.23.2-bookworm@sha256:d754ed9f64ac293b10268157f283ee23256fb32a4f8dedb25c8446ca5bcb0bb3 AS build\nWORKDIR /src\nCOPY go.mod go.sum ./\nRUN go mod download\nCOPY . .\nRUN CGO_ENABLED=0 go build -trimpath -ldflags=\"-s -w\" -o /out/vitrine ./cmd/vitrine\n\n# Estágio 2: só o binário, sem shell nem gerenciador de pacotes\nFROM gcr.io/distroless/static-debian12:nonroot@sha256:2053dbbf6ec7135c4e994d3464c478db6f48d3ca21052c8f44915edc96e02c39\nCOPY --from=build /out/vitrine /vitrine\nUSER 65532:65532\nEXPOSE 8080\nENTRYPOINT [\"/vitrine\"]",
-    "implantacao": "cosign verify --key cosign.pub registry.ipestore.example/loja/vitrine:3.0.4\ndocker run -d --name vitrine \\\n  --read-only \\\n  --cap-drop ALL \\\n  --security-opt no-new-privileges:true \\\n  -p 8080:8080 \\\n  registry.ipestore.example/loja/vitrine:3.0.4"
+    "implantacao": "cosign verify --key cosign.pub registry.ipestore.example/loja/vitrine@sha256:0b8232c7783b9392ff134d5df8df69b254f852dc8634510b2eeb2650e06104d4\ndocker run -d --name vitrine \\\n  --read-only \\\n  --cap-drop ALL \\\n  --security-opt no-new-privileges:true \\\n  -p 8080:8080 \\\n  registry.ipestore.example/loja/vitrine@sha256:0b8232c7783b9392ff134d5df8df69b254f852dc8634510b2eeb2650e06104d4"
    },
    "esperado": [
-    "rede_host"
+    "rede_host",
+    "sem_assinatura"
    ],
    "correcoes": {
     "rede_host": [
@@ -2502,6 +2517,18 @@ docker run -d --name api-pedidos \
       "arquivo": "implantacao",
       "de": "--network host \\",
       "para": "  -p 8080:8080 \\"
+     }
+    ],
+    "sem_assinatura": [
+     {
+      "arquivo": "implantacao",
+      "de": "cosign verify --key cosign.pub registry.ipestore.example/loja/vitrine:3.0.4",
+      "para": "cosign verify --key cosign.pub registry.ipestore.example/loja/vitrine@sha256:0b8232c7783b9392ff134d5df8df69b254f852dc8634510b2eeb2650e06104d4"
+     },
+     {
+      "arquivo": "implantacao",
+      "de": "registry.ipestore.example/loja/vitrine:3.0.4",
+      "para": "  registry.ipestore.example/loja/vitrine@sha256:0b8232c7783b9392ff134d5df8df69b254f852dc8634510b2eeb2650e06104d4"
      }
     ]
    },
@@ -2618,7 +2645,8 @@ docker run -d --name api-pedidos \
    "dockerfile": "FROM gcr.io/distroless/static-debian12:nonroot@sha256:2053dbbf6ec7135c4e994d3464c478db6f48d3ca21052c8f44915edc96e02c39\nUSER 65532:65532",
    "implantacao": "cosign verify --key cosign.pub registry.ipestore.example/loja/y:1.0\ndocker run --read-only --cap-drop ALL --cap-add NET_BIND_SERVICE --security-opt no-new-privileges:true --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock registry.ipestore.example/loja/y:1.0",
    "esperado": [
-    "docker_sock"
+    "docker_sock",
+    "sem_assinatura"
    ]
   },
   {
@@ -2796,10 +2824,16 @@ docker run -d --name api-pedidos \
             var im = parseImagem(p.imagem);
             if (!im.digest && (im.tag === "" || im.tag === "latest")) add("tag_latest", "docker run: imagem " + p.imagem);
             if (p.imagem.indexOf(CTR.registro_confiavel) !== 0) add("registro", "imagem fora de " + CTR.registro_confiavel);
+            // Só conta como verificada a mesma referência do docker run (nome, tag e digest);
+            // por tag, a imagem pode mudar entre o cosign verify e o docker run.
             var assinada = outras.some(function(t) {
-                return t.length >= 2 && t[0] === "cosign" && t[1] === "verify" && t.slice(2).some(function(x) { return parseImagem(x).nome === im.nome; });
+                return t.length >= 2 && t[0] === "cosign" && t[1] === "verify" && t.slice(2).some(function(x) {
+                    var o = parseImagem(x);
+                    return o.nome === im.nome && o.tag === im.tag && o.digest === im.digest;
+                });
             });
-            if (!assinada) add("sem_assinatura", "nenhum cosign verify para " + im.nome);
+            if (!im.digest) add("sem_assinatura", "docker run por tag (" + p.imagem + "): a verificação por tag não garante a mesma imagem; verifique e rode pelo mesmo digest");
+            else if (!assinada) add("sem_assinatura", "nenhum cosign verify para " + p.imagem);
         }
         var faltam = [["--read-only", ro], ["--cap-drop ALL", drop], ["--security-opt no-new-privileges", nnp]]
             .filter(function(x) { return !x[1]; }).map(function(x) { return x[0]; });
