@@ -196,6 +196,8 @@ def validar_corpo(html, slug):
     ids_vistos = set()
     for article in articles:
         for filho in article.filhos:
+            if filho.tag in ("script", "style"):
+                continue
             if not _e_secao(filho):
                 erro(2, "article.study-container",
                      f"filho {_nome(filho)} não é section.study-section")
@@ -215,8 +217,8 @@ def validar_corpo(html, slug):
             erro(2, onde, "data-tipo ausente")
         elif tipo not in TIPOS:
             erro(2, onde, f'data-tipo "{tipo}" inválido')
-        nomes = [k for k, _ in s.attrs]
-        if nomes != ORDEM_ATRIBUTOS_SECAO and set(nomes) >= set(ORDEM_ATRIBUTOS_SECAO):
+        nomes = [k for k, _ in s.attrs if k in ORDEM_ATRIBUTOS_SECAO]
+        if nomes != ORDEM_ATRIBUTOS_SECAO and set(nomes) == set(ORDEM_ATRIBUTOS_SECAO):
             erro(2, onde, "ordem dos atributos deve ser class, id, data-tipo")
         titulos = [d for d in s.descendentes() if d.tag in TITULOS]
         if _primeiro_h2(s) is None:

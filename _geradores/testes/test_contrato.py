@@ -91,7 +91,29 @@ class TestContrato(unittest.TestCase):
 
     def test_regra_2_sem_id(self):
         html = CORPO_VALIDO.replace(' id="s5"', "")
-        self.assertTrue(any(e.startswith("X §2:") and "id" in e for e in msgs(html)))
+        self.assertIn("X §2: section (sem id): id ausente", msgs(html))
+
+    def test_regra_2_script_e_style_permitidos(self):
+        script = ('<script>var h = \'<section class="study-section" id="x">\'; '
+                  "var t = '<h2>';</script>")
+        html = CORPO_VALIDO.replace("</article>", script + "<style>.a{color:red}</style></article>")
+        self.assertEqual(msgs(html), [])
+        self.assertEqual([s.id for s in extrair_secoes(html)], ["s1", "s2", "s3", "s4", "s5"])
+
+    def test_regra_2_style_sozinho(self):
+        html = CORPO_VALIDO.replace("</article>", "<style>.a{}</style></article>")
+        self.assertEqual(msgs(html), [])
+
+    def test_regra_2_div_continua_erro(self):
+        html = CORPO_VALIDO.replace("</article>", "<div>x</div></article>")
+        self.assertIn("X §2: article.study-container: filho div não é section.study-section", msgs(html))
+
+    def test_regra_2_atributo_extra_nao_afeta_ordem(self):
+        for novo in ('<section style="x" class="study-section" id="s1" data-tipo="teoria">',
+                     '<section class="study-section" data-x="1" id="s1" data-tipo="teoria">',
+                     '<section class="study-section" id="s1" data-tipo="teoria" style="x">'):
+            html = CORPO_VALIDO.replace('<section class="study-section" id="s1" data-tipo="teoria">', novo)
+            self.assertEqual(msgs(html), [], novo)
 
     def test_ids_duplicados(self):
         html = CORPO_VALIDO.replace('id="s5"', 'id="s1"')
