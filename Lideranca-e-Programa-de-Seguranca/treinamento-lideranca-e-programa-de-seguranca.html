@@ -2719,7 +2719,7 @@ td {
    "explicacao": "Indicador de nível de serviço do SOC, interno ou contratado: serve para cobrar a equipe ou o prestador. O conselho não decide sobre SLA de triagem; decide sobre a exposição que um SOC lento deixaria aberta."},
   {"id": "I11", "nome": "Taxa de clique em simulação de phishing", "valor": "9,5% (trimestre anterior: 6,1%)",
    "gabarito": "kri", "essencial": false,
-   "explicacao": "KRI, mas não essencial: mede a exposição ao fator humano e a tendência piorou. Entra no painel se houver vaga, de preferência acompanhado da taxa de reporte, que mostra se as pessoas avisam quando desconfiam (Estudo 15)."},
+   "explicacao": "KRI, mas não essencial: mede a exposição ao fator humano e a tendência piorou. Se houver vaga entre os 6 KRIs, pode ser classificado como KRI, de preferência acompanhado da taxa de reporte, que mostra se as pessoas avisam quando desconfiam (Estudo 15)."},
   {"id": "I12", "nome": "Regras de detecção revisadas no trimestre", "valor": "34 de 120",
    "gabarito": "kpi", "essencial": false,
    "explicacao": "Mede o andamento do processo de engenharia de detecção (Estudo 46). É útil para o CISO cobrar a manutenção das regras, mas o conselho não tem o que fazer com ele; o efeito aparece, se aparecer, nos KRIs de exposição e nos incidentes."}
@@ -2876,10 +2876,10 @@ td {
             var li = el("li", null, "margin: 0.3rem 0; min-width: 0;");
             li.appendChild(el("div", i.nome, "font-weight: 600;"));
             li.appendChild(el("div", i.valor, "color: var(--muted);"));
-            var b = el("button", "Tirar do painel");
+            var b = el("button", "Desfazer KRI");
             b.type = "button";
             b.className = "btn-secondary";
-            b.setAttribute("aria-label", "Tirar " + i.nome + " do painel do conselho");
+            b.setAttribute("aria-label", "Desfazer a classificação de " + i.nome + " como KRI e tirá-lo do painel do conselho");
             b.setAttribute("style", "margin-top: 0.2rem; font-size: 0.78rem;");
             b.addEventListener("click", function() {
                 // o item some: o foco vai para o "Tirar" que ocupa a mesma posição ou, com o painel vazio, para o título

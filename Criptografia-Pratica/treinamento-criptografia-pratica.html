@@ -2345,7 +2345,7 @@ td {
   <h3>3. Validade menor: a votação SC-081 do CA/Browser Forum</h3>
   <p>
     O <strong>CA/Browser Forum</strong>, que reúne CAs e fabricantes de navegadores, aprovou a votação <strong>SC-081</strong> (versão v3,
-    encerrada em 04/11/2025), que reduz em etapas a validade máxima dos certificados TLS públicos e também o tempo em que a CA pode
+    encerrada em 11/04/2025), que reduz em etapas a validade máxima dos certificados TLS públicos e também o tempo em que a CA pode
     reaproveitar uma validação de domínio já feita. Os valores abaixo foram conferidos no texto da votação:
   </p>
 
@@ -2559,7 +2559,7 @@ td {
         <div class="pki-arrow" style="text-align:center; color:var(--muted); font-size:1.2rem;">&darr; <em>emitiu e assinou digitalmente</em></div>
         <div class="pki-node" id="node-leaf" style="border:1px solid var(--rule); padding:1rem; border-radius:var(--radius-sm); background:var(--ground);">
           <strong style="color:var(--t2-green);">[Nível 3 &bull; Certificado Folha] *.empresa.com.br</strong>
-          <p style="margin:0.25rem 0 0; font-size:0.85rem; color:var(--muted);">SAN: empresa.com.br, api.empresa.com.br &bull; Algoritmo: ECDSA P-256 com SHA-256 &bull; Validade: 398 dias</p>
+          <p style="margin:0.25rem 0 0; font-size:0.85rem; color:var(--muted);">SAN: empresa.com.br, api.empresa.com.br &bull; Algoritmo: ECDSA P-256 com SHA-256 &bull; Validade: 200 dias</p>
         </div>
       </div>
 
@@ -2723,8 +2723,8 @@ td {
       <div class="quiz-summary">
         <span class="quiz-tag">Questão 4 &bull; Ciclo de Vida de Certificados &bull; Cripto-agilidade</span>
         <p class="quiz-question">
-          Uma empresa renova seus certificados TLS à mão, a partir de uma planilha, uma vez por ano. Com a redução de validade
-          aprovada pelo CA/Browser Forum (SC-081), que risco essa prática enfrenta e que medidas reduzem esse risco?
+          Uma empresa renova seus certificados TLS à mão, a partir de uma planilha, e se acostumou a fazê-lo uma vez por ano, quando a validade era de 398 dias. Com a redução de validade
+          aprovada pelo CA/Browser Forum (SC-081), que risco essa rotina enfrenta e que medidas reduzem esse risco?
         </p>
       </div>
       <details class="quiz-details">
@@ -3077,7 +3077,7 @@ td {
         out.style.color = '#F87171';
         out.textContent = [
           '[ERRO CRÍTICO: SEC_ERROR_EXPIRED_CERTIFICATE]',
-          '1. A data atual ultrapassou o campo NotAfter (validade de 398 dias expirada).',
+          '1. A data atual ultrapassou o campo NotAfter (validade de 200 dias expirada).',
           '2. O navegador bloqueia imediatamente o acesso para prevenir uso de certificados abandonados.',
           'Ação Recomendada: Renovar o certificado digital junto à autoridade certificadora (ex.: via ACME / Certbot).'
         ].join('\n');

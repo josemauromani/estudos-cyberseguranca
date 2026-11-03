@@ -88,7 +88,7 @@ class TestCriptografiaPratica(unittest.TestCase):
             "15 de março de 2026", "200 dias", "15 de março de 2027", "100 dias",
             "15 de março de 2029", "47 dias", "398 dias", "10 dias",
             "CBOM", "FIPS 203", "ML-KEM", "FIPS 204", "ML-DSA", "FIPS 205", "SLH-DSA",
-            "agosto de 2024", "colher agora, decifrar depois", "cripto-agilidade",
+            "agosto de 2024", "colher agora, decifrar depois", "cripto-agilidade", "11/04/2025",
         ]:
             self.assertIn(termo, secao, f"A seção deve conter '{termo}'.")
 

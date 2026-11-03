@@ -323,7 +323,7 @@ flowchart TD
                     <div id="est-alocacao-campos" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.8rem; min-width: 0;"></div>
                 </fieldset>
 
-                <p id="est-disponivel" role="status" style="font-weight: 600; margin: 0.4rem 0;"></p>
+                <p id="est-disponivel" aria-live="off" style="font-weight: 600; margin: 0.4rem 0;"></p>
                 <div id="est-aviso" role="alert" style="font-size: 0.85rem; font-weight: 600;"></div>
 
                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem;">
@@ -706,6 +706,7 @@ flowchart TD
         return a;
     }
 
+    var estavaNegativo = false;
     function atualizarDisponivel() {
         var c = cenarioAtual();
         var s = sourcingAtual();
@@ -723,6 +724,9 @@ flowchart TD
             " · frentes " + soma + " · disponível: " + disponivel + " pontos" +
             (valido ? "" : " (há campo com valor que não é inteiro de 0 para cima)");
         linha.style.color = disponivel < 0 || !valido ? COR.erro : "";
+        // a linha não é região viva (mudaria a cada tecla); o aviso só é falado quando o saldo vira negativo
+        if (disponivel < 0 && !estavaNegativo) mostrarAviso("O orçamento disponível ficou negativo (" + disponivel + " pontos). Reduza alguma frente antes de aplicar o plano.");
+        estavaNegativo = disponivel < 0;
     }
 
     function renderCenario() {
