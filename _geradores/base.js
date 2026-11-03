@@ -763,6 +763,9 @@
 
     function posicionar() {
       if (!atual) return;
+      // Zera a posição antes de medir: left/top antigos encolhem a largura do popover.
+      pop.style.left = '0';
+      pop.style.top = '0';
       const r = atual.getBoundingClientRect();
       const w = pop.offsetWidth;
       const h = pop.offsetHeight;

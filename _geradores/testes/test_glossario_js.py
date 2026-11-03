@@ -103,6 +103,27 @@ class TestGlossarioJs(unittest.TestCase):
         self.assertGreaterEqual(s["left"], 16)
         self.assertLessEqual(s["right"], s["w"] - 16)
 
+    def test_margens_apos_reabrir_em_outro_termo(self):
+        s = self.rodar("""
+          const todos = Array.from(document.querySelectorAll('dfn.glossario'));
+          const b = todos.find((x) => x !== d) || d;
+          [d, b].forEach((x) => { x.style.position = 'fixed'; x.style.top = '100px'; });
+          const medidas = [];
+          const abrir = (x, lado) => {
+            x.style.left = lado === 'esq' ? '0' : 'auto';
+            x.style.right = lado === 'esq' ? 'auto' : '0';
+            x.focus();
+            const r = pop().getBoundingClientRect();
+            medidas.push({left: r.left, right: r.right});
+          };
+          abrir(d, 'dir'); abrir(b, 'esq'); abrir(d, 'dir');
+          // Estado antigo: o popover ficou com left alto do uso anterior (Chrome headless não passa de ~500 px).
+          d.blur(); pop().style.left = (innerWidth - 100) + 'px'; abrir(d, 'dir');
+          __fim({medidas, w: innerWidth, n: todos.length});""", largura=360)
+        for m in s["medidas"]:
+            self.assertGreaterEqual(m["left"], 16)
+            self.assertLessEqual(m["right"], s["w"] - 16)
+
     def test_vira_para_cima_sem_espaco(self):
         s = self.rodar("""
           d.style.position = 'fixed'; d.style.bottom = '0';
