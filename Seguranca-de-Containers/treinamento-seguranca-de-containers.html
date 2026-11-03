@@ -4781,6 +4781,16 @@ docker run -d --name api-pedidos \
       timer = setTimeout(fechar, 200);
     }
 
+    const TABULAVEL = 'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
+
+    // Próximo elemento tabulável depois do termo na ordem do documento (o popover fica no fim do body).
+    function proximoTabulavel(termo) {
+      const lista = Array.from(document.querySelectorAll(TABULAVEL));
+      return lista.find((el) =>
+        !pop.contains(el) && !termo.contains(el) && el.getClientRects().length > 0 &&
+        (termo.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING)) || null;
+    }
+
     function dentro(el) {
       return !!el && ((atual && atual.contains(el)) || pop.contains(el));
     }
@@ -4823,11 +4833,26 @@ docker run -d --name api-pedidos \
       if (e.key === 'Tab' && e.shiftKey) {
         e.preventDefault();
         atual.focus();
+      } else if (e.key === 'Tab' && !e.shiftKey) {
+        const t = atual;
+        const prox = proximoTabulavel(t);
+        e.preventDefault();
+        fechar();
+        if (prox) prox.focus();
+        else t.focus();
       } else if (e.key === 'Escape') {
         const t = atual;
         fechar();
         t.focus();
       }
+    });
+    // WCAG 1.4.13: Esc dispensa o popover mesmo aberto por hover, com o foco em outro lugar.
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || !atual) return;
+      const t = atual;
+      const focoAqui = dentro(document.activeElement);
+      fechar();
+      if (focoAqui) t.focus();
     });
     document.addEventListener('click', (e) => {
       if (atual && !dentro(e.target)) fechar();
