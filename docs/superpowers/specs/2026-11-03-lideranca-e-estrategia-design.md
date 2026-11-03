@@ -1,7 +1,7 @@
 # Design Spec: Trilha 14 — Liderança & Estratégia (Módulos 59 e 60) e Ajustes Vindos de Perfis Executivos
 
 **Data:** 2026-11-03
-**Status:** Rascunho para aprovação
+**Status:** Aprovada (2026-11-03) e implementada (branch feat/lideranca-e-estrategia)
 **Repositório:** `estudos_cyberseguranca`
 **Specs anteriores:** [`2026-11-02-auditoria-ti-e-certificacoes-design.md`](2026-11-02-auditoria-ti-e-certificacoes-design.md), [`2026-11-02-trilhas-especializacao-design.md`](2026-11-02-trilhas-especializacao-design.md), [`2026-11-03-certificacoes-praticas-pentest-design.md`](2026-11-03-certificacoes-praticas-pentest-design.md)
 **Referência Metodológica:** Superpowers Spec-Driven Development (SDD)
