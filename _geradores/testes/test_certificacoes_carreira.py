@@ -191,9 +191,10 @@ class TestCertificacoesCarreira(unittest.TestCase):
     def test_dominios_e_pesos(self):
         d = self._dados()
         esperados = {"Security+": 5, "CISSP": 8, "CCSP": 6, "CISM": 4, "CEH": 9,
-                     "ISFS": 4, "PDPF/PDPP": 11, "ITIL 4 F": 7, "CSFPC": 9, "CISA": 5, "ISO 27001 LA": 7}
-        com_pesos = ("Security+", "CISSP", "CCSP", "CISM", "CISA", "ISFS", "ITIL 4 F")
-        entrada = ("Security+", "ISFS", "PDPF/PDPP", "ITIL 4 F", "CSFPC")
+                     "ISFS": 4, "PDPF/PDPP": 11, "ITIL 4 F": 7, "CSFPC": 9, "CISA": 5, "ISO 27001 LA": 7,
+                     "eJPT": 4, "eCPPT": 6, "OSCP": 10}
+        com_pesos = ("Security+", "CISSP", "CCSP", "CISM", "CISA", "ISFS", "ITIL 4 F", "eJPT", "eCPPT")
+        entrada = ("Security+", "ISFS", "PDPF/PDPP", "ITIL 4 F", "CSFPC", "eJPT")
         for c in d["certificacoes"]:
             with self.subTest(cert=c["sigla"]):
                 self.assertIn(c["nivel"], (1, 2, 3))
@@ -356,17 +357,34 @@ class TestCertificacoesCarreira(unittest.TestCase):
         subtitulo = ESTUDOS_DADOS["Certificacoes-e-Carreira"]["subtitulo"]
         readme = (GERADORES.parent / "README.md").read_text(encoding="utf-8")
         curriculo = (GERADORES / "CURRICULO.md").read_text(encoding="utf-8")
-        for sigla in ("CISA", "ISFS"):
+        for sigla in ("CISA", "ISFS", "OSCP"):
             self.assertIn(sigla, subtitulo, f"Subtítulo do módulo 33 sem {sigla}")
             self.assertIn(sigla, readme, f"README sem {sigla}")
             self.assertIn(sigla, curriculo, f"CURRICULO sem {sigla}")
+
+    def test_certificacoes_praticas(self):
+        d = self._dados()
+        iniciante = {"anos_ti": 0, "anos_si": 0, "anos_gestao_si": 0, "graduacao": False, "certificacoes": []}
+        veterano = {"anos_ti": 20, "anos_si": 15, "anos_gestao_si": 10, "graduacao": True, "certificacoes": []}
+        for sigla, nivel in (("eJPT", 1), ("eCPPT", 2), ("OSCP", 2)):
+            with self.subTest(cert=sigla):
+                cert = self._cert(d, sigla)
+                self.assertEqual(cert["nivel"], nivel)
+                self.assertEqual(cert["requisitos"], {})
+                self.assertEqual(elegibilidade(cert, iniciante), "sem-exigencia")
+                self.assertEqual(elegibilidade(cert, veterano), "sem-exigencia")
+
+    def test_sem_texto_de_doze(self):
+        arquivos = list(GERADORES.glob("*_body.html")) + [GERADORES.parent / "README.md", GERADORES / "CURRICULO.md", GERADORES / "index_dados.py"]
+        for a in arquivos:
+            self.assertNotIn("12 certificações", a.read_text(encoding="utf-8"), a.name)
 
     def test_tabela_certificacoes_da_secao(self):
         sec = self._secao(self.body_path.read_text(encoding="utf-8"), "certificacoes")
         tabela = re.search(r"<table.*?</table>", sec, re.S).group(0)
         for c in CERTIFICACOES:
             self.assertIn(f"<strong>{c['sigla']}</strong>", tabela, f"Sigla ausente na tabela: {c['sigla']}")
-        self.assertEqual(len(CERTIFICACOES), 12)
+        self.assertEqual(len(CERTIFICACOES), 15)
 
     def test_componentes_pedagogicos(self):
         content = self.compiled_path.read_text(encoding="utf-8")

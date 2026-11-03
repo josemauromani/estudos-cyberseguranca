@@ -877,6 +877,33 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "experiencia": "5 anos, sendo 2 em gestão de SI, e 300 horas de auditoria",
         "modulos": ["ISO-27001-e-27002", "Auditoria-de-TI", "Gestao-de-Riscos-TI", "Continuidade-e-Disaster-Recovery", "LGPD-e-Privacidade"],
     },
+    {
+        "sigla": "eJPT",
+        "site_oficial": "https://ine.com/security/certifications/ejpt-certification",
+        "nome": "Junior Penetration Tester",
+        "orgao": "INE Security",
+        "foco": "Entrada / ofensiva (prova prática)",
+        "experiencia": "Sem exigência formal",
+        "modulos": ["Redes-e-Protocolos", "Reconhecimento-e-OSINT", "OWASP-Top-10-Web", "Seguranca-em-APIs", "Pentest-Metodologias", "Linux-para-Seguranca", "PowerShell-e-Windows-Interno", "Laboratorio-Domestico-e-Portfolio", "Active-Directory-Fundamentos"],
+    },
+    {
+        "sigla": "eCPPT",
+        "site_oficial": "https://ine.com/security/certifications/ecppt-certification",
+        "nome": "Certified Professional Penetration Tester",
+        "orgao": "INE Security",
+        "foco": "Técnica / ofensiva (prova prática)",
+        "experiencia": "Sem exigência formal",
+        "modulos": ["Redes-e-Protocolos", "Reconhecimento-e-OSINT", "OWASP-Top-10-Web", "Seguranca-em-APIs", "Pentest-Metodologias", "Linux-para-Seguranca", "Python-para-Seguranca", "PowerShell-e-Windows-Interno", "Active-Directory-Fundamentos", "Ataques-e-Defesa-no-AD"],
+    },
+    {
+        "sigla": "OSCP",
+        "site_oficial": "https://www.offsec.com/courses/pen-200/",
+        "nome": "OffSec Certified Professional",
+        "orgao": "OffSec",
+        "foco": "Técnica / ofensiva (prova prática de 24 horas)",
+        "experiencia": "Sem exigência formal",
+        "modulos": ["Redes-e-Protocolos", "Reconhecimento-e-OSINT", "OWASP-Top-10-Web", "Seguranca-em-APIs", "Pentest-Metodologias", "Linux-para-Seguranca", "Python-para-Seguranca", "PowerShell-e-Windows-Interno", "Laboratorio-Domestico-e-Portfolio", "Active-Directory-Fundamentos", "Ataques-e-Defesa-no-AD"],
+    },
 ]
 
 # 5. METADADOS RICOS DOS ESTUDOS CANÔNICOS
@@ -1459,7 +1486,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
     },
     "Certificacoes-e-Carreira": {
         "titulo": "Formação, Certificações e Carreira",
-        "subtitulo": "Graduações e pós em segurança, 12 certificações (de Security+, ISFS e ITIL 4 a CISSP, CISM e CISA), trajetórias de GRC e papéis do NICE Framework",
+        "subtitulo": "Graduações e pós em segurança, 15 certificações (de Security+, ISFS e ITIL 4 a CISSP, CISM e CISA, e a escada prática eJPT, eCPPT e OSCP), trajetórias de GRC e papéis do NICE Framework",
         "trilha": 7,
         "nist": "Protect",
         "mitre": "N/A (módulo de carreira)",

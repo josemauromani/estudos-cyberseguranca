@@ -127,6 +127,9 @@ class TestLigacoesNovas(unittest.TestCase):
             "CSFPC": ["Ransomware-Prevencao-a-Recuperacao"],
             "CISA": ["PAM-e-Acessos-Privilegiados", "Backup-Imutavel-e-Recuperacao"],
             "ISO 27001 LA": [],
+            "eJPT": ["Linux-para-Seguranca", "PowerShell-e-Windows-Interno", "Laboratorio-Domestico-e-Portfolio", "Active-Directory-Fundamentos"],
+            "eCPPT": ["Linux-para-Seguranca", "Python-para-Seguranca", "PowerShell-e-Windows-Interno", "Active-Directory-Fundamentos", "Ataques-e-Defesa-no-AD"],
+            "OSCP": ["Linux-para-Seguranca", "Python-para-Seguranca", "PowerShell-e-Windows-Interno", "Laboratorio-Domestico-e-Portfolio", "Active-Directory-Fundamentos", "Ataques-e-Defesa-no-AD"],
         }
         for c in CERTIFICACOES:
             with self.subTest(sigla=c["sigla"]):

@@ -38,7 +38,7 @@ xdg-open index.html          # No Linux
 O portal `index.html` tem um **menu lateral** com seis visões:
 - **Catálogo:** tela inicial, com os 58 módulos, o bloco **Continuar estudando** (último módulo aberto) e o **status** de cada módulo (não iniciado, em andamento, concluído). Permite **Agrupar por** Trilha, Nível, Perfil ou NIST, marcar **Só não concluídos** e buscar por título, termo técnico ou conceito (atalho `/`).
 - **Rotas sugeridas:** a rota de cada perfil profissional (Blue Team, Red Team, AppSec, GRC, Cloud/DevSecOps, Analista de Segurança da Informação) como sequência numerada, com progresso e o próximo módulo.
-- **Por certificação:** os módulos que cobrem cada uma das 12 certificações (CEH, CISM, CISSP, CCSP, GSEC, Security+, ISFS, PDPF/PDPP, ITIL 4 Foundation, CSFPC, CISA e ISO/IEC 27001 Lead Auditor).
+- **Por certificação:** os módulos que cobrem cada uma das 15 certificações (CEH, CISM, CISSP, CCSP, GSEC, Security+, ISFS, PDPF/PDPP, ITIL 4 Foundation, CSFPC, CISA, ISO/IEC 27001 Lead Auditor, eJPT, eCPPT e OSCP).
 - **Pela necessidade:** atalhos para os módulos com base em problemas práticos do dia a dia corporativo.
 - **Rota por vaga:** requisitos de uma vaga de Analista de Segurança da Informação ligados aos módulos que os cobrem.
 - **Meu progresso:** módulos concluídos e os que faltam, gravados no navegador (`localStorage`).
@@ -195,7 +195,7 @@ O portal (`index.html`) traz a visão **Rota por Vaga**, que liga cada requisito
 | Controles de segurança da informação | 26 | 06, 08, 38, 40, 58 |
 | Formação e certificações | 33 | 37 |
 
-O portal também exibe a visão **Por certificação** (12 certificações: CEH, CISM, CISSP, CCSP, GSEC, Security+, ISFS, PDPF/PDPP, ITIL 4 Foundation, CSFPC, CISA e ISO/IEC 27001 Lead Auditor), com os módulos que cobrem cada uma.
+O portal também exibe a visão **Por certificação** (15 certificações: CEH, CISM, CISSP, CCSP, GSEC, Security+, ISFS, PDPF/PDPP, ITIL 4 Foundation, CSFPC, CISA, ISO/IEC 27001 Lead Auditor, eJPT, eCPPT e OSCP), com os módulos que cobrem cada uma.
 
 ---
 

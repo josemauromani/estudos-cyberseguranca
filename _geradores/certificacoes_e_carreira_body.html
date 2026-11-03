@@ -46,7 +46,7 @@
         <h2>As Certificações da Vaga e o NICE Framework</h2>
 
         <p>
-            As certificações se dividem em <strong>entrada</strong> (fundamentos amplos), <strong>técnica</strong> (ferramentas e prática), <strong>gestão</strong> (programa, risco e governança) e <strong>especialidade</strong> (um tema, como nuvem). As doze abaixo cobrem da entrada à auditoria. Security+, GSEC, CEH, CISSP, CCSP, CISM e CISA são acreditadas segundo a ISO/IEC 17024, a norma para organismos que certificam pessoas, e exigem educação continuada para não expirar. O ISO 27001 Lead Auditor da PECB também está no escopo de acreditação ISO/IEC 17024 da certificadora e pede manutenção anual. Nas demais, a validade e a renovação variam por certificadora (veja a coluna Manutenção); em todas, confira as regras atuais no site oficial.
+            As certificações se dividem em <strong>entrada</strong> (fundamentos amplos), <strong>técnica</strong> (ferramentas e prática), <strong>gestão</strong> (programa, risco e governança) e <strong>especialidade</strong> (um tema, como nuvem). As quinze abaixo cobrem da entrada à auditoria, com a escada prática eJPT, eCPPT e OSCP para quem segue o caminho do teste de intrusão. Security+, GSEC, CEH, CISSP, CCSP, CISM e CISA são acreditadas segundo a ISO/IEC 17024, a norma para organismos que certificam pessoas, e exigem educação continuada para não expirar. O ISO 27001 Lead Auditor da PECB também está no escopo de acreditação ISO/IEC 17024 da certificadora e pede manutenção anual. Nas demais, a validade e a renovação variam por certificadora (veja a coluna Manutenção); em todas, confira as regras atuais no site oficial.
         </p>
 
         <div class="table-responsive">
@@ -67,6 +67,9 @@
                     <tr><td><strong>CSFPC</strong> (Cybersecurity Foundation)</td><td>CertiProf</td><td>Entrada</td><td>Sem exigência formal</td><td>Validade e renovação: confira na página da CertiProf</td></tr>
                     <tr><td><strong>CISA</strong></td><td>ISACA</td><td>Gestão (auditoria)</td><td>5 anos em auditoria, controle ou segurança de SI; até 3 dispensáveis</td><td>120 CPE a cada 3 anos</td></tr>
                     <tr><td><strong>ISO 27001 LA</strong> (Lead Auditor)</td><td>PECB</td><td>Especialidade (auditoria de SGSI)</td><td>5 anos, sendo 2 em gestão de SI, e 300 horas de auditoria; sem isso, nível Provisional ou Auditor</td><td>Validade de 3 anos, com CPD anual e taxa anual</td></tr>
+                    <tr><td><strong>eJPT</strong> (Junior Penetration Tester)</td><td>INE Security</td><td>Entrada (ofensiva)</td><td>Sem exigência formal; prova prática de 48 horas</td><td>Validade de 3 anos, com opções de renovação</td></tr>
+                    <tr><td><strong>eCPPT</strong> (Certified Professional Penetration Tester)</td><td>INE Security</td><td>Técnica (ofensiva)</td><td>Sem exigência formal; a INE indica 2 anos ou mais em segurança ofensiva</td><td>Validade de 3 anos, com opções de renovação</td></tr>
+                    <tr><td><strong>OSCP</strong> (OffSec Certified Professional)</td><td>OffSec</td><td>Técnica (ofensiva)</td><td>Sem exigência formal; prova prática de 24 horas e relatório</td><td>OSCP sem expiração; OSCP+ válida por 3 anos</td></tr>
                 </tbody>
             </table>
         </div>
@@ -412,6 +415,9 @@ flowchart TD
             <li>CSFPC — <a href="https://certiprof.com/pages/cyber-security-foundation-csfpc" target="_blank" rel="noopener noreferrer">site oficial do CertiProf</a>.</li>
             <li>CISA — <a href="https://www.isaca.org/credentialing/cisa" target="_blank" rel="noopener noreferrer">site oficial do ISACA</a>.</li>
             <li>ISO 27001 LA — <a href="https://pecb.com/en/education-and-certification-for-individuals/iso-iec-27001/iso-iec-27001-lead-auditor" target="_blank" rel="noopener noreferrer">site oficial do PECB</a>.</li>
+            <li>eJPT — <a href="https://ine.com/security/certifications/ejpt-certification" target="_blank" rel="noopener noreferrer">site oficial da INE Security</a>.</li>
+            <li>eCPPT — <a href="https://ine.com/security/certifications/ecppt-certification" target="_blank" rel="noopener noreferrer">site oficial da INE Security</a>.</li>
+            <li>OSCP — <a href="https://www.offsec.com/courses/pen-200/" target="_blank" rel="noopener noreferrer">site oficial da OffSec</a>.</li>
             <li>CQI/IRCA — certificação de auditores de sistemas de gestão e cursos de Lead Auditor certificados.</li>
         </ul>
 
@@ -1478,6 +1484,250 @@ flowchart TD
      "nota": "O módulo 26 cobre a auditoria interna (cláusula 9.2) e o ciclo de certificação; a gestão do programa de auditoria da ISO 19011 não tem módulo."
     }
    ]
+  },
+  {
+   "sigla": "eJPT",
+   "fontes": [
+    {
+     "titulo": "Página oficial da eJPT (INE Security)",
+     "url": "https://ine.com/security/certifications/ejpt-certification"
+    },
+    {
+     "titulo": "Comunicado da INE sobre a eJPT atualizada (26 de março de 2026)",
+     "url": "https://ine.com/newsroom/ine-security-launches-updated-ejpt-certification-with-expanded-web-app-testing-recon-training-and-offensive-ai"
+    }
+   ],
+   "nome": "Junior Penetration Tester",
+   "orgao": "INE Security",
+   "nivel": 1,
+   "foco": "Entrada ofensiva: teste de intrusão júnior, com prova prática",
+   "experiencia": "Sem exigência formal; a INE a indica para quem tem pouca ou nenhuma experiência em segurança, com noções de redes e sistemas. A prova é prática, de 48 horas e 45 questões (comunicado de março de 2026)",
+   "manutencao": "Validade de 3 anos a partir da concessão, com opções de renovação (confira a página de renovação da INE)",
+   "nota_dominios": "Os 4 domínios da página oficial da INE, com os pesos publicados.",
+   "requisitos": {},
+   "sem_experiencia": "",
+   "dominios": [
+    {
+     "nome": "Metodologias de avaliação",
+     "peso": 25,
+     "modulos": [
+      "Pentest-Metodologias",
+      "Reconhecimento-e-OSINT",
+      "Redes-e-Protocolos"
+     ]
+    },
+    {
+     "nome": "Auditoria de hosts e redes",
+     "peso": 25,
+     "modulos": [
+      "Redes-e-Protocolos",
+      "Linux-para-Seguranca",
+      "PowerShell-e-Windows-Interno"
+     ]
+    },
+    {
+     "nome": "Teste de intrusão em hosts e redes",
+     "peso": 35,
+     "modulos": [
+      "Pentest-Metodologias",
+      "Linux-para-Seguranca",
+      "PowerShell-e-Windows-Interno",
+      "Active-Directory-Fundamentos",
+      "Laboratorio-Domestico-e-Portfolio"
+     ],
+     "parcial": true,
+     "nota": "O currículo ensina a metodologia, o Linux, o Windows e o laboratório, mas nenhum módulo trata de exploração de serviços com ferramentas, escalada de privilégio ou pivoteamento. Pratique em laboratório."
+    },
+    {
+     "nome": "Teste de intrusão em aplicações web",
+     "peso": 15,
+     "modulos": [
+      "OWASP-Top-10-Web",
+      "Seguranca-em-APIs"
+     ]
+    }
+   ]
+  },
+  {
+   "sigla": "eCPPT",
+   "fontes": [
+    {
+     "titulo": "Página oficial da eCPPT (INE Security)",
+     "url": "https://ine.com/security/certifications/ecppt-certification"
+    }
+   ],
+   "nome": "Certified Professional Penetration Tester",
+   "orgao": "INE Security",
+   "nivel": 2,
+   "foco": "Técnica ofensiva: teste de intrusão profissional, com prova prática e foco em Active Directory",
+   "experiencia": "Sem exigência formal; a INE a indica para profissionais de tecnologia com 2 anos ou mais de experiência em segurança ofensiva",
+   "manutencao": "Validade de 3 anos a partir da concessão, com opções de renovação (confira a página de renovação da INE)",
+   "nota_dominios": "Os 6 domínios da página oficial da INE, com os pesos publicados. A página não informa duração, número de questões nem nota de aprovação: confira com a INE antes de agendar.",
+   "requisitos": {},
+   "sem_experiencia": "",
+   "dominios": [
+    {
+     "nome": "Coleta de informações e reconhecimento",
+     "peso": 10,
+     "modulos": [
+      "Reconhecimento-e-OSINT",
+      "Redes-e-Protocolos",
+      "Pentest-Metodologias"
+     ]
+    },
+    {
+     "nome": "Acesso inicial",
+     "peso": 15,
+     "modulos": [
+      "Ataques-e-Defesa-no-AD",
+      "Python-para-Seguranca"
+     ],
+     "parcial": true,
+     "nota": "Enumeração de usuários, password spraying e força bruta em serviços remotos não têm módulo dedicado; o módulo 39 só toca em ataques a credenciais do AD."
+    },
+    {
+     "nome": "Teste de intrusão em aplicações web",
+     "peso": 15,
+     "modulos": [
+      "OWASP-Top-10-Web",
+      "Seguranca-em-APIs"
+     ]
+    },
+    {
+     "nome": "Exploração e pós-exploração",
+     "peso": 25,
+     "modulos": [
+      "Linux-para-Seguranca",
+      "PowerShell-e-Windows-Interno",
+      "Pentest-Metodologias",
+      "Ataques-e-Defesa-no-AD"
+     ],
+     "parcial": true,
+     "nota": "Exploração de serviços, escalada de privilégio e quebra de hashes não têm módulo dedicado. Pratique em laboratório."
+    },
+    {
+     "nome": "Desenvolvimento de exploits",
+     "peso": 5,
+     "modulos": [],
+     "nota": "Nenhum módulo do currículo cobre buffer overflow, corrupção de memória nem desenvolvimento de exploit. Estude por fora."
+    },
+    {
+     "nome": "Teste de intrusão em Active Directory",
+     "peso": 30,
+     "modulos": [
+      "Active-Directory-Fundamentos",
+      "Ataques-e-Defesa-no-AD",
+      "PowerShell-e-Windows-Interno"
+     ],
+     "parcial": true,
+     "nota": "O módulo 39 cobre Kerberoasting, Pass-the-Hash e DCSync; AS-REP Roasting e Pass-the-Ticket não aparecem nele."
+    }
+   ]
+  },
+  {
+   "sigla": "OSCP",
+   "fontes": [
+    {
+     "titulo": "Página oficial da OSCP e do curso PEN-200 (OffSec)",
+     "url": "https://www.offsec.com/courses/pen-200/"
+    },
+    {
+     "titulo": "Página da prova OSCP+ (OffSec)",
+     "url": "https://www.offsec.com/products/oscp-plus/"
+    }
+   ],
+   "nome": "OffSec Certified Professional",
+   "orgao": "OffSec",
+   "nivel": 2,
+   "foco": "Técnica ofensiva: teste de intrusão com prova prática de 24 horas e relatório",
+   "experiencia": "Sem exigência formal; a OffSec recomenda redes TCP/IP, administração de Windows e Linux e scripting básico em Bash ou Python",
+   "manutencao": "A OSCP não expira; a OSCP+ vale por 3 anos e se mantém com nova prova, outra prova da OffSec (OSEP, OSWA, OSED ou OSEE) ou o programa de CPE. A aprovação concede as duas",
+   "nota_dominios": "Os temas do curso PEN-200 na página oficial da OffSec, que não publica pesos. A prova dura 24 horas, com 3 máquinas independentes e 1 conjunto de Active Directory, e o candidato tem mais 24 horas para entregar o relatório.",
+   "requisitos": {},
+   "sem_experiencia": "",
+   "dominios": [
+    {
+     "nome": "Preparação recomendada: redes, Windows, Linux e scripting",
+     "peso": null,
+     "modulos": [
+      "Redes-e-Protocolos",
+      "Linux-para-Seguranca",
+      "PowerShell-e-Windows-Interno",
+      "Python-para-Seguranca",
+      "Laboratorio-Domestico-e-Portfolio"
+     ]
+    },
+    {
+     "nome": "Enumeração e coleta de informações",
+     "peso": null,
+     "modulos": [
+      "Reconhecimento-e-OSINT",
+      "Redes-e-Protocolos",
+      "Pentest-Metodologias"
+     ]
+    },
+    {
+     "nome": "Fundamentos de criptografia",
+     "peso": null,
+     "modulos": [],
+     "nota": "Nenhum dos módulos ofensivos cobre criptografia; a base teórica está no módulo 3 (Criptografia Prática), fora deste conjunto."
+    },
+    {
+     "nome": "Ataques web e do lado do cliente",
+     "peso": null,
+     "modulos": [
+      "OWASP-Top-10-Web",
+      "Seguranca-em-APIs"
+     ],
+     "parcial": true,
+     "nota": "Os módulos 12 e 13 cobrem SQLi, XSS e falhas de API; ataques do lado do cliente e upload de arquivos não são tratados à parte."
+    },
+    {
+     "nome": "Ataques a senhas",
+     "peso": null,
+     "modulos": [
+      "Ataques-e-Defesa-no-AD"
+     ],
+     "parcial": true,
+     "nota": "Não há módulo sobre ataques de senha com ferramentas; o módulo 39 só cobre os de credenciais do AD."
+    },
+    {
+     "nome": "Evasão de antivírus",
+     "peso": null,
+     "modulos": [],
+     "nota": "Nenhum módulo do currículo cobre evasão de antivírus. Estude por fora."
+    },
+    {
+     "nome": "Escalada de privilégio no Windows e no Linux",
+     "peso": null,
+     "modulos": [
+      "Linux-para-Seguranca",
+      "PowerShell-e-Windows-Interno"
+     ],
+     "parcial": true,
+     "nota": "Os módulos 34 e 36 ensinam permissões e o Windows por dentro, mas não a técnica de escalada de privilégio."
+    },
+    {
+     "nome": "Pivoteamento e tunelamento",
+     "peso": null,
+     "modulos": [],
+     "nota": "Nenhum módulo do currículo cobre pivoteamento nem tunelamento. Estude por fora."
+    },
+    {
+     "nome": "Ataques ao Active Directory",
+     "peso": null,
+     "modulos": [
+      "Active-Directory-Fundamentos",
+      "Ataques-e-Defesa-no-AD"
+     ]
+    },
+    {
+     "nome": "Enumeração e exploração na AWS",
+     "peso": null,
+     "modulos": [],
+     "nota": "Nenhum dos módulos ofensivos cobre AWS; o módulo 21 (Segurança em Nuvem) trata da defesa, fora deste conjunto."
+    }
+   ]
   }
  ],
  "modulos": {
@@ -1609,9 +1859,17 @@ flowchart TD
    "numero": 34,
    "titulo": "Linux para Segurança: Shell, Permissões e Logs"
   },
+  "Python-para-Seguranca": {
+   "numero": 35,
+   "titulo": "Python para Segurança: Automação, Regex e Parsing"
+  },
   "PowerShell-e-Windows-Interno": {
    "numero": 36,
    "titulo": "PowerShell, Event Log e Registro do Windows"
+  },
+  "Laboratorio-Domestico-e-Portfolio": {
+   "numero": 37,
+   "titulo": "Laboratório Doméstico, CTFs e Portfólio"
   },
   "Active-Directory-Fundamentos": {
    "numero": 38,
