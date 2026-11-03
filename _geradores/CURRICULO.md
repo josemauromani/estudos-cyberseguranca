@@ -2,7 +2,7 @@
 
 ## 1. Visão Geral e Filosofia Pedagógica
 
-O currículo de **Estudos de Cibersegurança** foi concebido como uma formação autoinstrucional, prática e modular, dividida em **57 módulos temáticos** organizados em **13 trilhas estruturantes**. 
+O currículo de **Estudos de Cibersegurança** foi concebido como uma formação autoinstrucional, prática e modular, dividida em **58 módulos temáticos** organizados em **13 trilhas estruturantes**. 
 
 O projeto segue quatro diretrizes fundamentais:
 1. **Teoria Pragmática e Direta ao Ponto:** Eliminação de floreios acadêmicos desnecessários; foco no que engenheiros, analistas e auditores de segurança executam na rotina corporativa e no que bancas de concursos e certificações (CompTIA Security+, CySA+, PenTest+, CEH, CISSP) cobram.
@@ -111,7 +111,7 @@ flowchart LR
 
 ---
 
-## 3. Detalhamento dos 57 Módulos de Aprendizagem
+## 3. Detalhamento dos 58 Módulos de Aprendizagem
 
 ### Trilha 1: Fundamentos & Redes (`#2563EB`)
 
@@ -727,7 +727,7 @@ flowchart LR
 
 | Função NIST CSF 2.0 | Quantidade de Módulos | Módulos Vinculados |
 |---|---|---|
-| **GOVERN (GV)** | 7 módulos | 25, 26, 27, 31, 54, 56, 57 |
+| **GOVERN (GV)** | 8 módulos | 25, 26, 27, 31, 54, 56, 57, 58 |
 | **IDENTIFY (ID)** | 6 módulos | 01, 09, 11, 14, 17, 25 |
 | **PROTECT (PR)** | 32 módulos | 02, 03, 04, 05, 06, 07, 08, 09, 10, 12, 13, 15, 21, 22, 23, 24, 27, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 50, 51, 52, 55 |
 | **DETECT (DE)** | 18 módulos | 02, 07, 10, 16, 17, 20, 24, 29, 30, 34, 35, 36, 39, 46, 47, 48, 53, 55 |
@@ -749,7 +749,7 @@ Para orientar estudantes e profissionais com focos específicos, a matriz curric
 3. **Rota DevSecOps & Cloud Security:**  
    `01 -> 03 -> 04 -> 35 -> 06 -> 12 -> 13 -> 21 -> 41 -> 22 -> 50 -> 51 -> 52 -> 53 -> 24`
 4. **Rota GRC, Auditoria & Privacidade:**  
-   `01 -> 08 -> 40 -> 09 -> 25 -> 26 -> 57 -> 27 -> 56 -> 54 -> 55 -> 28 -> 43 -> 44`
+   `01 -> 08 -> 40 -> 09 -> 25 -> 26 -> 58 -> 57 -> 27 -> 56 -> 54 -> 55 -> 28 -> 43 -> 44`
 5. **Rota Perícia & Resposta a Incidentes:**  
    `01 -> 02 -> 06 -> 36 -> 10 -> 48 -> 16 -> 47 -> 18 -> 53 -> 42 -> 45 -> 19 -> 56 -> 20`
 6. **Rota 6: Analista de Segurança da Informação (vaga):**  

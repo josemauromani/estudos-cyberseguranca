@@ -366,6 +366,22 @@ class TestAuditoriaDeTI(unittest.TestCase):
         self.assertIn(f'data-slug="{SLUG}"', content)
         self.assertIn("58 / 58", content)
 
+    def test_pontes_para_o_58(self):
+        for corpo in ("gestao_de_riscos_ti", "iso_27001_e_27002", "gestao_de_riscos_de_terceiros"):
+            txt = (self.root / "_geradores" / f"{corpo}_body.html").read_text(encoding="utf-8")
+            fatos = txt[txt.index('id="fatos"'):]
+            self.assertIn("Estudo 58", fatos, corpo)
+        import index_dados
+        for sigla in ("CISM", "CISSP"):
+            cert = next(c for c in index_dados.CERTIFICACOES if c["sigla"] == sigla)
+            self.assertIn(SLUG, cert["modulos"], sigla)
+        readme = (self.root / "README.md").read_text(encoding="utf-8")
+        self.assertIn("58 módulos", readme)
+        self.assertNotIn("57 módulos", readme)
+        curriculo = (self.root / "_geradores" / "CURRICULO.md").read_text(encoding="utf-8")
+        self.assertIn("#### 58. Auditoria-de-TI", curriculo)
+        self.assertIn("25 ao 28, 31, 58", curriculo)
+
 
 if __name__ == "__main__":
     unittest.main()

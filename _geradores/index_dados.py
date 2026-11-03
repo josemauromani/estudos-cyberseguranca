@@ -597,7 +597,7 @@ ROTA_VAGA: List[Dict[str, Any]] = [
         "texto_vaga": "Controles de segurança da Informação",
         "icone": "🔐",
         "principais": ["ISO-27001-e-27002"],
-        "apoio": ["Hardening-Sistemas", "Arquitetura-Zero-Trust", "Active-Directory-Fundamentos", "PAM-e-Acessos-Privilegiados"],
+        "apoio": ["Hardening-Sistemas", "Arquitetura-Zero-Trust", "Active-Directory-Fundamentos", "PAM-e-Acessos-Privilegiados", "Auditoria-de-TI"],
     },
     {
         "id": "formacao",
@@ -701,6 +701,7 @@ ROTAS_PERFIL: List[Dict[str, Any]] = [
             "Gestao-de-Vulnerabilidades",
             "Gestao-de-Riscos-TI",
             "ISO-27001-e-27002",
+            "Auditoria-de-TI",
             "Gestao-de-Riscos-de-Terceiros",
             "LGPD-e-Privacidade",
             "Legislacao-e-Crimes-Ciberneticos",
@@ -782,7 +783,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "orgao": "ISACA",
         "foco": "Gestão de programa de SI",
         "experiencia": "5 anos em SI, sendo 3 em gestão",
-        "modulos": ["Resposta-a-Incidentes", "Gestao-de-Riscos-TI", "ISO-27001-e-27002", "Continuidade-e-Disaster-Recovery", "PCI-DSS", "Gestao-de-Crise-e-Comunicacao", "Exercicios-Tabletop", "Regulacao-Setor-Financeiro", "Gestao-de-Riscos-de-Terceiros"],
+        "modulos": ["Resposta-a-Incidentes", "Gestao-de-Riscos-TI", "ISO-27001-e-27002", "Continuidade-e-Disaster-Recovery", "PCI-DSS", "Gestao-de-Crise-e-Comunicacao", "Exercicios-Tabletop", "Regulacao-Setor-Financeiro", "Gestao-de-Riscos-de-Terceiros", "Auditoria-de-TI"],
     },
     {
         "sigla": "CISSP",
@@ -790,7 +791,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "orgao": "ISC2",
         "foco": "Generalista sênior (8 domínios)",
         "experiencia": "5 anos em 2+ domínios (1 ano dispensável por graduação ou certificação aprovada)",
-        "modulos": ["Fundamentos-Ciber", "Criptografia-Pratica", "Autenticacao-e-IAM", "Segmentacao-e-Firewall", "Resposta-a-Incidentes", "DevSecOps-e-CI-CD", "Gestao-de-Riscos-TI", "ISO-27001-e-27002", "Continuidade-e-Disaster-Recovery", "Seguranca-de-Bancos-de-Dados", "Active-Directory-Fundamentos", "PAM-e-Acessos-Privilegiados", "Backup-Imutavel-e-Recuperacao", "Monitoramento-de-Rede-NSM", "Deteccao-e-Resposta-em-Nuvem", "Gestao-de-Riscos-de-Terceiros"],
+        "modulos": ["Fundamentos-Ciber", "Criptografia-Pratica", "Autenticacao-e-IAM", "Segmentacao-e-Firewall", "Resposta-a-Incidentes", "DevSecOps-e-CI-CD", "Gestao-de-Riscos-TI", "ISO-27001-e-27002", "Continuidade-e-Disaster-Recovery", "Seguranca-de-Bancos-de-Dados", "Active-Directory-Fundamentos", "PAM-e-Acessos-Privilegiados", "Backup-Imutavel-e-Recuperacao", "Monitoramento-de-Rede-NSM", "Deteccao-e-Resposta-em-Nuvem", "Gestao-de-Riscos-de-Terceiros", "Auditoria-de-TI"],
     },
     {
         "sigla": "CCSP",

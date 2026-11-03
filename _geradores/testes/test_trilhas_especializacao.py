@@ -138,7 +138,7 @@ class TestLigacoesEspecializacao(unittest.TestCase):
                 "Operacoes-SOC-e-SIEM", "Forense-Digital", "Ransomware-Prevencao-a-Recuperacao",
                 "Gestao-de-Crise-e-Comunicacao", "SOAR-e-Automacao-de-Resposta",
             ],
-            "controles": ["Hardening-Sistemas", "Arquitetura-Zero-Trust", "Active-Directory-Fundamentos", "PAM-e-Acessos-Privilegiados"],
+            "controles": ["Hardening-Sistemas", "Arquitetura-Zero-Trust", "Active-Directory-Fundamentos", "PAM-e-Acessos-Privilegiados", "Auditoria-de-TI"],
             "formacao": ["Laboratorio-Domestico-e-Portfolio"],
         })
 

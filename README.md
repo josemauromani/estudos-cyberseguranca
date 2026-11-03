@@ -1,6 +1,6 @@
 # Estudos de Cibersegurança
 
-> Plataforma autoinstrucional, prática e enciclopédica sobre segurança da informação, defesa cibernética e governança corporativa, estruturada em **57 módulos temáticos** organizados em **13 trilhas estruturantes**.
+> Plataforma autoinstrucional, prática e enciclopédica sobre segurança da informação, defesa cibernética e governança corporativa, estruturada em **58 módulos temáticos** organizados em **13 trilhas estruturantes**.
 
 ---
 
@@ -36,7 +36,7 @@ xdg-open index.html          # No Linux
 ```
 
 O portal `index.html` tem um **menu lateral** com seis visões:
-- **Catálogo:** tela inicial, com os 57 módulos, o bloco **Continuar estudando** (último módulo aberto) e o **status** de cada módulo (não iniciado, em andamento, concluído). Permite **Agrupar por** Trilha, Nível, Perfil ou NIST, marcar **Só não concluídos** e buscar por título, termo técnico ou conceito (atalho `/`).
+- **Catálogo:** tela inicial, com os 58 módulos, o bloco **Continuar estudando** (último módulo aberto) e o **status** de cada módulo (não iniciado, em andamento, concluído). Permite **Agrupar por** Trilha, Nível, Perfil ou NIST, marcar **Só não concluídos** e buscar por título, termo técnico ou conceito (atalho `/`).
 - **Rotas sugeridas:** a rota de cada perfil profissional (Blue Team, Red Team, AppSec, GRC, Cloud/DevSecOps, Analista de Segurança da Informação) como sequência numerada, com progresso e o próximo módulo.
 - **Por certificação:** os módulos que cobrem cada prova (CEH, CISM, CISSP, CCSP, GSEC e Security+).
 - **Pela necessidade:** atalhos para os módulos com base em problemas práticos do dia a dia corporativo.
@@ -47,7 +47,7 @@ Cada módulo tem navegação lateral por seções, tema claro e escuro, checklis
 
 ---
 
-## 📚 Grade Curricular dos 57 Módulos
+## 📚 Grade Curricular dos 58 Módulos
 
 ### Estrutura das Trilhas e Percurso Formativo
 
@@ -65,7 +65,7 @@ flowchart TD
     end
 
     subgraph Governanca["3. Governança e Estratégia"]
-        T6["Trilha 6: Governança, Riscos & Conformidade<br><small>Módulos 25 a 28, 31 | ISO 27001, NIST CSF, LGPD e PCI-DSS</small>"]
+        T6["Trilha 6: Governança, Riscos & Conformidade<br><small>Módulos 25 a 28, 31, 58 | ISO 27001, NIST CSF, LGPD e PCI-DSS</small>"]
         T7["Trilha 7: Carreira & Formação<br><small>Módulos 32 e 33 | Inglês Técnico e Planejamento Profissional</small>"]
     end
 
@@ -177,6 +177,7 @@ flowchart TD
 | **55** | `Fraude-em-Pagamentos-e-Pix` | Fraude em Pagamentos: Pix, Golpes e Antifraude | Trilha 13: Setor Regulado BR | Detect / Protect | Mesa Antifraude |
 | **56** | `Legislacao-e-Crimes-Ciberneticos` | Legislação Brasileira e Crimes Cibernéticos | Trilha 13: Setor Regulado BR | Govern | Enquadramento de Casos |
 | **57** | `Gestao-de-Riscos-de-Terceiros` | Gestão de Riscos de Terceiros e Fornecedores | Trilha 13: Setor Regulado BR | Govern | Avaliador de Fornecedores |
+| **58** | `Auditoria-de-TI` | Auditoria de TI: SOX, ITGC e COBIT | Trilha 6: Governança & Riscos | Govern | Testador de ITGC |
 
 ---
 
@@ -222,7 +223,7 @@ flowchart LR
 
     subgraph Saida["Entrega Offline Standalone"]
         direction TB
-        H["treinamento-*.html<br>(57 Módulos 100% Offline)"]
+        H["treinamento-*.html<br>(58 Módulos 100% Offline)"]
         I["index.html<br>(Portal Central Dinâmico)"]
     end
 
@@ -235,7 +236,7 @@ flowchart LR
 
 ### Estrutura do Pipeline
 
-- `_geradores/estudos.txt`: Catálogo canônico dos 57 estudos com metadados estruturais (slug, título, pasta, arquivo HTML, número da trilha, cor do tema e função NIST CSF 2.0).
+- `_geradores/estudos.txt`: Catálogo canônico dos 58 estudos com metadados estruturais (slug, título, pasta, arquivo HTML, número da trilha, cor do tema e função NIST CSF 2.0).
 - `_geradores/CURRICULO.md`: Matriz pedagógica detalhada com competências, pré-requisitos e especificações de cada simulador interativo.
 - `_geradores/GUIA-DO-AUTOR.md`: Manual editorial e técnico para criação de novos módulos ou expansão de conteúdo.
 - `_geradores/base.css` e `_geradores/base.js`: Design System responsivo com suporte a temas claro e escuro, além de controladores de quizzes, checklists e utilitários de simulação.
@@ -278,7 +279,7 @@ python3 -m unittest discover -s _geradores/testes
 
 O currículo é estruturado de forma a atender diferentes objetivos e momentos de carreira:
 
-> No portal, a visão **Rotas sugeridas** mostra a rota de cada perfil como sequência numerada, com progresso e o próximo módulo a estudar; **Por certificação** reúne os módulos que cobrem cada prova; **Meu progresso** separa os concluídos dos que faltam; e o **Catálogo** agrupa os 57 módulos por nível (iniciante 12, intermediário 31, avançado 14), trilha, perfil ou função NIST.
+> No portal, a visão **Rotas sugeridas** mostra a rota de cada perfil como sequência numerada, com progresso e o próximo módulo a estudar; **Por certificação** reúne os módulos que cobrem cada prova; **Meu progresso** separa os concluídos dos que faltam; e o **Catálogo** agrupa os 58 módulos por nível (iniciante 12, intermediário 31, avançado 14), trilha, perfil ou função NIST.
 
 - **Blue Team & Defesa Ativa:** Módulos de redes, bastionamento Linux/Windows, firewalls, Zero Trust, EDR e detecção de ameaças; Linux e PowerShell para investigação (Trilha 8), Active Directory e detecção de ataques ao AD (Trilha 9) e ransomware (Trilha 10); engenharia de detecção, threat hunting, monitoramento de rede e SOAR (Trilha 11).
 - **Red Team & Testes de Invasão:** Técnicas de reconhecimento OSINT, OWASP Top 10 Web, segurança de APIs e metodologias de pentest; Linux e caminhos de ataque no Active Directory (Trilhas 8 e 9); escalação de privilégio em Kubernetes (Trilha 12).

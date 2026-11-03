@@ -1,4 +1,4 @@
-"""Os 57 corpos de módulo seguem o contrato de markup e a migração já foi aplicada."""
+"""Os 58 corpos de módulo seguem o contrato de markup e a migração já foi aplicada."""
 import sys
 import unittest
 from pathlib import Path
