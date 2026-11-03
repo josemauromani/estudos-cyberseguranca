@@ -237,7 +237,16 @@ class TestCertificacoesCarreira(unittest.TestCase):
         self.assertIn("em até 5 anos depois da aprovação", cism["sem_experiencia"])
         self.assertNotIn("aceita a experiência obtida", cism["sem_experiencia"])
         self.assertIn("10 anos anteriores ao pedido", cism["experiencia"])
-        self.assertNotIn("dispensas", cism["experiencia"])
+        self.assertIn("confira as dispensas na ISACA", cism["experiencia"])
+        urls_cism = [f["url"] for f in cism["fontes"]]
+        self.assertIn("https://www.isaca.org/credentialing/cism/get-cism-certified", urls_cism)
+        self.assertIn("https://support.isaca.org/s/article/What-are-the-requirements-to-become-CISM-certified", urls_cism)
+        # A lista de provas que renovam a OSCP+ não é publicada na página conferida: sem lista.
+        self.assertNotIn("OSEP", self._cert(d, "OSCP")["manutencao"])
+        self.assertIn("outra certificação qualificada da OffSec", self._cert(d, "OSCP")["manutencao"])
+        cripto = [dom for dom in self._cert(d, "OSCP")["dominios"] if "criptografia" in dom["nome"]][0]
+        self.assertEqual(cripto["modulos"], ["Criptografia-Pratica"])
+        self.assertTrue(cripto.get("parcial"))
         self.assertNotIn("17%", cism["nota_dominios"])
         self.assertNotIn("30%", cism["nota_dominios"])
         body = self.body_path.read_text(encoding="utf-8")
@@ -250,6 +259,18 @@ class TestCertificacoesCarreira(unittest.TestCase):
         # O exame da PECB, segundo o manual do candidato, é dissertativo (em transição para múltipla escolha).
         self.assertIn("dissertativ", self._cert(d, "ISO 27001 LA")["nota_dominios"])
         self.assertIn("https://www.giac.org/renewal", [f["url"] for f in self._cert(d, "GSEC")["fontes"]])
+
+    def test_ajustes_da_revisao_final(self):
+        cert = self.body_path.read_text(encoding="utf-8")
+        self.assertIn("CEH Practical", cert)
+        self.assertIn("https://www.comptia.org/en-us/blog/introducing-comptia-securityx/", cert)
+        for errado in ("site oficial do ISACA", "site oficial do ISC2", "site oficial do CompTIA"):
+            self.assertNotIn(errado, cert)
+        pent = (GERADORES / "pentest_metodologias_body.html").read_text(encoding="utf-8")
+        for url in ("https://www.offsec.com/products/oscp-plus/", "https://www.offsec.com/blog/oscp-grading-update/"):
+            self.assertIn(url, pent)
+        self.assertIn("CEH Practical", pent)
+        self.assertNotIn("Consulte o site da INE</td>", pent)
 
     def test_lacuna_e_cobertura_parcial(self):
         d = self._dados()
@@ -269,11 +290,9 @@ class TestCertificacoesCarreira(unittest.TestCase):
         self.assertTrue(req["CEH"]["alternativa"].strip())
         self.assertEqual((req["CISSP"]["anos_si"], req["CISSP"]["desconto_graduacao"]), (5, 1))
         self.assertEqual((req["CCSP"]["anos_ti"], req["CCSP"]["anos_si"], req["CCSP"]["anos_nuvem"]), (5, 3, 1))
-        # ISACA: 5 anos de experiência em gestão de segurança da informação (página oficial do CISM).
-        self.assertEqual(req["CISM"], {"anos_gestao_si": 5})
         for sigla in ("ISFS", "ITIL 4 F", "CSFPC"):
             self.assertEqual(req[sigla], {}, sigla)
-        for sigla in ("CISA", "ISO 27001 LA", "PDPF/PDPP"):
+        for sigla in ("CISM", "CISA", "ISO 27001 LA", "PDPF/PDPP"):
             self.assertEqual(req[sigla], {"conferir": True}, sigla)
             self.assertTrue(self._cert(d, sigla)["experiencia"].strip(), sigla)
         for c in d["certificacoes"]:
@@ -291,20 +310,17 @@ class TestCertificacoesCarreira(unittest.TestCase):
         self.assertEqual(elegibilidade(self._cert(d, "CISSP"), dict(graduado, graduacao=False)), "pendente")
         self.assertEqual(elegibilidade(self._cert(d, "CCSP"), graduado), "pendente")
         self.assertEqual(elegibilidade(self._cert(d, "CCSP"), dict(graduado, anos_si=3, anos_nuvem=1)), "elegivel")
-        self.assertEqual(elegibilidade(self._cert(d, "CISM"), dict(graduado, anos_si=5, anos_gestao_si=5)), "elegivel")
-        self.assertEqual(elegibilidade(self._cert(d, "CISM"), dict(graduado, anos_si=5, anos_gestao_si=3)), "pendente")
+        # CISM: a ISACA publica dispensas de experiência; o planejador manda conferir.
+        self.assertEqual(elegibilidade(self._cert(d, "CISM"), dict(graduado, anos_si=5, anos_gestao_si=5)), "conferir")
         # Anos em segurança contam como anos em TI, e anos em gestão de segurança contam como anos em segurança.
         so_seguranca = {"anos_ti": 0, "anos_si": 5, "anos_gestao_si": 0, "anos_nuvem": 1}
         self.assertEqual(elegibilidade(self._cert(d, "CCSP"), so_seguranca), "elegivel")
-        self.assertEqual(elegibilidade(self._cert(d, "CISM"), so_seguranca), "pendente")
-        so_gestao = {"anos_ti": 0, "anos_si": 0, "anos_gestao_si": 5, "anos_nuvem": 0}
-        self.assertEqual(elegibilidade(self._cert(d, "CISM"), so_gestao), "elegivel")
 
     def test_status_conferir(self):
         d = self._dados()
         veterano = {"anos_ti": 20, "anos_si": 20, "anos_gestao_si": 20, "anos_nuvem": 20,
                     "graduacao": True, "treinamento_oficial": True}
-        for sigla in ("CISA", "ISO 27001 LA", "PDPF/PDPP"):
+        for sigla in ("CISM", "CISA", "ISO 27001 LA", "PDPF/PDPP"):
             self.assertEqual(elegibilidade(self._cert(d, sigla), veterano), "conferir", sigla)
         self.assertEqual(elegibilidade(self._cert(d, "ISFS"), veterano), "sem-exigencia")
         body = self.body_path.read_text(encoding="utf-8")

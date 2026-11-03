@@ -784,7 +784,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "nome": "Certified Information Security Manager",
         "orgao": "ISACA",
         "foco": "Gestão de programa de SI",
-        "experiencia": "5 anos em gestão de SI, em 3 dos 4 domínios",
+        "experiencia": "5 anos em gestão de SI, em 3 dos 4 domínios (a ISACA publica dispensas)",
         "modulos": ["Resposta-a-Incidentes", "Gestao-de-Riscos-TI", "ISO-27001-e-27002", "Continuidade-e-Disaster-Recovery", "PCI-DSS", "Gestao-de-Crise-e-Comunicacao", "Exercicios-Tabletop", "Regulacao-Setor-Financeiro", "Gestao-de-Riscos-de-Terceiros", "Auditoria-de-TI"],
     },
     {
@@ -1144,7 +1144,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
     },
     "Pentest-Metodologias": {
         "titulo": "Fases do Pentest (PTES), Escopo e Relatório",
-        "subtitulo": "Estruturação profissional de testes de intrusão, regras de engajamento e relatórios técnicos e executivos",
+        "subtitulo": "Estruturação profissional de testes de intrusão, regras de engajamento, relatórios técnicos e executivos e a escada de certificações práticas (eJPT, eCPPT e OSCP)",
         "trilha": 3,
         "nist": "Identify",
         "mitre": "Todas as Táticas (PTES)",
@@ -1158,6 +1158,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
             "Modalidades White-Box, Gray-Box e Black-Box",
             "Regras de engajamento (RoE) e comunicação de incidentes",
             "Construtor interativo de matriz de achados e relatórios",
+            "Certificações práticas: eJPT, eCPPT e OSCP",
         ],
     },
     "Engenharia-Social-e-Phishing": {
