@@ -2251,7 +2251,7 @@ dfn.glossario:focus-visible {
 
     <div class="callout warning">
       <strong>⚠️ Atenção Criptográfica:</strong>
-      A integridade sem autenticidade não garante segurança contra atacantes ativos: se um adversário puder interceptar uma mensagem e recalcular um hash simples (ex.: SHA-256 sem chave compartilhada), a integridade parecerá válida para a vítima. Para vincular autenticidade à integridade, deve-se usar <strong>HMAC</strong> ou <strong>assinaturas digitais</strong> baseadas em chaves assimétricas.
+      A integridade sem autenticidade não garante segurança contra atacantes ativos: se um adversário puder interceptar uma mensagem e recalcular um hash simples (ex.: SHA-256 sem chave compartilhada), a integridade parecerá válida para a vítima. Para vincular autenticidade à integridade, deve-se usar <strong><dfn class="glossario" data-termo="hmac" tabindex="0" title="Código que combina uma função de hash (ex.: SHA-256) com uma chave secreta compartilhada. Prova a integridade e a autenticidade da mensagem: quem não tem a chave não consegue recalcular o valor.">HMAC</dfn></strong> ou <strong>assinaturas digitais</strong> baseadas em chaves assimétricas.
     </div>
 
     <h3>Princípios Arquiteturais Cardeais: Menor Privilégio e Defesa em Profundidade</h3>

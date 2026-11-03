@@ -2264,7 +2264,7 @@ dfn.glossario:focus-visible {
     <div class="info-card">
       <h4>PBKDF2 e scrypt</h4>
       <p>
-        <strong>PBKDF2:</strong> Padrão NIST com milhares de iterações <dfn class="glossario" data-termo="hmac" tabindex="0" title="Código que combina uma função de hash (ex.: SHA-256) com uma chave secreta compartilhada. Prova a integridade e a autenticidade da mensagem: quem não tem a chave não consegue recalcular o valor.">HMAC</dfn> (recomendado mínimo 600.000 iterações com HMAC-SHA256).
+        <strong>PBKDF2:</strong> Padrão NIST com milhares de iterações <dfn class="glossario" data-termo="hmac" tabindex="0" title="Código que combina uma função de hash (ex.: SHA-256) com uma chave secreta compartilhada. Prova a integridade e a autenticidade da mensagem: quem não tem a chave não consegue recalcular o valor.">HMAC</dfn> (recomendado mínimo 600.000 iterações com <dfn class="glossario" data-termo="hmac" tabindex="0" title="Código que combina uma função de hash (ex.: SHA-256) com uma chave secreta compartilhada. Prova a integridade e a autenticidade da mensagem: quem não tem a chave não consegue recalcular o valor.">HMAC-SHA256</dfn>).
         <br><strong>scrypt:</strong> Criado para combater ASICs ao exigir parâmetros de memória estritos (N, r, p).
       </p>
     </div>
@@ -2456,15 +2456,15 @@ dfn.glossario:focus-visible {
       permitindo que atacantes adulterassem o payload para <code>{"role": "admin"}</code> e obtivessem acesso irrestrito.
     </li>
     <li>
-      <strong>Confusão de Algoritmo (Key Confusion / HMAC vs RSA - CVE-2015-9235):</strong>
+      <strong>Confusão de Algoritmo (Key Confusion / <dfn class="glossario" data-termo="hmac" tabindex="0" title="Código que combina uma função de hash (ex.: SHA-256) com uma chave secreta compartilhada. Prova a integridade e a autenticidade da mensagem: quem não tem a chave não consegue recalcular o valor.">HMAC</dfn> vs RSA - CVE-2015-9235):</strong>
       Ocorre quando a API espera um token assinado assimetricamente com RSA (RS256), possuindo a chave pública RSA disponível publicamente.
       Se o atacante trocar o header para HS256 e assinar o token usando a chave pública RSA do servidor como se fosse a chave simétrica secreta,
-      bibliotecas vulneráveis usam a mesma chave para validar HMAC e aceitam a assinatura forjada!
+      bibliotecas vulneráveis usam a mesma chave para validar <dfn class="glossario" data-termo="hmac" tabindex="0" title="Código que combina uma função de hash (ex.: SHA-256) com uma chave secreta compartilhada. Prova a integridade e a autenticidade da mensagem: quem não tem a chave não consegue recalcular o valor.">HMAC</dfn> e aceitam a assinatura forjada!
     </li>
     <li>
       <strong>Chaves Secretas Fracas (Brute-Force Offline):</strong>
       Como o invasor possui o Header, Payload e Signature válidos capturados, ele pode testar bilhões de senhas por segundo
-      offline em ferramentas como <em>Hashcat</em> ou <em>jwtcat</em> para descobrir o segredo HMAC simétrico e assinar novos tokens arbitrários.
+      offline em ferramentas como <em>Hashcat</em> ou <em>jwtcat</em> para descobrir o segredo <dfn class="glossario" data-termo="hmac" tabindex="0" title="Código que combina uma função de hash (ex.: SHA-256) com uma chave secreta compartilhada. Prova a integridade e a autenticidade da mensagem: quem não tem a chave não consegue recalcular o valor.">HMAC</dfn> simétrico e assinar novos tokens arbitrários.
     </li>
     <li>
       <strong>O Desafio da Revogação de Tokens (Stateful vs Stateless):</strong>
