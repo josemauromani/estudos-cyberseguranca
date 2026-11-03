@@ -118,6 +118,85 @@ Encarregado:      dpo@ipestore.example</code></pre>
         </div>
     </section>
 
+    <!-- SEÇÃO 2B: ISO/IEC 27701 E PRIVACY BY DESIGN -->
+    <section class="study-section" id="iso-27701" data-tipo="teoria">
+        <h2>ISO/IEC 27701 e Privacy by Design</h2>
+
+        <p class="lead-text">
+            Cumprir a lei uma vez não prova que a privacidade é gerida todo dia. A ISO/IEC 27701 organiza esse esforço como um sistema de gestão, e o <em>Privacy by Design</em> manda tirar o risco do desenho, em vez de remendá-lo depois.
+        </p>
+
+        <h3>O SGPI da ISO/IEC 27701</h3>
+        <p>
+            A ISO/IEC 27701 especifica um Sistema de Gestão de Privacidade da Informação (SGPI, em inglês PIMS, <em>Privacy Information Management System</em>). Ela serve de roteiro para estruturar políticas, responsabilidades, controles e melhoria contínua do tratamento de dados pessoais, e sua aderência pode ser auditada por terceiros.
+        </p>
+        <p>
+            A norma usa os papéis do vocabulário ISO, que se alinham, sem coincidir exatamente, com a LGPD: o <strong>controlador</strong> (<em>PII controller</em>) decide as finalidades e os meios do tratamento; o <strong>operador</strong> (<em>PII processor</em>) trata os dados em nome do controlador. Quem figura em cada papel já foi definido neste estudo; aqui o que muda é que cada papel recebe um conjunto próprio de controles e evidências.
+        </p>
+
+        <table class="data-table">
+            <thead>
+                <tr><th>Edição</th><th>Natureza</th><th>Relação com a ISO/IEC 27001</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>ISO/IEC 27701:2019</td>
+                    <td>Extensão das ISO/IEC 27001 e 27002 para privacidade</td>
+                    <td>Só podia ser implantada sobre um SGSI conforme a 27001</td>
+                </tr>
+                <tr>
+                    <td>ISO/IEC 27701:2025</td>
+                    <td>Norma autônoma de sistema de gestão de privacidade</td>
+                    <td>Pode ser implantada e certificada sem a 27001, mas combina com ela</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">🗓️</span>
+                <strong>Confira a edição antes de citar</strong>
+            </div>
+            <p>
+                A edição de 2025 foi publicada em outubro de 2025 e substitui a de 2019. Certificados emitidos contra a edição de 2019 seguem regras de transição definidas pelos organismos de certificação, e edital ou contrato pode ainda citar a versão antiga. Confirme a edição e o prazo de transição na página da norma na ISO e com o organismo de certificação.
+            </p>
+        </div>
+
+        <h3>Privacy by Design e by Default na lei</h3>
+        <p>
+            A ideia de embutir a privacidade no projeto tem base legal nos dois lados. Na LGPD, o <strong>art. 46, §2º</strong> determina que as medidas de segurança, técnicas e administrativas, sejam observadas desde a fase de concepção do produto ou do serviço até a sua execução. No <strong>GDPR</strong> (Regulamento Geral de Proteção de Dados da União Europeia), o <strong>art. 25</strong> exige proteção de dados desde a concepção (<em>by design</em>, item 1) e por padrão (<em>by default</em>, item 2): por padrão, só os dados necessários a cada finalidade devem ser tratados.
+        </p>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Os 7 princípios fundamentais de Ann Cavoukian</strong>
+            </div>
+            <p>
+                O conceito de <em>Privacy by Design</em> foi formulado por Ann Cavoukian, ex-comissária de informação e privacidade de Ontário (Canadá), em 7 princípios:
+            </p>
+            <ol>
+                <li>Proativo, não reativo; preventivo, não corretivo.</li>
+                <li>Privacidade como configuração padrão (<em>by Default</em>).</li>
+                <li>Privacidade incorporada ao projeto.</li>
+                <li>Funcionalidade total, com soma positiva em vez de soma zero.</li>
+                <li>Segurança de ponta a ponta, durante todo o ciclo de vida.</li>
+                <li>Visibilidade e transparência.</li>
+                <li>Respeito à privacidade do usuário, com foco nele.</li>
+            </ol>
+        </div>
+
+        <div class="callout key">
+            <div class="callout-title">
+                <span class="callout-icon">🔗</span>
+                <strong>Como as peças se encaixam</strong>
+            </div>
+            <p>
+                O princípio 2 é o <em>by Default</em> do art. 25 do GDPR e se apoia na necessidade, já vista nos princípios da LGPD. O RIPD documenta o risco desde a concepção. O encarregado é o ponto de contato que um SGPI espera encontrar. A ISO/IEC 27701 pede que isso seja um processo gerido e evidenciado, não um esforço pontual.
+            </p>
+        </div>
+    </section>
+
     <!-- SEÇÃO 3: SIMULADOR -->
     <section class="study-section" id="simulador" data-tipo="laboratorio">
         <h2>Laboratório Prático: Construtor de Avaliação de Impacto à Privacidade (RIPD)</h2>
@@ -202,6 +281,10 @@ Encarregado:      dpo@ipestore.example</code></pre>
                 <input type="checkbox" id="chk-lg-7">
                 <label for="chk-lg-7"><strong>Incidentes:</strong> procedimento para comunicar ANPD e titulares em 3 dias úteis, testado em exercício.</label>
             </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lg-8">
+                <label for="chk-lg-8"><strong>Privacy by Design:</strong> novo produto ou mudança passa por revisão de privacidade na concepção, com configuração padrão que trata só o necessário (art. 46, §2º).</label>
+            </li>
         </ul>
     </section>
 
@@ -280,6 +363,17 @@ Encarregado:      dpo@ipestore.example</code></pre>
                 </div>
             </details>
         </div>
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 7 (ISO/IEC 27701):</strong> Uma empresa sem certificação ISO/IEC 27001 quer certificar seu sistema de gestão de privacidade. Isso é possível?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Pela edição de 2025 da ISO/IEC 27701, sim: ela é uma norma autônoma. A edição de 2019 era uma extensão das ISO/IEC 27001 e 27002 e só se aplicava sobre um SGSI. Confira com o organismo de certificação as regras de transição de cada edição.</p>
+                </div>
+            </details>
+        </div>
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
@@ -312,6 +406,7 @@ Encarregado:      dpo@ipestore.example</code></pre>
             <li>Resolução CD/ANPD nº 15/2024 (comunicação de incidente de segurança).</li>
             <li>Resolução CD/ANPD nº 19/2024 (transferência internacional de dados).</li>
             <li>ANPD — Guia orientativo sobre legítimo interesse.</li>
+            <li>ISO/IEC 27701: sistema de gestão de privacidade da informação (edição de 2025; a de 2019 era extensão da ISO/IEC 27001). Lei nº 13.709/2018, art. 46, §2º, e GDPR (Regulamento UE 2016/679), art. 25.</li>
         </ul>
 
         <div class="callout tip" style="margin-top: 1.5rem;">

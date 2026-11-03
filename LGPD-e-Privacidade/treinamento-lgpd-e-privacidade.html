@@ -2066,6 +2066,7 @@ td {
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: Cada Dado Precisa de um Porquê</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#obrigacoes" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Direitos, RIPD, Incidentes e Sanções</span></span><span class="toc-contador"></span></a></li>
+    <li><a class="toc-item" href="#iso-27701" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">ISO/IEC 27701 e Privacy by Design</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Construtor de Avaliação de Impacto à Privacidade (RIPD)</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist do Programa de Privacidade</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
@@ -2082,14 +2083,14 @@ td {
   <h1>Bases Legais, Direitos do Titular e RIPD/DPIA</h1>
   <p class="mhead-sub">Conformidade com a Lei 13.709/2018, governança de dados pessoais e relatórios de impacto à privacidade</p>
   <div class="chips"><span class="chip">⏱ 45 min</span><span class="chip">📈 Iniciante</span><span class="chip">🛡 NIST Govern / Protect</span><span class="chip">🎯 ATT&amp;CK Conformidade Regulatória</span><span class="chip">👤 GRC &amp; Auditoria</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>3 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>8 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>7 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 27: LGPD-e-Privacidade Body Fragment -->
 <article class="study-container" data-slug="lgpd">
 
     <!-- SEÇÃO 1: FUNDAMENTOS -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: Cada Dado Precisa de um Porquê</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 7</small></span><h2>Introdução: Cada Dado Precisa de um Porquê</h2></div>
 
         <p class="lead-text">
             A Ipê Store trata dados de clientes (pedidos, entregas, crédito, marketing) e de funcionários (folha, atestados, controle de acesso). A Lei Geral de Proteção de Dados Pessoais, a <strong>Lei nº 13.709/2018</strong> (LGPD), não proíbe nada disso: ela exige que cada tratamento tenha finalidade clara, base legal adequada, só os dados necessários e segurança proporcional ao risco. O Estudo 29 tratou da classificação e do DLP; este estudo trata do porquê e do como, do ponto de vista da lei.
@@ -2137,7 +2138,7 @@ td {
 
     <!-- SEÇÃO 2: DIREITOS, RIPD, INCIDENTES E SANÇÕES -->
     <section class="study-section" id="obrigacoes" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Direitos, RIPD, Incidentes e Sanções</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 7</small></span><h2>Direitos, RIPD, Incidentes e Sanções</h2></div>
 
         <h3>Direitos do titular (art. 18 e art. 20)</h3>
         <p>
@@ -2187,9 +2188,88 @@ Encarregado:      dpo@ipestore.example</code></pre>
         </div>
     </section>
 
+    <!-- SEÇÃO 2B: ISO/IEC 27701 E PRIVACY BY DESIGN -->
+    <section class="study-section" id="iso-27701" data-tipo="teoria">
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 7</small></span><h2>ISO/IEC 27701 e Privacy by Design</h2></div>
+
+        <p class="lead-text">
+            Cumprir a lei uma vez não prova que a privacidade é gerida todo dia. A ISO/IEC 27701 organiza esse esforço como um sistema de gestão, e o <em>Privacy by Design</em> manda tirar o risco do desenho, em vez de remendá-lo depois.
+        </p>
+
+        <h3>O SGPI da ISO/IEC 27701</h3>
+        <p>
+            A ISO/IEC 27701 especifica um Sistema de Gestão de Privacidade da Informação (SGPI, em inglês PIMS, <em>Privacy Information Management System</em>). Ela serve de roteiro para estruturar políticas, responsabilidades, controles e melhoria contínua do tratamento de dados pessoais, e sua aderência pode ser auditada por terceiros.
+        </p>
+        <p>
+            A norma usa os papéis do vocabulário ISO, que se alinham, sem coincidir exatamente, com a LGPD: o <strong>controlador</strong> (<em>PII controller</em>) decide as finalidades e os meios do tratamento; o <strong>operador</strong> (<em>PII processor</em>) trata os dados em nome do controlador. Quem figura em cada papel já foi definido neste estudo; aqui o que muda é que cada papel recebe um conjunto próprio de controles e evidências.
+        </p>
+
+        <table class="data-table">
+            <thead>
+                <tr><th>Edição</th><th>Natureza</th><th>Relação com a ISO/IEC 27001</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>ISO/IEC 27701:2019</td>
+                    <td>Extensão das ISO/IEC 27001 e 27002 para privacidade</td>
+                    <td>Só podia ser implantada sobre um SGSI conforme a 27001</td>
+                </tr>
+                <tr>
+                    <td>ISO/IEC 27701:2025</td>
+                    <td>Norma autônoma de sistema de gestão de privacidade</td>
+                    <td>Pode ser implantada e certificada sem a 27001, mas combina com ela</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">🗓️</span>
+                <strong>Confira a edição antes de citar</strong>
+            </div>
+            <p>
+                A edição de 2025 foi publicada em outubro de 2025 e substitui a de 2019. Certificados emitidos contra a edição de 2019 seguem regras de transição definidas pelos organismos de certificação, e edital ou contrato pode ainda citar a versão antiga. Confirme a edição e o prazo de transição na página da norma na ISO e com o organismo de certificação.
+            </p>
+        </div>
+
+        <h3>Privacy by Design e by Default na lei</h3>
+        <p>
+            A ideia de embutir a privacidade no projeto tem base legal nos dois lados. Na LGPD, o <strong>art. 46, §2º</strong> determina que as medidas de segurança, técnicas e administrativas, sejam observadas desde a fase de concepção do produto ou do serviço até a sua execução. No <strong>GDPR</strong> (Regulamento Geral de Proteção de Dados da União Europeia), o <strong>art. 25</strong> exige proteção de dados desde a concepção (<em>by design</em>, item 1) e por padrão (<em>by default</em>, item 2): por padrão, só os dados necessários a cada finalidade devem ser tratados.
+        </p>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Os 7 princípios fundamentais de Ann Cavoukian</strong>
+            </div>
+            <p>
+                O conceito de <em>Privacy by Design</em> foi formulado por Ann Cavoukian, ex-comissária de informação e privacidade de Ontário (Canadá), em 7 princípios:
+            </p>
+            <ol>
+                <li>Proativo, não reativo; preventivo, não corretivo.</li>
+                <li>Privacidade como configuração padrão (<em>by Default</em>).</li>
+                <li>Privacidade incorporada ao projeto.</li>
+                <li>Funcionalidade total, com soma positiva em vez de soma zero.</li>
+                <li>Segurança de ponta a ponta, durante todo o ciclo de vida.</li>
+                <li>Visibilidade e transparência.</li>
+                <li>Respeito à privacidade do usuário, com foco nele.</li>
+            </ol>
+        </div>
+
+        <div class="callout key">
+            <div class="callout-title">
+                <span class="callout-icon">🔗</span>
+                <strong>Como as peças se encaixam</strong>
+            </div>
+            <p>
+                O princípio 2 é o <em>by Default</em> do art. 25 do GDPR e se apoia na necessidade, já vista nos princípios da LGPD. O RIPD documenta o risco desde a concepção. O encarregado é o ponto de contato que um SGPI espera encontrar. A ISO/IEC 27701 pede que isso seja um processo gerido e evidenciado, não um esforço pontual.
+            </p>
+        </div>
+    </section>
+
     <!-- SEÇÃO 3: SIMULADOR -->
     <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 3 de 6</small></span><h2>Laboratório Prático: Construtor de Avaliação de Impacto à Privacidade (RIPD)</h2></div>
+        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 4 de 7</small></span><h2>Laboratório Prático: Construtor de Avaliação de Impacto à Privacidade (RIPD)</h2></div>
 
         <p class="lead-text">
             Os cinco fluxos de tratamento da Ipê Store foram mapeados às pressas, e alguns têm problemas. Abra cada um, corrija a base legal e as salvaguardas, cadastre novos fluxos e gere a minuta do RIPD. As regras seguem a LGPD e a Resolução CD/ANPD nº 2/2022 de forma simplificada; uma avaliação real envolve o jurídico.
@@ -2236,7 +2316,7 @@ Encarregado:      dpo@ipestore.example</code></pre>
 
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist do Programa de Privacidade</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 5 de 7</small></span><h2>Checklist do Programa de Privacidade</h2></div>
 
         <p class="lead-text">
             Use esta lista para avaliar a adequação de uma empresa à LGPD. O estado das caixas fica salvo no seu navegador.
@@ -2271,12 +2351,16 @@ Encarregado:      dpo@ipestore.example</code></pre>
                 <input type="checkbox" id="chk-lg-7">
                 <label for="chk-lg-7"><strong>Incidentes:</strong> procedimento para comunicar ANPD e titulares em 3 dias úteis, testado em exercício.</label>
             </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lg-8">
+                <label for="chk-lg-8"><strong>Privacy by Design:</strong> novo produto ou mudança passa por revisão de privacidade na concepção, com configuração padrão que trata só o necessário (art. 46, §2º).</label>
+            </li>
         </ul>
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 6 de 7</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2349,11 +2433,22 @@ Encarregado:      dpo@ipestore.example</code></pre>
                 </div>
             </details>
         </div>
+        <div class="quiz-item" data-q="q7">
+            <div class="quiz-question">
+                <strong>Questão 7 (ISO/IEC 27701):</strong> Uma empresa sem certificação ISO/IEC 27001 quer certificar seu sistema de gestão de privacidade. Isso é possível?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Pela edição de 2025 da ISO/IEC 27701, sim: ela é uma norma autônoma. A edição de 2019 era uma extensão das ISO/IEC 27001 e 27002 e só se aplicava sobre um SGSI. Confira com o organismo de certificação as regras de transição de cada edição.</p>
+                </div>
+            </details>
+        </div>
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 7 de 7</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2381,6 +2476,7 @@ Encarregado:      dpo@ipestore.example</code></pre>
             <li>Resolução CD/ANPD nº 15/2024 (comunicação de incidente de segurança).</li>
             <li>Resolução CD/ANPD nº 19/2024 (transferência internacional de dados).</li>
             <li>ANPD — Guia orientativo sobre legítimo interesse.</li>
+            <li>ISO/IEC 27701: sistema de gestão de privacidade da informação (edição de 2025; a de 2019 era extensão da ISO/IEC 27001). Lei nº 13.709/2018, art. 46, §2º, e GDPR (Regulamento UE 2016/679), art. 25.</li>
         </ul>
 
         <div class="callout tip" style="margin-top: 1.5rem;">

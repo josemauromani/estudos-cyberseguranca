@@ -162,10 +162,34 @@ class TestLgpd(unittest.TestCase):
         self.assertIn('class="terminal-box', content)
         self.assertIn('class="diagram-svg-wrap', content)
         self.assertNotIn('<pre class="mermaid"', content)
-        self.assertEqual(content.count('class="checklist-item"'), 7)
-        self.assertGreaterEqual(content.count('class="quiz-item"'), 6)
+        self.assertEqual(content.count('class="checklist-item"'), 8)
+        self.assertGreaterEqual(content.count('class="quiz-item"'), 7)
         self.assertIn('class="facts-grid', content)
         self.assertIn('initChecklist("lgpd")', content)
+
+    def _secao_27701(self, texto):
+        ini = texto.index('<section class="study-section" id="iso-27701" data-tipo="teoria">')
+        return texto[ini:texto.index("</section>", ini)]
+
+    def test_secao_iso_27701_antes_do_laboratorio(self):
+        body = self.body_path.read_text(encoding="utf-8")
+        ini = body.index('<section class="study-section" id="iso-27701" data-tipo="teoria">')
+        fim = body.index("</section>", ini) + len("</section>")
+        resto = body[fim:]
+        self.assertTrue(re.match(r'\s*(<!--.*?-->\s*)?<section class="study-section" id="simulador" data-tipo="laboratorio">', resto, re.S))
+        self.assertIn("Seção 7 de 7", self.compiled_path.read_text(encoding="utf-8"))
+
+    def test_secao_iso_27701_conteudo(self):
+        for texto in (self.body_path.read_text(encoding="utf-8"), self.compiled_path.read_text(encoding="utf-8")):
+            sec = self._secao_27701(texto)
+            for termo in ("ISO/IEC 27701", "controlador", "operador", "art. 46", "GDPR", "art. 25",
+                          "Privacy by Design", "by Default", "SGPI", "2025", "2019"):
+                self.assertIn(termo, sec, termo)
+
+    def test_secao_iso_27701_referencia(self):
+        for texto in (self.body_path.read_text(encoding="utf-8"), self.compiled_path.read_text(encoding="utf-8")):
+            ini = texto.index('id="fatos"')
+            self.assertIn("ISO/IEC 27701", texto[ini:texto.index("</section>", ini)])
 
     def test_integracao_com_portal_index(self):
         content = self.portal_path.read_text(encoding="utf-8")
