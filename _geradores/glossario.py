@@ -155,7 +155,6 @@ class _Marcador(HTMLParser):
         super().__init__(convert_charrefs=False)
         self.saida: List[str] = []
         self.pilha: List[tuple] = []  # (tag, ignorado, e_secao)
-        self.usados_secao: set = set()
         self.usados: set = set()
         self.regex, self.siglas, self.palavras = _montar_regex(verbetes)
         self.titulos = {v["id"]: texto_sem_html(v["significado"]) for v in verbetes}
@@ -173,8 +172,6 @@ class _Marcador(HTMLParser):
                 classes = set(valor.split())
         ignorado = tag in TAGS_IGNORADAS or bool(classes & CLASSES_IGNORADAS)
         e_secao = tag == "section" and "study-section" in classes
-        if e_secao:
-            self.usados_secao = set()
         self.pilha.append((tag, ignorado, e_secao))
 
     def handle_startendtag(self, tag, attrs):
@@ -237,9 +234,8 @@ class _Marcador(HTMLParser):
         for m in self.regex.finditer(data):
             trecho = m.group(0)
             vid = self.siglas.get(trecho) or self.palavras.get(trecho.casefold())
-            if vid is None or vid in self.usados_secao:
+            if vid is None:
                 continue
-            self.usados_secao.add(vid)
             self.usados.add(vid)
             self.saida.append(data[pos:m.start()])
             self.saida.append(
@@ -251,7 +247,7 @@ class _Marcador(HTMLParser):
 
 
 def marcar_termos(html: str, verbetes: List[Dict[str, Any]]):
-    """Marca a 1ª ocorrência de cada verbete por seção; devolve (html, ids ordenados)."""
+    """Marca todas as ocorrências dos verbetes no texto das seções; devolve (html, ids ordenados)."""
     marcador = _Marcador(verbetes)
     # Offsets de início de linha (para recuperar referências sem ';', como "&CK ").
     marcador._inicio_linhas = [0] + [m.end() for m in re.finditer(r"\n", html)]

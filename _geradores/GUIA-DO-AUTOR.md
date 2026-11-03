@@ -306,7 +306,7 @@ O glossário é central: os verbetes ficam em `_geradores/glossario_dados.py` (l
 - **Sigla × palavra:** um termo sem letras minúsculas (HMAC, TLS) é uma sigla e só casa com a caixa exata; os demais casam sem distinguir maiúsculas de minúsculas.
 - **Fronteira:** não pode haver letra, dígito, `_` ou `-` colado ao termo. Assim `RC4-HMAC` e `HMACs` não casam com HMAC (para o plural, cadastre em `variacoes`).
 - **Variação mais longa vence** quando duas formas começam no mesmo ponto.
-- **1ª ocorrência por seção:** cada verbete é marcado só na 1ª ocorrência de cada `section.study-section`; na seção seguinte, marca de novo.
+- **Todas as ocorrências:** cada ocorrência do termo no texto corrido é marcada, para que o tooltip apareça onde quer que a pessoa esteja lendo. Por isso, cadastre só siglas e termos técnicos, nunca palavras comuns, que sublinhariam a página inteira.
 
 **Depois de cadastrar ou editar um verbete**, recompile os módulos e o portal:
 

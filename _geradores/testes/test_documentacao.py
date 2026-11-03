@@ -33,8 +33,9 @@ class TestDocumentacao(unittest.TestCase):
 
     def test_guia_documenta_glossario(self):
         guia = GUIA.read_text(encoding="utf-8")
-        for trecho in ("glossario_dados.py", "marcar_termos", "1ª ocorrência", "por seção"):
+        for trecho in ("glossario_dados.py", "marcar_termos", "Todas as ocorrências"):
             self.assertIn(trecho, guia)
+        self.assertNotIn("1ª ocorrência por seção", guia)
 
     def test_readme_cita_glossario(self):
         readme = README.read_text(encoding="utf-8")

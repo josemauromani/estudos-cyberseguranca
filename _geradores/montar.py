@@ -187,7 +187,7 @@ def montar_treinamento(
         raise ContratoInvalido(erros)
     secoes = extrair_secoes(body_content)
 
-    # Glossário: marca a 1ª ocorrência de cada termo por seção e embute os verbetes usados
+    # Glossário: marca as ocorrências dos termos e embute os verbetes usados
     verbetes = carregar_glossario()
     body_content, ids_glossario = marcar_termos(body_content, verbetes)
     bloco_glossario = bloco_dados_glossario(ids_glossario, verbetes)

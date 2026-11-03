@@ -21,9 +21,9 @@ def sec(corpo, sid="s1"):
 
 
 class TestMarcarTermos(unittest.TestCase):
-    def test_marca_primeira_ocorrencia_por_secao(self):
+    def test_marca_todas_as_ocorrencias(self):
         html, ids = marcar_termos(sec("<p>HMAC e HMAC</p>") + sec("<p>HMAC</p>", "s2"), [V])
-        self.assertEqual(html.count("<dfn"), 2)
+        self.assertEqual(html.count("<dfn"), 3)
         self.assertEqual(ids, ["hmac"])
 
     def test_saida_exata(self):
@@ -129,7 +129,9 @@ class TestMarcarTermos(unittest.TestCase):
     def test_estudo_01(self):
         entrada = (RAIZ / "_geradores" / "fundamentos_ciber_body.html").read_text(encoding="utf-8")
         html, _ = marcar_termos(entrada, [V])
-        self.assertGreaterEqual(html.count("<dfn"), 1)
+        # Teoria: cartão Integridade, callout "Atenção Criptográfica" e tabela STRIDE.
+        self.assertEqual(html.count("<dfn"), 3)
+        self.assertIn('usar <strong><dfn class="glossario" data-termo="hmac"', html)
         for m in re.finditer(r"<(button|script)\b.*?</\1>", html, flags=re.S):
             self.assertNotIn("<dfn", m.group(0))
 

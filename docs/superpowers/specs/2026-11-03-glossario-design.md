@@ -90,7 +90,7 @@ Devolve o HTML marcado e a lista ordenada de ids usados.
 - **Sigla x palavra:** o termo (ou variação) sem nenhuma letra minúscula é sigla e casa diferenciando maiúsculas de minúsculas. Os demais casam sem diferenciar.
 - **Fronteira:** o caractere antes e o depois do trecho casado não podem ser letra (inclusive acentuada), dígito, `_` nem `-`. Assim "HMAC-SHA256" não vira "HMAC" + "-SHA256", e "HMACs" não casa.
 - **Variações:** contam como o mesmo verbete. Quando duas formas casam no mesmo ponto, vence a mais longa. O texto exibido é o original do corpo.
-- **Densidade:** só a 1ª ocorrência de cada verbete **por seção** (`section.study-section`). Texto fora de seção não é marcado.
+- **Densidade:** todas as ocorrências de cada verbete no texto corrido de `section.study-section` são marcadas. Texto fora de seção não é marcado. *(Revisado em 2026-11-03 após a entrega: a regra original, "1ª ocorrência por seção", deixava sem tooltip o HMAC do callout "Atenção Criptográfica" do Estudo 01, porque as seções são longas e a 1ª ocorrência fica parágrafos acima. O usuário escolheu marcar todas.)*
 - **Saída:** `<dfn class="glossario" data-termo="hmac" tabindex="0" title="<significado sem HTML>">HMAC</dfn>`. O `title` é o fallback para quem está sem JavaScript; o `base.js` o remove ao iniciar, para não duplicar com o popover.
 
 Integração no `montar.py`, na função `montar_treinamento`:
@@ -98,7 +98,7 @@ Integração no `montar.py`, na função `montar_treinamento`:
 1. Depois de `validar_corpo` e de `extrair_secoes`, antes de `processar_diagramas_html`: `body_content, ids = marcar_termos(body_content, GLOSSARIO)`.
 2. Se `ids` não estiver vazio, a página recebe antes do `<script>` do `base.js` um `<script type="application/json" id="glossario-dados">` com apenas os verbetes usados, cada um com `id`, `termo`, `categoria`, `sigla_de`, `termo_ingles` e `significado`. Os caracteres `<`, `>` e `&` são escapados como `<`, `>` e `&`. Módulo sem termos não recebe o bloco.
 
-Resultado esperado no Estudo 01 (`fundamentos_ciber_body.html`): HMAC marcado no texto corrido das seções de teoria (linhas 46, 114 e 207 hoje, uma vez por seção). Ficam sem marca o botão do quiz (linhas 406–407, dentro de `button`) e o texto do laboratório (linha 729, dentro de `script`).
+Resultado esperado no Estudo 01 (`fundamentos_ciber_body.html`): HMAC marcado no texto corrido das seções de teoria (linhas 46, 114 e 207 hoje). Ficam sem marca o botão do quiz (linhas 406–407, dentro de `button`) e o texto do laboratório (linha 729, dentro de `script`).
 
 ### 3. Tooltip no módulo: `base.js` e `base.css`
 
@@ -135,7 +135,7 @@ Resultado esperado no Estudo 01 (`fundamentos_ciber_body.html`): HMAC marcado no
 
 ### 5. Documentação
 
-- `_geradores/GUIA-DO-AUTOR.md`: seção "Glossário", com como cadastrar um verbete, as regras de marcação (contextos ignorados, sigla x palavra, fronteira, 1ª ocorrência por seção) e quando um termo deve entrar no glossário.
+- `_geradores/GUIA-DO-AUTOR.md`: seção "Glossário", com como cadastrar um verbete, as regras de marcação (contextos ignorados, sigla x palavra, fronteira, todas as ocorrências) e quando um termo deve entrar no glossário.
 - `README.md`: o portal passa de seis para **sete visões**, com a descrição do Glossário.
 
 ### 6. Entrega
@@ -148,7 +148,7 @@ Seguem o padrão `unittest` do projeto e rodam só os arquivos afetados (conferi
 
 - `testes/test_glossario_dados.py`: campos obrigatórios presentes; ids únicos e no formato; `relacionados` apontam para ids existentes; referências com URL `https://`; campos de texto sem HTML fora de `<strong>`, `<em>` e `<code>`.
 - `testes/test_glossario.py`, unidade de `marcar_termos`:
-  - marca a 1ª ocorrência por seção e de novo na seção seguinte;
+  - marca todas as ocorrências, em todas as seções;
   - não marca dentro de cada contexto ignorado nem em valor de atributo;
   - sigla diferencia maiúsculas e minúsculas; palavra não;
   - fronteira: "HMAC-SHA256", "HMACs" e "XHMAC" não casam como HMAC;
@@ -164,5 +164,5 @@ Seguem o padrão `unittest` do projeto e rodam só os arquivos afetados (conferi
 
 ## Riscos
 
-- **Falso positivo na marcação** (uma palavra comum cadastrada como verbete marcando trechos que não são o termo técnico). Mitigação: 1ª ocorrência por seção e contextos ignorados; o modo híbrido fica como evolução.
+- **Falso positivo na marcação** (uma palavra comum cadastrada como verbete marcando trechos que não são o termo técnico). Mitigação: cadastrar só siglas e termos técnicos, e os contextos ignorados; o modo híbrido fica como evolução.
 - **Divergência entre "Aparece em" e o módulo compilado.** Mitigação: os dois usam a mesma função `marcar_termos` sobre o mesmo corpo.

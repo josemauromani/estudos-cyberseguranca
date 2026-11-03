@@ -84,11 +84,21 @@ class TestGlossarioJs(unittest.TestCase):
           const link = document.querySelector('a.glossario-pop-link');
           const noLink = document.activeElement === link;
           ev(link, {key: 'Tab'});
-          __fim({tem: !!esperado, noLink, certo: document.activeElement === esperado, oculto: !visivel()});""")
+          const ehTermo = esperado.matches('dfn.glossario');
+          __fim({tem: !!esperado, noLink, certo: document.activeElement === esperado, ehTermo,
+                 oculto: !visivel(), descDoTermo: d.getAttribute('aria-describedby'),
+                 descDoProximo: esperado.getAttribute('aria-describedby')});""")
         self.assertTrue(s["tem"])
         self.assertTrue(s["noLink"])
         self.assertTrue(s["certo"])
-        self.assertTrue(s["oculto"])
+        # O popover do termo de origem fecha.
+        self.assertIsNone(s["descDoTermo"])
+        if s["ehTermo"]:
+            # O próximo tabulável é outro termo do glossário: o popover abre para ele.
+            self.assertFalse(s["oculto"])
+            self.assertEqual(s["descDoProximo"], "glossario-pop")
+        else:
+            self.assertTrue(s["oculto"])
 
     def test_esc_fecha_popover_de_hover_com_foco_fora(self):
         s = self.rodar("""
