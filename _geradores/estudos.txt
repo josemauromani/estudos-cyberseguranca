@@ -1,4 +1,4 @@
-# Catálogo Canônico de Estudos em Cibersegurança (57 Módulos)
+# Catálogo Canônico de Estudos em Cibersegurança (58 Módulos)
 # Formato: slug|titulo_curto|pasta|arquivo_html|trilha_num|cor_tema|nist_fn
 #
 # Trilhas:
