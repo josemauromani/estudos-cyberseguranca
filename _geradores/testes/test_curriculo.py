@@ -108,6 +108,33 @@ class TestCurriculo(unittest.TestCase):
         self.assertIn("cache_diagramas", guia_txt)
         self.assertIn("npx @mermaid-js/mermaid-cli", guia_txt)
 
+    def test_trilha_14_documentada(self):
+        readme = (self.root / "README.md").read_text(encoding="utf-8")
+        curriculo = self.curriculo_file.read_text(encoding="utf-8")
+        guia = self.guia_file.read_text(encoding="utf-8")
+        self.assertIn("Trilha 14: Liderança & Estratégia", curriculo)
+        self.assertIn("Trilha 14: Liderança & Estratégia", readme)
+        self.assertIn("#### 59. Lideranca-e-Programa-de-Seguranca", curriculo)
+        self.assertIn("#### 60. Estruturacao-da-Area-de-Seguranca", curriculo)
+        self.assertIn("60 módulos", readme)
+        corpos = list((self.root / "_geradores").glob("*_body.html"))
+        self.assertTrue(corpos)
+        for nome, texto in [("README.md", readme), ("CURRICULO.md", curriculo),
+                            ("GUIA-DO-AUTOR.md", guia)] + [
+                (c.name, c.read_text(encoding="utf-8")) for c in corpos]:
+            self.assertNotIn("58 módulos", texto, nome)
+
+    def test_rotas_incluem_lideranca(self):
+        from index_dados import CERTIFICACOES, ROTAS_PERFIL
+        rotas = {r["id"]: r["modulos"] for r in ROTAS_PERFIL}
+        self.assertEqual(rotas["grc"][-2:], ["Lideranca-e-Programa-de-Seguranca",
+                                             "Estruturacao-da-Area-de-Seguranca"])
+        self.assertEqual(rotas["analista_si"][-1], "Lideranca-e-Programa-de-Seguranca")
+        certs = {c["sigla"]: c["modulos"] for c in CERTIFICACOES}
+        self.assertIn("Lideranca-e-Programa-de-Seguranca", certs["CISM"])
+        self.assertIn("Estruturacao-da-Area-de-Seguranca", certs["CISM"])
+        self.assertIn("Lideranca-e-Programa-de-Seguranca", certs["CISSP"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -2,7 +2,7 @@
 
 ## 1. Visão Geral e Filosofia Pedagógica
 
-O currículo de **Estudos de Cibersegurança** foi concebido como uma formação autoinstrucional, prática e modular, dividida em **58 módulos temáticos** organizados em **13 trilhas estruturantes**. 
+O currículo de **Estudos de Cibersegurança** foi concebido como uma formação autoinstrucional, prática e modular, dividida em **60 módulos temáticos** organizados em **14 trilhas estruturantes**. 
 
 O projeto segue quatro diretrizes fundamentais:
 1. **Teoria Pragmática e Direta ao Ponto:** Eliminação de floreios acadêmicos desnecessários; foco no que engenheiros, analistas e auditores de segurança executam na rotina corporativa e no que bancas de concursos e certificações (CompTIA Security+, CySA+, PenTest+, CEH, CISSP) cobram.
@@ -14,9 +14,9 @@ O projeto segue quatro diretrizes fundamentais:
 
 ---
 
-## 2. Mapa das 13 Trilhas Temáticas
+## 2. Mapa das 14 Trilhas Temáticas
 
-A matriz pedagógica conecta diretamente as 13 trilhas estruturantes aos 6 pilares de governança e operação técnica preconizados pelo **NIST CSF 2.0**:
+A matriz pedagógica conecta diretamente as 14 trilhas estruturantes aos 6 pilares de governança e operação técnica preconizados pelo **NIST CSF 2.0**:
 
 ```mermaid
 flowchart LR
@@ -35,6 +35,7 @@ flowchart LR
         T11["Trilha 11: Detecção Avançada & Threat Hunting"]
         T12["Trilha 12: Nuvem, Containers & Kubernetes"]
         T13["Trilha 13: Setor Regulado no Brasil"]
+        T14["Trilha 14: Liderança & Estratégia"]
     end
 
     subgraph NIST["NIST CSF 2.0 (Funções Centrais)"]
@@ -91,6 +92,8 @@ flowchart LR
     T13 --> GV
     T13 --> DE
     T13 --> PR
+
+    T14 --> GV
 ```
 
 | Trilha | Denominação | Cor do Tema | Foco Técnico | Módulos |
@@ -108,10 +111,11 @@ flowchart LR
 | **Trilha 11** | Detecção Avançada & Threat Hunting | `#A21CAF` (Fúcsia) | Detecção além da rotina do SOC: engenharia de detecção, threat hunting, monitoramento de rede e automação de resposta com SOAR. | 46 ao 49 |
 | **Trilha 12** | Nuvem, Containers & Kubernetes | `#0F766E` (Verde-azulado) | Segurança de nuvem nativa: containers, Kubernetes, infraestrutura como código e detecção e resposta a incidentes em nuvem. | 50 ao 53 |
 | **Trilha 13** | Setor Regulado no Brasil | `#4D7C0F` (Verde-oliva) | Segurança no contexto brasileiro: regulação do setor financeiro, fraude em pagamentos e Pix, legislação penal e riscos de terceiros. | 54 ao 57 |
+| **Trilha 14** | Liderança & Estratégia | `#A16207` (Dourado) | Liderança e estratégia de segurança: o papel do CISO, governança e comunicação com o conselho, maturidade, desenho do time e sourcing (SOC interno, MSSP, MDR e híbrido). | 59 e 60 |
 
 ---
 
-## 3. Detalhamento dos 58 Módulos de Aprendizagem
+## 3. Detalhamento dos 60 Módulos de Aprendizagem
 
 ### Trilha 1: Fundamentos & Redes (`#2563EB`)
 
@@ -749,7 +753,7 @@ flowchart LR
 
 | Função NIST CSF 2.0 | Quantidade de Módulos | Módulos Vinculados |
 |---|---|---|
-| **GOVERN (GV)** | 8 módulos | 25, 26, 27, 31, 54, 56, 57, 58 |
+| **GOVERN (GV)** | 10 módulos | 25, 26, 27, 31, 54, 56, 57, 58, 59, 60 |
 | **IDENTIFY (ID)** | 6 módulos | 01, 09, 11, 14, 17, 25 |
 | **PROTECT (PR)** | 32 módulos | 02, 03, 04, 05, 06, 07, 08, 09, 10, 12, 13, 15, 21, 22, 23, 24, 27, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 50, 51, 52, 55 |
 | **DETECT (DE)** | 18 módulos | 02, 07, 10, 16, 17, 20, 24, 29, 30, 34, 35, 36, 39, 46, 47, 48, 53, 55 |
@@ -771,11 +775,11 @@ Para orientar estudantes e profissionais com focos específicos, a matriz curric
 3. **Rota DevSecOps & Cloud Security:**  
    `01 -> 03 -> 04 -> 35 -> 06 -> 12 -> 13 -> 21 -> 41 -> 22 -> 50 -> 51 -> 52 -> 53 -> 24`
 4. **Rota GRC, Auditoria & Privacidade:**  
-   `01 -> 08 -> 40 -> 09 -> 25 -> 26 -> 58 -> 57 -> 27 -> 56 -> 54 -> 55 -> 28 -> 43 -> 44`
+   `01 -> 08 -> 40 -> 09 -> 25 -> 26 -> 58 -> 57 -> 27 -> 56 -> 54 -> 55 -> 28 -> 43 -> 44 -> 59 -> 60`
 5. **Rota Perícia & Resposta a Incidentes:**  
    `01 -> 02 -> 06 -> 36 -> 10 -> 48 -> 16 -> 47 -> 18 -> 53 -> 42 -> 45 -> 19 -> 56 -> 20`
 6. **Rota 6: Analista de Segurança da Informação (vaga):**  
-   `01 -> 34 -> 36 -> 05 -> 06 -> 07 -> 10 -> 29 -> 30 -> 38 -> 40 -> 25 -> 26 -> 31 -> 54 -> 57 -> 18 -> 49 -> 42 -> 43 -> 32 -> 37 -> 33`  
+   `01 -> 34 -> 36 -> 05 -> 06 -> 07 -> 10 -> 29 -> 30 -> 38 -> 40 -> 25 -> 26 -> 31 -> 54 -> 57 -> 18 -> 49 -> 42 -> 43 -> 32 -> 37 -> 33 -> 59`  
    Cada competência da vaga também aparece, com os módulos principais e de apoio, na seção "Rota por Vaga" do portal (`index.html`).
 
 No portal, a aba **Rotas Sugeridas** mostra cada rota como sequência numerada, com o progresso salvo no navegador e o próximo módulo a estudar. As sequências vêm de `ROTAS_PERFIL` em `_geradores/index_dados.py`, que é a fonte única; um teste (`test_rotas_sugeridas.py`) garante que esta seção continue igual aos dados.
