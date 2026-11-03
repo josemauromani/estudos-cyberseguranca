@@ -331,6 +331,22 @@ class TestCertificacoesCarreira(unittest.TestCase):
         self.assertIn('if (req.conferir) return { status: "conferir", faltas: [] };', corpo)
         self.assertLess(corpo.index("req.conferir"), corpo.index('"sem-exigencia"'))
 
+    def test_textos_listam_todas_as_certificacoes_conferir(self):
+        """O parágrafo antes do planejador e o CURRICULO citam todas as certificações com status "conferir"."""
+        d = self._dados()
+        conferir = [c["sigla"] for c in d["certificacoes"] if c["requisitos"].get("conferir")]
+        self.assertIn("CISM", conferir)
+        trajetorias = self._secao(self.body_path.read_text(encoding="utf-8"), "trajetorias")
+        paragrafo = re.search(r"<p>\s*O planejador do laboratório a seguir.*?</p>", trajetorias, re.S)
+        self.assertIsNotNone(paragrafo)
+        curriculo = (GERADORES / "CURRICULO.md").read_text(encoding="utf-8")
+        lista_curriculo = re.search(r"quando o requisito é descrito só em texto \(([^)]*)\)", curriculo)
+        self.assertIsNotNone(lista_curriculo)
+        for sigla in conferir:
+            nome_curriculo = "ISO 27001 Lead Auditor" if sigla == "ISO 27001 LA" else sigla
+            self.assertIn(sigla, paragrafo.group(0), f"Parágrafo do planejador sem {sigla}")
+            self.assertIn(nome_curriculo, lista_curriculo.group(1), f"CURRICULO sem {sigla}")
+
     # ---------------------------------------------------------------- compilado
     def test_simulador_estrutura(self):
         content = self.compiled_path.read_text(encoding="utf-8")
