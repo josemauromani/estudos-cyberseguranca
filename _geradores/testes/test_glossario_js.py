@@ -72,6 +72,38 @@ class TestGlossarioJs(unittest.TestCase):
           __fim(document.activeElement === d);""")
         self.assertTrue(s)
 
+    def test_tab_no_link_vai_ao_proximo_tabulavel_do_termo(self):
+        s = self.rodar("""
+          const SEL = 'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
+          const ev = (el, o) => el.dispatchEvent(new KeyboardEvent('keydown', Object.assign({bubbles: true, cancelable: true}, o)));
+          const p = pop();
+          const lista = Array.from(document.querySelectorAll(SEL)).filter((e) => !p.contains(e) && e.getClientRects().length);
+          const esperado = lista.find((e) => d.compareDocumentPosition(e) & Node.DOCUMENT_POSITION_FOLLOWING && !d.contains(e));
+          d.focus();
+          ev(d, {key: 'Tab'});
+          const link = document.querySelector('a.glossario-pop-link');
+          const noLink = document.activeElement === link;
+          ev(link, {key: 'Tab'});
+          __fim({tem: !!esperado, noLink, certo: document.activeElement === esperado, oculto: !visivel()});""")
+        self.assertTrue(s["tem"])
+        self.assertTrue(s["noLink"])
+        self.assertTrue(s["certo"])
+        self.assertTrue(s["oculto"])
+
+    def test_esc_fecha_popover_de_hover_com_foco_fora(self):
+        s = self.rodar("""
+          d.dispatchEvent(new MouseEvent('mouseenter', {bubbles: false}));
+          setTimeout(() => {
+            const abriu = visivel();
+            document.body.setAttribute('tabindex', '-1');
+            document.body.focus();
+            document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
+            __fim({abriu, oculto: !visivel(), foco: document.activeElement === d});
+          }, 300);""")
+        self.assertTrue(s["abriu"])
+        self.assertTrue(s["oculto"])
+        self.assertFalse(s["foco"])
+
     def test_mouse_abre_com_atraso(self):
         s = self.rodar("""
           d.dispatchEvent(new MouseEvent('mouseenter'));

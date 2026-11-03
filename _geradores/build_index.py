@@ -431,11 +431,12 @@ def _render_verbete(v: dict, por_id: Dict[str, dict], slugs: List[str], status_m
     if slugs:
         chips = " ".join(render_chip_modulo(sl, status_map) for sl in slugs)
         campo("Aparece em", f'<span class="verbete-modulos">{chips}</span>')
+    cat = f' <span class="verbete-cat">{escape(v["categoria"])}</span>' if v.get("categoria") else ""
     sigla = f'\n          <p class="verbete-sigla">{escape(v["sigla_de"])}</p>' if v.get("sigla_de") else ""
     vid = escape(v["id"], quote=True)
     return (
         f'        <article class="verbete" id="g-{vid}" data-busca="{busca}">\n'
-        f'          <header><h3>{escape(v["termo"])}</h3> <span class="verbete-cat">{escape(v["categoria"])}</span></header>{sigla}\n'
+        f'          <header><h3>{escape(v["termo"])}</h3>{cat}</header>{sigla}\n'
         f'          <dl>\n' + "\n".join(campos) + "\n          </dl>\n        </article>"
     )
 

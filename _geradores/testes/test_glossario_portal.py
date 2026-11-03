@@ -58,6 +58,10 @@ class TestGlossarioPortal(unittest.TestCase):
         self.assertNotIn("<dt>Termo em inglês", c)
         self.assertIn('target="_blank" rel="noopener"', c)
 
+    def test_verbete_sem_categoria(self):
+        html = render_glossario([{"id": "x", "termo": "X", "significado": "y"}], {}, {})
+        self.assertNotIn("verbete-cat", html)
+
     def test_aparece_em_cinco_modulos(self):
         mods = modulos_por_termo(GLOSSARIO)["hmac"]
         self.assertEqual(set(mods), set(CINCO))

@@ -17,7 +17,6 @@ CAMPOS_OBRIGATORIOS = ("id", "termo", "significado")
 CAMPOS_TEXTO = ("termo", "significado", "sigla_de", "termo_ingles", "categoria", "explicacao", "historico")
 
 RE_ID = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
-RE_TAG = re.compile(r"<[^>]*>")
 RE_TAG_PERMITIDA = re.compile(r"</?(strong|em|code)>")
 
 
@@ -35,7 +34,7 @@ def texto_sem_html(s: str) -> str:
 
 
 def _html_proibido(s: str) -> bool:
-    return any(not RE_TAG_PERMITIDA.fullmatch(t) for t in RE_TAG.findall(s))
+    return "<" in RE_TAG_PERMITIDA.sub("", s)
 
 
 def validar_glossario(verbetes: List[Dict[str, Any]]) -> List[str]:

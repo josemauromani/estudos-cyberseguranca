@@ -60,6 +60,11 @@ class TestGlossarioDados(unittest.TestCase):
         ok = "<strong>a</strong> <em>b</em> <code>c</code>"
         self.assertEqual(validar_glossario([_verbete(significado=ok)]), [])
 
+    def test_menor_que_solto_proibido(self):
+        for texto in ("valor <limite", "a < b"):
+            self.assertTrue(validar_glossario([_verbete(significado=texto)]), texto)
+        self.assertEqual(validar_glossario([_verbete(significado="<strong>x</strong>")]), [])
+
     def test_campo_desconhecido(self):
         erros = validar_glossario([_verbete(pronuncia="rá-qui")])
         self.assertTrue(any("pronuncia" in e for e in erros))
