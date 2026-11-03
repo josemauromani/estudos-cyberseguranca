@@ -114,6 +114,81 @@ Restauração nunca testada: some 50% de incerteza ao tempo e não confie no res
         </div>
     </section>
 
+    <section class="study-section" id="iso-22301" data-tipo="teoria">
+        <h2>ISO 22301:2019: o SGCN</h2>
+        <p class="lead-text">
+            BIA, RTO, plano e teste são peças. A ISO 22301:2019 junta todas num <strong>sistema de gestão de continuidade de negócios (SGCN)</strong>: um ciclo que a empresa mantém, mede e melhora, e que um auditor externo consegue verificar.
+        </p>
+
+        <h3>Estrutura de cláusulas</h3>
+        <p>
+            A norma (título oficial: <em>Security and resilience: Business continuity management systems: Requirements</em>) segue a estrutura harmonizada das normas de sistemas de gestão, a mesma da ISO/IEC 27001. Os requisitos ficam nas cláusulas 4 a 10; as cláusulas 1 a 3 são escopo, referências e termos.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Cláusula</th><th>Tema</th><th>O que pede, em resumo</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>4</td><td>Contexto da organização</td><td>Entender o contexto, as partes interessadas e definir o escopo do SGCN</td></tr>
+                    <tr><td>5</td><td>Liderança</td><td>Comprometimento da direção, política de continuidade, papéis e responsabilidades</td></tr>
+                    <tr><td>6</td><td>Planejamento</td><td>Riscos e oportunidades do próprio sistema e objetivos de continuidade</td></tr>
+                    <tr><td>7</td><td>Apoio</td><td>Recursos, competência, conscientização, comunicação e informação documentada</td></tr>
+                    <tr><td>8</td><td>Operação</td><td>O núcleo de continuidade: BIA, estratégias, planos e exercícios (abaixo)</td></tr>
+                    <tr><td>9</td><td>Avaliação de desempenho</td><td>Monitoramento, auditoria interna e análise crítica pela direção</td></tr>
+                    <tr><td>10</td><td>Melhoria</td><td>Não conformidades, ação corretiva e melhoria contínua</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>A cláusula 8 em cinco passos</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Item</th><th>Tema</th><th>No que você já estudou</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>8.2</td><td>Análise de impacto no negócio (BIA) e avaliação de riscos</td><td>A BIA define MTPD, RTO e RPO (seção de introdução); a avaliação de riscos olha as ameaças que podem causar a interrupção</td></tr>
+                    <tr><td>8.3</td><td>Estratégias e soluções de continuidade</td><td>Sites, replicação e backup 3-2-1 (seção de estratégias)</td></tr>
+                    <tr><td>8.4</td><td>Planos e procedimentos de continuidade</td><td>Estrutura de resposta, comunicação e recuperação: o plano de continuidade e o de DR</td></tr>
+                    <tr><td>8.5</td><td>Programa de exercícios</td><td>Tabletop, restauração e failover; o RTO real é o medido</td></tr>
+                    <tr><td>8.6</td><td>Avaliação da documentação e das capacidades</td><td>A organização avalia se a BIA, os riscos, as estratégias e os procedimentos continuam adequados</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            O ponto de auditoria é o encadeamento: a BIA justifica a estratégia, a estratégia sustenta o plano e os <strong>exercícios</strong> geram a evidência de que o plano funciona. Plano sem exercício registrado é a não conformidade mais fácil de achar.
+        </p>
+
+        <div class="callout key">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>Mesma terminologia, outra lente</strong>
+            </div>
+            <p>
+                A norma usa MTPD (ou tempo máximo aceitável de interrupção), RTO e RPO com as definições que você viu. Na ISO 22301 o RTO e o RPO são, na prática, o que a BIA entrega ao SGCN; o que a norma cobra é que sejam aprovados, revisados e rastreáveis até a estratégia escolhida.
+            </p>
+        </div>
+
+        <h3>Certificação e emenda de 2024</h3>
+        <ul>
+            <li><strong>certificação:</strong> a ISO 22301 é certificável. Um organismo de certificação acreditado audita o SGCN (em geral em duas etapas, com auditorias de manutenção nos anos seguintes). A norma é a base da certificação da organização; não confunda com a certificação profissional de pessoas (como Lead Implementer ou Lead Auditor).</li>
+            <li><strong>Edição:</strong> a edição vigente é a de 2019 (segunda edição, substituiu a de 2012). Até novembro de 2026 não há terceira edição publicada nas fontes consultadas; confira sempre o catálogo da ISO.</li>
+            <li><strong>Emenda de 2024:</strong> a ISO 22301:2019/Amd 1:2024 (&ldquo;Climate action changes&rdquo;) acrescenta a ação climática às cláusulas 4.1 e 4.2: a organização determina se a mudança climática é uma questão relevante e considera as partes interessadas relacionadas. É a mesma alteração aplicada a dezenas de normas de sistemas de gestão. Não é uma nova edição.</li>
+            <li><strong>ISO 22313:</strong> documento de orientação sobre como usar a ISO 22301. Não é certificável e não acrescenta requisitos.</li>
+        </ul>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">⚠️</span>
+                <strong>Certificado não é capacidade de recuperar</strong>
+            </div>
+            <p>
+                A certificação atesta que o sistema de gestão existe e opera conforme a norma. Quem prova que o ERP volta em 9 horas é o exercício medido, não o certificado. Confira o escopo do certificado: ele pode cobrir só uma unidade ou um serviço.
+            </p>
+        </div>
+    </section>
+
     <!-- SEÇÃO 3: SIMULADOR -->
     <section class="study-section" id="simulador" data-tipo="laboratorio">
         <h2>Laboratório Prático: Calculadora de RTO/RPO e Validador da Estratégia 3-2-1</h2>
@@ -188,6 +263,10 @@ Restauração nunca testada: some 50% de incerteza ao tempo e não confie no res
             <li class="checklist-item">
                 <input type="checkbox" id="chk-dr-7">
                 <label for="chk-dr-7"><strong>Plano acessível:</strong> versão impressa ou fora do ambiente principal, com contatos e senhas de emergência em cofre.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-dr-8">
+                <label for="chk-dr-8"><strong>SGCN (ISO 22301:2019):</strong> escopo, política e programa de exercícios definidos, com auditoria interna e análise crítica da direção registradas; se a certificação for meta, o escopo do certificado cobre os serviços críticos.</label>
             </li>
         </ul>
     </section>
@@ -267,6 +346,18 @@ Restauração nunca testada: some 50% de incerteza ao tempo e não confie no res
                 </div>
             </details>
         </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 7 (ISO 22301):</strong> Uma empresa tem plano de DR detalhado, mas nenhum registro de exercício nos últimos dois anos. O que um auditor da ISO 22301:2019 aponta, e por quê?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A falta do programa de exercícios (cláusula 8.5) e, em consequência, da avaliação da capacidade (8.6) e da análise crítica pela direção (cláusula 9). Existir plano não basta: a norma exige evidência de que o plano foi exercitado, os resultados registrados e as lições levadas à melhoria (cláusula 10).</p>
+                </div>
+            </details>
+        </div>
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
@@ -294,7 +385,7 @@ Restauração nunca testada: some 50% de incerteza ao tempo e não confie no res
 
         <h3>Referências</h3>
         <ul>
-            <li>ISO 22301 — Sistemas de gestão de continuidade de negócios.</li>
+            <li>ISO 22301:2019 — Security and resilience: Business continuity management systems: Requirements, com a emenda ISO 22301:2019/Amd 1:2024 (ação climática). A ISO 22313 é a orientação de uso.</li>
             <li>NIST SP 800-34 Rev. 1 — Contingency Planning Guide for Federal Information Systems.</li>
             <li>Business Continuity Institute — Good Practice Guidelines.</li>
         </ul>
