@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Estrutura do portal (T9): barra superior, menu lateral com seis visões, catálogo
+"""Estrutura do portal (T9): barra superior, menu lateral com sete visões, catálogo
 como tela inicial, cartões novos e o contrato de marcação lido pelo JS do portal (T10)."""
 
 import re
@@ -87,9 +87,9 @@ class TestPortal(unittest.TestCase):
             cls.html = gerar_index_html(output_path=Path(tmp) / "index.html").read_text(encoding="utf-8")
 
     # ---- Testes do brief (verbatim) -------------------------------------
-    def test_menu_com_seis_visoes(self):
+    def test_menu_com_sete_visoes(self):
         self.assertEqual(re.findall(r'<a [^>]*data-view="(\w+)"', self.html),
-                         ["catalogo", "rotas", "certificacoes", "necessidades", "vaga", "progresso"])
+                         ["catalogo", "rotas", "certificacoes", "necessidades", "vaga", "progresso", "glossario"])
 
     def test_so_catalogo_visivel_na_carga(self):
         visiveis = re.findall(r'<section class="view" data-view="(\w+)">', self.html)
@@ -117,7 +117,7 @@ class TestPortal(unittest.TestCase):
     # ---- Contrato de marcação para T10 ---------------------------------
     def test_visoes_ocultas_com_hidden(self):
         ocultas = re.findall(r'<section class="view" data-view="(\w+)" hidden>', self.html)
-        self.assertEqual(ocultas, ["rotas", "certificacoes", "necessidades", "vaga", "progresso"])
+        self.assertEqual(ocultas, ["rotas", "certificacoes", "necessidades", "vaga", "progresso", "glossario"])
 
     def test_menu_lateral_e_botao_da_gaveta(self):
         self.assertRegex(self.html, r'<nav class="menu-lateral" [^>]*aria-label="[^"]+"')

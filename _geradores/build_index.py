@@ -6,7 +6,7 @@ Construtor do Portal Central — Estudos em Cibersegurança
 Gera a página raiz index.html a partir de index_dados.py, das fontes embutidas,
 de tokens.css, de index.css e do status de compilação de cada estudo do catálogo.
 
-Estrutura: barra superior (menu, marca, busca, tema) + menu lateral com seis visões
+Estrutura: barra superior (menu, marca, busca, tema) + menu lateral com sete visões
 (Catálogo, Rotas sugeridas, Por certificação, Pela necessidade, Rota por vaga,
 Meu progresso) + conteúdo. Só o Catálogo aparece na carga; as demais visões vêm
 com `hidden` e são alternadas pelo JavaScript do portal.
@@ -22,6 +22,7 @@ Uso como módulo:
 import argparse
 import json
 import sys
+import unicodedata
 from functools import lru_cache
 from html import escape
 from pathlib import Path
@@ -33,6 +34,7 @@ sys.path.insert(0, str(GERADORES_DIR))
 
 from contrato import extrair_secoes
 from fontes import css_fontes
+from glossario import GlossarioInvalido, carregar_glossario, marcar_termos, texto_sem_html
 from index_dados import (
     CERTIFICACOES,
     ESTUDOS_DADOS,
@@ -56,6 +58,7 @@ VISOES = [
     ("necessidades", "🛠", "Pela necessidade"),
     ("vaga", "💼", "Rota por vaga"),
     ("progresso", "📈", "Meu progresso"),
+    ("glossario", "📖", "Glossário"),
 ]
 
 # Botões da barra "Agrupar por" do catálogo: (id, rótulo)
@@ -371,6 +374,104 @@ def render_chip_modulo(slug: str, status_map: Dict[str, dict], apoio: bool = Fal
         href = escape(info["caminho_relativo"], quote=True)
         return f'<a href="{href}" class="vaga-chip{extra}" {data_slug}>{texto}</a>'
     return f'<span class="vaga-chip pendente{extra}" {data_slug} aria-disabled="true" title="Em construção">{texto}</span>'
+
+
+def _sem_acento(texto: str) -> str:
+    """Minúsculas e sem marcas combinantes (ordenação e busca do glossário)."""
+    nfd = unicodedata.normalize("NFD", texto)
+    return "".join(c for c in nfd if not unicodedata.combining(c)).casefold()
+
+
+def modulos_por_termo(verbetes: List[dict]) -> Dict[str, List[str]]:
+    """id do verbete -> slugs dos módulos cujo corpo o marca, na ordem de ESTUDOS_DADOS."""
+    resultado: Dict[str, List[str]] = {v["id"]: [] for v in verbetes}
+    catalogo = carregar_catalogo_estudos()
+    for slug in ESTUDOS_DADOS:
+        corpo = corpo_do_modulo(slug, catalogo)
+        if corpo is None:
+            continue
+        _, ids = marcar_termos(corpo.read_text(encoding="utf-8"), verbetes)
+        for i in ids:
+            resultado[i].append(slug)
+    return resultado
+
+
+def _render_verbete(v: dict, por_id: Dict[str, dict], slugs: List[str], status_map: Dict[str, dict]) -> str:
+    busca = " ".join(
+        [v["termo"], v.get("sigla_de", ""), v.get("termo_ingles", ""), *v.get("variacoes", []),
+         texto_sem_html(v["significado"])]
+    )
+    busca = escape(_sem_acento(busca), quote=True)
+    campos = []
+
+    def campo(rotulo: str, conteudo: str) -> None:
+        campos.append(f"          <dt>{rotulo}</dt><dd>{conteudo}</dd>")
+
+    if v.get("termo_ingles"):
+        campo("Termo em inglês", escape(v["termo_ingles"]))
+    campo("Significado", v["significado"])
+    if v.get("explicacao"):
+        campo("Explicação", v["explicacao"])
+    if v.get("historico"):
+        campo("Histórico", v["historico"])
+    if v.get("variacoes"):
+        campo("Variações", ", ".join(f"<code>{escape(x)}</code>" for x in v["variacoes"]))
+    if v.get("relacionados"):
+        links = ", ".join(
+            f'<a href="#v-glossario/{escape(r, quote=True)}">{escape(por_id[r]["termo"] if r in por_id else r)}</a>'
+            for r in v["relacionados"]
+        )
+        campo("Relacionados", links)
+    if v.get("referencias"):
+        itens = "".join(
+            f'<li><a href="{escape(url, quote=True)}" target="_blank" rel="noopener">{escape(nome)}</a></li>'
+            for nome, url in v["referencias"]
+        )
+        campo("Referências", f'<ul class="verbete-refs">{itens}</ul>')
+    if slugs:
+        chips = " ".join(render_chip_modulo(sl, status_map) for sl in slugs)
+        campo("Aparece em", f'<span class="verbete-modulos">{chips}</span>')
+    sigla = f'\n          <p class="verbete-sigla">{escape(v["sigla_de"])}</p>' if v.get("sigla_de") else ""
+    vid = escape(v["id"], quote=True)
+    return (
+        f'        <article class="verbete" id="g-{vid}" data-busca="{busca}">\n'
+        f'          <header><h3>{escape(v["termo"])}</h3> <span class="verbete-cat">{escape(v["categoria"])}</span></header>{sigla}\n'
+        f'          <dl>\n' + "\n".join(campos) + "\n          </dl>\n        </article>"
+    )
+
+
+def render_glossario(verbetes: List[dict], aparece_em: Dict[str, List[str]], status_map: Dict[str, dict]) -> str:
+    """Conteúdo da visão Glossário: busca, índice A–Z, grupos por letra e verbetes."""
+    por_id = {v["id"]: v for v in verbetes}
+    ordenados = sorted(verbetes, key=lambda v: (_sem_acento(v["termo"]), v["termo"]))
+    grupos: Dict[str, List[dict]] = {}
+    for v in ordenados:
+        inicial = _sem_acento(v["termo"])[:1].upper()
+        letra = inicial if "A" <= inicial <= "Z" else "#"
+        grupos.setdefault(letra, []).append(v)
+    letras = []
+    for l in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        if l in grupos:
+            letras.append(f'<a href="#g-letra-{l.lower()}">{l}</a>')
+        else:
+            letras.append(f'<span aria-disabled="true">{l}</span>')
+    blocos = []
+    for letra, vs in grupos.items():
+        ident = "num" if letra == "#" else letra.lower()
+        cartoes = "\n".join(_render_verbete(v, por_id, aparece_em.get(v["id"], []), status_map) for v in vs)
+        blocos.append(
+            f'      <section class="glossario-grupo" data-letra="{letra}">\n'
+            f'        <h2 id="g-letra-{ident}">{letra}</h2>\n{cartoes}\n      </section>'
+        )
+    return (
+        '      <label class="glossario-busca">\n'
+        '        <span class="sr-only">Buscar no glossário</span>\n'
+        '        <input type="search" id="busca-glossario" placeholder="Buscar termo, sigla ou significado…" autocomplete="off">\n'
+        '      </label>\n'
+        f'      <nav class="glossario-letras" aria-label="Índice por letra">{" ".join(letras)}</nav>\n'
+        + "\n".join(blocos)
+        + '\n      <p class="glossario-vazio" hidden>Nenhum termo encontrado.</p>'
+    )
 
 
 def render_rota_vaga(rota: List[dict], status_map: Dict[str, dict]) -> str:
@@ -997,9 +1098,30 @@ PORTAL_JS = """
   function visaoDoHash() {
     const h = location.hash || '';
     if (h.indexOf('#v-') !== 0) return null;
-    const v = h.slice(3);
+    const v = h.slice(3).split('/')[0];
     const existe = Array.from(document.querySelectorAll('section.view')).some(s => s.getAttribute('data-view') === v);
     return existe ? v : null;
+  }
+
+  // Âncora de "#v-<visao>/<ancora>" (ex.: #v-glossario/hmac), ou ''.
+  function ancoraDoHash() {
+    const h = location.hash || '';
+    const i = h.indexOf('/');
+    if (h.indexOf('#v-') !== 0 || i < 0) return '';
+    try { return decodeURIComponent(h.slice(i + 1)); } catch (e) { return ''; }
+  }
+
+  let destaqueTimer = null;
+  function irParaAncora() {
+    const ancora = ancoraDoHash();
+    if (!ancora) return;
+    const alvo = document.getElementById('g-' + ancora);
+    document.querySelectorAll('.verbete.destaque').forEach(el => el.classList.remove('destaque'));
+    clearTimeout(destaqueTimer);
+    if (!alvo || alvo.offsetParent === null) { window.scrollTo(0, 0); return; }
+    alvo.scrollIntoView({ block: 'start' });
+    alvo.classList.add('destaque');
+    destaqueTimer = setTimeout(() => alvo.classList.remove('destaque'), 2000);
   }
 
   function mostrarVisao(v) {
@@ -1051,9 +1173,10 @@ PORTAL_JS = """
     });
     window.addEventListener('hashchange', () => {
       mostrarVisao(visaoDoHash() || 'catalogo');
+      irParaAncora();
     });
     const inicial = visaoDoHash();
-    if (inicial) mostrarVisao(inicial);
+    if (inicial) { mostrarVisao(inicial); irParaAncora(); }
 
     document.addEventListener('click', e => {
       if (!menuAberto()) return;
@@ -1077,8 +1200,29 @@ PORTAL_JS = """
     });
   }
 
+  // Glossário: filtra os verbetes por data-busca (sem acento) e esconde grupos vazios.
+  function filtrarGlossario() {
+    const campo = document.getElementById('busca-glossario');
+    const query = removerAcentos((campo && campo.value || '').trim());
+    let visiveis = 0;
+    document.querySelectorAll('.glossario-grupo').forEach(grupo => {
+      let n = 0;
+      grupo.querySelectorAll('.verbete').forEach(v => {
+        const casa = !query || (v.getAttribute('data-busca') || '').includes(query);
+        v.hidden = !casa;
+        if (casa) n++;
+      });
+      grupo.hidden = n === 0;
+      visiveis += n;
+    });
+    const vazio = document.querySelector('.glossario-vazio');
+    if (vazio) vazio.hidden = visiveis > 0;
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     initTheme();
+    const buscaGlossario = document.getElementById('busca-glossario');
+    if (buscaGlossario) buscaGlossario.addEventListener('input', filtrarGlossario);
     const input = document.getElementById('busca');
     if (input) input.addEventListener('input', filtrarCards);
     const limpar = document.getElementById('limpar-busca');
@@ -1141,6 +1285,7 @@ def gerar_index_html(
         css_partes.append(css_file.read_text(encoding="utf-8"))
     css_content = "\n".join(css_partes)
 
+    verbetes = carregar_glossario()
     catalogo = carregar_catalogo_estudos()
     stats = calcular_estatisticas(catalogo, ESTUDOS_DADOS)
     status_map = stats["status_map"]
@@ -1152,6 +1297,7 @@ def gerar_index_html(
         "certificacoes": len(CERTIFICACOES),
         "necessidades": len(NECESSIDADES),
         "vaga": len(ROTA_VAGA),
+        "glossario": len(verbetes),
     })
     progresso_global_html = render_progresso_global(stats)
     grupos_html = render_catalogo(ESTUDOS_DADOS, status_map)
@@ -1165,6 +1311,7 @@ def gerar_index_html(
     necessidades_html = render_necessidades_grid(NECESSIDADES, status_map)
     rota_vaga_html = render_rota_vaga(ROTA_VAGA, status_map)
     meu_progresso_html = render_meu_progresso(ESTUDOS_DADOS, status_map)
+    glossario_html = render_glossario(verbetes, modulos_por_termo(verbetes), status_map)
 
     dados_json = json.dumps(dados_portal(), ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     portal_js = PORTAL_JS.replace("__DADOS_PORTAL__", dados_json)
@@ -1276,6 +1423,13 @@ def gerar_index_html(
 {meu_progresso_html}
     </section>
 
+    <!-- Visão: Glossário -->
+    <section class="view" data-view="glossario" hidden>
+      <h1>Glossário</h1>
+      <p class="lede">Siglas e termos técnicos usados nos módulos, com significado, histórico e onde aparecem.</p>
+{glossario_html}
+    </section>
+
     <footer class="portal-footer">
       <p>&copy; 2026 Estudos de Cibersegurança &bull; Material Autoinstrucional e Prático 100% Offline</p>
       <p>Curadoria e desenvolvimento técnico por <strong>José Mauro da Silva Brandão</strong> &bull; Alinhado a NIST CSF 2.0, MITRE ATT&amp;CK Enterprise, ISO/IEC 27001:2022 e LGPD (Lei nº 13.709/2018).</p>
@@ -1316,9 +1470,13 @@ def main(argv=None):
     output_path = Path(args.saida)
     css_path = Path(args.css)
 
-    caminho_gerado = gerar_index_html(output_path=output_path, css_path=css_path)
+    try:
+        caminho_gerado = gerar_index_html(output_path=output_path, css_path=css_path)
+    except GlossarioInvalido as e:
+        print("\n".join(e.erros), file=sys.stderr)
+        return 1
     print(f"[OK] Portal central gerado com sucesso em: {caminho_gerado}")
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

@@ -1188,3 +1188,116 @@ a.progresso-titulo:hover {
     animation: none !important;
   }
 }
+
+/* Visão Glossário */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.glossario-busca {
+  display: block;
+  margin-bottom: 12px;
+}
+.glossario-busca input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+.glossario-letras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+.glossario-letras a,
+.glossario-letras span {
+  min-width: 28px;
+  padding: 4px 6px;
+  text-align: center;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  font: 600 13px var(--font-mono);
+}
+.glossario-letras a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.glossario-letras a:hover {
+  background: var(--accent-soft);
+}
+.glossario-letras span {
+  color: var(--muted);
+  opacity: 0.5;
+}
+.glossario-grupo h2 {
+  margin: 24px 0 10px;
+  scroll-margin-top: 80px;
+}
+.glossario-grupo[hidden],
+.verbete[hidden],
+.glossario-vazio[hidden] {
+  display: none;
+}
+.glossario-vazio {
+  color: var(--muted);
+}
+.verbete {
+  margin-bottom: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  scroll-margin-top: 80px;
+  transition: background 0.3s;
+}
+.verbete.destaque {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.verbete header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+.verbete h3 {
+  margin: 0;
+}
+.verbete-cat {
+  color: var(--muted);
+  font: 400 12px var(--font-mono);
+  text-transform: uppercase;
+}
+.verbete-sigla {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+.verbete dl {
+  margin: 10px 0 0;
+}
+.verbete dt {
+  margin-top: 8px;
+  color: var(--muted);
+  font: 600 12px var(--font-mono);
+  text-transform: uppercase;
+}
+.verbete dd {
+  margin: 2px 0 0;
+}
+.verbete-refs {
+  margin: 0;
+  padding-left: 18px;
+}
+.verbete-modulos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
