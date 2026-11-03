@@ -311,7 +311,7 @@ flowchart TD
                 <strong>De onde vem essa tabela: prática de mercado, não norma</strong>
             </div>
             <p>
-                Nem a SOX nem a PCAOB AS 2201 fixam tamanhos de amostra. A tabela acima é prática de mercado: as linhas trimestral, mensal e semanal seguem a tabela para populações pequenas do guia <em>Audit Sampling</em> da AICPA (<em>Audit Guide: Audit Sampling</em>); as linhas diária e várias vezes ao dia são as faixas usuais nas metodologias das firmas de auditoria, na ordem de grandeza das tabelas estatísticas de amostragem por atributos do mesmo guia (sem desvio esperado, 22 itens para uma taxa tolerável de 10% com 90% de confiança, e 29 com 95%). Cada firma publica a sua, e a do auditor externo é a que vale para o seu teste. O simulador usa o mínimo de cada faixa. Controles por evento (cada mudança, cada desligamento) não têm frequência fixa; neste simulador, entram na linha do tamanho da população no período: até 4 ocorrências, trimestral; até 12, mensal; até 52, semanal; até 365, diária; acima disso, várias vezes ao dia.
+                Nem a SOX nem a PCAOB AS 2201 fixam tamanhos de amostra. A tabela acima é prática de mercado: todas as linhas são faixas usuais nas metodologias das firmas de auditoria. Cada firma publica a sua, e a do auditor externo é a que vale para o seu teste. Como base técnica, o guia <em>Audit Sampling</em> da AICPA (<em>Audit Guide: Audit Sampling</em>) traz uma tabela própria para populações pequenas e tabelas estatísticas de amostragem por atributos: sem desvio esperado e com taxa tolerável de 10%, são 22 itens para 90% de confiança e 29 para 95%. O simulador usa o mínimo de cada faixa. Controles por evento (cada mudança, cada desligamento) não têm frequência fixa; neste simulador, entram na linha do tamanho da população no período: até 4 ocorrências, trimestral; até 12, mensal; até 52, semanal; até 365, diária; acima disso, várias vezes ao dia.
             </p>
         </div>
 
@@ -552,7 +552,7 @@ flowchart TD
 <script type="application/json" id="aud-dados">
 {
  "contexto": "Ipê Store S.A. (fictícia), varejista com ADRs registrados na SEC, exercício de 2025. Cinco ITGC no escopo, em três sistemas. Empresa, pessoas, tíquetes e evidências inventados.",
- "fonte_amostragem": "Tabela de prática de mercado, não de norma: nem a SOX nem a PCAOB AS 2201 fixam tamanhos de amostra. As linhas trimestral, mensal e semanal seguem a tabela para populações pequenas do guia Audit Sampling da AICPA (Audit Guide: Audit Sampling); as linhas diária e várias vezes ao dia são as faixas usuais nas metodologias das firmas de auditoria, na ordem de grandeza das tabelas estatísticas de amostragem por atributos do mesmo guia. Cada firma calibra a sua; o simulador usa o mínimo de cada faixa.",
+ "fonte_amostragem": "Tabela de prática de mercado, não de norma: nem a SOX nem a PCAOB AS 2201 fixam tamanhos de amostra. Todas as linhas são faixas usuais nas metodologias das firmas de auditoria; cada firma publica a sua, e a do auditor externo prevalece. Como base técnica, o guia Audit Sampling da AICPA (Audit Guide: Audit Sampling) traz uma tabela própria para populações pequenas e tabelas estatísticas de amostragem por atributos (sem desvio esperado e com taxa tolerável de 10%: 22 itens para 90% de confiança e 29 para 95%). O simulador usa o mínimo de cada faixa.",
  "tabela_amostragem": {
   "anual": {"rotulo": "Anual", "min": 1, "faixa": "1"},
   "trimestral": {"rotulo": "Trimestral", "min": 2, "faixa": "2"},
