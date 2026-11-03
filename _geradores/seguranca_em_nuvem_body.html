@@ -119,6 +119,77 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
         </div>
     </section>
 
+    <section class="study-section" id="iso-27017-27018" data-tipo="teoria">
+        <h2>ISO/IEC 27017 e 27018: Controles e Privacidade na Nuvem</h2>
+
+        <p class="lead-text">
+            A ISO/IEC 27001 e a 27002 valem para qualquer ambiente, mas a nuvem muda quem faz o quê. Duas normas irmãs adaptam o conjunto: a <strong>ISO/IEC 27017</strong> trata dos controles de segurança em serviços de nuvem, e a <strong>ISO/IEC 27018</strong> trata da proteção de <strong>dados pessoais</strong> em nuvem pública.
+        </p>
+
+        <h3>ISO/IEC 27017: segurança de serviços em nuvem</h3>
+        <p>
+            É um código de práticas que dá orientação específica de nuvem sobre controles da ISO/IEC 27002, separando o que cabe ao <strong>cliente</strong> do serviço e o que cabe ao <strong>provedor</strong>. A edição de 2015 também trazia controles adicionais próprios de nuvem, numerados à parte (série CLD). A edição de 2026, que a substitui, passou a seguir a estrutura da 27002:2022 e acrescenta controles específicos de nuvem. Esse é o mesmo assunto da <strong>responsabilidade compartilhada</strong> vista no início deste estudo, agora escrito como requisito: quem configura, quem monitora, quem apaga.
+        </p>
+        <ul>
+            <li><strong>Papéis e responsabilidades:</strong> o contrato precisa dizer quem faz o quê, e cada lado deve conhecer a sua parte.</li>
+            <li><strong>Separação entre clientes:</strong> o ambiente virtual de um cliente não pode alcançar o de outro.</li>
+            <li><strong>Monitoramento:</strong> o cliente precisa enxergar o que acontece nos seus recursos; o provedor, o que acontece na plataforma.</li>
+            <li><strong>Saída do serviço:</strong> devolução e remoção dos ativos do cliente ao fim do contrato.</li>
+        </ul>
+
+        <h3>ISO/IEC 27018: dados pessoais em nuvem pública</h3>
+        <p>
+            Orienta o provedor que atua como <strong>operador de dados pessoais</strong> (<em>PII processor</em>): tratar só conforme as instruções do cliente, não usar os dados para publicidade própria, informar sobre suboperadores, ajudar o cliente a atender pedidos de titulares, avisar sobre incidentes e apagar os dados ao final. Ela também pode servir ao cliente, que é o <strong>controlador</strong>, para avaliar um provedor. A edição de 2019 foi substituída pela de 2025, alinhada à 27002:2022.
+        </p>
+
+        <table class="data-table">
+            <thead>
+                <tr><th>Norma</th><th>Edições</th><th>Foco</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>ISO/IEC 27017</td>
+                    <td>2015; 2026 (a atual)</td>
+                    <td>Segurança da informação em serviços de nuvem, para cliente e provedor</td>
+                </tr>
+                <tr>
+                    <td>ISO/IEC 27018</td>
+                    <td>2019; 2025 (a atual)</td>
+                    <td>Proteção de dados pessoais em nuvem pública, com o provedor como operador</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">🗓️</span>
+                <strong>Confira a edição antes de citar</strong>
+            </div>
+            <p>
+                Material e contratos ainda citam as edições de 2015 e 2019. Verifique qual vale para o seu certificado, relatório ou edital. Os números dos controles mudaram entre as edições, então cite-os sempre com a edição.
+            </p>
+        </div>
+
+        <h3>Como entram na Declaração de Aplicabilidade</h3>
+        <p>
+            Nenhuma das duas é certificada sozinha na prática comum: elas orientam o SGSI da ISO/IEC 27001. Cada organização registra, na sua <strong>Declaração de Aplicabilidade</strong>, quais controles se aplicam, se estão implementados e por quê.
+        </p>
+        <ul>
+            <li><strong>Provedor:</strong> inclui os controles de nuvem e de proteção de dados pessoais que o serviço sustenta e os mostra ao cliente como evidência.</li>
+            <li><strong>Cliente:</strong> marca como aplicáveis os controles da sua parte (identidades, configuração, dados) e, para o resto, registra a confiança no provedor: contrato, relatórios e certificados dele.</li>
+        </ul>
+
+        <div class="callout key">
+            <div class="callout-title">
+                <span class="callout-icon">🔗</span>
+                <strong>Ligação com os outros estudos</strong>
+            </div>
+            <p>
+                Os dois lados da Declaração de Aplicabilidade seguem a divisão da responsabilidade compartilhada, e o CSPM é a evidência contínua da parte do cliente. A Declaração de Aplicabilidade é detalhada no Estudo 26 (ISO 27001 e 27002); a gestão de privacidade, no Estudo 27 (LGPD, seção da ISO/IEC 27701).
+            </p>
+        </div>
+    </section>
+
     <!-- SEÇÃO 3: SIMULADOR -->
     <section class="study-section" id="simulador" data-tipo="laboratorio">
         <h2>Laboratório Prático: Auditor de Permissões S3 e Políticas IAM Cloud</h2>
@@ -205,6 +276,10 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
                 <input type="checkbox" id="chk-nv-7">
                 <label for="chk-nv-7"><strong>Postura contínua:</strong> CSPM comparando com os CIS Benchmarks e alertas para mudanças críticas.</label>
             </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-nv-8">
+                <label for="chk-nv-8"><strong>Provedor e normas:</strong> pedir o certificado e a Declaração de Aplicabilidade do provedor (ISO/IEC 27001, 27017, 27018), conferir a edição e o escopo, e registrar na sua própria Declaração o que é do cliente.</label>
+            </li>
         </ul>
     </section>
 
@@ -283,6 +358,18 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
                 </div>
             </details>
         </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 7 (Normas):</strong> A empresa usa um provedor com certificado ISO/IEC 27018. Isso a livra de responder pela LGPD sobre os dados pessoais dos clientes dela?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. O certificado indica que o provedor, como operador, protege os dados conforme a norma, dentro do escopo certificado. A empresa continua controladora e responsável pelas bases legais, pelo contrato com o operador e pela configuração do que é dela. Na Declaração de Aplicabilidade, o provedor entra como apoio, não como substituto.</p>
+                </div>
+            </details>
+        </div>
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
@@ -314,6 +401,8 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
             <li>AWS — Blocking public access to your Amazon S3 storage e Use IMDSv2.</li>
             <li>CIS Benchmarks para AWS, Azure e GCP.</li>
             <li>Microsoft Learn e Google Cloud — controles equivalentes de acesso anônimo a armazenamento.</li>
+            <li>ISO/IEC 27017 (edições 2015 e 2026) — controles de segurança da informação para serviços em nuvem.</li>
+            <li>ISO/IEC 27018 (edições 2019 e 2025) — proteção de dados pessoais em nuvem pública.</li>
         </ul>
 
         <div class="callout tip" style="margin-top: 1.5rem;">
