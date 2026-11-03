@@ -355,9 +355,32 @@ class TestRegulacaoSetorFinanceiro(unittest.TestCase):
         self.assertIn('class="diagram-svg-wrap', content)
         self.assertNotIn('<pre class="mermaid"', content)
         self.assertEqual(content.count('class="checklist-item"'), 7)
-        self.assertGreaterEqual(content.count('class="quiz-item"'), 6)
+        self.assertGreaterEqual(content.count('class="quiz-item"'), 7)
         self.assertIn('class="facts-grid', content)
         self.assertIn('initChecklist("regulacao-setor-financeiro")', content)
+
+    def test_correspondencia_normativa(self):
+        body = self._body()
+        exig = body[body.index('id="exigencias"'):body.index('id="simulador"')]
+        fim = exig[exig.index("<h3>Normas revogadas e vigentes"):]
+        tabela = re.search(r"<table.*?</table>", fim, re.S)
+        self.assertIsNotNone(tabela, "tabela de correspondência no fim da seção exigencias")
+        linhas = re.findall(r"<tr>(.*?)</tr>", tabela.group(0), re.S)
+        pares = [("Res. CMN 4.658/2018", "Res. CMN 4.893/2021"),
+                 ("Res. CMN 4.752/2019", "Res. CMN 4.893/2021"),
+                 ("Circular 3.909/2018", "Res. BCB 85/2021")]
+        for antiga, vigente in pares:
+            with self.subTest(antiga=antiga):
+                linha = next((l for l in linhas if antiga in l), None)
+                self.assertIsNotNone(linha, antiga)
+                self.assertLess(linha.index(antiga), linha.index(vigente))
+        self.assertIn("01/07/2021", tabela.group(0))
+        self.assertIn("01/08/2021", tabela.group(0))
+        self.assertRegex(fim, r'<div class="callout (?:tip|warning|law|danger)[^"]*">')
+        self.assertIn("Vagas e currículos", fim)
+        fatos = body[body.index('id="fatos"'):body.index("</article>")]
+        self.assertIn("bcb.gov.br", fatos)
+        self.assertIn("Circ_3909", fatos)
 
     def test_integracao_com_portal_index(self):
         content = self.portal_path.read_text(encoding="utf-8")
