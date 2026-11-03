@@ -231,6 +231,63 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
         </p>
     </section>
 
+    <!-- SEÇÃO: ISO/IEC 27005:2022 -->
+    <section class="study-section" id="iso-27005" data-tipo="teoria">
+        <h2>ISO/IEC 27005:2022: Risco de Segurança da Informação</h2>
+
+        <p class="lead-text">
+            A ISO 31000 diz como gerir qualquer risco; a ISO/IEC 27001 exige que a organização avalie e trate os riscos de segurança da informação. A <strong>ISO/IEC 27005:2022</strong> é o elo entre as duas: orienta como conduzir esse processo, sem impor uma metodologia única.
+        </p>
+
+        <h3>Como as Três Normas se Encaixam</h3>
+        <ul>
+            <li><strong>ISO 31000:2018:</strong> princípios, estrutura e processo genéricos (já vistos na seção anterior). A 27005:2022 segue esse processo e usa a mesma linguagem: contexto, identificação, análise, avaliação, tratamento, monitoramento e comunicação.</li>
+            <li><strong>ISO/IEC 27001:2022:</strong> é a norma certificável e a que traz os requisitos. A cláusula <strong>6.1.2</strong> exige definir e aplicar um processo de avaliação de riscos; a <strong>6.1.3</strong>, um processo de tratamento, com a comparação com o Anexo A e a Declaração de Aplicabilidade. As cláusulas <strong>8.2</strong> e <strong>8.3</strong> exigem executar a avaliação e implementar o plano de tratamento, a intervalos planejados ou diante de mudanças significativas, guardando informação documentada.</li>
+            <li><strong>ISO/IEC 27005:2022:</strong> não é certificável. É orientação: mostra como cumprir 6.1.2 e 6.1.3 de forma consistente, e a 27001 aceita qualquer método que produza resultados consistentes, válidos e comparáveis.</li>
+        </ul>
+
+        <h3>Duas Abordagens para Identificar Riscos</h3>
+        <p>
+            A edição de 2022 descreve duas formas de identificar riscos, que podem ser combinadas na mesma organização.
+        </p>
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Abordagem</th><th>Ponto de partida</th><th>Quando costuma servir</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Baseada em ativos</strong></td><td>Inventário de ativos, com ameaças e vulnerabilidades de cada um e as consequências de perder confidencialidade, integridade ou disponibilidade.</td><td>Escopos bem delimitados e com inventário confiável, como um sistema, um data center ou o escopo de uma certificação.</td></tr>
+                    <tr><td><strong>Baseada em eventos</strong></td><td>Cenários de risco: fontes de risco e eventos que levam a consequências para o negócio (por exemplo, "ransomware paralisa o faturamento"). Pode ser estratégica ou operacional.</td><td>Visão executiva, riscos que atravessam vários ativos, ou quando o inventário ainda é incompleto.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout key">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>Dois Conjuntos de Critérios</strong>
+            </div>
+            <p>
+                Defina os critérios antes de analisar. Há os <strong>critérios para realizar avaliações de riscos</strong> (escalas de consequência e probabilidade e como se obtém o nível de risco) e os <strong>critérios de aceitação</strong> de riscos (o nível até o qual o risco pode ser aceito e por quem). Misturar os dois é um erro comum: um mede o risco, o outro decide o que fazer com ele.
+            </p>
+        </div>
+
+        <h3>Ligação com o Laboratório</h3>
+        <p>
+            A <strong>matriz 5×5</strong> do laboratório é um exemplo de critério para realizar a avaliação: as escalas de 1 a 5 e as faixas Baixo a Crítico. O <strong>apetite</strong> de 9 pontos funciona como critério de aceitação, e o registro de riscos guarda dono, tratamento e risco residual. Os cenários do laboratório (ransomware, vazamento, fraude) são cenários no sentido da abordagem baseada em eventos; o campo "ativo" de cada ficha permite ler os mesmos casos pela abordagem baseada em ativos.
+        </p>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">⚠️</span>
+                <strong>O Que o Auditor Pede</strong>
+            </div>
+            <p>
+                Numa auditoria da ISO/IEC 27001:2022, o auditor procura o processo definido (6.1.2), os critérios aprovados, os donos dos riscos, o plano de tratamento aprovado e a aceitação do risco residual pelos donos (6.1.3), além das evidências de que o processo roda de fato (8.2 e 8.3).
+            </p>
+        </div>
+    </section>
+
     <!-- SEÇÃO 3: SIMULADOR -->
     <section class="study-section" id="simulador" data-tipo="laboratorio">
         <h2>Laboratório Prático: Calculadora de Matriz 5×5 e Risco Financeiro</h2>
@@ -344,6 +401,10 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
                 <input type="checkbox" id="chk-risco-7">
                 <label for="chk-risco-7"><strong>Revisão periódica:</strong> o registro é revisto ao menos uma vez por ano e após incidentes ou mudanças relevantes, com indicadores de risco (KRIs) acompanhados.</label>
             </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-risco-8">
+                <label for="chk-risco-8"><strong>Dois conjuntos de critérios:</strong> os critérios para realizar a avaliação e os critérios de aceitação estão documentados separadamente, e o escopo declara se a identificação é baseada em ativos, em eventos ou nas duas.</label>
+            </li>
         </ul>
     </section>
 
@@ -428,6 +489,19 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
                 </div>
             </details>
         </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 7 (ISO/IEC 27005:2022):</strong> Qual é a relação entre a ISO/IEC 27005:2022, a ISO 31000 e a ISO/IEC 27001:2022, e qual a diferença entre as abordagens baseada em ativos e baseada em eventos?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A 27005 aplica o processo da ISO 31000 à segurança da informação e orienta o cumprimento das cláusulas 6.1.2 e 6.1.3 da 27001; não é certificável.</p>
+                    <p>Na abordagem baseada em ativos, o risco nasce do inventário (ativo, ameaça, vulnerabilidade). Na baseada em eventos, nasce de cenários que levam a consequências para o negócio. A organização escolhe a que couber ao escopo, ou combina as duas, desde que os resultados sejam consistentes, válidos e comparáveis.</p>
+                </div>
+            </details>
+        </div>
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
@@ -450,6 +524,10 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
             <div class="facts-card">
                 <h4>4. Escolha de controles</h4>
                 <p>Entre opções que se excluem, vence o maior benefício líquido dentro do orçamento, com residual dentro do apetite.</p>
+            </div>
+            <div class="facts-card">
+                <h4>5. ISO/IEC 27005:2022</h4>
+                <p>Orienta a avaliação e o tratamento de riscos exigidos pela 27001 (6.1.2, 6.1.3, 8.2, 8.3). Identificação baseada em ativos ou em eventos; critérios de avaliação separados dos critérios de aceitação.</p>
             </div>
         </div>
 

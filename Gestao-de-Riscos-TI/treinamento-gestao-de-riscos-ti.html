@@ -2066,6 +2066,7 @@ td {
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: Risco Precisa Caber numa Decisão</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#processo" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">ISO 31000, Matriz 5×5 e Cálculo Financeiro</span></span><span class="toc-contador"></span></a></li>
+    <li><a class="toc-item" href="#iso-27005" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">ISO/IEC 27005:2022: Risco de Segurança da Informação</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Calculadora de Matriz 5×5 e Risco Financeiro</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist do Processo de Gestão de Riscos</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Concursos</span></span><span class="toc-contador"></span></a></li>
@@ -2082,14 +2083,14 @@ td {
   <h1>ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)</h1>
   <p class="mhead-sub">Processo da ISO 31000:2018, metodologias de análise de risco, matrizes 5x5, cálculo financeiro de perdas e justificativa de ROI</p>
   <div class="chips"><span class="chip">⏱ 45 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Govern / Identify</span><span class="chip">🎯 ATT&amp;CK Governança Corporativa</span><span class="chip">👤 GRC &amp; Auditoria · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>3 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>8 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>7 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 25: Gestao-de-Riscos-TI Body Fragment -->
 <article class="study-container" data-slug="gestao-riscos-ti">
 
     <!-- SEÇÃO 1: INTRODUÇÃO -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: Risco Precisa Caber numa Decisão</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 7</small></span><h2>Introdução: Risco Precisa Caber numa Decisão</h2></div>
 
         <p class="lead-text">
             A diretoria não aprova "mais segurança". Ela aprova uma troca: gastar R$ 420 mil por ano para que um ransomware deixe de custar, em média, R$ 3 milhões por ano. Gestão de riscos é o processo que transforma ameaças técnicas nessa troca, com premissas que alguém pode questionar e revisar. Neste estudo você vai conduzir o processo da ISO 31000:2018, posicionar riscos numa matriz 5×5, calcular a perda esperada em reais e escolher o tratamento com melhor retorno, tudo para a <strong>Ipê Store</strong>, uma loja online fictícia que processa pagamentos com cartão.
@@ -2129,7 +2130,7 @@ td {
 
     <!-- SEÇÃO 2: PROCESSO E ANÁLISE -->
     <section class="study-section" id="processo" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>ISO 31000, Matriz 5×5 e Cálculo Financeiro</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 7</small></span><h2>ISO 31000, Matriz 5×5 e Cálculo Financeiro</h2></div>
 
         <h3>ISO 31000:2018: Princípios, Estrutura e Processo</h3>
         <p>
@@ -2299,9 +2300,66 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
         </p>
     </section>
 
+    <!-- SEÇÃO: ISO/IEC 27005:2022 -->
+    <section class="study-section" id="iso-27005" data-tipo="teoria">
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 7</small></span><h2>ISO/IEC 27005:2022: Risco de Segurança da Informação</h2></div>
+
+        <p class="lead-text">
+            A ISO 31000 diz como gerir qualquer risco; a ISO/IEC 27001 exige que a organização avalie e trate os riscos de segurança da informação. A <strong>ISO/IEC 27005:2022</strong> é o elo entre as duas: orienta como conduzir esse processo, sem impor uma metodologia única.
+        </p>
+
+        <h3>Como as Três Normas se Encaixam</h3>
+        <ul>
+            <li><strong>ISO 31000:2018:</strong> princípios, estrutura e processo genéricos (já vistos na seção anterior). A 27005:2022 segue esse processo e usa a mesma linguagem: contexto, identificação, análise, avaliação, tratamento, monitoramento e comunicação.</li>
+            <li><strong>ISO/IEC 27001:2022:</strong> é a norma certificável e a que traz os requisitos. A cláusula <strong>6.1.2</strong> exige definir e aplicar um processo de avaliação de riscos; a <strong>6.1.3</strong>, um processo de tratamento, com a comparação com o Anexo A e a Declaração de Aplicabilidade. As cláusulas <strong>8.2</strong> e <strong>8.3</strong> exigem executar a avaliação e implementar o plano de tratamento, a intervalos planejados ou diante de mudanças significativas, guardando informação documentada.</li>
+            <li><strong>ISO/IEC 27005:2022:</strong> não é certificável. É orientação: mostra como cumprir 6.1.2 e 6.1.3 de forma consistente, e a 27001 aceita qualquer método que produza resultados consistentes, válidos e comparáveis.</li>
+        </ul>
+
+        <h3>Duas Abordagens para Identificar Riscos</h3>
+        <p>
+            A edição de 2022 descreve duas formas de identificar riscos, que podem ser combinadas na mesma organização.
+        </p>
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Abordagem</th><th>Ponto de partida</th><th>Quando costuma servir</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Baseada em ativos</strong></td><td>Inventário de ativos, com ameaças e vulnerabilidades de cada um e as consequências de perder confidencialidade, integridade ou disponibilidade.</td><td>Escopos bem delimitados e com inventário confiável, como um sistema, um data center ou o escopo de uma certificação.</td></tr>
+                    <tr><td><strong>Baseada em eventos</strong></td><td>Cenários de risco: fontes de risco e eventos que levam a consequências para o negócio (por exemplo, "ransomware paralisa o faturamento"). Pode ser estratégica ou operacional.</td><td>Visão executiva, riscos que atravessam vários ativos, ou quando o inventário ainda é incompleto.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout key">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>Dois Conjuntos de Critérios</strong>
+            </div>
+            <p>
+                Defina os critérios antes de analisar. Há os <strong>critérios para realizar avaliações de riscos</strong> (escalas de consequência e probabilidade e como se obtém o nível de risco) e os <strong>critérios de aceitação</strong> de riscos (o nível até o qual o risco pode ser aceito e por quem). Misturar os dois é um erro comum: um mede o risco, o outro decide o que fazer com ele.
+            </p>
+        </div>
+
+        <h3>Ligação com o Laboratório</h3>
+        <p>
+            A <strong>matriz 5×5</strong> do laboratório é um exemplo de critério para realizar a avaliação: as escalas de 1 a 5 e as faixas Baixo a Crítico. O <strong>apetite</strong> de 9 pontos funciona como critério de aceitação, e o registro de riscos guarda dono, tratamento e risco residual. Os cenários do laboratório (ransomware, vazamento, fraude) são cenários no sentido da abordagem baseada em eventos; o campo "ativo" de cada ficha permite ler os mesmos casos pela abordagem baseada em ativos.
+        </p>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">⚠️</span>
+                <strong>O Que o Auditor Pede</strong>
+            </div>
+            <p>
+                Numa auditoria da ISO/IEC 27001:2022, o auditor procura o processo definido (6.1.2), os critérios aprovados, os donos dos riscos, o plano de tratamento aprovado e a aceitação do risco residual pelos donos (6.1.3), além das evidências de que o processo roda de fato (8.2 e 8.3).
+            </p>
+        </div>
+    </section>
+
     <!-- SEÇÃO 3: SIMULADOR -->
     <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 3 de 6</small></span><h2>Laboratório Prático: Calculadora de Matriz 5×5 e Risco Financeiro</h2></div>
+        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 4 de 7</small></span><h2>Laboratório Prático: Calculadora de Matriz 5×5 e Risco Financeiro</h2></div>
 
         <p class="lead-text">
             Escolha um dos seis cenários da Ipê Store. Clique na célula da matriz onde você acha que o risco está e compare com o que os números dizem. Ajuste AV, EF e ARO, escolha um tratamento e acompanhe o registro de riscos: o plano precisa caber no orçamento anual e deixar cada risco residual dentro do apetite.
@@ -2377,7 +2435,7 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
 
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist do Processo de Gestão de Riscos</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 5 de 7</small></span><h2>Checklist do Processo de Gestão de Riscos</h2></div>
 
         <p class="lead-text">
             Use esta lista para revisar o processo de riscos de uma organização ou preparar uma auditoria da ISO/IEC 27001. O estado das caixas fica salvo no seu navegador.
@@ -2412,12 +2470,16 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
                 <input type="checkbox" id="chk-risco-7">
                 <label for="chk-risco-7"><strong>Revisão periódica:</strong> o registro é revisto ao menos uma vez por ano e após incidentes ou mudanças relevantes, com indicadores de risco (KRIs) acompanhados.</label>
             </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-risco-8">
+                <label for="chk-risco-8"><strong>Dois conjuntos de critérios:</strong> os critérios para realizar a avaliação e os critérios de aceitação estão documentados separadamente, e o escopo declara se a identificação é baseada em ativos, em eventos ou nas duas.</label>
+            </li>
         </ul>
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Concursos</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 6 de 7</small></span><h2>Questões de Fixação e Concursos</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2496,11 +2558,24 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
                 </div>
             </details>
         </div>
+
+        <div class="quiz-item" data-q="q7">
+            <div class="quiz-question">
+                <strong>Questão 7 (ISO/IEC 27005:2022):</strong> Qual é a relação entre a ISO/IEC 27005:2022, a ISO 31000 e a ISO/IEC 27001:2022, e qual a diferença entre as abordagens baseada em ativos e baseada em eventos?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A 27005 aplica o processo da ISO 31000 à segurança da informação e orienta o cumprimento das cláusulas 6.1.2 e 6.1.3 da 27001; não é certificável.</p>
+                    <p>Na abordagem baseada em ativos, o risco nasce do inventário (ativo, ameaça, vulnerabilidade). Na baseada em eventos, nasce de cenários que levam a consequências para o negócio. A organização escolhe a que couber ao escopo, ou combina as duas, desde que os resultados sejam consistentes, válidos e comparáveis.</p>
+                </div>
+            </details>
+        </div>
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 7 de 7</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2518,6 +2593,10 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
             <div class="facts-card">
                 <h4>4. Escolha de controles</h4>
                 <p>Entre opções que se excluem, vence o maior benefício líquido dentro do orçamento, com residual dentro do apetite.</p>
+            </div>
+            <div class="facts-card">
+                <h4>5. ISO/IEC 27005:2022</h4>
+                <p>Orienta a avaliação e o tratamento de riscos exigidos pela 27001 (6.1.2, 6.1.3, 8.2, 8.3). Identificação baseada em ativos ou em eventos; critérios de avaliação separados dos critérios de aceitação.</p>
             </div>
         </div>
 

@@ -206,14 +206,39 @@ class TestGestaoRiscosTI(unittest.TestCase):
         motor = content[ini:content.index("</script>", ini)]
         self.assertNotIn("innerHTML", motor)
 
+    # ------------------------------------------------------------ ISO/IEC 27005
+    def _secao(self, content, sid):
+        m = re.search(r'<section class="study-section" id="%s" data-tipo="[a-z]+">(.*?)</section>' % sid, content, re.S)
+        self.assertIsNotNone(m, f"Seção {sid} ausente")
+        return m.group(1)
+
+    def test_secao_iso_27005_antes_do_laboratorio(self):
+        body = self.body_path.read_text(encoding="utf-8")
+        m = re.search(r'<section class="study-section" id="iso-27005" data-tipo="teoria">.*?</section>\s*(?:<!--.*?-->\s*)?(<section[^>]*>)', body, re.S)
+        self.assertIsNotNone(m, "Seção iso-27005 ausente")
+        self.assertIn('id="simulador" data-tipo="laboratorio"', m.group(1))
+        content = self.compiled_path.read_text(encoding="utf-8")
+        self.assertIn("Seção 7 de 7", content)
+
+    def test_secao_iso_27005_conteudo(self):
+        content = self.compiled_path.read_text(encoding="utf-8")
+        sec = self._secao(content, "iso-27005")
+        for termo in ("ISO/IEC 27005:2022", "ISO 31000", "6.1.2", "baseada em eventos",
+                      "baseada em ativos", "critérios de aceitação", "matriz 5×5"):
+            self.assertIn(termo, sec, f"Termo ausente na seção: {termo}")
+
+    def test_secao_iso_27005_referencia(self):
+        content = self.compiled_path.read_text(encoding="utf-8")
+        self.assertIn("ISO/IEC 27005:2022", self._secao(content, "fatos"))
+
     def test_componentes_pedagogicos(self):
         content = self.compiled_path.read_text(encoding="utf-8")
         self.assertIn('class="callout', content)
         self.assertIn('class="terminal-box', content)
         self.assertIn('class="diagram-svg-wrap', content)
         self.assertNotIn('<pre class="mermaid"', content)
-        self.assertEqual(content.count('class="checklist-item"'), 7)
-        self.assertGreaterEqual(content.count('class="quiz-item"'), 5)
+        self.assertEqual(content.count('class="checklist-item"'), 8)
+        self.assertGreaterEqual(content.count('class="quiz-item"'), 7)
         self.assertIn('class="facts-grid', content)
         self.assertIn('initChecklist("gestao-riscos-ti")', content)
 
