@@ -1367,3 +1367,52 @@ td {
     break-inside: avoid;
   }
 }
+
+/* ==========================================================================
+   Glossário: termos marcados e popover
+   ========================================================================== */
+dfn.glossario {
+  font-style: normal;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: help;
+}
+dfn.glossario:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+.glossario-pop {
+  position: fixed;
+  z-index: 60;
+  box-sizing: border-box;
+  max-width: min(22rem, calc(100vw - 32px));
+  padding: 0.75rem 0.9rem;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+.glossario-pop[hidden] {
+  display: none;
+}
+.glossario-pop-titulo {
+  font-weight: 700;
+}
+.glossario-pop-sub {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 0.1rem;
+}
+.glossario-pop-texto {
+  margin-top: 0.4rem;
+}
+.glossario-pop-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: var(--accent);
+  font-weight: 600;
+}

@@ -194,6 +194,14 @@ class TestContrasteAA(unittest.TestCase):
                     cor_texto = resolver(texto, tokens, cor_fundo, local)
                     self.assertGreaterEqual(contraste(cor_texto, cor_fundo), 4.5)
 
+    def test_glossario_estilizado(self):
+        css = carregar_css()
+        for seletor in ("dfn.glossario {", "dfn.glossario:focus-visible", ".glossario-pop {"):
+            self.assertIn(seletor, css)
+        base = (GERADORES / "base.css").read_text(encoding="utf-8")
+        secao = base[base.rindex("Glossário: termos"):]
+        self.assertNotRegex(secao, r"#[0-9A-Fa-f]{3,8}\b")
+
 
 if __name__ == "__main__":
     unittest.main()
