@@ -21,6 +21,8 @@ DOMINIO_OFICIAL = {
     "CEH": "eccouncil.org",
     "CISM": "isaca.org",
     "CISA": "isaca.org",
+    "CRISC": "isaca.org",
+    "CDPSE": "isaca.org",
     "CISSP": "isc2.org",
     "CCSP": "isc2.org",
     "GSEC": "giac.org",
@@ -192,8 +194,8 @@ class TestCertificacoesCarreira(unittest.TestCase):
         d = self._dados()
         esperados = {"Security+": 5, "CISSP": 8, "CCSP": 6, "CISM": 4, "CEH": 9,
                      "ISFS": 4, "PDPF/PDPP": 11, "ITIL 4 F": 7, "CSFPC": 9, "CISA": 5, "ISO 27001 LA": 7,
-                     "eJPT": 4, "eCPPT": 6, "OSCP": 10}
-        com_pesos = ("Security+", "CISSP", "CCSP", "CISM", "CISA", "ISFS", "ITIL 4 F", "eJPT", "eCPPT")
+                     "eJPT": 4, "eCPPT": 6, "OSCP": 10, "CRISC": 4, "CDPSE": 4}
+        com_pesos = ("Security+", "CISSP", "CCSP", "CISM", "CISA", "ISFS", "ITIL 4 F", "eJPT", "eCPPT", "CRISC", "CDPSE")
         entrada = ("Security+", "ISFS", "PDPF/PDPP", "ITIL 4 F", "CSFPC", "eJPT")
         for c in d["certificacoes"]:
             with self.subTest(cert=c["sigla"]):
@@ -223,6 +225,8 @@ class TestCertificacoesCarreira(unittest.TestCase):
         self.assertEqual(pesos("CCSP"), [17, 20, 17, 16, 17, 13])
         self.assertEqual(pesos("CISSP"), [16, 10, 13, 13, 13, 12, 13, 10])
         self.assertEqual(pesos("CISA"), [18, 18, 12, 26, 26])
+        self.assertEqual(pesos("CRISC"), [26, 22, 32, 20])
+        self.assertEqual(pesos("CDPSE"), [20, 18, 23, 39])
         self.assertEqual(pesos("Security+"), [12, 22, 18, 28, 20])
         self.assertIn("3 de novembro de 2026", self._cert(d, "CISM")["nota_dominios"])
         self.assertIn("17 de novembro de 2026", self._cert(d, "Security+")["nota_dominios"])
@@ -442,12 +446,38 @@ class TestCertificacoesCarreira(unittest.TestCase):
         for a in arquivos:
             self.assertNotIn("12 certificações", a.read_text(encoding="utf-8"), a.name)
 
+    def test_sem_texto_de_quinze(self):
+        arquivos = list(GERADORES.glob("*_body.html")) + [GERADORES.parent / "README.md", GERADORES / "CURRICULO.md", GERADORES / "index_dados.py"]
+        for a in arquivos:
+            self.assertNotIn("15 certificações", a.read_text(encoding="utf-8"), a.name)
+
+    def test_crisc_e_cdpse(self):
+        d = self._dados()
+        casos = {"CRISC": ("crisc", "crisc-exam-content-outline", "Lideranca-e-Programa-de-Seguranca"),
+                 "CDPSE": ("cdpse", "cdpse-exam-content-outline", "LGPD-e-Privacidade")}
+        for sigla, (slug, outline, modulo) in casos.items():
+            with self.subTest(cert=sigla):
+                c = self._cert(d, sigla)
+                self.assertEqual((c["orgao"], c["nivel"], c["requisitos"]), ("ISACA", 3, {"conferir": True}))
+                urls = [f["url"] for f in c["fontes"]]
+                base = f"https://www.isaca.org/credentialing/{slug}"
+                self.assertIn(base, urls)
+                self.assertIn(f"{base}/{outline}", urls)
+                self.assertIn("120", c["manutencao"])
+                self.assertIn("3 anos", c["manutencao"])
+                self.assertIn("3 anos", c["experiencia"])
+                self.assertIn("10 anos", c["experiencia"])
+                m = next(x for x in CERTIFICACOES if x["sigla"] == sigla)
+                self.assertEqual(m["site_oficial"], base)
+                self.assertGreaterEqual(len(m["modulos"]), 5)
+                self.assertIn(modulo, m["modulos"])
+
     def test_tabela_certificacoes_da_secao(self):
         sec = self._secao(self.body_path.read_text(encoding="utf-8"), "certificacoes")
         tabela = re.search(r"<table.*?</table>", sec, re.S).group(0)
         for c in CERTIFICACOES:
             self.assertIn(f"<strong>{c['sigla']}</strong>", tabela, f"Sigla ausente na tabela: {c['sigla']}")
-        self.assertEqual(len(CERTIFICACOES), 15)
+        self.assertEqual(len(CERTIFICACOES), 17)
 
     def test_componentes_pedagogicos(self):
         content = self.compiled_path.read_text(encoding="utf-8")

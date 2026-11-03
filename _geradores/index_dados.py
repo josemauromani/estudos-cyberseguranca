@@ -914,6 +914,24 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "experiencia": "Sem exigência formal",
         "modulos": ["Redes-e-Protocolos", "Reconhecimento-e-OSINT", "OWASP-Top-10-Web", "Seguranca-em-APIs", "Pentest-Metodologias", "Linux-para-Seguranca", "Python-para-Seguranca", "PowerShell-e-Windows-Interno", "Laboratorio-Domestico-e-Portfolio", "Active-Directory-Fundamentos", "Ataques-e-Defesa-no-AD"],
     },
+    {
+        "sigla": "CRISC",
+        "site_oficial": "https://www.isaca.org/credentialing/crisc",
+        "nome": "Certified in Risk and Information Systems Control",
+        "orgao": "ISACA",
+        "foco": "Risco de TI e controles",
+        "experiencia": "3 anos em ao menos 2 dos 4 domínios, nos 10 anos anteriores ao pedido",
+        "modulos": ["Gestao-de-Riscos-TI", "Lideranca-e-Programa-de-Seguranca", "ISO-27001-e-27002", "Gestao-de-Riscos-de-Terceiros", "Auditoria-de-TI", "Continuidade-e-Disaster-Recovery", "Autenticacao-e-IAM", "Gestao-de-Vulnerabilidades"],
+    },
+    {
+        "sigla": "CDPSE",
+        "site_oficial": "https://www.isaca.org/credentialing/cdpse",
+        "nome": "Certified Data Privacy Solutions Engineer",
+        "orgao": "ISACA",
+        "foco": "Privacidade na arquitetura e no ciclo de vida dos dados",
+        "experiencia": "3 anos nos domínios da CDPSE, nos 10 anos anteriores ao pedido",
+        "modulos": ["LGPD-e-Privacidade", "Gestao-de-Riscos-de-Terceiros", "Protecao-de-Dados-e-Conteudo", "Seguranca-de-Bancos-de-Dados", "Criptografia-Pratica", "DevSecOps-e-CI-CD", "Seguranca-em-Nuvem", "Seguranca-em-APIs"],
+    },
 ]
 
 # 5. METADADOS RICOS DOS ESTUDOS CANÔNICOS
@@ -1497,7 +1515,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
     },
     "Certificacoes-e-Carreira": {
         "titulo": "Formação, Certificações e Carreira",
-        "subtitulo": "Graduações e pós em segurança, 15 certificações (de Security+, ISFS e ITIL 4 a CISSP, CISM e CISA, e a escada prática eJPT, eCPPT e OSCP), trajetórias de GRC e papéis do NICE Framework",
+        "subtitulo": "Graduações e pós em segurança, 17 certificações (de Security+, ISFS e ITIL 4 a CISSP, CISM, CISA, CRISC e CDPSE, e a escada prática eJPT, eCPPT e OSCP), trajetórias de GRC e papéis do NICE Framework",
         "trilha": 7,
         "nist": "Protect",
         "mitre": "N/A (módulo de carreira)",
