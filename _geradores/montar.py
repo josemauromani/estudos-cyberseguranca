@@ -49,6 +49,12 @@ from chassi import (
     numerar_questoes,
 )
 from contrato import ContratoInvalido, extrair_secoes, validar_corpo
+from glossario import (
+    GlossarioInvalido,
+    bloco_dados_glossario,
+    carregar_glossario,
+    marcar_termos,
+)
 
 
 def carregar_css(base_css: Optional[Path] = None) -> str:
@@ -181,6 +187,11 @@ def montar_treinamento(
         raise ContratoInvalido(erros)
     secoes = extrair_secoes(body_content)
 
+    # Glossário: marca a 1ª ocorrência de cada termo por seção e embute os verbetes usados
+    verbetes = carregar_glossario()
+    body_content, ids_glossario = marcar_termos(body_content, verbetes)
+    bloco_glossario = bloco_dados_glossario(ids_glossario, verbetes)
+
     # Processamento e pré-compilação de diagramas Mermaid embutidos
     body_content = processar_diagramas_html(
         body_content, cache_dir=cache_diagramas, forcar=recompilar_diagramas
@@ -221,6 +232,7 @@ def montar_treinamento(
 
 {main_html}
 
+  {bloco_glossario}
   <!-- Scripts Interativos Embutidos -->
   <script>
 {js_content}
@@ -299,6 +311,10 @@ def main(argv=None):
             cache_diagramas=Path(args.cache_diagramas) if args.cache_diagramas else None,
         )
     except ContratoInvalido as e:
+        for msg in e.erros:
+            print(msg, file=sys.stderr)
+        sys.exit(1)
+    except GlossarioInvalido as e:
         for msg in e.erros:
             print(msg, file=sys.stderr)
         sys.exit(1)

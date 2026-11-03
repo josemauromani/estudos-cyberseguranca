@@ -5,6 +5,7 @@ Glossário — validação do cadastro e utilitários
 Valida os verbetes de glossario_dados.py. Biblioteca padrão apenas.
 """
 
+import json
 import re
 from typing import Any, Dict, List
 
@@ -258,3 +259,24 @@ def marcar_termos(html: str, verbetes: List[Dict[str, Any]]):
     marcador.feed(html)
     marcador.close()
     return "".join(marcador.saida), sorted(marcador.usados)
+
+
+# ---------------------------------------------------------------------------
+# Bloco de dados embutido no módulo compilado
+# ---------------------------------------------------------------------------
+
+CAMPOS_BLOCO = ("termo", "categoria", "sigla_de", "termo_ingles", "significado")
+
+
+def bloco_dados_glossario(ids: List[str], verbetes: List[Dict[str, Any]]) -> str:
+    """JSON (<script type="application/json">) com os verbetes usados; "" se ids vazio."""
+    if not ids:
+        return ""
+    por_id = {v["id"]: v for v in verbetes}
+    dados = {
+        i: {c: por_id[i][c] for c in CAMPOS_BLOCO if c in por_id[i]}
+        for i in ids
+    }
+    texto = json.dumps(dados, ensure_ascii=False)
+    texto = texto.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+    return f'<script type="application/json" id="glossario-dados">{texto}</script>'
