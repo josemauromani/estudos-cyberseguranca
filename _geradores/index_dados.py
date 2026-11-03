@@ -1447,7 +1447,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
     },
     "Certificacoes-e-Carreira": {
         "titulo": "Formação, Certificações e Carreira",
-        "subtitulo": "Graduações e pós em segurança, certificações CEH, CISM, CISSP, CCSP, GSEC e Security+, e papéis do NICE Framework",
+        "subtitulo": "Graduações e pós em segurança, 12 certificações (de Security+, ISFS e ITIL 4 a CISSP, CISM e CISA), trajetórias de GRC e papéis do NICE Framework",
         "trilha": 7,
         "nist": "Protect",
         "mitre": "N/A (módulo de carreira)",

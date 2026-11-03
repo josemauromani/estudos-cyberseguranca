@@ -255,6 +255,16 @@ class TestCertificacoesCarreira(unittest.TestCase):
         self.assertNotIn("lattes.cnpq.br", body)
         self.assertNotIn("%", self._secao(body, "trajetorias"))
 
+    def test_textos_de_vitrine_citam_as_certificacoes_novas(self):
+        """Subtítulo do módulo 33, README e CURRICULO não podem ficar presos às seis certificações originais."""
+        subtitulo = ESTUDOS_DADOS["Certificacoes-e-Carreira"]["subtitulo"]
+        readme = (GERADORES.parent / "README.md").read_text(encoding="utf-8")
+        curriculo = (GERADORES / "CURRICULO.md").read_text(encoding="utf-8")
+        for sigla in ("CISA", "ISFS"):
+            self.assertIn(sigla, subtitulo, f"Subtítulo do módulo 33 sem {sigla}")
+            self.assertIn(sigla, readme, f"README sem {sigla}")
+            self.assertIn(sigla, curriculo, f"CURRICULO sem {sigla}")
+
     def test_tabela_certificacoes_da_secao(self):
         sec = self._secao(self.body_path.read_text(encoding="utf-8"), "certificacoes")
         tabela = re.search(r"<table.*?</table>", sec, re.S).group(0)

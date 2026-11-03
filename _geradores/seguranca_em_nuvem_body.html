@@ -128,7 +128,7 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
 
         <h3>ISO/IEC 27017: segurança de serviços em nuvem</h3>
         <p>
-            É um código de práticas que dá orientação específica de nuvem sobre controles da ISO/IEC 27002, separando o que cabe ao <strong>cliente</strong> do serviço e o que cabe ao <strong>provedor</strong>. A edição de 2015 também trazia controles adicionais próprios de nuvem, numerados à parte (série CLD). A edição de 2026, que a substitui, passou a seguir a estrutura da 27002:2022 e acrescenta controles específicos de nuvem. Esse é o mesmo assunto da <strong>responsabilidade compartilhada</strong> vista no início deste estudo, agora escrito como requisito: quem configura, quem monitora, quem apaga.
+            É um código de práticas que dá orientação específica de nuvem sobre controles da ISO/IEC 27002, separando o que cabe ao <strong>cliente</strong> do serviço e o que cabe ao <strong>provedor</strong>. A edição de 2015 também trazia controles adicionais próprios de nuvem, numerados à parte (série CLD). A edição de 2026, que a substitui, passou a se alinhar à ISO/IEC 27002:2022; confira no texto da norma como ficaram os controles próprios de nuvem. Esse é o mesmo assunto da <strong>responsabilidade compartilhada</strong> vista no início deste estudo, agora escrito como requisito: quem configura, quem monitora, quem apaga.
         </p>
         <ul>
             <li><strong>Papéis e responsabilidades:</strong> o contrato precisa dizer quem faz o quê, e cada lado deve conhecer a sua parte.</li>
@@ -142,6 +142,7 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
             Orienta o provedor que atua como <strong>operador de dados pessoais</strong> (<em>PII processor</em>): tratar só conforme as instruções do cliente, não usar os dados para publicidade própria, informar sobre suboperadores, ajudar o cliente a atender pedidos de titulares, avisar sobre incidentes e apagar os dados ao final. Ela também pode servir ao cliente, que é o <strong>controlador</strong>, para avaliar um provedor. A edição de 2019 foi substituída pela de 2025, alinhada à 27002:2022.
         </p>
 
+        <div class="table-responsive">
         <table class="data-table">
             <thead>
                 <tr><th>Norma</th><th>Edições</th><th>Foco</th></tr>
@@ -159,6 +160,7 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
                 </tr>
             </tbody>
         </table>
+        </div>
 
         <div class="callout warning">
             <div class="callout-title">
@@ -172,7 +174,7 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
 
         <h3>Como entram na Declaração de Aplicabilidade</h3>
         <p>
-            Nenhuma das duas é certificada sozinha na prática comum: elas orientam o SGSI da ISO/IEC 27001. Cada organização registra, na sua <strong>Declaração de Aplicabilidade</strong>, quais controles se aplicam, se estão implementados e por quê.
+            As duas são códigos de prática: a certificação costuma ser feita como extensão do escopo da ISO/IEC 27001, e elas orientam o SGSI dessa norma. Cada organização registra, na sua <strong>Declaração de Aplicabilidade</strong>, quais controles se aplicam, se estão implementados e por quê.
         </p>
         <ul>
             <li><strong>Provedor:</strong> inclui os controles de nuvem e de proteção de dados pessoais que o serviço sustenta e os mostra ao cliente como evidência.</li>
