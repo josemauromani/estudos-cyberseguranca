@@ -51,7 +51,7 @@ class TestGlossarioModulo(unittest.TestCase):
             body = Path(tmp) / "fixture_body.html"
             body.write_text(corpo_valido(), encoding="utf-8")
             html = compilar(body, "Threat-Hunting")
-        self.assertNotIn("glossario-dados", html)
+        self.assertIsNone(RE_JSON.search(html))
 
     def test_json_escapado(self):
         bloco = bloco_dados_glossario(
