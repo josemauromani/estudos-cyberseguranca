@@ -1,7 +1,7 @@
 # Glossário com tooltip nos módulos — design
 
 **Data:** 2026-11-03
-**Status:** Rascunho para aprovação
+**Status:** Aprovada e implementada
 **Tamanho:** subsistema novo (dados, marcação no build, tooltip nos módulos e visão nova no portal); sem módulo novo.
 
 ## Intenção
