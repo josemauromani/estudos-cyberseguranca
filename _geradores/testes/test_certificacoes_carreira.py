@@ -343,8 +343,32 @@ class TestCertificacoesCarreira(unittest.TestCase):
     def test_trajetorias_conteudo(self):
         sec = self._secao(self.body_path.read_text(encoding="utf-8"), "trajetorias")
         for termo in ("suporte", "CISO", "MBA", "Foundation", "EXIN", "CertiProf", "CQI/IRCA", "exemplo",
-                      "GRC", "Privacidade", "Auditoria", "Técnico", "por onde começar"):
+                      "GRC", "Privacidade", "Auditoria", "Técnico", "por onde começar",
+                      "três perfis", "Pentest", "eJPT", "eCPPT", "OSCP", "eCTHP", "SecurityX", "CASP+", "CTF"):
             self.assertIn(termo.lower(), sec.lower(), f"Termo ausente na seção trajetorias: {termo}")
+
+    def test_trajetorias_linha_pentest(self):
+        sec = self._secao(self.body_path.read_text(encoding="utf-8"), "trajetorias")
+        self.assertNotIn("dois perfis", sec.lower())
+        linhas = [l for l in re.findall(r"<tr>.*?</tr>", sec, re.S)
+                  if re.match(r"<tr>\s*<td>[^<]*(<strong>)?[^<]*Pentest", l)]
+        self.assertEqual(len(linhas), 1, "Linha Pentest ausente na tabela")
+        for termo in ("eJPT", "eCPPT", "OSCP", "14 (Pentest"):
+            self.assertIn(termo, linhas[0])
+        self.assertIn("dezembro de 2024", sec)
+
+    def test_checklist_e_quiz_33(self):
+        body = self.body_path.read_text(encoding="utf-8")
+        self.assertEqual(body.count('class="checklist-item"'), 8)
+        self.assertEqual(body.count('class="quiz-item"'), 8)
+        quiz = self._secao(body, "quiz")
+        self.assertIn("Questão 8", quiz)
+        self.assertIn("prática", quiz.lower())
+
+    def test_fatos_cita_securityx_e_ecthp(self):
+        fatos = self._secao(self.body_path.read_text(encoding="utf-8"), "fatos")
+        self.assertIn("https://www.comptia.org/en-us/certifications/securityx/", fatos)
+        self.assertIn("https://ine.com/security/certifications/ecthp-certification", fatos)
 
     def test_trajetorias_sem_dados_pessoais(self):
         body = self.body_path.read_text(encoding="utf-8")
