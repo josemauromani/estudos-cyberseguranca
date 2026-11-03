@@ -170,6 +170,15 @@ class TestThreatHunting(unittest.TestCase):
         self.assertIn("Estudo 46", fim)
         self.assertIn("vira detecção", fim)
 
+    def test_menciona_ecthp(self):
+        body = self.body_path.read_text(encoding="utf-8")
+        self.assertIn("eCTHP", body)
+        fim = body[body.index('id="fatos"'):body.index("</article>")]
+        m = re.search(r'<a [^>]*href="(https://[^"]*ine\.com[^"]*)"[^>]*>', fim)
+        self.assertIsNotNone(m, "link https para ine.com ausente em fatos")
+        self.assertIn("noopener noreferrer", m.group(0))
+        self.assertIn("Estudo 33", body)
+
     # ---------------------------------------------------------------- dados
     def test_dados_ficticios_e_bem_formados(self):
         d = self._dados()
