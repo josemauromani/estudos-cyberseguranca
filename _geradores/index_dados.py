@@ -784,7 +784,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "nome": "Certified Information Security Manager",
         "orgao": "ISACA",
         "foco": "Gestão de programa de SI",
-        "experiencia": "5 anos em SI, sendo 3 em gestão",
+        "experiencia": "5 anos em gestão de SI, em 3 dos 4 domínios",
         "modulos": ["Resposta-a-Incidentes", "Gestao-de-Riscos-TI", "ISO-27001-e-27002", "Continuidade-e-Disaster-Recovery", "PCI-DSS", "Gestao-de-Crise-e-Comunicacao", "Exercicios-Tabletop", "Regulacao-Setor-Financeiro", "Gestao-de-Riscos-de-Terceiros", "Auditoria-de-TI"],
     },
     {

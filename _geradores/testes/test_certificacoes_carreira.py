@@ -214,6 +214,34 @@ class TestCertificacoesCarreira(unittest.TestCase):
                     if dom.get("parcial") or not dom["modulos"]:
                         self.assertTrue(dom.get("nota", "").strip(), f"{dom['nome']} precisa de nota")
 
+    def test_revisao_contra_fontes_oficiais(self):
+        """Valores conferidos nas páginas dos emissores em 3 de novembro de 2026."""
+        d = self._dados()
+        pesos = lambda sigla: [dom["peso"] for dom in self._cert(d, sigla)["dominios"]]
+        self.assertEqual(pesos("CISM"), [18, 20, 33, 29])  # job practice em vigor desde 3/11/2026
+        self.assertEqual(pesos("CCSP"), [17, 20, 17, 16, 17, 13])
+        self.assertEqual(pesos("CISSP"), [16, 10, 13, 13, 13, 12, 13, 10])
+        self.assertEqual(pesos("CISA"), [18, 18, 12, 26, 26])
+        self.assertEqual(pesos("Security+"), [12, 22, 18, 28, 20])
+        self.assertIn("3 de novembro de 2026", self._cert(d, "CISM")["nota_dominios"])
+        self.assertIn("17 de novembro de 2026", self._cert(d, "Security+")["nota_dominios"])
+        self.assertIn("15 de abril de 2027", self._cert(d, "CISSP")["nota_dominios"])
+        # O mínimo anual de CPE da ISC2 é apenas sugerido; só o total do ciclo é exigido.
+        for sigla, total in (("CISSP", "120"), ("CCSP", "90")):
+            m = self._cert(d, sigla)["manutencao"]
+            self.assertIn(total + " CPE a cada 3 anos", m)
+            self.assertIn("sugere", m)
+            self.assertNotIn("mínimo de", m)
+        self.assertIn("a ISACA aceita", self._cert(d, "CISM")["sem_experiencia"])
+        self.assertIn("3 dos 4 domínios", self._cert(d, "CISM")["experiencia"])
+        # Números que a página oficial não confirma foram trocados por remissão à página.
+        self.assertNotIn("120", self._cert(d, "CEH")["manutencao"])
+        self.assertIn("página oficial", self._cert(d, "CEH")["manutencao"])
+        self.assertNotIn("3 anos", self._cert(d, "CSFPC")["manutencao"])
+        # O exame da PECB, segundo o manual do candidato, é dissertativo (em transição para múltipla escolha).
+        self.assertIn("dissertativ", self._cert(d, "ISO 27001 LA")["nota_dominios"])
+        self.assertIn("https://www.giac.org/renewal", [f["url"] for f in self._cert(d, "GSEC")["fontes"]])
+
     def test_lacuna_e_cobertura_parcial(self):
         d = self._dados()
         ceh = self._cert(d, "CEH")
@@ -232,7 +260,8 @@ class TestCertificacoesCarreira(unittest.TestCase):
         self.assertTrue(req["CEH"]["alternativa"].strip())
         self.assertEqual((req["CISSP"]["anos_si"], req["CISSP"]["desconto_graduacao"]), (5, 1))
         self.assertEqual((req["CCSP"]["anos_ti"], req["CCSP"]["anos_si"], req["CCSP"]["anos_nuvem"]), (5, 3, 1))
-        self.assertEqual((req["CISM"]["anos_si"], req["CISM"]["anos_gestao_si"]), (5, 3))
+        # ISACA: 5 anos de experiência em gestão de segurança da informação (página oficial do CISM).
+        self.assertEqual(req["CISM"], {"anos_gestao_si": 5})
         for sigla in ("ISFS", "ITIL 4 F", "CSFPC"):
             self.assertEqual(req[sigla], {}, sigla)
         for sigla in ("CISA", "ISO 27001 LA", "PDPF/PDPP"):
@@ -253,10 +282,12 @@ class TestCertificacoesCarreira(unittest.TestCase):
         self.assertEqual(elegibilidade(self._cert(d, "CISSP"), dict(graduado, graduacao=False)), "pendente")
         self.assertEqual(elegibilidade(self._cert(d, "CCSP"), graduado), "pendente")
         self.assertEqual(elegibilidade(self._cert(d, "CCSP"), dict(graduado, anos_si=3, anos_nuvem=1)), "elegivel")
-        self.assertEqual(elegibilidade(self._cert(d, "CISM"), dict(graduado, anos_si=5, anos_gestao_si=3)), "elegivel")
+        self.assertEqual(elegibilidade(self._cert(d, "CISM"), dict(graduado, anos_si=5, anos_gestao_si=5)), "elegivel")
+        self.assertEqual(elegibilidade(self._cert(d, "CISM"), dict(graduado, anos_si=5, anos_gestao_si=3)), "pendente")
         # Anos em segurança contam como anos em TI, e anos em gestão de segurança contam como anos em segurança.
         so_seguranca = {"anos_ti": 0, "anos_si": 5, "anos_gestao_si": 0, "anos_nuvem": 1}
         self.assertEqual(elegibilidade(self._cert(d, "CCSP"), so_seguranca), "elegivel")
+        self.assertEqual(elegibilidade(self._cert(d, "CISM"), so_seguranca), "pendente")
         so_gestao = {"anos_ti": 0, "anos_si": 0, "anos_gestao_si": 5, "anos_nuvem": 0}
         self.assertEqual(elegibilidade(self._cert(d, "CISM"), so_gestao), "elegivel")
 
