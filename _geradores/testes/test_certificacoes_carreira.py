@@ -228,13 +228,47 @@ class TestCertificacoesCarreira(unittest.TestCase):
         motor = content[ini:content.index("</script>", ini)]
         self.assertNotIn("innerHTML", motor)
 
+    # ------------------------------------------------------------- trajetórias
+    def _secao(self, body, sid):
+        m = re.search(r'<section class="study-section" id="%s".*?</section>' % sid, body, re.S)
+        self.assertIsNotNone(m, f"Seção {sid} ausente")
+        return m.group(0)
+
+    def test_secao_trajetorias_antes_do_laboratorio(self):
+        body = self.body_path.read_text(encoding="utf-8")
+        self.assertRegex(
+            body,
+            r'(?s)<section class="study-section" id="trajetorias" data-tipo="teoria">.*?</section>\s*'
+            r'(<!--.*?-->\s*)?<section class="study-section" id="simulador" data-tipo="laboratorio">',
+        )
+        self.assertIn("Seção 7 de 7", self.compiled_path.read_text(encoding="utf-8"))
+
+    def test_trajetorias_conteudo(self):
+        sec = self._secao(self.body_path.read_text(encoding="utf-8"), "trajetorias")
+        for termo in ("suporte", "CISO", "MBA", "Foundation", "EXIN", "CertiProf", "CQI/IRCA", "exemplo",
+                      "GRC", "Privacidade", "Auditoria", "Técnico", "por onde começar"):
+            self.assertIn(termo.lower(), sec.lower(), f"Termo ausente na seção trajetorias: {termo}")
+
+    def test_trajetorias_sem_dados_pessoais(self):
+        body = self.body_path.read_text(encoding="utf-8")
+        self.assertNotIn("linkedin.com/in/", body)
+        self.assertNotIn("lattes.cnpq.br", body)
+        self.assertNotIn("%", self._secao(body, "trajetorias"))
+
+    def test_tabela_certificacoes_da_secao(self):
+        sec = self._secao(self.body_path.read_text(encoding="utf-8"), "certificacoes")
+        tabela = re.search(r"<table.*?</table>", sec, re.S).group(0)
+        for c in CERTIFICACOES:
+            self.assertIn(f"<strong>{c['sigla']}</strong>", tabela, f"Sigla ausente na tabela: {c['sigla']}")
+        self.assertEqual(len(CERTIFICACOES), 12)
+
     def test_componentes_pedagogicos(self):
         content = self.compiled_path.read_text(encoding="utf-8")
         self.assertIn('class="callout', content)
         self.assertIn('class="diagram-svg-wrap', content)
         self.assertNotIn('<pre class="mermaid"', content)
-        self.assertEqual(content.count('class="checklist-item"'), 7)
-        self.assertGreaterEqual(content.count('class="quiz-item"'), 6)
+        self.assertEqual(content.count('class="checklist-item"'), 8)
+        self.assertGreaterEqual(content.count('class="quiz-item"'), 7)
         self.assertIn('class="facts-grid', content)
         self.assertIn('initChecklist("certificacoes-carreira")', content)
 
