@@ -1733,6 +1733,55 @@ td {
 }
 
 /* ==========================================================================
+   Glossário: termos marcados e popover
+   ========================================================================== */
+dfn.glossario {
+  font-style: normal;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: help;
+}
+dfn.glossario:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+.glossario-pop {
+  position: fixed;
+  z-index: 60;
+  box-sizing: border-box;
+  max-width: min(22rem, calc(100vw - 32px));
+  padding: 0.75rem 0.9rem;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+.glossario-pop[hidden] {
+  display: none;
+}
+.glossario-pop-titulo {
+  font-weight: 700;
+}
+.glossario-pop-sub {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 0.1rem;
+}
+.glossario-pop-texto {
+  margin-top: 0.4rem;
+}
+.glossario-pop-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
    Regras internas dos simuladores, preservadas do base.css anterior ao
    redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
@@ -3083,6 +3132,7 @@ hostssl    loja   svc_loja  10.0.3.0/24   scram-sha-256</code></pre>
 </main>
 </div>
 
+  
   <!-- Scripts Interativos Embutidos -->
   <script>
 /**
@@ -3814,6 +3864,156 @@ hostssl    loja   svc_loja  10.0.3.0/24   scram-sha-256</code></pre>
     definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
   }
 
+  // --------------------------------------------------------------------------
+  // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
+  // --------------------------------------------------------------------------
+  function initGlossario() {
+    const fonte = document.getElementById('glossario-dados');
+    if (!fonte) return;
+    let dados;
+    try {
+      dados = JSON.parse(fonte.textContent);
+    } catch (e) {
+      return;
+    }
+    const termos = Array.from(document.querySelectorAll('dfn.glossario[data-termo]'));
+    if (!termos.length) return;
+    termos.forEach((t) => t.removeAttribute('title'));
+
+    const pop = document.createElement('div');
+    pop.id = 'glossario-pop';
+    pop.className = 'glossario-pop';
+    pop.setAttribute('role', 'tooltip');
+    pop.hidden = true;
+    document.body.appendChild(pop);
+
+    let atual = null;
+    let timer = null;
+    const MARGEM = 16;
+
+    function limpaTimer() {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    }
+
+    function posicionar() {
+      if (!atual) return;
+      // Zera a posição antes de medir: left/top antigos encolhem a largura do popover.
+      pop.style.left = '0';
+      pop.style.top = '0';
+      const r = atual.getBoundingClientRect();
+      const w = pop.offsetWidth;
+      const h = pop.offsetHeight;
+      const maxEsq = Math.max(MARGEM, window.innerWidth - MARGEM - w);
+      const esq = Math.min(Math.max(r.left, MARGEM), maxEsq);
+      let topo = r.bottom + 6;
+      if (topo + h > window.innerHeight - 8 && r.top - 6 - h >= 0) topo = r.top - 6 - h;
+      pop.style.left = esq + 'px';
+      pop.style.top = Math.max(0, topo) + 'px';
+    }
+
+    function abrir(termo) {
+      limpaTimer();
+      const v = dados[termo.getAttribute('data-termo')];
+      if (!v) return;
+      if (atual && atual !== termo) atual.removeAttribute('aria-describedby');
+      atual = termo;
+      const id = termo.getAttribute('data-termo');
+      pop.textContent = '';
+      const titulo = document.createElement('div');
+      titulo.className = 'glossario-pop-titulo';
+      titulo.textContent = v.categoria ? v.termo + ' · ' + v.categoria : v.termo;
+      pop.appendChild(titulo);
+      const sub = v.sigla_de || v.termo_ingles;
+      if (sub) {
+        const el = document.createElement('div');
+        el.className = 'glossario-pop-sub';
+        el.textContent = sub;
+        pop.appendChild(el);
+      }
+      const texto = document.createElement('div');
+      texto.className = 'glossario-pop-texto';
+      texto.innerHTML = v.significado || '';
+      pop.appendChild(texto);
+      const link = document.createElement('a');
+      link.className = 'glossario-pop-link';
+      link.href = '../index.html#v-glossario/' + id;
+      link.textContent = 'Ver no glossário →';
+      pop.appendChild(link);
+      pop.hidden = false;
+      termo.setAttribute('aria-describedby', 'glossario-pop');
+      posicionar();
+    }
+
+    function fechar() {
+      limpaTimer();
+      pop.hidden = true;
+      if (atual) atual.removeAttribute('aria-describedby');
+      atual = null;
+    }
+
+    function agendarFechar() {
+      limpaTimer();
+      timer = setTimeout(fechar, 200);
+    }
+
+    function dentro(el) {
+      return !!el && ((atual && atual.contains(el)) || pop.contains(el));
+    }
+
+    termos.forEach((t) => {
+      t.addEventListener('mouseenter', () => {
+        limpaTimer();
+        timer = setTimeout(() => abrir(t), 150);
+      });
+      t.addEventListener('mouseleave', agendarFechar);
+      t.addEventListener('focus', () => abrir(t));
+      t.addEventListener('click', () => {
+        if (atual !== t) abrir(t);
+      });
+      t.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && atual === t) {
+          fechar();
+          t.focus();
+        } else if (e.key === 'Tab' && !e.shiftKey && atual === t) {
+          const link = pop.querySelector('a.glossario-pop-link');
+          if (link) {
+            e.preventDefault();
+            link.focus();
+          }
+        }
+      });
+      t.addEventListener('focusout', (e) => {
+        if (!dentro(e.relatedTarget)) agendarFechar();
+      });
+    });
+
+    pop.addEventListener('mouseenter', limpaTimer);
+    pop.addEventListener('mouseleave', agendarFechar);
+    pop.addEventListener('focusin', limpaTimer);
+    pop.addEventListener('focusout', (e) => {
+      if (!dentro(e.relatedTarget)) agendarFechar();
+    });
+    pop.addEventListener('keydown', (e) => {
+      if (!atual) return;
+      if (e.key === 'Tab' && e.shiftKey) {
+        e.preventDefault();
+        atual.focus();
+      } else if (e.key === 'Escape') {
+        const t = atual;
+        fechar();
+        t.focus();
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (atual && !dentro(e.target)) fechar();
+    });
+    window.addEventListener('resize', posicionar);
+    window.addEventListener('scroll', posicionar, { passive: true });
+  }
+
   let iniciado = false;
   function init() {
     if (iniciado) return;
@@ -3824,6 +4024,7 @@ hostssl    loja   svc_loja  10.0.3.0/24   scram-sha-256</code></pre>
     initConcluir();
     initGaveta();
     initLeitura();
+    initGlossario();
   }
 
   // --------------------------------------------------------------------------
@@ -3849,6 +4050,7 @@ hostssl    loja   svc_loja  10.0.3.0/24   scram-sha-256</code></pre>
   // Namespace unificado
   window.CS = {
     init,
+    initGlossario,
     labProgress,
     safeStorageGet,
     safeStorageSet,

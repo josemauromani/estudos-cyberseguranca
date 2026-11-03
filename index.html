@@ -1551,6 +1551,119 @@ a.progresso-titulo:hover {
   }
 }
 
+/* Visão Glossário */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.glossario-busca {
+  display: block;
+  margin-bottom: 12px;
+}
+.glossario-busca input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+.glossario-letras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+.glossario-letras a,
+.glossario-letras span {
+  min-width: 28px;
+  padding: 4px 6px;
+  text-align: center;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  font: 600 13px var(--font-mono);
+}
+.glossario-letras a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.glossario-letras a:hover {
+  background: var(--accent-soft);
+}
+.glossario-letras span {
+  color: var(--muted);
+  opacity: 0.5;
+}
+.glossario-grupo h2 {
+  margin: 24px 0 10px;
+  scroll-margin-top: 80px;
+}
+.glossario-grupo[hidden],
+.verbete[hidden],
+.glossario-vazio[hidden] {
+  display: none;
+}
+.glossario-vazio {
+  color: var(--muted);
+}
+.verbete {
+  margin-bottom: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  scroll-margin-top: 80px;
+  transition: background 0.3s;
+}
+.verbete.destaque {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.verbete header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+.verbete h3 {
+  margin: 0;
+}
+.verbete-cat {
+  color: var(--muted);
+  font: 400 12px var(--font-mono);
+  text-transform: uppercase;
+}
+.verbete-sigla {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+.verbete dl {
+  margin: 10px 0 0;
+}
+.verbete dt {
+  margin-top: 8px;
+  color: var(--muted);
+  font: 600 12px var(--font-mono);
+  text-transform: uppercase;
+}
+.verbete dd {
+  margin: 2px 0 0;
+}
+.verbete-refs {
+  margin: 0;
+  padding-left: 18px;
+}
+.verbete-modulos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
   </style>
 </head>
 <body>
@@ -1581,6 +1694,7 @@ a.progresso-titulo:hover {
       <a href="#v-necessidades" data-view="necessidades">🛠 Pela necessidade <span class="n">58</span></a>
       <a href="#v-vaga" data-view="vaga">💼 Rota por vaga <span class="n">7</span></a>
       <a href="#v-progresso" data-view="progresso">📈 Meu progresso</a>
+      <a href="#v-glossario" data-view="glossario">📖 Glossário <span class="n">1</span></a>
     </nav>
     <div class="gprog" id="progresso-global">
       <span class="gp-rotulo">Seu progresso</span>
@@ -3882,6 +3996,33 @@ a.progresso-titulo:hover {
       </ol>
     </section>
 
+    <!-- Visão: Glossário -->
+    <section class="view" data-view="glossario" hidden>
+      <h1>Glossário</h1>
+      <p class="lede">Siglas e termos técnicos usados nos módulos, com significado, histórico e onde aparecem.</p>
+      <label class="glossario-busca">
+        <span class="sr-only">Buscar no glossário</span>
+        <input type="search" id="busca-glossario" placeholder="Buscar termo, sigla ou significado…" autocomplete="off">
+      </label>
+      <nav class="glossario-letras" aria-label="Índice por letra"><span aria-disabled="true">A</span> <span aria-disabled="true">B</span> <span aria-disabled="true">C</span> <span aria-disabled="true">D</span> <span aria-disabled="true">E</span> <span aria-disabled="true">F</span> <span aria-disabled="true">G</span> <a href="#v-glossario/letra-h">H</a> <span aria-disabled="true">I</span> <span aria-disabled="true">J</span> <span aria-disabled="true">K</span> <span aria-disabled="true">L</span> <span aria-disabled="true">M</span> <span aria-disabled="true">N</span> <span aria-disabled="true">O</span> <span aria-disabled="true">P</span> <span aria-disabled="true">Q</span> <span aria-disabled="true">R</span> <span aria-disabled="true">S</span> <span aria-disabled="true">T</span> <span aria-disabled="true">U</span> <span aria-disabled="true">V</span> <span aria-disabled="true">W</span> <span aria-disabled="true">X</span> <span aria-disabled="true">Y</span> <span aria-disabled="true">Z</span></nav>
+      <section class="glossario-grupo" data-letra="H">
+        <h2 id="g-letra-h">H</h2>
+        <article class="verbete" id="g-hmac" data-busca="hmac hash-based message authentication code (codigo de autenticacao de mensagem baseado em hash)  hmac-sha256 hmac-sha1 codigo que combina uma funcao de hash (ex.: sha-256) com uma chave secreta compartilhada. prova a integridade e a autenticidade da mensagem: quem nao tem a chave nao consegue recalcular o valor.">
+          <header><h3>HMAC</h3> <span class="verbete-cat">Criptografia</span></header>
+          <p class="verbete-sigla">Hash-based Message Authentication Code (Código de Autenticação de Mensagem baseado em Hash)</p>
+          <dl>
+          <dt>Significado</dt><dd>Código que combina uma função de hash (ex.: SHA-256) com uma chave secreta compartilhada. Prova a integridade e a autenticidade da mensagem: quem não tem a chave não consegue recalcular o valor.</dd>
+          <dt>Explicação</dt><dd>Um hash simples pode ser recalculado por qualquer pessoa depois de alterar a mensagem; o HMAC não, porque o cálculo depende da chave secreta. É usado em TLS, IPsec, JWT com <code>HS256</code>, HOTP/TOTP e na assinatura de webhooks. O que o HMAC não oferece é não-repúdio, porque as duas partes têm a mesma chave. Para não-repúdio, use assinatura digital com chave assimétrica.</dd>
+          <dt>Histórico</dt><dd>Proposto por Mihir Bellare, Ran Canetti e Hugo Krawczyk em 1996, no artigo <em>Keying Hash Functions for Message Authentication</em> (CRYPTO '96). Publicado como RFC 2104 em fevereiro de 1997 e padronizado pelo NIST no FIPS 198 (2002), revisado no FIPS 198-1 (2008).</dd>
+          <dt>Variações</dt><dd><code>HMAC-SHA256</code>, <code>HMAC-SHA1</code></dd>
+          <dt>Referências</dt><dd><ul class="verbete-refs"><li><a href="https://www.rfc-editor.org/rfc/rfc2104" target="_blank" rel="noopener">RFC 2104</a></li><li><a href="https://csrc.nist.gov/pubs/fips/198-1/final" target="_blank" rel="noopener">FIPS 198-1</a></li></ul></dd>
+          <dt>Aparece em</dt><dd><span class="verbete-modulos"><a href="Fundamentos-Ciber/treinamento-fundamentos-ciber.html" class="vaga-chip" data-slug="Fundamentos-Ciber">01 · Tríade CIA, Ameaças e Modelagem STRIDE</a> <a href="Criptografia-Pratica/treinamento-criptografia-pratica.html" class="vaga-chip" data-slug="Criptografia-Pratica">03 · Criptografia Simétrica, Assimétrica, Hashes e PKI</a> <a href="Autenticacao-e-IAM/treinamento-autenticacao-e-iam.html" class="vaga-chip" data-slug="Autenticacao-e-IAM">04 · Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</a> <a href="Seguranca-em-APIs/treinamento-seguranca-em-apis.html" class="vaga-chip" data-slug="Seguranca-em-APIs">13 · OWASP API Security, Rate Limiting e Tokens</a> <a href="SOAR-e-Automacao-de-Resposta/treinamento-soar-e-automacao-de-resposta.html" class="vaga-chip" data-slug="SOAR-e-Automacao-de-Resposta">49 · SOAR: Playbooks e Automação de Resposta</a></span></dd>
+          </dl>
+        </article>
+      </section>
+      <p class="glossario-vazio" hidden>Nenhum termo encontrado.</p>
+    </section>
+
     <footer class="portal-footer">
       <p>&copy; 2026 Estudos de Cibersegurança &bull; Material Autoinstrucional e Prático 100% Offline</p>
       <p>Curadoria e desenvolvimento técnico por <strong>José Mauro da Silva Brandão</strong> &bull; Alinhado a NIST CSF 2.0, MITRE ATT&amp;CK Enterprise, ISO/IEC 27001:2022 e LGPD (Lei nº 13.709/2018).</p>
@@ -4443,9 +4584,34 @@ a.progresso-titulo:hover {
   function visaoDoHash() {
     const h = location.hash || '';
     if (h.indexOf('#v-') !== 0) return null;
-    const v = h.slice(3);
+    const v = h.slice(3).split('/')[0];
     const existe = Array.from(document.querySelectorAll('section.view')).some(s => s.getAttribute('data-view') === v);
     return existe ? v : null;
+  }
+
+  // Âncora de "#v-<visao>/<ancora>" (ex.: #v-glossario/hmac), ou ''.
+  function ancoraDoHash() {
+    const h = location.hash || '';
+    const i = h.indexOf('/');
+    if (h.indexOf('#v-') !== 0 || i < 0) return '';
+    try { return decodeURIComponent(h.slice(i + 1)); } catch (e) { return ''; }
+  }
+
+  let destaqueTimer = null;
+  function irParaAncora() {
+    const ancora = ancoraDoHash();
+    if (!ancora) return;
+    // Um filtro ativo esconderia o alvo: limpa a busca do glossário antes de resolver a âncora.
+    const campo = document.getElementById('busca-glossario');
+    if (campo && campo.value) { campo.value = ''; filtrarGlossario(); }
+    const alvo = document.getElementById('g-' + ancora);
+    document.querySelectorAll('.verbete.destaque').forEach(el => el.classList.remove('destaque'));
+    clearTimeout(destaqueTimer);
+    if (!alvo || alvo.offsetParent === null) { window.scrollTo(0, 0); return; }
+    alvo.scrollIntoView({ block: 'start' });
+    if (!alvo.classList.contains('verbete')) return;  // letras do índice: só rola
+    alvo.classList.add('destaque');
+    destaqueTimer = setTimeout(() => alvo.classList.remove('destaque'), 2000);
   }
 
   function mostrarVisao(v) {
@@ -4497,9 +4663,10 @@ a.progresso-titulo:hover {
     });
     window.addEventListener('hashchange', () => {
       mostrarVisao(visaoDoHash() || 'catalogo');
+      irParaAncora();
     });
     const inicial = visaoDoHash();
-    if (inicial) mostrarVisao(inicial);
+    if (inicial) { mostrarVisao(inicial); irParaAncora(); }
 
     document.addEventListener('click', e => {
       if (!menuAberto()) return;
@@ -4523,8 +4690,29 @@ a.progresso-titulo:hover {
     });
   }
 
+  // Glossário: filtra os verbetes por data-busca (sem acento) e esconde grupos vazios.
+  function filtrarGlossario() {
+    const campo = document.getElementById('busca-glossario');
+    const query = removerAcentos((campo && campo.value || '').trim());
+    let visiveis = 0;
+    document.querySelectorAll('.glossario-grupo').forEach(grupo => {
+      let n = 0;
+      grupo.querySelectorAll('.verbete').forEach(v => {
+        const casa = !query || (v.getAttribute('data-busca') || '').includes(query);
+        v.hidden = !casa;
+        if (casa) n++;
+      });
+      grupo.hidden = n === 0;
+      visiveis += n;
+    });
+    const vazio = document.querySelector('.glossario-vazio');
+    if (vazio) vazio.hidden = visiveis > 0;
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     initTheme();
+    const buscaGlossario = document.getElementById('busca-glossario');
+    if (buscaGlossario) buscaGlossario.addEventListener('input', filtrarGlossario);
     const input = document.getElementById('busca');
     if (input) input.addEventListener('input', filtrarCards);
     const limpar = document.getElementById('limpar-busca');
