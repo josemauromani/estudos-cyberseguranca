@@ -1,7 +1,7 @@
 # Design Spec: Auditoria de TI (Módulo 58), Normas ISO Complementares e Certificações de Mercado
 
 **Data:** 2026-11-02
-**Status:** Em revisão pelo usuário
+**Status:** Aprovada (2026-11-02) e implementada
 **Repositório:** `estudos_cyberseguranca`
 **Specs anteriores:** [`2026-10-15-competencias-vaga-analista-si-design.md`](2026-10-15-competencias-vaga-analista-si-design.md), [`2026-11-02-trilhas-especializacao-design.md`](2026-11-02-trilhas-especializacao-design.md)
 **Referência Metodológica:** Superpowers Spec-Driven Development (SDD)
