@@ -52,7 +52,7 @@ class TestRotaVagaDados(unittest.TestCase):
     def test_certificacoes_exatas(self):
         siglas = [c["sigla"] for c in CERTIFICACOES]
         self.assertEqual(siglas, ["CEH", "CISM", "CISSP", "CCSP", "GSEC", "Security+",
-                                  "ISFS", "PDPF/PDPP", "ITIL 4 F", "CSFPC", "CISA", "ISO 27001 LA", "eJPT", "eCPPT", "OSCP"])
+                                  "ISFS", "PDPF/PDPP", "ITIL 4 F", "CSFPC", "CISA", "ISO 27001 LA", "eJPT", "eCPPT", "OSCP", "CRISC", "CDPSE"])
         self.assertEqual(len(siglas), len(set(siglas)))
 
     def test_modulos_da_rota_tem_carreira_analista(self):
@@ -137,7 +137,7 @@ class TestRotaVagaRender(unittest.TestCase):
         html = render_certificacoes(CERTIFICACOES, _status(set()))
         for c in CERTIFICACOES:
             self.assertIn(escape(c["sigla"]), html)
-        self.assertEqual(html.count('<tr class="cert-row"'), 15)
+        self.assertEqual(html.count('<tr class="cert-row"'), len(CERTIFICACOES))
         self.assertIn("Confira os requisitos atuais no site oficial do órgão emissor", html)
 
     def test_matriz_link_site_oficial(self):

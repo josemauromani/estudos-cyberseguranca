@@ -130,6 +130,8 @@ class TestLigacoesNovas(unittest.TestCase):
             "eJPT": ["Linux-para-Seguranca", "PowerShell-e-Windows-Interno", "Laboratorio-Domestico-e-Portfolio", "Active-Directory-Fundamentos"],
             "eCPPT": ["Linux-para-Seguranca", "Python-para-Seguranca", "PowerShell-e-Windows-Interno", "Active-Directory-Fundamentos", "Ataques-e-Defesa-no-AD"],
             "OSCP": ["Linux-para-Seguranca", "Python-para-Seguranca", "PowerShell-e-Windows-Interno", "Laboratorio-Domestico-e-Portfolio", "Active-Directory-Fundamentos", "Ataques-e-Defesa-no-AD"],
+            "CRISC": [],
+            "CDPSE": [],
         }
         for c in CERTIFICACOES:
             with self.subTest(sigla=c["sigla"]):
@@ -150,9 +152,9 @@ class TestDocumentacao(unittest.TestCase):
             "01 -> 02 -> 34 -> 36 -> 05 -> 06 -> 07 -> 48 -> 10 -> 39 -> 16 -> 17 -> 46 -> 47 -> 18 -> 49 -> 42",
             "01 -> 02 -> 34 -> 04 -> 11 -> 12 -> 13 -> 38 -> 39 -> 50 -> 51 -> 14 -> 15",
             "01 -> 03 -> 04 -> 35 -> 06 -> 12 -> 13 -> 21 -> 41 -> 22 -> 50 -> 51 -> 52 -> 53 -> 24",
-            "01 -> 08 -> 40 -> 09 -> 25 -> 26 -> 58 -> 57 -> 27 -> 56 -> 54 -> 55 -> 28 -> 43 -> 44",
+            "01 -> 08 -> 40 -> 09 -> 25 -> 26 -> 58 -> 57 -> 27 -> 56 -> 54 -> 55 -> 28 -> 43 -> 44 -> 59 -> 60",
             "01 -> 02 -> 06 -> 36 -> 10 -> 48 -> 16 -> 47 -> 18 -> 53 -> 42 -> 45 -> 19 -> 56 -> 20",
-            "01 -> 34 -> 36 -> 05 -> 06 -> 07 -> 10 -> 29 -> 30 -> 38 -> 40 -> 25 -> 26 -> 31 -> 54 -> 57 -> 18 -> 49 -> 42 -> 43 -> 32 -> 37 -> 33",
+            "01 -> 34 -> 36 -> 05 -> 06 -> 07 -> 10 -> 29 -> 30 -> 38 -> 40 -> 25 -> 26 -> 31 -> 54 -> 57 -> 18 -> 49 -> 42 -> 43 -> 32 -> 37 -> 33 -> 59",
         ]
         for rota in rotas:
             with self.subTest(rota=rota):
