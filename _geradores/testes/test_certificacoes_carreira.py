@@ -380,8 +380,18 @@ class TestCertificacoesCarreira(unittest.TestCase):
         sec = self._secao(self.body_path.read_text(encoding="utf-8"), "trajetorias")
         for termo in ("suporte", "CISO", "MBA", "Foundation", "EXIN", "CertiProf", "CQI/IRCA", "exemplo",
                       "GRC", "Privacidade", "Auditoria", "Técnico", "por onde começar",
-                      "três perfis", "Pentest", "eJPT", "eCPPT", "OSCP", "eCTHP", "SecurityX", "CASP+", "CTF"):
+                      "oito perfis", "Pentest", "eJPT", "eCPPT", "OSCP", "eCTHP", "SecurityX", "CASP+", "CTF"):
             self.assertIn(termo.lower(), sec.lower(), f"Termo ausente na seção trajetorias: {termo}")
+
+    def test_trajetorias_lideranca_executiva(self):
+        sec = self._secao(self.body_path.read_text(encoding="utf-8"), "trajetorias")
+        for termo in ("Liderança executiva", "auditor", "DPO", "arquiteto", "CTO", "IAM", "mesma empresa",
+                      "comunidade", "CISSP", "setor financeiro", "Estudo 59", "Estudo 60", "só 1 dos 5", "ilustra"):
+            self.assertIn(termo.lower(), sec.lower(), f"Termo ausente: {termo}")
+        linhas = [l for l in re.findall(r"<tr>.*?</tr>", sec, re.S) if "Liderança / CISO" in l]
+        self.assertEqual(len(linhas), 1, "Linha Liderança / CISO ausente na tabela")
+        for termo in ("CISM", "CRISC", "CISSP", "Estudo 25", "Estudo 26", "Estudo 58", "Estudo 59", "Estudo 60"):
+            self.assertIn(termo, linhas[0])
 
     def test_trajetorias_linha_pentest(self):
         sec = self._secao(self.body_path.read_text(encoding="utf-8"), "trajetorias")
@@ -396,9 +406,10 @@ class TestCertificacoesCarreira(unittest.TestCase):
     def test_checklist_e_quiz_33(self):
         body = self.body_path.read_text(encoding="utf-8")
         self.assertEqual(body.count('class="checklist-item"'), 8)
-        self.assertEqual(body.count('class="quiz-item"'), 8)
+        self.assertGreaterEqual(body.count('class="quiz-item"'), 9)
         quiz = self._secao(body, "quiz")
         self.assertIn("Questão 8", quiz)
+        self.assertIn("Questão 9", quiz)
         self.assertIn("prática", quiz.lower())
 
     def test_fatos_cita_securityx_e_ecthp(self):
@@ -411,6 +422,8 @@ class TestCertificacoesCarreira(unittest.TestCase):
         self.assertNotIn("linkedin.com/in/", body)
         self.assertNotIn("lattes.cnpq.br", body)
         self.assertNotIn("%", self._secao(body, "trajetorias"))
+        for marca in ("F63", "A93", "primeiro programa"):
+            self.assertNotIn(marca.lower(), body.lower())
 
     def test_textos_de_vitrine_citam_as_certificacoes_novas(self):
         """Subtítulo do módulo 33, README e CURRICULO não podem ficar presos às seis certificações originais."""
