@@ -10,12 +10,30 @@ import re
 import sys
 import unittest
 from pathlib import Path
+from urllib.parse import urlparse
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from index_dados import CERTIFICACOES, ESTUDOS_DADOS  # noqa: E402
 
 GERADORES = Path(__file__).resolve().parent.parent
+DOMINIO_OFICIAL = {
+    "CEH": "eccouncil.org",
+    "CISM": "isaca.org",
+    "CISA": "isaca.org",
+    "CISSP": "isc2.org",
+    "CCSP": "isc2.org",
+    "GSEC": "giac.org",
+    "Security+": "comptia.org",
+    "ISFS": "exin.com",
+    "PDPF/PDPP": "exin.com",
+    "ITIL 4 F": "peoplecert.org",
+    "CSFPC": "certiprof.com",
+    "ISO 27001 LA": "pecb.com",
+    "eJPT": "ine.com",
+    "eCPPT": "ine.com",
+    "OSCP": "offsec.com",
+}
 CAMPOS_PERFIL = ("anos_ti", "anos_si", "anos_gestao_si", "anos_nuvem")
 
 
@@ -102,6 +120,45 @@ class TestCertificacoesCarreira(unittest.TestCase):
                 cobertos = {m for dom in cert["dominios"] for m in dom["modulos"]}
                 faltando = set(portal["modulos"]) - cobertos
                 self.assertFalse(faltando, f"módulos do portal sem domínio: {faltando}")
+
+    # ------------------------------------------------------------ fontes oficiais
+    def test_fontes_oficiais(self):
+        d = self._dados()
+        self.assertEqual(d["conferido_em"], "novembro de 2026")
+        for c in d["certificacoes"]:
+            with self.subTest(cert=c["sigla"]):
+                dominio = DOMINIO_OFICIAL[c["sigla"]]
+                self.assertTrue(c["fontes"], "fontes vazia")
+                for f in c["fontes"]:
+                    self.assertTrue(f["titulo"].strip())
+                    self.assertTrue(f["url"].startswith("https://"), f["url"])
+                    host = urlparse(f["url"]).hostname or ""
+                    self.assertTrue(host == dominio or host.endswith("." + dominio), f["url"])
+
+    def test_site_oficial_coerente(self):
+        d = self._dados()
+        for c in CERTIFICACOES:
+            with self.subTest(cert=c["sigla"]):
+                self.assertEqual(c["site_oficial"], self._cert(d, c["sigla"])["fontes"][0]["url"])
+
+    def test_fontes_no_cartao(self):
+        body = self.body_path.read_text(encoding="utf-8")
+        m = re.search(r"function cartaoCert\(c\) \{(.*?)\n    \}\n", body, re.S)
+        self.assertIsNotNone(m)
+        corpo = m.group(1)
+        for trecho in ("Fontes oficiais: ", "/^https:\\/\\//.test(", "noopener noreferrer", "overflow-wrap: anywhere"):
+            self.assertIn(trecho, corpo)
+        self.assertNotIn("innerHTML", corpo)
+        self.assertIn("Fontes conferidas em ", body)
+        self.assertIn("CERT.conferido_em", body)
+
+    def test_fatos_lista_sites_oficiais(self):
+        body = self.body_path.read_text(encoding="utf-8")
+        ini = body.index('id="fatos"')
+        fatos = body[ini:body.index("</section>", ini)]
+        for c in CERTIFICACOES:
+            with self.subTest(cert=c["sigla"]):
+                self.assertIn(c["site_oficial"], fatos)
 
     def test_modulos_pendentes_sinalizados(self):
         """Módulo sem página compilada aparece como pendente no planejador, como no portal."""

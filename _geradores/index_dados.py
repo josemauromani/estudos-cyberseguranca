@@ -771,6 +771,7 @@ ROTAS_PERFIL: List[Dict[str, Any]] = [
 CERTIFICACOES: List[Dict[str, Any]] = [
     {
         "sigla": "CEH",
+        "site_oficial": "https://www.eccouncil.org/train-certify/certified-ethical-hacker-ceh/",
         "nome": "Certified Ethical Hacker",
         "orgao": "EC-Council",
         "foco": "Técnica / ofensiva",
@@ -779,6 +780,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
     },
     {
         "sigla": "CISM",
+        "site_oficial": "https://www.isaca.org/credentialing/cism",
         "nome": "Certified Information Security Manager",
         "orgao": "ISACA",
         "foco": "Gestão de programa de SI",
@@ -787,6 +789,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
     },
     {
         "sigla": "CISSP",
+        "site_oficial": "https://www.isc2.org/certifications/cissp",
         "nome": "Certified Information Systems Security Professional",
         "orgao": "ISC2",
         "foco": "Generalista sênior (8 domínios)",
@@ -795,6 +798,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
     },
     {
         "sigla": "CCSP",
+        "site_oficial": "https://www.isc2.org/certifications/ccsp",
         "nome": "Certified Cloud Security Professional",
         "orgao": "ISC2",
         "foco": "Segurança em nuvem (6 domínios)",
@@ -803,6 +807,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
     },
     {
         "sigla": "GSEC",
+        "site_oficial": "https://www.giac.org/certifications/security-essentials-gsec/",
         "nome": "GIAC Security Essentials",
         "orgao": "GIAC (SANS)",
         "foco": "Técnica generalista",
@@ -811,6 +816,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
     },
     {
         "sigla": "Security+",
+        "site_oficial": "https://www.comptia.org/en-us/certifications/security/",
         "nome": "CompTIA Security+ (SY0-701)",
         "orgao": "CompTIA",
         "foco": "Entrada / fundamentos",
@@ -819,6 +825,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
     },
     {
         "sigla": "ISFS",
+        "site_oficial": "https://www.exin.com/data-protection-security/exin-information-security-management-iso-iec-27001/information-security-foundation-based-on-iso-iec-27001/",
         "nome": "Information Security Foundation based on ISO/IEC 27001",
         "orgao": "EXIN",
         "foco": "Entrada / fundamentos de SI (ISO/IEC 27001)",
@@ -827,6 +834,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
     },
     {
         "sigla": "PDPF/PDPP",
+        "site_oficial": "https://www.exin.com/data-protection-security/exin-privacy-and-data-protection/exin-privacy-and-data-protection-foundation/",
         "nome": "Privacy & Data Protection Foundation e Professional (com a ISFS, formam o EXIN Data Protection Officer)",
         "orgao": "EXIN",
         "foco": "Privacidade e proteção de dados (GDPR)",
@@ -835,6 +843,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
     },
     {
         "sigla": "ITIL 4 F",
+        "site_oficial": "https://www.peoplecert.org/browse-certifications/it-governance-and-service-management/ITIL-1/itil-4-foundation-2565",
         "nome": "ITIL 4 Foundation",
         "orgao": "PeopleCert (Axelos)",
         "foco": "Gestão de serviços de TI",
@@ -843,6 +852,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
     },
     {
         "sigla": "CSFPC",
+        "site_oficial": "https://certiprof.com/pages/cyber-security-foundation-csfpc",
         "nome": "Cybersecurity Foundation Professional Certification",
         "orgao": "CertiProf",
         "foco": "Entrada / cibersegurança (CyBOK)",
@@ -851,6 +861,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
     },
     {
         "sigla": "CISA",
+        "site_oficial": "https://www.isaca.org/credentialing/cisa",
         "nome": "Certified Information Systems Auditor",
         "orgao": "ISACA",
         "foco": "Auditoria de sistemas de informação",
@@ -859,6 +870,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
     },
     {
         "sigla": "ISO 27001 LA",
+        "site_oficial": "https://pecb.com/en/education-and-certification-for-individuals/iso-iec-27001/iso-iec-27001-lead-auditor",
         "nome": "PECB Certified ISO/IEC 27001 Lead Auditor",
         "orgao": "PECB",
         "foco": "Auditoria de SGSI (ISO 19011)",

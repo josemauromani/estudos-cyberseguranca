@@ -417,7 +417,7 @@ def render_certificacoes(certs: List[dict], status_map: Dict[str, dict]) -> str:
     for c in certs:
         chips = " ".join(render_chip_modulo(s, status_map) for s in c["modulos"])
         linhas.append(f"""          <tr class="cert-row">
-            <td data-label="Sigla"><strong>{escape(c['sigla'])}</strong><br><span class="cert-nome">{escape(c['nome'])}</span></td>
+            <td data-label="Sigla"><strong>{escape(c['sigla'])}</strong><br><span class="cert-nome">{escape(c['nome'])}</span><br><a class="cert-site" href="{escape(c['site_oficial'], quote=True)}" target="_blank" rel="noopener noreferrer">site oficial</a></td>
             <td data-label="Órgão">{escape(c['orgao'])}</td>
             <td data-label="Foco">{escape(c['foco'])}</td>
             <td data-label="Experiência">{escape(c['experiencia'])}</td>

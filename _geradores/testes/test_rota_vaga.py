@@ -140,6 +140,20 @@ class TestRotaVagaRender(unittest.TestCase):
         self.assertEqual(html.count('<tr class="cert-row"'), 12)
         self.assertIn("Confira os requisitos atuais no site oficial do órgão emissor", html)
 
+    def test_matriz_link_site_oficial(self):
+        html = render_certificacoes(CERTIFICACOES, _status(set()))
+        linhas = html.split('<tr class="cert-row"')[1:]
+        self.assertEqual(len(linhas), len(CERTIFICACOES))
+        for c, linha in zip(CERTIFICACOES, linhas):
+            with self.subTest(cert=c["sigla"]):
+                self.assertIn(
+                    f'<a class="cert-site" href="{escape(c["site_oficial"], quote=True)}" target="_blank" rel="noopener noreferrer"',
+                    linha)
+        conteudo = (ROOT / "index.html").read_text(encoding="utf-8")
+        for c in CERTIFICACOES:
+            self.assertIn(f'href="{escape(c["site_oficial"], quote=True)}"', conteudo)
+        self.assertEqual(conteudo.count('<tr class="cert-row"'), len(CERTIFICACOES))
+
     def test_portal_contem_secoes_cada_uma_na_sua_visao(self):
         conteudo = Path(gerar_index_html(output_path=ROOT / "index.html")).read_text(encoding="utf-8")
         visoes = [m.start() for m in re.finditer(r'<section class="view" data-view="', conteudo)] + [conteudo.index("</main>")]

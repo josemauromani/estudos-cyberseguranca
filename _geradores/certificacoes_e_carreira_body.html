@@ -400,6 +400,18 @@ flowchart TD
             <li>CertiProf — Cybersecurity Foundation Professional Certification (CSFPC): página do produto e temas da prova.</li>
             <li>ISACA — CISA Job Practice e requisitos de certificação.</li>
             <li>PECB — ISO/IEC 27001 Lead Auditor: brochura do curso, manual do candidato e política de manutenção de certificações.</li>
+            <li>CEH — <a href="https://www.eccouncil.org/train-certify/certified-ethical-hacker-ceh/" target="_blank" rel="noopener noreferrer">site oficial do EC-Council</a>.</li>
+            <li>CISM — <a href="https://www.isaca.org/credentialing/cism" target="_blank" rel="noopener noreferrer">site oficial do ISACA</a>.</li>
+            <li>CISSP — <a href="https://www.isc2.org/certifications/cissp" target="_blank" rel="noopener noreferrer">site oficial do ISC2</a>.</li>
+            <li>CCSP — <a href="https://www.isc2.org/certifications/ccsp" target="_blank" rel="noopener noreferrer">site oficial do ISC2</a>.</li>
+            <li>GSEC — <a href="https://www.giac.org/certifications/security-essentials-gsec/" target="_blank" rel="noopener noreferrer">site oficial do GIAC (SANS)</a>.</li>
+            <li>Security+ — <a href="https://www.comptia.org/en-us/certifications/security/" target="_blank" rel="noopener noreferrer">site oficial do CompTIA</a>.</li>
+            <li>ISFS — <a href="https://www.exin.com/data-protection-security/exin-information-security-management-iso-iec-27001/information-security-foundation-based-on-iso-iec-27001/" target="_blank" rel="noopener noreferrer">site oficial do EXIN</a>.</li>
+            <li>PDPF/PDPP — <a href="https://www.exin.com/data-protection-security/exin-privacy-and-data-protection/exin-privacy-and-data-protection-foundation/" target="_blank" rel="noopener noreferrer">site oficial do EXIN</a>.</li>
+            <li>ITIL 4 F — <a href="https://www.peoplecert.org/browse-certifications/it-governance-and-service-management/ITIL-1/itil-4-foundation-2565" target="_blank" rel="noopener noreferrer">site oficial do PeopleCert (Axelos)</a>.</li>
+            <li>CSFPC — <a href="https://certiprof.com/pages/cyber-security-foundation-csfpc" target="_blank" rel="noopener noreferrer">site oficial do CertiProf</a>.</li>
+            <li>CISA — <a href="https://www.isaca.org/credentialing/cisa" target="_blank" rel="noopener noreferrer">site oficial do ISACA</a>.</li>
+            <li>ISO 27001 LA — <a href="https://pecb.com/en/education-and-certification-for-individuals/iso-iec-27001/iso-iec-27001-lead-auditor" target="_blank" rel="noopener noreferrer">site oficial do PECB</a>.</li>
             <li>CQI/IRCA — certificação de auditores de sistemas de gestão e cursos de Lead Auditor certificados.</li>
         </ul>
 
@@ -419,6 +431,7 @@ flowchart TD
 <!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
 <script type="application/json" id="cert-dados">
 {
+ "conferido_em": "novembro de 2026",
  "aviso": "Regras de experiência simplificadas. Confira sempre os requisitos atuais no site do órgão emissor.",
  "niveis": {
   "1": "Entrada",
@@ -428,6 +441,12 @@ flowchart TD
  "certificacoes": [
   {
    "sigla": "CEH",
+   "fontes": [
+    {
+     "titulo": "Página oficial do CEH (EC-Council)",
+     "url": "https://www.eccouncil.org/train-certify/certified-ethical-hacker-ceh/"
+    }
+   ],
    "nome": "Certified Ethical Hacker",
    "orgao": "EC-Council",
    "nivel": 2,
@@ -520,6 +539,16 @@ flowchart TD
   },
   {
    "sigla": "CISM",
+   "fontes": [
+    {
+     "titulo": "Página oficial do CISM (ISACA)",
+     "url": "https://www.isaca.org/credentialing/cism"
+    },
+    {
+     "titulo": "Conteúdo do exame CISM (ISACA)",
+     "url": "https://www.isaca.org/credentialing/cism/cism-exam-content-outline"
+    }
+   ],
    "nome": "Certified Information Security Manager",
    "orgao": "ISACA",
    "nivel": 3,
@@ -576,6 +605,16 @@ flowchart TD
   },
   {
    "sigla": "CISSP",
+   "fontes": [
+    {
+     "titulo": "Página oficial do CISSP (ISC2)",
+     "url": "https://www.isc2.org/certifications/cissp"
+    },
+    {
+     "titulo": "Outline do exame CISSP (ISC2)",
+     "url": "https://www.isc2.org/certifications/cissp/cissp-certification-exam-outline"
+    }
+   ],
    "nome": "Certified Information Systems Security Professional",
    "orgao": "ISC2",
    "nivel": 3,
@@ -674,6 +713,16 @@ flowchart TD
   },
   {
    "sigla": "CCSP",
+   "fontes": [
+    {
+     "titulo": "Página oficial do CCSP (ISC2)",
+     "url": "https://www.isc2.org/certifications/ccsp"
+    },
+    {
+     "titulo": "Outline do exame CCSP (ISC2)",
+     "url": "https://www.isc2.org/certifications/ccsp/ccsp-certification-exam-outline"
+    }
+   ],
    "nome": "Certified Cloud Security Professional",
    "orgao": "ISC2",
    "nivel": 3,
@@ -748,6 +797,12 @@ flowchart TD
   },
   {
    "sigla": "GSEC",
+   "fontes": [
+    {
+     "titulo": "Página oficial do GSEC (GIAC)",
+     "url": "https://www.giac.org/certifications/security-essentials-gsec/"
+    }
+   ],
    "nome": "GIAC Security Essentials",
    "orgao": "GIAC (SANS)",
    "nivel": 2,
@@ -823,6 +878,12 @@ flowchart TD
   },
   {
    "sigla": "Security+",
+   "fontes": [
+    {
+     "titulo": "Página oficial do Security+ (CompTIA)",
+     "url": "https://www.comptia.org/en-us/certifications/security/"
+    }
+   ],
    "nome": "CompTIA Security+ (SY0-701)",
    "orgao": "CompTIA",
    "nivel": 1,
@@ -895,6 +956,12 @@ flowchart TD
   },
   {
    "sigla": "ISFS",
+   "fontes": [
+    {
+     "titulo": "Página oficial do ISFS (EXIN)",
+     "url": "https://www.exin.com/data-protection-security/exin-information-security-management-iso-iec-27001/information-security-foundation-based-on-iso-iec-27001/"
+    }
+   ],
    "nome": "Information Security Foundation based on ISO/IEC 27001",
    "orgao": "EXIN",
    "nivel": 1,
@@ -946,6 +1013,16 @@ flowchart TD
   },
   {
    "sigla": "PDPF/PDPP",
+   "fontes": [
+    {
+     "titulo": "Página oficial do PDPF (EXIN)",
+     "url": "https://www.exin.com/data-protection-security/exin-privacy-and-data-protection/exin-privacy-and-data-protection-foundation/"
+    },
+    {
+     "titulo": "Página oficial do PDPP (EXIN)",
+     "url": "https://www.exin.com/pt-br/data-protection-security/exin-privacy-and-data-protection/exin-privacy-and-data-protection-professional/"
+    }
+   ],
    "nome": "Privacy & Data Protection Foundation e Professional (com a ISFS, formam o EXIN Data Protection Officer)",
    "orgao": "EXIN",
    "nivel": 1,
@@ -1050,6 +1127,12 @@ flowchart TD
   },
   {
    "sigla": "ITIL 4 F",
+   "fontes": [
+    {
+     "titulo": "Página oficial do ITIL 4 Foundation (PeopleCert)",
+     "url": "https://www.peoplecert.org/browse-certifications/it-governance-and-service-management/ITIL-1/itil-4-foundation-2565"
+    }
+   ],
    "nome": "ITIL 4 Foundation",
    "orgao": "PeopleCert (Axelos)",
    "nivel": 1,
@@ -1118,6 +1201,12 @@ flowchart TD
   },
   {
    "sigla": "CSFPC",
+   "fontes": [
+    {
+     "titulo": "Página oficial do CSFPC (CertiProf)",
+     "url": "https://certiprof.com/pages/cyber-security-foundation-csfpc"
+    }
+   ],
    "nome": "Cybersecurity Foundation Professional Certification",
    "orgao": "CertiProf",
    "nivel": 1,
@@ -1204,6 +1293,16 @@ flowchart TD
   },
   {
    "sigla": "CISA",
+   "fontes": [
+    {
+     "titulo": "Página oficial do CISA (ISACA)",
+     "url": "https://www.isaca.org/credentialing/cisa"
+    },
+    {
+     "titulo": "Conteúdo do exame CISA (ISACA)",
+     "url": "https://www.isaca.org/credentialing/cisa/cisa-job-practice-areas"
+    }
+   ],
    "nome": "Certified Information Systems Auditor",
    "orgao": "ISACA",
    "nivel": 3,
@@ -1272,6 +1371,16 @@ flowchart TD
   },
   {
    "sigla": "ISO 27001 LA",
+   "fontes": [
+    {
+     "titulo": "Página oficial do ISO/IEC 27001 Lead Auditor (PECB)",
+     "url": "https://pecb.com/en/education-and-certification-for-individuals/iso-iec-27001/iso-iec-27001-lead-auditor"
+    },
+    {
+     "titulo": "Manual do candidato ISO/IEC 27001 Lead Auditor (PECB)",
+     "url": "https://pecb.com/pdf/candidate-handbooks/pecb-candidate-handbook-iso-27001-lead-auditor.pdf"
+    }
+   ],
    "nome": "PECB Certified ISO/IEC 27001 Lead Auditor",
    "orgao": "PECB",
    "nivel": 3,
@@ -1671,6 +1780,20 @@ flowchart TD
         }
         card.appendChild(linha);
         card.appendChild(el("p", "Exigência: " + c.experiencia + ". Manutenção: " + c.manutencao + ".", "margin: 0 0 0.6rem 0; font-size: 0.82rem;"));
+        var fontes = el("p", "Fontes oficiais: ", "margin: 0 0 0.6rem 0; font-size: 0.8rem; overflow-wrap: anywhere;");
+        c.fontes.forEach(function(f, i) {
+            if (i > 0) fontes.appendChild(document.createTextNode(" · "));
+            if (/^https:\/\//.test(f.url)) {
+                var a = el("a", f.titulo);
+                a.setAttribute("href", f.url);
+                a.setAttribute("target", "_blank");
+                a.setAttribute("rel", "noopener noreferrer");
+                fontes.appendChild(a);
+            } else {
+                fontes.appendChild(el("span", f.titulo));
+            }
+        });
+        card.appendChild(fontes);
         card.appendChild(el("p", c.nota_dominios, "margin: 0 0 0.5rem 0; font-size: 0.8rem; color: var(--muted);"));
 
         var lista = el("ul", null, "list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem;");
@@ -1786,7 +1909,7 @@ flowchart TD
     };
 
     document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("cert-aviso").textContent = CERT.aviso;
+        document.getElementById("cert-aviso").textContent = CERT.aviso + " Fontes conferidas em " + CERT.conferido_em + ".";
         CAMPOS.forEach(function(par) {
             document.getElementById(par[1]).addEventListener("input", atualizarPerfilCert);
         });

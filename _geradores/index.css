@@ -921,6 +921,11 @@ a.vaga-chip:hover {
   color: var(--muted);
 }
 
+.cert-site {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
 .cert-nota {
   margin: 0;
   font-size: 13px;
