@@ -76,7 +76,7 @@ ROTAS_NOVAS = {
 
 class TestCatalogoEspecializacao(unittest.TestCase):
     def test_posicoes_46_a_57(self):
-        self.assertEqual(list(ESTUDOS_DADOS)[45:], NOVOS)
+        self.assertEqual(list(ESTUDOS_DADOS)[45:57], NOVOS)
         self.assertEqual([ESTUDOS_DADOS[s]["trilha"] for s in NOVOS], [11] * 4 + [12] * 4 + [13] * 4)
         self.assertEqual([ESTUDOS_DADOS[s]["nist"] for s in NOVOS], NIST_NOVOS)
 

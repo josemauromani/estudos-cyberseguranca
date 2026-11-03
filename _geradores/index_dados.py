@@ -541,6 +541,12 @@ NECESSIDADES: List[Dict[str, str]] = [
         "categoria": "Regulação",
         "icone": "🤝",
     },
+    {
+        "desafio": "Preciso preparar a TI para uma auditoria SOX ou de ITGC",
+        "slug": "Auditoria-de-TI",
+        "categoria": "Conformidade",
+        "icone": "🧾",
+    },
 ]
 
 # 4b. ROTA DA VAGA: competências exigidas -> módulos
@@ -1838,6 +1844,24 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
             "Cláusulas: incidente, auditoria, subcontratação, saída",
             "Quarta parte: o fornecedor do fornecedor",
             "NIST CSF 2.0 GV.SC e ISO 27002 5.19–5.23",
+        ],
+    },
+    "Auditoria-de-TI": {
+        "titulo": "Auditoria de TI: SOX, ITGC e COBIT",
+        "subtitulo": "Controles gerais de TI, teste de desenho e de efetividade, amostragem e deficiências",
+        "trilha": 6,
+        "nist": "Govern",
+        "mitre": "T1078 Valid Accounts / T1098 Account Manipulation",
+        "carreiras": ["GRC & Auditoria", ROTULO_ANALISTA_SI],
+        "tempo_minutos": 45,
+        "nivel": "intermediario",
+        "pergunta_chave": "O controle está no papel. Como você prova que ele funcionou o ano inteiro?",
+        "simulador_nome": "Testador de ITGC",
+        "fatos": [
+            "SOX 404 e ICFR",
+            "4 domínios de ITGC",
+            "TOD vs TOE e amostragem por frequência",
+            "Deficiência, deficiência significativa e fraqueza material",
         ],
     },
 }

@@ -73,3 +73,4 @@ Regulacao-Setor-Financeiro|Regulação Cibernética do Setor Financeiro|Regulaca
 Fraude-em-Pagamentos-e-Pix|Fraude em Pagamentos: Pix, Golpes e Antifraude|Fraude-em-Pagamentos-e-Pix|treinamento-fraude-em-pagamentos-e-pix.html|13|#4D7C0F|Detect / Protect
 Legislacao-e-Crimes-Ciberneticos|Legislação Brasileira e Crimes Cibernéticos|Legislacao-e-Crimes-Ciberneticos|treinamento-legislacao-e-crimes-ciberneticos.html|13|#4D7C0F|Govern
 Gestao-de-Riscos-de-Terceiros|Gestão de Riscos de Terceiros e Fornecedores|Gestao-de-Riscos-de-Terceiros|treinamento-gestao-de-riscos-de-terceiros.html|13|#4D7C0F|Govern
+Auditoria-de-TI|Auditoria de TI: SOX, ITGC e COBIT|Auditoria-de-TI|treinamento-auditoria-de-ti.html|6|#D97706|Govern

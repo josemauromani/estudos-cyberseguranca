@@ -100,7 +100,7 @@ flowchart LR
 | **Trilha 3** | Segurança Ofensiva | `#DC2626` (Vermelho) | Reconhecimento, falhas web, APIs, testes de intrusão e phishing | 11 ao 15 |
 | **Trilha 4** | Operações, SOC & Resposta | `#7C3AED` (Roxo) | Monitoramento, SIEM, CTI, contenção de incidentes e forense | 16 ao 20 |
 | **Trilha 5** | Especialidades & Fronteiras | `#0891B2` (Ciano) | Nuvem pública, DevSecOps/CI-CD, IoT/TO (Purdue) e Inteligência Artificial | 21 ao 24 |
-| **Trilha 6** | Governança, Riscos & Conformidade | `#D97706` (Âmbar) | Gestão de risco (ALE/SLE), ISO 27001/27002, LGPD e continuidade de negócios | 25 ao 28, 31 |
+| **Trilha 6** | Governança, Riscos & Conformidade | `#D97706` (Âmbar) | Gestão de risco (ALE/SLE), ISO 27001/27002, LGPD e continuidade de negócios | 25 ao 28, 31, 58 |
 | **Trilha 7** | Carreira & Formação | `#DB2777` (Rosa) | Inglês técnico, formação acadêmica, certificações e preparação para vagas | 32 e 33 |
 | **Trilha 8** | Ferramentas & Automação do Analista | `#475569` (Ardósia) | Base prática do analista: Linux e PowerShell para investigação, automação com Python e regex, laboratório doméstico e portfólio | 34 ao 37 |
 | **Trilha 9** | Identidade Corporativa & Active Directory | `#4F46E5` (Índigo) | Identidade no ambiente corporativo: Active Directory, Kerberos, ataques e detecção no AD, acessos privilegiados (PAM) e Entra ID | 38 ao 41 |
@@ -413,6 +413,16 @@ flowchart LR
 - **Pré-requisitos:** Segmentacao-e-Firewall, ISO-27001-e-27002.
 - **Conceitos-Chave:** PAN, SAD, CVV, Tokenização vs truncamento vs criptografia, CDE e sistemas "connected-to", Segmentação validada por teste, SAQ A, A-EP, B, C, D, QSA, ISA, ROC, AOC, Níveis de comerciante, Requisitos que passaram a ser obrigatórios em 31/03/2025.
 - **Simulador Interativo em JS:** *Delimitador de Escopo CDE* — Um inventário de 11 sistemas fictícios da Ipê Store (servidores web e de aplicação, banco de pedidos, backup, AD, SIEM, bastion, estações, gateway de pagamento terceirizado) em três arquiteturas de checkout: formulário próprio, JavaScript do gateway e iframe do gateway. No modo exercício, o aluno classifica cada sistema como CDE, conectado, fora do escopo ou terceiro e escolhe o SAQ, e o simulador corrige com o motivo. No modo livre, o aluno indica se cada sistema armazena, processa ou transmite PAN, se impacta a segurança e se está segmentado, e a classificação e o SAQ sugerido (D, A-EP ou A) se recalculam.
+
+#### 58. Auditoria-de-TI
+- **Título:** Auditoria de TI: SOX, ITGC e COBIT
+- **Função NIST CSF 2.0:** *Govern (GV)*
+- **Tempo Estimado:** 45 minutos | **Carreiras:** GRC & Auditoria, Analista de Segurança da Informação
+- **MITRE ATT&CK:** T1078 Valid Accounts / T1098 Account Manipulation
+- **Objetivos de Aprendizagem:** Explicar por que a TI entra na SOX 404 (controles internos sobre relatórios financeiros, COSO 2013, abordagem top-down da PCAOB AS 2201); reconhecer os 4 domínios de ITGC (acesso a programas e dados, gestão de mudanças, desenvolvimento e aquisição, operações) e a diferença entre ITGC, ITAC e IPE; ligar os ITGC aos objetivos do COBIT 2019; conduzir walkthrough, teste de desenho (TOD) e de efetividade operacional (TOE) com amostra proporcional à frequência do controle; classificar exceções em deficiência, deficiência significativa ou fraqueza material, considerando controles compensatórios.
+- **Pré-requisitos:** Gestao-de-Riscos-TI, ISO-27001-e-27002.
+- **Conceitos-Chave:** Sarbanes-Oxley seções 302 e 404; ICFR; COSO 2013 (princípio 11, controles gerais de tecnologia); PCAOB AS 2201; ITGC vs ITAC; IPE (completude e exatidão); SOC 1 vs SOC 2 de fornecedores; COBIT 2019 (EDM, APO, BAI, DSS, MEA e os 40 objetivos); walkthrough; TOD e TOE; amostragem por frequência (prática de mercado); controle compensatório; carta de recomendação e remediação; IIA Global Internal Audit Standards (2024).
+- **Simulador Interativo em JS:** *Testador de ITGC* — Cinco controles gerais de TI de uma empresa fictícia, em três sistemas e nos quatro domínios. O aluno escolhe o tamanho da amostra de cada controle (o simulador compara com a tabela de referência por frequência), inspeciona a evidência dos itens sorteados e marca as exceções (aprovação depois da implantação, aprovador igual ao executor, desligado com acesso ativo além do prazo) e classifica o controle, levando em conta o controle compensatório. A correção mostra a classificação esperada e o porquê.
 
 ### Trilha 7: Carreira & Formação (`#DB2777`)
 
