@@ -177,7 +177,8 @@ class TestAuditoriaDeTI(unittest.TestCase):
 
     def test_nao_repete_auditoria_do_sgsi(self):
         body = self._body()
-        self.assertNotIn("Fase 2", body, "as fases da certificação ISO são ensinadas no Estudo 26")
+        for proibido in ("fase 2", "etapa 2", "estágio 2", "stage 2"):
+            self.assertNotIn(proibido, body.lower(), "as fases da certificação ISO são ensinadas no Estudo 26")
         paragrafos = re.findall(r"<p>(.*?)</p>", body, re.S)
         self.assertTrue(any("auditoria do SGSI" in p and "Estudo 26" in p for p in paragrafos),
                         "ao falar da auditoria do SGSI, remeter ao Estudo 26")

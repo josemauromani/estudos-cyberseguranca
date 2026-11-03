@@ -2095,7 +2095,7 @@ td {
         <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 9</small></span><h2>Introdução: A Política Existe, a Evidência Não</h2></div>
 
         <p class="lead-text">
-            Uma companhia brasileira acaba de registrar ADRs na SEC e, pela primeira vez, vai ser auditada também sobre os controles internos dos seus relatórios financeiros. A TI tem uma política de acesso bem escrita: todo trimestre, cada gestor revisa quem acessa o ERP; todo desligado perde o acesso em até 2 dias úteis; toda mudança em produção é aprovada antes de entrar. Na primeira visita, o auditor externo não pede a política. Pede a evidência: as quatro revisões de acesso de janeiro a dezembro, assinadas e datadas; a lista de desligados do RH cruzada com a lista de usuários ativos; e as mudanças do ano, com a data da aprovação e a da implantação. Das quatro revisões, duas não existem; as outras duas não têm data. Contas de desligados continuaram ativas por semanas, e mudanças foram aprovadas depois de entrar em produção. A política estava certa; o controle é que não funcionou o ano inteiro. Este módulo ensina a pensar como o auditor de TI: o que ele testa, quantos itens, com que evidência e como classifica o que encontra.
+            Uma companhia brasileira registrou ADRs na SEC há dois anos e, neste exercício, passa pela primeira auditoria do ICFR: além das demonstrações, o auditor externo vai opinar sobre os controles internos dos seus relatórios financeiros. A TI tem uma política de acesso bem escrita: todo trimestre, cada gestor revisa quem acessa o ERP; todo desligado perde o acesso em até 2 dias úteis; toda mudança em produção é aprovada antes de entrar. Na primeira visita, o auditor externo não pede a política. Pede a evidência: as quatro revisões de acesso de janeiro a dezembro, assinadas e datadas; a lista de desligados do RH cruzada com a lista de usuários ativos; e as mudanças do ano, com a data da aprovação e a da implantação. Das quatro revisões, duas não existem; as outras duas não têm data. Contas de desligados continuaram ativas por semanas, e mudanças foram aprovadas depois de entrar em produção. A política estava certa; o controle é que não funcionou o ano inteiro. Este módulo ensina a pensar como o auditor de TI: o que ele testa, quantos itens, com que evidência e como classifica o que encontra.
         </p>
 
         <div class="callout tip">
@@ -2305,7 +2305,7 @@ ORDER BY r.data_desligamento;</code></pre>
         </div>
 
         <p>
-            O COBIT 2019 não se aplica inteiro a toda empresa. Os <strong>11 fatores de desenho</strong> (estratégia, metas corporativas, perfil de risco, questões de I&amp;T, cenário de ameaças, requisitos de conformidade, papel da TI, modelo de contratação da TI, métodos de implementação, estratégia de adoção de tecnologia e porte da empresa) dizem quais objetivos priorizar. Cada objetivo se apoia em sete componentes do sistema de governança (processos, estruturas organizacionais, políticas e procedimentos, informação, cultura e comportamento, pessoas e competências, e serviços, infraestrutura e aplicações), e os processos são avaliados em <strong>níveis de capacidade de 0 a 5</strong>, numa escala inspirada no CMMI.
+            O COBIT 2019 não se aplica inteiro a toda empresa. Os <strong>11 fatores de desenho</strong> (estratégia, metas corporativas, perfil de risco, questões de I&amp;T, cenário de ameaças, requisitos de conformidade, papel da TI, modelo de contratação da TI, métodos de implementação, estratégia de adoção de tecnologia e porte da empresa) dizem quais objetivos priorizar. Cada objetivo se apoia em sete componentes do sistema de governança (processos, estruturas organizacionais, princípios, políticas e procedimentos, informação, cultura, ética e comportamento, pessoas e competências, e serviços, infraestrutura e aplicações), e os processos são avaliados em <strong>níveis de capacidade de 0 a 5</strong>, numa escala inspirada no CMMI.
         </p>
 
         <h3>Dos ITGC aos objetivos COBIT</h3>
@@ -2398,7 +2398,7 @@ ORDER BY r.data_desligamento;</code></pre>
                 <tbody>
                     <tr><td><strong>Deficiência</strong></td><td>O desenho ou a operação de um controle não permite que a administração ou os funcionários, no curso normal de suas funções, previnam ou detectem distorções tempestivamente.</td><td>Comunicada por escrito à administração; entra no plano de remediação.</td></tr>
                     <tr><td><strong>Deficiência significativa</strong></td><td>Deficiência, ou combinação de deficiências, no ICFR, menos grave que uma fraqueza material, mas importante o bastante para merecer a atenção dos responsáveis pela supervisão dos relatórios financeiros.</td><td>Comunicada por escrito também ao comitê de auditoria.</td></tr>
-                    <tr><td><strong>Fraqueza material</strong></td><td>Deficiência, ou combinação de deficiências, no ICFR, tal que haja possibilidade razoável de que uma distorção relevante nas demonstrações anuais ou intermediárias não seja prevenida ou detectada tempestivamente.</td><td>A administração não pode concluir que o ICFR é efetivo, e o auditor emite opinião adversa sobre o ICFR. Vai a público no relatório anual.</td></tr>
+                    <tr><td><strong>Fraqueza material</strong></td><td>Deficiência, ou combinação de deficiências, no ICFR, tal que haja possibilidade razoável de que uma distorção relevante nas demonstrações anuais ou intermediárias não seja prevenida ou detectada tempestivamente.</td><td>Comunicada por escrito à administração e ao comitê de auditoria. A administração não pode concluir que o ICFR é efetivo, e o auditor emite opinião adversa sobre o ICFR. Vai a público no relatório anual.</td></tr>
                 </tbody>
             </table>
         </div>
@@ -2431,7 +2431,7 @@ ORDER BY r.data_desligamento;</code></pre>
 
             <div class="lab-body" style="min-width: 0;">
                 <div id="aud-controles" role="group" aria-label="Escolha o controle" style="display: flex; flex-wrap: wrap; gap: 0.4rem;"></div>
-                <div id="aud-placar" aria-live="polite" style="margin-top: 0.6rem; font-size: 0.85rem; font-weight: 600;"></div>
+                <div id="aud-placar" style="margin-top: 0.6rem; font-size: 0.85rem; font-weight: 600;"></div>
                 <div id="aud-controle" style="margin-top: 0.8rem; min-width: 0; overflow-wrap: anywhere;"></div>
                 <p style="font-size: 0.76rem; color: var(--muted); margin: 0.8rem 0 0 0;">Empresa, sistemas, tíquetes e evidências inventados. A tabela de amostragem é prática de mercado e a regra de classificação é uma convenção didática; na auditoria real, a classificação é julgamento profissional.</p>
             </div>
@@ -2536,7 +2536,7 @@ ORDER BY r.data_desligamento;</code></pre>
 
         <div class="quiz-item" data-q="q5">
             <div class="quiz-question">
-                <strong>Questão 5 (SOC 1 e SOC 2):</strong> A folha de pagamento é processada por um prestador. Ele envia um SOC 2 Tipo II sem exceções. O auditor da SOX aceita?
+                <strong>Questão 5 (SOC 1 e SOC 2):</strong> A folha de pagamento é processada por um prestador. Ele envia um SOC 2 Tipo 2 sem exceções. O auditor da SOX aceita?
             </div>
             <details class="quiz-details">
                 <summary class="quiz-toggle">Ver resposta explicada</summary>
@@ -2815,7 +2815,7 @@ ORDER BY r.data_desligamento;</code></pre>
         var txt = "Placar: " + pontos + " de " + (D.controles.length * 3) + " pontos · controles testados: " + corrigidos + " de " + D.controles.length;
         if (corrigidos === D.controles.length) {
             var pior = 0;
-            D.controles.forEach(function(c) { pior = Math.max(pior, ORDEM.indexOf(c.gabarito)); });
+            D.controles.forEach(function(c) { pior = Math.max(pior, ORDEM.indexOf(window.classificarControle(c, window.contarExcecoes(c), c.compensatorio))); });
             txt += pior === 3 ? " · Conclusão: há fraqueza material; a Ipê Store não pode declarar o ICFR efetivo." :
                 " · Conclusão: sem fraqueza material; as deficiências vão para a carta de recomendação.";
         }
