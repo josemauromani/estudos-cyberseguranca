@@ -37,9 +37,11 @@ def efetivo(perfil):
 
 
 def elegibilidade(cert, perfil):
-    """Regra espelhada no JavaScript: 'sem-exigencia', 'elegivel' ou 'pendente'."""
+    """Regra espelhada no JavaScript: 'conferir', 'sem-exigencia', 'elegivel' ou 'pendente'."""
     perfil = efetivo(perfil)
     req = cert["requisitos"]
+    if req.get("conferir"):
+        return "conferir"
     if not req:
         return "sem-exigencia"
     if req.get("alternativa") and perfil.get("treinamento_oficial"):
@@ -131,19 +133,25 @@ class TestCertificacoesCarreira(unittest.TestCase):
 
     def test_dominios_e_pesos(self):
         d = self._dados()
-        esperados = {"Security+": 5, "CISSP": 8, "CCSP": 6, "CISM": 4, "CEH": 9}
+        esperados = {"Security+": 5, "CISSP": 8, "CCSP": 6, "CISM": 4, "CEH": 9,
+                     "ISFS": 4, "PDPF/PDPP": 11, "ITIL 4 F": 7, "CSFPC": 9, "CISA": 5, "ISO 27001 LA": 7}
+        com_pesos = ("Security+", "CISSP", "CCSP", "CISM", "CISA", "ISFS", "ITIL 4 F")
+        entrada = ("Security+", "ISFS", "PDPF/PDPP", "ITIL 4 F", "CSFPC")
         for c in d["certificacoes"]:
             with self.subTest(cert=c["sigla"]):
                 self.assertIn(c["nivel"], (1, 2, 3))
+                if c["sigla"] in entrada:
+                    self.assertEqual(c["nivel"], 1)
                 for campo in ("foco", "experiencia", "manutencao", "nota_dominios"):
                     self.assertTrue(c[campo].strip(), campo)
                 if c["sigla"] in esperados:
                     self.assertEqual(len(c["dominios"]), esperados[c["sigla"]])
                 pesos = [dom["peso"] for dom in c["dominios"]]
-                if c["sigla"] in ("Security+", "CISSP", "CCSP", "CISM"):
+                if c["sigla"] in com_pesos:
                     self.assertEqual(sum(pesos), 100)
                 else:
-                    self.assertTrue(all(p is None for p in pesos), "sem pesos inventados para CEH e GSEC")
+                    self.assertTrue(all(p is None for p in pesos),
+                                    "sem pesos inventados para CEH, GSEC, PDPF/PDPP, CSFPC e ISO 27001 LA")
                 for dom in c["dominios"]:
                     self.assertTrue(dom["nome"].strip())
                     if dom.get("parcial") or not dom["modulos"]:
@@ -168,6 +176,11 @@ class TestCertificacoesCarreira(unittest.TestCase):
         self.assertEqual((req["CISSP"]["anos_si"], req["CISSP"]["desconto_graduacao"]), (5, 1))
         self.assertEqual((req["CCSP"]["anos_ti"], req["CCSP"]["anos_si"], req["CCSP"]["anos_nuvem"]), (5, 3, 1))
         self.assertEqual((req["CISM"]["anos_si"], req["CISM"]["anos_gestao_si"]), (5, 3))
+        for sigla in ("ISFS", "ITIL 4 F", "CSFPC"):
+            self.assertEqual(req[sigla], {}, sigla)
+        for sigla in ("CISA", "ISO 27001 LA", "PDPF/PDPP"):
+            self.assertEqual(req[sigla], {"conferir": True}, sigla)
+            self.assertTrue(self._cert(d, sigla)["experiencia"].strip(), sigla)
         for c in d["certificacoes"]:
             if c["requisitos"]:
                 self.assertTrue(c["sem_experiencia"].strip(), c["sigla"])
@@ -189,6 +202,21 @@ class TestCertificacoesCarreira(unittest.TestCase):
         self.assertEqual(elegibilidade(self._cert(d, "CCSP"), so_seguranca), "elegivel")
         so_gestao = {"anos_ti": 0, "anos_si": 0, "anos_gestao_si": 5, "anos_nuvem": 0}
         self.assertEqual(elegibilidade(self._cert(d, "CISM"), so_gestao), "elegivel")
+
+    def test_status_conferir(self):
+        d = self._dados()
+        veterano = {"anos_ti": 20, "anos_si": 20, "anos_gestao_si": 20, "anos_nuvem": 20,
+                    "graduacao": True, "treinamento_oficial": True}
+        for sigla in ("CISA", "ISO 27001 LA", "PDPF/PDPP"):
+            self.assertEqual(elegibilidade(self._cert(d, sigla), veterano), "conferir", sigla)
+        self.assertEqual(elegibilidade(self._cert(d, "ISFS"), veterano), "sem-exigencia")
+        body = self.body_path.read_text(encoding="utf-8")
+        self.assertRegex(body, r'"conferir": \["Requisito em texto: confira na certificadora", "rgba\(')
+        motor = re.search(r"function elegibilidade\(c\) \{(.*?)\n    \}", body, re.S)
+        self.assertIsNotNone(motor)
+        corpo = motor.group(1)
+        self.assertIn('if (req.conferir) return { status: "conferir", faltas: [] };', corpo)
+        self.assertLess(corpo.index("req.conferir"), corpo.index('"sem-exigencia"'))
 
     # ---------------------------------------------------------------- compilado
     def test_simulador_estrutura(self):

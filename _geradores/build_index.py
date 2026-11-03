@@ -177,7 +177,7 @@ def render_cartao(slug: str, d: dict, status_info: dict) -> str:
     nivel = d["nivel"]
     perfis = escape("|".join(d["carreiras"]), quote=True)
     rotas_str = " ".join(r["id"] for r in ROTAS_PERFIL if slug in r["modulos"])
-    certs_str = escape(" ".join(c["sigla"] for c in CERTIFICACOES if slug in c["modulos"]), quote=True)
+    certs_str = escape("|".join(c["sigla"] for c in CERTIFICACOES if slug in c["modulos"]), quote=True)
     busca = escape(
         " ".join([
             slug, d["titulo"], d["subtitulo"], d["pergunta_chave"], d["simulador_nome"],

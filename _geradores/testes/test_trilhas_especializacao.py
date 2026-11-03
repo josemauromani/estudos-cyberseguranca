@@ -168,6 +168,11 @@ class TestLigacoesEspecializacao(unittest.TestCase):
             "CISM": ["Regulacao-Setor-Financeiro", "Gestao-de-Riscos-de-Terceiros"],
             "Security+": ["Engenharia-de-Deteccao", "Fraude-em-Pagamentos-e-Pix"],
             "CEH": ["Seguranca-em-Kubernetes"],
+            "ISFS": ["Legislacao-e-Crimes-Ciberneticos"],
+            "PDPF/PDPP": ["Gestao-de-Riscos-de-Terceiros", "Legislacao-e-Crimes-Ciberneticos"],
+            "ITIL 4 F": ["Gestao-de-Riscos-de-Terceiros"],
+            "CSFPC": ["Legislacao-e-Crimes-Ciberneticos"],
+            "CISA": ["Gestao-de-Riscos-de-Terceiros"],
         }
         self.assertTrue(set(esperado) <= {c["sigla"] for c in CERTIFICACOES})
         for c in CERTIFICACOES:

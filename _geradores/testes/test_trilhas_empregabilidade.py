@@ -121,6 +121,12 @@ class TestLigacoesNovas(unittest.TestCase):
             "CISM": ["Gestao-de-Crise-e-Comunicacao", "Exercicios-Tabletop"],
             "CEH": ["Ataques-e-Defesa-no-AD"],
             "CCSP": [],
+            "ISFS": [],
+            "PDPF/PDPP": [],
+            "ITIL 4 F": [],
+            "CSFPC": ["Ransomware-Prevencao-a-Recuperacao"],
+            "CISA": ["PAM-e-Acessos-Privilegiados", "Backup-Imutavel-e-Recuperacao"],
+            "ISO 27001 LA": [],
         }
         for c in CERTIFICACOES:
             with self.subTest(sigla=c["sigla"]):

@@ -813,6 +813,460 @@ flowchart TD
      ]
     }
    ]
+  },
+  {
+   "sigla": "ISFS",
+   "nome": "Information Security Foundation based on ISO/IEC 27001",
+   "orgao": "EXIN",
+   "nivel": 1,
+   "foco": "Entrada: fundamentos de segurança da informação com base na ISO/IEC 27001 e na 27002",
+   "experiencia": "Sem exigência formal de experiência; basta a aprovação na prova (40 questões em 60 minutos, 65% para passar)",
+   "manutencao": "A EXIN não exige renovação periódica; se houver validade, ela vem impressa no certificado",
+   "nota_dominios": "Os 4 requisitos do guia de preparação da EXIN (edição 202508), com os pesos publicados.",
+   "requisitos": {},
+   "sem_experiencia": "",
+   "dominios": [
+    {
+     "nome": "Informação e segurança",
+     "peso": 27.5,
+     "modulos": [
+      "Fundamentos-Ciber",
+      "ISO-27001-e-27002",
+      "Protecao-de-Dados-e-Conteudo"
+     ]
+    },
+    {
+     "nome": "Ameaças e riscos",
+     "peso": 12.5,
+     "modulos": [
+      "Gestao-de-Riscos-TI",
+      "Engenharia-Social-e-Phishing"
+     ]
+    },
+    {
+     "nome": "Controles de segurança: organizacionais, de pessoas, físicos e tecnológicos",
+     "peso": 52.5,
+     "modulos": [
+      "ISO-27001-e-27002",
+      "Autenticacao-e-IAM",
+      "Criptografia-Pratica",
+      "Engenharia-Social-e-Phishing",
+      "Continuidade-e-Disaster-Recovery"
+     ]
+    },
+    {
+     "nome": "Legislação, regulamentos e normas",
+     "peso": 7.5,
+     "modulos": [
+      "LGPD-e-Privacidade",
+      "Legislacao-e-Crimes-Ciberneticos",
+      "ISO-27001-e-27002"
+     ]
+    }
+   ]
+  },
+  {
+   "sigla": "PDPF/PDPP",
+   "nome": "Privacy & Data Protection Foundation e Professional (com a ISFS, formam o EXIN Data Protection Officer)",
+   "orgao": "EXIN",
+   "nivel": 1,
+   "foco": "Privacidade e proteção de dados: do GDPR (Foundation) ao sistema de gestão da privacidade (Professional)",
+   "experiencia": "Sem exigência de experiência. O PDPF pede só a prova (40 questões em 60 minutos). O PDPP pede a prova (40 questões em 120 minutos, com consulta ao texto do GDPR) e o treinamento credenciado da EXIN com as tarefas práticas. Com a ISFS, as duas formam a trilha EXIN Data Protection Officer",
+   "manutencao": "A EXIN não exige renovação periódica; se houver validade, ela vem impressa no certificado",
+   "nota_dominios": "Duas provas, cada uma com pesos próprios que somam 100% (guias da EXIN: PDPF edição 202512; PDPP edição 202610, que trocou o nome Practitioner por Professional). O peso aparece no nome de cada domínio. As provas cobram o GDPR europeu; o currículo ensina a LGPD, de estrutura parecida (bases legais, direitos, papéis e relatório de impacto).",
+   "requisitos": {
+    "conferir": true
+   },
+   "sem_experiencia": "Não há exigência de experiência, mas o PDPP só é concedido com o treinamento credenciado da EXIN e as tarefas práticas. Confira as regras atuais no site da EXIN.",
+   "dominios": [
+    {
+     "nome": "PDPF · Escopo do GDPR (12,5% da PDPF)",
+     "peso": null,
+     "modulos": [
+      "LGPD-e-Privacidade",
+      "Legislacao-e-Crimes-Ciberneticos"
+     ]
+    },
+    {
+     "nome": "PDPF · Princípios do tratamento de dados (37,5% da PDPF)",
+     "peso": null,
+     "modulos": [
+      "LGPD-e-Privacidade"
+     ]
+    },
+    {
+     "nome": "PDPF · Prática do tratamento: governança de dados, tratamento online e uso de IA (10% da PDPF)",
+     "peso": null,
+     "modulos": [
+      "Protecao-de-Dados-e-Conteudo",
+      "IA-e-Ciberseguranca"
+     ]
+    },
+    {
+     "nome": "PDPF · Transferências internacionais de dados pessoais (15% da PDPF)",
+     "peso": null,
+     "modulos": [
+      "LGPD-e-Privacidade",
+      "Gestao-de-Riscos-de-Terceiros"
+     ]
+    },
+    {
+     "nome": "PDPF · Avaliação e mitigação de riscos: RIPD, violações e autoridade supervisora (25% da PDPF)",
+     "peso": null,
+     "modulos": [
+      "LGPD-e-Privacidade",
+      "Resposta-a-Incidentes"
+     ]
+    },
+    {
+     "nome": "PDPP · Políticas de proteção de dados e privacidade desde a concepção (7,5% do PDPP)",
+     "peso": null,
+     "modulos": [
+      "LGPD-e-Privacidade"
+     ]
+    },
+    {
+     "nome": "PDPP · Sistema de gestão da privacidade da informação, SGPI (32,5% do PDPP)",
+     "peso": null,
+     "modulos": [
+      "ISO-27001-e-27002",
+      "LGPD-e-Privacidade"
+     ],
+     "nota": "O SGPI da ISO/IEC 27701 estende o SGSI da ISO 27001 (módulo 26) com controles de privacidade: estude os dois juntos."
+    },
+    {
+     "nome": "PDPP · Papéis do controlador, do operador e do encarregado, DPO (17,5% do PDPP)",
+     "peso": null,
+     "modulos": [
+      "LGPD-e-Privacidade",
+      "Gestao-de-Riscos-de-Terceiros"
+     ]
+    },
+    {
+     "nome": "PDPP · Relatório de impacto à proteção de dados, RIPD/DPIA (20% do PDPP)",
+     "peso": null,
+     "modulos": [
+      "LGPD-e-Privacidade",
+      "Gestao-de-Riscos-TI"
+     ]
+    },
+    {
+     "nome": "PDPP · Violações de dados, notificação e resposta a incidentes (12,5% do PDPP)",
+     "peso": null,
+     "modulos": [
+      "Resposta-a-Incidentes",
+      "Gestao-de-Crise-e-Comunicacao"
+     ]
+    },
+    {
+     "nome": "PDPP · O GDPR e o AI Act europeu (10% do PDPP)",
+     "peso": null,
+     "modulos": [
+      "IA-e-Ciberseguranca"
+     ],
+     "parcial": true,
+     "nota": "O módulo 24 trata do uso de IA em segurança; o AI Act europeu e a relação dele com o GDPR não têm módulo."
+    }
+   ]
+  },
+  {
+   "sigla": "ITIL 4 F",
+   "nome": "ITIL 4 Foundation",
+   "orgao": "PeopleCert (Axelos)",
+   "nivel": 1,
+   "foco": "Gestão de serviços de TI: sistema de valor, cadeia de valor e práticas ITIL",
+   "experiencia": "Sem exigência formal de experiência; prova de 40 questões em 60 minutos, 65% para passar. A PeopleCert já oferece o ITIL Foundation (Version 5) e planeja aposentar os módulos do ITIL 4 em 31 de dezembro de 2027",
+   "manutencao": "Renovação a cada 3 anos com 60 pontos de CPD (PeopleCert Plus) ou aprovação em outra prova da mesma família",
+   "nota_dominios": "Os 7 resultados de aprendizagem do syllabus oficial do ITIL 4 Foundation; o peso é a parte das 40 questões de cada um. O currículo é de segurança: os conceitos de gestão de serviços não têm módulo.",
+   "requisitos": {},
+   "sem_experiencia": "",
+   "dominios": [
+    {
+     "nome": "Conceitos-chave de gestão de serviços",
+     "peso": 12.5,
+     "modulos": [],
+     "nota": "Valor, produtos e serviços, utilidade e garantia, e relações de serviço não têm módulo. Estude pelo livro oficial do ITIL 4 Foundation."
+    },
+    {
+     "nome": "Os 7 princípios orientadores",
+     "peso": 15,
+     "modulos": [],
+     "nota": "Sem módulo: foco no valor, começar de onde está, progredir de forma iterativa com feedback, colaborar e promover visibilidade, pensar e trabalhar de forma holística, manter simples e prático, otimizar e automatizar."
+    },
+    {
+     "nome": "As 4 dimensões da gestão de serviços",
+     "peso": 5,
+     "modulos": [],
+     "nota": "Organizações e pessoas, informação e tecnologia, parceiros e fornecedores, fluxos de valor e processos: sem módulo."
+    },
+    {
+     "nome": "Sistema de valor de serviço (SVS)",
+     "peso": 2.5,
+     "modulos": [],
+     "nota": "Sem módulo no currículo."
+    },
+    {
+     "nome": "Cadeia de valor de serviço e suas 6 atividades",
+     "peso": 5,
+     "modulos": [],
+     "nota": "Planejar, melhorar, engajar, desenhar e fazer a transição, obter ou construir, entregar e dar suporte: sem módulo."
+    },
+    {
+     "nome": "Propósito de 15 práticas ITIL",
+     "peso": 17.5,
+     "modulos": [
+      "ISO-27001-e-27002",
+      "Gestao-de-Riscos-de-Terceiros",
+      "Operacoes-SOC-e-SIEM",
+      "DevSecOps-e-CI-CD",
+      "Resposta-a-Incidentes",
+      "Auditoria-de-TI"
+     ],
+     "parcial": true,
+     "nota": "Têm módulo: segurança da informação (26), fornecedores (57), monitoramento e eventos (16), liberação e implantação (22), incidentes (18) e mudanças (58). Relacionamento, ativos de TI, configuração de serviço e as práticas de atendimento não têm."
+    },
+    {
+     "nome": "As 7 práticas cobradas em detalhe",
+     "peso": 42.5,
+     "modulos": [
+      "Resposta-a-Incidentes",
+      "Auditoria-de-TI"
+     ],
+     "parcial": true,
+     "nota": "Gestão de incidentes (18) e habilitação de mudanças (58, gestão de mudanças nos ITGC) têm módulo. Melhoria contínua, gestão de problemas, de requisições de serviço, central de serviço e gestão de nível de serviço não têm."
+    }
+   ]
+  },
+  {
+   "sigla": "CSFPC",
+   "nome": "Cybersecurity Foundation Professional Certification",
+   "orgao": "CertiProf",
+   "nivel": 1,
+   "foco": "Entrada: fundamentos de cibersegurança com base no CyBOK v1.0 e no guia do NIST para pequenas empresas",
+   "experiencia": "Sem exigência formal de experiência; prova online de 40 questões em 60 minutos, 80% (32 acertos) para passar",
+   "manutencao": "Validade de 3 anos a partir da aprovação, com renovação pela CertiProf",
+   "nota_dominios": "Os 9 temas publicados pela CertiProf, sem pesos: a página da prova não informa a distribuição das questões.",
+   "requisitos": {},
+   "sem_experiencia": "",
+   "dominios": [
+    {
+     "nome": "NIST: cibersegurança para pequenas empresas",
+     "peso": null,
+     "modulos": [
+      "Fundamentos-Ciber",
+      "Autenticacao-e-IAM",
+      "Seguranca-em-Endpoints-EDR",
+      "Backup-Imutavel-e-Recuperacao"
+     ]
+    },
+    {
+     "nome": "Fundamentos de cibersegurança (CyBOK)",
+     "peso": null,
+     "modulos": [
+      "Fundamentos-Ciber"
+     ]
+    },
+    {
+     "nome": "Gestão de riscos",
+     "peso": null,
+     "modulos": [
+      "Gestao-de-Riscos-TI"
+     ]
+    },
+    {
+     "nome": "Leis e regulação",
+     "peso": null,
+     "modulos": [
+      "Legislacao-e-Crimes-Ciberneticos",
+      "LGPD-e-Privacidade"
+     ]
+    },
+    {
+     "nome": "Fatores humanos",
+     "peso": null,
+     "modulos": [
+      "Engenharia-Social-e-Phishing"
+     ]
+    },
+    {
+     "nome": "Privacidade e direitos online",
+     "peso": null,
+     "modulos": [
+      "LGPD-e-Privacidade"
+     ],
+     "parcial": true,
+     "nota": "O módulo 27 cobre a LGPD e os direitos do titular; as tecnologias de privacidade do CyBOK (anonimato, comunicação confidencial, privacidade em redes sociais) não têm módulo."
+    },
+    {
+     "nome": "Malware e tecnologias de ataque",
+     "peso": null,
+     "modulos": [
+      "Analise-Basica-de-Malware",
+      "Ransomware-Prevencao-a-Recuperacao"
+     ]
+    },
+    {
+     "nome": "Comportamento adversarial",
+     "peso": null,
+     "modulos": [
+      "Threat-Intelligence"
+     ]
+    },
+    {
+     "nome": "Operações de segurança e gestão de incidentes",
+     "peso": null,
+     "modulos": [
+      "Operacoes-SOC-e-SIEM",
+      "Resposta-a-Incidentes",
+      "Seguranca-em-Endpoints-EDR"
+     ]
+    }
+   ]
+  },
+  {
+   "sigla": "CISA",
+   "nome": "Certified Information Systems Auditor",
+   "orgao": "ISACA",
+   "nivel": 3,
+   "foco": "Auditoria de sistemas de informação: processo de auditoria, governança, ciclo de vida, operação e proteção de ativos",
+   "experiencia": "5 anos de experiência profissional em auditoria, controle ou segurança de sistemas de informação, obtida nos 10 anos anteriores ao pedido; até 3 anos podem ser dispensados (1 ano por experiência geral em SI ou em auditoria e de 1 a 3 anos por formação acadêmica). O pedido de certificação deve ser feito até 5 anos depois da aprovação",
+   "manutencao": "120 horas de CPE a cada 3 anos (mínimo de 20 por ano) e taxa anual",
+   "nota_dominios": "Os 5 domínios da prática de trabalho (job practice) em vigor desde 1º de agosto de 2024, com os pesos publicados pela ISACA.",
+   "requisitos": {
+    "conferir": true
+   },
+   "sem_experiencia": "Você pode fazer a prova antes: a ISACA aceita o pedido de certificação até 5 anos depois da aprovação. Como a experiência vale em auditoria e controle, e não só em segurança, confira a elegibilidade no site da ISACA.",
+   "dominios": [
+    {
+     "nome": "Processo de auditoria de sistemas de informação",
+     "peso": 18,
+     "modulos": [
+      "Auditoria-de-TI",
+      "Gestao-de-Riscos-TI"
+     ]
+    },
+    {
+     "nome": "Governança e gestão de TI",
+     "peso": 18,
+     "modulos": [
+      "Auditoria-de-TI",
+      "ISO-27001-e-27002",
+      "Gestao-de-Riscos-TI",
+      "Gestao-de-Riscos-de-Terceiros"
+     ]
+    },
+    {
+     "nome": "Aquisição, desenvolvimento e implementação de sistemas de informação",
+     "peso": 12,
+     "modulos": [
+      "DevSecOps-e-CI-CD",
+      "Auditoria-de-TI"
+     ],
+     "parcial": true,
+     "nota": "Os módulos 22 e 58 cobrem o desenvolvimento seguro e a gestão de mudanças; gestão de projetos, estudo de viabilidade, migração de dados e revisão pós-implantação não têm módulo."
+    },
+    {
+     "nome": "Operações de sistemas de informação e resiliência do negócio",
+     "peso": 26,
+     "modulos": [
+      "Continuidade-e-Disaster-Recovery",
+      "Backup-Imutavel-e-Recuperacao",
+      "Seguranca-de-Bancos-de-Dados",
+      "Resposta-a-Incidentes",
+      "Gestao-de-Vulnerabilidades"
+     ]
+    },
+    {
+     "nome": "Proteção dos ativos de informação",
+     "peso": 26,
+     "modulos": [
+      "Autenticacao-e-IAM",
+      "PAM-e-Acessos-Privilegiados",
+      "Criptografia-Pratica",
+      "Segmentacao-e-Firewall",
+      "Seguranca-em-Nuvem",
+      "LGPD-e-Privacidade",
+      "Forense-Digital"
+     ]
+    }
+   ]
+  },
+  {
+   "sigla": "ISO 27001 LA",
+   "nome": "PECB Certified ISO/IEC 27001 Lead Auditor",
+   "orgao": "PECB",
+   "nivel": 3,
+   "foco": "Auditoria de SGSI: preparar, conduzir, encerrar e gerir auditorias da ISO/IEC 27001 segundo a ISO 19011",
+   "experiencia": "Prova PECB ISO/IEC 27001 Lead Auditor (ou equivalente), 5 anos de experiência profissional, sendo 2 em gestão de segurança da informação, 300 horas de atividades de auditoria e assinatura do código de ética. Com 2 anos (1 em gestão de SI) e 200 horas, o nível é Auditor; sem experiência, Provisional Auditor",
+   "manutencao": "Validade de 3 anos, com horas anuais de CPD e taxa anual de manutenção (US$ 100 no manual do candidato)",
+   "nota_dominios": "Os 7 domínios de competência do manual do candidato da PECB (versão 7.0), sem peso percentual: a prova dissertativa distribui 75 pontos em 12 questões, e o encerramento da auditoria vale 25 deles.",
+   "requisitos": {
+    "conferir": true
+   },
+   "sem_experiencia": "Sem experiência, a aprovação na prova dá o nível Provisional Auditor; Auditor e Lead Auditor pedem horas de auditoria comprovadas. Confira os requisitos atuais no site da PECB.",
+   "dominios": [
+    {
+     "nome": "Princípios e conceitos fundamentais de um SGSI",
+     "peso": null,
+     "modulos": [
+      "ISO-27001-e-27002",
+      "Fundamentos-Ciber"
+     ]
+    },
+    {
+     "nome": "O sistema de gestão de segurança da informação (SGSI)",
+     "peso": null,
+     "modulos": [
+      "ISO-27001-e-27002",
+      "Gestao-de-Riscos-TI",
+      "Continuidade-e-Disaster-Recovery",
+      "LGPD-e-Privacidade"
+     ]
+    },
+    {
+     "nome": "Conceitos e princípios fundamentais de auditoria",
+     "peso": null,
+     "modulos": [
+      "Auditoria-de-TI",
+      "ISO-27001-e-27002"
+     ],
+     "parcial": true,
+     "nota": "O módulo 58 ensina evidência, amostragem e independência; os princípios de auditoria da ISO 19011 não aparecem com esse nome."
+    },
+    {
+     "nome": "Preparação de uma auditoria ISO/IEC 27001",
+     "peso": null,
+     "modulos": [
+      "ISO-27001-e-27002",
+      "Auditoria-de-TI"
+     ]
+    },
+    {
+     "nome": "Condução de uma auditoria ISO/IEC 27001",
+     "peso": null,
+     "modulos": [
+      "Auditoria-de-TI",
+      "ISO-27001-e-27002"
+     ]
+    },
+    {
+     "nome": "Encerramento de uma auditoria ISO/IEC 27001",
+     "peso": null,
+     "modulos": [
+      "ISO-27001-e-27002",
+      "Auditoria-de-TI"
+     ]
+    },
+    {
+     "nome": "Gestão de um programa de auditoria ISO/IEC 27001",
+     "peso": null,
+     "modulos": [
+      "ISO-27001-e-27002"
+     ],
+     "parcial": true,
+     "nota": "O módulo 26 cobre a auditoria interna (cláusula 9.2) e o ciclo de certificação; a gestão do programa de auditoria da ISO 19011 não tem módulo."
+    }
+   ]
   }
  ],
  "modulos": {
@@ -880,6 +1334,10 @@ flowchart TD
    "numero": 16,
    "titulo": "Rotina de SOC L1/L2, Logs e Regras Sigma"
   },
+  "Threat-Intelligence": {
+   "numero": 17,
+   "titulo": "IoCs, TTPs, MITRE ATT&CK e STIX/TAXII"
+  },
   "Resposta-a-Incidentes": {
    "numero": 18,
    "titulo": "Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)"
@@ -903,6 +1361,10 @@ flowchart TD
   "Seguranca-em-IoT-e-OT": {
    "numero": 23,
    "titulo": "Redes Industriais (SCADA/Modbus) e IoT"
+  },
+  "IA-e-Ciberseguranca": {
+   "numero": 24,
+   "titulo": "Ameaças a LLMs (OWASP LLM), Deepfakes e Defesa"
   },
   "Gestao-de-Riscos-TI": {
    "numero": 25,
@@ -1004,6 +1466,10 @@ flowchart TD
    "numero": 55,
    "titulo": "Fraude em Pagamentos: Pix, Golpes e Antifraude"
   },
+  "Legislacao-e-Crimes-Ciberneticos": {
+   "numero": 56,
+   "titulo": "Legislação Brasileira e Crimes Cibernéticos"
+  },
   "Gestao-de-Riscos-de-Terceiros": {
    "numero": 57,
    "titulo": "Gestão de Riscos de Terceiros e Fornecedores"
@@ -1028,7 +1494,8 @@ flowchart TD
     var STATUS = {
         "sem-exigencia": ["Sem exigência formal de experiência", "rgba(37, 99, 235, 0.22)"],
         "elegivel": ["Elegível com o perfil informado", "rgba(22, 163, 74, 0.25)"],
-        "pendente": ["Experiência ainda insuficiente", "rgba(202, 138, 4, 0.30)"]
+        "pendente": ["Experiência ainda insuficiente", "rgba(202, 138, 4, 0.30)"],
+        "conferir": ["Requisito em texto: confira na certificadora", "rgba(124, 58, 237, 0.22)"]
     };
     var COBERTURA = {
         coberto: ["Coberto", "rgba(22, 163, 74, 0.25)"],
@@ -1080,6 +1547,7 @@ flowchart TD
     // Regra espelhada nos testes em Python.
     function elegibilidade(c) {
         var req = c.requisitos;
+        if (req.conferir) return { status: "conferir", faltas: [] };
         if (!Object.keys(req).length) return { status: "sem-exigencia", faltas: [] };
         if (req.alternativa && perfil.treinamento_oficial) return { status: "elegivel", faltas: [], via: req.alternativa };
         var p = efetivo();
@@ -1117,6 +1585,7 @@ flowchart TD
         var linha = el("p", null, "margin: 0 0 0.4rem 0; font-size: 0.85rem;");
         linha.appendChild(selo(STATUS[e.status][0], STATUS[e.status][1]));
         if (e.via) linha.appendChild(el("span", " via " + e.via + "."));
+        if (e.status === "conferir") linha.appendChild(el("span", " " + c.sem_experiencia));
         if (e.faltas.length) {
             var umSo = e.faltas.length === 1 && e.faltas[0].indexOf("1 ano ") === 0;
             linha.appendChild(el("span", (umSo ? " Falta " : " Faltam ") + e.faltas.join(", ") + ". " + c.sem_experiencia));
@@ -1129,7 +1598,7 @@ flowchart TD
         c.dominios.forEach(function(dom, i) {
             var li = el("li", null, "border-top: 1px solid var(--rule); padding-top: 0.5rem;");
             var topo = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; justify-content: space-between;");
-            topo.appendChild(el("span", (i + 1) + ". " + dom.nome + (dom.peso !== null ? " (" + dom.peso + "%)" : ""), "font-weight: 600; font-size: 0.85rem;"));
+            topo.appendChild(el("span", (i + 1) + ". " + dom.nome + (dom.peso !== null ? " (" + String(dom.peso).replace(".", ",") + "%)" : ""), "font-weight: 600; font-size: 0.85rem;"));
             var cob = cobertura(dom);
             topo.appendChild(selo(COBERTURA[cob][0], COBERTURA[cob][1]));
             li.appendChild(topo);

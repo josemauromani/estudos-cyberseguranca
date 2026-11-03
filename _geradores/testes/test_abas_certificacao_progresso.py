@@ -55,7 +55,8 @@ class TestAbasCertificacaoProgresso(unittest.TestCase):
             m = re.search(rf'id="estudo-{re.escape(slug)}"[^>]*?data-certs="([^"]*)"', self.html, re.S)
             with self.subTest(slug=slug):
                 self.assertIsNotNone(m)
-                self.assertEqual(m.group(1).split(), esperado)
+                # Separador "|", como em data-perfis: siglas como "ITIL 4 F" têm espaço.
+                self.assertEqual([x for x in m.group(1).split("|") if x], esperado)
 
     def test_painel_da_certificacao_em_ordem_numerica_com_link(self):
         status = {s: {"disponivel": True, "caminho_relativo": f"{s}/x.html"} for s in ESTUDOS_DADOS}
