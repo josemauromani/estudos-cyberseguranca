@@ -66,7 +66,8 @@ class TestGlossarioPortal(unittest.TestCase):
         self.assertEqual(len(re.findall(r'data-slug="', self.cartao("hmac"))), 5)
 
     def test_letras(self):
-        self.assertRegex(self.html, r'<a [^>]*href="#g-letra-h"[^>]*>H</a>')
+        self.assertRegex(self.html, r'<a [^>]*href="#v-glossario/letra-h"[^>]*>H</a>')
+        self.assertIn('<h2 id="g-letra-h">', self.html)
         self.assertRegex(self.html, r'<span [^>]*aria-disabled="true"[^>]*>A</span>')
 
     def test_ordem_ignora_acento(self):
@@ -135,6 +136,31 @@ class TestGlossarioPortalJs(unittest.TestCase):
           __fim({a: a, hmac: !g.hidden, grupo: !grupo.hidden, vazio: vazio.hidden});
         """, "#v-glossario")
         self.assertEqual(s, {"a": {"hmac": True, "vazio": True}, "hmac": False, "grupo": False, "vazio": False})
+
+    def test_clique_na_letra_mantem_glossario(self):
+        s = self.rodar("""
+          document.querySelector('.glossario-letras a[href$="letra-h"]').click();
+          setTimeout(() => {
+            const v = document.querySelector('section.view[data-view="glossario"]');
+            const h = document.getElementById('g-letra-h').getBoundingClientRect();
+            __fim({visivel: !v.hidden, hash: location.hash, dest: document.querySelectorAll('.destaque').length,
+                   noTopo: h.top >= 0 && h.top < window.innerHeight});
+          }, 50);
+        """, "#v-glossario")
+        self.assertEqual(s, {"visivel": True, "hash": "#v-glossario/letra-h", "dest": 0, "noTopo": True})
+
+    def test_ancora_limpa_filtro_ativo(self):
+        s = self.rodar("""
+          const b = document.getElementById('busca-glossario');
+          b.value = 'xyz'; b.dispatchEvent(new Event('input', {bubbles: true}));
+          location.hash = '#v-glossario/hmac';
+          setTimeout(() => {
+            const g = document.getElementById('g-hmac');
+            __fim({campo: b.value, visivel: !g.hidden && g.offsetParent !== null,
+                   destaque: g.classList.contains('destaque')});
+          }, 50);
+        """, "#v-glossario")
+        self.assertEqual(s, {"campo": "", "visivel": True, "destaque": True})
 
 
 if __name__ == "__main__":

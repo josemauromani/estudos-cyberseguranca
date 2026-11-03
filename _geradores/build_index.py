@@ -452,7 +452,7 @@ def render_glossario(verbetes: List[dict], aparece_em: Dict[str, List[str]], sta
     letras = []
     for l in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
         if l in grupos:
-            letras.append(f'<a href="#g-letra-{l.lower()}">{l}</a>')
+            letras.append(f'<a href="#v-glossario/letra-{l.lower()}">{l}</a>')
         else:
             letras.append(f'<span aria-disabled="true">{l}</span>')
     blocos = []
@@ -1115,11 +1115,15 @@ PORTAL_JS = """
   function irParaAncora() {
     const ancora = ancoraDoHash();
     if (!ancora) return;
+    // Um filtro ativo esconderia o alvo: limpa a busca do glossário antes de resolver a âncora.
+    const campo = document.getElementById('busca-glossario');
+    if (campo && campo.value) { campo.value = ''; filtrarGlossario(); }
     const alvo = document.getElementById('g-' + ancora);
     document.querySelectorAll('.verbete.destaque').forEach(el => el.classList.remove('destaque'));
     clearTimeout(destaqueTimer);
     if (!alvo || alvo.offsetParent === null) { window.scrollTo(0, 0); return; }
     alvo.scrollIntoView({ block: 'start' });
+    if (!alvo.classList.contains('verbete')) return;  // letras do índice: só rola
     alvo.classList.add('destaque');
     destaqueTimer = setTimeout(() => alvo.classList.remove('destaque'), 2000);
   }
