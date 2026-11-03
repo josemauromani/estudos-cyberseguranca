@@ -209,10 +209,34 @@ class TestIaCiber(unittest.TestCase):
         self.assertIn('class="terminal-box', content)
         self.assertIn('class="diagram-svg-wrap', content)
         self.assertNotIn('<pre class="mermaid"', content)
-        self.assertEqual(content.count('class="checklist-item"'), 7)
-        self.assertGreaterEqual(content.count('class="quiz-item"'), 6)
+        self.assertEqual(content.count('class="checklist-item"'), 8)
+        self.assertGreaterEqual(content.count('class="quiz-item"'), 7)
         self.assertIn('class="facts-grid', content)
         self.assertIn('initChecklist("ia-ciber")', content)
+
+    def _secao_governanca(self, texto):
+        ini = texto.index('<section class="study-section" id="governanca-ia" data-tipo="teoria">')
+        return texto[ini:texto.index("</section>", ini)]
+
+    def test_secao_governanca_ia_antes_do_laboratorio(self):
+        body = self.body_path.read_text(encoding="utf-8")
+        ini = body.index('<section class="study-section" id="governanca-ia" data-tipo="teoria">')
+        resto = body[body.index("</section>", ini) + len("</section>"):]
+        self.assertTrue(re.match(r'\s*(<!--.*?-->\s*)?<section class="study-section" id="simulador" data-tipo="laboratorio">', resto, re.S))
+        self.assertIn("Seção 7 de 7", self.compiled_path.read_text(encoding="utf-8"))
+
+    def test_secao_governanca_ia_conteudo(self):
+        for texto in (self.body_path.read_text(encoding="utf-8"), self.compiled_path.read_text(encoding="utf-8")):
+            sec = self._secao_governanca(texto)
+            for termo in ("ISO/IEC 42001:2023", "AI RMF", "Govern", "Map", "Measure", "Manage", "NIST AI 600-1"):
+                self.assertIn(termo, sec, termo)
+
+    def test_secao_governanca_ia_referencia(self):
+        content = self.compiled_path.read_text(encoding="utf-8")
+        ini = content.index('id="fatos"')
+        fatos = content[ini:]
+        self.assertIn("ISO/IEC 42001:2023", fatos)
+        self.assertIn("NIST AI 100-1", fatos)
 
     def test_integracao_com_portal_index(self):
         content = self.portal_path.read_text(encoding="utf-8")

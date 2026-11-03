@@ -2066,6 +2066,7 @@ td {
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: O Assistente Que Obedece a Qualquer Um</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#defesas" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Defesas, Deepfakes e IA a Favor da Defesa</span></span><span class="toc-contador"></span></a></li>
+    <li><a class="toc-item" href="#governanca-ia" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Governança de IA: ISO/IEC 42001 e NIST AI RMF</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Lab de Prompt Injection e Defesas</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Segurança para Aplicações com IA</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
@@ -2082,14 +2083,14 @@ td {
   <h1>Ameaças a LLMs (OWASP LLM), Deepfakes e Defesa</h1>
   <p class="mhead-sub">Segurança de modelos fundacionais, vetores de injeção de prompt, envenenamento e uso defensivo de IA</p>
   <div class="chips"><span class="chip">⏱ 45 min</span><span class="chip">📈 Avançado</span><span class="chip">🛡 NIST Protect / Detect</span><span class="chip">🎯 ATT&amp;CK ATLAS (Adversarial Threat Landscape for AI)</span><span class="chip">👤 AppSec &amp; DevSecOps · Blue Team &amp; Defesa</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>3 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>8 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>7 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 24: IA-e-Ciberseguranca Body Fragment -->
 <article class="study-container" data-slug="ia-ciber">
 
     <!-- SEÇÃO 1: RISCOS DE APLICAÇÕES COM LLM -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: O Assistente Que Obedece a Qualquer Um</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 7</small></span><h2>Introdução: O Assistente Que Obedece a Qualquer Um</h2></div>
 
         <p class="lead-text">
             A Ipê Store colocou no site um assistente com IA generativa: ele responde sobre trocas consultando a base de documentos (RAG), consulta pedidos e envia e-mails. Um modelo de linguagem não separa com segurança a instrução de quem o configurou do texto que chega do usuário ou de um documento: para ele, tudo é texto. Quem controla qualquer parte desse texto pode tentar dar ordens.
@@ -2130,7 +2131,7 @@ td {
 
     <!-- SEÇÃO 2: DEFESAS, DEEPFAKES E IA NA DEFESA -->
     <section class="study-section" id="defesas" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Defesas, Deepfakes e IA a Favor da Defesa</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 7</small></span><h2>Defesas, Deepfakes e IA a Favor da Defesa</h2></div>
 
         <h3>Defesas em camadas</h3>
         <ul>
@@ -2183,9 +2184,66 @@ def enviar_email(destino: str, texto: str, sessao) -> dict:
         </div>
     </section>
 
+    <!-- SEÇÃO: GOVERNANÇA DE IA -->
+    <section class="study-section" id="governanca-ia" data-tipo="teoria">
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 7</small></span><h2>Governança de IA: ISO/IEC 42001 e NIST AI RMF</h2></div>
+
+        <p>
+            Até aqui o módulo tratou de ataques e defesas técnicas. Mas a empresa também precisa responder a perguntas de gestão: quem aprovou usar este modelo? Que riscos foram avaliados? Quem responde quando ele erra? Dois documentos organizam essas respostas. Um é uma norma certificável (ISO/IEC 42001) e o outro é um guia voluntário de gestão de riscos (NIST AI RMF). Eles se complementam e não competem.
+        </p>
+
+        <h3>ISO/IEC 42001:2023: o sistema de gestão de IA</h3>
+        <p>
+            A <strong>ISO/IEC 42001:2023</strong> foi publicada em dezembro de 2023 e define os requisitos de um <strong>sistema de gestão de inteligência artificial</strong> (<em>AI management system</em>, AIMS). É a mesma ideia da ISO/IEC 27001 para segurança da informação: em vez de checar um sistema isolado, a organização mantém um sistema de gestão que se repete e melhora.
+        </p>
+        <ul>
+            <li><strong>Estrutura harmonizada:</strong> usa a mesma Estrutura Harmonizada (cláusulas 4 a 10: contexto, liderança, planejamento, apoio, operação, avaliação de desempenho e melhoria) de outras normas de sistema de gestão. Quem já conhece a 27001 reconhece o desenho.</li>
+            <li><strong>Anexo A:</strong> traz um catálogo de controles para o uso responsável de IA, como políticas, papéis e responsabilidades, dados, ciclo de vida do sistema e relação com terceiros. A organização escolhe o que se aplica ao seu caso e justifica.</li>
+            <li><strong>Avaliação de impacto do sistema de IA:</strong> além do risco para a organização, a norma pede avaliar as consequências do sistema para pessoas e grupos afetados. É uma diferença em relação à gestão de riscos de segurança clássica (Estudo 25).</li>
+            <li><strong>Certificável:</strong> um organismo de certificação acreditado pode auditar a organização, como acontece com a 27001. A certificação vale para o sistema de gestão da organização, e não para a qualidade de um modelo específico.</li>
+        </ul>
+
+        <h3>NIST AI RMF 1.0: as quatro funções</h3>
+        <p>
+            O <strong>AI RMF 1.0</strong> (<em>AI Risk Management Framework</em>, publicação NIST AI 100-1, de janeiro de 2023) é um guia voluntário e não certificável. Organiza a gestão de riscos de IA em quatro funções:
+        </p>
+        <ul>
+            <li><strong>Govern (governar):</strong> cultura, políticas, papéis e responsabilidades. É transversal: acompanha as outras três funções em todo o ciclo de vida.</li>
+            <li><strong>Map (mapear):</strong> entender o contexto de uso, quem pode ser afetado e quais riscos existem.</li>
+            <li><strong>Measure (medir):</strong> avaliar e acompanhar esses riscos com métodos e métricas, inclusive testes de segurança como os do laboratório deste módulo.</li>
+            <li><strong>Manage (gerir):</strong> priorizar os riscos, tratá-los e responder a incidentes.</li>
+        </ul>
+        <p>
+            O guia também descreve características de uma IA confiável: válida e confiável, segura, resiliente e protegida, responsável e transparente, explicável e interpretável, com privacidade reforçada e com os vieses nocivos geridos.
+        </p>
+        <p>
+            Para IA generativa existe o <strong>NIST AI 600-1</strong>, o Perfil de IA Generativa (julho de 2024), que aplica o AI RMF aos riscos próprios desses modelos, como alucinação e vazamento de informação. Os ataques das <a href="#introducao">ameaças do OWASP LLM Top 10</a> entram em Map e Measure, e as <a href="#defesas">defesas e o cuidado com deepfakes</a> entram em Manage.
+        </p>
+
+        <div class="callout key">
+            <div class="callout-title">
+                <span class="callout-icon">ℹ️</span>
+                <strong>Como usar os dois juntos</strong>
+            </div>
+            <p>
+                Uma leitura prática: a ISO/IEC 42001 dá a estrutura de gestão e a evidência para auditoria; o AI RMF dá o vocabulário e o método para tratar os riscos dentro dessa estrutura. O NIST informa que está revisando o AI RMF, e até a data desta edição o texto de referência continua sendo o 1.0. Confira a página do NIST antes de citar uma versão.
+            </p>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">⚠️</span>
+                <strong>Norma não é lei</strong>
+            </div>
+            <p>
+                Seguir a ISO/IEC 42001 ou o AI RMF não substitui obrigações legais, como a LGPD (Estudo 27) e as regras de IA que cada país venha a adotar. Use os documentos como método e consulte o jurídico para a conformidade.
+            </p>
+        </div>
+    </section>
+
     <!-- SEÇÃO 3: SIMULADOR -->
     <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 3 de 6</small></span><h2>Laboratório Prático: Lab de Prompt Injection e Defesas</h2></div>
+        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 4 de 7</small></span><h2>Laboratório Prático: Lab de Prompt Injection e Defesas</h2></div>
 
         <p class="lead-text">
             O Assistente Ipê abaixo é um modelo <strong>simulado</strong>: ele segue regras determinísticas que imitam um modelo vulnerável, para que cada ataque e cada defesa tenham efeito previsível. Os ataques e as defesas, porém, são os que se usam com modelos reais. Ligue as defesas e veja o que cada uma barra e o que deixa passar.
@@ -2225,7 +2283,7 @@ def enviar_email(destino: str, texto: str, sessao) -> dict:
 
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist de Segurança para Aplicações com IA</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 5 de 7</small></span><h2>Checklist de Segurança para Aplicações com IA</h2></div>
 
         <p class="lead-text">
             Use esta lista na revisão de um assistente, agente ou integração com IA. O estado das caixas fica salvo no seu navegador.
@@ -2260,12 +2318,16 @@ def enviar_email(destino: str, texto: str, sessao) -> dict:
                 <input type="checkbox" id="chk-ia-7">
                 <label for="chk-ia-7"><strong>Processos contra deepfake:</strong> pedidos sensíveis confirmados por canal de retorno e dupla aprovação.</label>
             </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ia-8">
+                <label for="chk-ia-8"><strong>Governança de IA:</strong> inventário dos sistemas de IA em uso, responsável definido e riscos avaliados (Govern, Map, Measure, Manage).</label>
+            </li>
         </ul>
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 6 de 7</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2338,11 +2400,23 @@ def enviar_email(destino: str, texto: str, sessao) -> dict:
                 </div>
             </details>
         </div>
+
+        <div class="quiz-item" data-q="q7">
+            <div class="quiz-question">
+                <strong>Questão 7 (Governança):</strong> A diretoria pergunta se vale certificar a empresa na ISO/IEC 42001 ou apenas seguir o NIST AI RMF. Qual a diferença?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A ISO/IEC 42001:2023 é uma norma de sistema de gestão que pode ser auditada e certificada por organismo acreditado. O AI RMF 1.0 (NIST AI 100-1) é um guia voluntário, sem certificação, organizado em Govern, Map, Measure e Manage. Muitas organizações usam o AI RMF como método de risco dentro do sistema de gestão da norma.</p>
+                </div>
+            </details>
+        </div>
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 7 de 7</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2368,6 +2442,8 @@ def enviar_email(destino: str, texto: str, sessao) -> dict:
             <li>OWASP GenAI Security Project — OWASP Top 10 for LLM Applications 2025.</li>
             <li>MITRE ATLAS (atlas.mitre.org).</li>
             <li>NIST AI 100-1 — Artificial Intelligence Risk Management Framework (AI RMF 1.0).</li>
+            <li>NIST AI 600-1 — Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile (julho de 2024).</li>
+            <li>ISO/IEC 42001:2023 — Information technology — Artificial intelligence — Management system.</li>
         </ul>
 
         <div class="callout tip" style="margin-top: 1.5rem;">

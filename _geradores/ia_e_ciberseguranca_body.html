@@ -111,6 +111,63 @@ def enviar_email(destino: str, texto: str, sessao) -> dict:
         </div>
     </section>
 
+    <!-- SEÇÃO: GOVERNANÇA DE IA -->
+    <section class="study-section" id="governanca-ia" data-tipo="teoria">
+        <h2>Governança de IA: ISO/IEC 42001 e NIST AI RMF</h2>
+
+        <p>
+            Até aqui o módulo tratou de ataques e defesas técnicas. Mas a empresa também precisa responder a perguntas de gestão: quem aprovou usar este modelo? Que riscos foram avaliados? Quem responde quando ele erra? Dois documentos organizam essas respostas. Um é uma norma certificável (ISO/IEC 42001) e o outro é um guia voluntário de gestão de riscos (NIST AI RMF). Eles se complementam e não competem.
+        </p>
+
+        <h3>ISO/IEC 42001:2023: o sistema de gestão de IA</h3>
+        <p>
+            A <strong>ISO/IEC 42001:2023</strong> foi publicada em dezembro de 2023 e define os requisitos de um <strong>sistema de gestão de inteligência artificial</strong> (<em>AI management system</em>, AIMS). É a mesma ideia da ISO/IEC 27001 para segurança da informação: em vez de checar um sistema isolado, a organização mantém um sistema de gestão que se repete e melhora.
+        </p>
+        <ul>
+            <li><strong>Estrutura harmonizada:</strong> usa a mesma Estrutura Harmonizada (cláusulas 4 a 10: contexto, liderança, planejamento, apoio, operação, avaliação de desempenho e melhoria) de outras normas de sistema de gestão. Quem já conhece a 27001 reconhece o desenho.</li>
+            <li><strong>Anexo A:</strong> traz um catálogo de controles para o uso responsável de IA, como políticas, papéis e responsabilidades, dados, ciclo de vida do sistema e relação com terceiros. A organização escolhe o que se aplica ao seu caso e justifica.</li>
+            <li><strong>Avaliação de impacto do sistema de IA:</strong> além do risco para a organização, a norma pede avaliar as consequências do sistema para pessoas e grupos afetados. É uma diferença em relação à gestão de riscos de segurança clássica (Estudo 25).</li>
+            <li><strong>Certificável:</strong> um organismo de certificação acreditado pode auditar a organização, como acontece com a 27001. A certificação vale para o sistema de gestão da organização, e não para a qualidade de um modelo específico.</li>
+        </ul>
+
+        <h3>NIST AI RMF 1.0: as quatro funções</h3>
+        <p>
+            O <strong>AI RMF 1.0</strong> (<em>AI Risk Management Framework</em>, publicação NIST AI 100-1, de janeiro de 2023) é um guia voluntário e não certificável. Organiza a gestão de riscos de IA em quatro funções:
+        </p>
+        <ul>
+            <li><strong>Govern (governar):</strong> cultura, políticas, papéis e responsabilidades. É transversal: acompanha as outras três funções em todo o ciclo de vida.</li>
+            <li><strong>Map (mapear):</strong> entender o contexto de uso, quem pode ser afetado e quais riscos existem.</li>
+            <li><strong>Measure (medir):</strong> avaliar e acompanhar esses riscos com métodos e métricas, inclusive testes de segurança como os do laboratório deste módulo.</li>
+            <li><strong>Manage (gerir):</strong> priorizar os riscos, tratá-los e responder a incidentes.</li>
+        </ul>
+        <p>
+            O guia também descreve características de uma IA confiável: válida e confiável, segura, resiliente e protegida, responsável e transparente, explicável e interpretável, com privacidade reforçada e com os vieses nocivos geridos.
+        </p>
+        <p>
+            Para IA generativa existe o <strong>NIST AI 600-1</strong>, o Perfil de IA Generativa (julho de 2024), que aplica o AI RMF aos riscos próprios desses modelos, como alucinação e vazamento de informação. Os ataques das <a href="#introducao">ameaças do OWASP LLM Top 10</a> entram em Map e Measure, e as <a href="#defesas">defesas e o cuidado com deepfakes</a> entram em Manage.
+        </p>
+
+        <div class="callout key">
+            <div class="callout-title">
+                <span class="callout-icon">ℹ️</span>
+                <strong>Como usar os dois juntos</strong>
+            </div>
+            <p>
+                Uma leitura prática: a ISO/IEC 42001 dá a estrutura de gestão e a evidência para auditoria; o AI RMF dá o vocabulário e o método para tratar os riscos dentro dessa estrutura. O NIST informa que está revisando o AI RMF, e até a data desta edição o texto de referência continua sendo o 1.0. Confira a página do NIST antes de citar uma versão.
+            </p>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">⚠️</span>
+                <strong>Norma não é lei</strong>
+            </div>
+            <p>
+                Seguir a ISO/IEC 42001 ou o AI RMF não substitui obrigações legais, como a LGPD (Estudo 27) e as regras de IA que cada país venha a adotar. Use os documentos como método e consulte o jurídico para a conformidade.
+            </p>
+        </div>
+    </section>
+
     <!-- SEÇÃO 3: SIMULADOR -->
     <section class="study-section" id="simulador" data-tipo="laboratorio">
         <h2>Laboratório Prático: Lab de Prompt Injection e Defesas</h2>
@@ -187,6 +244,10 @@ def enviar_email(destino: str, texto: str, sessao) -> dict:
             <li class="checklist-item">
                 <input type="checkbox" id="chk-ia-7">
                 <label for="chk-ia-7"><strong>Processos contra deepfake:</strong> pedidos sensíveis confirmados por canal de retorno e dupla aprovação.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ia-8">
+                <label for="chk-ia-8"><strong>Governança de IA:</strong> inventário dos sistemas de IA em uso, responsável definido e riscos avaliados (Govern, Map, Measure, Manage).</label>
             </li>
         </ul>
     </section>
@@ -266,6 +327,18 @@ def enviar_email(destino: str, texto: str, sessao) -> dict:
                 </div>
             </details>
         </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 7 (Governança):</strong> A diretoria pergunta se vale certificar a empresa na ISO/IEC 42001 ou apenas seguir o NIST AI RMF. Qual a diferença?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A ISO/IEC 42001:2023 é uma norma de sistema de gestão que pode ser auditada e certificada por organismo acreditado. O AI RMF 1.0 (NIST AI 100-1) é um guia voluntário, sem certificação, organizado em Govern, Map, Measure e Manage. Muitas organizações usam o AI RMF como método de risco dentro do sistema de gestão da norma.</p>
+                </div>
+            </details>
+        </div>
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
@@ -296,6 +369,8 @@ def enviar_email(destino: str, texto: str, sessao) -> dict:
             <li>OWASP GenAI Security Project — OWASP Top 10 for LLM Applications 2025.</li>
             <li>MITRE ATLAS (atlas.mitre.org).</li>
             <li>NIST AI 100-1 — Artificial Intelligence Risk Management Framework (AI RMF 1.0).</li>
+            <li>NIST AI 600-1 — Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile (julho de 2024).</li>
+            <li>ISO/IEC 42001:2023 — Information technology — Artificial intelligence — Management system.</li>
         </ul>
 
         <div class="callout tip" style="margin-top: 1.5rem;">
