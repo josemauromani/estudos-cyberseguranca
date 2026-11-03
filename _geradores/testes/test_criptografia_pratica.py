@@ -71,6 +71,33 @@ class TestCriptografiaPratica(unittest.TestCase):
         self.assertIn('class="quiz-item', content)
         self.assertIn('class="facts-grid', content)
         self.assertIn("initChecklist('criptografia-pratica')", content)
+        self.assertGreaterEqual(content.count('class="quiz-item'), 4)
+
+    def test_secao_ciclo_de_certificados(self):
+        """A seção de ciclo de vida de certificados fica logo antes do laboratório."""
+        body = self.body_path.read_text(encoding="utf-8")
+        abertura = '<section class="study-section" id="ciclo-de-certificados" data-tipo="teoria">'
+        self.assertIn(abertura, body)
+        ini = body.index(abertura)
+        fim = body.index("</section>", ini)
+        secao = body[ini:fim]
+        resto = body[fim + len("</section>"):]
+        self.assertIn('id="laboratorio-cripto"', resto.split("<section", 1)[1].split(">", 1)[0])
+        for termo in [
+            "CLM", "ACME", "RFC 8555", "SC-081",
+            "15 de março de 2026", "200 dias", "15 de março de 2027", "100 dias",
+            "15 de março de 2029", "47 dias", "398 dias", "10 dias",
+            "CBOM", "FIPS 203", "ML-KEM", "FIPS 204", "ML-DSA", "FIPS 205", "SLH-DSA",
+            "agosto de 2024", "colher agora, decifrar depois", "cripto-agilidade",
+        ]:
+            self.assertIn(termo, secao, f"A seção deve conter '{termo}'.")
+
+    def test_referencias_clm(self):
+        """Os fatos essenciais citam as fontes oficiais do ciclo de certificados."""
+        body = self.body_path.read_text(encoding="utf-8")
+        fatos = body[body.index('id="fatos-essenciais"'):]
+        for termo in ["cabforum.org", "RFC 8555", "csrc.nist.gov"]:
+            self.assertIn(termo, fatos)
 
     def test_integracao_com_portal_index(self):
         """Verifica se o portal index.html aponta Criptografia-Pratica como Disponível com link ativo."""

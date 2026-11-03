@@ -215,6 +215,153 @@ flowchart TD
   </p>
 </section>
 
+<!-- SEÇÃO: CICLO DE VIDA DE CERTIFICADOS E CRIPTO-AGILIDADE -->
+<section class="study-section" id="ciclo-de-certificados" data-tipo="teoria">
+  <h2>Ciclo de Vida de Certificados e Cripto-agilidade</h2>
+
+  <p>
+    Emitir um certificado é a parte fácil. O difícil é saber, a qualquer momento, quantos certificados a organização tem,
+    quem responde por cada um e quando cada um vence. Esta seção mostra como a gestão do ciclo de vida de certificados
+    e a preparação para algoritmos pós-quânticos fazem parte da mesma disciplina: manter a criptografia da empresa
+    <strong>trocável sem drama</strong>, o que se chama de cripto-agilidade.
+  </p>
+
+  <h3>1. Gestão do Ciclo de Vida de Certificados (CLM)</h3>
+  <p>
+    A <strong>CLM (Certificate Lifecycle Management)</strong> cobre o caminho completo de um certificado: pedido, emissão,
+    instalação, monitoramento, renovação e revogação. Na prática, um programa de CLM começa por quatro perguntas:
+  </p>
+  <ul>
+    <li><strong>Inventário:</strong> quais certificados existem, em quais servidores, balanceadores, APIs e dispositivos, e de qual CA vieram? Certificados esquecidos em um equipamento legado são os que costumam vencer sem aviso.</li>
+    <li><strong>Dono:</strong> cada certificado precisa de uma equipe responsável e de um contato que atenda de verdade, e não de um e-mail de quem já saiu da empresa.</li>
+    <li><strong>Renovação automática:</strong> renovar à mão não escala. Quanto mais curta a validade, mais a renovação precisa ser um processo sem intervenção humana.</li>
+    <li><strong>Revogação:</strong> se a chave privada vazar, é preciso saber onde o certificado está instalado, revogá-lo e trocá-lo rapidamente.</li>
+  </ul>
+
+  <div class="callout warning">
+    <h4>Certificado vencido é queda de serviço</h4>
+    <p>
+      Um certificado expirado não degrada o serviço aos poucos: o navegador ou o cliente da API recusa a conexão de uma vez.
+      Já houve quedas de serviços de grande porte causadas apenas por um certificado que ninguém lembrou de renovar.
+      O padrão do incidente é sempre o mesmo: <strong>sem inventário, ninguém sabe que o certificado existe; sem dono,
+      ninguém recebe o alerta; sem automação, a renovação depende de uma lembrança</strong>. Trate a data de vencimento
+      como um indicador de risco operacional, com alerta antecipado e escalonamento.
+    </p>
+  </div>
+
+  <h3>2. ACME (RFC 8555): renovação automática</h3>
+  <p>
+    O <strong>ACME (Automatic Certificate Management Environment)</strong>, definido na <strong>RFC 8555</strong>, é o protocolo
+    com que um cliente prova à CA que controla um domínio e recebe o certificado sem intervenção humana. O fluxo resumido:
+    o cliente cria uma conta na CA, pede um certificado para um domínio, resolve um desafio de validação (por exemplo, publicar
+    um valor em um registro DNS ou em um endereço HTTP do domínio), envia a requisição de assinatura (CSR) e baixa o certificado emitido.
+    Agendado para rodar com frequência, o mesmo cliente renova antes do vencimento, sem tíquete e sem calendário.
+  </p>
+
+  <h3>3. Validade menor: a votação SC-081 do CA/Browser Forum</h3>
+  <p>
+    O <strong>CA/Browser Forum</strong>, que reúne CAs e fabricantes de navegadores, aprovou a votação <strong>SC-081</strong> (versão v3,
+    encerrada em 04/11/2025), que reduz em etapas a validade máxima dos certificados TLS públicos e também o tempo em que a CA pode
+    reaproveitar uma validação de domínio já feita. Os valores abaixo foram conferidos no texto da votação:
+  </p>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Emitido a partir de</th>
+          <th>Validade máxima</th>
+          <th>Reuso da validação de domínio</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>antes de 15 de março de 2026</td>
+          <td>398 dias</td>
+          <td>398 dias</td>
+        </tr>
+        <tr>
+          <td>15 de março de 2026</td>
+          <td>200 dias</td>
+          <td>200 dias</td>
+        </tr>
+        <tr>
+          <td>15 de março de 2027</td>
+          <td>100 dias</td>
+          <td>100 dias</td>
+        </tr>
+        <tr>
+          <td>15 de março de 2029</td>
+          <td>47 dias</td>
+          <td>10 dias</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    A conclusão operacional é direta: com 47 dias de validade, renovar manualmente significa renovar cerca de oito vezes por ano
+    cada certificado. Quem ainda depende de planilha e lembrete terá de automatizar com ACME ou com uma plataforma de CLM
+    antes das próximas etapas do calendário.
+  </p>
+
+  <h3>4. Cripto-agilidade e o risco pós-quântico</h3>
+  <p>
+    <strong>Cripto-agilidade</strong> é a capacidade de trocar algoritmos, tamanhos de chave e certificados sem reescrever
+    sistemas inteiros. Ela importa porque um computador quântico suficientemente poderoso quebraria os algoritmos de chave
+    pública usados hoje (RSA, Diffie-Hellman e curvas elípticas). O perigo já existe antes dessa máquina: um adversário pode
+    guardar tráfego cifrado hoje para abri-lo no futuro, estratégia conhecida como
+    <strong>colher agora, decifrar depois</strong> (<em>harvest now, decrypt later</em>). Dados que precisam continuar secretos por muitos anos
+    já estão expostos a esse risco.
+  </p>
+  <p>
+    O NIST publicou, em <strong>agosto de 2024</strong> (13/08/2024), as primeiras versões finais dos padrões pós-quânticos:
+  </p>
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Padrão</th>
+          <th>Algoritmo</th>
+          <th>Função</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>FIPS 203</strong></td>
+          <td>ML-KEM (Module-Lattice-Based Key-Encapsulation Mechanism)</td>
+          <td>Estabelecimento de chaves</td>
+        </tr>
+        <tr>
+          <td><strong>FIPS 204</strong></td>
+          <td>ML-DSA (Module-Lattice-Based Digital Signature)</td>
+          <td>Assinatura digital</td>
+        </tr>
+        <tr>
+          <td><strong>FIPS 205</strong></td>
+          <td>SLH-DSA (Stateless Hash-Based Digital Signature)</td>
+          <td>Assinatura digital baseada em hash</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Para saber o que migrar, é preciso saber o que existe. O <strong>CBOM (Cryptographic Bill of Materials)</strong> é o inventário
+    criptográfico: uma lista de algoritmos, bibliotecas, protocolos, chaves e certificados usados em cada sistema, no mesmo espírito
+    do SBOM para software. Sem ele, o plano de migração começa às cegas.
+  </p>
+
+  <div class="callout tip">
+    <h4>Plano de migração pós-quântica em etapas</h4>
+    <ol>
+      <li><strong>Inventariar:</strong> montar o CBOM com algoritmos, bibliotecas, certificados e protocolos de cada sistema.</li>
+      <li><strong>Priorizar:</strong> começar pelos dados de vida longa e pelos canais mais expostos à captura, que sofrem o risco de colher agora, decifrar depois.</li>
+      <li><strong>Tornar ágil:</strong> eliminar algoritmos fixos no código, centralizar bibliotecas e automatizar a troca de certificados (CLM e ACME).</li>
+      <li><strong>Testar:</strong> experimentar ML-KEM e ML-DSA em ambiente de homologação, medindo tamanho de chaves, desempenho e compatibilidade.</li>
+      <li><strong>Migrar em fases:</strong> trocar por sistema, com possibilidade de voltar atrás, e acompanhar fornecedores e padrões.</li>
+    </ol>
+  </div>
+</section>
+
 <!-- SEÇÃO 3: LABORATÓRIO INTERATIVO -->
 <section class="study-section" id="laboratorio-cripto" data-tipo="laboratorio">
   <h2>Laboratório Interativo: Web Crypto API Nativa</h2>
@@ -487,6 +634,31 @@ flowchart TD
       </div>
       </details>
     </div>
+    <!-- Questão 4 -->
+    <div class="quiz-item">
+      <div class="quiz-summary">
+        <span class="quiz-tag">Questão 4 &bull; Ciclo de Vida de Certificados &bull; Cripto-agilidade</span>
+        <p class="quiz-question">
+          Uma empresa renova seus certificados TLS à mão, a partir de uma planilha, uma vez por ano. Com a redução de validade
+          aprovada pelo CA/Browser Forum (SC-081), que risco essa prática enfrenta e que medidas reduzem esse risco?
+        </p>
+      </div>
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta explicada</summary>
+      <div class="quiz-answer">
+        <div class="answer-badge correct">Resposta Correta: O risco é a queda de serviço por certificado vencido; a saída é inventário, dono definido e renovação automática (ACME).</div>
+        <p><strong>Fundamentação Técnica:</strong></p>
+        <p>
+          A validade máxima cai de 398 para 200 dias (certificados emitidos a partir de 15 de março de 2026), depois para 100 dias
+          (15 de março de 2027) e para 47 dias (15 de março de 2029). Um processo manual e anual deixa de caber nesse calendário:
+          o número de renovações por certificado cresce e cada esquecimento vira indisponibilidade. O programa de <strong>CLM</strong>
+          resolve isso com inventário completo, responsável por certificado, alertas de vencimento e renovação automática pelo
+          protocolo <strong>ACME (RFC 8555)</strong>. O mesmo hábito de inventariar e automatizar prepara a organização para a troca
+          de algoritmos pós-quânticos (cripto-agilidade).
+        </p>
+      </div>
+      </details>
+    </div>
   </div>
 </section>
 
@@ -515,14 +687,29 @@ flowchart TD
       <p class="facts-card-desc">96 bits de Vetor de Inicialização único. Nunca reutilize o mesmo IV com a mesma chave AES em modo GCM!</p>
     </div>
     <div class="facts-card">
-      <span class="facts-card-num">398 dias</span>
+      <span class="facts-card-num">200 dias</span>
       <span class="facts-card-label">Validade Máxima TLS</span>
-      <p class="facts-card-desc">Limite máximo imposto por navegadores e CA/Browser Forum para certificados públicos TLS X.509.</p>
+      <p class="facts-card-desc">Limite do CA/Browser Forum para certificados públicos TLS emitidos desde 15 de março de 2026 (antes eram 398 dias). A votação SC-081 prevê 100 dias em 2027 e 47 dias em 2029.</p>
     </div>
     <div class="facts-card">
       <span class="facts-card-num">Argon2id</span>
       <span class="facts-card-label">Padrão Ouro para Senhas</span>
       <p class="facts-card-desc">Resistente a ataques paralelos em GPU e ataques de canal lateral (side-channel). Vencedor da PHC.</p>
+    </div>
+    <div class="facts-card">
+      <span class="facts-card-num">RFC 8555</span>
+      <span class="facts-card-label">ACME</span>
+      <p class="facts-card-desc">Protocolo de automação de emissão e renovação de certificados. Fonte: IETF (rfc-editor.org/rfc/rfc8555).</p>
+    </div>
+    <div class="facts-card">
+      <span class="facts-card-num">SC-081v3</span>
+      <span class="facts-card-label">Votação do CA/Browser Forum</span>
+      <p class="facts-card-desc">Calendário de redução de validade e de reuso da validação de domínio. Fonte: cabforum.org/2025/04/11/ballot-sc081v3-introduce-schedule-of-reducing-validity-and-data-reuse-periods/.</p>
+    </div>
+    <div class="facts-card">
+      <span class="facts-card-num">FIPS 203/204/205</span>
+      <span class="facts-card-label">Padrões Pós-quânticos do NIST</span>
+      <p class="facts-card-desc">ML-KEM, ML-DSA e SLH-DSA, finais em 13/08/2024. Fonte: csrc.nist.gov/pubs/fips/203/final, 204/final e 205/final.</p>
     </div>
     <div class="facts-card">
       <span class="facts-card-num">PFS</span>
