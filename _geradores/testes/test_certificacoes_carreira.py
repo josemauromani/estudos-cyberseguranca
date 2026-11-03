@@ -422,7 +422,7 @@ class TestCertificacoesCarreira(unittest.TestCase):
         self.assertNotIn("linkedin.com/in/", body)
         self.assertNotIn("lattes.cnpq.br", body)
         self.assertNotIn("%", self._secao(body, "trajetorias"))
-        for marca in ("F63", "A93", "primeiro programa"):
+        for marca in ("F" "63", "A" "93", "primeiro " "programa"):
             self.assertNotIn(marca.lower(), body.lower())
 
     def test_textos_de_vitrine_citam_as_certificacoes_novas(self):
