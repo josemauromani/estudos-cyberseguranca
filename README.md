@@ -192,7 +192,7 @@ O portal (`index.html`) traz a visão **Rota por Vaga**, que liga cada requisito
 | Inglês | 32 | — |
 | PCI-DSS, ISO 27001/27002, ISO 31000 e NIST | 25, 26, 31 | 18, 54, 57 |
 | Resposta a incidentes | 18 | 16, 19, 42, 43, 49 |
-| Controles de segurança da informação | 26 | 06, 08, 38, 40 |
+| Controles de segurança da informação | 26 | 06, 08, 38, 40, 58 |
 | Formação e certificações | 33 | 37 |
 
 O portal também exibe a visão **Por certificação** (CEH, CISM, CISSP, CCSP, GSEC e Security+), com os módulos que cobrem cada uma.
@@ -279,7 +279,7 @@ python3 -m unittest discover -s _geradores/testes
 
 O currículo é estruturado de forma a atender diferentes objetivos e momentos de carreira:
 
-> No portal, a visão **Rotas sugeridas** mostra a rota de cada perfil como sequência numerada, com progresso e o próximo módulo a estudar; **Por certificação** reúne os módulos que cobrem cada prova; **Meu progresso** separa os concluídos dos que faltam; e o **Catálogo** agrupa os 58 módulos por nível (iniciante 12, intermediário 31, avançado 14), trilha, perfil ou função NIST.
+> No portal, a visão **Rotas sugeridas** mostra a rota de cada perfil como sequência numerada, com progresso e o próximo módulo a estudar; **Por certificação** reúne os módulos que cobrem cada prova; **Meu progresso** separa os concluídos dos que faltam; e o **Catálogo** agrupa os 58 módulos por nível (iniciante 12, intermediário 32, avançado 14), trilha, perfil ou função NIST.
 
 - **Blue Team & Defesa Ativa:** Módulos de redes, bastionamento Linux/Windows, firewalls, Zero Trust, EDR e detecção de ameaças; Linux e PowerShell para investigação (Trilha 8), Active Directory e detecção de ataques ao AD (Trilha 9) e ransomware (Trilha 10); engenharia de detecção, threat hunting, monitoramento de rede e SOAR (Trilha 11).
 - **Red Team & Testes de Invasão:** Técnicas de reconhecimento OSINT, OWASP Top 10 Web, segurança de APIs e metodologias de pentest; Linux e caminhos de ataque no Active Directory (Trilhas 8 e 9); escalação de privilégio em Kubernetes (Trilha 12).
