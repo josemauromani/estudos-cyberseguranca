@@ -216,7 +216,7 @@
 - [ ] **Step 1: Write the failing tests.** Em `test_glossario_portal.py`, gerar o portal com `gerar_index_html(output_path=<tmp>)`:
   - `test_menu_e_visao`: link `<a href="#v-glossario" data-view="glossario">📖 Glossário <span class="n">1</span></a>`; `<section class="view" data-view="glossario" hidden>`.
   - `test_verbete_hmac_completo`: `#g-hmac` contém, nesta ordem, `HMAC`, `Criptografia`, `Hash-based Message Authentication Code`, os `<dt>` Significado, Explicação, Histórico, Variações, Referências, Aparece em; não contém `<dt>Relacionados` nem `<dt>Termo em inglês` (vazios); links de referência com `target="_blank" rel="noopener"`.
-  - `test_aparece_em_seis_modulos`: `modulos_por_termo(GLOSSARIO)["hmac"]` é o conjunto `{"Fundamentos-Ciber", "Criptografia-Pratica", "Autenticacao-e-IAM", "Seguranca-em-APIs", "Active-Directory-Fundamentos", "SOAR-e-Automacao-de-Resposta"}` na ordem de `ESTUDOS_DADOS`; o cartão tem 6 chips `data-slug`.
+  - `test_aparece_em_cinco_modulos`: `modulos_por_termo(GLOSSARIO)["hmac"]` é o conjunto `{"Fundamentos-Ciber", "Criptografia-Pratica", "Autenticacao-e-IAM", "Seguranca-em-APIs", "SOAR-e-Automacao-de-Resposta"}` (Active-Directory-Fundamentos só cita `RC4-HMAC`, que a regra de fronteira não casa) na ordem de `ESTUDOS_DADOS`; o cartão tem 5 chips `data-slug`.
   - `test_letras`: `H` é link para `#g-letra-h`; `A` é `span aria-disabled="true"`.
   - `test_ordem_ignora_acento`: `render_glossario` com termos "Ética", "Escopo" e "Exploit" ordena Escopo, Ética, Exploit, todos no grupo `E`.
   - `test_relacionado_vira_link`: dois verbetes fictícios com `relacionados` cruzados geram `href="#v-glossario/<outro>"`.
@@ -288,7 +288,7 @@
 
 - [ ] **Step 2: Conferir o alcance.**
   Run: `grep -l 'data-termo="hmac"' */treinamento-*.html | sort`
-  Expected: exatamente os 6 arquivos de Fundamentos-Ciber, Criptografia-Pratica, Autenticacao-e-IAM, Seguranca-em-APIs, Active-Directory-Fundamentos e SOAR-e-Automacao-de-Resposta.
+  Expected: exatamente os 5 arquivos de Fundamentos-Ciber, Criptografia-Pratica, Autenticacao-e-IAM, Seguranca-em-APIs e SOAR-e-Automacao-de-Resposta (Active-Directory-Fundamentos só cita `RC4-HMAC`).
 
 - [ ] **Step 3: Suíte completa** (conferir `free -h` antes; com menos de ~4 GB disponíveis, rodar só os `test_glossario*.py`, `test_portal*.py`, `test_compilados_atualizados.py` e `test_documentacao.py`).
   Run: `systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=1G python3 -m unittest discover -s _geradores/testes`

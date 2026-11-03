@@ -30,7 +30,7 @@ Siglas e termos técnicos aparecem em vários módulos sem uma explicação comu
 | Onde fica o glossário | **Nova visão no portal** (`index.html`) |
 | Campos do verbete | Todos os propostos, mais **termo em inglês** |
 | Implementação | Verbetes em Python + marcação por `html.parser` + popover próprio no `base.js` |
-| Alcance do HMAC | Tooltip nos **6 módulos** que citam HMAC; a validação manual é feita no Estudo 01 |
+| Alcance do HMAC | Tooltip nos módulos que citam HMAC (6 na conversa; 5 na implementação, porque Active-Directory-Fundamentos só cita `RC4-HMAC`, que a regra de fronteira não casa); a validação manual é feita no Estudo 01 |
 
 ## Abordagens consideradas
 
@@ -140,7 +140,7 @@ Resultado esperado no Estudo 01 (`fundamentos_ciber_body.html`): HMAC marcado no
 
 ### 6. Entrega
 
-`base.js` e `base.css` mudam, então os 60 módulos e o portal são recompilados com `./_geradores/gerar.sh todos`. O commit de build fica separado dos commits de código, como no restante do repositório. Módulos que citam HMAC hoje e passam a ter tooltip: Fundamentos-Ciber, Criptografia-Pratica, Autenticacao-e-IAM, Seguranca-em-APIs, Active-Directory-Fundamentos e SOAR-e-Automacao-de-Resposta.
+`base.js` e `base.css` mudam, então os 60 módulos e o portal são recompilados com `./_geradores/gerar.sh todos`. O commit de build fica separado dos commits de código, como no restante do repositório. Módulos que citam HMAC hoje e passam a ter tooltip: Fundamentos-Ciber, Criptografia-Pratica, Autenticacao-e-IAM, Seguranca-em-APIs e SOAR-e-Automacao-de-Resposta. Active-Directory-Fundamentos só cita `RC4-HMAC` (tipo de criptografia do Kerberos), que a regra de fronteira não casa, e fica sem tooltip.
 
 ## Testes
 
@@ -155,7 +155,7 @@ Seguem o padrão `unittest` do projeto e rodam só os arquivos afetados (conferi
   - variação mais longa vence;
   - remover as tags `dfn` do resultado devolve exatamente o HTML de entrada.
 - Módulo compilado: o Estudo 01 contém `dfn.glossario[data-termo="hmac"]` e `#glossario-dados` com só o HMAC; um módulo sem termos não contém `#glossario-dados`.
-- Portal: a visão `glossario` existe; o menu tem o link com a contagem; `#g-hmac` lista os 6 módulos.
+- Portal: a visão `glossario` existe; o menu tem o link com a contagem; `#g-hmac` lista os 5 módulos.
 - Navegador (harness `testes/navegador.py`, Chrome headless):
   - módulo: foco no termo abre o popover com o significado; `Esc` fecha; o link aponta para `../index.html#v-glossario/hmac`; sem erros no console;
   - portal: abrir `#v-glossario/hmac` mostra a visão e o cartão `#g-hmac`; a busca por "autenticacao" encontra o HMAC e por "xyz" mostra a mensagem de vazio.
