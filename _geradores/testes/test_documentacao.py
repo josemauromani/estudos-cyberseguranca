@@ -31,6 +31,17 @@ class TestDocumentacao(unittest.TestCase):
         self.assertIn("fontes", readme.lower())
         self.assertNotIn("a aba **Por Nível**", readme)
 
+    def test_guia_documenta_glossario(self):
+        guia = GUIA.read_text(encoding="utf-8")
+        for trecho in ("glossario_dados.py", "marcar_termos", "1ª ocorrência", "por seção"):
+            self.assertIn(trecho, guia)
+
+    def test_readme_cita_glossario(self):
+        readme = README.read_text(encoding="utf-8")
+        self.assertIn("sete visões", readme)
+        self.assertIn("**Glossário:**", readme)
+        self.assertNotIn("seis visões", readme)
+
     def test_gitignore(self):
         texto = (ROOT / ".gitignore").read_text(encoding="utf-8")
         for pasta in (".superpowers/brainstorm/", ".superpowers/capturas/",

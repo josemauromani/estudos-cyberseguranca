@@ -270,6 +270,50 @@ flowchart TD
 - **Injeção SVG Direta:** O bloco `<pre>` é substituído por `<div class="diagram-svg-wrap" role="img" aria-label="..."><svg>...</svg></div>`, com renderização vetorial cristalina em qualquer densidade de pixels.
 - **Geração Automática via CLI:** Se um diagrama novo for criado ou um existente for editado, o compilador invoca `npx @mermaid-js/mermaid-cli` em Chromium headless com fundo transparente e tema escuro, persistindo o novo SVG no cache. Compilações subsequentes utilizam o cache instantaneamente sem necessidade de invocar o Node.js.
 
+### 3.9 Glossário (`glossario_dados.py`)
+
+O glossário é central: os verbetes ficam em `_geradores/glossario_dados.py` (lista `GLOSSARIO`) e o `montar.py` marca os termos sozinho em cada módulo. **Não escreva marcação de glossário no corpo.** O aluno vê um tooltip com o significado e o link "Ver no glossário →" (`../index.html#v-glossario/<id>`); o portal tem a visão "📖 Glossário", com busca, índice A–Z e os módulos onde o termo aparece.
+
+**Quando um termo merece entrar:** siglas e jargão que aparecem em mais de um módulo, ou que o texto do módulo não explica. Termo usado uma vez e já definido no próprio parágrafo não precisa de verbete. Evite palavras comuns do português (risco de marcar trechos que não são o termo técnico).
+
+**Como cadastrar** (um dicionário por verbete):
+
+```python
+{
+    "id": "hmac",                    # minúsculas, dígitos e hífen; único
+    "termo": "HMAC",
+    "sigla_de": "Hash-based Message Authentication Code",
+    "termo_ingles": "Hash-based MAC",
+    "categoria": "Criptografia",
+    "significado": "Código que combina um hash com uma chave secreta. Prova <strong>integridade</strong> e autenticidade.",
+    "explicacao": "Quem não tem a chave não recalcula o valor. Usado em TLS e em JWT com <code>HS256</code>.",
+    "historico": "Proposto em 1996 por Bellare, Canetti e Krawczyk.",
+    "variacoes": ["HMACs"],          # outras formas que também devem ser marcadas
+    "relacionados": ["mac"],         # ids de outros verbetes (precisam existir)
+    "referencias": [("RFC 2104", "https://www.rfc-editor.org/rfc/rfc2104")],
+},
+```
+
+- **Obrigatórios:** `id`, `termo`, `significado`.
+- **Opcionais:** `sigla_de`, `termo_ingles`, `categoria`, `explicacao`, `historico`, `variacoes`, `relacionados` (lista de ids) e `referencias` (lista de pares `(rótulo, URL https)`).
+- **HTML permitido** nos textos: apenas `<strong>`, `<em>` e `<code>`.
+- **O build falha** (`GlossarioInvalido`, mensagem `glossario <id>: <campo>: <descrição>`) com campo desconhecido, id inválido ou duplicado, `relacionados` que aponta para id inexistente, URL que não seja https ou HTML fora da lista.
+
+**Regras da marcação automática** (`marcar_termos`, em `_geradores/glossario.py`):
+
+- Só o texto corrido dentro de `section.study-section` é marcado.
+- São ignorados: `pre`, `code`, `kbd`, `samp`, `script`, `style`, `svg`, `textarea`, títulos `h1` a `h6`, `a`, `button`, `label`, `dfn` e elementos com a classe `terminal-box` ou `mermaid`.
+- **Sigla × palavra:** um termo sem letras minúsculas (HMAC, TLS) é uma sigla e só casa com a caixa exata; os demais casam sem distinguir maiúsculas de minúsculas.
+- **Fronteira:** não pode haver letra, dígito, `_` ou `-` colado ao termo. Assim `RC4-HMAC` e `HMACs` não casam com HMAC (para o plural, cadastre em `variacoes`).
+- **Variação mais longa vence** quando duas formas começam no mesmo ponto.
+- **1ª ocorrência por seção:** cada verbete é marcado só na 1ª ocorrência de cada `section.study-section`; na seção seguinte, marca de novo.
+
+**Depois de cadastrar ou editar um verbete**, recompile os módulos e o portal:
+
+```bash
+./_geradores/gerar.sh todos
+```
+
 ---
 
 ## 4. Diretrizes Técnicas para Simuladores em JavaScript

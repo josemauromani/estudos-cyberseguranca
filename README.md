@@ -35,13 +35,14 @@ xdg-open index.html          # No Linux
 # ou abra 'index.html' pelo seu gerenciador de arquivos / navegador
 ```
 
-O portal `index.html` tem um **menu lateral** com seis visões:
+O portal `index.html` tem um **menu lateral** com sete visões:
 - **Catálogo:** tela inicial, com os 60 módulos, o bloco **Continuar estudando** (último módulo aberto) e o **status** de cada módulo (não iniciado, em andamento, concluído). Permite **Agrupar por** Trilha, Nível, Perfil ou NIST, marcar **Só não concluídos** e buscar por título, termo técnico ou conceito (atalho `/`).
 - **Rotas sugeridas:** a rota de cada perfil profissional (Blue Team, Red Team, AppSec, GRC, Cloud/DevSecOps, Analista de Segurança da Informação) como sequência numerada, com progresso e o próximo módulo.
 - **Por certificação:** os módulos que cobrem cada uma das 17 certificações (CEH, CISM, CISSP, CCSP, GSEC, Security+, ISFS, PDPF/PDPP, ITIL 4 Foundation, CSFPC, CISA, ISO/IEC 27001 Lead Auditor, eJPT, eCPPT, OSCP, CRISC e CDPSE).
 - **Pela necessidade:** atalhos para os módulos com base em problemas práticos do dia a dia corporativo.
 - **Rota por vaga:** requisitos de uma vaga de Analista de Segurança da Informação ligados aos módulos que os cobrem.
 - **Meu progresso:** módulos concluídos e os que faltam, gravados no navegador (`localStorage`).
+- **Glossário:** verbetes de siglas e termos técnicos, com busca, índice por letra (A–Z), significado, explicação, histórico e os módulos onde o termo aparece. Nos módulos, os termos são marcados automaticamente e mostram um tooltip com o significado e o link para o verbete.
 
 Cada módulo tem navegação lateral por seções, tema claro e escuro, checklist e questões com progresso salvo.
 
