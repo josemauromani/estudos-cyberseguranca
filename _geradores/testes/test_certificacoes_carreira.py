@@ -374,6 +374,13 @@ class TestCertificacoesCarreira(unittest.TestCase):
                 self.assertEqual(elegibilidade(cert, iniciante), "sem-exigencia")
                 self.assertEqual(elegibilidade(cert, veterano), "sem-exigencia")
 
+    def test_oscp_pre_requisitos_nao_sao_dominio_da_prova(self):
+        oscp = self._cert(self._dados(), "OSCP")
+        nomes = [dom["nome"] for dom in oscp["dominios"]]
+        self.assertIn("Pré-requisitos recomendados (não é domínio da prova)", nomes)
+        self.assertNotIn("Preparação recomendada: redes, Windows, Linux e scripting", nomes)
+        self.assertIn("A aprovação concede as duas", oscp["manutencao"])  # pen-200: "earn both the OSCP and OSCP+"
+
     def test_sem_texto_de_doze(self):
         arquivos = list(GERADORES.glob("*_body.html")) + [GERADORES.parent / "README.md", GERADORES / "CURRICULO.md", GERADORES / "index_dados.py"]
         for a in arquivos:
