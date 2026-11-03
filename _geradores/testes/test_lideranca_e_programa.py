@@ -21,8 +21,10 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from index_dados import ESTUDOS_DADOS  # noqa: E402
+from navegador import CHROME, executar  # noqa: E402
 
 SLUG = "Lideranca-e-Programa-de-Seguranca"
 SECOES = ["introducao", "governanca", "risco-de-negocio", "metricas-conselho", "orcamento", "simulador",
@@ -265,6 +267,54 @@ class TestLiderancaEPrograma(unittest.TestCase):
         self.assertIn("aria-pressed", motor)
         self.assertIn("textContent", motor)
         self.assertIn("createElement", motor)
+
+    def test_foco_restaurado_no_codigo(self):
+        """Cada clique recria os cartões e o painel: o motor guarda a chave do botão e devolve o foco a ele."""
+        motor = self._motor()
+        self.assertIn('estado.foco = i.id + ":" + c', motor)
+        self.assertIn('registrarAlvo(i.id + ":" + c, b)', motor)
+        ini = motor.index("function renderTudo()")
+        render = motor[ini:motor.index("\n    }", ini)]
+        self.assertLess(render.index("renderIndicadores()"), render.index("restaurarFoco()"))
+        self.assertLess(render.index("renderPainel()"), render.index("restaurarFoco()"))
+        ini = motor.index("function restaurarFoco()")
+        self.assertIn(".focus()", motor[ini:motor.index("\n    }", ini)])
+
+    @unittest.skipUnless(CHROME, "Chrome ausente")
+    def test_foco_do_teclado_sobrevive_a_classificacao(self):
+        """No navegador: classificar e tirar do painel não jogam o foco para o <body>."""
+        r = executar(self._compilado(), r"""
+          const card = (n) => document.querySelectorAll('#lid-indicadores [role=group]')[n];
+          const ativo = () => document.activeElement;
+          const out = {};
+          let b = card(2).querySelectorAll('button')[0];        // I03 como KRI
+          const rotulo = b.getAttribute('aria-label');
+          b.focus(); b.click();
+          out.kri = {label: ativo().getAttribute('aria-label'), novo: ativo() !== b,
+                     pressed: ativo().getAttribute('aria-pressed')};
+          b = card(4).querySelectorAll('button')[0]; b.focus(); b.click();   // I05 como KRI
+          b = card(4).querySelectorAll('button')[1]; b.focus(); b.click();   // I05 vira KPI
+          out.kpi = ativo().getAttribute('aria-label');
+          b = card(4).querySelectorAll('button')[0]; b.focus(); b.click();   // I05 volta a KRI
+          let tirar = document.querySelectorAll('#lid-painel button');
+          tirar[0].focus(); tirar[0].click();
+          out.tirar1 = {noPainel: document.getElementById('lid-painel').contains(ativo()),
+                        tag: ativo().tagName, restantes: document.querySelectorAll('#lid-painel button').length};
+          tirar = document.querySelectorAll('#lid-painel button');
+          tirar[0].focus(); tirar[0].click();
+          out.tirar2 = {noPainel: document.getElementById('lid-painel').contains(ativo()), tag: ativo().tagName};
+          out.rotulo = rotulo;
+          __fim(out);
+        """)
+        self.assertEqual(r["erros"], [])
+        s = r["saida"]
+        self.assertEqual(s["kri"]["label"], s["rotulo"], "o foco volta ao botão clicado, recriado")
+        self.assertTrue(s["kri"]["novo"])
+        self.assertEqual(s["kri"]["pressed"], "true")
+        self.assertIn("como KPI operacional", s["kpi"])
+        self.assertEqual(s["tirar1"], {"noPainel": True, "tag": "BUTTON", "restantes": 1})
+        self.assertTrue(s["tirar2"]["noPainel"], "painel vazio: o foco fica no título do painel")
+        self.assertEqual(s["tirar2"]["tag"], "H4")
 
     def test_componentes_pedagogicos(self):
         body = self._body()

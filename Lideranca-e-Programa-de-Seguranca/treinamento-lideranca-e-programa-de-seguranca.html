@@ -2735,7 +2735,9 @@ td {
     // o texto repete o limite_painel do JSON (6), conferido pelo teste do módulo
     var AVISO_LIMITE = "O painel aceita no máximo 6 KRIs. Tire um indicador do painel antes de incluir outro: um painel do conselho com KRIs demais perde o foco.";
     var COR = { ok: "var(--tip-color)", erro: "var(--danger-color)", aviso: "var(--warning-color)" };
-    var estado = { escolhas: {}, resultado: null };
+    // foco: chave do botão que disparou o último render; alvos: botões recriados no render atual, por chave
+    var estado = { escolhas: {}, resultado: null, foco: null };
+    var alvos = {};
 
     function $(id) { return document.getElementById(id); }
     function el(tag, texto, estilo) {
@@ -2753,6 +2755,13 @@ td {
     }
     function nomes(ids) {
         return ids.map(function(id) { return indicadorPorId(id).nome; }).join("; ");
+    }
+    function registrarAlvo(chave, elemento) { alvos[chave] = elemento; }
+    // cada render recria os cartões e o painel; devolve o foco do teclado ao botão equivalente
+    function restaurarFoco() {
+        var alvo = estado.foco ? alvos[estado.foco] : null;
+        estado.foco = null;
+        if (alvo) alvo.focus();
     }
     function mostrarAviso(texto) {
         var box = $("lid-aviso");
@@ -2829,7 +2838,11 @@ td {
                 b.className = escolha === c ? "btn-primary" : "btn-secondary";
                 b.setAttribute("aria-pressed", escolha === c ? "true" : "false");
                 b.setAttribute("aria-label", "Classificar " + i.nome + " como " + ROTULO[c]);
-                b.addEventListener("click", function() { window.classificar(i.id, c); });
+                b.addEventListener("click", function() {
+                    estado.foco = i.id + ":" + c;
+                    if (!window.classificar(i.id, c)) estado.foco = null;
+                });
+                registrarAlvo(i.id + ":" + c, b);
                 grupo.appendChild(b);
             });
             card.appendChild(grupo);
@@ -2849,14 +2862,17 @@ td {
         var box = $("lid-painel");
         box.replaceChildren();
         var n = contarKris();
-        box.appendChild(el("h4", "Painel do conselho (" + n + " de " + D.limite_painel + " KRIs)", "margin: 0 0 0.4rem 0;"));
+        var titulo = el("h4", "Painel do conselho (" + n + " de " + D.limite_painel + " KRIs)", "margin: 0 0 0.4rem 0;");
+        titulo.setAttribute("tabindex", "-1");
+        registrarAlvo("painel", titulo);
+        box.appendChild(titulo);
         var kris = D.indicadores.filter(function(i) { return estado.escolhas[i.id] === "kri"; });
         if (!kris.length) {
             box.appendChild(el("p", "Nenhum KRI no painel ainda. Classifique um indicador como KRI para incluí-lo.", "font-size: 0.83rem; color: var(--muted); margin: 0;"));
             return;
         }
         var ol = el("ol", null, "margin: 0; padding-left: 1.2rem; font-size: 0.83rem;");
-        kris.forEach(function(i) {
+        kris.forEach(function(i, idx) {
             var li = el("li", null, "margin: 0.3rem 0; min-width: 0;");
             li.appendChild(el("div", i.nome, "font-weight: 600;"));
             li.appendChild(el("div", i.valor, "color: var(--muted);"));
@@ -2865,7 +2881,12 @@ td {
             b.className = "btn-secondary";
             b.setAttribute("aria-label", "Tirar " + i.nome + " do painel do conselho");
             b.setAttribute("style", "margin-top: 0.2rem; font-size: 0.78rem;");
-            b.addEventListener("click", function() { window.tirarDoPainel(i.id); });
+            b.addEventListener("click", function() {
+                // o item some: o foco vai para o "Tirar" que ocupa a mesma posição ou, com o painel vazio, para o título
+                estado.foco = kris.length > 1 ? "tirar:" + Math.min(idx, kris.length - 2) : "painel";
+                window.tirarDoPainel(i.id);
+            });
+            registrarAlvo("tirar:" + idx, b);
             li.appendChild(b);
             ol.appendChild(li);
         });
@@ -2901,9 +2922,11 @@ td {
     }
 
     function renderTudo() {
+        alvos = {};
         renderIndicadores();
         renderPainel();
         renderResultado();
+        restaurarFoco();
         if (typeof CS !== "undefined" && CS.labProgress) {
             CS.labProgress(Object.keys(estado.escolhas).length, D.indicadores.length);
         }
