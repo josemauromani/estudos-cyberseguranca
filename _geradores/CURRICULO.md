@@ -731,6 +731,16 @@ flowchart LR
 - **Conceitos-Chave:** modelo das três linhas e independência da auditoria interna; linha de reporte; LGPD (encarregado) e Res. CD/ANPD nº 18/2024; função Govern do NIST CSF 2.0; registro de risco executivo; KPI, KRI e métrica de vaidade; painel do conselho (limite, tendência, dono, decisão pedida); Res. CMN 4.893/2021 como exemplo setorial de reporte; Capex e Opex; business case; ROSI.
 - **Simulador Interativo em JS:** *Do SIEM ao Conselho* — Doze indicadores fictícios do relatório trimestral de uma empresa. O aluno classifica cada um como KRI para o conselho, KPI operacional ou métrica de vaidade; o painel do conselho aceita no máximo 6 KRIs e recusa o sétimo com aviso. A avaliação mostra os acertos, os KRIs essenciais ausentes, a métrica de vaidade incluída no painel e a explicação de cada indicador.
 
+#### 60. Estruturacao-da-Area-de-Seguranca
+- **Título:** Estruturação da Área de Segurança: Maturidade, Time e Sourcing
+- **Função NIST CSF 2.0:** *Govern (GV)*
+- **Tempo Estimado:** 50 minutos | **Carreiras:** GRC & Auditoria
+- **MITRE ATT&CK:** N/A (estruturação e sourcing)
+- **Objetivos de Aprendizagem:** Conduzir o diagnóstico e o plano dos primeiros 90 dias (ouvir, medir, decidir) com entregáveis de 30, 60 e 90 dias; medir a maturidade com o perfil atual e o perfil alvo do NIST CSF 2.0 e explicar o que os tiers 1 a 4 medem; transformar a lacuna em roadmap priorizado; desenhar o time por porte e escolher entre SOC interno, MSSP, MDR e híbrido pelo que cada um entrega, com contrato, SLA por etapa, métricas de fornecedor e plano de saída; estruturar um programa de conscientização medido pela taxa de reporte; tratar o risco herdado em fusões e aquisições com due diligence e integração de identidades por federação.
+- **Pré-requisitos:** Lideranca-e-Programa-de-Seguranca, Operacoes-SOC-e-SIEM, Gestao-de-Riscos-de-Terceiros.
+- **Conceitos-Chave:** plano de 90 dias; quick wins e roadmap; perfis organizacionais e tiers do NIST CSF 2.0; CMMI e C2M2 como alternativas; funções mínimas por porte; SOC interno, MSSP, MDR e híbrido; SLA, métricas de fornecedor e plano de saída; taxa de clique e taxa de reporte; due diligence, federação e risco herdado; Res. CMN 4.893/2021 como exigência setorial no cenário da fintech
+- **Simulador Interativo em JS:** *Alocador de Programa* — Três cenários fictícios (varejo de porte médio, fintech regulada e indústria com OT), cada um com orçamento em pontos, perfil atual e perfil alvo por função do NIST CSF 2.0 e exigências do setor. O aluno escolhe o modelo de SOC e distribui os pontos entre seis frentes; o motor calcula o nível alcançado por função, verifica as exigências e lista os riscos residuais, e recusa com mensagem a alocação acima do orçamento, negativa ou não inteira. O teste do módulo espelha o cálculo em Python.
+
 ---
 
 ## 4. Matriz de Mapeamento com Frameworks Globais

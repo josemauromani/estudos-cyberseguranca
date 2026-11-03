@@ -1978,4 +1978,22 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
             "Business case e limites do ROSI",
         ],
     },
+    "Estruturacao-da-Area-de-Seguranca": {
+        "titulo": "Estruturação da Área de Segurança: Maturidade, Time e Sourcing",
+        "subtitulo": "Plano de 90 dias, perfis do NIST CSF 2.0, desenho do time, SOC interno, MSSP e MDR, conscientização e aquisições",
+        "trilha": 14,
+        "nist": "Govern",
+        "mitre": "N/A (estruturação e sourcing)",
+        "carreiras": ["GRC & Auditoria"],
+        "tempo_minutos": 50,
+        "nivel": "avancado",
+        "pergunta_chave": "Você chegou como primeiro CISO da empresa. O que acontece nos primeiros 90 dias?",
+        "simulador_nome": "Alocador de Programa",
+        "fatos": [
+            "Perfil atual e perfil alvo (NIST CSF 2.0)",
+            "Níveis (tiers) 1 a 4",
+            "SOC interno, MSSP, MDR e híbrido",
+            "Plano de 90 dias",
+        ],
+    },
 }

@@ -1,0 +1,913 @@
+<!-- Estudo 60: Estruturacao-da-Area-de-Seguranca Body Fragment -->
+<article class="study-container" data-slug="estruturacao-da-area-de-seguranca">
+
+    <!-- SEÇÃO 1: DIAGNÓSTICO E PLANO DE 90 DIAS -->
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: Diagnóstico e Plano de 90 Dias</h2>
+
+        <p class="lead-text">
+            A Ipê Alimentos (fictícia) nunca teve uma área de segurança. Depois de um ransomware que parou a fábrica por dias, o conselho criou o cargo de CISO e contratou alguém de fora. No primeiro dia chegam três pedidos: o diretor de TI quer aprovar a compra de uma ferramenta que um fornecedor apresentou na semana anterior, a seguradora quer um questionário respondido até o fim do mês e o diretor-presidente quer saber "quanto falta para a gente estar seguro". Nenhum dos três pedidos pode ser respondido ainda, porque ninguém sabe o que a empresa tem, o que já funciona e o que mais pode dar errado. Este módulo trata do trabalho de montar a área: o diagnóstico e o plano dos primeiros 90 dias, a medida de maturidade com o NIST CSF 2.0, o desenho do time e a escolha entre SOC interno, MSSP, MDR e modelo híbrido, o programa de conscientização medido e a segurança em fusões e aquisições.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>Pergunta-chave do módulo</strong>
+            </div>
+            <p>Você chegou como primeiro CISO da empresa. O que acontece nos primeiros 90 dias?</p>
+        </div>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🧭</span>
+                <strong>O que vem do Estudo 59</strong>
+            </div>
+            <p>
+                O Estudo 59 tratou do papel do CISO, da governança, dos KRIs e do relato ao conselho. Aqui o ponto de partida é outro: a área ainda não existe, ou existe só no organograma. Os KRIs do Estudo 59 e a declaração de apetite são a forma de reportar o progresso do plano construído neste módulo.
+            </p>
+        </div>
+
+        <h3>Os 90 dias em três movimentos: ouvir, medir, decidir</h3>
+        <p>
+            O erro mais caro de quem chega é decidir antes de entender. Comprar uma ferramenta na segunda semana resolve um problema que ainda não foi medido e consome o crédito político que vai faltar depois, quando o roadmap pedir dinheiro. Os primeiros 90 dias se organizam em três movimentos que se sobrepõem:
+        </p>
+        <ul>
+            <li><strong>Ouvir.</strong> Conversas individuais com os <em>stakeholders</em>: diretoria, donos dos processos críticos, TI, jurídico, riscos, auditoria interna, encarregado de dados, compras e os principais fornecedores de tecnologia. Ler os relatórios de incidentes passados, os achados de auditoria abertos, os questionários de clientes e de seguradoras e os contratos com obrigações de segurança. A pergunta que mais rende: "o que tira o seu sono e o que já foi tentado?".</li>
+            <li><strong>Medir.</strong> Inventário mínimo (ativos, identidades privilegiadas, sistemas expostos à internet, dados sensíveis, fornecedores críticos) e o <strong>perfil atual</strong> de maturidade, função por função, com evidência e não com opinião (próxima seção).</li>
+            <li><strong>Decidir.</strong> Os riscos principais, os ganhos rápidos (<em>quick wins</em>) que reduzem exposição real com pouco custo e o <strong>roadmap</strong> de um a três anos, com orçamento e donos, aprovado pela diretoria.</li>
+        </ul>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Marco</th><th>Entregáveis</th><th>Quem precisa ver</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>30 dias</strong></td><td>Mapa de stakeholders e das conversas feitas; lista de incidentes e achados abertos; inventário mínimo (mesmo incompleto, com as lacunas declaradas); primeiros ganhos rápidos já em andamento (por exemplo, MFA nas contas privilegiadas e no acesso remoto).</td><td>Quem o CISO reporta e o comitê de segurança, se houver.</td></tr>
+                    <tr><td><strong>60 dias</strong></td><td>Perfil atual por função do NIST CSF 2.0, com evidência; os 5 riscos principais em linguagem de negócio, com dono; proposta de perfil alvo e de modelo de operação (time e sourcing).</td><td>Diretoria e donos dos riscos.</td></tr>
+                    <tr><td><strong>90 dias</strong></td><td>Roadmap aprovado, com orçamento, fases e donos; política de topo submetida à aprovação; formato e frequência do reporte combinados com a diretoria e o conselho (Estudo 59); ganhos rápidos concluídos e medidos.</td><td>Diretoria e conselho.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">⚠️</span>
+                <strong>Ganho rápido não é atalho</strong>
+            </div>
+            <p>
+                Um ganho rápido bom reduz uma exposição que o diagnóstico já mostrou (conta privilegiada sem MFA, backup nunca testado, sistema exposto com vulnerabilidade crítica conhecida) e cabe no orçamento que já existe. Uma ferramenta nova comprada no primeiro mês não é ganho rápido: ela traz contrato, implantação e operação antes de reduzir qualquer risco, e costuma ficar mal configurada porque ninguém sabe ainda o que ela deveria proteger.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: MATURIDADE COM O NIST CSF 2.0 -->
+    <section class="study-section" id="maturidade" data-tipo="teoria">
+        <h2>Maturidade com o NIST CSF 2.0: Perfil Atual, Perfil Alvo e Tiers</h2>
+
+        <p>
+            O <strong>NIST CSF 2.0</strong> (NIST CSWP 29, fevereiro de 2024) organiza os resultados de segurança em seis funções: Governar (GV), Identificar (ID), Proteger (PR), Detectar (DE), Responder (RS) e Recuperar (RC). Para medir onde a empresa está e aonde quer chegar, o próprio framework oferece duas ferramentas que se complementam: os <strong>perfis organizacionais</strong> e os <strong>níveis</strong> (<em>tiers</em>).
+        </p>
+
+        <h3>Perfil atual e perfil alvo</h3>
+        <p>
+            Um perfil organizacional descreve, para os resultados do CSF que importam à empresa (funções, categorias e subcategorias), a situação e a prioridade de cada um. O <strong>perfil atual</strong> descreve os resultados que a empresa alcança hoje; o <strong>perfil alvo</strong> descreve os que ela quer alcançar, escolhidos a partir do risco, das obrigações legais, regulatórias e contratuais e do apetite aprovado. O CSF 2.0 sugere cinco passos: definir o escopo do perfil; reunir as informações necessárias (políticas, inventários, avaliações de risco, requisitos); criar o perfil, atual e alvo; analisar as lacunas entre os dois e montar um plano de ação; implementar o plano e atualizar o perfil. O ciclo se repete: o perfil não é um retrato que se tira uma vez.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Do Perfil Atual ao Roadmap</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Do Perfil Atual ao Roadmap">
+flowchart TD
+    ESC["Escopo do perfil<br><small>empresa inteira, unidade ou serviço crítico</small>"]
+    PA["Perfil atual<br><small>resultados alcançados hoje, com evidência</small>"]
+    PT["Perfil alvo<br><small>risco, obrigações e apetite aprovado</small>"]
+    GAP["Análise de lacunas<br><small>o que falta, por função e categoria</small>"]
+    PRI["Priorização<br><small>risco reduzido, obrigação, dependência, custo</small>"]
+    RM["Roadmap<br><small>quick wins, fases de 1 a 3 anos, donos e orçamento</small>"]
+    MED["Execução e medida<br><small>KRIs ao conselho e perfil atualizado</small>"]
+    ESC --> PA
+    ESC --> PT
+    PA --> GAP
+    PT --> GAP
+    GAP --> PRI --> RM --> MED
+    MED -->|"novo ciclo"| PA
+            </pre>
+        </div>
+
+        <h3>Como a lacuna vira roadmap</h3>
+        <p>
+            A lista de lacunas sempre é maior que o orçamento. A ordem que costuma funcionar é a mesma do Estudo 59: primeiro o que é obrigação legal, regulatória ou contratual; depois o que mais reduz os cenários de risco fora do apetite; depois as dependências (detecção sem inventário não enxerga o que importa; resposta sem detecção não tem o que responder); e, espalhados no caminho, os ganhos rápidos. Cada item do roadmap precisa de dono, prazo, custo e o indicador que vai mostrar que funcionou. Um roadmap sem dono é uma lista de desejos do CISO.
+        </p>
+
+        <h3>Os níveis (tiers) 1 a 4 e o que eles medem</h3>
+        <p>
+            Os <strong>tiers</strong> do CSF 2.0 caracterizam o rigor das práticas de governança e de gestão de risco cibernético da organização, não a quantidade de ferramentas:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Nível</th><th>Governança do risco</th><th>Gestão do risco</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Tier 1: Parcial</strong> (<em>Partial</em>)</td><td>Sem estratégia formal; a segurança é tratada caso a caso, sem ligação com o risco do negócio.</td><td>Pouca consciência do risco cibernético no nível da organização; a cadeia de suprimentos é pouco considerada.</td></tr>
+                    <tr><td><strong>Tier 2: Informado por riscos</strong> (<em>Risk Informed</em>)</td><td>Práticas aprovadas pela gestão, mas não adotadas como política da organização inteira.</td><td>Há consciência do risco, mas o tratamento não é consistente entre as áreas.</td></tr>
+                    <tr><td><strong>Tier 3: Repetível</strong> (<em>Repeatable</em>)</td><td>Práticas aprovadas formalmente e expressas em política, revisadas quando o risco ou o negócio mudam.</td><td>Abordagem consistente na organização inteira, com papéis definidos e monitoramento.</td></tr>
+                    <tr><td><strong>Tier 4: Adaptativo</strong> (<em>Adaptive</em>)</td><td>O risco cibernético faz parte da cultura e das decisões da alta direção, ao lado dos riscos financeiros e operacionais.</td><td>A organização se adapta a partir de lições aprendidas, de indicadores e de informação de ameaças, em tempo hábil.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            O CSF 2.0 não manda chegar ao Tier 4. Subir de nível faz sentido quando o risco ou as obrigações são maiores, ou quando o custo de subir compensa a redução de risco. Os tiers ajudam a escrever o perfil atual e o perfil alvo, mas não são uma nota de maturidade por função: essa é uma simplificação comum em diagnósticos, e é a que o laboratório deste módulo usa (níveis de 1 a 4 em cada função), avisando que é uma convenção didática.
+        </p>
+
+        <div class="callout key">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Perfil alvo não é "tudo no máximo"</strong>
+            </div>
+            <p>
+                Um perfil alvo com todas as funções no nível mais alto é um sinal de que ninguém fez a conta. O alvo é uma decisão de risco: uma fintech regulada precisa de Responder e Governar mais altos do que um varejo médio; uma fábrica com OT precisa de Identificar e Recuperar antes de Detectar sofisticado. O alvo aprovado pela diretoria é o que transforma o roadmap em compromisso.
+            </p>
+        </div>
+
+        <h3>Outros modelos de maturidade</h3>
+        <p>
+            Há alternativas, citadas aqui só para que o nome não surpreenda numa entrevista ou num edital. O <strong>CMMI</strong> (<em>Capability Maturity Model Integration</em>, mantido pelo CMMI Institute, hoje parte da ISACA) mede a maturidade de processos em níveis. O <strong>C2M2</strong> (<em>Cybersecurity Capability Maturity Model</em>, do Departamento de Energia dos EUA) nasceu no setor elétrico e mede práticas por domínio em níveis de indicador de maturidade (MIL0 a MIL3); é comum em empresas com OT. Também se usa a ISO/IEC 27001 (Estudo 26) como régua. O modelo importa menos do que três cuidados: medir com evidência, usar a mesma régua no diagnóstico e na revisão e explicar a nota à diretoria em termos de risco.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 3: DESENHO DO TIME E SOURCING -->
+    <section class="study-section" id="time-e-sourcing" data-tipo="teoria">
+        <h2>Desenho do Time e Sourcing do SOC</h2>
+
+        <p>
+            O roadmap diz o que precisa ser feito; o desenho do time diz quem faz, dentro e fora da empresa. A decisão mais cara e mais difícil de desfazer é a do SOC (Estudo 16): monitorar e responder 24 horas por dia, 7 dias por semana. Uma posição 24x7 cobre 168 horas por semana; com jornadas de 40 horas, são mais de 4 pessoas por posição antes de contar férias, treinamento e afastamentos. Por isso pouca empresa média mantém um SOC próprio completo, e quase toda empresa precisa decidir o que terceirizar.
+        </p>
+
+        <h3>Funções mínimas por porte</h3>
+        <p>
+            Não existe tabela oficial de tamanho de equipe; o que segue é um ponto de partida para discutir, a ajustar pelo risco e pelo setor:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Porte</th><th>Dentro da empresa</th><th>Costuma ficar fora</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Pequena</strong></td><td>Um responsável por segurança, às vezes acumulando com TI, com acesso à diretoria; política e gestão de acessos.</td><td>Monitoramento 24x7, resposta a incidentes sob demanda e teste de intrusão.</td></tr>
+                    <tr><td><strong>Média</strong></td><td>CISO; GRC (política, riscos, terceiros, conscientização); engenharia de segurança (identidade, vulnerabilidades, nuvem); um ou dois analistas que conhecem o negócio e coordenam o provedor.</td><td>Monitoramento e primeira resposta 24x7 (MSSP, MDR ou híbrido), forense e teste de intrusão.</td></tr>
+                    <tr><td><strong>Grande ou regulada</strong></td><td>CISO com reporte funcional definido; times de GRC, arquitetura, engenharia, identidade, AppSec, detecção e resposta; função de risco cibernético na segunda linha (Estudo 59).</td><td>Picos de demanda, especialidades raras, teste de intrusão independente e, muitas vezes, parte do turno da madrugada.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>SOC interno, MSSP, MDR e híbrido</h3>
+        <p>
+            Os quatro modelos se distinguem pelo que entregam, não pela marca de quem vende. Antes de comparar preço, compare a entrega:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Modelo</th><th>O que entrega</th><th>Custo relativo</th><th>Riscos principais</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>SOC interno</strong></td><td>Monitoramento, triagem, resposta e engenharia de detecção feitos por empregados, com o maior conhecimento do negócio e controle total das regras e dos dados.</td><td>O mais alto: pessoas para 24x7, plataforma, treinamento e retenção.</td><td>Meses até a cobertura completa; rotatividade; dependência de pessoas-chave.</td></tr>
+                    <tr><td><strong>MSSP</strong> (<em>Managed Security Services Provider</em>)</td><td>Monitoramento de eventos (em geral no SIEM, do provedor ou da empresa), triagem e notificação; às vezes também a administração de dispositivos de segurança.</td><td>O mais baixo dos terceirizados.</td><td>Entrega alerta, não contenção: a resposta continua com a empresa; SLA de notificação confundido com SLA de resolução; volume de alertas sem contexto.</td></tr>
+                    <tr><td><strong>MDR</strong> (<em>Managed Detection and Response</em>)</td><td>Detecção e resposta com a telemetria que o provedor opera (em geral endpoint, identidade e nuvem): caça, investigação e ações de contenção autorizadas em contrato, como isolar uma máquina.</td><td>Intermediário.</td><td>Cobre só o que a telemetria enxerga (rede industrial e sistemas legados costumam ficar fora); ação de contenção sem combinar pode parar a operação; dependência do provedor.</td></tr>
+                    <tr><td><strong>Híbrido</strong></td><td>Time interno pequeno, com contexto do negócio e engenharia de detecção, e provedor para o 24x7 e a primeira resposta.</td><td>Entre o MDR e o interno.</td><td>Fronteira de responsabilidade mal definida (cada lado acha que o outro respondeu); custo de coordenação.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🚨</span>
+                <strong>A responsabilidade não se terceiriza</strong>
+            </div>
+            <p>
+                Qualquer que seja o modelo, quem responde pelo incidente perante o cliente, o regulador e o conselho é a empresa. O provedor executa parte do trabalho; a decisão de isolar um sistema crítico, de comunicar um incidente e de aceitar um risco continua dentro de casa. Um provedor de segurança é também um fornecedor crítico, com acesso privilegiado: entra no programa de terceiros do Estudo 57 com a avaliação mais rigorosa.
+            </p>
+        </div>
+
+        <h3>Contrato, SLA, métricas de fornecedor e plano de saída</h3>
+        <p>
+            O contrato de SOC terceirizado é onde a escolha do modelo se torna real. Os pontos que mais geram problema:
+        </p>
+        <ul>
+            <li><strong>Escopo de cobertura:</strong> quais fontes de log e quais ambientes (endpoints, identidade, nuvem, rede, OT, sistemas legados) estão dentro, por escrito. O que não está na lista não é monitorado.</li>
+            <li><strong>SLA separado por etapa:</strong> tempo para notificar, para triar, para conter (quando a contenção faz parte do serviço) e para entregar o relatório. Um SLA só de notificação mede a velocidade do e-mail, não a do incidente.</li>
+            <li><strong>Autorização de resposta:</strong> que ações o provedor pode tomar sozinho, em quais sistemas, e quem na empresa autoriza as demais, com contatos de plantão.</li>
+            <li><strong>Métricas de fornecedor</strong> revisadas todo mês: tempo de detecção e de resposta nos incidentes confirmados, taxa de falsos positivos encaminhados, fontes que pararam de enviar logs, casos de uso novos ou revisados e resultado dos exercícios conjuntos.</li>
+            <li><strong>Direito de auditoria e propriedade:</strong> acesso da empresa aos dados, às regras de detecção, aos registros das investigações e aos relatórios de auditoria independente do provedor.</li>
+            <li><strong>Plano de saída:</strong> como os logs, as regras, os casos e o histórico voltam para a empresa ou passam a outro provedor, em que formato e em quanto tempo, com um período de transição em que os dois operam juntos. Sem plano de saída, trocar de provedor custa a memória do SOC.</li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 4: PROGRAMA DE CONSCIENTIZAÇÃO MEDIDO -->
+    <section class="study-section" id="conscientizacao" data-tipo="teoria">
+        <h2>Programa de Conscientização Medido</h2>
+
+        <p>
+            O treinamento anual obrigatório, com vídeo e prova no fim, prova que a empresa cumpriu uma exigência; não prova que alguém mudou de comportamento. Um programa de conscientização de verdade escolhe comportamentos que reduzem um risco já identificado no diagnóstico (reportar o e-mail suspeito, confirmar por outro canal o pedido de pagamento urgente, não reutilizar a senha do trabalho), ensina cada um deles no momento e no formato em que ele acontece e mede se mudou. As técnicas de engenharia social e as defesas humanas estão no Estudo 15; aqui o foco é como o CISO estrutura e mede o programa.
+        </p>
+
+        <h3>Métricas: a taxa de reporte, não só a de clique</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Métrica</th><th>O que mostra</th><th>Cuidado</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Taxa de clique</strong> em simulação de phishing</td><td>Quantos caíram na isca.</td><td>Depende muito da dificuldade da isca: uma simulação fácil derruba a taxa sem mudar nada. Compare simulações de dificuldade parecida.</td></tr>
+                    <tr><td><strong>Taxa de reporte</strong></td><td>Quantos avisaram a segurança pelo canal oficial. É o comportamento que transforma cada pessoa em sensor.</td><td>Só funciona com um botão ou canal simples e com resposta rápida a quem reporta.</td></tr>
+                    <tr><td><strong>Tempo até o primeiro reporte</strong></td><td>Quanto tempo a campanha (real ou simulada) circulou antes de a segurança saber.</td><td>É o número que liga a conscientização à detecção: alimenta a função Detectar.</td></tr>
+                    <tr><td><strong>Incidentes reais com causa humana</strong></td><td>Pagamentos fraudulentos evitados ou não, credenciais entregues, dados enviados por engano.</td><td>Poucos eventos e muita variação: olhe a tendência em vários trimestres.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Público prioritário</h3>
+        <p>
+            Nem todo mundo corre o mesmo risco. Comece por quem tem acesso a dinheiro (contas a pagar, tesouraria), a dados sensíveis (RH, atendimento, jurídico), a privilégio técnico (administradores de TI e de nuvem, desenvolvedores) e pela alta direção, alvo preferido da fraude do falso executivo. Para esses grupos, conteúdo específico e simulações próprias rendem mais do que o mesmo vídeo para a empresa inteira.
+        </p>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">⚠️</span>
+                <strong>Simulação que pune ensina a esconder</strong>
+            </div>
+            <p>
+                Expor quem clicou ou atrelar a simulação a punição derruba a taxa de reporte: as pessoas aprendem a não avisar quando erram, que é exatamente o contrário do que o programa quer. Quem clicou recebe orientação curta no momento; quem reportou recebe agradecimento. O resultado vai à diretoria por área e por tendência, não por nome.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 5: FUSÕES, AQUISIÇÕES E INTEGRAÇÃO -->
+    <section class="study-section" id="fusoes-e-aquisicoes" data-tipo="teoria">
+        <h2>Fusões, Aquisições e Integração</h2>
+
+        <p>
+            Quando a empresa compra outra, compra também as contas comprometidas, as vulnerabilidades sem correção, os dados guardados sem base legal e os incidentes que ainda não foram descobertos. Esse é o <strong>risco herdado</strong>. O CISO entra em dois momentos: antes da assinatura, para que o risco influencie o preço e as condições do negócio, e depois dela, para integrar sem abrir a rede da compradora para o invasor que já estava na adquirida.
+        </p>
+
+        <h3>Due diligence de segurança antes da compra</h3>
+        <p>
+            A due diligence de segurança acontece antes da assinatura, em geral com acesso limitado (sala de dados, entrevistas e questionário), e responde a uma pergunta de negócio: quanto custa e quanto tempo leva trazer a adquirida para o padrão mínimo da compradora, e o que pode estar escondido.
+        </p>
+        <ul>
+            <li><strong>Histórico:</strong> incidentes dos últimos anos, comunicações a autoridades (ANPD, reguladores setoriais), processos e reclamações de titulares.</li>
+            <li><strong>Exposição externa:</strong> o que se vê de fora sem pedir acesso (sistemas expostos, certificados vencidos, credenciais vazadas, domínios parecidos), com as técnicas do Estudo 11.</li>
+            <li><strong>Governança e controles:</strong> política, responsável pela segurança, MFA em contas privilegiadas e acesso remoto, backup testado, gestão de vulnerabilidades, fornecedores críticos.</li>
+            <li><strong>Dados e obrigações:</strong> que dados pessoais e sensíveis existem, com que base legal (Estudo 27), e que contratos de clientes exigem controles que a compradora vai herdar.</li>
+            <li><strong>Resultado:</strong> uma lista de riscos com custo estimado de correção, que vira ajuste de preço, condição para fechar o negócio ou plano de integração, conforme decidirem a diretoria e o jurídico.</li>
+        </ul>
+
+        <h3>Integração de identidades e federação depois</h3>
+        <p>
+            A tentação depois da assinatura é ligar as redes e fundir os diretórios para "ganhar sinergia". O caminho mais seguro trata a adquirida como um terceiro até que ela seja avaliada: começa pela <strong>federação</strong> de identidades (a compradora confia na autenticação da adquirida para aplicações específicas, com MFA e acesso condicional), sem relação de confiança ampla entre domínios nem rede plana entre as duas empresas. A identidade híbrida, a federação e o acesso condicional estão no Estudo 41. A fusão dos diretórios e das redes vem depois, quando a adquirida tiver passado por varredura de comprometimento, troca de credenciais privilegiadas e o mesmo padrão mínimo de controles.
+        </p>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🧬</span>
+                <strong>O risco herdado chega pelo acesso que você mesmo abriu</strong>
+            </div>
+            <p>
+                Um invasor instalado na adquirida antes da compra ganha, no dia da integração, o caminho até a compradora. Antes de criar qualquer confiança entre os ambientes: procure sinais de comprometimento (Estudo 47), troque as senhas e chaves das contas privilegiadas, revise os acessos de terceiros da adquirida (Estudo 57) e deixe a conexão entre as redes restrita ao que as aplicações precisam.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: SIMULADOR -->
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Alocador de Programa</h2>
+
+        <p class="lead-text">
+            Você é o primeiro CISO de uma de três empresas fictícias. Escolha o cenário, o modelo de SOC e distribua o orçamento do primeiro ano, em pontos, entre as seis frentes. Clique em "Aplicar plano": o simulador calcula o nível alcançado em cada função do NIST CSF 2.0, verifica as exigências do cenário e lista os riscos que continuam. O modelo de SOC consome parte do orçamento; o que sobra vai para as frentes.
+        </p>
+
+        <p>
+            <strong>Como o cálculo funciona.</strong> Cada função parte do nível do perfil atual. O modelo de SOC soma níveis em Detectar e Responder; cada frente soma um nível a cada bloco completo de pontos numa função que ela afeta (por exemplo, 10 pontos em Identidade e privilégio sobem Proteger em um nível; 20 pontos em Detecção e resposta sobem Detectar em dois e Responder em um). Nenhuma função passa do nível 4. Os pontos, os custos e os efeitos são uma convenção didática, não uma medida de mercado.
+        </p>
+
+        <p>
+            <strong>O cenário da fintech.</strong> A Ipê Crédito é uma instituição financeira autorizada pelo Banco Central, sujeita à Res. CMN 4.893/2021 (alterada pela Res. CMN 5.274/2025). As exigências do cenário vêm do que a norma de fato pede, conforme o Estudo 54: política de segurança cibernética aprovada pelo conselho de administração, com um diretor responsável e um relatório anual sobre a implementação do plano apresentado ao conselho (Governar); plano de ação e de resposta a incidentes, com registro, análise da causa e do impacto e controle dos efeitos dos incidentes relevantes, e comunicação deles ao Banco Central (Responder); controles de prevenção e detecção de intrusão e mecanismos de rastreabilidade (Detectar); cópias de segurança e cenários de incidentes considerados nos testes de continuidade de negócios (Recuperar). A norma não fala em níveis: o "nível 3" é a tradução que o laboratório faz dessas obrigações. Se a fintech fosse instituição de pagamento, a norma seria a Res. BCB 85, com o mesmo desenho (Estudo 54). Antes de usar num caso real, confira o texto compilado em normativos.bcb.gov.br.
+        </p>
+
+        <div class="lab-box est-lab" id="est-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Maturidade, time e sourcing</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Alocador de Programa: o primeiro ano do CISO</h3>
+                    <p id="est-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body" style="min-width: 0;">
+                <div class="lab-controls" style="flex-direction: column; align-items: stretch;">
+                    <label for="est-cenario" style="flex-wrap: wrap; max-width: 100%;">Cenário
+                        <select id="est-cenario" style="max-width: 100%; min-width: 0;"></select>
+                    </label>
+                    <div id="est-cenario-info" style="font-size: 0.88rem; min-width: 0; overflow-wrap: anywhere;"></div>
+                </div>
+
+                <fieldset id="est-sourcing" class="lab-controls" style="border: 1px solid var(--rule); flex-direction: column; align-items: stretch;">
+                    <legend style="font-weight: 600; padding: 0 0.3rem;">Modelo de SOC</legend>
+                </fieldset>
+
+                <fieldset id="est-alocacao" class="lab-controls" style="border: 1px solid var(--rule); flex-direction: column; align-items: stretch;">
+                    <legend style="font-weight: 600; padding: 0 0.3rem;">Pontos por frente (números inteiros)</legend>
+                    <div id="est-alocacao-campos" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.8rem; min-width: 0;"></div>
+                </fieldset>
+
+                <p id="est-disponivel" role="status" style="font-weight: 600; margin: 0.4rem 0;"></p>
+                <div id="est-aviso" role="alert" style="font-size: 0.85rem; font-weight: 600;"></div>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem;">
+                    <button type="button" class="btn-primary" id="est-aplicar">Aplicar plano</button>
+                    <button type="button" class="btn-secondary" id="est-exemplo">Preencher plano de exemplo</button>
+                    <button type="button" class="btn-secondary" id="est-armadilha">Preencher armadilha comum</button>
+                    <button type="button" class="btn-secondary" id="est-zerar">Zerar pontos</button>
+                </div>
+                <p id="est-nota" style="font-size: 0.85rem; margin: 0.6rem 0 0 0;"></p>
+                <div id="est-resultado" role="region" aria-label="Resultado do plano" tabindex="-1" style="margin-top: 0.8rem; min-width: 0; overflow-wrap: anywhere;"></div>
+                <p style="font-size: 0.76rem; color: var(--muted); margin: 0.8rem 0 0 0;">Empresas, perfis, orçamentos, custos e efeitos inventados. Os níveis de 1 a 4 por função são uma simplificação didática inspirada nos tiers do NIST CSF 2.0, que não definem nota por função.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 7: CHECKLIST -->
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist: Plano de 90 Dias</h2>
+
+        <p class="lead-text">
+            Plano de 90 dias em seis entregas. Use como roteiro dos primeiros 90 dias numa área nova ou numa área que você acabou de assumir. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-est-1">
+                <label for="chk-est-1"><strong>Stakeholders ouvidos:</strong> diretoria, donos dos processos críticos, TI, jurídico, riscos, auditoria, encarregado e compras, com incidentes passados e achados abertos lidos.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-est-2">
+                <label for="chk-est-2"><strong>Perfil atual medido:</strong> nível por função do NIST CSF 2.0 com evidência, e o inventário mínimo com as lacunas declaradas.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-est-3">
+                <label for="chk-est-3"><strong>Top 5 riscos:</strong> escritos em linguagem de negócio, cada um com dono e com a ligação ao apetite aprovado.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-est-4">
+                <label for="chk-est-4"><strong>Quick wins:</strong> ganhos rápidos que reduzem exposição já medida, com pouco custo, concluídos e com o resultado mostrado.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-est-5">
+                <label for="chk-est-5"><strong>Roadmap aprovado:</strong> perfil alvo, fases, orçamento, modelo de time e de sourcing e donos, aprovados pela diretoria.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-est-6">
+                <label for="chk-est-6"><strong>Reporte combinado:</strong> formato, frequência e KRIs do relato à diretoria e ao conselho acordados (Estudo 59).</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 8: QUIZ -->
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (90 dias):</strong> Na segunda semana, o diretor de TI pede que o novo CISO aprove a compra de uma plataforma de detecção para "mostrar resultado rápido". O que o CISO deveria responder?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Que a decisão vem depois do diagnóstico. Sem inventário e sem perfil atual, ninguém sabe se a maior lacuna é de detecção, nem quais fontes a plataforma deveria monitorar. Ganho rápido é reduzir uma exposição já conhecida com o que existe (por exemplo, MFA nas contas privilegiadas). A compra entra no roadmap, comparada com as outras opções de sourcing, quando o perfil alvo estiver definido.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Perfis do CSF 2.0):</strong> Qual a diferença entre perfil atual e perfil alvo, e o que se faz com a diferença entre eles?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O perfil atual descreve os resultados do CSF que a organização alcança hoje; o perfil alvo, os que ela quer alcançar, escolhidos pelo risco, pelas obrigações e pelo apetite. A diferença é analisada como lacunas, priorizada e transformada num plano de ação (o roadmap). Depois da execução, o perfil atual é atualizado e o ciclo recomeça.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Tiers):</strong> Um consultor afirma que "toda empresa deve buscar o Tier 4 do NIST CSF em todas as funções". Está correto?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. Os tiers (1 Parcial, 2 Informado por riscos, 3 Repetível, 4 Adaptativo) caracterizam o rigor das práticas de governança e gestão de risco, e o CSF 2.0 recomenda subir de nível quando o risco ou as obrigações justificam e o custo compensa. Além disso, os tiers não são uma nota por função; usar níveis por função é uma simplificação de diagnóstico.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (MSSP e MDR):</strong> Uma empresa contratou um MSSP com SLA de 15 minutos para notificar alertas críticos. Num sábado de madrugada, o alerta de ransomware chegou em 10 minutos, e a criptografia continuou por horas. O SLA foi cumprido? O que faltou?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O SLA de notificação foi cumprido, e esse é o problema: ele não mede contenção. O MSSP entrega monitoramento e notificação; a resposta continuava com a empresa, que não tinha plantão. Faltou definir no contrato quem contém e em quanto tempo: ou um modelo MDR ou híbrido com ações de contenção autorizadas, ou um plantão interno com playbook e acesso para agir fora do horário comercial.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Plano de saída):</strong> Por que o contrato com o provedor de SOC precisa de plano de saída desde a assinatura?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque os logs, as regras de detecção, os casos investigados e o histórico ficam na plataforma do provedor. Sem cláusula que diga como e em que formato esse material volta para a empresa ou passa a outro provedor, com período de transição, trocar de fornecedor significa recomeçar do zero e ficar sem cobertura durante a troca. Na hora da saída, o provedor não tem incentivo para negociar isso.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Conscientização):</strong> A taxa de clique nas simulações de phishing caiu pela metade em um ano, mas a taxa de reporte ficou parada. O programa está funcionando?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não dá para afirmar. A taxa de clique cai também quando as iscas ficam mais fáceis de reconhecer; e se as pessoas não reportam, a segurança continua sem saber quando uma campanha real começa. O comportamento que mais importa é o reporte, porque transforma cada funcionário em sensor e reduz o tempo de detecção. Vale conferir a dificuldade das simulações, a facilidade do canal de reporte e se há punição implícita para quem erra.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 7 (Fusões e aquisições):</strong> Uma semana depois de fechar a compra de uma concorrente, a TI propõe criar uma relação de confiança ampla entre os domínios das duas empresas para que todos acessem tudo. Qual o risco e qual a alternativa?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O risco herdado: se houver um invasor ou credenciais comprometidas na adquirida, a confiança ampla entrega a ele o caminho até a compradora. A alternativa é tratar a adquirida como terceiro, usar federação para as aplicações que precisam ser compartilhadas, com MFA e acesso condicional (Estudo 41), e só fundir diretórios e redes depois de varredura de comprometimento, troca de credenciais privilegiadas e alinhamento ao padrão mínimo de controles.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 9: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>Perfil atual e perfil alvo (NIST CSF 2.0)</h4>
+                <p>O perfil atual descreve os resultados alcançados hoje; o alvo, os desejados pelo risco e pelas obrigações. A lacuna, priorizada, vira o roadmap; o ciclo se repete.</p>
+            </div>
+            <div class="facts-card">
+                <h4>Níveis (tiers) 1 a 4</h4>
+                <p>Parcial, Informado por riscos, Repetível e Adaptativo: o rigor da governança e da gestão de risco. Subir de nível é decisão de risco e custo, não obrigação.</p>
+            </div>
+            <div class="facts-card">
+                <h4>SOC interno, MSSP, MDR e híbrido</h4>
+                <p>Interno: contexto e controle, custo mais alto. MSSP: monitora e notifica. MDR: detecta e contém na telemetria dele. Híbrido: time interno com provedor 24x7. Contrato com SLA por etapa e plano de saída.</p>
+            </div>
+            <div class="facts-card">
+                <h4>Plano de 90 dias</h4>
+                <p>Ouvir, medir, decidir: stakeholders, perfil atual, top 5 riscos, quick wins, roadmap aprovado e reporte combinado.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>NIST CSWP 29: <em>The NIST Cybersecurity Framework (CSF) 2.0</em> (fevereiro de 2024): funções, perfis organizacionais e tiers.</li>
+            <li>NIST SP 1301: Quick-Start Guide do NIST CSF 2.0 para criar e usar perfis organizacionais.</li>
+            <li>NIST SP 1302: Quick-Start Guide do NIST CSF 2.0 sobre o uso dos tiers.</li>
+            <li>NIST SP 1300: Quick-Start Guide do NIST CSF 2.0 para pequenas empresas.</li>
+            <li>NIST SP 800-50 Rev. 1: <em>Building a Cybersecurity and Privacy Learning Program</em> (2024).</li>
+            <li>U.S. Department of Energy: <em>Cybersecurity Capability Maturity Model</em> (C2M2).</li>
+            <li>CMMI Institute (ISACA): <em>Capability Maturity Model Integration</em> (CMMI).</li>
+            <li>Res. CMN 4.893/2021, alterada pela Res. CMN 5.274/2025: texto compilado em normativos.bcb.gov.br.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🏁</span>
+                <strong>Próximos passos</strong>
+            </div>
+            <p>
+                Este é o segundo módulo da Trilha 14 (Liderança &amp; Estratégia) e fecha o catálogo de 60 módulos. Se ainda não fez, volte ao Estudo 59 para o relato ao conselho, que é como o progresso deste plano chega à alta direção. Para aprofundar as frentes do roadmap, siga os Estudos 16 (SOC), 57 (terceiros), 15 (engenharia social) e 41 (identidade híbrida). Um plano de 90 dias com perfil atual, perfil alvo e a escolha de sourcing justificada, feito para uma empresa fictícia, é uma boa amostra de trabalho para uma entrevista de coordenação ou de gestão.
+            </p>
+        </div>
+    </section>
+
+</article>
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="est-dados">
+{
+ "contexto": "Três empresas fictícias do grupo Ipê, cada uma com o primeiro CISO recém-chegado e o orçamento do primeiro ano em pontos. Empresas, perfis, custos e efeitos são inventados e servem só para treinar o raciocínio.",
+ "funcoes": ["GV", "ID", "PR", "DE", "RS", "RC"],
+ "nomes_funcoes": {"GV": "Governar (Govern)", "ID": "Identificar (Identify)", "PR": "Proteger (Protect)",
+                   "DE": "Detectar (Detect)", "RS": "Responder (Respond)", "RC": "Recuperar (Recover)"},
+ "frentes": [
+  {"id": "identidade", "nome": "Identidade e privilégio", "descricao": "MFA, cofre de senhas privilegiadas, revisão de acessos.",
+   "efeitos": {"PR": 10}},
+  {"id": "vulnerabilidades", "nome": "Gestão de vulnerabilidades", "descricao": "Inventário de ativos, varredura, priorização e prazo de correção.",
+   "efeitos": {"ID": 10, "PR": 20}},
+  {"id": "deteccao", "nome": "Detecção e resposta", "descricao": "Fontes de log, casos de uso, playbooks e exercícios de resposta.",
+   "efeitos": {"DE": 10, "RS": 20}},
+  {"id": "resiliencia", "nome": "Resiliência e backup", "descricao": "Cópias isoladas, testes de restauração e plano de continuidade.",
+   "efeitos": {"RC": 10}},
+  {"id": "conscientizacao", "nome": "Conscientização", "descricao": "Programa por comportamento, simulações e canal de reporte.",
+   "efeitos": {"PR": 20, "DE": 30}},
+  {"id": "grc", "nome": "GRC", "descricao": "Política de topo, registro de riscos, comitê e gestão de terceiros.",
+   "efeitos": {"GV": 10, "ID": 20}}
+ ],
+ "sourcing": {
+  "interno": {"nome": "SOC interno", "custo": 50, "efeitos": {"DE": 2, "RS": 2},
+   "riscos": ["Turnos 24x7 exigem contratar e reter analistas; até a equipe completar, madrugadas e fins de semana ficam descobertos.",
+              "Dependência de poucas pessoas-chave: férias e saídas abrem buracos na cobertura e no conhecimento."]},
+  "mssp": {"nome": "MSSP (serviço gerenciado de segurança)", "custo": 15, "efeitos": {"DE": 1},
+   "riscos": ["O MSSP monitora e notifica; conter e erradicar continua com o time da empresa, que precisa estar pronto para agir.",
+              "SLA de notificação não é SLA de contenção: o alerta chega no prazo e o incidente pode seguir aberto."]},
+  "mdr": {"nome": "MDR (detecção e resposta gerenciadas)", "custo": 25, "efeitos": {"DE": 1, "RS": 1},
+   "riscos": ["Cobre só a telemetria que o provedor opera: ambientes fora dela (rede industrial, sistemas legados, nuvem não integrada) ficam sem detecção se o contrato não os incluir.",
+              "A resposta se limita às ações autorizadas em contrato: isolar uma máquina crítica sem combinar antes pode parar a operação.",
+              "Sem plano de saída, trocar de provedor custa a telemetria, as regras e o histórico."]},
+  "hibrido": {"nome": "Híbrido (time interno com provedor 24x7)", "custo": 35, "efeitos": {"DE": 2, "RS": 1},
+   "riscos": ["Fronteira de responsabilidade mal desenhada: sem RACI e playbook comum, cada lado acha que o outro respondeu.",
+              "Custo de coordenação: alguém do time interno precisa gerir o contrato, o SLA e as métricas do provedor."]}
+ },
+ "cenarios": [
+  {"id": "varejo", "nome": "Ipê Store: varejo de porte médio",
+   "descricao": "Varejista com lojas físicas e loja virtual (fictícia). TI enxuta, nenhum time de segurança, um incidente no ano passado que começou com a senha de um prestador.",
+   "orcamento": 100,
+   "perfil_atual": {"GV": 1, "ID": 1, "PR": 2, "DE": 1, "RS": 1, "RC": 2},
+   "perfil_alvo": {"GV": 2, "ID": 2, "PR": 3, "DE": 3, "RS": 2, "RC": 3},
+   "exigencias": [
+    {"funcao": "PR", "nivel_minimo": 3, "motivo": "O último incidente começou com a senha de um prestador reutilizada no acesso remoto: a diretoria exige MFA em todo acesso remoto e privilegiado e revisão periódica de acessos (Proteger no nível 3)."},
+    {"funcao": "RC", "nivel_minimo": 3, "motivo": "A loja virtual concentra a venda da Black Friday: a diretoria quer restauração testada dos sistemas de venda, com tempo de volta conhecido (Recuperar no nível 3)."},
+    {"funcao": "DE", "nivel_minimo": 2, "motivo": "Hoje ninguém olha os registros fora do horário comercial: a diretoria quer monitoramento 24x7 dos sistemas de venda (Detectar no nível 2)."}
+   ],
+   "solucao_exemplo": {"sourcing": "mdr",
+    "alocacao": {"identidade": 15, "vulnerabilidades": 15, "deteccao": 10, "resiliencia": 15, "conscientizacao": 10, "grc": 10}},
+   "armadilha": {"sourcing": "interno", "alocacao": {"deteccao": 30, "identidade": 20},
+    "falha_esperada": "A loja virtual concentra a venda da Black Friday: a diretoria quer restauração testada dos sistemas de venda, com tempo de volta conhecido (Recuperar no nível 3).",
+    "licao": "O SOC próprio consumiu metade do orçamento e nada foi para backup: a detecção ficou ótima, mas depois de um ransomware a loja não volta no prazo."}},
+  {"id": "fintech", "nome": "Ipê Crédito: fintech regulada",
+   "descricao": "Fintech de crédito autorizada a funcionar pelo Banco Central como instituição financeira (fictícia), sujeita à Res. CMN 4.893/2021. Política antiga, sem plano de resposta testado.",
+   "orcamento": 120,
+   "perfil_atual": {"GV": 2, "ID": 2, "PR": 2, "DE": 1, "RS": 1, "RC": 2},
+   "perfil_alvo": {"GV": 3, "ID": 3, "PR": 3, "DE": 3, "RS": 3, "RC": 3},
+   "exigencias": [
+    {"funcao": "GV", "nivel_minimo": 3, "motivo": "Res. CMN 4.893/2021: política de segurança cibernética aprovada pelo conselho de administração, diretor responsável pela política e pelo plano de ação e de resposta, e relatório anual sobre a implementação do plano apresentado ao conselho. No laboratório, isso pede Governar no nível 3."},
+    {"funcao": "RS", "nivel_minimo": 3, "motivo": "Res. CMN 4.893/2021: plano de ação e de resposta a incidentes, com registro, análise da causa e do impacto e controle dos efeitos dos incidentes relevantes, e comunicação deles ao Banco Central. No laboratório, isso pede Responder no nível 3."},
+    {"funcao": "DE", "nivel_minimo": 3, "motivo": "Res. CMN 4.893/2021: a política trata de prevenção e detecção de intrusão e de mecanismos de rastreabilidade. No laboratório, isso pede Detectar no nível 3."},
+    {"funcao": "RC", "nivel_minimo": 3, "motivo": "Res. CMN 4.893/2021: os controles incluem cópias de segurança dos dados e a política define os cenários de incidentes considerados nos testes de continuidade de negócios. No laboratório, isso pede Recuperar no nível 3."}
+   ],
+   "solucao_exemplo": {"sourcing": "hibrido",
+    "alocacao": {"identidade": 10, "vulnerabilidades": 15, "deteccao": 20, "resiliencia": 10, "conscientizacao": 20, "grc": 10}},
+   "armadilha": {"sourcing": "mssp", "alocacao": {"identidade": 40, "vulnerabilidades": 40, "grc": 25},
+    "falha_esperada": "Res. CMN 4.893/2021: plano de ação e de resposta a incidentes, com registro, análise da causa e do impacto e controle dos efeitos dos incidentes relevantes, e comunicação deles ao Banco Central. No laboratório, isso pede Responder no nível 3.",
+    "licao": "MSSP barato e todo o resto em prevenção: o alerta chega, mas ninguém tem plano nem gente para conter, registrar e comunicar o incidente relevante."}},
+  {"id": "industria", "nome": "Ipê Alimentos: indústria com OT",
+   "descricao": "Fábrica com linhas automatizadas e rede de automação (OT) ligada à rede corporativa (fictícia). Parou por dias depois de um ransomware no ano passado.",
+   "orcamento": 90,
+   "perfil_atual": {"GV": 1, "ID": 1, "PR": 1, "DE": 1, "RS": 1, "RC": 1},
+   "perfil_alvo": {"GV": 2, "ID": 3, "PR": 2, "DE": 2, "RS": 2, "RC": 3},
+   "exigencias": [
+    {"funcao": "ID", "nivel_minimo": 3, "motivo": "Ninguém sabe quantos CLPs, estações de engenharia e servidores de supervisão existem nem quais conversam com a rede corporativa: o conselho pede inventário de TI e de OT antes de qualquer projeto (Identificar no nível 3)."},
+    {"funcao": "RC", "nivel_minimo": 3, "motivo": "A última parada por ransomware deixou a produção parada por dias: o conselho pede cópias isoladas e restauração testada dos servidores de supervisão e de produção (Recuperar no nível 3)."},
+    {"funcao": "DE", "nivel_minimo": 2, "motivo": "A seguradora condicionou a renovação da apólice de risco cibernético a monitoramento contínuo do ambiente corporativo (Detectar no nível 2)."}
+   ],
+   "solucao_exemplo": {"sourcing": "mdr",
+    "alocacao": {"identidade": 10, "vulnerabilidades": 20, "deteccao": 0, "resiliencia": 20, "conscientizacao": 5, "grc": 10}},
+   "armadilha": {"sourcing": "interno", "alocacao": {"deteccao": 20, "identidade": 20},
+    "falha_esperada": "Ninguém sabe quantos CLPs, estações de engenharia e servidores de supervisão existem nem quais conversam com a rede corporativa: o conselho pede inventário de TI e de OT antes de qualquer projeto (Identificar no nível 3).",
+    "licao": "SOC próprio antes do inventário: a equipe não enxerga o que não sabe que existe, e o orçamento acabou antes das cópias isoladas."}}
+ ]
+}
+</script>
+<script>
+(function() {
+    var D = JSON.parse(document.getElementById("est-dados").textContent);
+    var COR = { ok: "var(--tip-color)", erro: "var(--danger-color)", aviso: "var(--warning-color)" };
+    // os campos de alocação são criados uma vez; digitar e trocar de cenário só atualizam textos e valores
+    var campos = {};
+    var radios = {};
+    var atendidos = {};
+
+    function $(id) { return document.getElementById(id); }
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function tem(obj, chave) { return Object.prototype.hasOwnProperty.call(obj, chave); }
+    function cenarioPorId(id) {
+        for (var i = 0; i < D.cenarios.length; i++) if (D.cenarios[i].id === id) return D.cenarios[i];
+        return null;
+    }
+    function frentePorId(id) {
+        for (var i = 0; i < D.frentes.length; i++) if (D.frentes[i].id === id) return D.frentes[i];
+        return null;
+    }
+    function cenarioAtual() { return cenarioPorId($("est-cenario").value); }
+    function sourcingAtual() {
+        var ids = Object.keys(radios);
+        for (var i = 0; i < ids.length; i++) if (radios[ids[i]].checked) return ids[i];
+        return null;
+    }
+    function mostrarAviso(texto) {
+        var box = $("est-aviso");
+        box.textContent = texto;
+        box.setAttribute("style", "font-size: 0.85rem; font-weight: 600;" +
+            (texto ? " border-left: 4px solid " + COR.aviso + "; padding-left: 0.5rem; margin-top: 0.4rem;" : ""));
+    }
+    function limparResultado() { $("est-resultado").replaceChildren(); }
+
+    // ================================================ regras (espelhadas nos testes)
+    // nivel(f) = min(4, atual[f] + efeito do SOC em f + soma(pontos da frente // pontos_por_nivel[f]));
+    // alocação acima do disponível, negativa, não inteira ou com frente desconhecida é recusada sem calcular perfil
+    window.aplicarPlano = function(cenarioId, sourcing, alocacao) {
+        var c = cenarioPorId(cenarioId);
+        var soc = tem(D.sourcing, sourcing) ? D.sourcing[sourcing] : null;
+        if (!c || !soc) {
+            mostrarAviso(!c ? "Escolha um cenário." : "Escolha o modelo de SOC antes de aplicar o plano.");
+            limparResultado();
+            return null;
+        }
+        alocacao = alocacao || {};
+        var chaves = Object.keys(alocacao);
+        var soma = 0;
+        for (var i = 0; i < chaves.length; i++) {
+            var v = alocacao[chaves[i]];
+            if (!frentePorId(chaves[i])) {
+                mostrarAviso("Frente desconhecida: " + chaves[i] + ".");
+                limparResultado();
+                return null;
+            }
+            if (typeof v !== "number" || !Number.isInteger(v) || v < 0) {
+                mostrarAviso("Use só números inteiros, de 0 para cima, em cada frente. O perfil não foi calculado.");
+                limparResultado();
+                return null;
+            }
+            soma += v;
+        }
+        var disponivel = c.orcamento - soc.custo;
+        if (soma > disponivel) {
+            mostrarAviso("A alocação passa do orçamento em " + (soma - disponivel) + " pontos: com " + soc.nome +
+                ", sobram " + disponivel + " para as frentes. Tire pontos de alguma frente ou escolha outro modelo de SOC. O perfil não foi calculado.");
+            limparResultado();
+            return null;
+        }
+        mostrarAviso("");
+        var alcancado = {};
+        D.funcoes.forEach(function(f) {
+            var ganho = tem(soc.efeitos, f) ? soc.efeitos[f] : 0;
+            D.frentes.forEach(function(fr) {
+                if (tem(fr.efeitos, f)) ganho += Math.floor((tem(alocacao, fr.id) ? alocacao[fr.id] : 0) / fr.efeitos[f]);
+            });
+            alcancado[f] = Math.min(4, c.perfil_atual[f] + ganho);
+        });
+        var r = {
+            perfil_alcancado: alcancado,
+            exigencias_nao_atendidas: c.exigencias.filter(function(e) {
+                return alcancado[e.funcao] < e.nivel_minimo;
+            }).map(function(e) { return e.motivo; }),
+            riscos_residuais: D.funcoes.filter(function(f) {
+                return alcancado[f] < c.perfil_alvo[f];
+            }).concat(soc.riscos)
+        };
+        renderResultado(c, sourcing, r);
+        return r;
+    };
+
+    // ================================================ interface
+    // lê os campos sem convertê-los à força: o que não for inteiro chega ao motor e é recusado lá
+    function lerAlocacao() {
+        var a = {};
+        D.frentes.forEach(function(fr) {
+            var campo = campos[fr.id];
+            var bruto = campo.value.trim();
+            if (campo.validity && campo.validity.badInput) a[fr.id] = NaN;
+            else a[fr.id] = bruto === "" ? 0 : Number(bruto);
+        });
+        return a;
+    }
+
+    function atualizarDisponivel() {
+        var c = cenarioAtual();
+        var s = sourcingAtual();
+        var custo = s ? D.sourcing[s].custo : 0;
+        var a = lerAlocacao();
+        var soma = 0;
+        var valido = true;
+        Object.keys(a).forEach(function(k) {
+            if (typeof a[k] === "number" && Number.isInteger(a[k]) && a[k] >= 0) soma += a[k];
+            else valido = false;
+        });
+        var disponivel = c.orcamento - custo - soma;
+        var linha = $("est-disponivel");
+        linha.textContent = "Orçamento " + c.orcamento + " · modelo de SOC " + (s ? custo : "(não escolhido)") +
+            " · frentes " + soma + " · disponível: " + disponivel + " pontos" +
+            (valido ? "" : " (há campo com valor que não é inteiro de 0 para cima)");
+        linha.style.color = disponivel < 0 || !valido ? COR.erro : "";
+    }
+
+    function renderCenario() {
+        var c = cenarioAtual();
+        var box = $("est-cenario-info");
+        box.replaceChildren();
+        box.appendChild(el("p", c.descricao, "margin: 0.2rem 0;"));
+        box.appendChild(el("p", "Orçamento do primeiro ano: " + c.orcamento + " pontos.", "margin: 0.2rem 0; font-weight: 600;"));
+        box.appendChild(el("strong", "Exigências do cenário:"));
+        var ul = el("ul", null, "margin: 0.2rem 0 0 0; padding-left: 1.2rem;");
+        c.exigencias.forEach(function(e) {
+            ul.appendChild(el("li", D.nomes_funcoes[e.funcao] + " no nível " + e.nivel_minimo + " ou acima. " + e.motivo, "margin: 0.2rem 0;"));
+        });
+        box.appendChild(ul);
+    }
+
+    function celula(tag, texto, estilo) { return el(tag, String(texto), estilo); }
+
+    function renderResultado(c, sourcing, r) {
+        var box = $("est-resultado");
+        box.replaceChildren();
+        box.appendChild(el("h4", "Resultado: " + c.nome + " com " + D.sourcing[sourcing].nome, "margin: 0 0 0.4rem 0;"));
+        var wrap = el("div");
+        wrap.className = "table-responsive";
+        var tabela = el("table");
+        tabela.className = "data-table";
+        var thead = el("thead");
+        var trh = el("tr");
+        ["Função", "Atual", "Alcançado", "Alvo"].forEach(function(h) { trh.appendChild(celula("th", h)); });
+        thead.appendChild(trh);
+        tabela.appendChild(thead);
+        var tbody = el("tbody");
+        D.funcoes.forEach(function(f) {
+            var tr = el("tr");
+            var alc = r.perfil_alcancado[f];
+            var alvo = c.perfil_alvo[f];
+            tr.appendChild(celula("td", D.nomes_funcoes[f]));
+            tr.appendChild(celula("td", c.perfil_atual[f]));
+            var marca = alc < alvo ? " (abaixo do alvo)" : (alc > alvo ? " (acima do alvo)" : " (no alvo)");
+            tr.appendChild(celula("td", alc + marca, "font-weight: 600; color: " + (alc < alvo ? COR.erro : COR.ok) + ";"));
+            tr.appendChild(celula("td", alvo));
+            tbody.appendChild(tr);
+        });
+        tabela.appendChild(tbody);
+        wrap.appendChild(tabela);
+        box.appendChild(wrap);
+
+        var exig = el("div", null, "border-left: 4px solid " + (r.exigencias_nao_atendidas.length ? COR.erro : COR.ok) + "; padding: 0.3rem 0.6rem; margin-top: 0.6rem; font-size: 0.85rem;");
+        if (!r.exigencias_nao_atendidas.length) {
+            exig.appendChild(el("strong", "Exigências do cenário: todas atendidas."));
+        } else {
+            exig.appendChild(el("strong", "Exigências não atendidas (" + r.exigencias_nao_atendidas.length + "):"));
+            var ul = el("ul", null, "margin: 0.2rem 0 0 0; padding-left: 1.2rem;");
+            r.exigencias_nao_atendidas.forEach(function(m) { ul.appendChild(el("li", m)); });
+            exig.appendChild(ul);
+        }
+        box.appendChild(exig);
+
+        var lacunas = r.riscos_residuais.filter(function(x) { return D.funcoes.indexOf(x) >= 0; });
+        var riscosSoc = r.riscos_residuais.filter(function(x) { return D.funcoes.indexOf(x) < 0; });
+        var res = el("div", null, "border-left: 4px solid " + COR.aviso + "; padding: 0.3rem 0.6rem; margin-top: 0.6rem; font-size: 0.85rem;");
+        res.appendChild(el("strong", "Riscos residuais:"));
+        var ulr = el("ul", null, "margin: 0.2rem 0 0 0; padding-left: 1.2rem;");
+        lacunas.forEach(function(f) {
+            ulr.appendChild(el("li", D.nomes_funcoes[f] + " fica abaixo do perfil alvo (" + r.perfil_alcancado[f] + " de " + c.perfil_alvo[f] + ")."));
+        });
+        riscosSoc.forEach(function(t) { ulr.appendChild(el("li", "Do modelo de SOC: " + t)); });
+        res.appendChild(ulr);
+        box.appendChild(res);
+
+        var acima = D.funcoes.filter(function(f) { return r.perfil_alcancado[f] > c.perfil_alvo[f]; });
+        if (acima.length) {
+            box.appendChild(el("p", "Acima do alvo em " + acima.map(function(f) { return D.nomes_funcoes[f]; }).join(", ") +
+                ": pontos que talvez fizessem mais falta em outra frente ou que poderiam voltar ao orçamento.", "font-size: 0.85rem; margin: 0.6rem 0 0 0;"));
+        }
+        box.appendChild(el("p", r.exigencias_nao_atendidas.length ?
+            "Releia as exigências e veja quais frentes sobem as funções que ficaram para trás; às vezes a troca do modelo de SOC libera os pontos que faltam." :
+            "Plano viável para este cenário. O plano de exemplo do simulador é didático, não é receita única: outras distribuições também atendem às exigências, e o que vale numa empresa real é justificar cada ponto pelo risco e pelas obrigações.",
+            "font-size: 0.85rem; margin: 0.6rem 0 0 0;"));
+
+        if (!r.exigencias_nao_atendidas.length) atendidos[c.id] = true;
+        if (typeof CS !== "undefined" && CS.labProgress) CS.labProgress(Object.keys(atendidos).length, D.cenarios.length);
+    }
+
+    function preencher(plano, nota) {
+        if (radios[plano.sourcing]) radios[plano.sourcing].checked = true;
+        D.frentes.forEach(function(fr) {
+            campos[fr.id].value = String(tem(plano.alocacao, fr.id) ? plano.alocacao[fr.id] : 0);
+        });
+        $("est-nota").textContent = nota;
+        mostrarAviso("");
+        limparResultado();
+        atualizarDisponivel();
+    }
+
+    function montarControles() {
+        var sel = $("est-cenario");
+        D.cenarios.forEach(function(c) {
+            var o = el("option", c.nome);
+            o.value = c.id;
+            sel.appendChild(o);
+        });
+
+        var fs = $("est-sourcing");
+        Object.keys(D.sourcing).forEach(function(sid) {
+            var s = D.sourcing[sid];
+            var lab = el("label", null, "font-weight: 400; align-items: flex-start;");
+            var r = el("input");
+            r.type = "radio";
+            r.name = "est-sourcing-opcao";
+            r.value = sid;
+            r.id = "est-soc-" + sid;
+            lab.setAttribute("for", r.id);
+            r.addEventListener("change", function() { limparResultado(); atualizarDisponivel(); });
+            radios[sid] = r;
+            lab.appendChild(r);
+            lab.appendChild(el("span", s.nome + " · custo " + s.custo + " pontos"));
+            fs.appendChild(lab);
+        });
+
+        var fa = $("est-alocacao-campos");
+        D.frentes.forEach(function(fr) {
+            var grupo = el("div", null, "display: flex; flex-direction: column; gap: 0.25rem; min-width: 0;");
+            var inp = el("input");
+            inp.type = "number";
+            inp.min = "0";
+            inp.step = "1";
+            inp.value = "0";
+            inp.id = "est-aloc-" + fr.id;
+            inp.setAttribute("inputmode", "numeric");
+            inp.setAttribute("style", "width: 100%; box-sizing: border-box;");
+            var lab = el("label", fr.nome);
+            lab.setAttribute("for", inp.id);
+            var efeitos = Object.keys(fr.efeitos).map(function(f) {
+                return fr.efeitos[f] + " pts = +1 em " + D.nomes_funcoes[f];
+            }).join("; ");
+            var dica = el("small", fr.descricao + " " + efeitos + ".", "color: var(--muted); font-size: 0.78rem;");
+            dica.id = inp.id + "-dica";
+            inp.setAttribute("aria-describedby", dica.id);
+            inp.addEventListener("input", atualizarDisponivel);
+            campos[fr.id] = inp;
+            grupo.appendChild(lab);
+            grupo.appendChild(inp);
+            grupo.appendChild(dica);
+            fa.appendChild(grupo);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        $("est-contexto").textContent = D.contexto;
+        montarControles();
+        $("est-cenario").addEventListener("change", function() {
+            $("est-nota").textContent = "";
+            mostrarAviso("");
+            limparResultado();
+            renderCenario();
+            atualizarDisponivel();
+        });
+        $("est-aplicar").addEventListener("click", function() {
+            var r = window.aplicarPlano($("est-cenario").value, sourcingAtual(), lerAlocacao());
+            if (r) $("est-resultado").focus();
+        });
+        $("est-exemplo").addEventListener("click", function() {
+            preencher(cenarioAtual().solucao_exemplo, "Plano de exemplo preenchido. Clique em \"Aplicar plano\" para ver o resultado e depois tente uma distribuição sua.");
+        });
+        $("est-armadilha").addEventListener("click", function() {
+            var c = cenarioAtual();
+            preencher(c.armadilha, "Armadilha comum: " + c.armadilha.licao + " Clique em \"Aplicar plano\" para ver o que falha.");
+        });
+        $("est-zerar").addEventListener("click", function() {
+            D.frentes.forEach(function(fr) { campos[fr.id].value = "0"; });
+            $("est-nota").textContent = "";
+            mostrarAviso("");
+            limparResultado();
+            atualizarDisponivel();
+        });
+        renderCenario();
+        atualizarDisponivel();
+
+        if (typeof initChecklist === "function") {
+            initChecklist("estruturacao-da-area-de-seguranca");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>
