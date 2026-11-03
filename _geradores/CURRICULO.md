@@ -20,7 +20,7 @@ A matriz pedagógica conecta diretamente as 14 trilhas estruturantes aos 6 pilar
 
 ```mermaid
 flowchart LR
-    subgraph Trilhas["13 Trilhas Temáticas"]
+    subgraph Trilhas["14 Trilhas Temáticas"]
         direction TB
         T1["Trilha 1: Fundamentos & Redes"]
         T2["Trilha 2: Segurança Defensiva"]
