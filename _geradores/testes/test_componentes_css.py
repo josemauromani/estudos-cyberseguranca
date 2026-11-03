@@ -183,7 +183,7 @@ class TestContrasteAA(unittest.TestCase):
         tokens_css = (GERADORES / "tokens.css").read_text(encoding="utf-8")
         claro = declaracoes(bloco(tokens_css, TEMAS["claro"]))
         trilhas = sorted(n for n in claro if re.fullmatch(r"--t\d+-[a-z]+", n))
-        self.assertEqual(len(trilhas), 13)
+        self.assertEqual(len(trilhas), 14)
         for tema, inicio in TEMAS.items():
             tokens = dict(claro)
             tokens.update(declaracoes(bloco(tokens_css, inicio)))

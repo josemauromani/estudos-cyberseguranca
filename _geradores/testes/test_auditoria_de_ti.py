@@ -364,7 +364,9 @@ class TestAuditoriaDeTI(unittest.TestCase):
         content = self.portal_path.read_text(encoding="utf-8")
         self.assertIn(f"{SLUG}/treinamento-auditoria-de-ti.html", content)
         self.assertIn(f'data-slug="{SLUG}"', content)
-        self.assertIn("58 / 58", content)
+        import montar
+        n = len(montar.carregar_catalogo_estudos())
+        self.assertIn(f"{n} / {n}", content)
 
     def test_pontes_para_o_58(self):
         for corpo in ("gestao_de_riscos_ti", "iso_27001_e_27002", "gestao_de_riscos_de_terceiros"):

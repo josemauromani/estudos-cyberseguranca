@@ -719,6 +719,18 @@ flowchart LR
 - **Conceitos-Chave:** ciclo de vida do terceiro; criticidade vs risco inerente e residual; questionários e evidências (ISO 27001, SOC 2); quarta parte (subcontratados); cláusulas de segurança; direito de auditoria; plano de saída; NIST CSF 2.0 GV.SC; controle 5.19–5.23 da ISO 27002:2022; exigências de contratação da Res. CMN 4.893.
 - **Simulador Interativo em JS:** *Avaliador de Fornecedores* — O aluno avalia três fornecedores fictícios (respostas a questionário e evidências), calcula criticidade e risco, escolhe as cláusulas obrigatórias e decide contratar, contratar com condições ou recusar. O simulador mostra o risco residual e o que falta no plano de saída.
 
+### Trilha 14: Liderança & Estratégia (`#A16207`)
+
+#### 59. Lideranca-e-Programa-de-Seguranca
+- **Título:** Liderança e Programa de Segurança: o Papel do CISO
+- **Função NIST CSF 2.0:** *Govern (GV)*
+- **Tempo Estimado:** 45 minutos | **Carreiras:** GRC & Auditoria, Analista de Segurança da Informação
+- **MITRE ATT&CK:** N/A (liderança e governança)
+- **Objetivos de Aprendizagem:** Descrever o papel do CISO e situá-lo no modelo das três linhas do IIA (2020); reconhecer o conflito quando o CTO ou o CIO acumula a função e as salvaguardas (comitê, reporte funcional, relato direto ao conselho, aceite formal do risco); distinguir CISO, DPO e encarregado; organizar a governança pelas categorias da função Govern do NIST CSF 2.0 (GV.OC, GV.RM, GV.RR, GV.PO, GV.OV, GV.SC), com política de topo, comitê e RACI; traduzir apetite e tolerância em limites de indicadores; separar KPI, KRI e métrica de vaidade; montar o relato ao conselho e um business case com Capex, Opex e as limitações do ROSI.
+- **Pré-requisitos:** Gestao-de-Riscos-TI, ISO-27001-e-27002.
+- **Conceitos-Chave:** modelo das três linhas e independência da auditoria interna; linha de reporte; LGPD (encarregado) e Res. CD/ANPD nº 18/2024; função Govern do NIST CSF 2.0; registro de risco executivo; KPI, KRI e métrica de vaidade; painel do conselho (limite, tendência, dono, decisão pedida); Res. CMN 4.893/2021 como exemplo setorial de reporte; Capex e Opex; business case; ROSI.
+- **Simulador Interativo em JS:** *Do SIEM ao Conselho* — Doze indicadores fictícios do relatório trimestral de uma empresa. O aluno classifica cada um como KRI para o conselho, KPI operacional ou métrica de vaidade; o painel do conselho aceita no máximo 6 KRIs e recusa o sétimo com aviso. A avaliação mostra os acertos, os KRIs essenciais ausentes, a métrica de vaidade incluída no painel e a explicação de cada indicador.
+
 ---
 
 ## 4. Matriz de Mapeamento com Frameworks Globais

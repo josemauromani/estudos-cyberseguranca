@@ -1252,6 +1252,7 @@ td {
 .badge-t11 { background-color: rgba(162, 28, 175, 0.15); color: var(--t11-fuchsia); }
 .badge-t12 { background-color: rgba(15, 118, 110, 0.15); color: var(--t12-teal); }
 .badge-t13 { background-color: rgba(77, 124, 15, 0.15); color: var(--t13-lime); }
+.badge-t14 { background-color: rgba(161, 98, 7, 0.15); color: var(--t14-gold); }
 
 .meta-bar {
   display: flex;

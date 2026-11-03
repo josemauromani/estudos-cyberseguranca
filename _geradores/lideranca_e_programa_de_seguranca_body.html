@@ -1,0 +1,850 @@
+<!-- Estudo 59: Lideranca-e-Programa-de-Seguranca Body Fragment -->
+<article class="study-container" data-slug="lideranca-e-programa-de-seguranca">
+
+    <!-- SEÇÃO 1: O PAPEL DO CISO E A LINHA DE REPORTE -->
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: O Papel do CISO e a Linha de Reporte</h2>
+
+        <p class="lead-text">
+            A reunião trimestral do conselho de administração da Ipê Store (fictícia) reserva 15 minutos para segurança. O relatório que chegou do SOC tem 22 páginas: 40 mil alertas no SIEM, 2,3 milhões de bloqueios no firewall, 118 mil e-mails maliciosos barrados, gráficos de pizza por severidade. Um conselheiro pergunta: "Isso é bom ou ruim? Precisamos decidir alguma coisa?". Ninguém na sala sabe responder. Na mesma semana, o time de infraestrutura sabia que quase um terço das vulnerabilidades críticas dos sistemas expostos à internet estava fora do prazo e que dois dos cinco testes de restauração tinham falhado, mas nada disso estava no relatório. O problema não era falta de dado; era falta de tradução. Este módulo trata do trabalho de quem lidera a segurança: onde essa pessoa fica na estrutura, como a governança é montada, como o risco técnico vira linguagem de negócio, o que vai ao conselho e como se pede orçamento.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>Pergunta-chave do módulo</strong>
+            </div>
+            <p>O SIEM gerou 40 mil alertas no trimestre. O que disso o conselho precisa saber?</p>
+        </div>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🧭</span>
+                <strong>O que vem dos Estudos 25, 26, 54 e 58, e o que não se repete aqui</strong>
+            </div>
+            <p>
+                O Estudo 25 ensinou a identificar, analisar e calcular risco (matriz, apetite, tolerância, perda esperada); o Estudo 26 mostrou como se monta e se certifica um SGSI pela ISO/IEC 27001. Este módulo parte desses conceitos e trata de outra pergunta: como levá-los à alta direção e transformá-los em decisão. O Estudo 54 detalha a regulação do setor financeiro, que aqui aparece só como exemplo de exigência de reporte ao conselho, e o Estudo 58 mostrou o trabalho da auditoria, que aqui é a terceira linha do modelo do IIA.
+            </p>
+        </div>
+
+        <h3>O que faz um CISO</h3>
+        <p>
+            O <strong>CISO</strong> (<em>Chief Information Security Officer</em>) é o executivo que responde pelo programa de segurança da informação: a estratégia, a política, a gestão do risco cibernético, a resposta a incidentes e o relato à alta direção. A palavra que define o cargo é <strong>programa</strong>: o CISO não é o melhor técnico da equipe, é quem faz a segurança funcionar como um sistema de decisões, com orçamento, prioridades, donos e prestação de contas. As responsabilidades típicas, que variam com o porte e o setor:
+        </p>
+        <ul>
+            <li><strong>Estratégia e roadmap:</strong> onde a empresa está, aonde precisa chegar e em que ordem, alinhado aos objetivos do negócio.</li>
+            <li><strong>Política e governança:</strong> política de topo aprovada pela alta direção, normas, comitê de segurança e papéis definidos.</li>
+            <li><strong>Risco:</strong> manter o registro de riscos cibernéticos em linguagem de negócio e levar à direção o que está fora da tolerância.</li>
+            <li><strong>Operação e resposta:</strong> garantir que alguém detecta, responde e recupera, seja com equipe própria, seja com prestador (Estudos 16 e 18).</li>
+            <li><strong>Relato:</strong> traduzir o estado da segurança em poucos indicadores, tendências e decisões pedidas.</li>
+            <li><strong>Pessoas e orçamento:</strong> montar a equipe, defender o investimento e prestar contas do que foi gasto.</li>
+        </ul>
+
+        <h3>O modelo das três linhas do IIA (2020)</h3>
+        <p>
+            Para entender onde o CISO fica, comece pelo modelo que a auditoria e os reguladores usam para enxergar qualquer organização: o <strong>modelo das três linhas</strong> (<em>Three Lines Model</em>) do <strong>IIA</strong> (<em>The Institute of Internal Auditors</em>), publicado em julho de 2020 como atualização do antigo modelo das "três linhas de defesa". A atualização tirou a palavra "defesa" de propósito: as linhas não são barreiras, são papéis que colaboram, e o modelo se organiza em seis princípios. Os papéis são estes:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Papel</th><th>Quem exerce</th><th>O que faz</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Órgão de governança</strong></td><td>Conselho de administração e seus comitês (riscos, auditoria)</td><td>Responde às partes interessadas pela supervisão da organização; define a direção, delega à gestão, garante os recursos e estabelece uma auditoria interna independente.</td></tr>
+                    <tr><td><strong>Primeira linha</strong></td><td>Gestão: áreas de negócio, operações, TI</td><td>Entrega produtos e serviços e é dona dos riscos que assume ao fazer isso: opera os controles no dia a dia.</td></tr>
+                    <tr><td><strong>Segunda linha</strong></td><td>Gestão: riscos, compliance, segurança da informação, privacidade</td><td>Traz conhecimento especializado, apoio, monitoramento e questionamento (<em>challenge</em>) sobre a gestão dos riscos da primeira linha.</td></tr>
+                    <tr><td><strong>Terceira linha</strong></td><td>Auditoria interna</td><td>Avalia com <strong>independência</strong> e objetividade se a governança e a gestão de riscos funcionam, e reporta ao órgão de governança (Estudo 58).</td></tr>
+                    <tr><td><strong>Prestadores externos de avaliação</strong></td><td>Auditoria externa, certificadoras, reguladores</td><td>Dão uma avaliação adicional, de fora da organização.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Dois detalhes do modelo de 2020 importam para o CISO. Primeiro, a primeira e a segunda linha ficam <strong>dentro da gestão</strong>: a segunda linha não é independente da diretoria como a auditoria interna; ela é independente de quem opera o controle que ela monitora. Segundo, os papéis podem se misturar numa mesma área, desde que a independência da terceira linha seja preservada. É exatamente o caso do CISO.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Modelo das Três Linhas com o CISO e o Conselho</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Modelo das Três Linhas com o CISO e o Conselho">
+flowchart TD
+    PI["Partes interessadas<br><small>acionistas, clientes, reguladores</small>"]
+    CA["Órgão de governança<br><small>conselho de administração e comitês de riscos e de auditoria</small>"]
+    subgraph GES["Gestão: diretoria executiva"]
+        L1["1ª linha: negócio, operações e TI<br><small>donos do risco, operam os controles</small>"]
+        CISO["CISO<br><small>política, risco cibernético e relato</small>"]
+        L2["2ª linha: riscos e compliance<br><small>expertise, monitoramento e questionamento</small>"]
+    end
+    L3["3ª linha: auditoria interna<br><small>avaliação independente e objetiva</small>"]
+    EXT["Avaliação externa<br><small>auditoria externa, certificadora, regulador</small>"]
+    CA -->|"presta contas"| PI
+    CA -->|"delega, dirige e dá recursos"| GES
+    GES -->|"reporta e presta contas"| CA
+    CISO -.->|"apoia e questiona"| L1
+    CISO -.->|"reporte funcional"| L2
+    CISO -->|"relato periódico direto"| CA
+    L3 -->|"reporta com independência"| CA
+    L3 -.->|"avalia"| GES
+    EXT -.->|"avalia"| CA
+            </pre>
+        </div>
+
+        <p>
+            O time do CISO costuma fazer as duas coisas: <strong>opera</strong> controles (SOC, gestão de identidades, varredura de vulnerabilidades), papel de primeira linha, e <strong>define e monitora</strong> (política, padrões, risco cibernético, exceções), papel de segunda linha. Bancos grandes costumam separar as duas metades: o CISO na primeira linha, perto da tecnologia, e uma função de risco cibernético na segunda linha, sob o diretor de riscos (CRO), que questiona o CISO. Em empresas menores, a mesma pessoa faz as duas metades. Nenhum desenho é proibido; o que não pode faltar é a regra de fundo: <strong>quem opera um controle não pode ser o único a atestar que ele funciona</strong>.
+        </p>
+
+        <h3>A linha de reporte e o conflito do CISO que acumula CTO ou CIO</h3>
+        <p>
+            A quem o CISO se reporta decide o que chega ao conselho. As opções mais comuns são o CIO ou o <strong>CTO</strong> (diretor de tecnologia), o diretor-presidente (CEO), o diretor de riscos (CRO) ou o jurídico. Em muitas empresas, principalmente médias, o CTO ou o CIO acumula a função de CISO. O conflito é estrutural, não pessoal: quem é cobrado por prazo de entrega, disponibilidade e custo da tecnologia é também quem decide se aceita o risco de entregar sem o controle, e quem escreve o relatório sobre a própria área. Uma janela de manutenção adiada, uma exceção de MFA "temporária" e um teste de restauração que fica para o mês seguinte são decisões razoáveis isoladamente; somadas, e sem ninguém de fora olhando, são risco acumulado que nunca chega ao conselho.
+        </p>
+        <p>As salvaguardas que tornam o acúmulo defensável:</p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Salvaguarda</th><th>O que resolve</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Comitê de segurança ou de riscos</strong> com negócio, riscos e jurídico</td><td>Aceite de risco acima de um limite e exceções à política deixam de ser decisão de uma pessoa só; ficam em ata.</td></tr>
+                    <tr><td><strong>Reporte funcional</strong> (linha pontilhada) ao CRO ou ao comitê de riscos ou de auditoria do conselho</td><td>Separa quem cobra entrega de quem avalia o risco; o CISO tem a quem levar um tema que o chefe direto não quer ouvir.</td></tr>
+                    <tr><td><strong>Relato periódico direto ao conselho</strong>, sem filtro</td><td>O conselho ouve o estado da segurança de quem responde por ela, com a mesma pauta todo trimestre.</td></tr>
+                    <tr><td><strong>Aceite formal do risco pelo dono do negócio</strong>, com prazo e controle compensatório</td><td>O risco aceito tem nome, data de validade e volta à pauta quando vence.</td></tr>
+                    <tr><td><strong>Avaliação periódica pela auditoria interna</strong></td><td>A terceira linha verifica se as salvaguardas funcionam, e não só se existem.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>O regulador aceita o acúmulo, com uma condição</strong>
+            </div>
+            <p>
+                Na Res. CMN 4.893/2021, que trata da política de segurança cibernética das instituições financeiras, a instituição designa um diretor responsável pela política e pelo plano de ação e de resposta a incidentes, e esse diretor pode acumular outras funções desde que não haja conflito de interesses (Estudo 54). É a mesma lógica das salvaguardas acima: o acúmulo não é proibido, mas precisa de desenho que neutralize o conflito. Confira a redação vigente em normativos.bcb.gov.br, porque a resolução foi alterada em dezembro de 2025.
+            </p>
+        </div>
+
+        <h3>CISO, DPO e encarregado</h3>
+        <p>
+            Três papéis que se confundem. O <strong>CISO</strong> protege a informação em geral, pessoal ou não. O <strong>DPO</strong> (<em>Data Protection Officer</em>) é o termo do GDPR europeu (arts. 37 a 39), que exige que ele atue com independência e se reporte ao nível mais alto da gestão. No Brasil, a LGPD (Lei 13.709/2018) chama o papel de <strong>encarregado</strong>: a pessoa indicada pelo controlador e pelo operador para ser o canal de comunicação com os titulares e com a ANPD (art. 5º, VIII), que recebe reclamações, orienta funcionários e contratados e recebe as comunicações da autoridade (art. 41). A Res. CD/ANPD nº 18/2024 regulamenta a atuação do encarregado, inclusive o conflito de interesse.
+        </p>
+        <p>
+            O CISO pode ser o encarregado? A norma não proíbe o acúmulo, mas pede que o conflito seja avaliado, e ele existe: o encarregado é quem deve questionar as medidas de segurança aplicadas aos dados pessoais e falar com a ANPD num incidente que pode ter nascido de um controle do próprio CISO. Por isso as funções costumam ficar separadas e trabalhar juntas: o CISO responde pelos controles; o encarregado, pelo canal com titulares e autoridade e pela orientação sobre o tratamento; os dois sentam no comitê de crise (Estudo 43). As obrigações de privacidade em si estão no Estudo 27.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 2: GOVERNANÇA DE SEGURANÇA -->
+    <section class="study-section" id="governanca" data-tipo="teoria">
+        <h2>Governança de Segurança: a Função Govern do NIST CSF 2.0</h2>
+
+        <p>
+            Gestão é fazer a segurança funcionar; <strong>governança</strong> é decidir quem decide, com que critério, e como a alta direção sabe que está funcionando. O <strong>NIST CSF 2.0</strong> (<em>Cybersecurity Framework</em>, publicado em fevereiro de 2024 como NIST CSWP 29) tornou isso explícito: às cinco funções da versão 1.1 (Identify, Protect, Detect, Respond, Recover) somou uma sexta, <strong>Govern</strong> (GV), desenhada no centro das outras porque informa todas elas. As seis categorias da função Govern são um bom roteiro para o que um programa de segurança precisa ter acima da operação:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Categoria</th><th>O que pede</th><th>Evidência que a alta direção deveria ver</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>GV.OC</strong> Contexto organizacional</td><td>Missão, partes interessadas, requisitos legais, regulatórios e contratuais, e as dependências críticas da organização entendidos e considerados nas decisões de segurança.</td><td>Mapa dos serviços críticos e das obrigações (LGPD, setor, contratos), revisado com o negócio.</td></tr>
+                    <tr><td><strong>GV.RM</strong> Estratégia de gestão de riscos</td><td>Prioridades, restrições, declarações de apetite e de tolerância a risco (GV.RM-02) e premissas estabelecidas e usadas nas decisões.</td><td>Declaração de apetite aprovada e o risco cibernético integrado ao risco corporativo.</td></tr>
+                    <tr><td><strong>GV.RR</strong> Papéis, responsabilidades e autoridades</td><td>A liderança responde pelo risco cibernético; papéis e autoridades definidos e comunicados; recursos adequados à estratégia de risco (GV.RR-03).</td><td>Matriz RACI do programa, linha de reporte do CISO e orçamento ligado ao plano.</td></tr>
+                    <tr><td><strong>GV.PO</strong> Política</td><td>Política de segurança estabelecida a partir do contexto, da estratégia e das prioridades, comunicada, aplicada, revisada e atualizada.</td><td>Política de topo aprovada, com data da última revisão e processo de exceções.</td></tr>
+                    <tr><td><strong>GV.OV</strong> Supervisão</td><td>Os resultados da estratégia de gestão de riscos cibernéticos são revisados e usados para ajustá-la.</td><td>Relato periódico com KRIs contra a tolerância e decisões tomadas a partir dele.</td></tr>
+                    <tr><td><strong>GV.SC</strong> Gestão de riscos da cadeia de suprimentos</td><td>Programa de risco de fornecedores com critérios, requisitos contratuais e monitoramento (Estudo 57).</td><td>Fornecedores críticos identificados e com avaliação em dia.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            O CSF 2.0 não é norma certificável; é uma taxonomia de resultados. Quem tem SGSI pela ISO/IEC 27001 encontra os mesmos temas nas cláusulas de liderança (5) e de análise crítica pela direção (9.3); a montagem, a declaração de aplicabilidade e a certificação do SGSI estão no Estudo 26. Para ligar o risco cibernético ao risco corporativo, o NIST publica a série NIST IR 8286.
+        </p>
+
+        <h3>Política de topo, normas e procedimentos</h3>
+        <p>
+            A <strong>política de topo</strong> é curta e muda pouco: diz por que a segurança existe na organização, quais são os objetivos, quem responde por quê, qual o critério de risco e como se pede exceção. Quem a aprova é a alta direção (o conselho ou a diretoria), e essa aprovação é o que dá ao CISO autoridade para cobrar as áreas. Abaixo dela ficam as <strong>normas</strong> (o que se exige em cada tema: acesso, criptografia, fornecedores, desenvolvimento) e os <strong>procedimentos</strong> (como se faz). Uma política de 80 páginas com configuração de firewall dentro não é política de topo: ninguém no conselho a lê, e ela precisa de nova aprovação a cada troca de produto.
+        </p>
+
+        <h3>O comitê de segurança</h3>
+        <p>
+            O comitê é o lugar onde as decisões que o CISO não deve tomar sozinho são tomadas e registradas. Um comitê que funciona tem:
+        </p>
+        <ul>
+            <li><strong>Regimento</strong> (<em>charter</em>): mandato, composição, quórum, frequência e a que instância ele se reporta.</li>
+            <li><strong>Composição com o negócio:</strong> diretores das áreas que são donas dos riscos, riscos, jurídico, encarregado e tecnologia, e não só a equipe técnica.</li>
+            <li><strong>Pauta de decisão:</strong> aceite de riscos acima do limite delegado, exceções à política, prioridades do roadmap, resposta a achados de auditoria.</li>
+            <li><strong>Ata com decisões e responsáveis:</strong> é a evidência que a auditoria (Estudo 58) e o regulador vão pedir.</li>
+        </ul>
+
+        <h3>Papéis com RACI</h3>
+        <p>
+            A matriz <strong>RACI</strong> diz, para cada decisão ou atividade, quem <strong>R</strong>ealiza (<em>Responsible</em>), quem <strong>A</strong>prova e responde por ela (<em>Accountable</em>, sempre uma só instância por linha), quem é <strong>C</strong>onsultado antes e quem é <strong>I</strong>nformado depois. O erro mais comum é pôr o CISO como "A" em tudo: ele vira dono de riscos que pertencem ao negócio e passa a responder por decisões que não toma.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Decisão ou atividade</th><th>R</th><th>A</th><th>C</th><th>I</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Aprovar a política de topo</td><td>CISO</td><td>Conselho (ou diretoria)</td><td>Jurídico, riscos, encarregado</td><td>Toda a organização</td></tr>
+                    <tr><td>Definir o apetite a risco cibernético</td><td>CRO e CISO</td><td>Conselho</td><td>Diretoria executiva</td><td>Comitê de segurança</td></tr>
+                    <tr><td>Aceitar um risco acima da tolerância</td><td>Dono do processo de negócio</td><td>Comitê de segurança ou de riscos</td><td>CISO, jurídico</td><td>Auditoria interna</td></tr>
+                    <tr><td>Operar os controles de tecnologia</td><td>Times de TI</td><td>Diretor de tecnologia</td><td>CISO</td><td>Comitê de segurança</td></tr>
+                    <tr><td>Avaliar a efetividade do programa</td><td>Auditoria interna</td><td>Comitê de auditoria</td><td>CISO</td><td>Conselho</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: RISCO EM LINGUAGEM DE NEGÓCIO -->
+    <section class="study-section" id="risco-de-negocio" data-tipo="teoria">
+        <h2>Risco em Linguagem de Negócio: Apetite, Tolerância e Indicadores</h2>
+
+        <p>
+            O Estudo 25 definiu <strong>apetite</strong> (quanto risco a organização aceita para atingir seus objetivos) e <strong>tolerância</strong> (o desvio aceitável para um objetivo específico) e ensinou a calcular o risco. O trabalho do CISO começa depois do cálculo: escrever o apetite numa forma que o conselho aprove e acompanhe, e transformar cada tolerância num limite que um indicador consiga mostrar.
+        </p>
+
+        <h3>Da declaração de apetite ao limite do indicador</h3>
+        <p>
+            Uma declaração de apetite útil é escrita em termos de negócio e tem pelo menos uma parte mensurável. "A empresa tem baixo apetite a risco cibernético" não orienta nenhuma decisão. Compare com a Ipê Store:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Declaração de apetite (aprovada pelo conselho)</th><th>Tolerância (limite mensurável)</th><th>Indicador que mostra o limite</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Não aceitamos que a venda on-line pare por incidente cibernético por mais tempo do que o cliente tolera.</td><td>Recuperar os sistemas críticos em até 8 horas; 100% dos testes de restauração com sucesso.</td><td>Testes de restauração bem-sucedidos nos sistemas críticos</td></tr>
+                    <tr><td>Não aceitamos acesso privilegiado sem segundo fator.</td><td>Zero conta privilegiada sem MFA fora de exceção aprovada e vigente.</td><td>Percentual de contas privilegiadas com MFA</td></tr>
+                    <tr><td>Aceitamos risco moderado de exposição na internet, desde que corrigido no prazo.</td><td>Pelo menos 95% das vulnerabilidades críticas em sistemas expostos corrigidas dentro do SLA.</td><td>Percentual de críticas expostas corrigidas no SLA</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Cada indicador ganha faixas: verde dentro da tolerância, amarelo quando se aproxima do limite (o sinal de alerta antecipado) e vermelho fora dela. Vermelho por dois períodos seguidos é, por definição, um tema que sobe ao conselho com uma decisão pedida. No NIST CSF 2.0, as declarações de apetite e de tolerância ficam em GV.RM-02.
+        </p>
+
+        <h3>O registro de risco executivo</h3>
+        <p>
+            O registro de riscos técnico tem centenas de linhas: vulnerabilidades, achados de pentest, exceções. O conselho precisa de outro documento, o <strong>registro de risco executivo</strong>: de 10 a 15 cenários em linguagem de negócio ("parada da venda on-line por ransomware", "vazamento da base de clientes por fornecedor", "fraude no pagamento a fornecedores por e-mail falso"), cada um com o dono executivo (um diretor do negócio, não o CISO), a avaliação atual e a tendência, o tratamento em curso, os KRIs que o acompanham e a decisão pendente, se houver. Cada linha executiva agrupa dezenas de linhas técnicas; a ponte entre os dois registros é o que permite responder "por que esse investimento?" com o cenário que ele reduz.
+        </p>
+
+        <h3>KPI, KRI e métrica de vaidade</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Tipo</th><th>O que mede</th><th>Para quem</th><th>Exemplo</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>KPI</strong> (<em>key performance indicator</em>)</td><td>Desempenho de um processo contra uma meta: o quanto a operação está funcionando bem.</td><td>CISO, gerentes do SOC e da TI</td><td>MTTD, MTTR, alertas triados dentro do SLA, regras de detecção revisadas.</td></tr>
+                    <tr><td><strong>KRI</strong> (<em>key risk indicator</em>)</td><td>Exposição a um risco, com limite ligado à tolerância; de preferência antecipa o problema em vez de contá-lo depois.</td><td>Diretoria e conselho</td><td>Críticas expostas fora do SLA, contas privilegiadas sem MFA, restauração que falha, fornecedores críticos sem avaliação.</td></tr>
+                    <tr><td><strong>Métrica de vaidade</strong></td><td>Um número que impressiona, mas não muda nenhuma decisão: em geral, volume de atividade.</td><td>Ninguém (no máximo, um anexo operacional)</td><td>Alertas gerados, ataques bloqueados, e-mails maliciosos barrados.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            O teste prático para separar os três: <strong>se esse número dobrar no próximo trimestre, alguém decide algo diferente?</strong> Se 40 mil alertas virarem 80 mil, a primeira suspeita é uma regra mal ajustada, não um ataque; ninguém no conselho muda de decisão. Se as contas privilegiadas sem MFA dobrarem, alguém precisa agir. O mesmo dado pode servir aos dois níveis conforme o recorte: "patches aplicados no mês" é KPI da equipe de infraestrutura; "sistemas expostos à internet com crítica vencida além do SLA" é KRI, porque mede a porta aberta, não o esforço.
+        </p>
+
+        <h3>Como um achado técnico vira decisão</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Achado técnico</th><th>Risco em linguagem de negócio</th><th>Decisão pedida</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Concentrador de VPN com vulnerabilidade crítica explorada ativamente; atualização exige parada.</td><td>Um invasor pode entrar na rede das lojas sem credencial e chegar ao ERP; cenário "parada de vendas por ransomware".</td><td>Aprovar uma janela de 4 horas no domingo ou aceitar o risco por 15 dias, com monitoramento reforçado, assinado pelo diretor de operações.</td></tr>
+                    <tr><td>Dois de cinco testes de restauração falharam; ninguém sabe o tempo real de recuperação do ERP.</td><td>Depois de um ransomware, a empresa pode não conseguir faturar por dias, e não sabe dizer quantos.</td><td>Aprovar o projeto de cópia imutável e testes trimestrais (Estudos 28 e 45), ou registrar que o conselho aceita a incerteza.</td></tr>
+                    <tr><td>38 fornecedores com acesso remoto ao ambiente e sem avaliação de segurança.</td><td>Um fornecedor comprometido vira a porta de entrada; cenário "vazamento por terceiro".</td><td>Aprovar a regra "sem avaliação, sem acesso" a partir do próximo trimestre, com dono no Suprimentos (Estudo 57).</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout key">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>O CISO apresenta o risco; quem aceita é o dono do negócio</strong>
+            </div>
+            <p>
+                Aceitar um risco é uma decisão de negócio: quem ganha com a funcionalidade, com o prazo ou com a economia é quem assina o aceite. O CISO garante que a decisão foi informada (o cenário, a probabilidade, as opções e o custo de cada uma) e registrada, com prazo de validade. Um CISO que aceita riscos em nome do negócio esvazia o processo; um negócio que aceita sem ouvir o CISO fica sem a informação de que precisa.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: MÉTRICAS E RELATO AO CONSELHO -->
+    <section class="study-section" id="metricas-conselho" data-tipo="teoria">
+        <h2>Métricas e Relato ao Conselho</h2>
+
+        <p>
+            O conselho não opera a segurança; ele supervisiona (GV.OV). Para isso precisa de três respostas a cada reunião: <strong>estamos dentro do apetite?</strong>, <strong>o que mudou desde a última vez?</strong> e <strong>o que vocês precisam que a gente decida?</strong>. Tudo que não ajuda a responder às três fica no painel do CISO, não no do conselho.
+        </p>
+
+        <h3>O que entra num painel do conselho</h3>
+        <ul>
+            <li><strong>Poucos KRIs</strong>, cada um ligado a um cenário do registro executivo. Este módulo usa no máximo 6 no laboratório; é uma convenção didática, não norma, mas a ideia é a mesma de qualquer painel executivo: o que não cabe numa página não é lido.</li>
+            <li><strong>Limite</strong> de cada KRI (a tolerância aprovada) e a situação contra ele: verde, amarelo ou vermelho.</li>
+            <li><strong>Tendência</strong>: os últimos quatro períodos. Um 88% melhorando e um 88% piorando pedem conversas diferentes.</li>
+            <li><strong>Dono</strong>: o executivo que responde pelo indicador, com o plano e o prazo quando está fora do limite.</li>
+            <li><strong>Incidentes relevantes</strong> do período, com impacto no negócio e lições aprendidas, e não a contagem de incidentes.</li>
+            <li><strong>Decisões pedidas</strong>, explícitas, com opções e custo.</li>
+        </ul>
+
+        <h3>O que não entra, e as armadilhas</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Armadilha</th><th>Por que engana</th><th>O que pôr no lugar</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Contagem de alertas, de bloqueios ou de "ataques"</td><td>Mede o volume da internet e o ajuste das regras, não a exposição; sobe e desce sem que o risco mude.</td><td>Incidentes relevantes, tempo dentro da tolerância, cobertura de detecção nos ativos críticos.</td></tr>
+                    <tr><td>"100% conforme"</td><td>Conforme com o quê, em que escopo, verificado por quem? Conformidade é um retrato do controle no papel; não garante que ele funcionou (Estudo 58).</td><td>Resultado de teste do controle e achados abertos da auditoria, com prazo.</td></tr>
+                    <tr><td>Mapa de calor sem decisão</td><td>Mostra muitos riscos coloridos e nenhuma pergunta para quem tem o poder de decidir.</td><td>Os três ou quatro riscos que mudaram de faixa e o que se pede para cada um.</td></tr>
+                    <tr><td>Métrica que virou meta da equipe</td><td>Quando a medida vira meta, ela tende a ser otimizada em si (lei de Goodhart): fecha-se o chamado em vez de resolver o problema.</td><td>Combinar o indicador com outro que denuncie o atalho, por exemplo reabertura de chamados.</td></tr>
+                    <tr><td>Jargão técnico</td><td>CVE, EDR e TTP sem tradução fazem o conselho desligar ou aprovar sem entender.</td><td>Cenário de negócio, impacto e opção; o detalhe técnico fica no anexo.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Frequência e formato</h3>
+        <p>
+            O ritmo mais comum é trimestral para o conselho ou seu comitê de riscos, mensal para a diretoria executiva e semanal no nível operacional, com relato extraordinário quando um incidente relevante acontece. O formato que funciona é uma página com a mensagem principal, os KRIs contra a tolerância e a tendência, as mudanças no registro executivo, os incidentes relevantes e as decisões pedidas, mais um anexo para quem quiser o detalhe. A pauta se repete todo trimestre, para que o conselho compare.
+        </p>
+        <p>
+            Respondendo à pergunta-chave: dos 40 mil alertas, o conselho precisa saber quantos viraram incidente relevante, que impacto tiveram no negócio, se a detecção e a resposta ficaram dentro da tolerância, se a exposição está subindo ou caindo e se há alguma decisão a tomar. O número 40 mil, sozinho, não responde a nenhuma dessas perguntas.
+        </p>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">🏦</span>
+                <strong>Exemplo setorial: o que a Res. CMN 4.893/2021 pede ao conselho</strong>
+            </div>
+            <p>
+                Nas instituições financeiras, o reporte ao conselho não é só boa prática. Pela Res. CMN 4.893/2021, a política de segurança cibernética e o plano de ação e de resposta a incidentes são aprovados pelo conselho de administração (ou, na falta dele, pela diretoria), e a instituição elabora um relatório anual sobre a implementação do plano, com data-base de 31 de dezembro, que trata da efetividade das ações e dos incidentes relevantes do período e é apresentado ao comitê de riscos, quando houver, e ao conselho. O Estudo 54 detalha a norma, a equivalente para instituições de pagamento (Res. BCB 85) e as alterações de dezembro de 2025 (Res. CMN 5.274); antes de usar num caso real, confira a redação vigente em normativos.bcb.gov.br.
+            </p>
+        </div>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">📏</span>
+                <strong>Medir é um programa, não uma planilha</strong>
+            </div>
+            <p>
+                O NIST SP 800-55 (<em>Measurement Guide for Information Security</em>, volumes 1 e 2, de 2024) descreve como escolher medidas e montar um programa de medição: cada indicador com definição, fonte do dado, frequência, dono e uso previsto. Um KRI sem definição escrita muda de significado a cada trimestre e a tendência deixa de valer.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 5: ORÇAMENTO E BUSINESS CASE -->
+    <section class="study-section" id="orcamento" data-tipo="teoria">
+        <h2>Orçamento e Business Case</h2>
+
+        <p>
+            O orçamento é o lugar onde a estratégia vira escolha. GV.RR-03 pede recursos adequados à estratégia de risco, mas quem aprova o dinheiro é a diretoria financeira e o conselho, que comparam o pedido de segurança com todos os outros pedidos da empresa. Pedir bem é parte do trabalho.
+        </p>
+
+        <h3>Capex e Opex</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th></th><th>Capex (<em>capital expenditure</em>)</th><th>Opex (<em>operational expenditure</em>)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>O que é</strong></td><td>Investimento que vira ativo e é depreciado ou amortizado ao longo da vida útil.</td><td>Despesa recorrente, reconhecida no período em que acontece.</td></tr>
+                    <tr><td><strong>Exemplos em segurança</strong></td><td>Equipamentos, licenças perpétuas, parte dos custos de implantação de um sistema.</td><td>Assinaturas de software como serviço, serviço gerenciado de monitoramento, suporte, salários, treinamento.</td></tr>
+                    <tr><td><strong>Como pesa na decisão</strong></td><td>Desembolso concentrado no início, aprovação por ciclo de investimento, efeito no resultado diluído nos anos seguintes.</td><td>Sem investimento inicial, mas compromisso todo ano e efeito direto no resultado do período.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            A tendência de software por assinatura e de serviços gerenciados desloca o gasto de segurança de Capex para Opex, e isso muda a conversa: um projeto que seria investimento único vira despesa permanente. Quem classifica cada gasto é a controladoria, pelas normas contábeis; o CISO precisa saber em qual orçamento o pedido vai entrar e apresentar o custo total de pelo menos três anos, não só o do primeiro ano.
+        </p>
+
+        <h3>Como montar um business case</h3>
+        <p>Um <strong>business case</strong> de segurança responde, em uma ou duas páginas, às perguntas que a diretoria financeira faria de qualquer forma:</p>
+        <ol>
+            <li><strong>Problema:</strong> o cenário de risco do registro executivo, em linguagem de negócio, com a situação atual dos KRIs que o acompanham.</li>
+            <li><strong>Opções:</strong> pelo menos três, incluindo "não fazer nada" (com o risco que fica) e uma alternativa mais barata ou parcial.</li>
+            <li><strong>Custo:</strong> custo total de cada opção em três anos (Capex, Opex, pessoas, implantação e o custo de oportunidade de quem vai implantar).</li>
+            <li><strong>Risco reduzido:</strong> que cenário muda, que KRI sai de que valor para que valor e, quando houver base, a faixa de perda esperada antes e depois (o cálculo está no Estudo 25).</li>
+            <li><strong>Decisão pedida:</strong> a opção recomendada, o valor, o prazo e o que acontece se a decisão for adiada.</li>
+        </ol>
+
+        <h3>ROSI e as limitações dele</h3>
+        <p>
+            O <strong>ROSI</strong> (<em>return on security investment</em>) tenta pôr o investimento em segurança na mesma régua dos outros: <strong>ROSI = (perda esperada evitada − custo da solução) ÷ custo da solução</strong>, em que a perda esperada evitada é a diferença entre a perda anual esperada sem e com o controle, calculada como no Estudo 25. A ENISA publicou em 2012 um guia introdutório do método. É útil como um dos argumentos, mas tem limites que todo conselheiro experiente conhece:
+        </p>
+        <ul>
+            <li><strong>Precisão falsa:</strong> frequência e impacto são estimativas, muitas vezes com pouca base histórica; um número com duas casas decimais esconde uma incerteza enorme. Apresente faixas, não um valor.</li>
+            <li><strong>Eventos raros e graves:</strong> uma média anual dilui o cenário que pode quebrar a empresa; o conselho costuma se importar mais com a cauda do que com a média.</li>
+            <li><strong>Controles que se sobrepõem:</strong> somar a perda evitada de cada controle conta o mesmo risco duas vezes.</li>
+            <li><strong>Incentivo a inflar:</strong> quem quer o projeto estima a perda evitada; ROSI de fornecedor é material de venda, não análise.</li>
+            <li><strong>Segurança não gera receita:</strong> o "retorno" é perda que não aconteceu; obrigação legal ou regulatória e exigência de cliente não dependem de ROSI positivo.</li>
+        </ul>
+
+        <h3>Priorização por risco</h3>
+        <p>
+            Com mais pedidos do que orçamento, a ordem costuma ser: primeiro o que é obrigação legal, regulatória ou contratual; depois o que mais reduz os cenários fora do apetite por real investido; depois as dependências (não adianta comprar detecção sem ter quem responda); e, no meio, os ganhos rápidos que melhoram um KRI com pouco custo e criam credibilidade. O que não pode orientar a prioridade é o fornecedor que apareceu na última semana ou o incidente que saiu no jornal se ele não se aplica à empresa.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 6: SIMULADOR -->
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Do SIEM ao Conselho</h2>
+
+        <p class="lead-text">
+            O relatório trimestral do SOC e da TI da Ipê Store (fictícia) chegou com 12 indicadores. Classifique cada um como <strong>KRI para o conselho</strong>, <strong>KPI operacional</strong> ou <strong>métrica de vaidade</strong>. Cada KRI entra no painel do conselho ao lado, que aceita no máximo 6. Depois, clique em "Avaliar painel": o simulador mostra os acertos, os KRIs essenciais que ficaram fora, a métrica de vaidade que entrou no painel e a explicação de cada indicador.
+        </p>
+
+        <div class="lab-box lid-lab" id="lid-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">KRI, KPI ou vaidade</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Do SIEM ao Conselho: Ipê Store</h3>
+                    <p id="lid-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body" style="min-width: 0;">
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; min-width: 0;">
+                    <div id="lid-indicadores" role="group" aria-label="Indicadores do relatório trimestral" style="flex: 2 1 22rem; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.6rem;"></div>
+                    <aside id="lid-painel" aria-label="Painel do conselho" style="flex: 1 1 16rem; min-width: 0; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.6rem 0.8rem;"></aside>
+                </div>
+                <div id="lid-aviso" role="status" aria-live="polite" style="margin-top: 0.6rem; font-size: 0.85rem; font-weight: 600;"></div>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem;">
+                    <button type="button" class="btn-primary" id="lid-avaliar">Avaliar painel</button>
+                    <button type="button" class="btn-secondary" id="lid-recomecar">Recomeçar</button>
+                </div>
+                <div id="lid-resultado" role="region" aria-label="Avaliação do painel" tabindex="-1" style="margin-top: 0.8rem; min-width: 0; overflow-wrap: anywhere;"></div>
+                <p style="font-size: 0.76rem; color: var(--muted); margin: 0.8rem 0 0 0;">Empresa, indicadores e valores inventados. O limite de 6 KRIs é uma convenção didática; o gabarito reflete a regra deste módulo (exposição com limite e dono vai ao conselho; desempenho de processo fica no painel operacional; volume de atividade não orienta decisão).</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 7: CHECKLIST -->
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist: Antes de Levar um Tema ao Conselho</h2>
+
+        <p class="lead-text">
+            Use antes de pôr um tema de segurança na pauta da diretoria ou do conselho. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lid-1">
+                <label for="chk-lid-1"><strong>Decisão pedida explícita:</strong> a primeira frase diz o que se pede ao conselho (aprovar, aceitar um risco, priorizar ou apenas tomar ciência) e até quando.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lid-2">
+                <label for="chk-lid-2"><strong>Impacto em linguagem de negócio:</strong> o cenário diz o que para, quem é afetado e o que se perde (venda, multa, cliente, reputação), sem sigla técnica sem tradução.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lid-3">
+                <label for="chk-lid-3"><strong>Tendência:</strong> o indicador vem com os últimos períodos e com o limite de tolerância aprovado, para mostrar se a situação melhora ou piora.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lid-4">
+                <label for="chk-lid-4"><strong>Dono:</strong> há um executivo do negócio que responde pelo risco e pelo plano, com prazo, e não só o CISO.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-lid-5">
+                <label for="chk-lid-5"><strong>Opções com custo:</strong> pelo menos três opções, incluindo não fazer nada, cada uma com custo total e com o risco que fica depois dela.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 8: QUIZ -->
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Três linhas):</strong> A auditoria interna ajudou a desenhar o novo processo de revisão de acessos e, seis meses depois, foi escalada para auditá-lo. Qual o problema, à luz do modelo das três linhas do IIA?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A independência e a objetividade da terceira linha ficam comprometidas: ninguém avalia com isenção o processo que ajudou a desenhar. O modelo admite que a auditoria interna dê consultoria, desde que não assuma responsabilidade de gestão. Quando a consultoria vira desenho do controle, a avaliação seguinte deve ser feita por outra equipe ou por avaliador externo, e o conflito deve ser comunicado ao comitê de auditoria.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Linha de reporte):</strong> Numa empresa média, o CTO acumula a função de CISO. Para cumprir o prazo de uma migração, ele mesmo autoriza desligar o MFA de uma conta de serviço privilegiada "por algumas semanas". O que falta nesse desenho?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Falta separar quem cobra a entrega de quem aceita o risco. A mesma pessoa ganha com o prazo e decide que o risco é aceitável. A exceção deveria ser um aceite formal do dono do negócio, ou do comitê de segurança acima do limite delegado, com prazo de validade, controle compensatório (por exemplo, restrição de origem e monitoramento da conta) e registro. Com acúmulo de funções, o comitê, o reporte funcional ao CRO ou ao comitê do conselho e a avaliação da auditoria interna são as salvaguardas.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (KPI e KRI):</strong> O MTTR do SOC caiu de 9 para 5 horas no ano. O gerente quer pôr esse número no painel do conselho como principal indicador de risco. Você concorda?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não como KRI. O MTTR é um KPI: mede a eficiência de um processo contra uma meta interna, e a melhora é mérito da equipe, que cabe no painel do CISO. O conselho precisa da exposição: por exemplo, se algum incidente relevante ficou fora da tolerância de contenção aprovada, ou a situação dos sistemas críticos sem recuperação testada. Uma média de tempo de resposta pode melhorar enquanto um único incidente grave fica dias sem contenção.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Métrica de vaidade):</strong> O relatório abre com "bloqueamos 2,3 milhões de ataques no trimestre, alta de 40%". Por que esse número não serve ao conselho, e o que pôr no lugar?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque mede a atividade automatizada da internet contra qualquer endereço público, não a exposição da empresa: ele sobe ou desce sem que o risco mude, e nenhuma decisão muda se ele dobrar. Também sugere uma segurança que "funciona" pelo volume, o que é enganoso. No lugar: incidentes relevantes e seu impacto, KRIs de exposição contra a tolerância (críticas expostas fora do SLA, contas privilegiadas sem MFA, restauração testada) e as decisões pedidas.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (NIST CSF 2.0):</strong> Em que categorias da função Govern ficam, respectivamente: (a) as declarações de apetite e de tolerância a risco; (b) a alocação de recursos adequados à estratégia de risco; (c) a revisão dos resultados da estratégia para ajustá-la?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> (a) GV.RM, estratégia de gestão de riscos (subcategoria GV.RM-02); (b) GV.RR, papéis, responsabilidades e autoridades (GV.RR-03); (c) GV.OV, supervisão. As outras três categorias da função são GV.OC (contexto organizacional), GV.PO (política) e GV.SC (gestão de riscos da cadeia de suprimentos). A função Govern é a novidade do CSF 2.0 (NIST CSWP 29, 2024).</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (ROSI):</strong> Um fornecedor apresenta à diretoria um estudo que mostra ROSI de 900% para a ferramenta dele. Como o CISO deve tratar esse número?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Como material de venda. O ROSI depende da perda esperada evitada, estimada por quem quer vender, com frequência e impacto incertos e muitas vezes sem considerar os controles que a empresa já tem (o mesmo risco contado duas vezes). O CISO refaz a conta com os cenários do próprio registro executivo, apresenta faixas em vez de um número, compara com as opções (inclusive não fazer nada) e mostra que KRI a ferramenta move. O ROSI é um argumento no business case, nunca a decisão.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 7 (Res. CMN 4.893/2021, estilo concurso):</strong> Numa instituição financeira com conselho de administração, quem aprova a política de segurança cibernética, e a quem é apresentado o relatório anual sobre a implementação do plano de ação e de resposta a incidentes?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O conselho de administração aprova a política e o plano (a diretoria, se não houver conselho). O relatório anual, com data-base de 31 de dezembro, é apresentado ao comitê de riscos, quando existente, e ao conselho de administração. A norma também exige um diretor responsável pela política e pelo plano, que pode acumular outras funções sem conflito de interesses. Como a Res. CMN 5.274/2025 alterou a 4.893, confira a redação vigente antes de responder sobre detalhes e prazos (Estudo 54).</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 8 (Encarregado):</strong> Para economizar, a empresa quer indicar o CISO como encarregado pelo tratamento de dados pessoais da LGPD. Isso é proibido? Qual o cuidado?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> A LGPD e a Res. CD/ANPD nº 18/2024 não proíbem o acúmulo, mas pedem que o conflito de interesse seja avaliado. O encarregado é o canal com titulares e ANPD e deve poder questionar as medidas de segurança aplicadas aos dados pessoais; se ele é também quem desenha e opera essas medidas, num incidente vai falar com a autoridade sobre o próprio controle. Se acumular, documente a avaliação do conflito e dê ao encarregado acesso direto à alta direção; em empresas que podem, mantenha as funções separadas e trabalhando juntas.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 9: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>Modelo das três linhas (IIA, 2020)</h4>
+                <p>O conselho supervisiona; a gestão exerce a 1ª linha (opera e é dona do risco) e a 2ª (expertise, monitoramento e questionamento); a auditoria interna, 3ª linha, avalia com independência. O CISO costuma ter papéis de 1ª e 2ª linha.</p>
+            </div>
+            <div class="facts-card">
+                <h4>Função Govern do NIST CSF 2.0</h4>
+                <p>Seis categorias: GV.OC contexto, GV.RM estratégia de risco (apetite e tolerância), GV.RR papéis e recursos, GV.PO política, GV.OV supervisão e GV.SC cadeia de suprimentos.</p>
+            </div>
+            <div class="facts-card">
+                <h4>KPI, KRI e métrica de vaidade</h4>
+                <p>KPI mede o desempenho do processo; KRI mede a exposição, com limite, tendência e dono; vaidade é volume que não muda decisão. Teste: se o número dobrar, alguém decide algo diferente?</p>
+            </div>
+            <div class="facts-card">
+                <h4>Business case e limites do ROSI</h4>
+                <p>Problema, opções (inclusive não fazer nada), custo total em Capex e Opex, risco reduzido e decisão pedida. ROSI ajuda, mas tem precisão falsa, dilui eventos graves e conta controles sobrepostos.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>The IIA: <em>The IIA's Three Lines Model: An Update of the Three Lines of Defense</em> (julho de 2020).</li>
+            <li>NIST CSWP 29: <em>The NIST Cybersecurity Framework (CSF) 2.0</em> (fevereiro de 2024), função Govern.</li>
+            <li>NIST IR 8286: <em>Integrating Cybersecurity and Enterprise Risk Management (ERM)</em>, e a série 8286A a 8286D.</li>
+            <li>NIST SP 800-55, volumes 1 e 2: <em>Measurement Guide for Information Security</em> (2024).</li>
+            <li>COSO: <em>Enterprise Risk Management — Integrating with Strategy and Performance</em> (2017).</li>
+            <li>ISO/IEC 27001:2022, cláusulas 5 (liderança) e 9.3 (análise crítica pela direção).</li>
+            <li>Res. CMN 4.893/2021, alterada pela Res. CMN 5.274/2025: texto compilado em normativos.bcb.gov.br.</li>
+            <li>Lei 13.709/2018 (LGPD), art. 5º, VIII, e art. 41; Res. CD/ANPD nº 18/2024 (atuação do encarregado).</li>
+            <li>ENISA: <em>Introduction to Return on Security Investment</em> (2012).</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🏁</span>
+                <strong>Próximos passos</strong>
+            </div>
+            <p>
+                Este é o primeiro módulo da Trilha 14 (Liderança &amp; Estratégia), a camada base para quem quer crescer em direção à gestão. O Estudo 60 (Estruturação da Área de Segurança) é a camada avançada: o diagnóstico e o plano dos primeiros 90 dias, a maturidade com o NIST CSF 2.0, o desenho do time e o sourcing do SOC. Para planejar a carreira até lá, com as certificações de gestão e de risco, veja o Estudo 33 (Certificações e Carreira). Um painel de seis KRIs com limite, tendência e dono, montado para uma empresa fictícia ou para o seu laboratório, é uma boa amostra de trabalho para uma entrevista de coordenação.
+            </p>
+        </div>
+    </section>
+
+</article>
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="lid-dados">
+{
+ "contexto": "Ipê Store S.A. (fictícia), varejista com lojas físicas e loja virtual. Relatório trimestral do SOC e da TI preparado para a reunião do conselho. Empresa, indicadores e valores inventados.",
+ "limite_painel": 6,
+ "indicadores": [
+  {"id": "I01", "nome": "Alertas gerados pelo SIEM no trimestre", "valor": "40.212 (trimestre anterior: 31.870)",
+   "gabarito": "vaidade", "essencial": false,
+   "explicacao": "O volume depende de quantas regras estão ligadas e de como foram ajustadas: sobe com uma regra ruidosa e cai com um ajuste, sem que o risco mude. Nenhuma decisão do conselho muda se ele dobrar. O que interessa sai dele: quantos alertas viraram incidente relevante e se foram contidos dentro da tolerância."},
+  {"id": "I02", "nome": "Tempo médio de detecção (MTTD) de incidentes confirmados", "valor": "19 h (meta do SOC: 12 h)",
+   "gabarito": "kpi", "essencial": false,
+   "explicacao": "Mede a eficiência do SOC contra uma meta interna: é o painel do CISO e do gerente do SOC (Estudo 16). Vai ao conselho só traduzido em exposição, por exemplo, se um incidente relevante ficou sem detecção por mais tempo do que a tolerância aprovada."},
+  {"id": "I03", "nome": "Vulnerabilidades críticas em sistemas expostos à internet corrigidas dentro do SLA", "valor": "71% (tolerância: no mínimo 95%; trimestre anterior: 78%)",
+   "gabarito": "kri", "essencial": true,
+   "explicacao": "Essencial. É exposição direta: cada crítica vencida num sistema exposto é uma porta conhecida aberta. Tem limite ligado ao apetite, tendência piorando e dono (diretor de tecnologia). Fora da tolerância, pede decisão: janela de manutenção, reforço de equipe ou aceite formal do risco (Estudo 09)."},
+  {"id": "I04", "nome": "Conexões bloqueadas no firewall de perímetro", "valor": "2,3 milhões no trimestre",
+   "gabarito": "vaidade", "essencial": false,
+   "explicacao": "Varreduras automáticas batem em qualquer endereço público: o número mede o barulho da internet, não o risco da empresa. Impressiona, mas não orienta decisão. Se o firewall deixasse de bloquear, o problema apareceria nos indicadores de exposição e de incidentes."},
+  {"id": "I05", "nome": "Contas privilegiadas com MFA", "valor": "88% (tolerância: 100%, salvo exceção aprovada)",
+   "gabarito": "kri", "essencial": true,
+   "explicacao": "Essencial. Conta privilegiada sem segundo fator é o caminho mais curto de um invasor até o controle do ambiente e um passo comum nos casos de ransomware (Estudos 40 e 42). A tolerância é zero exceção não aprovada: o conselho precisa saber que 12% estão fora e quem é o dono do prazo."},
+  {"id": "I06", "nome": "Tempo médio de resposta (MTTR) a incidentes confirmados", "valor": "6 h (meta do SOC: 8 h)",
+   "gabarito": "kpi", "essencial": false,
+   "explicacao": "Desempenho do processo de resposta contra uma meta interna: bom para gerir a equipe (Estudo 18). Uma média pode melhorar enquanto um único incidente grave fica dias sem contenção; ao conselho interessa o incidente relevante fora da tolerância, não a média."},
+  {"id": "I07", "nome": "Avaliação de segurança em dia dos fornecedores críticos", "valor": "54% (tolerância: no mínimo 90%)",
+   "gabarito": "kri", "essencial": true,
+   "explicacao": "Essencial. Mede a exposição a terceiros com acesso a dados e sistemas (GV.SC no NIST CSF 2.0 e Estudo 57). Está muito abaixo do limite, e o dono costuma ser a área de Suprimentos, não a segurança: é tema típico de decisão do comitê ou do conselho."},
+  {"id": "I08", "nome": "E-mails maliciosos bloqueados pelo gateway", "valor": "118 mil no trimestre",
+   "gabarito": "vaidade", "essencial": false,
+   "explicacao": "Volume de atividade da ferramenta: varia com campanhas de spam no mundo inteiro e não diz nada sobre o que passou. Para o risco de phishing, os indicadores úteis são a taxa de clique, a taxa de reporte e os incidentes que começaram por e-mail."},
+  {"id": "I09", "nome": "Testes de restauração de sistemas críticos bem-sucedidos", "valor": "3 de 5 no trimestre (tolerância: 5 de 5)",
+   "gabarito": "kri", "essencial": true,
+   "explicacao": "Essencial. Backup não testado é hipótese: dois sistemas críticos podem não voltar depois de um ransomware, e a empresa não sabe em quanto tempo voltaria (Estudos 28 e 45). Ligado diretamente à declaração de apetite sobre parada da venda."},
+  {"id": "I10", "nome": "Triagem de alertas de severidade alta dentro do SLA de 30 minutos", "valor": "92% (meta do SOC: 95%)",
+   "gabarito": "kpi", "essencial": false,
+   "explicacao": "Indicador de nível de serviço do SOC, interno ou contratado: serve para cobrar a equipe ou o prestador. O conselho não decide sobre SLA de triagem; decide sobre a exposição que um SOC lento deixaria aberta."},
+  {"id": "I11", "nome": "Taxa de clique em simulação de phishing", "valor": "9,5% (trimestre anterior: 6,1%)",
+   "gabarito": "kri", "essencial": false,
+   "explicacao": "KRI, mas não essencial: mede a exposição ao fator humano e a tendência piorou. Entra no painel se houver vaga, de preferência acompanhado da taxa de reporte, que mostra se as pessoas avisam quando desconfiam (Estudo 15)."},
+  {"id": "I12", "nome": "Regras de detecção revisadas no trimestre", "valor": "34 de 120",
+   "gabarito": "kpi", "essencial": false,
+   "explicacao": "Mede o andamento do processo de engenharia de detecção (Estudo 46). É útil para o CISO cobrar a manutenção das regras, mas o conselho não tem o que fazer com ele; o efeito aparece, se aparecer, nos KRIs de exposição e nos incidentes."}
+ ]
+}
+</script>
+<script>
+(function() {
+    var D = JSON.parse(document.getElementById("lid-dados").textContent);
+    var CLASSES = ["kri", "kpi", "vaidade"];
+    var ROTULO = { kri: "KRI para o conselho", kpi: "KPI operacional", vaidade: "Métrica de vaidade" };
+    var CURTO = { kri: "KRI", kpi: "KPI", vaidade: "Vaidade" };
+    // o texto repete o limite_painel do JSON (6), conferido pelo teste do módulo
+    var AVISO_LIMITE = "O painel aceita no máximo 6 KRIs. Tire um indicador do painel antes de incluir outro: um painel do conselho com KRIs demais perde o foco.";
+    var COR = { ok: "var(--tip-color)", erro: "var(--danger-color)", aviso: "var(--warning-color)" };
+    var estado = { escolhas: {}, resultado: null };
+
+    function $(id) { return document.getElementById(id); }
+    function el(tag, texto, estilo) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (estilo) e.setAttribute("style", estilo);
+        return e;
+    }
+    function indicadorPorId(id) {
+        for (var i = 0; i < D.indicadores.length; i++) if (D.indicadores[i].id === id) return D.indicadores[i];
+        return null;
+    }
+    function contarKris() {
+        return Object.keys(estado.escolhas).filter(function(k) { return estado.escolhas[k] === "kri"; }).length;
+    }
+    function nomes(ids) {
+        return ids.map(function(id) { return indicadorPorId(id).nome; }).join("; ");
+    }
+    function mostrarAviso(texto) {
+        var box = $("lid-aviso");
+        box.textContent = texto;
+        box.setAttribute("style", "margin-top: 0.6rem; font-size: 0.85rem; font-weight: 600;" +
+            (texto ? " border-left: 4px solid " + COR.aviso + "; padding-left: 0.5rem;" : ""));
+    }
+
+    // ================================================ regras (espelhadas nos testes)
+    // aceita a classificação; o KRI além do limite_painel é recusado com aviso, sem cortar nada em silêncio
+    window.classificar = function(indicadorId, classe) {
+        var ind = indicadorPorId(indicadorId);
+        if (!ind || CLASSES.indexOf(classe) < 0) return false;
+        if (classe === "kri" && estado.escolhas[indicadorId] !== "kri" && contarKris() >= D.limite_painel) {
+            mostrarAviso(AVISO_LIMITE);
+            return false;
+        }
+        estado.escolhas[indicadorId] = classe;
+        estado.resultado = null;
+        mostrarAviso("");
+        renderTudo();
+        return true;
+    };
+
+    window.tirarDoPainel = function(indicadorId) {
+        if (estado.escolhas[indicadorId] !== "kri") return false;
+        delete estado.escolhas[indicadorId];
+        estado.resultado = null;
+        mostrarAviso("");
+        renderTudo();
+        return true;
+    };
+
+    // acertos contra o gabarito (sem classificação conta como erro), KRIs no painel,
+    // essenciais ausentes do painel e métrica de vaidade marcada como KRI
+    window.avaliarPainel = function() {
+        var r = { acertos: 0, kri_no_painel: [], essenciais_ausentes: [], vaidade_no_painel: [] };
+        D.indicadores.forEach(function(i) {
+            var e = estado.escolhas[i.id];
+            if (e === i.gabarito) r.acertos++;
+            if (e === "kri") r.kri_no_painel.push(i.id);
+            if (i.essencial && e !== "kri") r.essenciais_ausentes.push(i.id);
+            if (i.gabarito === "vaidade" && e === "kri") r.vaidade_no_painel.push(i.id);
+        });
+        if (r.kri_no_painel.length > D.limite_painel) {
+            mostrarAviso(AVISO_LIMITE);
+            return null;
+        }
+        estado.resultado = r;
+        renderTudo();
+        var box = $("lid-resultado");
+        if (box) box.focus();
+        return r;
+    };
+
+    // ================================================ interface
+    function renderIndicadores() {
+        var box = $("lid-indicadores");
+        box.replaceChildren();
+        var r = estado.resultado;
+        D.indicadores.forEach(function(i) {
+            var escolha = estado.escolhas[i.id];
+            var borda = "var(--rule)";
+            if (r) borda = escolha === i.gabarito ? COR.ok : COR.erro;
+            var card = el("div", null, "border: 1px solid var(--rule); border-left: 4px solid " + borda + "; border-radius: var(--radius-sm); padding: 0.5rem 0.7rem; min-width: 0;");
+            card.appendChild(el("h4", i.id + " · " + i.nome, "margin: 0; font-size: 0.92rem;"));
+            card.appendChild(el("div", i.valor, "font-size: 0.85rem; color: var(--muted); margin-top: 0.15rem;"));
+            var grupo = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.45rem;");
+            grupo.setAttribute("role", "group");
+            grupo.setAttribute("aria-label", "Classificação de " + i.nome);
+            CLASSES.forEach(function(c) {
+                var b = el("button", CURTO[c]);
+                b.type = "button";
+                b.className = escolha === c ? "btn-primary" : "btn-secondary";
+                b.setAttribute("aria-pressed", escolha === c ? "true" : "false");
+                b.setAttribute("aria-label", "Classificar " + i.nome + " como " + ROTULO[c]);
+                b.addEventListener("click", function() { window.classificar(i.id, c); });
+                grupo.appendChild(b);
+            });
+            card.appendChild(grupo);
+            if (r) {
+                var fb = el("div", null, "margin-top: 0.45rem; font-size: 0.82rem;");
+                fb.appendChild(el("strong", (escolha === i.gabarito ? "Certo. " : "Revise. ") + "Gabarito: " + ROTULO[i.gabarito] +
+                    (escolha ? " · Você: " + ROTULO[escolha] + "." : " · Você não classificou."),
+                    "color: " + (escolha === i.gabarito ? COR.ok : COR.erro) + ";"));
+                fb.appendChild(el("div", i.explicacao, "margin-top: 0.2rem;"));
+                card.appendChild(fb);
+            }
+            box.appendChild(card);
+        });
+    }
+
+    function renderPainel() {
+        var box = $("lid-painel");
+        box.replaceChildren();
+        var n = contarKris();
+        box.appendChild(el("h4", "Painel do conselho (" + n + " de " + D.limite_painel + " KRIs)", "margin: 0 0 0.4rem 0;"));
+        var kris = D.indicadores.filter(function(i) { return estado.escolhas[i.id] === "kri"; });
+        if (!kris.length) {
+            box.appendChild(el("p", "Nenhum KRI no painel ainda. Classifique um indicador como KRI para incluí-lo.", "font-size: 0.83rem; color: var(--muted); margin: 0;"));
+            return;
+        }
+        var ol = el("ol", null, "margin: 0; padding-left: 1.2rem; font-size: 0.83rem;");
+        kris.forEach(function(i) {
+            var li = el("li", null, "margin: 0.3rem 0; min-width: 0;");
+            li.appendChild(el("div", i.nome, "font-weight: 600;"));
+            li.appendChild(el("div", i.valor, "color: var(--muted);"));
+            var b = el("button", "Tirar do painel");
+            b.type = "button";
+            b.className = "btn-secondary";
+            b.setAttribute("aria-label", "Tirar " + i.nome + " do painel do conselho");
+            b.setAttribute("style", "margin-top: 0.2rem; font-size: 0.78rem;");
+            b.addEventListener("click", function() { window.tirarDoPainel(i.id); });
+            li.appendChild(b);
+            ol.appendChild(li);
+        });
+        box.appendChild(ol);
+    }
+
+    function linha(ok, titulo, texto) {
+        var b = el("div", null, "border-left: 4px solid " + (ok ? COR.ok : COR.erro) + "; padding: 0.3rem 0.6rem; margin-top: 0.4rem; font-size: 0.85rem;");
+        b.appendChild(el("strong", titulo));
+        if (texto) b.appendChild(el("span", " " + texto));
+        return b;
+    }
+
+    function renderResultado() {
+        var box = $("lid-resultado");
+        box.replaceChildren();
+        var r = estado.resultado;
+        if (!r) return;
+        var total = D.indicadores.length;
+        box.appendChild(el("strong", "Acertos: " + r.acertos + " de " + total + " indicadores.", "font-size: 0.95rem;"));
+        var semClasse = D.indicadores.filter(function(i) { return !estado.escolhas[i.id]; }).length;
+        if (semClasse) box.appendChild(linha(false, "Sem classificação:", semClasse + " indicador(es) contam como erro."));
+        box.appendChild(linha(!r.essenciais_ausentes.length, "KRIs essenciais ausentes do painel:",
+            r.essenciais_ausentes.length ? nomes(r.essenciais_ausentes) + ". Sem eles, o conselho não vê a exposição que mais pede decisão." : "nenhum."));
+        box.appendChild(linha(!r.vaidade_no_painel.length, "Métrica de vaidade no painel:",
+            r.vaidade_no_painel.length ? nomes(r.vaidade_no_painel) + ". Volume de atividade ocupa a vaga de um KRI e não orienta decisão." : "nenhuma."));
+        var kpis = r.kri_no_painel.filter(function(id) { return indicadorPorId(id).gabarito === "kpi"; });
+        if (kpis.length) box.appendChild(linha(false, "KPI operacional no painel:", nomes(kpis) + ". Cabe no painel do CISO, não no do conselho."));
+        var limpo = !r.essenciais_ausentes.length && !r.vaidade_no_painel.length && !kpis.length;
+        box.appendChild(el("p", limpo ?
+            "Painel pronto para o conselho: só exposição com limite, tendência e dono. As explicações de cada indicador estão nos cartões." :
+            "Revise os cartões marcados em vermelho: cada um traz a explicação do gabarito.", "font-size: 0.85rem; margin: 0.6rem 0 0 0;"));
+    }
+
+    function renderTudo() {
+        renderIndicadores();
+        renderPainel();
+        renderResultado();
+        if (typeof CS !== "undefined" && CS.labProgress) {
+            CS.labProgress(Object.keys(estado.escolhas).length, D.indicadores.length);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        $("lid-contexto").textContent = D.contexto;
+        $("lid-avaliar").addEventListener("click", function() { window.avaliarPainel(); });
+        $("lid-recomecar").addEventListener("click", function() {
+            estado.escolhas = {};
+            estado.resultado = null;
+            mostrarAviso("");
+            renderTudo();
+        });
+        renderTudo();
+
+        if (typeof initChecklist === "function") {
+            initChecklist("lideranca-e-programa-de-seguranca");
+        }
+        if (typeof initQuiz === "function") {
+            initQuiz();
+        }
+    });
+})();
+</script>

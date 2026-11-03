@@ -101,6 +101,13 @@ TRILHAS: Dict[int, Dict[str, Any]] = {
         "cor_nome": "lime",
         "descricao": "Segurança no contexto brasileiro: regulação do setor financeiro, fraude em pagamentos e Pix, legislação penal e riscos de terceiros.",
     },
+    14: {
+        "id": 14,
+        "nome": "Liderança & Estratégia",
+        "cor": "#A16207",
+        "cor_nome": "gold",
+        "descricao": "Como o CISO pensa e como se monta uma área de segurança: governança, métricas para o conselho, orçamento, maturidade e sourcing.",
+    },
 }
 
 # 2. PERFIS PROFISSIONAIS DE CARREIRA
@@ -1951,6 +1958,24 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
             "4 domínios de ITGC",
             "TOD vs TOE e amostragem por frequência",
             "Deficiência, deficiência significativa e fraqueza material",
+        ],
+    },
+    "Lideranca-e-Programa-de-Seguranca": {
+        "titulo": "Liderança e Programa de Segurança: o Papel do CISO",
+        "subtitulo": "Linha de reporte, governança, KPI e KRI, relato ao conselho e orçamento de segurança",
+        "trilha": 14,
+        "nist": "Govern",
+        "mitre": "N/A (liderança e governança)",
+        "carreiras": ["GRC & Auditoria", ROTULO_ANALISTA_SI],
+        "tempo_minutos": 45,
+        "nivel": "intermediario",
+        "pergunta_chave": "O SIEM gerou 40 mil alertas no trimestre. O que disso o conselho precisa saber?",
+        "simulador_nome": "Do SIEM ao Conselho",
+        "fatos": [
+            "Modelo das três linhas (IIA, 2020)",
+            "Função Govern do NIST CSF 2.0",
+            "KPI, KRI e métrica de vaidade",
+            "Business case e limites do ROSI",
         ],
     },
 }

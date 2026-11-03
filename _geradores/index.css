@@ -648,6 +648,7 @@ a.mc[href]:hover {
 [data-trilha="11"] { --gc: var(--t11-fuchsia); }
 [data-trilha="12"] { --gc: var(--t12-teal); }
 [data-trilha="13"] { --gc: var(--t13-lime); }
+[data-trilha="14"] { --gc: var(--t14-gold); }
 
 /* Grupos por nível (Agrupar por > Nível): o JS cria .grupo[data-nivel]. */
 .grupo[data-nivel="iniciante"] { --gc: var(--t5-cyan); }
