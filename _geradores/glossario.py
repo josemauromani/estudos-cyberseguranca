@@ -103,3 +103,158 @@ def carregar_glossario() -> List[Dict[str, Any]]:
     if erros:
         raise GlossarioInvalido(erros)
     return verbetes
+
+
+# ---------------------------------------------------------------------------
+# Marcação automática de termos no corpo do módulo
+# ---------------------------------------------------------------------------
+
+from html import escape
+from html.parser import HTMLParser
+
+TAGS_IGNORADAS = {
+    "pre", "code", "kbd", "samp", "script", "style", "svg", "textarea",
+    "h1", "h2", "h3", "h4", "h5", "h6", "a", "button", "label", "dfn",
+}
+CLASSES_IGNORADAS = {"terminal-box", "mermaid"}
+TAGS_VAZIAS = {
+    "br", "img", "input", "hr", "meta", "link", "source", "wbr", "col",
+    "area", "base", "embed", "param", "track",
+}
+
+
+RE_FIM_TAG = re.compile(r"</[^>]*>")
+
+
+def _e_sigla(forma: str) -> bool:
+    """Sigla = nenhuma letra minúscula; casa diferenciando caixa."""
+    return not any(c.islower() for c in forma)
+
+
+def _montar_regex(verbetes: List[Dict[str, Any]]):
+    """Devolve (regex único, mapa sigla->id, mapa palavra(casefold)->id)."""
+    siglas: Dict[str, str] = {}
+    palavras: Dict[str, str] = {}
+    for v in verbetes:
+        for forma in [v["termo"]] + list(v.get("variacoes", [])):
+            if _e_sigla(forma):
+                siglas.setdefault(forma, v["id"])
+            else:
+                palavras.setdefault(forma.casefold(), v["id"])
+    formas = [(f, False) for f in siglas] + [(f, True) for f in palavras]
+    if not formas:
+        return None, siglas, palavras
+    formas.sort(key=lambda x: len(x[0]), reverse=True)
+    alternativas = [f"(?i:{re.escape(f)})" if ci else re.escape(f) for f, ci in formas]
+    regex = re.compile(r"(?<![\w-])(?:" + "|".join(alternativas) + r")(?![\w-])")
+    return regex, siglas, palavras
+
+
+class _Marcador(HTMLParser):
+    def __init__(self, verbetes: List[Dict[str, Any]]):
+        super().__init__(convert_charrefs=False)
+        self.saida: List[str] = []
+        self.pilha: List[tuple] = []  # (tag, ignorado, e_secao)
+        self.usados_secao: set = set()
+        self.usados: set = set()
+        self.regex, self.siglas, self.palavras = _montar_regex(verbetes)
+        self.titulos = {v["id"]: texto_sem_html(v["significado"]) for v in verbetes}
+        self._ini_fim = 0
+        self._inicio_linhas: List[int] = [0]
+
+    # -- tags ---------------------------------------------------------------
+    def handle_starttag(self, tag, attrs):
+        self.saida.append(self.get_starttag_text())
+        if tag in TAGS_VAZIAS:
+            return
+        classes = set()
+        for nome, valor in attrs:
+            if nome == "class" and valor:
+                classes = set(valor.split())
+        ignorado = tag in TAGS_IGNORADAS or bool(classes & CLASSES_IGNORADAS)
+        e_secao = tag == "section" and "study-section" in classes
+        if e_secao:
+            self.usados_secao = set()
+        self.pilha.append((tag, ignorado, e_secao))
+
+    def handle_startendtag(self, tag, attrs):
+        self.saida.append(self.get_starttag_text())
+
+    def parse_endtag(self, i):
+        # O handler roda dentro de super().parse_endtag; guardamos o início
+        # para recuperar o texto bruto (caixa e espaços originais).
+        self._ini_fim = i
+        return super().parse_endtag(i)
+
+    def handle_endtag(self, tag):
+        m = RE_FIM_TAG.match(self.rawdata, self._ini_fim)
+        self.saida.append(m.group(0) if m else f"</{tag}>")
+        for idx in range(len(self.pilha) - 1, -1, -1):
+            if self.pilha[idx][0] == tag:
+                del self.pilha[idx:]
+                break
+
+    # -- passagem direta ------------------------------------------------------
+    def _ref_bruta(self, tamanho: int) -> str:
+        """Texto original da referência (com ou sem ';' final) na posição atual."""
+        linha, col = self.getpos()
+        ini = self._inicio_linhas[linha - 1] + col
+        fim = ini + tamanho
+        if self.rawdata[fim:fim + 1] == ";":
+            fim += 1
+        return self.rawdata[ini:fim]
+
+    def handle_entityref(self, name):
+        self.saida.append(self._ref_bruta(1 + len(name)))
+
+    def handle_charref(self, name):
+        self.saida.append(self._ref_bruta(2 + len(name)))
+
+    def handle_comment(self, data):
+        self.saida.append(f"<!--{data}-->")
+
+    def handle_decl(self, decl):
+        self.saida.append(f"<!{decl}>")
+
+    def handle_pi(self, data):
+        self.saida.append(f"<?{data}>")
+
+    def unknown_decl(self, data):
+        self.saida.append(f"<![{data}]>")
+
+    # -- texto ----------------------------------------------------------------
+    def _pode_marcar(self) -> bool:
+        if self.regex is None:
+            return False
+        em_secao = any(e[2] for e in self.pilha)
+        return em_secao and not any(e[1] for e in self.pilha)
+
+    def handle_data(self, data):
+        if not self._pode_marcar():
+            self.saida.append(data)
+            return
+        pos = 0
+        for m in self.regex.finditer(data):
+            trecho = m.group(0)
+            vid = self.siglas.get(trecho) or self.palavras.get(trecho.casefold())
+            if vid is None or vid in self.usados_secao:
+                continue
+            self.usados_secao.add(vid)
+            self.usados.add(vid)
+            self.saida.append(data[pos:m.start()])
+            self.saida.append(
+                f'<dfn class="glossario" data-termo="{vid}" tabindex="0" '
+                f'title="{escape(self.titulos[vid], quote=True)}">{trecho}</dfn>'
+            )
+            pos = m.end()
+        self.saida.append(data[pos:])
+
+
+def marcar_termos(html: str, verbetes: List[Dict[str, Any]]):
+    """Marca a 1ª ocorrência de cada verbete por seção; devolve (html, ids ordenados)."""
+    marcador = _Marcador(verbetes)
+    # Offsets de início de linha (para recuperar referências sem ';', como "&CK ").
+    marcador._inicio_linhas = [0] + [m.end() for m in re.finditer(r"\n", html)]
+    marcador.feed(html)
+    marcador.close()
+    return "".join(marcador.saida), sorted(marcador.usados)
