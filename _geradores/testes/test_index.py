@@ -127,8 +127,11 @@ class TestBuildIndex(unittest.TestCase):
 
         # Metadados e cabeçalho
         self.assertIn("<!DOCTYPE html>", conteudo)
-        self.assertIn("Estudos de Cibersegurança", conteudo)
-        self.assertIn("José Mauro da Silva Brandão", conteudo)
+        self.assertIn("<title>Mapa da Cibersegurança — Catálogo e Portal Central</title>", conteudo)
+        self.assertIn('<span class="brand-nome">Mapa da Cibersegurança</span>', conteudo)
+        self.assertNotIn("Estudos de Cibersegurança", conteudo)
+        self.assertNotIn("José Mauro", conteudo)
+        self.assertNotIn("Curadoria", conteudo)
 
         # Totais do catálogo (lede da tela inicial)
         self.assertIn(f"{len(ESTUDOS_DADOS)} módulos em {len(TRILHAS)} trilhas", conteudo)

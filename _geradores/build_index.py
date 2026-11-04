@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Construtor do Portal Central — Estudos em Cibersegurança
+Construtor do Portal Central — Mapa da Cibersegurança
 ========================================================
 Gera a página raiz index.html a partir de index_dados.py, das fontes embutidas,
 de tokens.css, de index.css e do status de compilação de cada estudo do catálogo.
@@ -1327,7 +1327,7 @@ def gerar_index_html(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Plataforma de estudos autoinstrucional e prática em cibersegurança com {total} módulos temáticos, {stats["total_trilhas"]} trilhas e simuladores interativos em JavaScript.">
-  <title>Estudos de Cibersegurança — Catálogo e Portal Central</title>
+  <title>Mapa da Cibersegurança — Catálogo e Portal Central</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%233b82f6' d='M32 4 8 14v16c0 15 10 26 24 30 14-4 24-15 24-30V14z'/%3E%3Cpath fill='%23ffffff' d='M28 40 19 31l4-4 5 5 13-13 4 4z'/%3E%3C/svg%3E">
   <style>
 {css_content}
@@ -1338,9 +1338,9 @@ def gerar_index_html(
 <header class="topbar">
   <div class="topbar-in">
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-lateral" aria-label="Abrir menu">☰</button>
-    <a class="brand" href="index.html" aria-label="Estudos de Cibersegurança — início">
+    <a class="brand" href="index.html" aria-label="Mapa da Cibersegurança — início">
       <svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><path class="brand-escudo" d="M32 4 8 14v16c0 15 10 26 24 30 14-4 24-15 24-30V14z"/><path class="brand-check" d="M28 40 19 31l4-4 5 5 13-13 4 4z"/></svg>
-      <span class="brand-nome">Estudos de Cibersegurança</span>
+      <span class="brand-nome">Mapa da Cibersegurança</span>
     </a>
     <label class="busca">
       <span class="busca-icone" aria-hidden="true">🔍</span>
@@ -1436,8 +1436,8 @@ def gerar_index_html(
     </section>
 
     <footer class="portal-footer">
-      <p>&copy; 2026 Estudos de Cibersegurança &bull; Material Autoinstrucional e Prático 100% Offline</p>
-      <p>Curadoria e desenvolvimento técnico por <strong>José Mauro da Silva Brandão</strong> &bull; Alinhado a NIST CSF 2.0, MITRE ATT&amp;CK Enterprise, ISO/IEC 27001:2022 e LGPD (Lei nº 13.709/2018).</p>
+      <p>&copy; 2026 Mapa da Cibersegurança &bull; Material Autoinstrucional e Prático 100% Offline</p>
+      <p>Alinhado a NIST CSF 2.0, MITRE ATT&amp;CK Enterprise, ISO/IEC 27001:2022 e LGPD (Lei nº 13.709/2018).</p>
     </footer>
   </main>
 </div>
@@ -1457,7 +1457,7 @@ def gerar_index_html(
 def main(argv=None):
     """Ponto de entrada para execução via CLI."""
     parser = argparse.ArgumentParser(
-        description="Construtor do Portal Central (index.html) para Estudos em Cibersegurança."
+        description="Construtor do Portal Central (index.html) do Mapa da Cibersegurança."
     )
     parser.add_argument(
         "saida",
