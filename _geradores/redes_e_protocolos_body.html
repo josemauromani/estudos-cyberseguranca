@@ -1095,7 +1095,7 @@ sequenceDiagram
   // Calcula rede, broadcast, máscara e hosts úteis. Aritmética em inteiros sem sinal (>>> 0).
   function calcularCidr(texto) {
     var entrada = String(texto == null ? '' : texto).trim();
-    var m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})$/.exec(entrada);
+    var m = /^(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})\/(\d{1,2})$/.exec(entrada);
     if (!m) { return { erro: MSG_FORMATO }; }
     var octetos = [Number(m[1]), Number(m[2]), Number(m[3]), Number(m[4])];
     var prefixo = Number(m[5]);
@@ -1136,7 +1136,7 @@ sequenceDiagram
     var r = calcularCidr(entrada.value);
     if (r.erro) {
       var p = document.createElement('p');
-      p.className = 'lab-error';
+      p.className = 'quiz-feedback incorrect';
       p.textContent = r.erro;
       saida.appendChild(p);
       return;

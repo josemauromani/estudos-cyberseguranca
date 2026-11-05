@@ -22,10 +22,11 @@ def cidr(texto):
         if "/" not in texto:
             raise ValueError("sem prefixo")
         end, pref = texto.strip().split("/", 1)
-        if not pref.isdigit() or not 0 <= int(pref) <= 32:
+        digito = re.compile(r"[0-9]+")
+        if not digito.fullmatch(pref) or not 0 <= int(pref) <= 32:
             raise ValueError("prefixo")
         partes = end.split(".")
-        if len(partes) != 4 or not all(p.isdigit() and int(p) <= 255 for p in partes):
+        if len(partes) != 4 or not all(digito.fullmatch(p) and int(p) <= 255 for p in partes):
             raise ValueError("octeto")
         rede = ipaddress.ip_network(f"{end}/{pref}", strict=False)
     except ValueError:
@@ -159,7 +160,7 @@ class TestRedesProtocolos(unittest.TestCase):
         r = cidr("203.0.113.9/32")
         self.assertEqual(r["hosts_uteis"], 1)
         self.assertEqual(r["primeiro"], r["ultimo"])
-        for ruim in ["10.0.0.1/33", "256.1.1.1/24", "10.0.0.1", ""]:
+        for ruim in ["10.0.0.1/33", "256.1.1.1/24", "10.0.0.1", "", "010.0.0.1/8"]:
             self.assertIn("erro", cidr(ruim), ruim)
         body = self._body()
         self.assertIn("Use o formato 192.168.1.10/24", body)
