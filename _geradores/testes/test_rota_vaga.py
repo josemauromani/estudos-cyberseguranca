@@ -52,7 +52,7 @@ class TestRotaVagaDados(unittest.TestCase):
     def test_certificacoes_exatas(self):
         siglas = [c["sigla"] for c in CERTIFICACOES]
         self.assertEqual(siglas, ["CEH", "CISM", "CISSP", "CCSP", "GSEC", "Security+",
-                                  "ISFS", "PDPF/PDPP", "ITIL 4 F", "CSFPC", "CISA", "ISO 27001 LA", "eJPT", "eCPPT", "OSCP", "CRISC", "CDPSE"])
+                                  "ISFS", "PDPF/PDPP", "ITIL 4 F", "CSFPC", "CISA", "ISO 27001 LA", "eJPT", "eCPPT", "OSCP", "CRISC", "CDPSE", "CGEIT"])
         self.assertEqual(len(siglas), len(set(siglas)))
 
     def test_modulos_da_rota_tem_carreira_analista(self):

@@ -23,6 +23,7 @@ DOMINIO_OFICIAL = {
     "CISA": "isaca.org",
     "CRISC": "isaca.org",
     "CDPSE": "isaca.org",
+    "CGEIT": "isaca.org",
     "CISSP": "isc2.org",
     "CCSP": "isc2.org",
     "GSEC": "giac.org",
@@ -318,7 +319,7 @@ class TestCertificacoesCarreira(unittest.TestCase):
         self.assertEqual((req["CCSP"]["anos_ti"], req["CCSP"]["anos_si"], req["CCSP"]["anos_nuvem"]), (5, 3, 1))
         for sigla in ("ISFS", "ITIL 4 F", "CSFPC"):
             self.assertEqual(req[sigla], {}, sigla)
-        for sigla in ("CISM", "CISA", "ISO 27001 LA", "PDPF/PDPP"):
+        for sigla in ("CISM", "CISA", "ISO 27001 LA", "PDPF/PDPP", "CGEIT"):
             self.assertEqual(req[sigla], {"conferir": True}, sigla)
             self.assertTrue(self._cert(d, sigla)["experiencia"].strip(), sigla)
         for c in d["certificacoes"]:
@@ -512,7 +513,7 @@ class TestCertificacoesCarreira(unittest.TestCase):
         tabela = re.search(r"<table.*?</table>", sec, re.S).group(0)
         for c in CERTIFICACOES:
             self.assertIn(f"<strong>{c['sigla']}</strong>", tabela, f"Sigla ausente na tabela: {c['sigla']}")
-        self.assertEqual(len(CERTIFICACOES), 17)
+        self.assertEqual(len(CERTIFICACOES), 18)
 
     def test_componentes_pedagogicos(self):
         content = self.compiled_path.read_text(encoding="utf-8")

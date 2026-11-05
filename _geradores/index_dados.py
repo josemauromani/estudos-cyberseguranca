@@ -938,6 +938,15 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "experiencia": "3 anos nos domínios da CDPSE, nos 10 anos anteriores ao pedido",
         "modulos": ["LGPD-e-Privacidade", "Gestao-de-Riscos-de-Terceiros", "Protecao-de-Dados-e-Conteudo", "Seguranca-de-Bancos-de-Dados", "Criptografia-Pratica", "DevSecOps-e-CI-CD", "Seguranca-em-Nuvem", "Seguranca-em-APIs"],
     },
+    {
+        "sigla": "CGEIT",
+        "site_oficial": "https://www.isaca.org/credentialing/cgeit",
+        "nome": "Certified in the Governance of Enterprise IT",
+        "orgao": "ISACA",
+        "foco": "Governança de TI corporativa",
+        "experiencia": "Experiência em governança de TI corporativa; confira o requisito e as dispensas na página oficial da ISACA",
+        "modulos": ["Lideranca-e-Programa-de-Seguranca", "Estruturacao-da-Area-de-Seguranca", "Auditoria-de-TI", "Gestao-de-Riscos-TI", "ISO-27001-e-27002"],
+    },
 ]
 
 # 5. METADADOS RICOS DOS ESTUDOS CANÔNICOS
@@ -1523,7 +1532,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
     },
     "Certificacoes-e-Carreira": {
         "titulo": "Formação, Certificações e Carreira",
-        "subtitulo": "Graduações e pós em segurança, 17 certificações (de Security+, ISFS e ITIL 4 a CISSP, CISM, CISA, CRISC e CDPSE, e a escada prática eJPT, eCPPT e OSCP), trajetórias de GRC e papéis do NICE Framework",
+        "subtitulo": "Graduações e pós em segurança, 18 certificações (de Security+, ISFS e ITIL 4 a CISSP, CISM, CISA, CRISC, CDPSE e CGEIT, e a escada prática eJPT, eCPPT e OSCP), trajetórias de GRC e papéis do NICE Framework",
         "trilha": 7,
         "nist": "Protect",
         "mitre": "N/A (módulo de carreira)",

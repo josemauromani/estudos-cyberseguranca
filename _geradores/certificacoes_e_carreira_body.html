@@ -72,6 +72,7 @@
                     <tr><td><strong>OSCP</strong> (OffSec Certified Professional)</td><td>OffSec</td><td>Técnica (ofensiva)</td><td>Sem exigência formal; prova prática de 24 horas e relatório</td><td>OSCP sem expiração; OSCP+ válida por 3 anos</td></tr>
                     <tr><td><strong>CRISC</strong> (Risk and Information Systems Control)</td><td>ISACA</td><td>Gestão (risco de TI)</td><td>3 anos em ao menos 2 dos 4 domínios, nos 10 anos anteriores ao pedido; confira dispensas na página oficial</td><td>120 CPE a cada 3 anos</td></tr>
                     <tr><td><strong>CDPSE</strong> (Data Privacy Solutions Engineer)</td><td>ISACA</td><td>Especialidade (privacidade)</td><td>3 anos nos domínios da CDPSE, nos 10 anos anteriores ao pedido; confira dispensas na página oficial</td><td>120 CPE a cada 3 anos</td></tr>
+                    <tr><td><strong>CGEIT</strong> (Governance of Enterprise IT)</td><td>ISACA</td><td>Gestão (governança de TI)</td><td>Experiência em governança de TI corporativa; confira o requisito na página oficial</td><td>Educação continuada (CPE); confira na página oficial</td></tr>
                 </tbody>
             </table>
         </div>
@@ -198,7 +199,7 @@ flowchart TD
             Um aviso de nomenclatura: a CASP+ passou a se chamar CompTIA SecurityX em dezembro de 2024, com o lançamento do exame CAS-005. Quem encontrar vagas ou materiais antigos com o nome CASP+ está diante da mesma certificação.
         </p>
         <p>
-            O planejador do laboratório a seguir indica, para cada certificação, o que você já cumpre. Para CISM, CISA, CRISC, CDPSE, ISO 27001 LA e PDPF/PDPP ele mostra o requisito oficial e pede que você confira a elegibilidade na certificadora.
+            O planejador do laboratório a seguir indica, para cada certificação, o que você já cumpre. Para CISM, CISA, CRISC, CDPSE, CGEIT, ISO 27001 LA e PDPF/PDPP ele mostra o requisito oficial e pede que você confira a elegibilidade na certificadora.
         </p>
     </section>
 
@@ -476,6 +477,7 @@ flowchart TD
             <li>OSCP — <a href="https://www.offsec.com/courses/pen-200/" target="_blank" rel="noopener noreferrer">site oficial da OffSec</a>.</li>
             <li>CRISC — <a href="https://www.isaca.org/credentialing/crisc" target="_blank" rel="noopener noreferrer">site oficial da ISACA</a>.</li>
             <li>CDPSE — <a href="https://www.isaca.org/credentialing/cdpse" target="_blank" rel="noopener noreferrer">site oficial da ISACA</a>.</li>
+            <li>CGEIT — <a href="https://www.isaca.org/credentialing/cgeit" target="_blank" rel="noopener noreferrer">site oficial da ISACA</a>.</li>
             <li>SecurityX (antiga CASP+) — <a href="https://www.comptia.org/en-us/certifications/securityx/" target="_blank" rel="noopener noreferrer">site oficial da CompTIA</a>.</li>
             <li>SecurityX — <a href="https://www.comptia.org/en-us/blog/introducing-comptia-securityx/" target="_blank" rel="noopener noreferrer">anúncio da CompTIA sobre a mudança de nome da CASP+</a>.</li>
             <li>eCTHP — <a href="https://ine.com/security/certifications/ecthp-certification" target="_blank" rel="noopener noreferrer">site oficial da INE Security</a>.</li>
@@ -1940,6 +1942,68 @@ flowchart TD
       "Criptografia-Pratica",
       "Seguranca-em-Nuvem",
       "Seguranca-de-Bancos-de-Dados"
+     ]
+    }
+   ]
+  },
+  {
+   "sigla": "CGEIT",
+   "fontes": [
+    {
+     "titulo": "Página oficial da CGEIT (ISACA)",
+     "url": "https://www.isaca.org/credentialing/cgeit"
+    },
+    {
+     "titulo": "Conteúdo do exame CGEIT (ISACA)",
+     "url": "https://www.isaca.org/credentialing/cgeit/cgeit-exam-content-outline"
+    }
+   ],
+   "nome": "Certified in the Governance of Enterprise IT",
+   "orgao": "ISACA",
+   "nivel": 3,
+   "foco": "Governança de TI corporativa: estrutura de governança, recursos de TI, realização de benefícios e otimização de riscos",
+   "experiencia": "Experiência profissional em governança de TI corporativa. Confira o requisito exato e as dispensas na página oficial da ISACA, que também define o prazo do pedido de certificação",
+   "manutencao": "Educação continuada (CPE) e taxa anual da ISACA; confira a política de manutenção na página oficial",
+   "nota_dominios": "Os 4 domínios do conteúdo do exame (exam content outline) publicado pela ISACA. Os pesos não são exibidos aqui: confira-os na página oficial.",
+   "requisitos": {
+    "conferir": true
+   },
+   "sem_experiencia": "A experiência em governança de TI é exigida para a certificação. Confira na página oficial da ISACA a elegibilidade, o prazo do pedido e as dispensas.",
+   "dominios": [
+    {
+     "nome": "Governança de TI corporativa",
+     "peso": null,
+     "modulos": [
+      "Lideranca-e-Programa-de-Seguranca",
+      "Estruturacao-da-Area-de-Seguranca",
+      "ISO-27001-e-27002",
+      "Auditoria-de-TI"
+     ]
+    },
+    {
+     "nome": "Recursos de TI",
+     "peso": null,
+     "modulos": [
+      "Estruturacao-da-Area-de-Seguranca"
+     ],
+     "parcial": true,
+     "nota": "O Estudo 60 (estruturação da área) cobre papéis, equipe e orçamento de segurança; a gestão do portfólio, da capacidade e das aquisições de TI como um todo não tem módulo."
+    },
+    {
+     "nome": "Realização de benefícios",
+     "peso": null,
+     "modulos": [],
+     "parcial": true,
+     "nota": "Gestão de portfólio e de investimentos de TI, business case e medição do valor entregue não têm módulo; o Estudo 25 (Liderança) trata a comunicação de métricas à alta direção."
+    },
+    {
+     "nome": "Otimização de riscos",
+     "peso": null,
+     "modulos": [
+      "Gestao-de-Riscos-TI",
+      "Lideranca-e-Programa-de-Seguranca",
+      "ISO-27001-e-27002",
+      "Auditoria-de-TI"
      ]
     }
    ]
