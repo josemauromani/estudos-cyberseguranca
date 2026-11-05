@@ -1,6 +1,6 @@
 # Guia do Autor: Diretrizes Pedagógicas e Padrões de Conteúdo
 
-Este documento estabelece as diretrizes de redação técnica, arquitetura de informação e padrões de código HTML/JS para a elaboração dos 60 módulos da plataforma **Estudos de Cibersegurança**.
+Este documento estabelece as diretrizes de redação técnica, arquitetura de informação e padrões de código HTML/JS para a elaboração dos 60 módulos da plataforma **Mapa da Cibersegurança**.
 
 ---
 

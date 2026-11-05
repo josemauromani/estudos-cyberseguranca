@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Metadados Ricos e Catálogo Central — Estudos em Cibersegurança
+Metadados Ricos e Catálogo Central — Mapa da Cibersegurança
 =============================================================
 Centraliza informações detalhadas dos módulos temáticos, trilhas,
 funções NIST CSF 2.0, perfis de carreira e matriz de necessidades práticas.

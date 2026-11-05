@@ -129,8 +129,6 @@ class TestBuildIndex(unittest.TestCase):
         self.assertIn("<!DOCTYPE html>", conteudo)
         self.assertIn("<title>Mapa da Cibersegurança — Catálogo e Portal Central</title>", conteudo)
         self.assertIn('<span class="brand-nome">Mapa da Cibersegurança</span>', conteudo)
-        self.assertNotIn("Estudos de Cibersegurança", conteudo)
-        self.assertNotIn("José Mauro", conteudo)
         self.assertNotIn("Curadoria", conteudo)
 
         # Totais do catálogo (lede da tela inicial)

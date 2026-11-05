@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Script CLI Mestre — Estudos em Cibersegurança
+# Script CLI Mestre — Mapa da Cibersegurança
 # ==============================================================================
 # Automatiza a compilação de treinamentos individuais ou em lote e a
 # regeneração do portal principal index.html.
@@ -20,7 +20,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 exibir_ajuda() {
     cat << 'EOF'
 ==============================================================================
-Estudos em Cibersegurança — Gerador de Treinamentos e Portal
+Mapa da Cibersegurança — Gerador de Treinamentos e Portal
 ==============================================================================
 
 Uso:

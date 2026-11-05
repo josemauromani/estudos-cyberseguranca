@@ -1,4 +1,4 @@
-# Estudos de Cibersegurança
+# Mapa da Cibersegurança
 
 > Plataforma autoinstrucional, prática e enciclopédica sobre segurança da informação, defesa cibernética e governança corporativa, estruturada em **60 módulos temáticos** organizados em **14 trilhas estruturantes**.
 
@@ -6,7 +6,7 @@
 
 ## 🎯 Visão Geral do Projeto
 
-O projeto **Estudos de Cibersegurança** foi desenvolvido para oferecer uma trilha de aprendizagem moderna, prática e rigorosa, voltada a estudantes de tecnologia, analistas e engenheiros de segurança (Blue Team, Red Team, AppSec, SOC e GRC), bem como a candidatos a certificações técnicas internacionais (**CompTIA Security+**, **CySA+**, **PenTest+**, **CEH**, **CISSP**) e concursos públicos de TI (**FGV**, **Cebraspe**, **FCC**, etc.).
+O projeto **Mapa da Cibersegurança** foi desenvolvido para oferecer uma trilha de aprendizagem moderna, prática e rigorosa, voltada a estudantes de tecnologia, analistas e engenheiros de segurança (Blue Team, Red Team, AppSec, SOC e GRC), bem como a candidatos a certificações técnicas internacionais (**CompTIA Security+**, **CySA+**, **PenTest+**, **CEH**, **CISSP**) e concursos públicos de TI (**FGV**, **Cebraspe**, **FCC**, etc.).
 
 ### Pilares Fundamentais
 
@@ -298,7 +298,6 @@ O currículo é estruturado de forma a atender diferentes objetivos e momentos d
 
 ## 👤 Autor e Créditos
 
-- **Autor:** José Mauro da Silva Stelling
 - **Metodologia de Engenharia:** Superpowers Spec-Driven Development (SDD)
 - **Idioma:** Português do Brasil (pt-BR)
 - **Licença:** Material de uso pessoal, educacional e profissional.

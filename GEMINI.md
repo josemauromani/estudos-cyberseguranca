@@ -54,6 +54,6 @@ Always check and activate process skills before taking action:
 
 ## Project Overview
 
-Estudos em Cibersegurança: Material autoinstrucional e prático sobre segurança cibernética, inspirado na estrutura modular de estudos técnicos do autor (com treinamentos interativos em HTML, geradores automatizados em Python e planilhas práticas).
+Mapa da Cibersegurança: Material autoinstrucional e prático sobre segurança cibernética, inspirado na estrutura modular de estudos técnicos do autor (com treinamentos interativos em HTML, geradores automatizados em Python e planilhas práticas).
 
 Textos da interface, materiais de estudo e explicações são em Português do Brasil (**pt-BR**).

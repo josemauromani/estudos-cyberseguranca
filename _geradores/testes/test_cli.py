@@ -96,7 +96,7 @@ class TestCLI(unittest.TestCase):
         )
 
         # Verifica menções estruturais obrigatórias
-        self.assertIn("Estudos de Cibersegurança", readme_content)
+        self.assertIn("Mapa da Cibersegurança", readme_content)
         self.assertIn("gerar.sh", readme_content)
         self.assertIn("index.html", readme_content)
         self.assertIn("NIST CSF 2.0", readme_content)

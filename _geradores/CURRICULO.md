@@ -1,8 +1,8 @@
-# Matriz Curricular: Estudos de Cibersegurança
+# Matriz Curricular: Mapa da Cibersegurança
 
 ## 1. Visão Geral e Filosofia Pedagógica
 
-O currículo de **Estudos de Cibersegurança** foi concebido como uma formação autoinstrucional, prática e modular, dividida em **60 módulos temáticos** organizados em **14 trilhas estruturantes**. 
+O currículo do **Mapa da Cibersegurança** foi concebido como uma formação autoinstrucional, prática e modular, dividida em **60 módulos temáticos** organizados em **14 trilhas estruturantes**. 
 
 O projeto segue quatro diretrizes fundamentais:
 1. **Teoria Pragmática e Direta ao Ponto:** Eliminação de floreios acadêmicos desnecessários; foco no que engenheiros, analistas e auditores de segurança executam na rotina corporativa e no que bancas de concursos e certificações (CompTIA Security+, CySA+, PenTest+, CEH, CISSP) cobram.

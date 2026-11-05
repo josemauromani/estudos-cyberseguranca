@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Cadastro de verbetes do glossário — Estudos em Cibersegurança
+Cadastro de verbetes do glossário — Mapa da Cibersegurança
 =============================================================
 Um dicionário por verbete. Campos de texto aceitam apenas <strong>, <em>
 e <code> como HTML inline. A validação fica em glossario.py.

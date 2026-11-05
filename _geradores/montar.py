@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Compilador de Treinamentos Standalone — Estudos em Cibersegurança
+Compilador de Treinamentos Standalone — Mapa da Cibersegurança
 ================================================================
 Empacota fragmentos HTML de estudos (_body.html) em páginas HTML5
 completas, independentes e 100% offline-ready, embutindo inlined o
@@ -218,7 +218,7 @@ def montar_treinamento(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="study-slug" content="{slug}">
-  <title>{escape(titulo_final)} — Estudos de Cibersegurança</title>
+  <title>{escape(titulo_final)} — Mapa da Cibersegurança</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%233b82f6' d='M32 4 8 14v16c0 15 10 26 24 30 14-4 24-15 24-30V14z'/%3E%3Cpath fill='%23ffffff' d='M28 40 19 31l4-4 5 5 13-13 4 4z'/%3E%3C/svg%3E">
 
 
@@ -249,7 +249,7 @@ def montar_treinamento(
 def main(argv=None):
     """Ponto de entrada para execução via linha de comando."""
     parser = argparse.ArgumentParser(
-        description="Compilador de Treinamentos Standalone (Estudos em Cibersegurança)."
+        description="Compilador de Treinamentos Standalone (Mapa da Cibersegurança)."
     )
     parser.add_argument(
         "body_html",
