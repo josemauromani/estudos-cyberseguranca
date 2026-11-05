@@ -172,7 +172,7 @@ class TestAuditoriaDeTI(unittest.TestCase):
         for ref in ("Estudo 26", "Estudo 04", "Estudo 40", "Estudo 22", "Estudo 52", "Estudo 30", "Estudo 57"):
             self.assertIn(ref, antes, ref)
         fim = self._secao("fatos")
-        for ref in ("Estudo 25", "Estudo 26", "Estudo 57", "61 módulos"):
+        for ref in ("Estudo 25", "Estudo 26", "Estudo 57", "62 módulos"):
             self.assertIn(ref, fim, ref)
 
     def test_nao_repete_auditoria_do_sgsi(self):
@@ -378,7 +378,7 @@ class TestAuditoriaDeTI(unittest.TestCase):
             cert = next(c for c in index_dados.CERTIFICACOES if c["sigla"] == sigla)
             self.assertIn(SLUG, cert["modulos"], sigla)
         readme = (self.root / "README.md").read_text(encoding="utf-8")
-        self.assertIn("61 módulos", readme)
+        self.assertIn("62 módulos", readme)
         self.assertNotIn("57 módulos", readme)
         curriculo = (self.root / "_geradores" / "CURRICULO.md").read_text(encoding="utf-8")
         self.assertIn("#### 58. Auditoria-de-TI", curriculo)

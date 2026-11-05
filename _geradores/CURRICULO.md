@@ -2,7 +2,7 @@
 
 ## 1. Visão Geral e Filosofia Pedagógica
 
-O currículo do **Mapa da Cibersegurança** foi concebido como uma formação autoinstrucional, prática e modular, dividida em **61 módulos temáticos** organizados em **14 trilhas estruturantes**. 
+O currículo do **Mapa da Cibersegurança** foi concebido como uma formação autoinstrucional, prática e modular, dividida em **62 módulos temáticos** organizados em **14 trilhas estruturantes**. 
 
 O projeto segue quatro diretrizes fundamentais:
 1. **Teoria Pragmática e Direta ao Ponto:** Eliminação de floreios acadêmicos desnecessários; foco no que engenheiros, analistas e auditores de segurança executam na rotina corporativa e no que bancas de concursos e certificações (CompTIA Security+, CySA+, PenTest+, CEH, CISSP) cobram.
@@ -100,7 +100,7 @@ flowchart LR
 |---|---|---|---|---|
 | **Trilha 1** | Fundamentos & Redes | `#2563EB` (Azul) | Base sólida: CIA, protocolos, criptografia, IAM e perímetro, mais fundamentos de computação e SO | 01–05 e 61 |
 | **Trilha 2** | Segurança Defensiva | `#059669` (Verde) | Bastionamento, defesas de rede, Zero Trust, vulnerabilidades e EDR | 06 ao 10, 29, 30 |
-| **Trilha 3** | Segurança Ofensiva | `#DC2626` (Vermelho) | Reconhecimento, falhas web, APIs, testes de intrusão e phishing | 11 ao 15 |
+| **Trilha 3** | Segurança Ofensiva | `#DC2626` (Vermelho) | Reconhecimento, falhas web, APIs, testes de intrusão, phishing e a cadeia de exploração vista pela detecção | 11 ao 15 e 62 |
 | **Trilha 4** | Operações, SOC & Resposta | `#7C3AED` (Roxo) | Monitoramento, SIEM, CTI, contenção de incidentes e forense | 16 ao 20 |
 | **Trilha 5** | Especialidades & Fronteiras | `#0891B2` (Ciano) | Nuvem pública, DevSecOps/CI-CD, IoT/TO (Purdue) e Inteligência Artificial | 21 ao 24 |
 | **Trilha 6** | Governança, Riscos & Conformidade | `#D97706` (Âmbar) | Gestão de risco (ALE/SLE), ISO 27001/27002, LGPD e continuidade de negócios | 25 ao 28, 31, 58 |
@@ -115,7 +115,7 @@ flowchart LR
 
 ---
 
-## 3. Detalhamento dos 61 Módulos de Aprendizagem
+## 3. Detalhamento dos 62 Módulos de Aprendizagem
 
 ### Trilha 1: Fundamentos & Redes (`#2563EB`)
 
@@ -289,6 +289,16 @@ flowchart LR
 - **Pré-requisitos:** Fundamentos-Ciber.
 - **Conceitos-Chave:** Pretexting, Vishing, Smishing, Typosquatting em domínios, SPF (`v=spf1`), DKIM selector e assinatura criptográfica, DMARC política (`p=reject`), Chaves de segurança física anti-phishing (FIDO2).
 - **Simulador Interativo em JS:** *Analisador de E-mails Suspeitos (Spot the Indicators)* — Apresenta e-mails simulados na interface com cabeçalhos brutos e corpo visual; o estudante deve inspecionar e clicar nos indicadores de comprometimento (erros no cabeçalho `Return-Path`, links divergentes, spoofing de remetente, urgência forçada).
+
+#### 62. Exploracao-e-Escalada-de-Privilegio
+- **Título:** Exploração e Escalada de Privilégio: Detecção e Defesa
+- **Função NIST CSF 2.0:** *Detect (DE) / Protect (PR)*
+- **Tempo Estimado:** 50 minutos | **Carreiras:** Blue Team, Red Team, Analista de Segurança da Informação
+- **MITRE ATT&CK:** TA0001 Initial Access, TA0002 Execution, TA0004 Privilege Escalation (detecção)
+- **Objetivos de Aprendizagem:** Descrever a cadeia de ataque (varredura, exploração, shell, escalada) pelo que cada etapa deixa nos logs; reconhecer o servidor web iniciando um shell como sinal de ouro; barrar o reverse shell com egress filtering; reduzir a escalada no Linux e no Windows com menor privilégio e auditoria (auditd, eventos 4688, 4673 e 7045); correlacionar a cadeia numa linha do tempo no SIEM.
+- **Pré-requisitos:** Fundamentos-de-Computacao-e-SO, Pentest-Metodologias.
+- **Conceitos-Chave:** nmap e varredura de serviços; proxy de interceptação; injeção de comando; reverse shell vs bind shell; egress filtering; sudo, SUID, cron e capabilities; auditd; caminho de serviço sem aspas; SeImpersonatePrivilege; correlação em SIEM.
+- **Simulador Interativo em JS:** *Console do Defensor* — O aluno classifica eventos de log fictícios pela etapa da cadeia e pelo controle que os barraria, e recebe a explicação de cada um.
 
 ---
 
@@ -765,8 +775,8 @@ flowchart LR
 |---|---|---|
 | **GOVERN (GV)** | 10 módulos | 25, 26, 27, 31, 54, 56, 57, 58, 59, 60 |
 | **IDENTIFY (ID)** | 7 módulos | 01, 09, 11, 14, 17, 25, 61 |
-| **PROTECT (PR)** | 33 módulos | 02, 03, 04, 05, 06, 07, 08, 09, 10, 12, 13, 15, 21, 22, 23, 24, 27, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 50, 51, 52, 55, 61 |
-| **DETECT (DE)** | 18 módulos | 02, 07, 10, 16, 17, 20, 24, 29, 30, 34, 35, 36, 39, 46, 47, 48, 53, 55 |
+| **PROTECT (PR)** | 34 módulos | 02, 03, 04, 05, 06, 07, 08, 09, 10, 12, 13, 15, 21, 22, 23, 24, 27, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 50, 51, 52, 55, 61, 62 |
+| **DETECT (DE)** | 19 módulos | 02, 07, 10, 16, 17, 20, 24, 29, 30, 34, 35, 36, 39, 46, 47, 48, 53, 55, 62 |
 | **RESPOND (RS)** | 8 módulos | 18, 19, 20, 42, 43, 44, 49, 53 |
 | **RECOVER (RC)** | 4 módulos | 28, 42, 44, 45 |
 
@@ -781,7 +791,7 @@ Para orientar estudantes e profissionais com focos específicos, a matriz curric
 1. **Rota Blue Team / Analista SOC:**  
    `01 -> 61 -> 02 -> 34 -> 36 -> 05 -> 06 -> 07 -> 48 -> 10 -> 39 -> 16 -> 17 -> 46 -> 47 -> 18 -> 49 -> 42`
 2. **Rota Red Team / Pentest:**  
-   `01 -> 61 -> 02 -> 34 -> 04 -> 11 -> 12 -> 13 -> 38 -> 39 -> 50 -> 51 -> 14 -> 15`
+   `01 -> 61 -> 02 -> 34 -> 04 -> 11 -> 12 -> 13 -> 38 -> 39 -> 50 -> 51 -> 14 -> 62 -> 15`
 3. **Rota DevSecOps & Cloud Security:**  
    `01 -> 61 -> 03 -> 04 -> 35 -> 06 -> 12 -> 13 -> 21 -> 41 -> 22 -> 50 -> 51 -> 52 -> 53 -> 24`
 4. **Rota GRC, Auditoria & Privacidade:**  

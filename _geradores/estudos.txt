@@ -1,4 +1,4 @@
-# Catálogo Canônico do Mapa da Cibersegurança (61 Módulos)
+# Catálogo Canônico do Mapa da Cibersegurança (62 Módulos)
 # Formato: slug|titulo_curto|pasta|arquivo_html|trilha_num|cor_tema|nist_fn
 #
 # Trilhas:
@@ -78,3 +78,4 @@ Auditoria-de-TI|Auditoria de TI: SOX, ITGC e COBIT|Auditoria-de-TI|treinamento-a
 Lideranca-e-Programa-de-Seguranca|Liderança e Programa de Segurança: o Papel do CISO|Lideranca-e-Programa-de-Seguranca|treinamento-lideranca-e-programa-de-seguranca.html|14|#A16207|Govern
 Estruturacao-da-Area-de-Seguranca|Estruturação da Área de Segurança: Maturidade, Time e Sourcing|Estruturacao-da-Area-de-Seguranca|treinamento-estruturacao-da-area-de-seguranca.html|14|#A16207|Govern
 Fundamentos-de-Computacao-e-SO|Fundamentos de Computação e SO para Segurança|Fundamentos-de-Computacao-e-SO|treinamento-fundamentos-de-computacao-e-so.html|1|#2563EB|Identify / Protect
+Exploracao-e-Escalada-de-Privilegio|Exploração e Escalada de Privilégio: Detecção e Defesa|Exploracao-e-Escalada-de-Privilegio|treinamento-exploracao-e-escalada-de-privilegio.html|3|#DC2626|Detect / Protect

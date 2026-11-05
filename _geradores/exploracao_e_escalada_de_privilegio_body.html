@@ -1,0 +1,651 @@
+<article class="study-container" data-slug="exploracao-e-escalada-de-privilegio">
+
+    <!-- SEÇÃO 1: INTRODUÇÃO -->
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: A Cadeia de Ataque Vista de Quem Defende</h2>
+
+        <p class="lead-text">
+            Um teste de invasão autorizado, ou um ataque real, percorre quase sempre a mesma cadeia: o invasor mapeia o alvo, encontra uma falha numa aplicação exposta, ganha um primeiro acesso com pouco privilégio e, a partir dele, escala até administrador. Este módulo não ensina a executar essa cadeia — ele a estuda pelo lado do defensor: <strong>o que cada etapa deixa nos logs e na telemetria, e qual controle a interrompe</strong>. Quem reconhece o rastro de cada passo detecta o ataque cedo, antes da escalada.
+        </p>
+
+        <div class="callout law">
+            <div class="callout-title">
+                <span class="callout-icon">⚖️</span>
+                <strong>Só em laboratório próprio ou com autorização por escrito</strong>
+            </div>
+            <p>
+                Testar a segurança de um sistema sem <strong>autorização por escrito</strong> de quem responde por ele é invasão de dispositivo informático (<strong>Lei nº 12.737/2012</strong>, art. 154-A do Código Penal; ver Estudo 37). As técnicas abaixo são descritas para que o defensor saiba reconhecê-las e preveni-las; a prática ofensiva pertence a um laboratório seu ou a um engajamento com escopo e regras de engajamento (Estudo 14). Os exemplos usam a loja fictícia Ipê Store, com hosts <code>.ipestore.example</code> e endereços das faixas RFC 5737 e RFC 1918.
+            </p>
+        </div>
+
+        <h3>As quatro etapas e onde o defensor enxerga cada uma</h3>
+        <p>
+            A cadeia parte do <strong>reconhecimento</strong> (mapear portas e serviços), passa pela <strong>exploração</strong> de uma falha na aplicação, chega ao <strong>acesso inicial</strong> (um shell com o usuário do serviço) e termina na <strong>escalada de privilégio</strong> (virar <code>root</code> ou <code>SYSTEM</code>). A vantagem do defensor é que <em>nenhuma dessas etapas é silenciosa</em>: cada uma gera um registro em alguma fonte — IDS, log da aplicação, EDR, <code>auditd</code> no Linux ou o Log de Eventos no Windows.
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">A Cadeia de Ataque e o Ponto de Detecção de Cada Etapa</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+        <pre class="mermaid" data-title="A Cadeia de Ataque e o Ponto de Detecção de Cada Etapa">
+flowchart LR
+    R["1. Reconhecimento<br><small>varredura de portas,<br>enumeração de diretórios</small>"] --> E["2. Exploração<br><small>falha na aplicação<br>web exposta</small>"]
+    E --> A["3. Acesso inicial<br><small>shell com o usuário<br>do serviço</small>"]
+    A --> P["4. Escalada<br><small>root / SYSTEM</small>"]
+    R -.detecta.-> DR["IDS / firewall<br>log do servidor web"]
+    E -.detecta.-> DE["WAF / log da aplicação"]
+    A -.detecta.-> DA["EDR / egress / NSM"]
+    P -.detecta.-> DP["auditd / Eventos do Windows"]
+</pre>
+        </div>
+
+        <div class="callout key">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>Pergunta-chave do módulo</strong>
+            </div>
+            <p>Um servidor web foi comprometido e viraram root. Em que ponto da cadeia o defensor podia ter visto e parado o ataque?</p>
+        </div>
+
+        <div class="callout key">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>A ideia central</strong>
+            </div>
+            <p>
+                O ataque só vira incidente grave quando as quatro etapas acontecem sem que ninguém veja. O trabalho do defensor é <strong>encurtar essa cadeia</strong>: detectar na etapa 1 ou 2 custa um alerta; descobrir só depois da etapa 4 custa uma resposta a incidente inteira (Estudo 18).
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 2: RECONHECIMENTO -->
+    <section class="study-section" id="reconhecimento" data-tipo="teoria">
+        <h2>Etapa 1: Reconhecimento e o Que Ele Deixa Para Trás</h2>
+
+        <p>
+            Antes de atacar, o invasor levanta o que está exposto: quais portas respondem, qual serviço e versão roda em cada uma, e quais caminhos a aplicação web tem. Ferramentas como o <code>nmap</code> fazem a varredura de portas e a identificação de versão (<code>-sV</code>, scripts <code>NSE</code>); a enumeração de diretórios procura páginas e arquivos que não aparecem no menu. Para o defensor, o importante não é <em>como</em> isso é feito, e sim o <strong>rastro</strong> que deixa.
+        </p>
+
+        <table class="data-table">
+            <thead>
+                <tr><th>Sinal</th><th>Onde aparece</th><th>Como distinguir de tráfego normal</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Muitas portas tocadas por um mesmo IP em segundos</td><td>Log do firewall, fluxos (NetFlow), IDS</td><td>Um cliente legítimo fala com poucas portas conhecidas; uma varredura toca dezenas ou centenas</td></tr>
+                <tr><td>Rajada de <code>404</code> e <code>403</code> num curto intervalo</td><td>Log de acesso do servidor web</td><td>Enumeração de diretórios gera muitos caminhos inexistentes em sequência</td></tr>
+                <tr><td><em>User-Agent</em> de ferramenta ou ausente</td><td>Log da aplicação, WAF</td><td>Navegadores reais mandam cabeçalhos ricos; varredores costumam mandar cabeçalhos pobres ou assinados</td></tr>
+            </tbody>
+        </table>
+
+        <p>
+            A <strong>prevenção</strong> aqui é redução de superfície: fechar portas que não precisam estar abertas, pôr os serviços administrativos atrás de VPN ou segmentação (Estudo 05), e não expor páginas de teste. O que não dá para impedir é a varredura em si — por isso ela entra como um <strong>sinal precoce</strong>, não como algo a bloquear sempre.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🛡️</span>
+                <strong>Como o defensor vê</strong>
+            </div>
+            <p>
+                Um pico de conexões recusadas no firewall e uma rajada de <code>404</code> no log web, vindos do mesmo IP em poucos segundos, são a assinatura do reconhecimento. Sozinhos raramente justificam resposta, mas correlacionados com um acesso bem-sucedido logo depois (etapa 2) contam a história do começo do ataque. Monitoramento de rede no Estudo 48.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: EXPLORAÇÃO WEB -->
+    <section class="study-section" id="exploracao-web" data-tipo="teoria">
+        <h2>Etapa 2: Exploração da Aplicação e os Sinais do Abuso</h2>
+
+        <p>
+            A porta de entrada mais comum é uma falha na aplicação web exposta. Ferramentas de interceptação como o <strong>Burp Suite</strong> (Proxy, Repeater, Intruder) deixam o testador ver e repetir requisições para encontrar e confirmar a falha. Entre as falhas que levam a execução de comando no servidor, a <strong>injeção de comando</strong> é a mais direta: um campo que deveria receber, digamos, um nome de host para um diagnóstico acaba passando a entrada para o sistema operacional. A teoria das falhas web está no Estudo 12; aqui interessa o que o servidor registra quando isso acontece.
+        </p>
+
+        <table class="data-table">
+            <thead>
+                <tr><th>Sinal</th><th>Onde aparece</th><th>O que denuncia</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Parâmetro com metacaracteres de shell (<code>;</code>, <code>|</code>, <code>&amp;&amp;</code>, <code>$(</code>)</td><td>WAF, log da aplicação</td><td>Entrada que não tem razão de conter sintaxe de comando num campo de diagnóstico ou busca</td></tr>
+                <tr><td>Processo do servidor web gerando um processo de shell</td><td>EDR, Sysmon (evento 1)</td><td>O <code>nginx</code>/<code>php</code> não deveria iniciar <code>sh</code>, <code>bash</code> ou <code>cmd</code></td></tr>
+                <tr><td>Resposta anômala (erro, tempo longo, tamanho fora do padrão)</td><td>Log da aplicação, métricas</td><td>A aplicação se comportando de modo que a lógica normal não produz</td></tr>
+            </tbody>
+        </table>
+
+        <p>
+            A <strong>prevenção</strong> é em camadas: validar e tratar a entrada no servidor (nunca confiar no cliente), rodar o serviço web com o <strong>menor privilégio</strong> possível para que uma execução de comando renda pouco, e pôr um <strong>WAF</strong> à frente para barrar padrões óbvios de injeção. O WAF é rede de segurança, não substituto da validação.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🛡️</span>
+                <strong>Como o defensor vê</strong>
+            </div>
+            <p>
+                O sinal mais forte não está na requisição, e sim no host: <strong>o processo do servidor web iniciando um shell</strong>. Essa relação pai→filho, capturada pelo EDR ou pelo Sysmon, quase nunca tem explicação legítima e é um dos alertas de maior valor para detectar a etapa 2 virando etapa 3.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: ACESSO E SHELL -->
+    <section class="study-section" id="acesso-e-shell" data-tipo="teoria">
+        <h2>Etapa 3: Acesso Inicial e a Conversa de Saída</h2>
+
+        <p>
+            Confirmada a execução de comando, o invasor costuma transformá-la num <strong>shell interativo</strong>. Num <em>reverse shell</em>, o servidor comprometido abre uma conexão <strong>de saída</strong> para a máquina do atacante (o contrário de um serviço, que recebe conexões); num <em>bind shell</em>, abre uma porta nova para receber. Frameworks como o <strong>Metasploit</strong> (e o agente <code>meterpreter</code>) automatizam esse acesso. Para o defensor, a palavra-chave é <strong>saída</strong>: um servidor de produção que de repente inicia uma conexão para um destino desconhecido é anômalo.
+        </p>
+
+        <ul>
+            <li><strong>Egress (saída):</strong> servidores normalmente recebem conexões, não iniciam. Uma conexão de saída de um servidor web para um IP ou porta incomum é um dos sinais mais limpos de acesso inicial.</li>
+            <li><strong>Linhagem de processo:</strong> o shell é filho do processo do serviço; o EDR vê <code>php → sh → conexão de saída</code>, uma cadeia que a operação normal não produz.</li>
+            <li><strong>Beaconing:</strong> se o acesso vira um canal de comando e controle, a regularidade das conexões aparece no monitoramento de rede (Estudo 48).</li>
+        </ul>
+
+        <p>
+            A <strong>prevenção</strong> central é a <strong>filtragem de saída (egress filtering)</strong>: permitir que cada servidor fale só com os destinos de que precisa. Com egress restrito, o <em>reverse shell</em> simplesmente não conecta, e a tentativa vira um registro de bloqueio — detecção e prevenção no mesmo controle.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🛡️</span>
+                <strong>Como o defensor vê</strong>
+            </div>
+            <p>
+                Uma conexão de saída partindo de um servidor que só deveria responder, para um destino sem histórico, registrada no firewall de borda ou pelo EDR, é a etapa 3 acontecendo. Egress filtering transforma esse ponto num muro: o que não está liberado não sai, e a tentativa fica logada.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 5: ESCALADA LINUX -->
+    <section class="study-section" id="escalada-linux" data-tipo="teoria">
+        <h2>Etapa 4a: Escalada de Privilégio no Linux</h2>
+
+        <p>
+            Com um shell de usuário comum (por exemplo <code>www-data</code>), o invasor procura um caminho para <code>root</code>. Os vetores clássicos são configurações frouxas, não falhas exóticas: uma regra de <code>sudo</code> permissiva demais (<code>sudo -l</code> mostra o que o usuário pode rodar como root), um binário com o bit <strong>SUID</strong> indevido, uma tarefa <strong>cron</strong> gravável por quem não devia, ou <strong>capabilities</strong> concedidas a mais. Entender a memória por trás de um estouro (Estudo 61) ajuda a ler o último recurso, um <em>kernel</em> desatualizado.
+        </p>
+
+        <table class="data-table">
+            <thead>
+                <tr><th>Vetor</th><th>Prevenção</th><th>Detecção</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>sudo</code> mal configurado</td><td>Revisar o <code>sudoers</code>; princípio do menor privilégio</td><td><code>auditd</code> e o log do <code>sudo</code> registram o comando elevado</td></tr>
+                <tr><td>Binário <strong>SUID</strong> indevido</td><td>Inventariar e remover SUID desnecessário (hardening, Estudo 06)</td><td>Execução de SUID incomum por conta de serviço no <code>auditd</code></td></tr>
+                <tr><td>Tarefa <strong>cron</strong> gravável</td><td>Permissões corretas nos scripts agendados</td><td>Alteração do arquivo de cron registrada pela auditoria de integridade</td></tr>
+                <tr><td><strong>Capabilities</strong> excessivas</td><td>Conceder só a capability necessária</td><td>Processo usando capability fora do seu padrão</td></tr>
+            </tbody>
+        </table>
+
+        <p>
+            O fio comum é o <strong>menor privilégio</strong>: cada permissão a mais é um degrau para a escalada. A detecção vem da <strong>auditoria do sistema</strong> (<code>auditd</code>, contabilidade de processos), que registra a execução elevada mesmo quando a prevenção falhou.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🛡️</span>
+                <strong>Como o defensor vê</strong>
+            </div>
+            <p>
+                Uma conta de serviço — que deveria só servir páginas — executando <code>sudo</code>, rodando um SUID incomum ou lendo arquivos sensíveis aparece no <code>auditd</code> como um desvio claro do padrão daquela conta. Hardening no Estudo 06 fecha os vetores; a auditoria pega o que passou.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 6: ESCALADA WINDOWS -->
+    <section class="study-section" id="escalada-windows" data-tipo="teoria">
+        <h2>Etapa 4b: Escalada de Privilégio no Windows</h2>
+
+        <p>
+            No Windows o objetivo é virar <code>SYSTEM</code> ou administrador local, e de novo os caminhos mais comuns são configuração, não <em>exploit</em>: um <strong>serviço com caminho sem aspas</strong> (<code>unquoted service path</code>) que executa um binário plantado, um serviço com <strong>permissões fracas</strong> que o usuário pode reconfigurar, <strong>privilégios de token</strong> como <code>SeImpersonatePrivilege</code> explorados por contas de serviço, e <strong>credenciais esquecidas</strong> em arquivos ou no registro. A parte de domínio (Kerberoasting, Pass-the-Hash) fica no Estudo 39; aqui é escalada local, e o PowerShell e o Log de Eventos do Estudo 36 são as lentes do defensor.
+        </p>
+
+        <p>Esta parte é teórica; o exercício abaixo pede só que você reconheça o vetor numa saída fictícia de enumeração.</p>
+
+        <div class="callout key">
+            <div class="callout-title">
+                <span class="callout-icon">🔍</span>
+                <strong>Exercício de leitura: qual é o vetor?</strong>
+            </div>
+            <pre role="region" aria-label="saída fictícia de enumeração do Windows" tabindex="0" style="overflow:auto; font-size:0.8rem; background:var(--sunk); border-radius:var(--radius-sm); padding:0.6rem;">C:\Users\svc_app&gt; whoami /priv
+  SeImpersonatePrivilege        Impersonate a client after authentication   Enabled
+
+C:\Users\svc_app&gt; sc qc AppAtualiza
+  BINARY_PATH_NAME   : C:\Arquivos de Programas\Ipe Updater\upd.exe
+  SERVICE_START_NAME : LocalSystem</pre>
+            <p style="margin-top:0.5rem;">
+                Dois achados aparecem: o token <code>SeImpersonatePrivilege</code> habilitado numa conta de serviço, e um serviço <code>LocalSystem</code> cujo caminho tem espaços <strong>sem aspas</strong> (<code>C:\Arquivos de Programas\Ipe Updater\upd.exe</code>), que o Windows pode tentar resolver como <code>C:\Arquivos.exe</code> antes do caminho completo. Os dois são vetores de escalada local; a correção é citar o caminho entre aspas no serviço e restringir o privilégio de token.
+            </p>
+        </div>
+
+        <table class="data-table">
+            <thead>
+                <tr><th>Vetor</th><th>Prevenção</th><th>Detecção (Log de Eventos)</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Caminho de serviço sem aspas</td><td>Citar o caminho; permissões corretas na pasta</td><td>Criação de processo (4688) com caminho inesperado; instalação de serviço (7045)</td></tr>
+                <tr><td>Permissão fraca em serviço</td><td>Revisar ACLs de serviço</td><td>Alteração de configuração de serviço</td></tr>
+                <tr><td>Abuso de <code>SeImpersonate</code></td><td>Limitar o privilégio a contas que realmente precisam</td><td>Uso de privilégio sensível (4673), atribuição de token (4672)</td></tr>
+                <tr><td>Credencial esquecida em arquivo/registro</td><td>Não guardar segredo em texto claro; usar cofre</td><td>Leitura incomum de arquivos de configuração sensíveis</td></tr>
+            </tbody>
+        </table>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🛡️</span>
+                <strong>Como o defensor vê</strong>
+            </div>
+            <p>
+                Os eventos <strong>4688</strong> (criação de processo), <strong>4673/4672</strong> (uso de privilégio) e <strong>7045</strong> (serviço novo) desenham a escalada no Windows. Uma conta de serviço criando processos como <code>SYSTEM</code> ou instalando um serviço é o rastro que o Estudo 36 ensina a ler.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 7: LABORATÓRIO -->
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório: Console do Defensor</h2>
+
+        <p class="lead-text">
+            Você recebeu os registros fictícios de um incidente na Ipê Store: um servidor web foi comprometido e, horas depois, alguém era <code>root</code>. Cada linha abaixo veio de uma fonte diferente (IDS, log web, EDR, <code>auditd</code>, Eventos do Windows). Para cada evento, diga <strong>a que etapa da cadeia</strong> ele pertence e <strong>qual controle</strong> o teria interrompido. O console conta seus acertos. Nada é executado: as linhas são texto montado pelo simulador.
+        </p>
+
+        <div class="lab-box exp-lab" id="exp-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Linha do tempo do incidente</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Console do Defensor — lab-web01.ipestore.example</h3>
+                    <p id="exp-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
+                </div>
+            </div>
+
+            <div class="lab-body" style="min-width: 0;">
+                <div id="exp-eventos"></div>
+                <div style="margin-top: 1rem;">
+                    <button type="button" class="btn btn-primary" id="exp-avaliar">Avaliar classificação</button>
+                    <button type="button" class="btn" id="exp-limpar">Limpar</button>
+                </div>
+                <div id="exp-resultado" role="status" aria-live="polite" style="margin-top: 1rem;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 8: CHECKLIST -->
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist: Detectar e Barrar a Cadeia</h2>
+
+        <p class="lead-text">
+            Use esta lista para avaliar se um ambiente enxerga e interrompe a cadeia de exploração e escalada. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist" data-checklist-slug="exploracao-e-escalada-de-privilegio">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-exp-1">
+                <label for="chk-exp-1"><strong>Superfície:</strong> portas e serviços administrativos fora da internet (VPN/segmentação); páginas de teste e diagnóstico não expostas.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-exp-2">
+                <label for="chk-exp-2"><strong>Aplicação:</strong> entrada validada no servidor, serviço web rodando com menor privilégio e WAF à frente como rede de segurança.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-exp-3">
+                <label for="chk-exp-3"><strong>Linhagem de processo:</strong> alerta para o servidor web iniciando um shell (EDR/Sysmon evento 1).</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-exp-4">
+                <label for="chk-exp-4"><strong>Egress:</strong> saída de cada servidor restrita aos destinos necessários; conexões de saída anômalas alertadas.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-exp-5">
+                <label for="chk-exp-5"><strong>Linux:</strong> <code>sudoers</code> revisado, inventário de SUID, permissões corretas em cron; <code>auditd</code> registrando execução elevada.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-exp-6">
+                <label for="chk-exp-6"><strong>Windows:</strong> caminhos de serviço entre aspas, ACLs de serviço revisadas, privilégios de token limitados; eventos 4688/4673/7045 coletados.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-exp-7">
+                <label for="chk-exp-7"><strong>Correlação:</strong> reconhecimento, acesso e escalada ligados numa só linha do tempo no SIEM (Estudo 16), não tratados como alertas soltos.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 9: QUIZ -->
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Maior valor):</strong> Entre todos os sinais da cadeia, qual costuma ser o alerta de maior valor para pegar a transição de exploração para acesso, e por quê?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O processo do servidor web iniciando um shell (relação pai→filho capturada pelo EDR ou pelo Sysmon). Quase nenhuma operação legítima faz o <code>nginx</code>/<code>php</code> gerar <code>sh</code> ou <code>cmd</code>, então o falso positivo é baixo e o sinal indica execução de comando virando acesso interativo.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Egress):</strong> Por que a filtragem de saída é ao mesmo tempo prevenção e detecção do acesso inicial por <em>reverse shell</em>?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque o <em>reverse shell</em> depende de o servidor abrir uma conexão de saída. Com egress restrito, essa conexão não se completa (prevenção) e a tentativa fica registrada como bloqueio (detecção). Um único controle fecha o caminho e gera o rastro.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Menor privilégio):</strong> Um pentest ganhou shell de <code>www-data</code> e escalou a root por um binário SUID indevido. Qual mudança reduz o impacto da próxima vez, e qual fonte teria registrado a escalada?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Remover o bit SUID do binário que não precisava dele (inventário de SUID no hardening do Estudo 06) e, de forma geral, aplicar menor privilégio para que o acesso inicial renda pouco. A execução do SUID incomum pela conta de serviço teria aparecido no <code>auditd</code>.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Windows):</strong> Numa saída de <code>whoami /priv</code> aparece <code>SeImpersonatePrivilege</code> habilitado numa conta de serviço. Por que isso interessa ao defensor e que evento o acompanharia?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque esse privilégio é um vetor conhecido de escalada local para <code>SYSTEM</code> quando concedido a contas de serviço. O defensor limita o privilégio a quem realmente precisa e observa os eventos 4673 (uso de privilégio sensível) e 4672/4688 (atribuição de token e criação de processo) para notar o abuso.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Reconhecimento):</strong> O firewall mostra um IP tocando 200 portas em 5 segundos e, logo depois, uma rajada de <code>404</code> no log web do mesmo IP. Isso já é um incidente?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Ainda não: é reconhecimento, que por si só raramente justifica resposta e nem sempre dá para impedir. Vira sinal relevante quando correlacionado com um acesso bem-sucedido em seguida. O valor está em ligar o reconhecimento às etapas posteriores numa só linha do tempo, não em bloquear toda varredura.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (WAF):</strong> A equipe quer confiar só no WAF para barrar injeção de comando. Que limitação você aponta?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O WAF barra padrões conhecidos, mas pode ser contornado por codificação ou variações; ele é rede de segurança, não substituto da validação no servidor e do menor privilégio do serviço web. Defesa em profundidade: validar a entrada, limitar o que o serviço pode fazer e usar o WAF como camada adicional, com os logs alimentando a detecção.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 10: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>A cadeia: reconhecimento, exploração, acesso e escalada</h4>
+                <p>Reconhecimento → exploração → acesso → escalada. Detectar cedo custa um alerta; descobrir no fim custa um incidente.</p>
+            </div>
+            <div class="facts-card">
+                <h4>Sinal de ouro: servidor web iniciando um shell (EDR/Sysmon)</h4>
+                <p>Servidor web iniciando um shell (linhagem de processo no EDR/Sysmon) é o alerta de maior valor da etapa 2→3.</p>
+            </div>
+            <div class="facts-card">
+                <h4>Egress filtering barra e registra o reverse shell</h4>
+                <p>Filtragem de saída barra o <em>reverse shell</em> e, ao mesmo tempo, registra a tentativa.</p>
+            </div>
+            <div class="facts-card">
+                <h4>Escalada nasce de privilégio a mais; auditd e Eventos do Windows registram</h4>
+                <p>Quase toda escalada (sudo, SUID, cron, token, serviço) nasce de um privilégio a mais; <code>auditd</code> e Eventos do Windows registram o abuso.</p>
+            </div>
+            <div class="facts-card">
+                <h4>Correlação da cadeia numa linha do tempo no SIEM</h4>
+                <p>Varredura, acesso e escalada ligados por host e horário viram uma história única; alertas soltos, isolados, parecem ruído (Estudo 16).</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>MITRE ATT&amp;CK — táticas TA0001 (Initial Access), TA0002 (Execution), TA0004 (Privilege Escalation) e as técnicas associadas.</li>
+            <li>OWASP — Testing Guide e Top 10 (injeção), como base da teoria de falhas web do Estudo 12.</li>
+            <li>NIST SP 800-115 — Technical Guide to Information Security Testing and Assessment.</li>
+            <li>NIST CSWP 29 — Cybersecurity Framework (CSF) 2.0, funções Detect (DE.CM) e Protect (PR.PS).</li>
+            <li>CIS Benchmarks — hardening de Linux e Windows (base do Estudo 06).</li>
+            <li>Microsoft — documentação dos eventos de segurança 4688, 4672, 4673 e 7045.</li>
+            <li>Linux Audit (<code>auditd</code>) — documentação de regras e do registro de execução.</li>
+            <li>Lei nº 12.737/2012 (art. 154-A do Código Penal) — invasão de dispositivo informático.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Como este módulo conversa com a trilha</strong>
+            </div>
+            <p>
+                A metodologia do teste de invasão está no Estudo 14; a teoria das falhas web, no Estudo 12; o reconhecimento, no Estudo 11. Este módulo amarra a cadeia inteira pelo lado da detecção: o que cada etapa deixa no IDS (Estudo 48), no EDR (Estudo 10), no <code>auditd</code> (Estudo 06) e no Log de Eventos (Estudo 36), e como o SIEM (Estudo 16) costura tudo numa linha do tempo para a resposta a incidentes (Estudo 18).
+            </p>
+        </div>
+    </section>
+
+</article>
+
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="exp-dados">
+{
+ "contexto": "Ipê Store, host lab-web01.ipestore.example. Registros fictícios de um incidente de 02/11/2026, de cinco fontes. IPs das faixas RFC 5737 e RFC 1918; nada sai do seu navegador.",
+ "estagios": {
+   "reconhecimento": "1. Reconhecimento",
+   "exploracao": "2. Exploração",
+   "acesso": "3. Acesso inicial",
+   "escalada": "4. Escalada de privilégio"
+ },
+ "controles": {
+   "superficie": "Redução de superfície (fechar porta / tirar da internet)",
+   "validacao": "Validação no servidor + menor privilégio do serviço web",
+   "egress": "Filtragem de saída (egress)",
+   "hardening": "Hardening e menor privilégio (SUID/sudo/serviço)"
+ },
+ "eventos": [
+   {
+     "id": "ev1",
+     "fonte": "firewall / IDS",
+     "linha": "2026-11-02T09:14:03 drop src=198.51.100.37 dst=203.0.113.10 ports=22,23,25,80,443,3306,8080,8443 (+192 em 5s)",
+     "estagio": "reconhecimento",
+     "controle": "superficie",
+     "explicacao": "Um IP tocando quase 200 portas em segundos é varredura: reduza a superfície e use como sinal precoce."
+   },
+   {
+     "id": "ev2",
+     "fonte": "log web",
+     "linha": "2026-11-02T09:14:40 GET /admin /backup.zip /config.old /test.php -> 404 404 404 404 (ua: ferramenta)",
+     "estagio": "reconhecimento",
+     "controle": "superficie",
+     "explicacao": "Rajada de 404 em caminhos adivinhados é enumeração de diretórios; não exponha páginas de teste."
+   },
+   {
+     "id": "ev3",
+     "fonte": "WAF / log da aplicação",
+     "linha": "2026-11-02T09:21:11 POST /diagnostico host=192.0.2.5;<comando> -> 200 (parametro com metacaractere de shell)",
+     "estagio": "exploracao",
+     "controle": "validacao",
+     "explicacao": "Metacaractere de shell num campo de diagnóstico é tentativa de injeção de comando: valide no servidor e rode com menor privilégio."
+   },
+   {
+     "id": "ev4",
+     "fonte": "EDR / Sysmon",
+     "linha": "2026-11-02T09:21:12 process_create parent=php-fpm child=/bin/sh user=www-data",
+     "estagio": "exploracao",
+     "controle": "validacao",
+     "explicacao": "O servidor web gerando um shell é o sinal de maior valor da exploração virando execução; nasce de entrada não validada."
+   },
+   {
+     "id": "ev5",
+     "fonte": "firewall de borda",
+     "linha": "2026-11-02T09:21:13 allow? src=203.0.113.10(www-data) dst=198.51.100.37:4444 OUTBOUND (sem historico)",
+     "estagio": "acesso",
+     "controle": "egress",
+     "explicacao": "Conexão de saída de um servidor que só deveria responder é acesso inicial (reverse shell); egress filtering barra e registra."
+   },
+   {
+     "id": "ev6",
+     "fonte": "NSM / EDR",
+     "linha": "2026-11-02T09:22:00 outbound beacon src=203.0.113.10 dst=198.51.100.37:4444 interval~60s",
+     "estagio": "acesso",
+     "controle": "egress",
+     "explicacao": "A regularidade das conexões de saída é o canal de comando e controle do acesso; restrinja a saída por destino."
+   },
+   {
+     "id": "ev7",
+     "fonte": "auditd (Linux)",
+     "linha": "2026-11-02T09:35:20 type=SYSCALL exe=/usr/bin/find uid=www-data suid=1 (SUID incomum)",
+     "estagio": "escalada",
+     "controle": "hardening",
+     "explicacao": "Conta de serviço executando um SUID incomum é escalada no Linux; inventarie SUID e aplique menor privilégio."
+   },
+   {
+     "id": "ev8",
+     "fonte": "Eventos do Windows",
+     "linha": "2026-11-02T09:40:05 EventID=4673 SeImpersonatePrivilege account=svc_app ; 4688 new_process=cmd.exe SYSTEM",
+     "estagio": "escalada",
+     "controle": "hardening",
+     "explicacao": "Conta de serviço usando privilégio de token e criando processo como SYSTEM é escalada no Windows; limite o privilégio."
+   }
+ ]
+}
+</script>
+
+<script>
+(function () {
+  "use strict";
+  var raiz = document.getElementById("exp-dados");
+  if (!raiz) { return; }
+  var dados;
+  try { dados = JSON.parse(raiz.textContent); } catch (e) { return; }
+
+  var ctx = document.getElementById("exp-contexto");
+  if (ctx) { ctx.textContent = dados.contexto; }
+
+  var estagioIds = Object.keys(dados.estagios);
+  var controleIds = Object.keys(dados.controles);
+  var container = document.getElementById("exp-eventos");
+  var escolhas = {};
+
+  function opcao(sel, valor, texto) {
+    var o = document.createElement("option");
+    o.value = valor;
+    o.textContent = texto;
+    sel.appendChild(o);
+  }
+
+  function montar() {
+    dados.eventos.forEach(function (ev) {
+      escolhas[ev.id] = { estagio: "", controle: "" };
+
+      var card = document.createElement("div");
+      card.className = "exp-evento";
+      card.style.cssText = "border:1px solid var(--rule); border-radius:var(--radius-sm); padding:0.6rem 0.7rem; margin-bottom:0.6rem; min-width:0;";
+
+      var fonte = document.createElement("div");
+      fonte.style.cssText = "font-size:0.78rem; color:var(--muted); margin-bottom:0.2rem;";
+      fonte.textContent = "Fonte: " + ev.fonte;
+      card.appendChild(fonte);
+
+      var linha = document.createElement("pre");
+      linha.style.cssText = "margin:0 0 0.5rem 0; font-size:0.74rem; white-space:pre-wrap; word-break:break-word; background:var(--sunk); border-radius:var(--radius-sm); padding:0.4rem;";
+      linha.textContent = ev.linha;
+      card.appendChild(linha);
+
+      var grade = document.createElement("div");
+      grade.style.cssText = "display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr)); gap:0.5rem;";
+
+      var selE = document.createElement("select");
+      selE.className = "form-control";
+      selE.setAttribute("aria-label", "Etapa do evento " + ev.id);
+      opcao(selE, "", "Etapa…");
+      estagioIds.forEach(function (k) { opcao(selE, k, dados.estagios[k]); });
+      selE.addEventListener("change", function () { escolhas[ev.id].estagio = selE.value; });
+
+      var selC = document.createElement("select");
+      selC.className = "form-control";
+      selC.setAttribute("aria-label", "Controle do evento " + ev.id);
+      opcao(selC, "", "Controle…");
+      controleIds.forEach(function (k) { opcao(selC, k, dados.controles[k]); });
+      selC.addEventListener("change", function () { escolhas[ev.id].controle = selC.value; });
+
+      grade.appendChild(selE);
+      grade.appendChild(selC);
+      card.appendChild(grade);
+
+      var exp = document.createElement("p");
+      exp.className = "exp-explicacao";
+      exp.style.cssText = "margin:0.5rem 0 0 0; font-size:0.82rem; display:none;";
+      card.appendChild(exp);
+
+      card.dataset.id = ev.id;
+      container.appendChild(card);
+    });
+  }
+
+  // Motor espelhado pelos testes: conta acertos de etapa, de controle e completos.
+  function avaliar() {
+    var r = { total: dados.eventos.length, estagios_ok: 0, controles_ok: 0, acertos: 0, por_evento: {} };
+    dados.eventos.forEach(function (ev) {
+      var esc = escolhas[ev.id] || { estagio: "", controle: "" };
+      var eOk = esc.estagio === ev.estagio;
+      var cOk = esc.controle === ev.controle;
+      if (eOk) { r.estagios_ok += 1; }
+      if (cOk) { r.controles_ok += 1; }
+      if (eOk && cOk) { r.acertos += 1; }
+      r.por_evento[ev.id] = { estagio_ok: eOk, controle_ok: cOk };
+    });
+    return r;
+  }
+
+  function mostrar() {
+    var r = avaliar();
+    var saida = document.getElementById("exp-resultado");
+    while (saida.firstChild) { saida.removeChild(saida.firstChild); }
+
+    var resumo = document.createElement("p");
+    resumo.textContent = r.acertos + " de " + r.total + " eventos classificados por completo (etapa e controle). "
+      + "Etapas certas: " + r.estagios_ok + "/" + r.total + ". Controles certos: " + r.controles_ok + "/" + r.total + ".";
+    resumo.style.fontWeight = "600";
+    saida.appendChild(resumo);
+
+    dados.eventos.forEach(function (ev) {
+      var card = container.querySelector('[data-id="' + ev.id + '"]');
+      if (!card) { return; }
+      var exp = card.querySelector(".exp-explicacao");
+      var pe = r.por_evento[ev.id];
+      var marca = (pe.estagio_ok && pe.controle_ok) ? "✓ " : "✗ ";
+      exp.textContent = marca + "Etapa: " + dados.estagios[ev.estagio] + " · Controle: " + dados.controles[ev.controle] + ". " + ev.explicacao;
+      exp.style.display = "block";
+      exp.className = "exp-explicacao " + ((pe.estagio_ok && pe.controle_ok) ? "quiz-feedback correct" : "quiz-feedback incorrect");
+    });
+  }
+
+  function limpar() {
+    escolhas = {};
+    while (container.firstChild) { container.removeChild(container.firstChild); }
+    montar();
+    var saida = document.getElementById("exp-resultado");
+    while (saida.firstChild) { saida.removeChild(saida.firstChild); }
+  }
+
+  montar();
+  var bA = document.getElementById("exp-avaliar");
+  var bL = document.getElementById("exp-limpar");
+  if (bA) { bA.addEventListener("click", mostrar); }
+  if (bL) { bL.addEventListener("click", limpar); }
+
+  window.expAvaliar = avaliar;
+})();
+</script>

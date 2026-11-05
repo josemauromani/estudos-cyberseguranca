@@ -1,6 +1,6 @@
 # Mapa da Cibersegurança
 
-> Plataforma autoinstrucional, prática e enciclopédica sobre segurança da informação, defesa cibernética e governança corporativa, estruturada em **61 módulos temáticos** organizados em **14 trilhas estruturantes**.
+> Plataforma autoinstrucional, prática e enciclopédica sobre segurança da informação, defesa cibernética e governança corporativa, estruturada em **62 módulos temáticos** organizados em **14 trilhas estruturantes**.
 
 ---
 
@@ -36,7 +36,7 @@ xdg-open index.html          # No Linux
 ```
 
 O portal `index.html` tem um **menu lateral** com sete visões:
-- **Catálogo:** tela inicial, com os 61 módulos, o bloco **Continuar estudando** (último módulo aberto) e o **status** de cada módulo (não iniciado, em andamento, concluído). Permite **Agrupar por** Trilha, Nível, Perfil ou NIST, marcar **Só não concluídos** e buscar por título, termo técnico ou conceito (atalho `/`).
+- **Catálogo:** tela inicial, com os 62 módulos, o bloco **Continuar estudando** (último módulo aberto) e o **status** de cada módulo (não iniciado, em andamento, concluído). Permite **Agrupar por** Trilha, Nível, Perfil ou NIST, marcar **Só não concluídos** e buscar por título, termo técnico ou conceito (atalho `/`).
 - **Rotas sugeridas:** a rota de cada perfil profissional (Blue Team, Red Team, AppSec, GRC, Cloud/DevSecOps, Analista de Segurança da Informação) como sequência numerada, com progresso e o próximo módulo.
 - **Por certificação:** os módulos que cobrem cada uma das 17 certificações (CEH, CISM, CISSP, CCSP, GSEC, Security+, ISFS, PDPF/PDPP, ITIL 4 Foundation, CSFPC, CISA, ISO/IEC 27001 Lead Auditor, eJPT, eCPPT, OSCP, CRISC e CDPSE).
 - **Pela necessidade:** atalhos para os módulos com base em problemas práticos do dia a dia corporativo.
@@ -48,7 +48,7 @@ Cada módulo tem navegação lateral por seções, tema claro e escuro, checklis
 
 ---
 
-## 📚 Grade Curricular dos 61 Módulos
+## 📚 Grade Curricular dos 62 Módulos
 
 ### Estrutura das Trilhas e Percurso Formativo
 
@@ -60,7 +60,7 @@ flowchart TD
 
     subgraph Tecnicas["2. Trilhas Técnicas e Especialidades"]
         T2["Trilha 2: Segurança Defensiva<br><small>Módulos 06 a 10, 29, 30 | Hardening, Firewalls, Zero Trust, EDR e DB</small>"]
-        T3["Trilha 3: Segurança Ofensiva<br><small>Módulos 11 a 15 | Reconhecimento, OWASP Top 10, APIs e Pentest</small>"]
+        T3["Trilha 3: Segurança Ofensiva<br><small>Módulos 11 a 15 e 62 | Reconhecimento, OWASP Top 10, APIs, Pentest e Exploração (detecção)</small>"]
         T4["Trilha 4: Operações, SOC & Resposta<br><small>Módulos 16 a 20 | SIEM, Sigma, CTI, Resposta e Forense</small>"]
         T5["Trilha 5: Especialidades & Fronteiras<br><small>Módulos 21 a 24 | Nuvem, DevSecOps, IoT/TO e IA</small>"]
     end
@@ -185,6 +185,7 @@ flowchart TD
 | **59** | `Lideranca-e-Programa-de-Seguranca` | Liderança e Programa de Segurança: o Papel do CISO | Trilha 14: Liderança & Estratégia | Govern | Do SIEM ao Conselho |
 | **60** | `Estruturacao-da-Area-de-Seguranca` | Estruturação da Área de Segurança: Maturidade, Time e Sourcing | Trilha 14: Liderança & Estratégia | Govern | Alocador de Programa |
 | **61** | `Fundamentos-de-Computacao-e-SO` | Fundamentos de Computação e SO para Segurança | Trilha 1: Fundamentos & Redes | Identify / Protect | Inspetor de Bytes |
+| **62** | `Exploracao-e-Escalada-de-Privilegio` | Exploração e Escalada de Privilégio: Detecção e Defesa | Trilha 3: Segurança Ofensiva | Detect / Protect | Console do Defensor |
 
 ---
 
@@ -230,7 +231,7 @@ flowchart LR
 
     subgraph Saida["Entrega Offline Standalone"]
         direction TB
-        H["treinamento-*.html<br>(61 Módulos 100% Offline)"]
+        H["treinamento-*.html<br>(62 Módulos 100% Offline)"]
         I["index.html<br>(Portal Central Dinâmico)"]
     end
 
@@ -286,10 +287,10 @@ python3 -m unittest discover -s _geradores/testes
 
 O currículo é estruturado de forma a atender diferentes objetivos e momentos de carreira:
 
-> No portal, a visão **Rotas sugeridas** mostra a rota de cada perfil como sequência numerada, com progresso e o próximo módulo a estudar; **Por certificação** reúne os módulos que cobrem cada prova; **Meu progresso** separa os concluídos dos que faltam; e o **Catálogo** agrupa os 61 módulos por nível (iniciante 12, intermediário 34, avançado 15), trilha, perfil ou função NIST.
+> No portal, a visão **Rotas sugeridas** mostra a rota de cada perfil como sequência numerada, com progresso e o próximo módulo a estudar; **Por certificação** reúne os módulos que cobrem cada prova; **Meu progresso** separa os concluídos dos que faltam; e o **Catálogo** agrupa os 61 módulos por nível (iniciante 12, intermediário 34, avançado 16), trilha, perfil ou função NIST.
 
 - **Blue Team & Defesa Ativa:** Módulos de redes, bastionamento Linux/Windows, firewalls, Zero Trust, EDR e detecção de ameaças; Linux e PowerShell para investigação (Trilha 8), Active Directory e detecção de ataques ao AD (Trilha 9) e ransomware (Trilha 10); engenharia de detecção, threat hunting, monitoramento de rede e SOAR (Trilha 11).
-- **Red Team & Testes de Invasão:** Técnicas de reconhecimento OSINT, OWASP Top 10 Web, segurança de APIs e metodologias de pentest; Linux e caminhos de ataque no Active Directory (Trilhas 8 e 9); escalação de privilégio em Kubernetes (Trilha 12).
+- **Red Team & Testes de Invasão:** Técnicas de reconhecimento OSINT, OWASP Top 10 Web, segurança de APIs e metodologias de pentest; a cadeia de exploração e escalada vista pela detecção; Linux e caminhos de ataque no Active Directory (Trilhas 8 e 9); escalação de privilégio em Kubernetes (Trilha 12).
 - **Operações, SOC & Forense:** Análise de logs SIEM, regras Sigma, inteligência de ameaças (CTI), resposta a incidentes e análise básica de malware; threat hunting, monitoramento de rede (Trilha 11) e investigação de incidentes em nuvem (Trilha 12).
 - **Engenharia de Nuvem & DevSecOps:** Segurança em provedores cloud (AWS/Azure/GCP), pipelines CI/CD seguros, conteinerização e IoT/TO; containers, Kubernetes, infraestrutura como código e resposta a incidentes em nuvem (Trilha 12).
 - **Governança, Riscos e Conformidade (GRC):** Metodologias de avaliação de risco (ALE/SLE), ISO/IEC 27001/27002:2022, LGPD e planos de continuidade/DRP; acessos privilegiados (PAM), gestão de crise e exercícios tabletop (Trilhas 9 e 10); regulação do setor financeiro, fraude em Pix, legislação penal e riscos de terceiros (Trilha 13); papel do CISO, maturidade e estruturação da área de segurança (Trilha 14).

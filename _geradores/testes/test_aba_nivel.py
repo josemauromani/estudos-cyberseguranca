@@ -16,7 +16,7 @@ from index_dados import ESTUDOS_DADOS, NIVEIS  # noqa: E402
 from build_index import gerar_index_html  # noqa: E402
 
 INICIANTES = {1, 2, 3, 4, 5, 15, 27, 32, 33, 34, 37, 38}
-AVANCADOS = {14, 19, 20, 23, 24, 39, 46, 47, 48, 49, 50, 51, 52, 53, 60}
+AVANCADOS = {14, 19, 20, 23, 24, 39, 46, 47, 48, 49, 50, 51, 52, 53, 60, 62}
 
 
 def numero(slug):
