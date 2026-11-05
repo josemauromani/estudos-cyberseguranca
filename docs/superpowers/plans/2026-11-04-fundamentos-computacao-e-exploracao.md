@@ -38,7 +38,7 @@
 
 **Files:**
 - Create: `_geradores/testes/test_marca.py`
-- Modify: `_geradores/montar.py` (docstring, `<title>` na linha ~221, `argparse` na ~252), `_geradores/gerar.sh`, `_geradores/index_dados.py`, `_geradores/glossario_dados.py` (cabeçalhos), `README.md`, `_geradores/CURRICULO.md`, `_geradores/GUIA-DO-AUTOR.md`, `_geradores/estudos.txt` (linha 1), `AGENTS.md`, `GEMINI.md` (se for arquivo próprio e não link)
+- Modify: `_geradores/montar.py` (docstring, `<title>` na linha ~221, `argparse` na ~252), `_geradores/gerar.sh`, `_geradores/index_dados.py`, `_geradores/glossario_dados.py` (cabeçalhos), `README.md`, `_geradores/CURRICULO.md`, `_geradores/GUIA-DO-AUTOR.md`, `_geradores/estudos.txt` (linha 1), `GEMINI.md` (`AGENTS.md` é link simbólico para ele; editar só o `GEMINI.md`)
 - Modify: corpos `autenticacao_e_iam`, `seguranca_de_redes_defesa`, `arquitetura_zero_trust`, `segmentacao_e_firewall`, `hardening_sistemas`, `gestao_de_vulnerabilidades` (`_body.html`): comentário `Estudos de Cibersegurança - José Mauro da Silva Brandão` → `Mapa da Cibersegurança`
 - Modify: `_geradores/testes/test_cli.py:99` ("Mapa da Cibersegurança")
 - Recompilados: todos os `treinamento-*.html` e `index.html`
