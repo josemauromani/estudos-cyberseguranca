@@ -137,7 +137,7 @@ flowchart LR
 
         <ul>
             <li><strong>Egress (saída):</strong> servidores normalmente recebem conexões, não iniciam. Uma conexão de saída de um servidor web para um IP ou porta incomum é um dos sinais mais limpos de acesso inicial.</li>
-            <li><strong>Linhagem de processo:</strong> o shell é filho do processo do serviço; o EDR vê <code>php → sh → conexão de saída</code>, uma cadeia que a operação normal não produz.</li>
+            <li><strong>Linhagem de processo:</strong> o shell é filho do processo do serviço; o EDR vê <code>php → sh → conexão de saída</code>, uma cadeia que a operação normal não produz. O <em>shell</em> filho do servidor web é o sinal da passagem da etapa 2 para a 3; a etapa 3 propriamente dita é a conexão de saída.</li>
             <li><strong>Beaconing:</strong> se o acesso vira um canal de comando e controle, a regularidade das conexões aparece no monitoramento de rede (Estudo 48).</li>
         </ul>
 
@@ -210,10 +210,10 @@ flowchart LR
   SeImpersonatePrivilege        Impersonate a client after authentication   Enabled
 
 C:\Users\svc_app&gt; sc qc AppAtualiza
-  BINARY_PATH_NAME   : C:\Arquivos de Programas\Ipe Updater\upd.exe
+  BINARY_PATH_NAME   : C:\Program Files\Ipe Updater\upd.exe
   SERVICE_START_NAME : LocalSystem</pre>
             <p style="margin-top:0.5rem;">
-                Dois achados aparecem: o token <code>SeImpersonatePrivilege</code> habilitado numa conta de serviço, e um serviço <code>LocalSystem</code> cujo caminho tem espaços <strong>sem aspas</strong> (<code>C:\Arquivos de Programas\Ipe Updater\upd.exe</code>), que o Windows pode tentar resolver como <code>C:\Arquivos.exe</code> antes do caminho completo. Os dois são vetores de escalada local; a correção é citar o caminho entre aspas no serviço e restringir o privilégio de token.
+                Dois achados aparecem: o token <code>SeImpersonatePrivilege</code> habilitado numa conta de serviço, e um serviço <code>LocalSystem</code> cujo caminho tem espaços <strong>sem aspas</strong> (<code>C:\Program Files\Ipe Updater\upd.exe</code>), que o Windows pode tentar resolver como <code>C:\Program.exe</code> antes do caminho completo. O vetor só funciona se o atacante puder escrever num diretório intermediário do caminho. Os dois são vetores de escalada local; a correção é citar o caminho entre aspas no serviço e restringir o privilégio de token.
             </p>
         </div>
 
@@ -222,9 +222,9 @@ C:\Users\svc_app&gt; sc qc AppAtualiza
                 <tr><th>Vetor</th><th>Prevenção</th><th>Detecção (Log de Eventos)</th></tr>
             </thead>
             <tbody>
-                <tr><td>Caminho de serviço sem aspas</td><td>Citar o caminho; permissões corretas na pasta</td><td>Criação de processo (4688) com caminho inesperado; instalação de serviço (7045)</td></tr>
+                <tr><td>Caminho de serviço sem aspas</td><td>Citar o caminho; permissões corretas na pasta</td><td>Criação de processo (4688) com pai <code>services.exe</code> e caminho inesperado; instalação de serviço (7045), se o atacante registrar um novo</td></tr>
                 <tr><td>Permissão fraca em serviço</td><td>Revisar ACLs de serviço</td><td>Alteração de configuração de serviço</td></tr>
-                <tr><td>Abuso de <code>SeImpersonate</code></td><td>Limitar o privilégio a contas que realmente precisam</td><td>Uso de privilégio sensível (4673), atribuição de token (4672)</td></tr>
+                <tr><td>Abuso de <code>SeImpersonate</code></td><td>Limitar o privilégio a contas que realmente precisam</td><td>Uso de privilégio sensível (4673), privilégios especiais atribuídos a um novo logon (4672)</td></tr>
                 <tr><td>Credencial esquecida em arquivo/registro</td><td>Não guardar segredo em texto claro; usar cofre</td><td>Leitura incomum de arquivos de configuração sensíveis</td></tr>
             </tbody>
         </table>
@@ -331,7 +331,7 @@ C:\Users\svc_app&gt; sc qc AppAtualiza
             <details class="quiz-details">
                 <summary class="quiz-toggle">Ver resposta explicada</summary>
                 <div class="quiz-answer">
-                    <p><strong>Resposta:</strong> Porque o <em>reverse shell</em> depende de o servidor abrir uma conexão de saída. Com egress restrito, essa conexão não se completa (prevenção) e a tentativa fica registrada como bloqueio (detecção). Um único controle fecha o caminho e gera o rastro.</p>
+                    <p><strong>Resposta:</strong> Porque o <em>reverse shell</em> depende de o servidor abrir uma conexão de saída. Com egress restrito, essa conexão não se completa (prevenção) e a tentativa fica registrada como bloqueio (detecção). Um único controle fecha o caminho e gera o rastro, desde que a lista de destinos seja restritiva (filtrar por destino não barra C2 em portas liberadas como 443 e DNS).</p>
                 </div>
             </details>
         </div>
@@ -355,7 +355,7 @@ C:\Users\svc_app&gt; sc qc AppAtualiza
             <details class="quiz-details">
                 <summary class="quiz-toggle">Ver resposta explicada</summary>
                 <div class="quiz-answer">
-                    <p><strong>Resposta:</strong> Porque esse privilégio é um vetor conhecido de escalada local para <code>SYSTEM</code> quando concedido a contas de serviço. O defensor limita o privilégio a quem realmente precisa e observa os eventos 4673 (uso de privilégio sensível) e 4672/4688 (atribuição de token e criação de processo) para notar o abuso.</p>
+                    <p><strong>Resposta:</strong> Porque esse privilégio é um vetor conhecido de escalada local para <code>SYSTEM</code> quando concedido a contas de serviço. O defensor limita o privilégio a quem realmente precisa e observa os eventos 4673 (uso de privilégio sensível) e 4672/4688 (privilégios especiais atribuídos a um novo logon e criação de processo) para notar o abuso.</p>
                 </div>
             </details>
         </div>
@@ -484,7 +484,7 @@ C:\Users\svc_app&gt; sc qc AppAtualiza
      "linha": "2026-11-02T09:21:12 process_create parent=php-fpm child=/bin/sh user=www-data",
      "estagio": "exploracao",
      "controle": "validacao",
-     "explicacao": "O servidor web gerando um shell é o sinal de maior valor da exploração virando execução; nasce de entrada não validada."
+     "explicacao": "Limite entre as etapas 2 e 3: a criação do shell pelo servidor web é a própria exploração virando execução de comando, por isso conta como etapa 2 (exploração); o acesso (etapa 3) só se confirma com a conexão de saída. Nasce de entrada não validada."
    },
    {
      "id": "ev5",
@@ -505,7 +505,7 @@ C:\Users\svc_app&gt; sc qc AppAtualiza
    {
      "id": "ev7",
      "fonte": "auditd (Linux)",
-     "linha": "2026-11-02T09:35:20 type=SYSCALL exe=/usr/bin/find uid=www-data suid=1 (SUID incomum)",
+     "linha": "2026-11-02T09:35:20 type=SYSCALL exe=/usr/bin/find uid=33 euid=0 (SUID incomum: euid diferente de uid)",
      "estagio": "escalada",
      "controle": "hardening",
      "explicacao": "Conta de serviço executando um SUID incomum é escalada no Linux; inventarie SUID e aplique menor privilégio."

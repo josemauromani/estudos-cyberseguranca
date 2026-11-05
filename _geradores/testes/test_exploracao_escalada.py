@@ -151,6 +151,7 @@ class TestExploracaoEscalada(unittest.TestCase):
 
     def test_motor_espelhado(self):
         d = self._dados()
+        self.assertIn("eOk && cOk", self._body())
         gab = {ev["id"]: {"estagio": ev["estagio"], "controle": ev["controle"]} for ev in d["eventos"]}
         r = avaliar(d, gab)
         self.assertEqual(r["acertos"], r["total"])
