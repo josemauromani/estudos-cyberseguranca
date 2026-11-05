@@ -169,9 +169,57 @@ chown -R appuser:appgroup /etc/app-secrets/</code></pre>
     </div>
   </section>
 
+  <!-- 2. PANORAMA DE AMEAÇAS: MALWARE E NEGAÇÃO DE SERVIÇO -->
+  <section class="study-section" id="panorama-ameacas" data-tipo="teoria">
+    <h2>2. Panorama de Ameaças: Malware e Negação de Serviço</h2>
+    <p>
+      Antes de modelar ameaças de forma estruturada (STRIDE, na próxima seção), o analista precisa reconhecer as famílias de ameaça que mais aparecem na prática e em provas. Duas são onipresentes num SOC e em qualquer banca: o <strong>software malicioso (malware)</strong> e os ataques de <strong>negação de serviço</strong>. As duas tabelas abaixo organizam os tipos pelo traço que os distingue — é por esse traço, não pelo nome comercial, que a prova costura a resposta.
+    </p>
+
+    <h3>Tipos de malware</h3>
+    <table class="data-table">
+      <thead>
+        <tr><th>Tipo</th><th>O que é</th><th>Traço distintivo</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Vírus</strong></td><td>Código que se anexa a um arquivo ou programa hospedeiro e se replica quando esse hospedeiro é executado.</td><td>Precisa de um hospedeiro e de uma ação do usuário para se espalhar.</td></tr>
+        <tr><td><strong>Worm</strong></td><td>Programa que se replica sozinho pela rede, de máquina em máquina.</td><td>Propagação autônoma: não precisa de hospedeiro nem de ação do usuário.</td></tr>
+        <tr><td><strong>Trojan</strong> (cavalo de Troia)</td><td>Software que se disfarça de legítimo para o usuário instalar por vontade própria.</td><td>Engana em vez de se replicar; é o veículo de entrada, não o que se espalha.</td></tr>
+        <tr><td><strong>Rootkit</strong></td><td>Conjunto que esconde a presença do atacante, muitas vezes atuando no <code>kernel</code> (ver Estudo 61).</td><td>Furtividade e persistência: existe para não ser visto.</td></tr>
+        <tr><td><strong>Ransomware</strong></td><td>Cifra ou bloqueia os dados da vítima e exige resgate.</td><td>Ataca a <strong>disponibilidade</strong> (Seção 1); aprofundado no Estudo 42.</td></tr>
+        <tr><td><strong>Spyware</strong> / keylogger</td><td>Coleta informação (teclas, telas, credenciais) sem o usuário saber.</td><td>Furto silencioso de dados; viola a confidencialidade.</td></tr>
+        <tr><td><strong>Bot</strong> / botnet</td><td>Máquina comprometida controlada remotamente, parte de uma rede de zumbis.</td><td>Recurso descartável do atacante; é a munição de muitos ataques DDoS.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout tip">
+      <strong>💡 A distinção que cai em prova:</strong>
+      o <strong>vírus</strong> precisa de hospedeiro e de ação do usuário; o <strong>worm</strong> se espalha sozinho pela rede; o <strong>trojan</strong> engana para ser instalado; o <strong>rootkit</strong> existe para se esconder. A análise prática de amostras (hashes, cabeçalho PE, entropia, regras YARA) é o tema do Estudo 20.
+    </div>
+
+    <h3>Negação de serviço (DoS e DDoS)</h3>
+    <p>
+      Um ataque de negação de serviço (<strong>DoS</strong>, <em>Denial of Service</em>) tira um serviço do ar atacando diretamente a <strong>disponibilidade</strong>. Quando parte de muitas origens ao mesmo tempo — em geral uma <em>botnet</em> —, é um <strong>DDoS</strong> (distribuído), muito mais difícil de filtrar porque o tráfego vem de milhares de endereços.
+    </p>
+    <table class="data-table">
+      <thead>
+        <tr><th>Categoria</th><th>Como satura a vítima</th><th>Exemplos</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Volumétrico</strong></td><td>Enche a banda de rede com um volume de tráfego maior do que o link suporta.</td><td>UDP flood, ICMP flood.</td></tr>
+        <tr><td><strong>De protocolo</strong></td><td>Esgota recursos de estado, como a tabela de conexões de servidores e firewalls.</td><td>SYN flood (abusa do 3-way handshake, Estudo 02).</td></tr>
+        <tr><td><strong>De aplicação (camada 7)</strong></td><td>Faz poucas requisições, porém caras, que exaurem a aplicação sem encher a banda.</td><td>HTTP flood, Slowloris.</td></tr>
+        <tr><td><strong>Amplificação / reflexão</strong></td><td>Usa serviços de terceiros que respondem muito mais do que recebem, refletindo o tráfego para a vítima.</td><td>Amplificação de DNS, NTP e memcached.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout warning">
+      <strong>⚠️ DoS × DDoS:</strong>
+      a diferença não está na técnica, e sim na origem — <strong>uma</strong> fonte (DoS) contra <strong>muitas</strong> fontes coordenadas (DDoS). A mitigação é feita na borda, com filtragem e limitação de taxa, firewalls de aplicação e serviços anti-DDoS especializados (ver Estudos 02 e 07).
+    </div>
+  </section>
+
   <!-- 3. FUNDAMENTOS DA MODELAGEM DE AMEAÇAS STRIDE -->
   <section class="study-section" id="modelagem-stride" data-tipo="teoria">
-    <h2>2. Fundamentos da Modelagem de Ameaças STRIDE</h2>
+    <h2>3. Fundamentos da Modelagem de Ameaças STRIDE</h2>
     <p>
       A modelagem de ameaças é uma atividade estruturada que permite identificar, quantificar e mitigar fraquezas de segurança na fase de concepção e desenho de um sistema, muito antes de linhas de código serem escritas ou servidores provisionados. Identificar e mitigar uma falha na fase de arquitetura pode ser até <strong>60 vezes mais barato</strong> do que corrigi-la em produção após um incidente cibernético.
     </p>
@@ -264,7 +312,7 @@ flowchart LR
 
   <!-- 4. LABORATÓRIO / SIMULADOR INTERATIVO STRIDE CANVAS -->
   <section class="study-section" id="simulador-stride" data-tipo="laboratorio">
-    <h2>3. Laboratório Interativo: STRIDE Canvas</h2>
+    <h2>4. Laboratório Interativo: STRIDE Canvas</h2>
     <p>
       Utilize o <strong>STRIDE Canvas</strong> abaixo para conduzir um exercício realista de modelagem de ameaças. Selecione um ativo da arquitetura do sistema corporativo, analise as ameaças mapeadas para cada categoria STRIDE, simule a ativação de controles mitigatórios e exporte o relatório executivo de risco residual.
     </p>
@@ -325,7 +373,7 @@ flowchart LR
 
   <!-- 5. CHECKLIST OPERACIONAL DE BOAS PRÁTICAS -->
   <section class="study-section" id="checklist-pratico" data-tipo="checklist">
-    <h2>4. Checklist de Auditoria: Modelagem de Ameaças em Projetos Reais</h2>
+    <h2>5. Checklist de Auditoria: Modelagem de Ameaças em Projetos Reais</h2>
     <p>
       Este checklist operacional consolida as etapas mandatórias para a condução de sessões de modelagem de ameaças em squads de desenvolvimento ágil e revisões de arquitetura. O progresso é <strong>salvo automaticamente</strong> no seu navegador (<em>localStorage</em>) para consultas e auditorias futuras.
     </p>
@@ -369,7 +417,7 @@ flowchart LR
 
   <!-- 6. QUIZ DE FIXAÇÃO E VALIDAÇÃO -->
   <section class="study-section" id="quiz-fixacao" data-tipo="questoes">
-    <h2>5. Questões de Fixação e Concursos Públicos</h2>
+    <h2>6. Questões de Fixação e Concursos Públicos</h2>
     <p>
       Valide sua compreensão com questões analíticas baseadas em casos práticos e provas de alto nível em segurança cibernética e certificações internacionais:
     </p>
@@ -445,7 +493,7 @@ flowchart LR
 
   <!-- 7. FATOS ESSENCIAIS, NORMAS E PRÓXIMOS PASSOS -->
   <section class="study-section" id="fatos-essenciais" data-tipo="referencias">
-    <h2>6. Fatos Essenciais, Normas e Próximos Passos</h2>
+    <h2>7. Fatos Essenciais, Normas e Próximos Passos</h2>
     <p>
       Síntese dos conceitos-chave consolidados neste módulo piloto para consulta rápida e alinhamento normativo:
     </p>
