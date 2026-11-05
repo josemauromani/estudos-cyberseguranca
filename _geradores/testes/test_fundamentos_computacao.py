@@ -58,6 +58,42 @@ def simular_pilha(entrada, canario, aslr):
     return "crash"
 
 
+def texto_para_hex(texto):
+    """Espelho de textoParaHex: bytes UTF-8 em pares maiúsculos separados por espaço."""
+    return " ".join(f"{b:02X}" for b in texto.encode("utf-8"))
+
+
+def hex_para_texto(hex_texto):
+    """Espelho de hexParaTexto: None se houver dígito fora de 0-9A-F, número ímpar de dígitos ou UTF-8 inválido."""
+    limpo = re.sub(r"[\s:]", "", hex_texto)
+    if len(limpo) % 2 != 0 or not re.fullmatch(r"[0-9a-fA-F]*", limpo):
+        return None
+    try:
+        return bytes.fromhex(limpo).decode("utf-8")
+    except UnicodeDecodeError:
+        return None
+
+
+def texto_para_base64(texto):
+    """Espelho de textoParaBase64 (RFC 4648, com preenchimento)."""
+    return base64.b64encode(texto.encode("utf-8")).decode("ascii")
+
+
+def base64_para_texto(b64):
+    """Espelho de base64ParaTexto: alfabeto padrão, '=' só no fim, comprimento coerente; None se inválido."""
+    s = re.sub(r"\s", "", b64)
+    m = re.fullmatch(r"([A-Za-z0-9+/]*)(={0,2})", s)
+    if not m:
+        return None
+    dados, pad = m.groups()
+    if len(dados) % 4 == 1 or (pad and (len(dados) + len(pad)) % 4 != 0):
+        return None
+    try:
+        return base64.b64decode(dados + "=" * (-len(dados) % 4)).decode("utf-8")
+    except (ValueError, UnicodeDecodeError):
+        return None
+
+
 def numero_do_estudo(slug):
     linhas = [l for l in (Path(__file__).resolve().parent.parent / "estudos.txt").read_text(encoding="utf-8").splitlines()
               if l.strip() and not l.startswith("#")]
@@ -193,6 +229,22 @@ class TestFundamentosComputacao(unittest.TestCase):
         self.assertIn("TextEncoder", self._secao_funcao(motor, "textoParaBase64"))
         self.assertIn("TextDecoder", self._secao_funcao(motor, "hexParaTexto"))
         self.assertIn("TextDecoder", self._secao_funcao(motor, "base64ParaTexto"))
+
+    def test_conversoes_espelhadas(self):
+        self.assertEqual(texto_para_hex("ação"), "61 C3 A7 C3 A3 6F")
+        self.assertEqual(hex_para_texto("61 C3 A7 C3 A3 6F"), "ação")
+        self.assertEqual(hex_para_texto("61c3a7c3a36f"), "ação")
+        self.assertEqual(texto_para_base64("ação"), "YcOnw6Nv")
+        self.assertEqual(base64_para_texto("YcOnw6Nv"), "ação")
+        for t in ("", "a", "ab", "abc", "ç" * 9):
+            self.assertEqual(hex_para_texto(texto_para_hex(t)), t)
+            self.assertEqual(base64_para_texto(texto_para_base64(t)), t)
+        for ruim in ("zz", "6", "C3", "FF FE"):  # não hex, ímpar, UTF-8 truncado, UTF-8 inválido
+            self.assertIsNone(hex_para_texto(ruim), ruim)
+        for ruim in ("@@@", "A", "YcOnw6N=v", "YQ=", "Y===", "////", "YcOnw6Nv===", "=YQ"):
+            self.assertIsNone(base64_para_texto(ruim), ruim)
+        self.assertEqual(base64_para_texto("YQ=="), "a")
+        self.assertEqual(base64_para_texto("YQ"), "a")
 
     @staticmethod
     def _secao_funcao(motor, nome):

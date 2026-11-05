@@ -2224,7 +2224,7 @@ dfn.glossario:focus-visible {
             Quando uma função é chamada, a CPU empilha o <strong>endereço de retorno</strong>: o ponto do código para onde a execução volta quando a função termina. A função reserva em seguida espaço para suas variáveis locais. Em x86-64 a pilha cresce para endereços <em>menores</em>, mas um buffer é preenchido para endereços <em>maiores</em>. O resultado: os bytes que passam do fim do buffer avançam sobre o que foi empilhado antes dele, e o endereço de retorno está no caminho.
         </p>
         <p>
-            Funções como <code>strcpy</code>, <code>gets</code> e <code>sprintf</code> copiam até encontrar um byte zero, sem conferir o tamanho do destino. Com 300 bytes num buffer de 64, a cópia cobre as variáveis locais, o valor salvo de controle e o endereço de retorno. Quando a função executa <code>ret</code>, a CPU salta para o endereço que o atacante escolheu: é isso que a pergunta-chave chama de "controle do servidor". O mecanismo é a falha de lógica mais antiga da segurança de software, e continua sendo uma das classes mais exploradas.
+            Funções como <code>strcpy</code>, <code>gets</code> e <code>sprintf</code> copiam até encontrar um byte zero, sem conferir o tamanho do destino. Com 300 bytes num buffer de 64, a cópia cobre as variáveis locais, o valor salvo de controle e o endereço de retorno. Quando a função executa <code>ret</code>, a CPU salta para o endereço que o atacante escolheu: é isso que a pergunta-chave chama de "controle do servidor". O mecanismo é uma falha de segurança de memória: o programa grava fora dos limites que reservou. Continua entre as classes de defeito mais exploradas, e as linguagens com segurança de memória existem para evitá-la.
         </p>
         <p>
             O laboratório deste módulo simplifica o quadro em três faixas: 16 bytes de <em>buffer</em>, 8 de canário e 8 de endereço de retorno. Um quadro real também guarda o ponteiro de base salvo (8 bytes) e pode ter alinhamento extra; as proporções mudam, o princípio não.
@@ -3057,7 +3057,7 @@ fatura-0421.pdf: PE32+ executable (console) x86-64, for MS Windows</code></pre>
             caixa.appendChild(c);
         });
         var alem = Math.max(0, n - lista.length);
-        $("comp-contagem").textContent = entrada.length + " caracteres = " + n + " bytes UTF-8. O buffer comporta " + TAM.buffer + "." +
+        $("comp-contagem").textContent = Array.from(entrada).length + " caracteres = " + n + " bytes UTF-8. O buffer comporta " + TAM.buffer + "." +
             (alem > 0 ? " " + alem + " bytes passam do fim da pilha modelada." : "");
         var resultado = simularPilha(entrada, canario, aslr);
         var r = $("comp-resultado-pilha");
