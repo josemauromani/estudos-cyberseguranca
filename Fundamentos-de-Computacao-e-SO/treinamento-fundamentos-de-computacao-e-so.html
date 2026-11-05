@@ -2171,7 +2171,7 @@ dfn.glossario:focus-visible {
                 <strong>Para onde este módulo aponta</strong>
             </div>
             <p>
-                O módulo é a base e não repete o que outros ensinam a fundo. A visão de EDR está no Estudo 10; a coleta de memória e de evidências, no Estudo 19 (Forense Digital); a triagem de binários suspeitos, no Estudo 20 (Análise Básica de Malware); permissões e shell no Linux, no Estudo 34; registro, serviços e tokens do Windows, no Estudo 36; isolamento de containers, no Estudo 50. A execução técnica, que usa a pilha e o kernel descritos aqui para explorar uma falha e escalar privilégio, vem no Estudo 62.
+                O módulo é a base e não repete o que outros ensinam a fundo. A visão de EDR está no Estudo 10; a coleta de memória e de evidências, no Estudo 19 (Forense Digital); a triagem de binários suspeitos, no Estudo 20 (Análise Básica de Malware); permissões e shell no Linux, no Estudo 34; registro, serviços e tokens do Windows, no Estudo 36; isolamento de containers, no Estudo 50. A execução técnica de uma exploração fica fora do escopo: aqui entra só o que explica por que a falha existe e como se defende.
             </p>
         </div>
 
@@ -2250,7 +2250,7 @@ dfn.glossario:focus-visible {
                 <strong>Defesa em camadas, não bala de prata</strong>
             </div>
             <p>
-                Nenhuma das três impede o defeito; cada uma encarece a exploração. A correção de verdade é não ter o defeito: validar o tamanho da entrada, usar funções com limite e, quando possível, linguagens com segurança de memória. O Estudo 62 mostra o lado do atacante dessas camadas.
+                Nenhuma das três impede o defeito; cada uma encarece a exploração. A correção de verdade é não ter o defeito: validar o tamanho da entrada, usar funções com limite e, quando possível, linguagens com segurança de memória.
             </p>
         </div>
 
@@ -2438,7 +2438,7 @@ fatura-0421.pdf: PE32+ executable (console) x86-64, for MS Windows</code></pre>
         </div>
 
         <p>
-            Os dois modelos têm a mesma consequência de defesa: um processo herda a identidade de quem o criou, então o que importa é com que privilégio o serviço roda. Um binário setuid-root ou um serviço que roda como SYSTEM com um defeito de memória, como o da seção 2, entrega ao atacante a identidade mais poderosa do sistema. A escalada de privilégio é o assunto do Estudo 62.
+            Os dois modelos têm a mesma consequência de defesa: um processo herda a identidade de quem o criou, então o que importa é com que privilégio o serviço roda. Um binário setuid-root ou um serviço que roda como SYSTEM com um defeito de memória, como o da seção 2, entrega ao atacante a identidade mais poderosa do sistema. Por isso o princípio do menor privilégio vale tanto quanto corrigir o defeito.
         </p>
     </section>
 
@@ -2735,7 +2735,7 @@ fatura-0421.pdf: PE32+ executable (console) x86-64, for MS Windows</code></pre>
                 <strong>Próximos passos</strong>
             </div>
             <p>
-                Com a pilha, o kernel e os tokens na cabeça, o Estudo 62 (Exploração e Escalada de Privilégio) mostra o caminho de uma máquina do começo ao fim, em ambiente autorizado. Para aprofundar permissões e shell, vá ao Estudo 34 (Linux) e ao Estudo 36 (Windows); para o lado defensivo, ao Estudo 10 (EDR).
+                Com a pilha, o kernel e os tokens na cabeça, siga para o Estudo 34 (Linux) e o Estudo 36 (Windows), que aprofundam permissões e shell; para o lado defensivo, vá ao Estudo 10 (EDR).
             </p>
         </div>
     <div class="study-done">
@@ -3031,7 +3031,7 @@ fatura-0421.pdf: PE32+ executable (console) x86-64, for MS Windows</code></pre>
         normal: ["A entrada cabe no buffer", "A função termina e retorna ao chamador normalmente."],
         abortado_canario: ["Canário sobrescrito: processo abortado", "Antes de retornar, a função confere o canário, vê que mudou e encerra o processo (no Linux, __stack_chk_fail). O endereço de retorno nunca chega a ser usado: o ataque vira, no máximo, uma queda do serviço."],
         crash: ["Endereço de retorno corrompido: falha de segmentação", "O retorno salta para um endereço que o atacante não controla de forma útil (ASLR ligado, ou só parte do endereço foi sobrescrita). O processo cai: negação de serviço, sem controle do fluxo."],
-        controle_do_fluxo: ["Controle do fluxo de execução", "Sem canário e sem ASLR, o endereço de retorno inteiro vem da entrada e o atacante sabe onde saltar. DEP/NX ainda impede executar dados injetados na pilha, mas não impede reaproveitar código já existente (Estudo 62)."]
+        controle_do_fluxo: ["Controle do fluxo de execução", "Sem canário e sem ASLR, o endereço de retorno inteiro vem da entrada e o atacante sabe onde saltar. DEP/NX ainda impede executar dados injetados na pilha, mas não impede reaproveitar código já existente."]
     };
     function celulas(canario) {
         var lista = [];

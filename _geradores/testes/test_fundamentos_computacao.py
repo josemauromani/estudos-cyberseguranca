@@ -166,7 +166,7 @@ class TestFundamentosComputacao(unittest.TestCase):
     def test_pontes_sem_repetir(self):
         body = self._body()
         antes = body[:body.index('id="simulador"')]
-        refs = ["Estudo 10", "Estudo 62"]
+        refs = ["Estudo 10"]
         for slug in ("Linux-para-Seguranca", "PowerShell-e-Windows-Interno", "Forense-Digital",
                      "Analise-Basica-de-Malware", "Seguranca-de-Containers"):
             refs.append(f"Estudo {numero_do_estudo(slug)}")

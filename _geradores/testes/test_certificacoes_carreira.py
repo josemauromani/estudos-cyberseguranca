@@ -95,6 +95,25 @@ class TestCertificacoesCarreira(unittest.TestCase):
         return next(c for c in d["certificacoes"] if c["sigla"] == sigla)
 
     # ----------------------------------------------------------------- arquivos
+    def test_modulo_61_na_matriz(self):
+        slug = "Fundamentos-de-Computacao-e-SO"
+        d = self._dados()
+        for sigla in ("Security+", "GSEC", "eCPPT"):
+            with self.subTest(cert=sigla):
+                portal = next(c for c in CERTIFICACOES if c["sigla"] == sigla)
+                self.assertIn(slug, portal["modulos"])
+                doms = self._cert(d, sigla)["dominios"]
+                self.assertTrue(any(slug in dom["modulos"] for dom in doms))
+
+    def test_61_parcial_no_ecppt(self):
+        slug = "Fundamentos-de-Computacao-e-SO"
+        dom = next(x for x in self._cert(self._dados(), "eCPPT")["dominios"]
+                   if x["nome"] == "Desenvolvimento de exploits")
+        self.assertIn(slug, dom["modulos"])
+        self.assertTrue(dom.get("parcial"))
+        self.assertIn("estouro de memória", dom["nota"])
+        self.assertIn("não ensina a escrever exploit", dom["nota"])
+
     def test_body_and_compiled_files_exist(self):
         self.assertTrue(self.body_path.exists())
         self.assertTrue(self.compiled_path.exists())

@@ -2,7 +2,7 @@
 
 ## 1. Visão Geral e Filosofia Pedagógica
 
-O currículo do **Mapa da Cibersegurança** foi concebido como uma formação autoinstrucional, prática e modular, dividida em **60 módulos temáticos** organizados em **14 trilhas estruturantes**. 
+O currículo do **Mapa da Cibersegurança** foi concebido como uma formação autoinstrucional, prática e modular, dividida em **61 módulos temáticos** organizados em **14 trilhas estruturantes**. 
 
 O projeto segue quatro diretrizes fundamentais:
 1. **Teoria Pragmática e Direta ao Ponto:** Eliminação de floreios acadêmicos desnecessários; foco no que engenheiros, analistas e auditores de segurança executam na rotina corporativa e no que bancas de concursos e certificações (CompTIA Security+, CySA+, PenTest+, CEH, CISSP) cobram.
@@ -98,7 +98,7 @@ flowchart LR
 
 | Trilha | Denominação | Cor do Tema | Foco Técnico | Módulos |
 |---|---|---|---|---|
-| **Trilha 1** | Fundamentos & Redes | `#2563EB` (Azul) | Base sólida: CIA, protocolos, criptografia, IAM e perímetro | 01 ao 05 |
+| **Trilha 1** | Fundamentos & Redes | `#2563EB` (Azul) | Base sólida: CIA, protocolos, criptografia, IAM e perímetro, mais fundamentos de computação e SO | 01 ao 05 e 61 |
 | **Trilha 2** | Segurança Defensiva | `#059669` (Verde) | Bastionamento, defesas de rede, Zero Trust, vulnerabilidades e EDR | 06 ao 10, 29, 30 |
 | **Trilha 3** | Segurança Ofensiva | `#DC2626` (Vermelho) | Reconhecimento, falhas web, APIs, testes de intrusão e phishing | 11 ao 15 |
 | **Trilha 4** | Operações, SOC & Resposta | `#7C3AED` (Roxo) | Monitoramento, SIEM, CTI, contenção de incidentes e forense | 16 ao 20 |
@@ -115,7 +115,7 @@ flowchart LR
 
 ---
 
-## 3. Detalhamento dos 60 Módulos de Aprendizagem
+## 3. Detalhamento dos 61 Módulos de Aprendizagem
 
 ### Trilha 1: Fundamentos & Redes (`#2563EB`)
 
@@ -766,8 +766,8 @@ flowchart LR
 | Função NIST CSF 2.0 | Quantidade de Módulos | Módulos Vinculados |
 |---|---|---|
 | **GOVERN (GV)** | 10 módulos | 25, 26, 27, 31, 54, 56, 57, 58, 59, 60 |
-| **IDENTIFY (ID)** | 6 módulos | 01, 09, 11, 14, 17, 25 |
-| **PROTECT (PR)** | 32 módulos | 02, 03, 04, 05, 06, 07, 08, 09, 10, 12, 13, 15, 21, 22, 23, 24, 27, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 50, 51, 52, 55 |
+| **IDENTIFY (ID)** | 7 módulos | 01, 09, 11, 14, 17, 25, 61 |
+| **PROTECT (PR)** | 33 módulos | 02, 03, 04, 05, 06, 07, 08, 09, 10, 12, 13, 15, 21, 22, 23, 24, 27, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 50, 51, 52, 55, 61 |
 | **DETECT (DE)** | 18 módulos | 02, 07, 10, 16, 17, 20, 24, 29, 30, 34, 35, 36, 39, 46, 47, 48, 53, 55 |
 | **RESPOND (RS)** | 8 módulos | 18, 19, 20, 42, 43, 44, 49, 53 |
 | **RECOVER (RC)** | 4 módulos | 28, 42, 44, 45 |
@@ -781,17 +781,17 @@ flowchart LR
 Para orientar estudantes e profissionais com focos específicos, a matriz curricular recomenda as seguintes trilhas rápidas:
 
 1. **Rota Blue Team / Analista SOC:**  
-   `01 -> 02 -> 34 -> 36 -> 05 -> 06 -> 07 -> 48 -> 10 -> 39 -> 16 -> 17 -> 46 -> 47 -> 18 -> 49 -> 42`
+   `01 -> 61 -> 02 -> 34 -> 36 -> 05 -> 06 -> 07 -> 48 -> 10 -> 39 -> 16 -> 17 -> 46 -> 47 -> 18 -> 49 -> 42`
 2. **Rota Red Team / Pentest:**  
-   `01 -> 02 -> 34 -> 04 -> 11 -> 12 -> 13 -> 38 -> 39 -> 50 -> 51 -> 14 -> 15`
+   `01 -> 61 -> 02 -> 34 -> 04 -> 11 -> 12 -> 13 -> 38 -> 39 -> 50 -> 51 -> 14 -> 15`
 3. **Rota DevSecOps & Cloud Security:**  
-   `01 -> 03 -> 04 -> 35 -> 06 -> 12 -> 13 -> 21 -> 41 -> 22 -> 50 -> 51 -> 52 -> 53 -> 24`
+   `01 -> 61 -> 03 -> 04 -> 35 -> 06 -> 12 -> 13 -> 21 -> 41 -> 22 -> 50 -> 51 -> 52 -> 53 -> 24`
 4. **Rota GRC, Auditoria & Privacidade:**  
    `01 -> 08 -> 40 -> 09 -> 25 -> 26 -> 58 -> 57 -> 27 -> 56 -> 54 -> 55 -> 28 -> 43 -> 44 -> 59 -> 60`
 5. **Rota Perícia & Resposta a Incidentes:**  
-   `01 -> 02 -> 06 -> 36 -> 10 -> 48 -> 16 -> 47 -> 18 -> 53 -> 42 -> 45 -> 19 -> 56 -> 20`
+   `01 -> 61 -> 02 -> 06 -> 36 -> 10 -> 48 -> 16 -> 47 -> 18 -> 53 -> 42 -> 45 -> 19 -> 56 -> 20`
 6. **Rota 6: Analista de Segurança da Informação (vaga):**  
-   `01 -> 34 -> 36 -> 05 -> 06 -> 07 -> 10 -> 29 -> 30 -> 38 -> 40 -> 25 -> 26 -> 31 -> 54 -> 57 -> 18 -> 49 -> 42 -> 43 -> 32 -> 37 -> 33 -> 59`  
+   `01 -> 61 -> 34 -> 36 -> 05 -> 06 -> 07 -> 10 -> 29 -> 30 -> 38 -> 40 -> 25 -> 26 -> 31 -> 54 -> 57 -> 18 -> 49 -> 42 -> 43 -> 32 -> 37 -> 33 -> 59`  
    Cada competência da vaga também aparece, com os módulos principais e de apoio, na seção "Rota por Vaga" do portal (`index.html`).
 
 No portal, a aba **Rotas Sugeridas** mostra cada rota como sequência numerada, com o progresso salvo no navegador e o próximo módulo a estudar. As sequências vêm de `ROTAS_PERFIL` em `_geradores/index_dados.py`, que é a fonte única; um teste (`test_rotas_sugeridas.py`) garante que esta seção continue igual aos dados.

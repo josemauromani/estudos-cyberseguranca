@@ -116,7 +116,7 @@ class TestCurriculo(unittest.TestCase):
         self.assertIn("Trilha 14: Liderança & Estratégia", readme)
         self.assertIn("#### 59. Lideranca-e-Programa-de-Seguranca", curriculo)
         self.assertIn("#### 60. Estruturacao-da-Area-de-Seguranca", curriculo)
-        self.assertIn("60 módulos", readme)
+        self.assertIn("61 módulos", readme)
         corpos = list((self.root / "_geradores").glob("*_body.html"))
         self.assertTrue(corpos)
         for nome, texto in [("README.md", readme), ("CURRICULO.md", curriculo),

@@ -249,7 +249,7 @@ class TestGestaoRiscosTerceiros(unittest.TestCase):
             self.assertIn(ref, intro, ref)
         fim = body[body.index('id="fatos"'):body.index("</article>")]
         for ref in ("Trilha 13", "Estudo 54", "Estudo 55", "Estudo 56", "Estudo 33", "Estudo 37",
-                    "Rota por Vaga", "60 módulos"):
+                    "Rota por Vaga", "61 módulos"):
             self.assertIn(ref, fim, ref)
 
     # ------------------------------------------------- fatos normativos

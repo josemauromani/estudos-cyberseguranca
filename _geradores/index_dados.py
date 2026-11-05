@@ -634,6 +634,7 @@ ROTAS_PERFIL: List[Dict[str, Any]] = [
         "descricao": "Defesa e operação de SOC: redes, hardening, EDR, Active Directory, SIEM, threat intel, detecção avançada e resposta.",
         "modulos": [
             "Fundamentos-Ciber",
+            "Fundamentos-de-Computacao-e-SO",
             "Redes-e-Protocolos",
             "Linux-para-Seguranca",
             "PowerShell-e-Windows-Interno",
@@ -659,6 +660,7 @@ ROTAS_PERFIL: List[Dict[str, Any]] = [
         "descricao": "Segurança ofensiva ética: reconhecimento, falhas web e de APIs, caminhos de ataque no AD e no Kubernetes, pentest e engenharia social.",
         "modulos": [
             "Fundamentos-Ciber",
+            "Fundamentos-de-Computacao-e-SO",
             "Redes-e-Protocolos",
             "Linux-para-Seguranca",
             "Autenticacao-e-IAM",
@@ -680,6 +682,7 @@ ROTAS_PERFIL: List[Dict[str, Any]] = [
         "descricao": "Desenvolvimento e nuvem seguros: criptografia, IAM, APIs, pipeline, containers, Kubernetes, infraestrutura como código e resposta em nuvem.",
         "modulos": [
             "Fundamentos-Ciber",
+            "Fundamentos-de-Computacao-e-SO",
             "Criptografia-Pratica",
             "Autenticacao-e-IAM",
             "Python-para-Seguranca",
@@ -728,6 +731,7 @@ ROTAS_PERFIL: List[Dict[str, Any]] = [
         "descricao": "Investigação: rede, SOC, threat hunting, resposta a incidentes (inclusive em nuvem), ransomware, forense, legislação e malware.",
         "modulos": [
             "Fundamentos-Ciber",
+            "Fundamentos-de-Computacao-e-SO",
             "Redes-e-Protocolos",
             "Hardening-Sistemas",
             "PowerShell-e-Windows-Interno",
@@ -751,6 +755,7 @@ ROTAS_PERFIL: List[Dict[str, Any]] = [
         "descricao": "A rota da vaga de Analista de SI: soluções de segurança, bancos de dados, normas, controles, resposta a incidentes, inglês e certificações.",
         "modulos": [
             "Fundamentos-Ciber",
+            "Fundamentos-de-Computacao-e-SO",
             "Linux-para-Seguranca",
             "PowerShell-e-Windows-Interno",
             "Segmentacao-e-Firewall",
@@ -822,7 +827,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "orgao": "GIAC (SANS)",
         "foco": "Técnica generalista",
         "experiencia": "Sem exigência formal",
-        "modulos": ["Redes-e-Protocolos", "Criptografia-Pratica", "Segmentacao-e-Firewall", "Hardening-Sistemas", "Seguranca-de-Redes-Defesa", "Seguranca-em-Endpoints-EDR", "Operacoes-SOC-e-SIEM", "Linux-para-Seguranca", "PowerShell-e-Windows-Interno", "Active-Directory-Fundamentos", "Monitoramento-de-Rede-NSM", "Seguranca-de-Containers"],
+        "modulos": ["Redes-e-Protocolos", "Criptografia-Pratica", "Segmentacao-e-Firewall", "Hardening-Sistemas", "Seguranca-de-Redes-Defesa", "Seguranca-em-Endpoints-EDR", "Operacoes-SOC-e-SIEM", "Linux-para-Seguranca", "PowerShell-e-Windows-Interno", "Active-Directory-Fundamentos", "Monitoramento-de-Rede-NSM", "Seguranca-de-Containers", "Fundamentos-de-Computacao-e-SO"],
     },
     {
         "sigla": "Security+",
@@ -831,7 +836,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "orgao": "CompTIA",
         "foco": "Entrada / fundamentos",
         "experiencia": "Recomendada, sem exigência formal",
-        "modulos": ["Fundamentos-Ciber", "Redes-e-Protocolos", "Criptografia-Pratica", "Autenticacao-e-IAM", "Segmentacao-e-Firewall", "Gestao-de-Vulnerabilidades", "Seguranca-em-Endpoints-EDR", "Resposta-a-Incidentes", "PAM-e-Acessos-Privilegiados", "Ransomware-Prevencao-a-Recuperacao", "Backup-Imutavel-e-Recuperacao", "Engenharia-de-Deteccao", "Fraude-em-Pagamentos-e-Pix"],
+        "modulos": ["Fundamentos-Ciber", "Redes-e-Protocolos", "Criptografia-Pratica", "Autenticacao-e-IAM", "Segmentacao-e-Firewall", "Gestao-de-Vulnerabilidades", "Seguranca-em-Endpoints-EDR", "Resposta-a-Incidentes", "PAM-e-Acessos-Privilegiados", "Ransomware-Prevencao-a-Recuperacao", "Backup-Imutavel-e-Recuperacao", "Engenharia-de-Deteccao", "Fraude-em-Pagamentos-e-Pix", "Fundamentos-de-Computacao-e-SO"],
     },
     {
         "sigla": "ISFS",
@@ -903,7 +908,7 @@ CERTIFICACOES: List[Dict[str, Any]] = [
         "orgao": "INE Security",
         "foco": "Técnica / ofensiva (prova prática)",
         "experiencia": "Sem exigência formal",
-        "modulos": ["Redes-e-Protocolos", "Reconhecimento-e-OSINT", "OWASP-Top-10-Web", "Seguranca-em-APIs", "Pentest-Metodologias", "Linux-para-Seguranca", "Python-para-Seguranca", "PowerShell-e-Windows-Interno", "Active-Directory-Fundamentos", "Ataques-e-Defesa-no-AD"],
+        "modulos": ["Redes-e-Protocolos", "Reconhecimento-e-OSINT", "OWASP-Top-10-Web", "Seguranca-em-APIs", "Pentest-Metodologias", "Linux-para-Seguranca", "Python-para-Seguranca", "PowerShell-e-Windows-Interno", "Active-Directory-Fundamentos", "Ataques-e-Defesa-no-AD", "Fundamentos-de-Computacao-e-SO"],
     },
     {
         "sigla": "OSCP",

@@ -48,6 +48,15 @@ class TestDadosDasRotas(unittest.TestCase):
                 for slug in r["modulos"]:
                     self.assertIn(slug, ESTUDOS_DADOS)
 
+    def test_rotas_do_modulo_61(self):
+        slug = "Fundamentos-de-Computacao-e-SO"
+        rotas = {r["id"]: r["modulos"] for r in ROTAS_PERFIL}
+        for rid in ("blue_soc", "red_team", "devsecops_cloud", "pericia", "analista_si"):
+            with self.subTest(rota=rid):
+                m = rotas[rid]
+                self.assertEqual(m.index(slug), m.index("Fundamentos-Ciber") + 1)
+        self.assertNotIn(slug, rotas["grc"])
+
     def test_rotas_batem_com_o_curriculo(self):
         """O §5 do CURRICULO.md documenta as mesmas sequências que o portal mostra."""
         self.assertEqual(sequencias_do_curriculo(), [[numero(s) for s in r["modulos"]] for r in ROTAS_PERFIL])
@@ -56,7 +65,7 @@ class TestDadosDasRotas(unittest.TestCase):
         r = ROTAS_PERFIL[0]
         self.assertEqual(numero(r["modulos"][0]), 1)
         self.assertEqual(numero(r["modulos"][-1]), 42)
-        self.assertEqual(len(r["modulos"]), 17)
+        self.assertEqual(len(r["modulos"]), 18)
 
     def test_rota_blue_team_poe_threat_intel_antes_da_engenharia_de_deteccao(self):
         """O 17 é pré-requisito do 46: a rota não pode pedir a detecção antes da inteligência."""

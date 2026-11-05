@@ -168,7 +168,7 @@ class TestEstruturacaoDaArea(unittest.TestCase):
         for ref in ("Estudo 15", "Estudo 16", "Estudo 41", "Estudo 57", "Estudo 59"):
             self.assertIn(ref, antes, ref)
         fim = self._secao("fatos")
-        for ref in ("Trilha 14", "60 módulos"):
+        for ref in ("Trilha 14", "61 módulos"):
             self.assertIn(ref, fim, ref)
 
     def test_referencias(self):

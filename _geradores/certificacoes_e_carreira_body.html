@@ -925,7 +925,8 @@ flowchart TD
      "modulos": [
       "Hardening-Sistemas",
       "Arquitetura-Zero-Trust",
-      "ISO-27001-e-27002"
+      "ISO-27001-e-27002",
+      "Fundamentos-de-Computacao-e-SO"
      ]
     },
     {
@@ -1021,7 +1022,8 @@ flowchart TD
       "Segmentacao-e-Firewall",
       "Seguranca-em-Nuvem",
       "Seguranca-em-IoT-e-OT",
-      "Backup-Imutavel-e-Recuperacao"
+      "Backup-Imutavel-e-Recuperacao",
+      "Fundamentos-de-Computacao-e-SO"
      ]
     },
     {
@@ -1680,8 +1682,11 @@ flowchart TD
     {
      "nome": "Desenvolvimento de exploits",
      "peso": 5,
-     "modulos": [],
-     "nota": "Nenhum módulo do currículo cobre buffer overflow, corrupção de memória nem desenvolvimento de exploit. Estude por fora."
+     "modulos": [
+      "Fundamentos-de-Computacao-e-SO"
+     ],
+     "parcial": true,
+     "nota": "O módulo 61 explica por que o estouro de memória acontece (pilha, canário, ASLR/DEP), mas não ensina a escrever exploit. Pratique por fora."
     },
     {
      "nome": "Teste de intrusão em Active Directory",
@@ -2157,6 +2162,10 @@ flowchart TD
   "Estruturacao-da-Area-de-Seguranca": {
    "numero": 60,
    "titulo": "Estruturação da Área de Segurança: Maturidade, Time e Sourcing"
+  },
+  "Fundamentos-de-Computacao-e-SO": {
+   "numero": 61,
+   "titulo": "Fundamentos de Computação e SO para Segurança"
   }
  }
 }
