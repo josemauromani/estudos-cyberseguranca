@@ -75,7 +75,7 @@ A análise do catálogo frente a uma vaga de **Especialista em Governança, Risc
 | 4. CIS Controls (18 + Implementation Groups) | 26 (ISO) | expandir a seção existente (subseção `h3`) |
 | 3. CGEIT | 33 (Certificações) | matriz 17 → 18 |
 
-Cada adição de seção segue o contrato do corpo (`GUIA-DO-AUTOR.md` §2): `<section class="study-section" id=… data-tipo="teoria">` com `<h2>` numerado, callouts com modificador, tabelas `data-table`, e **1–2 questões** acrescentadas à seção de questões existente do módulo, mais referência(s) oficial(is) na seção de referências. Renumerar os `<h2>` seguintes do módulo.
+Cada adição de seção segue o contrato do corpo (`GUIA-DO-AUTOR.md` §2): `<section class="study-section" id=… data-tipo="teoria">` com `<h2>`, callouts com modificador, tabelas `data-table`, e **1–2 questões** acrescentadas à seção de questões existente do módulo, mais referência(s) oficial(is) na seção de referências. (Nos módulos 25/26/58 os `<h2>` não são numerados no texto — ver §3.6 —, então não há renumeração.)
 
 ### 3.1 Item 1 — Exceções de segurança (módulo 25)
 
@@ -106,26 +106,39 @@ Seção nova após a do item 2. Conteúdo:
 - Callout `tip`: a função transversal de GRC conecta sinais dispersos; a ferramenta ajuda, mas não substitui o julgamento.
 - Remissões: 25 (riscos), 09 (vulnerabilidades), 46/47 (detecção/hunting como fonte de sinal), 18 (incidentes). 1–2 questões + referência (ISACA/IRM; OCEG GRC Capability Model se confirmável).
 
-### 3.4 Item 4 — CIS Controls (módulo 26, expandir seção existente)
+### 3.4 Item 4 — CIS Controls vs Benchmarks (módulo 26, acréscimo mínimo)
 
-Na seção "SGSI, Anexo A, CIS Controls e NIST SP 800-53", acrescentar subseção `h3`:
-- Os **18 CIS Controls v8** como "o que fazer", organizados em **Implementation Groups** (IG1/IG2/IG3) por maturidade/porte.
-- Distinção explícita dos **CIS Benchmarks** (endurecimento por dispositivo, módulo 06).
-- Mapeamento CIS Controls ↔ ISO 27001 Anexo A (o Mapa já traz o Anexo A aqui).
-- 1 questão nova + referência (CIS Controls v8.1). Mantém-se subseção; não cria seção nova nem renumera o módulo.
+**Correção do builder check:** o módulo 26 **já cobre** os 18 CIS Controls v8.1, os Implementation Groups (IG1/IG2/IG3) e o crosswalk ISO↔CIS↔NIST (as subseções "CIS Controls v8.1 e NIST SP 800-53 Rev. 5" e "Crosswalk" já existem na seção `sgsi`). O crosswalk está travado em **15 entradas** por `test_crosswalk_tem_15_entradas_completas` — **não mexer** nele. O único ponto genuinamente ausente é a **distinção entre CIS Controls e CIS Benchmarks**.
+
+Escopo do item 4, portanto, **mínimo**: acrescentar à seção `sgsi` um parágrafo (ou callout) que distingue **CIS Controls** (os 18 — "o que fazer", já listados ali) dos **CIS Benchmarks** (endurecimento por dispositivo, módulo 06 — "como configurar"), mais **1 questão nova** na seção de questões do 26. Sem nova subseção de tabela, sem re-listar os 18, sem tocar no crosswalk. Referência: CIS Controls v8.1.
 
 ### 3.5 Item 3 — CGEIT na matriz (módulo 33)
 
 - `CERTIFICACOES` (`index_dados.py`): nova entrada no padrão de CRISC/CDPSE — `sigla` "CGEIT", `site_oficial` da ISACA, `nome` "Certified in the Governance of Enterprise IT", `orgao` "ISACA", `foco` "Governança de TI corporativa", `experiencia` conferida na ISACA (ou texto "confira"), `modulos`: `["Lideranca-e-Programa-de-Seguranca", "Estruturacao-da-Area-de-Seguranca", "Auditoria-de-TI", "Gestao-de-Riscos-TI", "ISO-27001-e-27002"]`.
 - `#cert-dados` no corpo do 33: entrada correspondente com domínios da **CGEIT** (da página oficial da ISACA; se um domínio não tiver módulo, `parcial` + nota, como no padrão) e `requisitos: {"conferir": true}` (como CISA/CISM). Entrada no bloco de lookup `slug→{numero,titulo}` se existir.
-- Matriz passa de **17 para 18**. Ajustar os testes de `test_certificacoes_carreira.py` que fixam a lista/contagem de certificações, os `esperados` de nº de domínios (só se CGEIT entrar com domínios conhecidos), `test_requisitos_de_experiencia` (CGEIT em `{"conferir": True}`) e `test_coerencia_com_a_matriz_do_portal` (CGEIT em `CERTIFICACOES` e no `#cert-dados`).
+- CGEIT entra **sem pesos** (como CEH/GSEC): domínios reais da ISACA com `peso: None`, módulos mapeados, `nota` onde um domínio não tiver módulo; `requisitos: {"conferir": true}`. **Não** adicionar CGEIT aos conjuntos `com_pesos`/`esperados`/`test_revisao_contra_fontes_oficiais`.
+- Matriz passa de **17 para 18**. Ripple de testes e textos a ajustar (ver §3.6).
+
+### 3.6 Ripple de testes e textos (do builder check — os testes são contrato editável, não congelado)
+
+A §3.5 original só citava `test_certificacoes_carreira.py`. O builder check mapeou o alcance real; o plano precisa de tarefas explícitas para:
+
+- **Módulo 25 (item 1):** `test_gestao_riscos_ti.py` fixa `iso-27005` imediatamente antes do laboratório e "Seção 7 de 7". Inserir a seção de exceções **entre** a `iso-27005` e o laboratório quebra a asserção de adjacência e a contagem → atualizar o teste para a nova ordem e "Seção 8 de 8".
+- **Módulo 58 (itens 2 e 5):** `test_auditoria_de_ti.py::test_secoes` fixa uma lista de **9 ids** e "Seção N de 9". Duas seções novas → lista de **11 ids** e "Seção N de 11"; inserir os ids novos na posição certa.
+- **Módulo 33 (item 3, CGEIT):** além de `test_certificacoes_carreira.py`, ajustar:
+  - `test_rota_vaga.py` — a lista ordenada de **17 siglas** e o dict `DOMINIO_OFICIAL` (CGEIT → isaca.org);
+  - o parágrafo do planejador no corpo do 33 e a lista "requisito… só em texto" do `CURRICULO.md` (ambos cobrados por `test_textos_listam_todas_as_certificacoes_conferir`, já que CGEIT terá `requisitos.conferir=True`);
+  - o subtítulo do módulo 33 e as duas ocorrências de "17 certificações" no `README.md` → 18.
+- Qualquer outro teste/helper que itere `CERTIFICACOES` e trave contagem/ordem.
+
+**Nota:** os `<h2>` dos módulos 25, 26 e 58 **não** são numerados no texto (o chassi gera "Seção 0X"), então **não há** renumeração de título a fazer nesses módulos (diferente do módulo 01). A tarefa de renumeração citada antes era vazia e sai.
 
 ---
 
 ## 4. Ordem de Entrega (sugerida ao plano)
 
 1. Item 3 (CGEIT) — menor e isolado.
-2. Item 4 (CIS Controls) — subseção no 26.
+2. Item 4 (CIS Controls vs Benchmarks) — acréscimo mínimo no 26.
 3. Item 1 (exceções) — módulo 25.
 4. Itens 2 e 5 — módulo 58 (duas seções correlatas).
 5. `gerar.sh todos`, suíte completa, varredura de nome.
@@ -133,5 +146,5 @@ Na seção "SGSI, Anexo A, CIS Controls e NIST SP 800-53", acrescentar subseçã
 ## 5. O que fica com o builder
 
 - Redação final em pt-BR e o texto exato das questões, dentro do que cada subseção define.
-- Confirmar nas fontes oficiais os dados citados (domínios/experiência da CGEIT na ISACA; numeração CIS Controls v8.1; cláusulas ISO/NIST). Onde a fonte não publicar, usar "confira na página oficial".
-- Posição exata de inserção e a renumeração dos `<h2>` em cada módulo.
+- Confirmar nas fontes oficiais os dados citados (domínios/experiência da CGEIT na ISACA; cláusulas ISO/NIST). Onde a fonte não publicar, usar "confira na página oficial".
+- Posição exata de inserção das seções novas (sem renumerar `<h2>` nos módulos 25/26/58).
