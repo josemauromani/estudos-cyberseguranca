@@ -132,6 +132,7 @@ class TestLigacoesNovas(unittest.TestCase):
             "OSCP": ["Linux-para-Seguranca", "Python-para-Seguranca", "PowerShell-e-Windows-Interno", "Laboratorio-Domestico-e-Portfolio", "Active-Directory-Fundamentos", "Ataques-e-Defesa-no-AD"],
             "CRISC": [],
             "CDPSE": [],
+            "CGEIT": [],
         }
         for c in CERTIFICACOES:
             with self.subTest(sigla=c["sigla"]):
