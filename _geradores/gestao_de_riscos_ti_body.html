@@ -288,6 +288,61 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
         </div>
     </section>
 
+    <section class="study-section" id="excecoes" data-tipo="teoria">
+        <h2>Gestão de Exceções de Segurança</h2>
+
+        <p class="lead-text">
+            Nem todo requisito ou controle pode ser cumprido no prazo: um sistema legado não suporta o algoritmo exigido, uma migração atrasa, um fornecedor não entrega o patch. Uma <strong>exceção de segurança</strong> é a <strong>aceitação formal e temporária de um risco</strong> quando um controle ou requisito não pode ser atendido agora. É a aceitação de risco (a quarta estratégia de tratamento) com dono, motivo e data para acabar.
+        </p>
+
+        <h3>O Ciclo de Vida de uma Exceção</h3>
+        <ol>
+            <li><strong>Solicitação:</strong> a área dona do ativo descreve o requisito não atendido, o motivo, o escopo e o impacto no negócio.</li>
+            <li><strong>Análise de risco:</strong> estima-se o risco criado pela lacuna, com os mesmos critérios de avaliação do registro de riscos.</li>
+            <li><strong>Aprovação por alçada:</strong> quem aprova depende do nível de risco; quanto maior o risco, mais alta a alçada. Quem aceita o risco é o dono do risco, não a área de segurança.</li>
+            <li><strong>Controle compensatório:</strong> uma medida alternativa reduz o risco enquanto a lacuna existir (segmentação, monitoramento reforçado, acesso restrito).</li>
+            <li><strong>Prazo e plano de remediação:</strong> a exceção tem data de validade e um plano com responsável e marcos para eliminar a causa.</li>
+            <li><strong>Reavaliação ou expiração:</strong> no vencimento, a exceção é encerrada porque a lacuna foi corrigida, ou é reavaliada e renovada com nova aprovação. Nunca se renova sozinha.</li>
+        </ol>
+
+        <h3>Estados e Papéis</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Estado</th><th>O que significa</th><th>Papel responsável</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Solicitada</strong></td><td>Pedido registrado, ainda sem decisão. O requisito segue valendo.</td><td>Solicitante (dono do ativo ou do processo)</td></tr>
+                    <tr><td><strong>Aprovada</strong></td><td>Risco analisado e aceito pela alçada competente, com controle compensatório e prazo definidos.</td><td>Dono do risco / comitê de riscos, conforme a alçada</td></tr>
+                    <tr><td><strong>Vigente</strong></td><td>Dentro do prazo, com o controle compensatório operando e o plano de remediação em andamento.</td><td>Dono do ativo executa; segurança monitora</td></tr>
+                    <tr><td><strong>Vencida</strong></td><td>Prazo expirou sem encerramento nem renovação aprovada. A aceitação perdeu a validade.</td><td>Sem dono efetivo, até que a GRC acione a alçada</td></tr>
+                    <tr><td><strong>Encerrada</strong></td><td>Lacuna corrigida e comprovada, ou exceção reavaliada e formalmente fechada.</td><td>Segurança valida a evidência; GRC registra</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Como a Função de GRC Desafia uma Exceção</h3>
+        <p>
+            A segunda linha não carimba pedidos: ela os questiona. Perguntas típicas: o requisito realmente não pode ser cumprido, ou só é inconveniente? O risco foi estimado com os critérios oficiais? O controle compensatório tem eficácia demonstrável, ou é só uma promessa? O prazo é compatível com o plano de remediação? Quem aprovou tem alçada para esse nível de risco? Existem outras exceções sobre o mesmo ativo ou processo?
+        </p>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">⚠️</span>
+                <strong>Exceção Vencida É Risco Aceito Sem Dono</strong>
+            </div>
+            <p>
+                Quando o prazo passa sem reavaliação, ninguém mais aceitou aquele risco: ele continua lá, sem aprovação válida e sem responsável. E exceções que se acumulam, ou que são renovadas várias vezes, deixam de ser casos isolados e viram <strong>risco sistêmico</strong>: o requisito deixou de valer na prática, e a soma das lacunas pode superar o apetite de risco mesmo que cada exceção, isolada, pareça aceitável. Por isso o registro de exceções precisa de relatório periódico de vencidas, renovações e concentração por ativo ou controle. A agregação desses sinais é tema do Estudo 58.
+            </p>
+        </div>
+
+        <h3>Ligações com Outros Estudos</h3>
+        <ul>
+            <li><strong>Estudo 26 (ISO 27001 e 27002):</strong> exceções a controles do Anexo A devem ser coerentes com a Declaração de Aplicabilidade e com a aceitação do risco residual.</li>
+            <li><strong>Estudo 58 (Auditoria de TI):</strong> o auditor testa se as exceções vigentes têm aprovação válida, controle compensatório e prazo, e trata o acúmulo de vencidas como achado.</li>
+        </ul>
+    </section>
+
     <!-- SEÇÃO 3: SIMULADOR -->
     <section class="study-section" id="simulador" data-tipo="laboratorio">
         <h2>Laboratório Prático: Calculadora de Matriz 5×5 e Risco Financeiro</h2>
@@ -502,6 +557,19 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
                 </div>
             </details>
         </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 8 (Exceções):</strong> Uma exceção de segurança aprovada para um sistema legado venceu há dois meses e ninguém a reavaliou. Qual é a situação do risco e o que a função de GRC deve fazer?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O risco continua existindo, mas a aceitação perdeu a validade: é um risco aceito sem dono.</p>
+                    <p>A GRC deve acionar a alçada competente para reavaliar a exceção (encerrar, se a lacuna foi corrigida, ou renovar com nova análise, controle compensatório e prazo) e verificar se há acúmulo de exceções vencidas, que configura risco sistêmico.</p>
+                </div>
+            </details>
+        </div>
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
@@ -536,6 +604,8 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
             <li>ABNT NBR ISO 31000:2018 — Gestão de riscos: diretrizes.</li>
             <li>ISO/IEC 27005:2022 — Orientações para gestão de riscos de segurança da informação.</li>
             <li>ISO/IEC 27001:2022, cláusulas 6.1.2 (avaliação de riscos) e 6.1.3 (tratamento de riscos).</li>
+            <li>ISO/IEC 27001:2022, cláusula 6.1.3 (tratamento de riscos e aceitação do risco residual) — base para a gestão de exceções.</li>
+            <li>NIST SP 800-37 Rev. 2 — Risk Management Framework (aceitação de risco e autorização).</li>
             <li>NIST SP 800-30 Rev. 1 — Guide for Conducting Risk Assessments.</li>
             <li>NIST Cybersecurity Framework 2.0 — categorias GV.RM (estratégia de gestão de riscos) e ID.RA (avaliação de riscos).</li>
             <li>NIST IR 8286 — Integrating Cybersecurity and Enterprise Risk Management (ERM).</li>

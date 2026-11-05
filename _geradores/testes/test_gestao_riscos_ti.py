@@ -216,9 +216,21 @@ class TestGestaoRiscosTI(unittest.TestCase):
         body = self.body_path.read_text(encoding="utf-8")
         m = re.search(r'<section class="study-section" id="iso-27005" data-tipo="teoria">.*?</section>\s*(?:<!--.*?-->\s*)?(<section[^>]*>)', body, re.S)
         self.assertIsNotNone(m, "Seção iso-27005 ausente")
+        self.assertIn('id="excecoes" data-tipo="teoria"', m.group(1))
+        m = re.search(r'<section class="study-section" id="excecoes" data-tipo="teoria">.*?</section>\s*(?:<!--.*?-->\s*)?(<section[^>]*>)', body, re.S)
+        self.assertIsNotNone(m, "Seção excecoes ausente")
         self.assertIn('id="simulador" data-tipo="laboratorio"', m.group(1))
         content = self.compiled_path.read_text(encoding="utf-8")
-        self.assertIn("Seção 7 de 7", content)
+        self.assertIn("Seção 8 de 8", content)
+
+    def test_secao_excecoes_conteudo(self):
+        content = self.compiled_path.read_text(encoding="utf-8")
+        sec = self._secao(content, "excecoes")
+        for termo in ("exceção", "aceitação", "alçada", "controle compensatório", "prazo",
+                      "reavaliação", "vencida", "sistêmico", "Estudo 58", "Estudo 26"):
+            self.assertIn(termo, sec, f"Termo ausente na seção: {termo}")
+        self.assertIn('class="callout warning"', sec)
+        self.assertIn('class="data-table"', sec)
 
     def test_secao_iso_27005_conteudo(self):
         content = self.compiled_path.read_text(encoding="utf-8")
