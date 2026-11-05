@@ -26,7 +26,7 @@ class TestCurriculo(unittest.TestCase):
 
     def test_tamanho_da_grade(self):
         """Único ponto com os totais fixos: crescer a grade é decisão explícita."""
-        self.assertEqual(len(self._linhas_catalogo()), 60)
+        self.assertEqual(len(self._linhas_catalogo()), 61)
         self.assertEqual(len(TRILHAS), 14)
 
     def test_estudos_txt_formato_valido(self):

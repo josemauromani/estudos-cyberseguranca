@@ -2019,4 +2019,23 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
             "Plano de 90 dias",
         ],
     },
+    "Fundamentos-de-Computacao-e-SO": {
+        "titulo": "Fundamentos de Computação e SO para Segurança",
+        "subtitulo": "Memória e processos, kernel e chamadas de sistema, binário e codificações, permissões e virtualização vistos pela segurança",
+        "trilha": 1,
+        "nist": "Identify / Protect",
+        "mitre": "N/A (fundamentos de computação)",
+        "carreiras": ["Blue Team & Defesa", "Red Team & Pentest", ROTULO_ANALISTA_SI],
+        "tempo_minutos": 40,
+        "nivel": "intermediario",
+        "pergunta_chave": "Por que escrever 300 bytes num campo de 64 pode dar ao atacante o controle do servidor?",
+        "simulador_nome": "Inspetor de Bytes",
+        "fatos": [
+            "Pilha, heap e o estouro de buffer",
+            "ASLR, DEP/NX e stack canaries",
+            "Kernel, espaço de usuário e chamadas de sistema",
+            "Magic bytes, hexadecimal e Base64",
+            "Hipervisor, VM e container",
+        ],
+    },
 }

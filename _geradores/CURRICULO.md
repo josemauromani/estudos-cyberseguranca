@@ -164,6 +164,18 @@ flowchart LR
 - **Conceitos-Chave:** Stateful vs Stateless, Tabela de Estados Conntrack, Regra Default Drop, DMZ de dois estágios, Trunking 802.1Q e isolamento inter-VLAN.
 - **Simulador Interativo em JS:** *Simulador de Regras de Firewall (Pass / Drop)* — Console interativo onde o aluno cadastra regras de firewall (ordem, IP origem/destino, porta, ação) e dispara pacotes de teste para visualizar qual regra capturou o pacote e a razão da decisão.
 
+#### 61. Fundamentos-de-Computacao-e-SO
+- **Título:** Fundamentos de Computação e SO para Segurança
+- **Função NIST CSF 2.0:** *Identify (ID) / Protect (PR)*
+- **Tempo Estimado:** 40 minutos | **Carreiras:** Blue Team, Red Team, Analista de Segurança da Informação
+- **MITRE ATT&CK:** N/A (fundamentos de computação)
+- **Objetivos de Aprendizagem:** Explicar por que o estouro de buffer na pilha desvia o fluxo de execução e o que ASLR, DEP/NX e canário mudam; distinguir espaço de usuário, kernel e chamadas de sistema e o que o EDR observa; ler um dump hexadecimal, distinguir codificação de criptografia (Base64) e reconhecer arquivos por magic bytes; comparar permissões Linux e Windows; diferenciar VM e container.
+- **Pré-requisitos:** Redes-e-Protocolos.
+- **Conceitos-Chave:** pilha e heap; endereço de retorno; ASLR, DEP/NX, canário; anéis de privilégio; chamada de sistema; rootkit de kernel; hexadecimal e little-endian; UTF-8; Base64; magic bytes; UID/SID, ACL, setuid, tokens; hipervisor tipo 1 e tipo 2; namespaces e cgroups.
+- **Simulador Interativo em JS:** *Inspetor de Bytes* — Três abas: identificação de seis arquivos fictícios por magic bytes (um com extensão falsa), conversão entre texto, hexadecimal e Base64 com bytes UTF-8, e uma pilha de 16 + 8 + 8 bytes em que as chaves de canário e ASLR mudam o resultado.
+
+---
+
 ---
 
 ### Trilha 2: Segurança Defensiva (`#059669`)

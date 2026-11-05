@@ -1,0 +1,939 @@
+<!-- Estudo 61: Fundamentos-de-Computacao-e-SO Body Fragment -->
+<article class="study-container" data-slug="fundamentos-de-computacao-e-so">
+
+    <!-- SEÇÃO 1: INTRODUÇÃO -->
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: A Base de Computação que a Segurança Usa Todo Dia</h2>
+
+        <p class="lead-text">
+            A equipe de desenvolvimento da Ipê Store (fictícia) publicou um serviço em C que lê o campo "nome" do cadastro de pedidos. O campo tem 64 bytes; ninguém validou o tamanho da entrada. Um teste de invasão autorizado enviou 300 bytes e o processo caiu com falha de segmentação. Para quem já opera servidores, escreve código ou atende chamados, a pergunta deste módulo é outra: por que uma falha de memória vira controle do servidor, e o que o sistema operacional faz para dificultar isso?
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>Pergunta-chave do módulo</strong>
+            </div>
+            <p>Por que escrever 300 bytes num campo de 64 pode dar ao atacante o controle do servidor?</p>
+        </div>
+
+        <p>
+            Este é um módulo de <strong>revisão</strong>. Você já sabe o que é memória, processo e arquivo; aqui cada conceito aparece pelo ângulo do ataque, da defesa ou da evidência. Cinco blocos formam a base que os módulos técnicos assumem: memória e processos, kernel e chamadas de sistema, binário e codificações, permissões e virtualização.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🧭</span>
+                <strong>Para onde este módulo aponta</strong>
+            </div>
+            <p>
+                O módulo é a base e não repete o que outros ensinam a fundo. A visão de EDR está no Estudo 10; a coleta de memória e de evidências, no Estudo 19 (Forense Digital); a triagem de binários suspeitos, no Estudo 20 (Análise Básica de Malware); permissões e shell no Linux, no Estudo 34; registro, serviços e tokens do Windows, no Estudo 36; isolamento de containers, no Estudo 50. A execução técnica, que usa a pilha e o kernel descritos aqui para explorar uma falha e escalar privilégio, vem no Estudo 62.
+            </p>
+        </div>
+
+        <h3>Como ler o módulo</h3>
+        <ul>
+            <li><strong>Memória e processos</strong> explica por que o estouro de buffer funciona e o que ASLR, DEP/NX e canário mudam.</li>
+            <li><strong>Kernel e chamadas de sistema</strong> mostra a fronteira que o EDR vigia e que o rootkit tenta atravessar.</li>
+            <li><strong>Binário e codificações</strong> dá a leitura de um dump hexadecimal, o Base64 e os <em>magic bytes</em>.</li>
+            <li><strong>Arquivos e permissões</strong> e <strong>Virtualização</strong> fecham o quadro em poucas linhas, com remissão aos módulos de aprofundamento.</li>
+            <li>O laboratório <strong>Inspetor de Bytes</strong> reúne três exercícios: identificar arquivos por assinatura, converter texto, hexadecimal e Base64, e ver uma pilha ser sobrescrita.</li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 2: MEMÓRIA E PROCESSOS -->
+    <section class="study-section" id="memoria-e-processos" data-tipo="teoria">
+        <h2>Memória e Processos: Por que o Estouro de Buffer Funciona</h2>
+
+        <p class="lead-text">
+            Cada processo enxerga um espaço de endereçamento virtual só seu. O código do programa, os dados, a <strong>heap</strong> e a <strong>pilha</strong> ocupam regiões diferentes desse espaço, e o kernel reserva uma parte para si. O estouro de buffer (<em>buffer overflow</em>) é o que acontece quando um programa grava dados numa região e ultrapassa o fim do que reservou.
+        </p>
+
+        <h3>O espaço de endereçamento de um processo</h3>
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Espaço de endereçamento de um processo (Linux x86-64, simplificado)</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Espaço de endereçamento de um processo (Linux x86-64, simplificado)">
+flowchart TD
+    K["Kernel<br><small>endereços altos, inacessível ao processo</small>"]
+    P["Pilha (stack)<br><small>variáveis locais e endereços de retorno; cresce para endereços menores</small>"]
+    L["Bibliotecas compartilhadas e arquivos mapeados<br><small>libc, mmap</small>"]
+    H["Heap<br><small>malloc e new; cresce para endereços maiores</small>"]
+    D["Dados<br><small>variáveis globais e estáticas</small>"]
+    T["Texto<br><small>código do programa, somente leitura e executável</small>"]
+    K --> P --> L --> H --> D --> T
+</pre>
+        </div>
+
+        <h3>Pilha × heap</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Característica</th><th>Pilha (<em>stack</em>)</th><th>Heap</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Quem gerencia</strong></td><td>O compilador, a cada chamada de função: o quadro nasce na entrada e some no retorno.</td><td>O programador (<code>malloc</code>/<code>free</code>, <code>new</code>/<code>delete</code>) ou o <em>runtime</em> da linguagem.</td></tr>
+                    <tr><td><strong>O que guarda</strong></td><td>Variáveis locais, argumentos, o <strong>endereço de retorno</strong> e registradores salvos.</td><td>Objetos e buffers cujo tamanho ou vida só se conhece em execução.</td></tr>
+                    <tr><td><strong>Falhas típicas</strong></td><td>Estouro de buffer na pilha: sobrescreve o endereço de retorno e muda para onde a função volta.</td><td>Estouro na heap, <em>use-after-free</em> e <em>double free</em>: corrompem ponteiros e metadados do alocador.</td></tr>
+                    <tr><td><strong>Classes no CWE</strong></td><td>CWE-121 (estouro baseado em pilha)</td><td>CWE-122 (estouro baseado em heap); CWE-787 cobre a escrita fora dos limites em geral</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>O quadro de pilha e o endereço de retorno</h3>
+        <p>
+            Quando uma função é chamada, a CPU empilha o <strong>endereço de retorno</strong>: o ponto do código para onde a execução volta quando a função termina. A função reserva em seguida espaço para suas variáveis locais. Em x86-64 a pilha cresce para endereços <em>menores</em>, mas um buffer é preenchido para endereços <em>maiores</em>. O resultado: os bytes que passam do fim do buffer avançam sobre o que foi empilhado antes dele, e o endereço de retorno está no caminho.
+        </p>
+        <p>
+            Funções como <code>strcpy</code>, <code>gets</code> e <code>sprintf</code> copiam até encontrar um byte zero, sem conferir o tamanho do destino. Com 300 bytes num buffer de 64, a cópia cobre as variáveis locais, o valor salvo de controle e o endereço de retorno. Quando a função executa <code>ret</code>, a CPU salta para o endereço que o atacante escolheu: é isso que a pergunta-chave chama de "controle do servidor". O mecanismo é a falha de lógica mais antiga da segurança de software, e continua sendo uma das classes mais exploradas.
+        </p>
+        <p>
+            O laboratório deste módulo simplifica o quadro em três faixas: 16 bytes de <em>buffer</em>, 8 de canário e 8 de endereço de retorno. Um quadro real também guarda o ponteiro de base salvo (8 bytes) e pode ter alinhamento extra; as proporções mudam, o princípio não.
+        </p>
+
+        <h3>As respostas do sistema: ASLR, DEP/NX e canário</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Defesa</th><th>O que faz</th><th>Como é contornada</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>ASLR</strong> (<em>Address Space Layout Randomization</em>)</td><td>Sorteia onde a pilha, a heap e as bibliotecas ficam a cada execução (o executável também, se compilado como PIE). O atacante não sabe para qual endereço saltar.</td><td>Vazamento de um endereço (<em>information leak</em>) revela a base; processos que reiniciam com o mesmo layout permitem tentativas repetidas.</td></tr>
+                    <tr><td><strong>DEP/NX</strong> (<em>Data Execution Prevention</em>, bit <em>No-eXecute</em>)</td><td>Marca pilha e heap como graváveis e <em>não executáveis</em>. Código injetado como dados não roda.</td><td>Reutilizar código que já existe e é executável, como trechos da libc (<em>return-to-libc</em>, ROP).</td></tr>
+                    <tr><td><strong>Canário</strong> (<em>stack canary</em>)</td><td>Um valor aleatório fica entre o buffer e o endereço de retorno. A função confere o valor antes de retornar; se mudou, o processo aborta.</td><td>Vazar o valor do canário, ou usar um defeito que escreve num índice específico sem passar por cima dele.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout key">
+            <div class="callout-title">
+                <span class="callout-icon">🧱</span>
+                <strong>Defesa em camadas, não bala de prata</strong>
+            </div>
+            <p>
+                Nenhuma das três impede o defeito; cada uma encarece a exploração. A correção de verdade é não ter o defeito: validar o tamanho da entrada, usar funções com limite e, quando possível, linguagens com segurança de memória. O Estudo 62 mostra o lado do atacante dessas camadas.
+            </p>
+        </div>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Linux — o que o SO e o binário ativam</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-comp-protecoes')">Copiar</button>
+            </div>
+<pre><code id="code-comp-protecoes">cat /proc/sys/kernel/randomize_va_space   # 2 = ASLR completo
+readelf -lW ./leitor-pedidos | grep GNU_STACK   # flags RW (sem E) = pilha não executável (NX)
+readelf -h ./leitor-pedidos | grep Type          # DYN = executável PIE, endereços sorteados
+readelf -s ./leitor-pedidos | grep __stack_chk_fail   # presença indica canário compilado</code></pre>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 3: KERNEL E SYSCALLS -->
+    <section class="study-section" id="kernel-e-syscalls" data-tipo="teoria">
+        <h2>Kernel, Espaço de Usuário e Chamadas de Sistema</h2>
+
+        <p class="lead-text">
+            O processador distingue níveis de privilégio. O código do <strong>kernel</strong> roda com acesso total ao hardware e à memória; os programas rodam no <strong>espaço de usuário</strong>, sem acesso direto a disco, rede ou memória de outro processo. Entre os dois fica uma porta estreita: a <strong>chamada de sistema</strong> (<em>system call</em>). Quem controla essa porta controla o que um programa consegue fazer, e é onde a segurança observa.
+        </p>
+
+        <h3>Anéis de privilégio</h3>
+        <p>
+            A arquitetura x86 define quatro anéis, de 0 (mais privilegiado) a 3. Linux e Windows usam só dois: o anel 0 para o kernel e os drivers, o anel 3 para os programas. Um hipervisor opera abaixo do kernel convidado, com extensões de hardware próprias (Intel VT-x, AMD-V), tema da seção de virtualização. Em ARM o conceito equivalente são os níveis de exceção (EL0 a EL3).
+        </p>
+
+        <h3>Da chamada de função à chamada de sistema</h3>
+        <p>
+            Quando um programa abre um arquivo, cria um processo ou abre uma conexão, ele pede ao kernel. No Linux, a biblioteca C (<code>open</code>, <code>connect</code>) prepara os argumentos e executa a instrução <code>syscall</code>, que transfere o controle para o kernel. No Windows, o caminho é a API do Win32 (<code>kernel32.dll</code>), depois <code>ntdll.dll</code>, que executa a instrução <code>syscall</code> para chegar ao <code>ntoskrnl.exe</code>.
+        </p>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Ação do programa</th><th>Linux (chamada de sistema)</th><th>Windows (<code>ntdll</code>)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Criar processo</td><td><code>execve</code>, <code>clone</code></td><td><code>NtCreateUserProcess</code></td></tr>
+                    <tr><td>Abrir arquivo</td><td><code>openat</code></td><td><code>NtCreateFile</code></td></tr>
+                    <tr><td>Comunicar pela rede</td><td><code>socket</code>, <code>connect</code></td><td><code>NtDeviceIoControlFile</code> (driver AFD)</td></tr>
+                    <tr><td>Carregar módulo de kernel</td><td><code>init_module</code>, <code>finit_module</code></td><td><code>NtLoadDriver</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Linux — o que um binário suspeito pede ao kernel (laboratório isolado)</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-comp-strace')">Copiar</button>
+            </div>
+<pre><code id="code-comp-strace">$ strace -f -e trace=execve,openat,connect ./atualizador
+execve("./atualizador", ["./atualizador"], ...) = 0
+openat(AT_FDCWD, "/etc/passwd", O_RDONLY) = 3
+connect(4, {sa_family=AF_INET, sin_port=htons(443), sin_addr=inet_addr("203.0.113.50")}, 16) = 0</code></pre>
+        </div>
+        <p>
+            O que o binário afirma fazer e o que ele pede ao kernel podem diferir. Um "atualizador" que lê <code>/etc/passwd</code> e conecta a um IP externo fora do esperado é achado de triagem (Estudo 20). A mesma ideia sustenta o EDR: observar o que os processos pedem ao kernel.
+        </p>
+
+        <h3>O que o EDR observa, e como o atacante tenta não ser visto</h3>
+        <ul>
+            <li><strong>Em espaço de usuário:</strong> alguns produtos instalam ganchos (<em>hooks</em>) nas funções de <code>ntdll.dll</code>. É visível e barato, mas o atacante pode chamar a instrução <code>syscall</code> diretamente (<em>direct syscalls</em>) e passar sem tocar na função monitorada.</li>
+            <li><strong>No kernel:</strong> <em>callbacks</em> de criação de processo, de carga de imagem e de acesso a objetos, e o rastreamento de eventos (ETW) no Windows; no Linux, eBPF e a auditoria (<code>auditd</code>). Um gancho no kernel é mais difícil de contornar, porque o atacante precisaria do mesmo nível de privilégio.</li>
+            <li><strong>Telemetria útil:</strong> árvore de processos, linha de comando, módulos carregados, conexões de rede. O Estudo 10 mostra como o EDR combina esses sinais em detecção.</li>
+        </ul>
+
+        <h3>Drivers e rootkits de kernel</h3>
+        <p>
+            Drivers rodam no anel 0, sem a proteção que isola os programas. Uma falha num driver dá execução com privilégio de kernel, e por isso o Windows exige drivers assinados. A técnica <strong>BYOVD</strong> (<em>Bring Your Own Vulnerable Driver</em>) usa um driver legítimo, assinado e vulnerável, para ganhar acesso de kernel e desativar o EDR.
+        </p>
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">⚠️</span>
+                <strong>Por que um rootkit de kernel é pior que um de usuário</strong>
+            </div>
+            <p>
+                Um <strong>rootkit</strong> de kernel roda no mesmo nível do que deveria vigiá-lo. Os programas de listagem de processos e arquivos pedem a informação ao kernel; se o kernel está comprometido, a resposta é filtrada e o processo malicioso não aparece. Logo, a ferramenta que roda dentro do sistema infectado não é fonte confiável. Os caminhos de detecção são olhar de fora: análise de memória (Estudo 19), imagem de disco examinada em outra máquina e comparação com uma base limpa.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 4: BINÁRIO E CODIFICAÇÕES -->
+    <section class="study-section" id="binario-e-codificacoes" data-tipo="teoria">
+        <h2>Binário, Hexadecimal e Codificações</h2>
+
+        <p class="lead-text">
+            Tudo que um analista examina, de um pacote de rede a um executável, é uma sequência de bytes. Ler um <strong>dump hexadecimal</strong>, reconhecer um arquivo pelos primeiros bytes e saber que o Base64 não esconde nada são habilidades de triagem que aparecem em forense, análise de malware e resposta a incidentes.
+        </p>
+
+        <h3>Bits, bytes e hexadecimal</h3>
+        <p>
+            Um byte tem 8 bits e vai de 0 a 255. Em <strong>hexadecimal</strong> (base 16), cada byte cabe em dois dígitos (<code>00</code> a <code>FF</code>), por isso os dumps usam essa notação. Um dump traz o deslocamento, os bytes e a leitura em ASCII:
+        </p>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Dump hexadecimal — início de um executável ELF (Linux)</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-comp-dump')">Copiar</button>
+            </div>
+<pre><code id="code-comp-dump">$ xxd -l 16 coletor.elf
+00000000: 7f45 4c46 0201 0100 0000 0000 0000 0000  .ELF............</code></pre>
+        </div>
+        <p>
+            Os quatro primeiros bytes (<code>7F 45 4C 46</code>) são o <code>0x7F</code> seguido de "ELF" em ASCII. O quinto byte (<code>02</code>) indica 64 bits e o sexto (<code>01</code>), dados em <em>little-endian</em>.
+        </p>
+
+        <h3>Endianness</h3>
+        <p>
+            <strong>Endianness</strong> é a ordem em que os bytes de um número maior são guardados. Processadores x86 e x86-64 usam <strong>little-endian</strong>: o byte menos significativo vem primeiro. O endereço <code>0x00007ffe12345678</code> aparece na memória como <code>78 56 34 12 fe 7f 00 00</code>. Isso importa para ler dumps de pilha e para entender por que o atacante escreve um endereço "ao contrário" numa entrada. Protocolos de rede usam a ordem inversa (<em>big-endian</em>, também chamada de ordem de rede), tema do Estudo 02.
+        </p>
+
+        <h3>ASCII e UTF-8</h3>
+        <p>
+            O ASCII usa 7 bits por caractere e cobre o alfabeto inglês. O <strong>UTF-8</strong> (RFC 3629) representa todos os caracteres Unicode com 1 a 4 bytes e é compatível com o ASCII: letras sem acento ocupam 1 byte, mas "ç" ocupa 2 (<code>C3 A7</code>). A consequência de segurança: <em>caracteres não são bytes</em>. Uma validação que conta 8 caracteres e uma cópia que conta bytes discordam quando há acento, e é assim que nascem estouros em código que "validou o tamanho". O laboratório conta bytes UTF-8 de propósito.
+        </p>
+
+        <h3>Base64: codificação não é criptografia</h3>
+        <p>
+            O <strong>Base64</strong> (RFC 4648) transforma bytes em um alfabeto de 64 caracteres imprimíveis: cada grupo de 3 bytes vira 4 caracteres, com <code>=</code> de preenchimento no fim. Serve para transportar binário por canais de texto (e-mail, JSON, cabeçalhos HTTP). Não há chave: qualquer pessoa decodifica. O texto "ação" em UTF-8 tem seis bytes (<code>61 C3 A7 C3 A3 6F</code>) e vira <code>YcOnw6Nv</code>.
+        </p>
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🚫</span>
+                <strong>Codificação não é criptografia</strong>
+            </div>
+            <p>
+                O cabeçalho <code>Authorization: Basic YWRtaW46SXBlIzIwMjY=</code> parece ilegível, mas decodifica para <code>admin:Ipe#2026</code> (credencial fictícia). Credencial em Base64 num repositório, num log ou numa configuração está exposta. O inverso também ocorre: atacantes usam Base64 para ofuscar comandos, como em <code>powershell -EncodedCommand</code>, que recebe Base64 de texto UTF-16LE. O analista decodifica e lê; não há chave a quebrar.
+            </p>
+        </div>
+
+        <h3>Magic bytes: o tipo de um arquivo está no conteúdo</h3>
+        <p>
+            A extensão é só um nome; o conteúdo diz o que o arquivo é. Muitos formatos começam com uma assinatura fixa, os <strong>magic bytes</strong>. O comando <code>file</code> e as ferramentas forenses usam esses prefixos, e o laboratório pede que você os reconheça.
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Tipo</th><th>Magic bytes (hex)</th><th>Em ASCII</th><th>Observação</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>PNG</td><td><code>89 50 4E 47 0D 0A 1A 0A</code></td><td><code>.PNG....</code></td><td>Imagem.</td></tr>
+                    <tr><td>PDF</td><td><code>25 50 44 46 2D</code></td><td><code>%PDF-</code></td><td>Documento; abre com JavaScript e anexos embutidos.</td></tr>
+                    <tr><td>ZIP</td><td><code>50 4B 03 04</code></td><td><code>PK..</code></td><td>Também é o contêiner de DOCX, XLSX e JAR.</td></tr>
+                    <tr><td>ELF</td><td><code>7F 45 4C 46</code></td><td><code>.ELF</code></td><td>Executável Linux.</td></tr>
+                    <tr><td>PE</td><td><code>4D 5A</code></td><td><code>MZ</code></td><td>Executável Windows (EXE, DLL).</td></tr>
+                    <tr><td>Script</td><td><code>23 21</code></td><td><code>#!</code></td><td>Linha <em>shebang</em>, que nomeia o interpretador.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Linux — extensão contra conteúdo</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-comp-file')">Copiar</button>
+            </div>
+<pre><code id="code-comp-file">$ file fatura-0421.pdf
+fatura-0421.pdf: PE32+ executable (console) x86-64, for MS Windows</code></pre>
+        </div>
+        <p>
+            Um "PDF" que o <code>file</code> descreve como executável do Windows é o exemplo clássico de extensão falsa em phishing. Duas ressalvas: assinaturas podem ser forjadas, e há arquivos poliglotas que são válidos em dois formatos; a assinatura orienta a triagem, mas não prova que o arquivo é inofensivo. Recuperar arquivos apagados pelas assinaturas (<em>file carving</em>) é técnica do Estudo 19; abrir o cabeçalho PE ou ELF é o início da análise estática do Estudo 20.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 5: ARQUIVOS E PERMISSÕES -->
+    <section class="study-section" id="arquivos-e-permissoes" data-tipo="teoria">
+        <h2>Arquivos, Usuários e Permissões: Linux × Windows</h2>
+
+        <p class="lead-text">
+            Quem pode ler, gravar e executar o quê decide o estrago de uma conta comprometida. Os dois sistemas respondem à mesma pergunta com modelos diferentes; o quadro abaixo serve de mapa e os detalhes ficam nos Estudos 34 (Linux) e 36 (Windows).
+        </p>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Conceito</th><th>Linux</th><th>Windows</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Identidade</strong></td><td><strong>UID</strong> e GID numéricos; o nome é só rótulo.</td><td><strong>SID</strong> do usuário e dos grupos, guardados no <em>token</em> de acesso.</td></tr>
+                    <tr><td><strong>Permissão de arquivo</strong></td><td>Bits <code>rwx</code> para dono, grupo e outros; ACL POSIX opcional (<code>getfacl</code>).</td><td><strong>ACL</strong> (DACL) com entradas por SID: permitir ou negar, herdadas das pastas.</td></tr>
+                    <tr><td><strong>Superusuário</strong></td><td><code>root</code> (UID 0) ignora as permissões de arquivo.</td><td><strong>SYSTEM</strong> e o grupo Administradores; SYSTEM é a conta dos serviços do SO.</td></tr>
+                    <tr><td><strong>Elevação</strong></td><td><strong>setuid</strong> (o programa roda como o dono), <code>sudo</code> e capabilities.</td><td>Tokens: o processo herda o token do pai; UAC separa o token elevado do comum; privilégios como <code>SeDebugPrivilege</code>.</td></tr>
+                    <tr><td><strong>Evidência</strong></td><td><code>/var/log/auth.log</code> ou <code>journalctl</code>; <code>find / -perm -4000</code> lista binários setuid.</td><td>Eventos 4624 (logon) e 4672 (privilégios especiais atribuídos) no log Security.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            Os dois modelos têm a mesma consequência de defesa: um processo herda a identidade de quem o criou, então o que importa é com que privilégio o serviço roda. Um binário setuid-root ou um serviço que roda como SYSTEM com um defeito de memória, como o da seção 2, entrega ao atacante a identidade mais poderosa do sistema. A escalada de privilégio é o assunto do Estudo 62.
+        </p>
+    </section>
+
+    <!-- SEÇÃO 6: VIRTUALIZAÇÃO -->
+    <section class="study-section" id="virtualizacao" data-tipo="teoria">
+        <h2>Virtualização e Containers</h2>
+
+        <p class="lead-text">
+            Quase tudo que a Ipê Store opera roda sobre uma camada de isolamento: máquinas virtuais no datacenter, containers no pipeline, uma VM de análise no laptop do analista. O isolamento tem força diferente em cada caso, e a diferença decide o que um atacante ganha ao escapar.
+        </p>
+
+        <h3>Hipervisor tipo 1 e tipo 2</h3>
+        <p>
+            O <strong>hipervisor</strong> cria e gerencia máquinas virtuais, cada uma com seu próprio kernel. O <strong>tipo 1</strong> roda direto sobre o hardware (<em>bare-metal</em>): VMware ESXi, Xen e Microsoft Hyper-V são exemplos. O <strong>tipo 2</strong> roda como programa dentro de um sistema operacional hospedeiro: VirtualBox e VMware Workstation. O tipo 2 herda a superfície de ataque do SO hospedeiro; o tipo 1 é a base de servidores e nuvem.
+        </p>
+
+        <h3>VM × container</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Aspecto</th><th>Máquina virtual</th><th>Container</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Kernel</strong></td><td>Cada VM tem o seu.</td><td>Todos compartilham o kernel do host.</td></tr>
+                    <tr><td><strong>Mecanismo de isolamento</strong></td><td>Virtualização por hardware (Intel VT-x, AMD-V) e hipervisor.</td><td><strong>namespaces</strong> (o que o processo enxerga: PIDs, rede, pontos de montagem, usuários) e <strong>cgroups</strong> (quanto consome: CPU, memória, processos).</td></tr>
+                    <tr><td><strong>Superfície de ataque</strong></td><td>Hipervisor e dispositivos emulados.</td><td>Todo o kernel do host: qualquer falha de kernel atravessa o container.</td></tr>
+                    <tr><td><strong>Custo</strong></td><td>Mais memória e tempo de inicialização.</td><td>Leve e rápido.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Fuga de VM e de container</h3>
+        <p>
+            A <strong>fuga</strong> (<em>escape</em>) é a classe de risco em que o código do convidado alcança o hospedeiro. Fuga de VM exige uma falha no hipervisor ou em um dispositivo emulado: é rara e valiosa. Fuga de container costuma vir de configuração: container <em>privileged</em>, socket do Docker montado dentro dele, diretórios do host montados com permissão de escrita, capabilities em excesso, ou uma falha do kernel compartilhado. Daí a regra de defesa: não rodar como root, retirar capabilities, aplicar perfis seccomp e AppArmor ou SELinux, e tratar o container como camada de empacotamento, não como fronteira de segurança absoluta. Os controles estão no Estudo 50.
+        </p>
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🔬</span>
+                <strong>Virtualização na sua bancada</strong>
+            </div>
+            <p>
+                A VM com snapshot é o ambiente padrão para detonar amostras (Estudo 20): volta-se ao estado limpo em segundos. Malware sabe disso e procura sinais de virtualização antes de agir; um resultado "limpo" na sandbox não prova que a amostra é inofensiva.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 7: LABORATÓRIO -->
+    <section class="study-section" id="simulador" data-tipo="laboratorio">
+        <h2>Laboratório Prático: Inspetor de Bytes</h2>
+
+        <p class="lead-text">
+            Três exercícios sobre bytes, todos com dados fictícios da Ipê Store. Na primeira aba, identifique seis arquivos pelos primeiros bytes. Na segunda, converta texto, hexadecimal e Base64 e veja por que o Base64 não protege um segredo. Na terceira, digite uma entrada e veja os bytes ocuparem a pilha.
+        </p>
+
+        <div class="lab-box comp-lab" id="comp-lab">
+            <div class="lab-header">
+                <div>
+                    <span class="lab-badge">Assinatura, codificação e pilha</span>
+                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Inspetor de Bytes: Ipê Store</h3>
+                    <p style="margin: 0; font-size: 0.9rem; color: var(--muted);">Arquivos e entradas inventados; nada aqui toca o seu sistema.</p>
+                </div>
+            </div>
+
+            <div class="lab-body" style="min-width: 0;">
+                <div role="tablist" aria-label="Exercícios do Inspetor de Bytes" id="comp-abas" class="comp-abas">
+                    <button type="button" role="tab" id="comp-aba-assinatura" aria-controls="comp-painel-assinatura" aria-selected="true" tabindex="0" class="comp-aba">Assinatura</button>
+                    <button type="button" role="tab" id="comp-aba-decodificador" aria-controls="comp-painel-decodificador" aria-selected="false" tabindex="-1" class="comp-aba">Decodificador</button>
+                    <button type="button" role="tab" id="comp-aba-pilha" aria-controls="comp-painel-pilha" aria-selected="false" tabindex="-1" class="comp-aba">Pilha</button>
+                </div>
+
+                <div role="tabpanel" id="comp-painel-assinatura" aria-labelledby="comp-aba-assinatura" class="comp-painel">
+                    <p class="comp-nota">Os primeiros bytes de seis arquivos recebidos pela Ipê Store. Escolha o tipo real de cada um pelos <em>magic bytes</em>, sem confiar na extensão.</p>
+                    <div id="comp-arquivos" role="group" aria-label="Arquivos para identificar" class="comp-grade"></div>
+                    <div class="comp-linha">
+                        <button type="button" class="btn-primary" id="comp-verificar">Verificar respostas</button>
+                        <button type="button" class="btn-secondary" id="comp-limpar-assinaturas">Limpar</button>
+                    </div>
+                    <div id="comp-resultado-assinatura" role="status" aria-live="polite" class="comp-resultado"></div>
+                    <div class="comp-livre">
+                        <label for="comp-hex-livre"><strong>Teste um prefixo seu</strong> (hexadecimal, com ou sem espaços):</label>
+                        <input type="text" id="comp-hex-livre" class="comp-campo" autocomplete="off" spellcheck="false" placeholder="ex.: 50 4B 03 04">
+                        <div id="comp-resultado-livre" role="status" aria-live="polite" class="comp-resultado"></div>
+                    </div>
+                </div>
+
+                <div role="tabpanel" id="comp-painel-decodificador" aria-labelledby="comp-aba-decodificador" class="comp-painel" hidden>
+                    <p class="comp-nota">Edite qualquer campo; os outros dois acompanham. A conversão usa os bytes UTF-8 do texto.</p>
+                    <label for="comp-texto"><strong>Texto</strong></label>
+                    <textarea id="comp-texto" class="comp-campo" rows="2" maxlength="200" spellcheck="false"></textarea>
+                    <label for="comp-hex"><strong>Hexadecimal</strong></label>
+                    <textarea id="comp-hex" class="comp-campo comp-mono" rows="2" spellcheck="false"></textarea>
+                    <label for="comp-b64"><strong>Base64</strong></label>
+                    <textarea id="comp-b64" class="comp-campo comp-mono" rows="2" spellcheck="false"></textarea>
+                    <div id="comp-aviso-decod" role="status" aria-live="polite" class="comp-resultado"></div>
+                    <div class="comp-linha">
+                        <button type="button" class="btn-secondary" id="comp-ex-acento">Exemplo: ação</button>
+                        <button type="button" class="btn-secondary" id="comp-ex-segredo">Exemplo: credencial em Base64</button>
+                    </div>
+                    <p id="comp-nota-segredo" class="comp-nota" aria-live="polite"></p>
+                </div>
+
+                <div role="tabpanel" id="comp-painel-pilha" aria-labelledby="comp-aba-pilha" class="comp-painel" hidden>
+                    <p class="comp-nota">A função copia o campo "nome" para um buffer de 16 bytes, sem conferir o tamanho. Cada célula é um byte: 16 de buffer, 8 de canário (se ligado) e 8 de endereço de retorno.</p>
+                    <label for="comp-entrada"><strong>Entrada do campo "nome"</strong> (conta bytes UTF-8)</label>
+                    <input type="text" id="comp-entrada" class="comp-campo" maxlength="200" autocomplete="off" spellcheck="false" value="Maria">
+                    <div class="comp-linha">
+                        <label class="comp-chave"><input type="checkbox" id="comp-canario" checked> Canário</label>
+                        <label class="comp-chave"><input type="checkbox" id="comp-aslr" checked> ASLR</label>
+                        <button type="button" class="btn-secondary" id="comp-ex-16">16 caracteres A</button>
+                        <button type="button" class="btn-secondary" id="comp-ex-20">20 A</button>
+                        <button type="button" class="btn-secondary" id="comp-ex-24">24 A</button>
+                        <button type="button" class="btn-secondary" id="comp-ex-200">200 A</button>
+                    </div>
+                    <div id="comp-contagem" role="status" aria-live="polite" class="comp-nota"></div>
+                    <div id="comp-pilha" role="img" aria-label="Pilha: células de buffer, canário e endereço de retorno" class="comp-pilha"></div>
+                    <div class="comp-legenda" aria-hidden="true">
+                        <span><i class="comp-cel comp-cel-buffer"></i> buffer</span>
+                        <span><i class="comp-cel comp-cel-canario"></i> canário</span>
+                        <span><i class="comp-cel comp-cel-retorno"></i> endereço de retorno</span>
+                        <span><i class="comp-cel comp-cel-cheia"></i> byte da entrada</span>
+                    </div>
+                    <div id="comp-resultado-pilha" role="status" aria-live="polite" class="comp-resultado"></div>
+                    <p class="comp-nota">Com ASLR desligado o atacante sabe para onde saltar; com ASLR ligado, saltar com a pilha sobrescrita costuma terminar em falha. Sem canário, 24 bytes ou mais atingem o endereço de retorno inteiro neste modelo simplificado. Um DEP/NX ligado não aparece como chave: ele impede executar o que se injeta, mas não impede o desvio do fluxo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 8: CHECKLIST -->
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist: Revisão de Fundamentos para o Analista</h2>
+
+        <p class="lead-text">
+            Use como autoavaliação antes de entrar nos módulos de exploração e de análise. O estado das caixas fica salvo no seu navegador.
+        </p>
+
+        <ul class="checklist">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-comp-1">
+                <label for="chk-comp-1"><strong>Dump hexadecimal:</strong> leio um <code>xxd</code> de ponta a ponta (deslocamento, bytes, ASCII) e sei qual é o byte menos significativo de um endereço little-endian.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-comp-2">
+                <label for="chk-comp-2"><strong>Assinatura de arquivo:</strong> reconheço PNG, PDF, ZIP, ELF, PE e script pelos primeiros bytes e desconfio de extensão que contradiz o conteúdo.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-comp-3">
+                <label for="chk-comp-3"><strong>Pilha × heap:</strong> explico onde ficam variáveis locais e endereço de retorno, onde ficam os objetos alocados em execução, e por que o estouro na pilha desvia o fluxo.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-comp-4">
+                <label for="chk-comp-4"><strong>Proteções de memória:</strong> sei conferir se um binário e o SO ativam ASLR, NX/DEP e canário, e o que cada uma deixa de cobrir.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-comp-5">
+                <label for="chk-comp-5"><strong>Codificação × cifra:</strong> trato Base64 e hexadecimal como representação e não como proteção, e decodifico antes de concluir que algo está "escondido".</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-comp-6">
+                <label for="chk-comp-6"><strong>Permissões Linux × Windows:</strong> comparo UID e SID, rwx e ACL, root e SYSTEM, setuid e tokens, e sei onde cada sistema registra o uso de privilégio.</label>
+            </li>
+        </ul>
+    </section>
+
+    <!-- SEÇÃO 9: QUIZ -->
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (Pilha):</strong> Por que um buffer local que recebe mais bytes do que comporta pode alterar o fluxo de execução do programa?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O buffer fica na pilha e é preenchido para endereços maiores, na direção do que foi empilhado antes dele, inclusive o endereço de retorno da função. Os bytes excedentes sobrescrevem esse endereço, e a instrução <code>ret</code> salta para o valor que a entrada escolheu. A causa é a ausência de verificação do tamanho da entrada.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Defesas):</strong> O binário foi compilado com canário, e o SO tem ASLR e NX ligados. Dá para dizer que o estouro de buffer foi corrigido?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não. As três defesas dificultam a exploração, mas o defeito continua lá: o processo ainda aborta ou cai com entrada longa (negação de serviço), e cada defesa tem contorno conhecido (vazamento de endereço ou do canário, reaproveitamento de código executável). A correção é validar o tamanho da entrada e usar cópia com limite.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Bytes):</strong> Um formulário aceita 16 caracteres, e a cópia para o buffer de 16 bytes usa o número de bytes. O que acontece com "ççççççççç" (9 caracteres)?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Em UTF-8, "ç" ocupa 2 bytes (<code>C3 A7</code>), então 9 caracteres são 18 bytes e passam do buffer de 16, apesar de a validação por caracteres aceitar a entrada. A regra é medir o tamanho na mesma unidade da cópia.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (Kernel):</strong> Por que o analista não deve confiar na lista de processos obtida dentro de uma máquina com suspeita de rootkit de kernel?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Os utilitários perguntam ao kernel, e o rootkit de kernel roda no mesmo nível e pode filtrar a resposta. A informação é adulterada na fonte. A análise confiável olha de fora: imagem de memória examinada em outra máquina, disco montado em outro sistema, comparação com uma base limpa (Estudo 19).</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (Codificação):</strong> Um colega encontra no repositório a string <code>YWRtaW46SXBlIzIwMjY=</code> numa configuração e diz que "está criptografada". Quem está certo?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não está. É Base64 (RFC 4648), uma codificação sem chave: decodifica para <code>admin:Ipe#2026</code>. Credencial em Base64 deve ser tratada como exposta, trocada e movida para um cofre de segredos.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Assinatura):</strong> O anexo <code>fatura-0421.pdf</code> começa com <code>4D 5A 90 00</code>. O que isso indica e qual é o próximo passo?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> <code>4D 5A</code> ("MZ") é a assinatura de um executável PE do Windows, não de um PDF (<code>25 50 44 46</code>). A extensão é falsa, indício de phishing com malware. Não abra; preserve o arquivo, calcule o hash e faça a triagem em ambiente isolado (Estudo 20).</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 7 (Isolamento):</strong> Por que a fuga de um container costuma ser mais provável que a fuga de uma VM?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O container compartilha o kernel do host e é isolado por namespaces e cgroups, de modo que uma falha de kernel ou uma configuração permissiva (modo privileged, socket do Docker montado, capabilities em excesso) basta. A VM tem kernel próprio e a fronteira é o hipervisor, uma superfície menor e mais difícil de explorar.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- SEÇÃO 10: FATOS E REFERÊNCIAS -->
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>Pilha, heap e o estouro de buffer</h4>
+                <p>A pilha guarda locais e o endereço de retorno; a heap guarda o que se aloca em execução. Escrever além do buffer na pilha sobrescreve o endereço de retorno e desvia o fluxo. A correção é limitar o tamanho da entrada.</p>
+            </div>
+            <div class="facts-card">
+                <h4>ASLR, DEP/NX e stack canaries</h4>
+                <p>ASLR sorteia endereços, DEP/NX impede executar dados e o canário detecta a sobrescrita antes do retorno. Dificultam a exploração; não corrigem o defeito e têm contornos conhecidos.</p>
+            </div>
+            <div class="facts-card">
+                <h4>Kernel, espaço de usuário e chamadas de sistema</h4>
+                <p>Programas rodam no anel 3 e pedem ao kernel (anel 0) o que não podem fazer sozinhos. O EDR observa essa fronteira; um rootkit de kernel a adultera, e a evidência confiável vem de fora do sistema.</p>
+            </div>
+            <div class="facts-card">
+                <h4>Magic bytes, hexadecimal e Base64</h4>
+                <p>O tipo do arquivo está nos primeiros bytes (<code>MZ</code>, <code>7F ELF</code>, <code>%PDF-</code>, <code>PK</code>). Base64 e hexadecimal são representações sem chave: codificação não é criptografia. Em UTF-8, tamanho em caracteres difere de tamanho em bytes.</p>
+            </div>
+            <div class="facts-card">
+                <h4>Hipervisor, VM e container</h4>
+                <p>Tipo 1 roda sobre o hardware; tipo 2, sobre um SO. A VM tem kernel próprio; o container compartilha o do host e se isola com namespaces e cgroups. A fuga de container vem sobretudo de configuração.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>IETF: RFC 4648, <em>The Base16, Base32, and Base64 Data Encodings</em> (2006); RFC 3629, <em>UTF-8, a transformation format of ISO 10646</em> (2003).</li>
+            <li>Intel: <em>Intel 64 and IA-32 Architectures Software Developer's Manual</em>; AMD: <em>AMD64 Architecture Programmer's Manual</em> (anéis de privilégio, pilha e instrução <code>syscall</code>).</li>
+            <li>Formato ELF: <em>System V Application Binary Interface</em> e a página <code>elf(5)</code>. Formato PE: <em>PE Format</em>, documentação da Microsoft.</li>
+            <li>MITRE CWE: CWE-121 (estouro de buffer baseado em pilha), CWE-122 (baseado em heap) e CWE-787 (escrita fora dos limites).</li>
+            <li>Páginas de manual do Linux: <code>namespaces(7)</code>, <code>cgroups(7)</code>, <code>capabilities(7)</code>, <code>syscalls(2)</code>.</li>
+            <li>Os valores de assinatura (magic bytes) do laboratório conferem com a saída do comando <code>file</code> e as especificações de cada formato; confira na fonte antes de usar em relatório.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🏁</span>
+                <strong>Próximos passos</strong>
+            </div>
+            <p>
+                Com a pilha, o kernel e os tokens na cabeça, o Estudo 62 (Exploração e Escalada de Privilégio) mostra o caminho de uma máquina do começo ao fim, em ambiente autorizado. Para aprofundar permissões e shell, vá ao Estudo 34 (Linux) e ao Estudo 36 (Windows); para o lado defensivo, ao Estudo 10 (EDR).
+            </p>
+        </div>
+    </section>
+
+</article>
+<style>
+.comp-abas { display: flex; flex-wrap: wrap; gap: 0.3rem; border-bottom: 2px solid var(--rule); margin-bottom: 0.8rem; }
+.comp-aba { font: inherit; font-weight: 600; padding: 0.5rem 1rem; border: 1px solid var(--rule); border-bottom: 0; border-radius: var(--radius-sm) var(--radius-sm) 0 0; background: var(--sunk); color: var(--ink); cursor: pointer; }
+.comp-aba[aria-selected="true"] { background: var(--surface); border-color: var(--accent); color: var(--accent); box-shadow: 0 2px 0 var(--surface); }
+.comp-painel { min-width: 0; }
+.comp-painel[hidden] { display: none; }
+.comp-nota { font-size: 0.85rem; color: var(--muted); margin: 0.4rem 0; }
+.comp-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 0.6rem; }
+.comp-cartao { border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.6rem 0.8rem; min-width: 0; background: var(--surface); }
+.comp-cartao strong { overflow-wrap: anywhere; }
+.comp-hexbox { font-family: var(--font-mono); font-size: 0.82rem; background: var(--sunk); padding: 0.4rem 0.5rem; border-radius: var(--radius-sm); margin: 0.4rem 0; overflow-wrap: anywhere; }
+.comp-cartao select { width: 100%; font: inherit; padding: 0.35rem; }
+.comp-linha { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-top: 0.7rem; }
+.comp-resultado { margin-top: 0.6rem; min-width: 0; overflow-wrap: anywhere; font-size: 0.9rem; }
+.comp-resultado:empty { display: none; }
+.comp-resultado p { margin: 0.3rem 0; }
+.comp-ok { color: var(--ok); font-weight: 600; }
+.comp-erro { color: var(--bad); font-weight: 600; }
+.comp-campo { display: block; width: 100%; box-sizing: border-box; font: inherit; padding: 0.4rem 0.5rem; margin: 0.2rem 0 0.6rem 0; border: 1px solid var(--rule-strong); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); }
+.comp-mono { font-family: var(--font-mono); font-size: 0.85rem; }
+.comp-livre { margin-top: 1rem; }
+.comp-chave { display: inline-flex; gap: 0.35rem; align-items: center; font-weight: 600; }
+.comp-pilha { display: flex; flex-wrap: wrap; gap: 3px; margin: 0.6rem 0; }
+.comp-cel { display: inline-block; width: 1.6rem; height: 1.6rem; border: 2px solid var(--rule-strong); border-radius: 3px; box-sizing: border-box; font-family: var(--font-mono); font-size: 0.6rem; line-height: 1.4rem; text-align: center; overflow: hidden; vertical-align: middle; }
+.comp-pilha .comp-cel { width: 1.9rem; height: 1.9rem; line-height: 1.7rem; }
+.comp-cel-buffer { border-color: var(--accent); }
+.comp-cel-canario { border-color: var(--warning-color); }
+.comp-cel-retorno { border-color: var(--danger-color); }
+.comp-cel-cheia { background: var(--ink); border-color: var(--ink); }
+.comp-pilha .comp-cel-cheia { color: var(--surface); }
+.comp-cel-sobrescrita { box-shadow: inset 0 0 0 2px var(--bad); }
+.comp-legenda { display: flex; flex-wrap: wrap; gap: 0.9rem; font-size: 0.8rem; color: var(--muted); }
+</style>
+<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
+<script type="application/json" id="comp-dados">
+{
+ "contexto": "Arquivos e entradas fictícios da Ipê Store. Nomes, conteúdos e bytes inventados para o exercício.",
+ "assinaturas": {"png": "89504E470D0A1A0A", "pdf": "255044462D", "zip": "504B0304", "elf": "7F454C46", "pe": "4D5A", "script": "2321"},
+ "rotulos": {"png": "PNG (imagem)", "pdf": "PDF (documento)", "zip": "ZIP (arquivo compactado)", "elf": "ELF (executável Linux)", "pe": "PE (executável Windows)", "script": "Script (shebang)"},
+ "arquivos": [
+  {"id": "A1", "nome": "logo-ipestore.png", "hex": "89 50 4E 47 0D 0A 1A 0A 00 00 00 0D 49 48 44 52", "tipo_real": "png",
+   "explicacao": "A assinatura de 8 bytes (89 50 4E 47 0D 0A 1A 0A) é a do PNG, e a extensão confere."},
+  {"id": "A2", "nome": "fatura-0421.pdf", "hex": "4D 5A 90 00 03 00 00 00 04 00 00 00 FF FF 00 00", "tipo_real": "pe",
+   "explicacao": "Extensão falsa: 4D 5A (MZ) é o começo de um executável PE do Windows. Um PDF legítimo começaria por 25 50 44 46. Padrão clássico de anexo de phishing."},
+  {"id": "A3", "nome": "backup-lojas.zip", "hex": "50 4B 03 04 14 00 00 00 08 00 5A 71 00 00 00 00", "tipo_real": "zip",
+   "explicacao": "50 4B 03 04 (PK) é o cabeçalho local de um arquivo ZIP. O mesmo contêiner também serve a DOCX, XLSX e JAR."},
+  {"id": "A4", "nome": "relatorio-vendas-q3.pdf", "hex": "25 50 44 46 2D 31 2E 37 0A 25 E2 E3 CF D3 0A 31", "tipo_real": "pdf",
+   "explicacao": "25 50 44 46 2D é %PDF-, seguido da versão (1.7). A extensão confere."},
+  {"id": "A5", "nome": "limpa-cache.sh", "hex": "23 21 2F 62 69 6E 2F 73 68 0A 63 64 20 2F 74 6D", "tipo_real": "script",
+   "explicacao": "23 21 é #!, a linha shebang que nomeia o interpretador (aqui /bin/sh). Um script não é binário, mas executa quando recebe permissão."},
+  {"id": "A6", "nome": "coletor.elf", "hex": "7F 45 4C 46 02 01 01 00 00 00 00 00 00 00 00 00", "tipo_real": "elf",
+   "explicacao": "7F 45 4C 46 é o 0x7F seguido de ELF. O quinto byte (02) indica 64 bits e o sexto (01), little-endian."}
+ ],
+ "pilha": {"buffer": 16, "canario": 8, "retorno": 8}
+}
+</script>
+<script>
+(function() {
+    var D = JSON.parse(document.getElementById("comp-dados").textContent);
+    var ALFABETO = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    var TAM = D.pilha;
+    var TIPOS = ["png", "pdf", "zip", "elf", "pe", "script"];
+
+    function $(id) { return document.getElementById(id); }
+    function el(tag, texto, classe) {
+        var e = document.createElement(tag);
+        if (texto !== undefined && texto !== null) e.textContent = texto;
+        if (classe) e.className = classe;
+        return e;
+    }
+    function limpar(no) { while (no.firstChild) no.removeChild(no.firstChild); }
+    function bytesDoTexto(texto) { return new TextEncoder().encode(texto); }
+    function paraHex(bytes) {
+        var partes = [];
+        for (var i = 0; i < bytes.length; i++) partes.push((bytes[i] < 16 ? "0" : "") + bytes[i].toString(16).toUpperCase());
+        return partes.join(" ");
+    }
+    function doHex(hex) {
+        var limpo = String(hex).replace(/[\s:]/g, "");
+        if (limpo.length % 2 !== 0 || !/^[0-9a-fA-F]*$/.test(limpo)) return null;
+        var bytes = new Uint8Array(limpo.length / 2);
+        for (var i = 0; i < bytes.length; i++) bytes[i] = parseInt(limpo.substr(i * 2, 2), 16);
+        return bytes;
+    }
+
+    // ================================================ regras (espelhadas nos testes)
+    // tipo cujo prefixo casa, o mais longo primeiro; null se nenhum
+    window.identificarAssinatura = function(hex) {
+        var limpo = String(hex).replace(/[\s:]/g, "").toUpperCase();
+        if (!/^[0-9A-F]+$/.test(limpo)) return null;
+        var tipos = TIPOS.slice().sort(function(a, b) { return D.assinaturas[b].length - D.assinaturas[a].length; });
+        for (var i = 0; i < tipos.length; i++) {
+            if (limpo.indexOf(D.assinaturas[tipos[i]]) === 0) return tipos[i];
+        }
+        return null;
+    };
+
+    window.textoParaHex = function(texto) {
+        return paraHex(new TextEncoder().encode(String(texto)));
+    };
+
+    // null se o hexadecimal for inválido ou os bytes não formarem UTF-8 válido
+    window.hexParaTexto = function(hex) {
+        var bytes = doHex(hex);
+        if (bytes === null) return null;
+        try { return new TextDecoder("utf-8", { fatal: true }).decode(bytes); } catch (e) { return null; }
+    };
+
+    window.textoParaBase64 = function(texto) {
+        var b = new TextEncoder().encode(String(texto));
+        var saida = "";
+        for (var i = 0; i < b.length; i += 3) {
+            var n = (b[i] << 16) | ((i + 1 < b.length ? b[i + 1] : 0) << 8) | (i + 2 < b.length ? b[i + 2] : 0);
+            saida += ALFABETO[(n >> 18) & 63] + ALFABETO[(n >> 12) & 63];
+            saida += i + 1 < b.length ? ALFABETO[(n >> 6) & 63] : "=";
+            saida += i + 2 < b.length ? ALFABETO[n & 63] : "=";
+        }
+        return saida;
+    };
+
+    // null se o Base64 for inválido (RFC 4648) ou os bytes não formarem UTF-8 válido
+    window.base64ParaTexto = function(b64) {
+        var s = String(b64).replace(/\s/g, "");
+        var m = /^([A-Za-z0-9+\/]*)(={0,2})$/.exec(s);
+        if (!m) return null;
+        var dados = m[1];
+        if (dados.length % 4 === 1) return null;
+        if (m[2] && (dados.length + m[2].length) % 4 !== 0) return null;
+        var bytes = [];
+        var acc = 0, bits = 0;
+        for (var i = 0; i < dados.length; i++) {
+            acc = (acc << 6) | ALFABETO.indexOf(dados[i]);
+            bits += 6;
+            if (bits >= 8) {
+                bits -= 8;
+                bytes.push((acc >> bits) & 255);
+                acc &= (1 << bits) - 1;
+            }
+        }
+        try { return new TextDecoder("utf-8", { fatal: true }).decode(new Uint8Array(bytes)); } catch (e) { return null; }
+    };
+
+    // n conta bytes UTF-8 da entrada, não caracteres
+    window.simularPilha = function(entrada, canario, aslr) {
+        var n = new TextEncoder().encode(String(entrada)).length;
+        if (n <= TAM.buffer) return "normal";
+        if (canario) return "abortado_canario";
+        if (aslr) return "crash";
+        return n >= TAM.buffer + TAM.retorno ? "controle_do_fluxo" : "crash";
+    };
+
+    // ================================================ abas
+    var abas = ["assinatura", "decodificador", "pilha"];
+    function selecionarAba(nome, foco) {
+        abas.forEach(function(a) {
+            var ativa = a === nome;
+            var botao = $("comp-aba-" + a);
+            botao.setAttribute("aria-selected", ativa ? "true" : "false");
+            botao.setAttribute("tabindex", ativa ? "0" : "-1");
+            $("comp-painel-" + a).hidden = !ativa;
+            if (ativa && foco) botao.focus();
+        });
+    }
+    abas.forEach(function(a, idx) {
+        var botao = $("comp-aba-" + a);
+        botao.addEventListener("click", function() { selecionarAba(a, false); });
+        botao.addEventListener("keydown", function(ev) {
+            var destino = null;
+            if (ev.key === "ArrowRight") destino = (idx + 1) % abas.length;
+            else if (ev.key === "ArrowLeft") destino = (idx + abas.length - 1) % abas.length;
+            else if (ev.key === "Home") destino = 0;
+            else if (ev.key === "End") destino = abas.length - 1;
+            if (destino !== null) { ev.preventDefault(); selecionarAba(abas[destino], true); }
+        });
+    });
+
+    // ================================================ aba 1: assinatura
+    var selecoes = {};
+    function renderArquivos() {
+        var caixa = $("comp-arquivos");
+        limpar(caixa);
+        D.arquivos.forEach(function(a) {
+            var cartao = el("div", null, "comp-cartao");
+            cartao.setAttribute("role", "group");
+            cartao.setAttribute("aria-label", "Arquivo " + a.nome);
+            cartao.appendChild(el("strong", a.nome));
+            cartao.appendChild(el("div", a.hex, "comp-hexbox"));
+            var sel = el("select");
+            sel.id = "comp-sel-" + a.id;
+            sel.setAttribute("aria-label", "Tipo real de " + a.nome);
+            var vazio = el("option", "Escolha o tipo real");
+            vazio.value = "";
+            sel.appendChild(vazio);
+            TIPOS.forEach(function(t) {
+                var o = el("option", D.rotulos[t]);
+                o.value = t;
+                sel.appendChild(o);
+            });
+            sel.addEventListener("change", function() { selecoes[a.id] = sel.value; });
+            cartao.appendChild(sel);
+            var fb = el("p", "", "comp-resultado");
+            fb.id = "comp-fb-" + a.id;
+            cartao.appendChild(fb);
+            caixa.appendChild(cartao);
+        });
+    }
+    function verificar() {
+        var acertos = 0, respondidos = 0;
+        D.arquivos.forEach(function(a) {
+            var fb = $("comp-fb-" + a.id);
+            limpar(fb);
+            var escolha = selecoes[a.id] || "";
+            if (!escolha) { fb.appendChild(el("span", "Sem resposta. " + a.explicacao, "comp-erro")); return; }
+            respondidos++;
+            var certo = escolha === identificarAssinatura(a.hex);
+            if (certo) acertos++;
+            fb.appendChild(el("span", certo ? "Correto. " : "Incorreto. ", certo ? "comp-ok" : "comp-erro"));
+            fb.appendChild(el("span", a.explicacao));
+        });
+        var r = $("comp-resultado-assinatura");
+        limpar(r);
+        r.appendChild(el("p", acertos + " de " + D.arquivos.length + " corretos" +
+            (respondidos < D.arquivos.length ? " (" + (D.arquivos.length - respondidos) + " sem resposta)." : "."), acertos === D.arquivos.length ? "comp-ok" : "comp-erro"));
+        if (window.CS && typeof window.CS.labProgress === "function") window.CS.labProgress(acertos, D.arquivos.length);
+    }
+    $("comp-verificar").addEventListener("click", verificar);
+    $("comp-limpar-assinaturas").addEventListener("click", function() {
+        selecoes = {};
+        renderArquivos();
+        limpar($("comp-resultado-assinatura"));
+        if (window.CS && typeof window.CS.labProgress === "function") window.CS.labProgress(0, D.arquivos.length);
+    });
+    $("comp-hex-livre").addEventListener("input", function() {
+        var r = $("comp-resultado-livre");
+        limpar(r);
+        var valor = $("comp-hex-livre").value;
+        if (!valor.trim()) return;
+        var tipo = identificarAssinatura(valor);
+        if (tipo) r.appendChild(el("p", "Casa com a assinatura de " + D.rotulos[tipo] + ".", "comp-ok"));
+        else r.appendChild(el("p", "Nenhuma das seis assinaturas casa (ou o texto não é hexadecimal). Um JPEG, por exemplo, começa por FF D8 FF e está fora deste exercício.", "comp-erro"));
+    });
+
+    // ================================================ aba 2: decodificador
+    var campos = { texto: $("comp-texto"), hex: $("comp-hex"), b64: $("comp-b64") };
+    function avisoDecod(msg, classe) {
+        var a = $("comp-aviso-decod");
+        limpar(a);
+        if (msg) a.appendChild(el("p", msg, classe || "comp-erro"));
+    }
+    function atualizarDecodificador(origem) {
+        var texto;
+        if (origem === "texto") texto = campos.texto.value;
+        else if (origem === "hex") {
+            texto = hexParaTexto(campos.hex.value);
+            if (texto === null) return avisoDecod("Hexadecimal inválido: use pares de dígitos 0-9 e A-F, e bytes que formem UTF-8 válido.");
+        } else {
+            texto = base64ParaTexto(campos.b64.value);
+            if (texto === null) return avisoDecod("Base64 inválido: use A-Z, a-z, 0-9, + e /, com = só no fim, e bytes que formem UTF-8 válido.");
+        }
+        avisoDecod("");
+        if (origem !== "texto") campos.texto.value = texto;
+        if (origem !== "hex") campos.hex.value = textoParaHex(texto);
+        if (origem !== "b64") campos.b64.value = textoParaBase64(texto);
+    }
+    ["texto", "hex", "b64"].forEach(function(o) {
+        campos[o].addEventListener("input", function() { $("comp-nota-segredo").textContent = ""; atualizarDecodificador(o); });
+    });
+    $("comp-ex-acento").addEventListener("click", function() {
+        campos.texto.value = "ação";
+        $("comp-nota-segredo").textContent = "\"ação\" tem 4 caracteres e 6 bytes UTF-8 (61 C3 A7 C3 A3 6F): o Base64 é YcOnw6Nv.";
+        atualizarDecodificador("texto");
+    });
+    $("comp-ex-segredo").addEventListener("click", function() {
+        campos.b64.value = "YWRtaW46SXBlIzIwMjY=";
+        atualizarDecodificador("b64");
+        $("comp-nota-segredo").textContent = "Sem chave nenhuma, o campo de texto mostra a credencial fictícia. Base64 é apenas outra forma de escrever os mesmos bytes: codificação não é criptografia.";
+    });
+    campos.texto.value = "ação";
+    atualizarDecodificador("texto");
+
+    // ================================================ aba 3: pilha
+    var MENSAGENS = {
+        normal: ["A entrada cabe no buffer", "A função termina e retorna ao chamador normalmente."],
+        abortado_canario: ["Canário sobrescrito: processo abortado", "Antes de retornar, a função confere o canário, vê que mudou e encerra o processo (no Linux, __stack_chk_fail). O endereço de retorno nunca chega a ser usado: o ataque vira, no máximo, uma queda do serviço."],
+        crash: ["Endereço de retorno corrompido: falha de segmentação", "O retorno salta para um endereço que o atacante não controla de forma útil (ASLR ligado, ou só parte do endereço foi sobrescrita). O processo cai: negação de serviço, sem controle do fluxo."],
+        controle_do_fluxo: ["Controle do fluxo de execução", "Sem canário e sem ASLR, o endereço de retorno inteiro vem da entrada e o atacante sabe onde saltar. DEP/NX ainda impede executar dados injetados na pilha, mas não impede reaproveitar código já existente (Estudo 62)."]
+    };
+    function celulas(canario) {
+        var lista = [];
+        var i;
+        for (i = 0; i < TAM.buffer; i++) lista.push("buffer");
+        if (canario) for (i = 0; i < TAM.canario; i++) lista.push("canario");
+        for (i = 0; i < TAM.retorno; i++) lista.push("retorno");
+        return lista;
+    }
+    function renderPilha() {
+        var entrada = $("comp-entrada").value;
+        var canario = $("comp-canario").checked;
+        var aslr = $("comp-aslr").checked;
+        var bytes = bytesDoTexto(entrada);
+        var n = bytes.length;
+        var lista = celulas(canario);
+        var caixa = $("comp-pilha");
+        limpar(caixa);
+        lista.forEach(function(tipo, i) {
+            var cheia = i < n;
+            var c = el("span", cheia ? paraHex(bytes.subarray(i, i + 1)) : "", "comp-cel comp-cel-" + tipo + (cheia ? " comp-cel-cheia" : ""));
+            if (cheia && tipo !== "buffer") c.className += " comp-cel-sobrescrita";
+            caixa.appendChild(c);
+        });
+        var alem = Math.max(0, n - lista.length);
+        $("comp-contagem").textContent = entrada.length + " caracteres = " + n + " bytes UTF-8. O buffer comporta " + TAM.buffer + "." +
+            (alem > 0 ? " " + alem + " bytes passam do fim da pilha modelada." : "");
+        var resultado = simularPilha(entrada, canario, aslr);
+        var r = $("comp-resultado-pilha");
+        limpar(r);
+        r.appendChild(el("p", MENSAGENS[resultado][0], resultado === "normal" ? "comp-ok" : "comp-erro"));
+        r.appendChild(el("p", MENSAGENS[resultado][1]));
+    }
+    $("comp-entrada").addEventListener("input", renderPilha);
+    $("comp-canario").addEventListener("change", renderPilha);
+    $("comp-aslr").addEventListener("change", renderPilha);
+    [["comp-ex-16", 16], ["comp-ex-20", 20], ["comp-ex-24", 24], ["comp-ex-200", 200]].forEach(function(par) {
+        $(par[0]).addEventListener("click", function() {
+            $("comp-entrada").value = new Array(par[1] + 1).join("A").slice(0, 200);
+            renderPilha();
+        });
+    });
+
+    renderArquivos();
+    renderPilha();
+})();
+</script>
