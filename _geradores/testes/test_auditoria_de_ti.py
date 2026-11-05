@@ -27,7 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from index_dados import ESTUDOS_DADOS  # noqa: E402
 
 SLUG = "Auditoria-de-TI"
-SECOES = ["introducao", "sox-404", "itgc", "cobit", "ciclo-do-teste", "simulador", "checklist", "quiz", "fatos"]
+SECOES = ["introducao", "sox-404", "itgc", "cobit", "ciclo-do-teste", "assurance", "correlacao-grc", "simulador", "checklist", "quiz", "fatos"]
 DOMINIOS = ("acesso", "mudanca", "desenvolvimento", "operacoes")
 FREQUENCIAS = ("anual", "trimestral", "mensal", "semanal", "diaria", "multipla")
 CLASSES = ("efetivo", "deficiencia", "significativa", "material")
@@ -131,6 +131,18 @@ class TestAuditoriaDeTI(unittest.TestCase):
         for n in range(1, len(SECOES) + 1):
             self.assertIn(f"Seção {n} de {len(SECOES)}", compilado)
         self.assertIn('data-slug="auditoria-de-ti"', body)
+
+    def test_secoes_assurance_e_correlacao(self):
+        a = self._secao("assurance")
+        for t in ("desenho", "efetividade operacional", "reexecução", "indagação",
+                  "racionalização", "modelo de assurance", "Três Linhas", "Estudo 59"):
+            self.assertIn(t, a, t)
+        self.assertEqual(a.count('class="data-table"'), 2)
+        c = self._secao("correlacao-grc")
+        for t in ("causa sistêmica", "sistêmic", "plataforma de GRC", "Estudo 25", "Estudo 09",
+                  "Estudo 18", "Estudos 46", "ServiceNow", "Archer", "MetricStream", "callout tip"):
+            self.assertIn(t, c, t)
+        self.assertNotIn("recomendamos", c)
 
     def test_coerencia_com_o_catalogo(self):
         content = self._compilado()

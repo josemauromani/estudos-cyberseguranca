@@ -342,6 +342,115 @@ flowchart TD
         </p>
     </section>
 
+    <!-- SEÇÃO: SECURITY ASSURANCE -->
+    <section class="study-section" id="assurance" data-tipo="teoria">
+        <h2>Security Assurance: Desenho, Efetividade e Racionalização</h2>
+
+        <p>
+            <strong>Assurance</strong> é a garantia independente e baseada em evidência de que os controles existem e funcionam. A pergunta é sempre dupla: o controle, <em>como foi desenhado</em>, trata o risco? E, se trata, ele <em>operou</em> de verdade durante o período? A seção anterior mostrou o ciclo do teste com a lente da SOX; aqui o foco é o programa de assurance como um todo, que serve também à ISO 27001, ao SOC 2 e à gestão interna de riscos.
+        </p>
+
+        <h3>Desenho × efetividade operacional</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Dimensão</th><th>Pergunta</th><th>Como se testa</th><th>Falha típica</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Desenho</strong></td><td>Se executado como descrito, o controle previne ou detecta o evento de risco?</td><td>Walkthrough, leitura da política e do procedimento, análise da cobertura.</td><td>Revisão de acessos que ignora contas privilegiadas e de serviço.</td></tr>
+                    <tr><td><strong>Efetividade operacional</strong></td><td>O controle foi executado, por quem devia, em todo o período?</td><td>Teste de uma amostra da população, com evidência de cada ocorrência.</td><td>Aprovação feita depois da implantação; revisão trimestral que só ocorreu duas vezes.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Um controle bem desenhado e mal executado é um problema de operação; um controle executado à risca, mas que não cobre o risco, é um problema de desenho. A ordem importa: testar a operação de um desenho falho desperdiça esforço (veja o ciclo na seção <em>O Ciclo do Teste</em>, sem repetir aqui os passos).
+        </p>
+
+        <h3>Tipos de teste e força da evidência</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Procedimento</th><th>O que é</th><th>Força da evidência</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Indagação</strong></td><td>Perguntar ao dono do controle como ele funciona.</td><td>Mais fraca. Serve de ponto de partida, nunca de conclusão isolada.</td></tr>
+                    <tr><td><strong>Observação</strong></td><td>Ver o controle sendo executado.</td><td>Fraca a média: vale para o momento observado, não para o período.</td></tr>
+                    <tr><td><strong>Inspeção</strong></td><td>Examinar registros, aprovações, logs e configurações.</td><td>Média a forte, desde que a população seja completa e o registro, íntegro.</td></tr>
+                    <tr><td><strong>Reexecução</strong></td><td>O auditor refaz o controle e compara o resultado.</td><td>Mais forte: o resultado não depende do relato de quem executa.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Na prática, combinam-se os procedimentos: a indagação orienta, a inspeção sustenta e a reexecução confirma os pontos de maior risco. Quanto maior o risco do controle, mais para a direita da tabela deve ir a evidência.
+        </p>
+
+        <h3>O modelo de assurance</h3>
+        <p>
+            Um <strong>modelo de assurance</strong> transforma testes avulsos em programa recorrente. Seus componentes:
+        </p>
+        <ul>
+            <li><strong>Escopo:</strong> quais sistemas, processos e controles entram, escolhidos por risco e por obrigação (contrato, norma, regulador).</li>
+            <li><strong>Critérios:</strong> contra o que se mede (política interna, ISO 27001/27002, COBIT, CIS, requisito contratual).</li>
+            <li><strong>Ritos:</strong> calendário e frequência de teste, proporcionais ao risco, com testes contínuos onde o controle é automatizável.</li>
+            <li><strong>Indicadores:</strong> percentual de controles testados, efetivos e com exceção; tempo de fechamento das ações; achados recorrentes.</li>
+            <li><strong>Evidências:</strong> repositório único, com data, fonte, responsável e retenção definida.</li>
+            <li><strong>Governança dos planos de ação:</strong> cada achado tem dono, prazo e critério de encerramento; prazos vencidos escalam; a mudança de prazo exige aprovação registrada.</li>
+        </ul>
+
+        <h3>Racionalização de controles</h3>
+        <p>
+            Com o tempo, os controles se acumulam: cada auditoria, incidente ou norma pede mais um. A <strong>racionalização</strong> parte do inverso: mapear cada controle ao risco que ele trata, identificar quais riscos têm controle demais (redundância, testado três vezes por três frameworks) e quais têm de menos. Controles redundantes são consolidados num só, testado uma vez e reaproveitado em vários referenciais; controles sem risco associado são candidatos a ser aposentados. Menos controles, bem desenhados e bem testados, dão mais garantia do que muitos controles de papel.
+        </p>
+
+        <div class="callout key">
+            <div class="callout-title">
+                <span class="callout-icon">🧱</span>
+                <strong>Onde o assurance encaixa nas Três Linhas</strong>
+            </div>
+            <p>
+                A primeira linha (gestão) é dona dos controles e faz o monitoramento do dia a dia. A segunda linha (risco e conformidade) define o arcabouço e testa por amostragem. A terceira linha (auditoria interna) dá a garantia independente ao conselho. Os três podem fazer testes, mas só a terceira é independente da gestão. O Estudo 59 (Liderança e Programa de Segurança) mostra como esse modelo se traduz em linha de reporte, governança e relato ao conselho.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO: CORRELAÇÃO SISTÊMICA E AUTOMAÇÃO DE GRC -->
+    <section class="study-section" id="correlacao-grc" data-tipo="teoria">
+        <h2>Correlação Sistêmica e Automação de GRC</h2>
+
+        <p>
+            Tratar achados, incidentes e exceções em silos produz uma lista longa e uma impressão enganosa de que há muitos problemas distintos. O trabalho de maior valor é <strong>correlacionar</strong> os sinais para chegar à <strong>causa sistêmica</strong>.
+        </p>
+
+        <h3>Da lista de achados à causa sistêmica</h3>
+        <p>
+            Imagine que o mesmo controle de acesso falho aparece em 3 auditorias, 2 incidentes e 5 exceções aprovadas. São 10 registros, mas um só problema sistêmico de IAM: por exemplo, ausência de um processo de desligamento integrado ao RH. Corrigir os 10 itens um a um é esforço sem fim; corrigir a causa os encerra juntos. Para encontrar a causa, agrupe os sinais por controle, por ativo, por processo e por dono, e pergunte o que eles têm em comum. Os sinais vêm de fontes diversas: achados de auditoria, incidentes (Estudo 18), detecções e caçadas (Estudos 46 e 47), exceções de segurança e riscos aceitos (Estudo 25), vulnerabilidades recorrentes (Estudo 09) e resultados de testes de controle.
+        </p>
+
+        <h3>O que uma plataforma de GRC automatiza</h3>
+        <p>
+            Uma <strong>plataforma de GRC</strong> (ou de gestão integrada de riscos, IRM) não substitui o julgamento; ela remove o trabalho manual e dá visão única. Os conceitos que a categoria cobre:
+        </p>
+        <ul>
+            <li><strong>Registro único</strong> de riscos, controles, achados, exceções e evidências, com identificadores e donos, em vez de planilhas paralelas.</li>
+            <li><strong>Workflow de planos de ação:</strong> abertura, atribuição, prazo, escalonamento e encerramento com evidência.</li>
+            <li><strong>Mapeamento controle ↔ risco ↔ requisito:</strong> um controle testado uma vez atende a vários referenciais (ISO 27001, SOX, LGPD, contratos).</li>
+            <li><strong>Indicadores:</strong> painéis de cobertura, efetividade, ações vencidas e recorrência, que alimentam o reporte à diretoria.</li>
+        </ul>
+        <p>
+            Ferramentas como ServiceNow GRC, Archer e MetricStream são exemplos da categoria; este material não recomenda nenhuma delas. A escolha depende do tamanho da empresa, da integração com os sistemas existentes e do orçamento, e uma planilha bem governada atende a muita organização pequena.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">💡</span>
+                <strong>Automatize o processo que já funciona</strong>
+            </div>
+            <p>
+                Uma plataforma de GRC amplifica o que já existe: com taxonomia de riscos confusa e donos indefinidos, ela só automatiza a confusão. Primeiro defina o modelo de riscos e controles, depois escolha a ferramenta. Os alertas e as caçadas dos Estudos 46 e 47 são fontes de sinal para esse registro, e a gestão de riscos do Estudo 25 define o modelo que ele precisa refletir.
+            </p>
+        </div>
+    </section>
+
     <!-- SEÇÃO 6: SIMULADOR -->
     <section class="study-section" id="simulador" data-tipo="laboratorio">
         <h2>Laboratório Prático: Testador de ITGC</h2>
@@ -499,6 +608,30 @@ flowchart TD
                 </div>
             </details>
         </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 8 (Assurance):</strong> A gestora diz que a revisão trimestral de acessos privilegiados é feita e mostra a ata. O auditor aceita a conclusão de que o controle é efetivo? O que acrescentaria?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Não só pela fala ou pela ata. A indagação é a evidência mais fraca; a ata prova que houve reunião, não que a revisão cobriu todas as contas privilegiadas. O auditor primeiro avalia o desenho (a revisão inclui contas de serviço e administradores?) e depois testa a efetividade operacional: obtém a lista completa de contas privilegiadas no sistema, inspeciona as quatro revisões do ano e reexecuta a comparação em ao menos uma delas, para confirmar que os acessos indevidos teriam sido detectados.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 9 (Correlação):</strong> Em um ano, três auditorias apontaram desligados com acesso ativo, dois incidentes envolveram contas de ex-funcionários e cinco exceções de segurança prorrogaram o mesmo acesso. Quantos problemas existem e o que fazer?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Provavelmente um: uma causa sistêmica no processo de desligamento e na gestão de identidades (por exemplo, falta de integração entre RH e IAM). Tratar os dez registros um a um não elimina a causa. A resposta correta correlaciona os sinais, abre um plano de ação único com dono e prazo, corrige o processo (revogação automática pelo evento do RH) e só então encerra os registros ligados, acompanhando a recorrência por indicador. Uma plataforma de GRC ajuda a manter esses vínculos, mas a análise da causa continua sendo humana.</p>
+                </div>
+            </details>
+        </div>
     </section>
 
     <!-- SEÇÃO 9: FATOS E REFERÊNCIAS -->
@@ -533,6 +666,8 @@ flowchart TD
             <li>ISACA: ITAF (<em>IT Audit Framework</em>), padrões e diretrizes da auditoria de sistemas de informação.</li>
             <li>The IIA: Global Internal Audit Standards (2024).</li>
             <li>AICPA: relatórios SOC 1 (controles relevantes para o ICFR do cliente) e SOC 2 (Trust Services Criteria); <em>Audit Guide: Audit Sampling</em>.</li>
+            <li>The IIA: <em>The IIA's Three Lines Model</em> (2020); COSO: <em>Guidance on Monitoring Internal Control Systems</em> (2009), para o monitoramento e a avaliação de efetividade dos controles.</li>
+            <li>ISACA: ITAF, padrões sobre evidência de auditoria e procedimentos de teste (indagação, observação, inspeção, reexecução); ISACA: COBIT 2019, objetivo MEA02 (monitorar, avaliar e analisar o sistema de controle interno).</li>
             <li>CFC: NBC TA 265, comunicação de deficiências de controle interno.</li>
         </ul>
 
