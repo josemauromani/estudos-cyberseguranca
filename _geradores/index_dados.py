@@ -956,7 +956,7 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
     },
     "Redes-e-Protocolos": {
         "titulo": "TCP/IP, DNS, Roteamento e Inspeção de Tráfego",
-        "subtitulo": "Pilha de protocolos, 3-way handshake, flags TCP e vetores de ataque em rede",
+        "subtitulo": "Pilha de protocolos, handshake TCP, CIDR e NAT, HTTP, Wi-Fi e vetores de ataque em rede",
         "trilha": 1,
         "nist": "Protect / Detect",
         "mitre": "TA0011 Command and Control / T1046 Network Service Discovery / T1071 Application Layer Protocol / T1557 Adversary-in-the-Middle",
@@ -970,6 +970,8 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
             "Dissecação de flags SYN/ACK/FIN/RST",
             "Vulnerabilidades em DNS e envenenamento ARP",
             "Simulador de montagem de pacotes e resposta de host",
+            "Sub-redes CIDR, roteamento e NAT (calculadora CIDR)",
+            "HTTP/1.1, HTTP/2 e HTTP/3 e segurança do Wi-Fi (WPA2, 802.1X, WPA3)",
         ],
     },
     "Criptografia-Pratica": {

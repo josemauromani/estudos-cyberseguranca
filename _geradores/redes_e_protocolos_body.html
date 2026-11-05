@@ -231,6 +231,149 @@ sequenceDiagram
   </p>
 </section>
 
+<!-- SEÇÃO: ENDEREÇAMENTO, ROTEAMENTO, HTTP E WI-FI -->
+<section class="study-section" id="enderecamento-http-wifi" data-tipo="teoria">
+  <h2>Endereçamento, Roteamento, HTTP e Wi-Fi</h2>
+
+  <p class="lead-text">
+    Saber ler um endereço IP com sua máscara, entender para onde um pacote é encaminhado, reconhecer o que um pedido HTTP
+    revela e distinguir os modos de segurança do Wi-Fi são habilidades que sustentam a segmentação, a análise de logs e a
+    defesa de redes sem fio. Os exemplos usam a rede fictícia da Ipê Store.
+  </p>
+
+  <h3>Sub-redes e CIDR</h3>
+  <p>
+    Um endereço IPv4 tem 32 bits, divididos em uma parte de <strong>rede</strong> e uma parte de <strong>host</strong>. A notação
+    <strong>CIDR</strong> (RFC 4632) escreve essa divisão como <code>endereço/prefixo</code>: em <code>192.168.10.77/26</code>, os
+    26 primeiros bits identificam a rede. A <strong>máscara</strong> é o mesmo prefixo escrito em decimal
+    (<code>/26</code> = <code>255.255.255.192</code>). O primeiro endereço do bloco é o endereço da <strong>rede</strong>, o último
+    é o <strong>broadcast</strong>, e os endereços entre os dois são os <strong>hosts úteis</strong> (2<sup>32&minus;prefixo</sup> &minus; 2
+    na maioria dos casos).
+  </p>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr><th>Bloco</th><th>Uso</th><th>Observação</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, <code>192.168.0.0/16</code></td><td>Endereços privados</td><td>RFC 1918. Não são roteados na Internet pública; saem via NAT.</td></tr>
+        <tr><td><code>192.0.2.0/24</code>, <code>198.51.100.0/24</code>, <code>203.0.113.0/24</code></td><td>Documentação e exemplos</td><td>RFC 5737. Seguros para usar em material de estudo e relatórios.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    A segmentação depende desses cálculos: cada VLAN ou zona recebe um bloco, e as regras de firewall são escritas sobre blocos
+    CIDR (veja o <strong>Estudo 05</strong>, Segmentação e Firewall). Um prefixo errado pode deixar um servidor dentro de uma zona que não deveria alcançá-lo.
+  </p>
+
+  <div class="lab-box" id="calculadora-cidr">
+    <div class="lab-header">
+      <div class="lab-badge">Calculadora</div>
+      <h3>Calculadora CIDR</h3>
+    </div>
+    <div class="form-group">
+      <label for="cidr-entrada">Endereço com prefixo (ex.: 192.168.10.77/26):</label>
+      <input type="text" id="cidr-entrada" class="form-control" value="192.168.10.77/26" autocomplete="off">
+    </div>
+    <div class="lab-actions">
+      <button type="button" class="btn primary" id="cidr-calcular">Calcular</button>
+    </div>
+    <div id="cidr-resultado" aria-live="polite"></div>
+  </div>
+
+  <h3>Roteamento, gateway e NAT</h3>
+  <p>
+    Cada host e cada roteador consulta uma <strong>tabela de rotas</strong>: o destino é comparado com os prefixos da tabela e vence a
+    rota mais específica (maior prefixo). Se nenhuma rota específica combina, o pacote segue pela <strong>rota padrão</strong>
+    (<code>0.0.0.0/0</code>), cujo próximo salto é o <strong>gateway</strong> padrão, em geral o roteador da borda. Em um
+    host Linux, <code>ip route</code> mostra essa tabela.
+  </p>
+  <p>
+    O <strong>NAT</strong> (tradução de endereços) reescreve o endereço de origem dos pacotes que saem de uma rede privada. A variante
+    mais comum, o <strong>PAT</strong> (também chamado de NAT overload ou masquerade), faz muitos hosts internos compartilharem um único
+    endereço público, distinguindo as conexões pela porta de origem registrada em uma tabela de traduções.
+  </p>
+
+  <div class="callout warning">
+    <h4>NAT não é firewall</h4>
+    <p>
+      Como o NAT só costuma criar traduções para conexões iniciadas de dentro, ele dá a impressão de proteger. Mas isso é um efeito
+      colateral: o NAT não avalia política, não inspeciona conteúdo e não registra decisões de bloqueio. Um host interno que
+      inicia uma conexão para um servidor malicioso passa normalmente, e redirecionamentos de porta (<em>port forwarding</em>)
+      expõem serviços internos. Proteção exige regras explícitas de firewall (Estudo 05).
+    </p>
+  </div>
+
+  <h3>HTTP para quem defende</h3>
+  <p>
+    A semântica do HTTP está descrita na RFC 9110. Um pedido tem método, caminho, cabeçalhos e, às vezes, corpo; a resposta traz um código de status.
+    O <code>GET</code> solicita um recurso e não deveria alterar estado; o <code>POST</code> envia dados para processamento
+    (formulários, APIs, logins); <code>PUT</code> e <code>DELETE</code> alteram ou removem recursos e merecem autenticação rigorosa.
+    As classes de status são: 2xx sucesso, 3xx redirecionamento, 4xx erro do cliente (401 sem autenticação, 403 proibido, 404 não encontrado) e 5xx erro do servidor.
+  </p>
+  <p>
+    Entre os cabeçalhos úteis para segurança estão <code>Host</code>, <code>User-Agent</code> e <code>Referer</code> (úteis em logs),
+    <code>Authorization</code> (credenciais, que nunca devem ir por HTTP sem TLS) e, nas respostas, <code>Strict-Transport-Security</code>,
+    <code>Content-Security-Policy</code> e <code>X-Content-Type-Options</code>. Os <strong>cookies</strong> são enviados pelo servidor no
+    cabeçalho <code>Set-Cookie</code> e devolvidos pelo navegador no cabeçalho <code>Cookie</code>; os atributos <code>Secure</code>,
+    <code>HttpOnly</code> e <code>SameSite</code> reduzem o risco de roubo e de uso indevido da sessão. As falhas em aplicações web estão no <strong>Estudo 12</strong> (OWASP Top 10).
+  </p>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr><th>Característica</th><th>HTTP/1.1</th><th>HTTP/2</th><th>HTTP/3</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Transporte</td><td>TCP</td><td>TCP</td><td>QUIC, sobre UDP</td></tr>
+        <tr><td>Formato</td><td>Texto legível</td><td>Binário, com quadros</td><td>Binário, com quadros</td></tr>
+        <tr><td>Multiplexação</td><td>Não (uma requisição por vez em cada conexão)</td><td>Sim, várias requisições na mesma conexão</td><td>Sim, sem bloqueio entre fluxos</td></tr>
+        <tr><td>Criptografia</td><td>Opcional (HTTPS usa TLS)</td><td>Usada com TLS na prática</td><td>Obrigatória, TLS 1.3 embutido no QUIC</td></tr>
+        <tr><td>Impacto para a defesa</td><td>Fácil de ler em capturas</td><td>Exige descriptografar TLS para inspecionar</td><td>Porta UDP/443: regras que só olham TCP/443 não o enxergam</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Wi-Fi: modos de segurança e ataques</h3>
+  <p>
+    O padrão IEEE 802.11 define as redes sem fio; a autenticação e a cifragem ficam por conta das certificações WPA da Wi-Fi Alliance.
+  </p>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr><th>Modo</th><th>Autenticação</th><th>Ponto forte</th><th>Ponto fraco</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>WPA2-PSK</td><td>Senha compartilhada (<em>pre-shared key</em>)</td><td>Simples de implantar</td><td>Quem captura o 4-way handshake pode tentar adivinhar a senha offline; todos usam a mesma chave</td></tr>
+        <tr><td>WPA2-Enterprise</td><td>802.1X com servidor RADIUS e credenciais por usuário</td><td>Revogação individual; sem senha única</td><td>Exige infraestrutura e validação correta do certificado do servidor</td></tr>
+        <tr><td>WPA3-Personal</td><td>SAE (Simultaneous Authentication of Equals)</td><td>Resiste ao ataque de dicionário offline contra o handshake capturado</td><td>Depende de suporte nos dispositivos e de senha forte contra tentativas online</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    No WPA2-PSK, o <strong>4-way handshake</strong> comprova que cliente e ponto de acesso conhecem a chave sem enviá-la, mas a troca pode ser
+    capturada no ar. Com ela, um atacante testa senhas candidatas <em>offline</em>, sem alertar a rede, e o sucesso depende só da força da senha.
+    O SAE do WPA3 elimina esse ataque offline, porque cada tentativa exige interação com a rede.
+  </p>
+  <p>
+    Outro risco é o <strong>evil twin</strong>: um ponto de acesso falso com o mesmo nome (SSID) de uma rede legítima, para atrair clientes e
+    interceptar o tráfego ou coletar credenciais. No modo Enterprise, o cliente que valida o certificado do servidor RADIUS não se conecta ao impostor.
+  </p>
+
+  <div class="callout tip">
+    <h4>Recomendações para o Wi-Fi da Ipê Store</h4>
+    <p>
+      Prefira WPA3 quando todos os dispositivos suportarem, ou WPA2/WPA3 em modo de transição. Use 802.1X em redes corporativas, com
+      validação de certificado nos clientes. Em redes com senha, use uma frase longa e única, troque-a quando alguém sair da equipe e
+      mantenha os convidados em uma rede separada (Estudo 05).
+    </p>
+  </div>
+</section>
+
 <!-- SEÇÃO 3: LABORATÓRIO / SIMULADOR INTERATIVO -->
 <section class="study-section" id="laboratorio-inspetor" data-tipo="laboratorio">
   <h2>Laboratório Interativo: Inspetor Visual de Pacotes e Probe de Portas</h2>
@@ -495,6 +638,66 @@ sequenceDiagram
       </div>
       </details>
     </div>
+
+    <!-- Questão 4 -->
+    <div class="quiz-item">
+      <div class="quiz-summary">
+        <span class="quiz-tag">Questão 4 &bull; Endereçamento &bull; CIDR</span>
+        <p class="quiz-question">
+          Um servidor da Ipê Store tem o endereço <code>192.168.10.77/26</code>. Quais são o endereço de rede, o broadcast e a quantidade de hosts úteis do bloco?
+        </p>
+      </div>
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta explicada</summary>
+      <div class="quiz-answer">
+        <div class="answer-badge correct">Resposta Correta: Rede 192.168.10.64, broadcast 192.168.10.127 e 62 hosts úteis.</div>
+        <p><strong>Fundamentação Técnica:</strong></p>
+        <p>
+          Um prefixo /26 deixa 6 bits para hosts, ou seja, blocos de 64 endereços (máscara 255.255.255.192). O endereço .77 cai no bloco que começa em .64 e termina em .127. Retirando o endereço de rede e o de broadcast, sobram 64 &minus; 2 = 62 hosts úteis, de .65 a .126.
+        </p>
+      </div>
+      </details>
+    </div>
+
+    <!-- Questão 5 -->
+    <div class="quiz-item">
+      <div class="quiz-summary">
+        <span class="quiz-tag">Questão 5 &bull; Wi-Fi &bull; WPA2 e WPA3</span>
+        <p class="quiz-question">
+          Por que uma rede WPA2-PSK é vulnerável a um ataque de dicionário offline depois que o 4-way handshake é capturado, e o que muda no WPA3-Personal?
+        </p>
+      </div>
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta explicada</summary>
+      <div class="quiz-answer">
+        <div class="answer-badge correct">Resposta Correta: Com o handshake em mãos, o atacante testa senhas sem interagir com a rede; o WPA3 usa SAE e impede esse teste offline.</div>
+        <p><strong>Fundamentação Técnica:</strong></p>
+        <p>
+          No WPA2-PSK, a captura do 4-way handshake fornece o material necessário para verificar cada senha candidata localmente, sem alertar o ponto de acesso. A segurança fica limitada à força da senha. O SAE (Simultaneous Authentication of Equals) do WPA3 faz cada tentativa exigir uma troca com o outro lado, o que inviabiliza o dicionário offline contra o handshake capturado.
+        </p>
+      </div>
+      </details>
+    </div>
+
+    <!-- Questão 6 -->
+    <div class="quiz-item">
+      <div class="quiz-summary">
+        <span class="quiz-tag">Questão 6 &bull; Roteamento &bull; NAT</span>
+        <p class="quiz-question">
+          Um gestor afirma que a rede interna está protegida porque usa NAT. Essa afirmação está correta?
+        </p>
+      </div>
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta explicada</summary>
+      <div class="quiz-answer">
+        <div class="answer-badge correct">Resposta Correta: Não. O NAT traduz endereços, mas não é firewall e não aplica política de segurança.</div>
+        <p><strong>Fundamentação Técnica:</strong></p>
+        <p>
+          O NAT (ou PAT) reescreve endereços e portas para compartilhar um endereço público. A ausência de conexões de entrada é efeito colateral da tabela de traduções, sem avaliar política nem inspecionar conteúdo; um host interno ainda pode contatar servidores maliciosos, e o redirecionamento de portas expõe serviços. A proteção vem de regras de firewall explícitas (Estudo 05).
+        </p>
+      </div>
+      </details>
+    </div>
   </div>
 </section>
 
@@ -537,6 +740,21 @@ sequenceDiagram
       <span class="facts-card-num">SYN-ACK</span>
       <span class="facts-card-label">Sinal de Porta Aberta</span>
       <p class="facts-card-desc">Se o host responder com SYN-ACK a porta está ativa. Se responder com RST-ACK está fechada.</p>
+    </div>
+    <div class="facts-card">
+      <span class="facts-card-num">RFC 4632</span>
+      <span class="facts-card-label">CIDR</span>
+      <p class="facts-card-desc">Notação endereço/prefixo. Blocos privados na RFC 1918 e de documentação na RFC 5737.</p>
+    </div>
+    <div class="facts-card">
+      <span class="facts-card-num">RFC 9110</span>
+      <span class="facts-card-label">Semântica HTTP</span>
+      <p class="facts-card-desc">Métodos, cabeçalhos e códigos de status. HTTP/3 roda sobre QUIC, em UDP.</p>
+    </div>
+    <div class="facts-card">
+      <span class="facts-card-num">802.11</span>
+      <span class="facts-card-label">Wi-Fi (IEEE 802.11 e WPA3)</span>
+      <p class="facts-card-desc">IEEE 802.11 define o padrão; o WPA3 da Wi-Fi Alliance usa SAE contra dicionário offline.</p>
     </div>
   </div>
 
@@ -867,3 +1085,106 @@ sequenceDiagram
   }
 })();
 </script>
+
+<script>
+(function() {
+  'use strict';
+
+  var MSG_FORMATO = 'Use o formato 192.168.1.10/24';
+
+  // Calcula rede, broadcast, máscara e hosts úteis. Aritmética em inteiros sem sinal (>>> 0).
+  function calcularCidr(texto) {
+    var entrada = String(texto == null ? '' : texto).trim();
+    var m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})$/.exec(entrada);
+    if (!m) { return { erro: MSG_FORMATO }; }
+    var octetos = [Number(m[1]), Number(m[2]), Number(m[3]), Number(m[4])];
+    var prefixo = Number(m[5]);
+    for (var i = 0; i < 4; i++) {
+      if (octetos[i] < 0 || octetos[i] > 255) { return { erro: MSG_FORMATO }; }
+    }
+    if (prefixo < 0 || prefixo > 32) { return { erro: MSG_FORMATO }; }
+
+    var ip = (((octetos[0] << 24) | (octetos[1] << 16) | (octetos[2] << 8) | octetos[3]) >>> 0);
+    var mascara = prefixo === 0 ? 0 : ((0xFFFFFFFF << (32 - prefixo)) >>> 0);
+    var rede = (ip & mascara) >>> 0;
+    var broadcast = (rede | (~mascara >>> 0)) >>> 0;
+
+    var hosts, primeiro, ultimo;
+    if (prefixo === 32) {
+      hosts = 1; primeiro = rede; ultimo = rede;
+    } else if (prefixo === 31) {
+      // RFC 3021: em enlaces ponto a ponto /31, os dois endereços são usáveis.
+      hosts = 2; primeiro = rede; ultimo = broadcast;
+    } else {
+      hosts = Math.pow(2, 32 - prefixo) - 2; primeiro = (rede + 1) >>> 0; ultimo = (broadcast - 1) >>> 0;
+    }
+    return {
+      rede: texto4(rede), broadcast: texto4(broadcast), mascara: texto4(mascara),
+      prefixo: prefixo, hosts_uteis: hosts, primeiro: texto4(primeiro), ultimo: texto4(ultimo)
+    };
+  }
+
+  function texto4(n) {
+    return [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join('.');
+  }
+
+  function mostrarCidr() {
+    var entrada = document.getElementById('cidr-entrada');
+    var saida = document.getElementById('cidr-resultado');
+    if (!entrada || !saida) { return; }
+    while (saida.firstChild) { saida.removeChild(saida.firstChild); }
+    var r = calcularCidr(entrada.value);
+    if (r.erro) {
+      var p = document.createElement('p');
+      p.className = 'lab-error';
+      p.textContent = r.erro;
+      saida.appendChild(p);
+      return;
+    }
+    var linhas = [
+      ['Rede', r.rede + '/' + r.prefixo],
+      ['Máscara', r.mascara],
+      ['Broadcast', r.broadcast],
+      ['Primeiro host', r.primeiro],
+      ['Último host', r.ultimo],
+      ['Hosts úteis', String(r.hosts_uteis)]
+    ];
+    var tabela = document.createElement('table');
+    tabela.className = 'data-table';
+    var corpo = document.createElement('tbody');
+    linhas.forEach(function(l) {
+      var tr = document.createElement('tr');
+      var th = document.createElement('th');
+      th.textContent = l[0];
+      var td = document.createElement('td');
+      td.textContent = l[1];
+      tr.appendChild(th); tr.appendChild(td); corpo.appendChild(tr);
+    });
+    tabela.appendChild(corpo);
+    saida.appendChild(tabela);
+    if (r.prefixo === 31) {
+      var n31 = document.createElement('p');
+      n31.textContent = '/31 (RFC 3021): enlace ponto a ponto, sem endereços de rede e broadcast reservados.';
+      saida.appendChild(n31);
+    }
+  }
+
+  function iniciarCidr() {
+    var botao = document.getElementById('cidr-calcular');
+    var entrada = document.getElementById('cidr-entrada');
+    if (botao) { botao.addEventListener('click', mostrarCidr); }
+    if (entrada) {
+      entrada.addEventListener('keydown', function(e) { if (e.key === 'Enter') { mostrarCidr(); } });
+    }
+    mostrarCidr();
+  }
+
+  window.calcularCidr = calcularCidr;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', iniciarCidr);
+  } else {
+    iniciarCidr();
+  }
+})();
+</script>
+
