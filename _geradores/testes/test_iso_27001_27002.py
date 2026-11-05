@@ -38,6 +38,14 @@ class TestIso27001e27002(unittest.TestCase):
         self.assertTrue(self.body_path.exists(), "_geradores/iso_27001_e_27002_body.html deve existir.")
         self.assertTrue(self.compiled_path.exists(), "ISO-27001-e-27002/treinamento-iso-27001-e-27002.html deve existir.")
 
+    def test_sgsi_distingue_cis_controls_de_benchmarks(self):
+        body = self.body_path.read_text(encoding="utf-8")
+        m = re.search(r'<section[^>]*id="sgsi".*?</section>', body, re.S)
+        self.assertIsNotNone(m)
+        sec = m.group(0)
+        for termo in ("CIS Controls", "CIS Benchmarks", "Estudo 06"):
+            self.assertIn(termo, sec)
+
     def test_teoria_e_conceitos_fundamentais(self):
         content = self.compiled_path.read_text(encoding="utf-8")
         termos = [

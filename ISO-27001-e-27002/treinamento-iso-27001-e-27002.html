@@ -2136,7 +2136,7 @@ dfn.glossario:focus-visible {
   <h1>SGSI, Anexo A, CIS Controls e NIST 800-53</h1>
   <p class="mhead-sub">Estrutura do SGSI, os 93 controles do Anexo A, Declaração de Aplicabilidade e crosswalk com CIS Controls v8.1 e NIST SP 800-53 Rev. 5</p>
   <div class="chips"><span class="chip">⏱ 50 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Govern</span><span class="chip">🎯 ATT&amp;CK Conformidade Normativa</span><span class="chip">👤 GRC &amp; Auditoria · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>5 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 26: ISO-27001-e-27002 Body Fragment -->
 <article class="study-container" data-slug="iso-27001-27002">
@@ -2260,6 +2260,16 @@ dfn.glossario:focus-visible {
         <p>
             Os <strong>CIS Controls v8.1</strong> (Center for Internet Security, 2024) são 18 controles priorizados, cada um com salvaguardas (safeguards) distribuídas em três Grupos de Implementação: <strong>IG1</strong> é a higiene cibernética essencial, que toda organização deveria ter; <strong>IG2</strong> acrescenta salvaguardas para quem tem ambientes mais complexos e dados sensíveis; <strong>IG3</strong> reúne as salvaguardas para quem enfrenta adversários sofisticados.
         </p>
+        <div class="callout key">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>CIS Controls não são CIS Benchmarks</strong>
+            </div>
+            <p>
+                Os <strong>CIS Controls</strong> (os 18 acima) dizem <em>o que fazer</em>: são prioridades de programa de segurança. Os <strong>CIS Benchmarks</strong> dizem <em>como configurar</em>: são guias de endurecimento (hardening) por sistema ou dispositivo, como um sistema operacional ou um roteador. O Benchmark é uma das formas de cumprir o CIS 4 (Configuração segura de ativos e software). Veja o endurecimento na prática no Estudo 06.
+            </p>
+        </div>
+
         <p>
             O <strong>NIST SP 800-53 Rev. 5</strong> é o catálogo de controles do governo dos EUA, organizado em 20 famílias identificadas por siglas (AC controle de acesso, AU auditoria, CM gestão de configuração, CP contingência, IA identificação e autenticação, IR resposta a incidentes, RA avaliação de riscos, SC proteção de sistemas e comunicações, SI integridade de sistemas, entre outras). As linhas de base baixa, moderada e alta ficam na publicação complementar <strong>NIST SP 800-53B</strong>.
         </p>
@@ -2467,6 +2477,19 @@ dfn.glossario:focus-visible {
                 </div>
             </details>
         </div>
+
+        <div class="quiz-item" data-q="q6">
+            <div class="quiz-question">
+                <strong>Questão 6 (CIS Controls × Benchmarks):</strong> Qual é a diferença entre os CIS Controls e os CIS Benchmarks?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Os Controls dizem o que fazer; os Benchmarks dizem como configurar.</p>
+                    <p>Os CIS Controls são os 18 controles priorizados de um programa de segurança. Os CIS Benchmarks são guias de configuração segura (hardening) por sistema ou dispositivo, vistos no Estudo 06, e ajudam a cumprir o CIS 4.</p>
+                </div>
+            </details>
+        </div>
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
@@ -2497,6 +2520,7 @@ dfn.glossario:focus-visible {
             <li>ISO/IEC 27001:2022 e Emenda 1:2024 (ABNT NBR ISO/IEC 27001).</li>
             <li>ISO/IEC 27002:2022 (ABNT NBR ISO/IEC 27002).</li>
             <li>CIS Controls v8.1 (Center for Internet Security, 2024) e o mapeamento oficial para a ISO/IEC 27001:2022.</li>
+            <li>CIS Benchmarks (Center for Internet Security): guias de configuração segura por sistema, distintos dos CIS Controls.</li>
             <li>NIST SP 800-53 Rev. 5 e NIST SP 800-53B (linhas de base de controles).</li>
             <li>NIST OLIR (Online Informative References): mapeamento do SP 800-53 Rev. 5 para a ISO/IEC 27001.</li>
         </ul>
