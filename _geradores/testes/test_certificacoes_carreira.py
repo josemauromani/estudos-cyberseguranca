@@ -300,9 +300,12 @@ class TestCertificacoesCarreira(unittest.TestCase):
         ceh = self._cert(d, "CEH")
         lacunas = [dom["nome"] for dom in ceh["dominios"] if not dom["modulos"]]
         parciais = [dom["nome"] for dom in ceh["dominios"] if dom.get("parcial")]
-        self.assertEqual(len(lacunas), 1)
-        self.assertIn("sem fio", lacunas[0])
-        self.assertEqual(len(parciais), 1)
+        self.assertEqual(len(lacunas), 0)
+        self.assertEqual(len(parciais), 2)
+        self.assertTrue(any("sem fio" in n for n in parciais))
+        sem_fio = next(d_ for d_ in ceh["dominios"] if "sem fio" in d_["nome"])
+        self.assertIn("Redes-e-Protocolos", sem_fio["modulos"])
+        self.assertIn("Estudo 02", sem_fio["nota"])
 
     def test_requisitos_de_experiencia(self):
         d = self._dados()

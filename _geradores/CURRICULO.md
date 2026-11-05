@@ -98,7 +98,7 @@ flowchart LR
 
 | Trilha | Denominação | Cor do Tema | Foco Técnico | Módulos |
 |---|---|---|---|---|
-| **Trilha 1** | Fundamentos & Redes | `#2563EB` (Azul) | Base sólida: CIA, protocolos, criptografia, IAM e perímetro, mais fundamentos de computação e SO | 01 ao 05 e 61 |
+| **Trilha 1** | Fundamentos & Redes | `#2563EB` (Azul) | Base sólida: CIA, protocolos, criptografia, IAM e perímetro, mais fundamentos de computação e SO | 01–05 e 61 |
 | **Trilha 2** | Segurança Defensiva | `#059669` (Verde) | Bastionamento, defesas de rede, Zero Trust, vulnerabilidades e EDR | 06 ao 10, 29, 30 |
 | **Trilha 3** | Segurança Ofensiva | `#DC2626` (Vermelho) | Reconhecimento, falhas web, APIs, testes de intrusão e phishing | 11 ao 15 |
 | **Trilha 4** | Operações, SOC & Resposta | `#7C3AED` (Roxo) | Monitoramento, SIEM, CTI, contenção de incidentes e forense | 16 ao 20 |
@@ -173,8 +173,6 @@ flowchart LR
 - **Pré-requisitos:** Redes-e-Protocolos.
 - **Conceitos-Chave:** pilha e heap; endereço de retorno; ASLR, DEP/NX, canário; anéis de privilégio; chamada de sistema; rootkit de kernel; hexadecimal e little-endian; UTF-8; Base64; magic bytes; UID/SID, ACL, setuid, tokens; hipervisor tipo 1 e tipo 2; namespaces e cgroups.
 - **Simulador Interativo em JS:** *Inspetor de Bytes* — Três abas: identificação de seis arquivos fictícios por magic bytes (um com extensão falsa), conversão entre texto, hexadecimal e Base64 com bytes UTF-8, e uma pilha de 16 + 8 + 8 bytes em que as chaves de canário e ASLR mudam o resultado.
-
----
 
 ---
 
