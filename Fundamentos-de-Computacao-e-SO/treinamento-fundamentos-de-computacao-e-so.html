@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Fundamentos-de-Computacao-e-SO">
@@ -2124,7 +1740,6 @@ dfn.glossario:focus-visible {
     <li><a class="toc-item" href="#binario-e-codificacoes" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Binário, Hexadecimal e Codificações</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#arquivos-e-permissoes" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Arquivos, Usuários e Permissões: Linux × Windows</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#virtualizacao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Virtualização e Containers</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Inspetor de Bytes</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist: Revisão de Fundamentos para o Analista</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2140,14 +1755,14 @@ dfn.glossario:focus-visible {
   <h1>Fundamentos de Computação e SO para Segurança</h1>
   <p class="mhead-sub">Memória e processos, kernel e chamadas de sistema, binário e codificações, permissões e virtualização vistos pela segurança</p>
   <div class="chips"><span class="chip">⏱ 40 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Identify / Protect</span><span class="chip">🎯 ATT&amp;CK N/A (fundamentos de computação)</span><span class="chip">👤 Blue Team &amp; Defesa · Red Team &amp; Pentest · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>6 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>7 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>6 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>7 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 61: Fundamentos-de-Computacao-e-SO Body Fragment -->
 <article class="study-container" data-slug="fundamentos-de-computacao-e-so">
 
     <!-- SEÇÃO 1: INTRODUÇÃO -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 10</small></span><h2>Introdução: A Base de Computação que a Segurança Usa Todo Dia</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 9</small></span><h2>Introdução: A Base de Computação que a Segurança Usa Todo Dia</h2></div>
 
         <p class="lead-text">
             A equipe de desenvolvimento da Ipê Store (fictícia) publicou um serviço em C que lê o campo "nome" do cadastro de pedidos. O campo tem 64 bytes; ninguém validou o tamanho da entrada. Um teste de invasão autorizado enviou 300 bytes e o processo caiu com falha de segmentação. Para quem já opera servidores, escreve código ou atende chamados, a pergunta deste módulo é outra: por que uma falha de memória vira controle do servidor, e o que o sistema operacional faz para dificultar isso?
@@ -2187,7 +1802,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 2: MEMÓRIA E PROCESSOS -->
     <section class="study-section" id="memoria-e-processos" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 10</small></span><h2>Memória e Processos: Por que o Estouro de Buffer Funciona</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 9</small></span><h2>Memória e Processos: Por que o Estouro de Buffer Funciona</h2></div>
 
         <p class="lead-text">
             Cada processo enxerga um espaço de endereçamento virtual só seu. O código do programa, os dados, a <strong>heap</strong> e a <strong>pilha</strong> ocupam regiões diferentes desse espaço, e o kernel reserva uma parte para si. O estouro de buffer (<em>buffer overflow</em>) é o que acontece quando um programa grava dados numa região e ultrapassa o fim do que reservou.
@@ -2268,7 +1883,7 @@ readelf -s ./leitor-pedidos | grep __stack_chk_fail   # presença indica canári
 
     <!-- SEÇÃO 3: KERNEL E SYSCALLS -->
     <section class="study-section" id="kernel-e-syscalls" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 10</small></span><h2>Kernel, Espaço de Usuário e Chamadas de Sistema</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 9</small></span><h2>Kernel, Espaço de Usuário e Chamadas de Sistema</h2></div>
 
         <p class="lead-text">
             O processador distingue níveis de privilégio. O código do <strong>kernel</strong> roda com acesso total ao hardware e à memória; os programas rodam no <strong>espaço de usuário</strong>, sem acesso direto a disco, rede ou memória de outro processo. Entre os dois fica uma porta estreita: a <strong>chamada de sistema</strong> (<em>system call</em>). Quem controla essa porta controla o que um programa consegue fazer, e é onde a segurança observa.
@@ -2336,7 +1951,7 @@ connect(4, {sa_family=AF_INET, sin_port=htons(443), sin_addr=inet_addr("203.0.11
 
     <!-- SEÇÃO 4: BINÁRIO E CODIFICAÇÕES -->
     <section class="study-section" id="binario-e-codificacoes" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 10</small></span><h2>Binário, Hexadecimal e Codificações</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 9</small></span><h2>Binário, Hexadecimal e Codificações</h2></div>
 
         <p class="lead-text">
             Tudo que um analista examina, de um pacote de rede a um executável, é uma sequência de bytes. Ler um <strong>dump hexadecimal</strong>, reconhecer um arquivo pelos primeiros bytes e saber que o Base64 não esconde nada são habilidades de triagem que aparecem em forense, análise de malware e resposta a incidentes.
@@ -2416,7 +2031,7 @@ fatura-0421.pdf: PE32+ executable (console) x86-64, for MS Windows</code></pre>
 
     <!-- SEÇÃO 5: ARQUIVOS E PERMISSÕES -->
     <section class="study-section" id="arquivos-e-permissoes" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 5 de 10</small></span><h2>Arquivos, Usuários e Permissões: Linux × Windows</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 5 de 9</small></span><h2>Arquivos, Usuários e Permissões: Linux × Windows</h2></div>
 
         <p class="lead-text">
             Quem pode ler, gravar e executar o quê decide o estrago de uma conta comprometida. Os dois sistemas respondem à mesma pergunta com modelos diferentes; o quadro abaixo serve de mapa e os detalhes ficam nos Estudos 34 (Linux) e 36 (Windows).
@@ -2444,7 +2059,7 @@ fatura-0421.pdf: PE32+ executable (console) x86-64, for MS Windows</code></pre>
 
     <!-- SEÇÃO 6: VIRTUALIZAÇÃO -->
     <section class="study-section" id="virtualizacao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 6 de 10</small></span><h2>Virtualização e Containers</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 6 de 9</small></span><h2>Virtualização e Containers</h2></div>
 
         <p class="lead-text">
             Quase tudo que a Ipê Store opera roda sobre uma camada de isolamento: máquinas virtuais no datacenter, containers no pipeline, uma VM de análise no laptop do analista. O isolamento tem força diferente em cada caso, e a diferença decide o que um atacante ganha ao escapar.
@@ -2486,90 +2101,10 @@ fatura-0421.pdf: PE32+ executable (console) x86-64, for MS Windows</code></pre>
     </section>
 
     <!-- SEÇÃO 7: LABORATÓRIO -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 7 de 10</small></span><h2>Laboratório Prático: Inspetor de Bytes</h2></div>
-
-        <p class="lead-text">
-            Três exercícios sobre bytes, todos com dados fictícios da Ipê Store. Na primeira aba, identifique seis arquivos pelos primeiros bytes. Na segunda, converta texto, hexadecimal e Base64 e veja por que o Base64 não protege um segredo. Na terceira, digite uma entrada e veja os bytes ocuparem a pilha.
-        </p>
-
-        <div class="lab-box comp-lab" id="comp-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Assinatura, codificação e pilha</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Inspetor de Bytes: Ipê Store</h3>
-                    <p style="margin: 0; font-size: 0.9rem; color: var(--muted);">Arquivos e entradas inventados; nada aqui toca o seu sistema.</p>
-                </div>
-            </div>
-
-            <div class="lab-body" style="min-width: 0;">
-                <div role="tablist" aria-label="Exercícios do Inspetor de Bytes" id="comp-abas" class="comp-abas">
-                    <button type="button" role="tab" id="comp-aba-assinatura" aria-controls="comp-painel-assinatura" aria-selected="true" tabindex="0" class="comp-aba">Assinatura</button>
-                    <button type="button" role="tab" id="comp-aba-decodificador" aria-controls="comp-painel-decodificador" aria-selected="false" tabindex="-1" class="comp-aba">Decodificador</button>
-                    <button type="button" role="tab" id="comp-aba-pilha" aria-controls="comp-painel-pilha" aria-selected="false" tabindex="-1" class="comp-aba">Pilha</button>
-                </div>
-
-                <div role="tabpanel" id="comp-painel-assinatura" aria-labelledby="comp-aba-assinatura" class="comp-painel">
-                    <p class="comp-nota">Os primeiros bytes de seis arquivos recebidos pela Ipê Store. Escolha o tipo real de cada um pelos <em>magic bytes</em>, sem confiar na extensão.</p>
-                    <div id="comp-arquivos" role="group" aria-label="Arquivos para identificar" class="comp-grade"></div>
-                    <div class="comp-linha">
-                        <button type="button" class="btn-primary" id="comp-verificar">Verificar respostas</button>
-                        <button type="button" class="btn-secondary" id="comp-limpar-assinaturas">Limpar</button>
-                    </div>
-                    <div id="comp-resultado-assinatura" role="status" aria-live="polite" class="comp-resultado"></div>
-                    <div class="comp-livre">
-                        <label for="comp-hex-livre"><strong>Teste um prefixo seu</strong> (hexadecimal, com ou sem espaços):</label>
-                        <input type="text" id="comp-hex-livre" class="comp-campo" autocomplete="off" spellcheck="false" placeholder="ex.: 50 4B 03 04">
-                        <div id="comp-resultado-livre" role="status" aria-live="polite" class="comp-resultado"></div>
-                    </div>
-                </div>
-
-                <div role="tabpanel" id="comp-painel-decodificador" aria-labelledby="comp-aba-decodificador" class="comp-painel" hidden>
-                    <p class="comp-nota">Edite qualquer campo; os outros dois acompanham. A conversão usa os bytes UTF-8 do texto.</p>
-                    <label for="comp-texto"><strong>Texto</strong></label>
-                    <textarea id="comp-texto" class="comp-campo" rows="2" maxlength="200" spellcheck="false"></textarea>
-                    <label for="comp-hex"><strong>Hexadecimal</strong></label>
-                    <textarea id="comp-hex" class="comp-campo comp-mono" rows="2" spellcheck="false"></textarea>
-                    <label for="comp-b64"><strong>Base64</strong></label>
-                    <textarea id="comp-b64" class="comp-campo comp-mono" rows="2" spellcheck="false"></textarea>
-                    <div id="comp-aviso-decod" role="status" aria-live="polite" class="comp-resultado"></div>
-                    <div class="comp-linha">
-                        <button type="button" class="btn-secondary" id="comp-ex-acento">Exemplo: ação</button>
-                        <button type="button" class="btn-secondary" id="comp-ex-segredo">Exemplo: credencial em Base64</button>
-                    </div>
-                    <p id="comp-nota-segredo" class="comp-nota" aria-live="polite"></p>
-                </div>
-
-                <div role="tabpanel" id="comp-painel-pilha" aria-labelledby="comp-aba-pilha" class="comp-painel" hidden>
-                    <p class="comp-nota">A função copia o campo "nome" para um buffer de 16 bytes, sem conferir o tamanho. Cada célula é um byte: 16 de buffer, 8 de canário (se ligado) e 8 de endereço de retorno.</p>
-                    <label for="comp-entrada"><strong>Entrada do campo "nome"</strong> (conta bytes UTF-8)</label>
-                    <input type="text" id="comp-entrada" class="comp-campo" maxlength="200" autocomplete="off" spellcheck="false" value="Maria">
-                    <div class="comp-linha">
-                        <label class="comp-chave"><input type="checkbox" id="comp-canario" checked> Canário</label>
-                        <label class="comp-chave"><input type="checkbox" id="comp-aslr" checked> ASLR</label>
-                        <button type="button" class="btn-secondary" id="comp-ex-16">16 caracteres A</button>
-                        <button type="button" class="btn-secondary" id="comp-ex-20">20 A</button>
-                        <button type="button" class="btn-secondary" id="comp-ex-24">24 A</button>
-                        <button type="button" class="btn-secondary" id="comp-ex-200">200 A</button>
-                    </div>
-                    <div id="comp-contagem" role="status" aria-live="polite" class="comp-nota"></div>
-                    <div id="comp-pilha" role="img" aria-label="Pilha: células de buffer, canário e endereço de retorno" class="comp-pilha"></div>
-                    <div class="comp-legenda" aria-hidden="true">
-                        <span><i class="comp-cel comp-cel-buffer"></i> buffer</span>
-                        <span><i class="comp-cel comp-cel-canario"></i> canário</span>
-                        <span><i class="comp-cel comp-cel-retorno"></i> endereço de retorno</span>
-                        <span><i class="comp-cel comp-cel-cheia"></i> byte da entrada</span>
-                    </div>
-                    <div id="comp-resultado-pilha" role="status" aria-live="polite" class="comp-resultado"></div>
-                    <p class="comp-nota">Com ASLR desligado o atacante sabe para onde saltar; com ASLR ligado, saltar com a pilha sobrescrita costuma terminar em falha. Sem canário, 24 bytes ou mais atingem o endereço de retorno inteiro neste modelo simplificado. Um DEP/NX ligado não aparece como chave: ele impede executar o que se injeta, mas não impede o desvio do fluxo.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 8: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 8 de 10</small></span><h2>Checklist: Revisão de Fundamentos para o Analista</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 7 de 9</small></span><h2>Checklist: Revisão de Fundamentos para o Analista</h2></div>
 
         <p class="lead-text">
             Use como autoavaliação antes de entrar nos módulos de exploração e de análise. O estado das caixas fica salvo no seu navegador.
@@ -2605,7 +2140,7 @@ fatura-0421.pdf: PE32+ executable (console) x86-64, for MS Windows</code></pre>
 
     <!-- SEÇÃO 9: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 9 de 10</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 8 de 9</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2694,7 +2229,7 @@ fatura-0421.pdf: PE32+ executable (console) x86-64, for MS Windows</code></pre>
 
     <!-- SEÇÃO 10: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 10 de 10</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 9 de 9</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2746,339 +2281,8 @@ fatura-0421.pdf: PE32+ executable (console) x86-64, for MS Windows</code></pre>
 </section>
 
 </article>
-<style>
-.comp-abas { display: flex; flex-wrap: wrap; gap: 0.3rem; border-bottom: 2px solid var(--rule); margin-bottom: 0.8rem; }
-.comp-aba { font: inherit; font-weight: 600; padding: 0.5rem 1rem; border: 1px solid var(--rule); border-bottom: 0; border-radius: var(--radius-sm) var(--radius-sm) 0 0; background: var(--sunk); color: var(--ink); cursor: pointer; }
-.comp-aba[aria-selected="true"] { background: var(--surface); border-color: var(--accent); color: var(--accent); box-shadow: 0 2px 0 var(--surface); }
-.comp-painel { min-width: 0; }
-.comp-painel[hidden] { display: none; }
-.comp-nota { font-size: 0.85rem; color: var(--muted); margin: 0.4rem 0; }
-.comp-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 0.6rem; }
-.comp-cartao { border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.6rem 0.8rem; min-width: 0; background: var(--surface); }
-.comp-cartao strong { overflow-wrap: anywhere; }
-.comp-hexbox { font-family: var(--font-mono); font-size: 0.82rem; background: var(--sunk); padding: 0.4rem 0.5rem; border-radius: var(--radius-sm); margin: 0.4rem 0; overflow-wrap: anywhere; }
-.comp-cartao select { width: 100%; font: inherit; padding: 0.35rem; }
-.comp-linha { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-top: 0.7rem; }
-.comp-resultado { margin-top: 0.6rem; min-width: 0; overflow-wrap: anywhere; font-size: 0.9rem; }
-.comp-resultado:empty { display: none; }
-.comp-resultado p { margin: 0.3rem 0; }
-.comp-ok { color: var(--ok); font-weight: 600; }
-.comp-erro { color: var(--bad); font-weight: 600; }
-.comp-campo { display: block; width: 100%; box-sizing: border-box; font: inherit; padding: 0.4rem 0.5rem; margin: 0.2rem 0 0.6rem 0; border: 1px solid var(--rule-strong); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); }
-.comp-mono { font-family: var(--font-mono); font-size: 0.85rem; }
-.comp-livre { margin-top: 1rem; }
-.comp-chave { display: inline-flex; gap: 0.35rem; align-items: center; font-weight: 600; }
-.comp-pilha { display: flex; flex-wrap: wrap; gap: 3px; margin: 0.6rem 0; }
-.comp-cel { display: inline-block; width: 1.6rem; height: 1.6rem; border: 2px solid var(--rule-strong); border-radius: 3px; box-sizing: border-box; font-family: var(--font-mono); font-size: 0.6rem; line-height: 1.4rem; text-align: center; overflow: hidden; vertical-align: middle; }
-.comp-pilha .comp-cel { width: 1.9rem; height: 1.9rem; line-height: 1.7rem; }
-.comp-cel-buffer { border-color: var(--accent); }
-.comp-cel-canario { border-color: var(--warning-color); }
-.comp-cel-retorno { border-color: var(--danger-color); }
-.comp-cel-cheia { background: var(--ink); border-color: var(--ink); }
-.comp-pilha .comp-cel-cheia { color: var(--surface); }
-.comp-cel-sobrescrita { box-shadow: inset 0 0 0 2px var(--bad); }
-.comp-legenda { display: flex; flex-wrap: wrap; gap: 0.9rem; font-size: 0.8rem; color: var(--muted); }
-</style>
-<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
-<script type="application/json" id="comp-dados">
-{
- "contexto": "Arquivos e entradas fictícios da Ipê Store. Nomes, conteúdos e bytes inventados para o exercício.",
- "assinaturas": {"png": "89504E470D0A1A0A", "pdf": "255044462D", "zip": "504B0304", "elf": "7F454C46", "pe": "4D5A", "script": "2321"},
- "rotulos": {"png": "PNG (imagem)", "pdf": "PDF (documento)", "zip": "ZIP (arquivo compactado)", "elf": "ELF (executável Linux)", "pe": "PE (executável Windows)", "script": "Script (shebang)"},
- "arquivos": [
-  {"id": "A1", "nome": "logo-ipestore.png", "hex": "89 50 4E 47 0D 0A 1A 0A 00 00 00 0D 49 48 44 52", "tipo_real": "png",
-   "explicacao": "A assinatura de 8 bytes (89 50 4E 47 0D 0A 1A 0A) é a do PNG, e a extensão confere."},
-  {"id": "A2", "nome": "fatura-0421.pdf", "hex": "4D 5A 90 00 03 00 00 00 04 00 00 00 FF FF 00 00", "tipo_real": "pe",
-   "explicacao": "Extensão falsa: 4D 5A (MZ) é o começo de um executável PE do Windows. Um PDF legítimo começaria por 25 50 44 46. Padrão clássico de anexo de phishing."},
-  {"id": "A3", "nome": "backup-lojas.zip", "hex": "50 4B 03 04 14 00 00 00 08 00 5A 71 00 00 00 00", "tipo_real": "zip",
-   "explicacao": "50 4B 03 04 (PK) é o cabeçalho local de um arquivo ZIP. O mesmo contêiner também serve a DOCX, XLSX e JAR."},
-  {"id": "A4", "nome": "relatorio-vendas-q3.pdf", "hex": "25 50 44 46 2D 31 2E 37 0A 25 E2 E3 CF D3 0A 31", "tipo_real": "pdf",
-   "explicacao": "25 50 44 46 2D é %PDF-, seguido da versão (1.7). A extensão confere."},
-  {"id": "A5", "nome": "limpa-cache.sh", "hex": "23 21 2F 62 69 6E 2F 73 68 0A 63 64 20 2F 74 6D", "tipo_real": "script",
-   "explicacao": "23 21 é #!, a linha shebang que nomeia o interpretador (aqui /bin/sh). Um script não é binário, mas executa quando recebe permissão."},
-  {"id": "A6", "nome": "coletor.elf", "hex": "7F 45 4C 46 02 01 01 00 00 00 00 00 00 00 00 00", "tipo_real": "elf",
-   "explicacao": "7F 45 4C 46 é o 0x7F seguido de ELF. O quinto byte (02) indica 64 bits e o sexto (01), little-endian."}
- ],
- "pilha": {"buffer": 16, "canario": 8, "retorno": 8}
-}
-</script>
-<script>
-(function() {
-    var D = JSON.parse(document.getElementById("comp-dados").textContent);
-    var ALFABETO = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    var TAM = D.pilha;
-    var TIPOS = ["png", "pdf", "zip", "elf", "pe", "script"];
 
-    function $(id) { return document.getElementById(id); }
-    function el(tag, texto, classe) {
-        var e = document.createElement(tag);
-        if (texto !== undefined && texto !== null) e.textContent = texto;
-        if (classe) e.className = classe;
-        return e;
-    }
-    function limpar(no) { while (no.firstChild) no.removeChild(no.firstChild); }
-    function bytesDoTexto(texto) { return new TextEncoder().encode(texto); }
-    function paraHex(bytes) {
-        var partes = [];
-        for (var i = 0; i < bytes.length; i++) partes.push((bytes[i] < 16 ? "0" : "") + bytes[i].toString(16).toUpperCase());
-        return partes.join(" ");
-    }
-    function doHex(hex) {
-        var limpo = String(hex).replace(/[\s:]/g, "");
-        if (limpo.length % 2 !== 0 || !/^[0-9a-fA-F]*$/.test(limpo)) return null;
-        var bytes = new Uint8Array(limpo.length / 2);
-        for (var i = 0; i < bytes.length; i++) bytes[i] = parseInt(limpo.substr(i * 2, 2), 16);
-        return bytes;
-    }
-
-    // ================================================ regras (espelhadas nos testes)
-    // tipo cujo prefixo casa, o mais longo primeiro; null se nenhum
-    window.identificarAssinatura = function(hex) {
-        var limpo = String(hex).replace(/[\s:]/g, "").toUpperCase();
-        if (!/^[0-9A-F]+$/.test(limpo)) return null;
-        var tipos = TIPOS.slice().sort(function(a, b) { return D.assinaturas[b].length - D.assinaturas[a].length; });
-        for (var i = 0; i < tipos.length; i++) {
-            if (limpo.indexOf(D.assinaturas[tipos[i]]) === 0) return tipos[i];
-        }
-        return null;
-    };
-
-    window.textoParaHex = function(texto) {
-        return paraHex(new TextEncoder().encode(String(texto)));
-    };
-
-    // null se o hexadecimal for inválido ou os bytes não formarem UTF-8 válido
-    window.hexParaTexto = function(hex) {
-        var bytes = doHex(hex);
-        if (bytes === null) return null;
-        try { return new TextDecoder("utf-8", { fatal: true }).decode(bytes); } catch (e) { return null; }
-    };
-
-    window.textoParaBase64 = function(texto) {
-        var b = new TextEncoder().encode(String(texto));
-        var saida = "";
-        for (var i = 0; i < b.length; i += 3) {
-            var n = (b[i] << 16) | ((i + 1 < b.length ? b[i + 1] : 0) << 8) | (i + 2 < b.length ? b[i + 2] : 0);
-            saida += ALFABETO[(n >> 18) & 63] + ALFABETO[(n >> 12) & 63];
-            saida += i + 1 < b.length ? ALFABETO[(n >> 6) & 63] : "=";
-            saida += i + 2 < b.length ? ALFABETO[n & 63] : "=";
-        }
-        return saida;
-    };
-
-    // null se o Base64 for inválido (RFC 4648) ou os bytes não formarem UTF-8 válido
-    window.base64ParaTexto = function(b64) {
-        var s = String(b64).replace(/\s/g, "");
-        var m = /^([A-Za-z0-9+\/]*)(={0,2})$/.exec(s);
-        if (!m) return null;
-        var dados = m[1];
-        if (dados.length % 4 === 1) return null;
-        if (m[2] && (dados.length + m[2].length) % 4 !== 0) return null;
-        var bytes = [];
-        var acc = 0, bits = 0;
-        for (var i = 0; i < dados.length; i++) {
-            acc = (acc << 6) | ALFABETO.indexOf(dados[i]);
-            bits += 6;
-            if (bits >= 8) {
-                bits -= 8;
-                bytes.push((acc >> bits) & 255);
-                acc &= (1 << bits) - 1;
-            }
-        }
-        try { return new TextDecoder("utf-8", { fatal: true }).decode(new Uint8Array(bytes)); } catch (e) { return null; }
-    };
-
-    // n conta bytes UTF-8 da entrada, não caracteres
-    window.simularPilha = function(entrada, canario, aslr) {
-        var n = new TextEncoder().encode(String(entrada)).length;
-        if (n <= TAM.buffer) return "normal";
-        if (canario) return "abortado_canario";
-        if (aslr) return "crash";
-        return n >= TAM.buffer + TAM.retorno ? "controle_do_fluxo" : "crash";
-    };
-
-    // ================================================ abas
-    var abas = ["assinatura", "decodificador", "pilha"];
-    function selecionarAba(nome, foco) {
-        abas.forEach(function(a) {
-            var ativa = a === nome;
-            var botao = $("comp-aba-" + a);
-            botao.setAttribute("aria-selected", ativa ? "true" : "false");
-            botao.setAttribute("tabindex", ativa ? "0" : "-1");
-            $("comp-painel-" + a).hidden = !ativa;
-            if (ativa && foco) botao.focus();
-        });
-    }
-    abas.forEach(function(a, idx) {
-        var botao = $("comp-aba-" + a);
-        botao.addEventListener("click", function() { selecionarAba(a, false); });
-        botao.addEventListener("keydown", function(ev) {
-            var destino = null;
-            if (ev.key === "ArrowRight") destino = (idx + 1) % abas.length;
-            else if (ev.key === "ArrowLeft") destino = (idx + abas.length - 1) % abas.length;
-            else if (ev.key === "Home") destino = 0;
-            else if (ev.key === "End") destino = abas.length - 1;
-            if (destino !== null) { ev.preventDefault(); selecionarAba(abas[destino], true); }
-        });
-    });
-
-    // ================================================ aba 1: assinatura
-    var selecoes = {};
-    function renderArquivos() {
-        var caixa = $("comp-arquivos");
-        limpar(caixa);
-        D.arquivos.forEach(function(a) {
-            var cartao = el("div", null, "comp-cartao");
-            cartao.setAttribute("role", "group");
-            cartao.setAttribute("aria-label", "Arquivo " + a.nome);
-            cartao.appendChild(el("strong", a.nome));
-            cartao.appendChild(el("div", a.hex, "comp-hexbox"));
-            var sel = el("select");
-            sel.id = "comp-sel-" + a.id;
-            sel.setAttribute("aria-label", "Tipo real de " + a.nome);
-            var vazio = el("option", "Escolha o tipo real");
-            vazio.value = "";
-            sel.appendChild(vazio);
-            TIPOS.forEach(function(t) {
-                var o = el("option", D.rotulos[t]);
-                o.value = t;
-                sel.appendChild(o);
-            });
-            sel.addEventListener("change", function() { selecoes[a.id] = sel.value; });
-            cartao.appendChild(sel);
-            var fb = el("p", "", "comp-resultado");
-            fb.id = "comp-fb-" + a.id;
-            cartao.appendChild(fb);
-            caixa.appendChild(cartao);
-        });
-    }
-    function verificar() {
-        var acertos = 0, respondidos = 0;
-        D.arquivos.forEach(function(a) {
-            var fb = $("comp-fb-" + a.id);
-            limpar(fb);
-            var escolha = selecoes[a.id] || "";
-            if (!escolha) { fb.appendChild(el("span", "Sem resposta. " + a.explicacao, "comp-erro")); return; }
-            respondidos++;
-            var certo = escolha === identificarAssinatura(a.hex);
-            if (certo) acertos++;
-            fb.appendChild(el("span", certo ? "Correto. " : "Incorreto. ", certo ? "comp-ok" : "comp-erro"));
-            fb.appendChild(el("span", a.explicacao));
-        });
-        var r = $("comp-resultado-assinatura");
-        limpar(r);
-        r.appendChild(el("p", acertos + " de " + D.arquivos.length + " corretos" +
-            (respondidos < D.arquivos.length ? " (" + (D.arquivos.length - respondidos) + " sem resposta)." : "."), acertos === D.arquivos.length ? "comp-ok" : "comp-erro"));
-        if (window.CS && typeof window.CS.labProgress === "function") window.CS.labProgress(acertos, D.arquivos.length);
-    }
-    $("comp-verificar").addEventListener("click", verificar);
-    $("comp-limpar-assinaturas").addEventListener("click", function() {
-        selecoes = {};
-        renderArquivos();
-        limpar($("comp-resultado-assinatura"));
-        if (window.CS && typeof window.CS.labProgress === "function") window.CS.labProgress(0, D.arquivos.length);
-    });
-    $("comp-hex-livre").addEventListener("input", function() {
-        var r = $("comp-resultado-livre");
-        limpar(r);
-        var valor = $("comp-hex-livre").value;
-        if (!valor.trim()) return;
-        var tipo = identificarAssinatura(valor);
-        if (tipo) r.appendChild(el("p", "Casa com a assinatura de " + D.rotulos[tipo] + ".", "comp-ok"));
-        else r.appendChild(el("p", "Nenhuma das seis assinaturas casa (ou o texto não é hexadecimal). Um JPEG, por exemplo, começa por FF D8 FF e está fora deste exercício.", "comp-erro"));
-    });
-
-    // ================================================ aba 2: decodificador
-    var campos = { texto: $("comp-texto"), hex: $("comp-hex"), b64: $("comp-b64") };
-    function avisoDecod(msg, classe) {
-        var a = $("comp-aviso-decod");
-        limpar(a);
-        if (msg) a.appendChild(el("p", msg, classe || "comp-erro"));
-    }
-    function atualizarDecodificador(origem) {
-        var texto;
-        if (origem === "texto") texto = campos.texto.value;
-        else if (origem === "hex") {
-            texto = hexParaTexto(campos.hex.value);
-            if (texto === null) return avisoDecod("Hexadecimal inválido: use pares de dígitos 0-9 e A-F, e bytes que formem UTF-8 válido.");
-        } else {
-            texto = base64ParaTexto(campos.b64.value);
-            if (texto === null) return avisoDecod("Base64 inválido: use A-Z, a-z, 0-9, + e /, com = só no fim, e bytes que formem UTF-8 válido.");
-        }
-        avisoDecod("");
-        if (origem !== "texto") campos.texto.value = texto;
-        if (origem !== "hex") campos.hex.value = textoParaHex(texto);
-        if (origem !== "b64") campos.b64.value = textoParaBase64(texto);
-    }
-    ["texto", "hex", "b64"].forEach(function(o) {
-        campos[o].addEventListener("input", function() { $("comp-nota-segredo").textContent = ""; atualizarDecodificador(o); });
-    });
-    $("comp-ex-acento").addEventListener("click", function() {
-        campos.texto.value = "ação";
-        $("comp-nota-segredo").textContent = "\"ação\" tem 4 caracteres e 6 bytes UTF-8 (61 C3 A7 C3 A3 6F): o Base64 é YcOnw6Nv.";
-        atualizarDecodificador("texto");
-    });
-    $("comp-ex-segredo").addEventListener("click", function() {
-        campos.b64.value = "YWRtaW46SXBlIzIwMjY=";
-        atualizarDecodificador("b64");
-        $("comp-nota-segredo").textContent = "Sem chave nenhuma, o campo de texto mostra a credencial fictícia. Base64 é apenas outra forma de escrever os mesmos bytes: codificação não é criptografia.";
-    });
-    campos.texto.value = "ação";
-    atualizarDecodificador("texto");
-
-    // ================================================ aba 3: pilha
-    var MENSAGENS = {
-        normal: ["A entrada cabe no buffer", "A função termina e retorna ao chamador normalmente."],
-        abortado_canario: ["Canário sobrescrito: processo abortado", "Antes de retornar, a função confere o canário, vê que mudou e encerra o processo (no Linux, __stack_chk_fail). O endereço de retorno nunca chega a ser usado: o ataque vira, no máximo, uma queda do serviço."],
-        crash: ["Endereço de retorno corrompido: falha de segmentação", "O retorno salta para um endereço que o atacante não controla de forma útil (ASLR ligado, ou só parte do endereço foi sobrescrita). O processo cai: negação de serviço, sem controle do fluxo."],
-        controle_do_fluxo: ["Controle do fluxo de execução", "Sem canário e sem ASLR, o endereço de retorno inteiro vem da entrada e o atacante sabe onde saltar. DEP/NX ainda impede executar dados injetados na pilha, mas não impede reaproveitar código já existente."]
-    };
-    function celulas(canario) {
-        var lista = [];
-        var i;
-        for (i = 0; i < TAM.buffer; i++) lista.push("buffer");
-        if (canario) for (i = 0; i < TAM.canario; i++) lista.push("canario");
-        for (i = 0; i < TAM.retorno; i++) lista.push("retorno");
-        return lista;
-    }
-    function renderPilha() {
-        var entrada = $("comp-entrada").value;
-        var canario = $("comp-canario").checked;
-        var aslr = $("comp-aslr").checked;
-        var bytes = bytesDoTexto(entrada);
-        var n = bytes.length;
-        var lista = celulas(canario);
-        var caixa = $("comp-pilha");
-        limpar(caixa);
-        lista.forEach(function(tipo, i) {
-            var cheia = i < n;
-            var c = el("span", cheia ? paraHex(bytes.subarray(i, i + 1)) : "", "comp-cel comp-cel-" + tipo + (cheia ? " comp-cel-cheia" : ""));
-            if (cheia && tipo !== "buffer") c.className += " comp-cel-sobrescrita";
-            caixa.appendChild(c);
-        });
-        var alem = Math.max(0, n - lista.length);
-        $("comp-contagem").textContent = Array.from(entrada).length + " caracteres = " + n + " bytes UTF-8. O buffer comporta " + TAM.buffer + "." +
-            (alem > 0 ? " " + alem + " bytes passam do fim da pilha modelada." : "");
-        var resultado = simularPilha(entrada, canario, aslr);
-        var r = $("comp-resultado-pilha");
-        limpar(r);
-        r.appendChild(el("p", MENSAGENS[resultado][0], resultado === "normal" ? "comp-ok" : "comp-erro"));
-        r.appendChild(el("p", MENSAGENS[resultado][1]));
-    }
-    $("comp-entrada").addEventListener("input", renderPilha);
-    $("comp-canario").addEventListener("change", renderPilha);
-    $("comp-aslr").addEventListener("change", renderPilha);
-    [["comp-ex-16", 16], ["comp-ex-20", 20], ["comp-ex-24", 24], ["comp-ex-200", 200]].forEach(function(par) {
-        $(par[0]).addEventListener("click", function() {
-            $("comp-entrada").value = new Array(par[1] + 1).join("A").slice(0, 200);
-            renderPilha();
-        });
-    });
-
-    renderArquivos();
-    renderPilha();
-})();
-</script>
+<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
 </main>
 </div>
 
@@ -3213,7 +2417,6 @@ fatura-0421.pdf: PE32+ executable (console) x86-64, for MS Windows</code></pre>
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3802,17 +3005,6 @@ fatura-0421.pdf: PE32+ executable (console) x86-64, for MS Windows</code></pre>
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -4026,7 +3218,6 @@ fatura-0421.pdf: PE32+ executable (console) x86-64, for MS Windows</code></pre>
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

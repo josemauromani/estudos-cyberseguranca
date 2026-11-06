@@ -13,7 +13,7 @@ GERADORES = Path(__file__).resolve().parent.parent
 RAIZ = GERADORES.parent
 TOKENS = GERADORES / "tokens.css"
 
-TIPOS = ["teoria", "laboratorio", "checklist", "questoes", "referencias"]
+TIPOS = ["teoria", "checklist", "questoes", "referencias"]
 NOVOS = ["--rule-strong", "--accent-soft", "--ok", "--bad", "--console", "--console-ink"] + \
         [f"--tipo-{t}" for t in TIPOS] + [f"--tipo-{t}-bg" for t in TIPOS]
 
@@ -87,7 +87,7 @@ class TestTokens(unittest.TestCase):
     def test_valores_da_spec(self):
         claro = bloco(self.css, ":root {")
         for nome, valor in {"--ground": "#F4F6F8", "--ink": "#14212B", "--tipo-teoria": "#2563EB",
-                            "--tipo-laboratorio": "#0D9488", "--tipo-checklist": "#B45309",
+                            "--tipo-checklist": "#B45309",
                             "--tipo-questoes": "#C026D3", "--tipo-referencias": "#64748B",
                             "--warning-color": "#EA580C", "--law-color": "#6D28D9",
                             "--console": "#0F1820"}.items():
@@ -121,18 +121,13 @@ class TestTokens(unittest.TestCase):
         self.assertIn("@font-face", html)
         self.assertIn("--tipo-teoria:", html)
 
-    def test_carregar_css_ordem_e_laboratorio_opcional(self):
+    def test_carregar_css_ordem(self):
         import montar
         css = montar.carregar_css()
         self.assertLess(css.index("@font-face"), css.index("--tipo-teoria:"))
         self.assertLess(css.index("--tipo-teoria:"), css.index(".callout"))
-        with tempfile.TemporaryDirectory() as tmp:
-            original = montar.LABORATORIO_CSS
-            montar.LABORATORIO_CSS = Path(tmp) / "nao_existe.css"
-            try:
-                self.assertIn("--tipo-teoria:", montar.carregar_css())
-            finally:
-                montar.LABORATORIO_CSS = original
+        self.assertNotIn(".lab-box", css)
+
 
 
 if __name__ == "__main__":

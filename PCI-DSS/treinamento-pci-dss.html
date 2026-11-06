@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="PCI-DSS">
@@ -2120,7 +1736,6 @@ dfn.glossario:focus-visible {
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: Quem Aceita Cartão Assina um Contrato</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#escopo" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Dados da Conta, Escopo, SAQ e Validação</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Delimitador de Escopo CDE</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Escopo e Conformidade PCI DSS</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Concursos</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2136,14 +1751,14 @@ dfn.glossario:focus-visible {
   <h1>PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos</h1>
   <p class="mhead-sub">Os 6 objetivos e 12 requisitos do padrão de cartões, delimitação do CDE, segmentação para reduzir escopo e tipos de SAQ</p>
   <div class="chips"><span class="chip">⏱ 45 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Govern / Protect</span><span class="chip">🎯 ATT&amp;CK TA0009 Collection / TA0010 Exfiltration</span><span class="chip">👤 GRC &amp; Auditoria · Blue Team &amp; Defesa · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 31: PCI-DSS Body Fragment -->
 <article class="study-container" data-slug="pci-dss">
 
     <!-- SEÇÃO 1: INTRODUÇÃO -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: Quem Aceita Cartão Assina um Contrato</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 5</small></span><h2>Introdução: Quem Aceita Cartão Assina um Contrato</h2></div>
 
         <p class="lead-text">
             O PCI DSS (<em>Payment Card Industry Data Security Standard</em>) não é lei: é uma exigência contratual. As bandeiras (Visa, Mastercard, American Express, Discover, JCB) criaram o PCI SSC (<em>PCI Security Standards Council</em>), que publica o padrão; o adquirente que credencia a loja exige que ela valide a conformidade todo ano. Quem descumpre paga multas repassadas pelo adquirente e, depois de um vazamento, pode perder o direito de aceitar cartão. A pergunta que decide quanto esforço isso custa é sempre a mesma: <strong>quais sistemas estão no escopo?</strong>
@@ -2185,7 +1800,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 2: DADOS E ESCOPO -->
     <section class="study-section" id="escopo" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Dados da Conta, Escopo, SAQ e Validação</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 5</small></span><h2>Dados da Conta, Escopo, SAQ e Validação</h2></div>
 
         <h3>PAN e Dados Sensíveis de Autenticação (SAD)</h3>
         <p>
@@ -2347,50 +1962,10 @@ dfn.glossario:focus-visible {
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 3 de 6</small></span><h2>Laboratório Prático: Delimitador de Escopo CDE</h2></div>
-
-        <p class="lead-text">
-            Escolha uma das três arquiteturas de checkout da Ipê Store. No <strong>modo exercício</strong>, classifique cada sistema do inventário e escolha o SAQ; depois confira o gabarito e o motivo de cada resposta. No <strong>modo livre</strong>, ligue e desligue os atributos de cada sistema e veja a classificação e o SAQ mudarem.
-        </p>
-
-        <div class="lab-box pci-lab" id="pci-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Laboratório de Escopo PCI DSS</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Inventário da Ipê Store</h3>
-                    <p id="pci-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
-                </div>
-            </div>
-
-            <div class="lab-body">
-                <h4 style="margin-top: 0;">1. Arquitetura do checkout</h4>
-                <div id="pci-arquiteturas" role="group" aria-label="Arquitetura do checkout" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
-                <p id="pci-arq-desc" style="font-size: 0.9rem; margin: 0.75rem 0 1.25rem 0;"></p>
-
-                <h4>2. Modo</h4>
-                <div id="pci-modos" role="group" aria-label="Modo do simulador" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
-                <p id="pci-modo-ajuda" style="font-size: 0.85rem; color: var(--muted); margin: 0.5rem 0 1.25rem 0;"></p>
-
-                <h4>3. Inventário</h4>
-                <div id="pci-sistemas" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 0.75rem;"></div>
-
-                <h4>4. SAQ</h4>
-                <div id="pci-saq" style="font-size: 0.9rem;"></div>
-
-                <div id="pci-resumo" style="margin-top: 1rem; font-size: 0.9rem;" aria-live="polite"></div>
-
-                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
-                    <button class="btn-primary" type="button" id="pci-btn-conferir" onclick="conferirEscopoPCI()">Conferir respostas</button>
-                    <button class="btn-secondary" type="button" id="pci-btn-restaurar" onclick="restaurarPCI()">Limpar respostas</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist de Escopo e Conformidade PCI DSS</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 3 de 5</small></span><h2>Checklist de Escopo e Conformidade PCI DSS</h2></div>
 
         <p class="lead-text">
             Use esta lista para preparar a validação anual ou revisar um ambiente de pagamento. O estado das caixas fica salvo no seu navegador.
@@ -2430,7 +2005,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Concursos</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 4 de 5</small></span><h2>Questões de Fixação e Concursos</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2513,7 +2088,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 5 de 5</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2561,441 +2136,7 @@ dfn.glossario:focus-visible {
 
 </article>
 
-<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
-<script type="application/json" id="pci-dados">
-{
- "contexto": "Loja online fictícia, Nível 3 pela régua da Visa (cerca de 400 mil transações de e-commerce por ano). Sistemas e fornecedores inventados para o laboratório.",
- "saq_opcoes": ["A", "A-EP", "B", "B-IP", "C", "C-VT", "P2PE", "D"],
- "arquiteturas": [
-  {
-   "id": "proprio",
-   "nome": "Checkout próprio",
-   "descricao": "O formulário de cartão é do site da Ipê; o servidor recebe o número do cartão e o envia ao gateway. O banco guarda o cartão cifrado para compras com um clique.",
-   "captura_no_site": true,
-   "saq": "D",
-   "explicacao_saq": "A loja armazena, processa e transmite PAN nos próprios sistemas, então nenhum SAQ simplificado se aplica: sobra o SAQ D, com todos os requisitos aplicáveis."
-  },
-  {
-   "id": "javascript",
-   "nome": "JavaScript do gateway",
-   "descricao": "A página de pagamento é servida pela Ipê, mas um script do gateway captura o cartão e o envia direto do navegador ao gateway (direct post). A loja recebe só um token.",
-   "captura_no_site": true,
-   "saq": "A-EP",
-   "explicacao_saq": "Nenhum sistema da loja recebe o PAN, mas o site controla como o cartão chega ao gateway: SAQ A-EP. A página de pagamento vira alvo de skimming, daí os requisitos 6.4.3 e 11.6.1."
-  },
-  {
-   "id": "iframe",
-   "nome": "Iframe do gateway",
-   "descricao": "Todo o formulário de cartão é servido pelo gateway dentro de um iframe (ou numa página de redirecionamento). A loja recebe só um token.",
-   "captura_no_site": false,
-   "saq": "A",
-   "explicacao_saq": "Todas as funções de dados do cartão estão com um terceiro validado: SAQ A, o mais curto. A loja ainda protege o site contra ataques de script que afetem o pagamento e gerencia o gateway como TPSP."
-  }
- ],
- "sistemas": [
-  {
-   "id": "web-loja", "nome": "Servidor web da loja", "terceiro": false,
-   "por_arquitetura": {
-    "proprio": {"descricao": "Hospeda o site e o formulário de pagamento; o número do cartão chega a ele no envio do checkout.", "pan": true, "impacta": true, "segmentado": false, "motivo": "Transmite o PAN: faz parte do CDE."},
-    "javascript": {"descricao": "Serve a página de pagamento que carrega o script do gateway; o navegador envia o cartão direto ao gateway.", "pan": false, "impacta": true, "segmentado": false, "motivo": "Não recebe o PAN, mas quem altera a página altera o script de captura (skimming): impacta a segurança."},
-    "iframe": {"descricao": "Mostra a página do pedido com um iframe; o formulário de cartão inteiro vem do gateway.", "pan": false, "impacta": true, "segmentado": false, "motivo": "Quem altera a página pode trocar o iframe por um formulário falso: continua impactando a segurança, com um SAQ bem menor."}
-   }
-  },
-  {
-   "id": "app-checkout", "nome": "Servidor de aplicação do checkout", "terceiro": false,
-   "por_arquitetura": {
-    "proprio": {"descricao": "Recebe o cartão do servidor web e chama a API do gateway para autorizar a compra.", "pan": true, "impacta": true, "segmentado": false, "motivo": "Processa e transmite o PAN: CDE."},
-    "javascript": {"descricao": "Monta a página de pagamento com o script do gateway e assina a requisição com a chave da loja; depois recebe só o token.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Controla o script e a chave que a página de pagamento usa: impacta a segurança da captura."},
-    "iframe": {"descricao": "Recebe do gateway, de servidor para servidor, o token e os 4 últimos dígitos do cartão.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Só vê o token, que não tem valor para o atacante, e não controla a página de pagamento: fora do escopo."}
-   }
-  },
-  {
-   "id": "db-pedidos", "nome": "Banco de dados de pedidos", "terceiro": false,
-   "por_arquitetura": {
-    "proprio": {"descricao": "Guarda o número do cartão cifrado para compras com um clique.", "pan": true, "impacta": true, "segmentado": false, "motivo": "Armazena PAN, mesmo cifrado: CDE, com gestão de chaves."},
-    "javascript": {"descricao": "Guarda o token do gateway e os 4 últimos dígitos; os cartões antigos foram expurgados.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Token e 4 últimos dígitos não são PAN: fora do escopo, desde que os dados antigos tenham sido expurgados."},
-    "iframe": {"descricao": "Guarda o token do gateway e os 4 últimos dígitos; os cartões antigos foram expurgados.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Token e 4 últimos dígitos não são PAN: fora do escopo, desde que os dados antigos tenham sido expurgados."}
-   }
-  },
-  {
-   "id": "backup", "nome": "Servidor de backup", "terceiro": false,
-   "por_arquitetura": {
-    "proprio": {"descricao": "Recebe cópias diárias do banco de pedidos.", "pan": true, "impacta": true, "segmentado": false, "motivo": "Armazena cópias do PAN: CDE. É no backup que o cartão esquecido costuma sobreviver."},
-    "javascript": {"descricao": "Recebe cópias do banco de pedidos, que agora só tem tokens; as cópias antigas com cartões foram destruídas.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Sem PAN nas cópias: fora do escopo. Sem destruir as cópias antigas, ele continuaria no CDE."},
-    "iframe": {"descricao": "Recebe cópias do banco de pedidos, que agora só tem tokens; as cópias antigas com cartões foram destruídas.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Sem PAN nas cópias: fora do escopo. Sem destruir as cópias antigas, ele continuaria no CDE."}
-   }
-  },
-  {
-   "id": "estacao-sac", "nome": "Estações do atendimento (SAC)", "terceiro": false,
-   "por_arquitetura": {
-    "proprio": {"descricao": "Os atendentes abrem o pedido no backoffice, que mostra o número completo do cartão.", "pan": true, "impacta": false, "segmentado": false, "motivo": "Exibe o PAN completo, então processa dados do cartão: CDE. Mascarar a tela (3.4.1) seria o primeiro passo."},
-    "javascript": {"descricao": "O backoffice mostra só a bandeira e os 4 últimos dígitos.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Não vê PAN nem acessa sistemas em escopo: fora do escopo."},
-    "iframe": {"descricao": "O backoffice mostra só a bandeira e os 4 últimos dígitos.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Não vê PAN nem acessa sistemas em escopo: fora do escopo."}
-   }
-  },
-  {
-   "id": "ad", "nome": "Active Directory", "terceiro": false,
-   "por_arquitetura": {
-    "proprio": {"descricao": "Autentica os administradores dos servidores do checkout.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Quem controla o AD decide quem entra nos sistemas do CDE: impacta a segurança."},
-    "javascript": {"descricao": "Autentica os administradores dos servidores web e de aplicação.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Controla o acesso aos sistemas que montam a página de pagamento: impacta a segurança."},
-    "iframe": {"descricao": "Autentica os administradores do servidor web.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Controla o acesso ao servidor que hospeda o iframe: impacta a segurança."}
-   }
-  },
-  {
-   "id": "siem", "nome": "SIEM", "terceiro": false,
-   "por_arquitetura": {
-    "proprio": {"descricao": "Recebe e guarda os logs dos servidores do checkout.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Guarda a trilha do requisito 10 e se conecta aos sistemas do CDE: impacta a segurança."},
-    "javascript": {"descricao": "Recebe e guarda os logs dos servidores web e de aplicação.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Guarda a trilha dos sistemas em escopo e se conecta a eles: impacta a segurança."},
-    "iframe": {"descricao": "Recebe e guarda os logs do servidor web.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Guarda a trilha do sistema em escopo e se conecta a ele: impacta a segurança."}
-   }
-  },
-  {
-   "id": "bastion", "nome": "Bastion de administração", "terceiro": false,
-   "por_arquitetura": {
-    "proprio": {"descricao": "Único caminho de acesso administrativo aos servidores do checkout.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Dá acesso administrativo ao CDE: impacta a segurança, e é onde o MFA do 8.4.2 entra."},
-    "javascript": {"descricao": "Único caminho de acesso administrativo aos servidores web e de aplicação.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Dá acesso administrativo aos sistemas em escopo: impacta a segurança."},
-    "iframe": {"descricao": "Único caminho de acesso administrativo ao servidor web.", "pan": false, "impacta": true, "segmentado": true, "motivo": "Dá acesso administrativo ao sistema em escopo: impacta a segurança."}
-   }
-  },
-  {
-   "id": "servidor-arquivos", "nome": "Servidor de arquivos do escritório", "terceiro": false,
-   "por_arquitetura": {
-    "proprio": {"descricao": "Fica na mesma rede plana do banco de pedidos, sem firewall entre eles.", "pan": false, "impacta": false, "segmentado": false, "motivo": "Não toca no cartão, mas sem segmentação qualquer máquina dessa rede alcança o CDE: entra no escopo."},
-    "javascript": {"descricao": "Continua na rede do escritório, que não tem mais nenhum sistema em escopo.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Sem caminho para sistemas em escopo: fora do escopo."},
-    "iframe": {"descricao": "Continua na rede do escritório, que não tem mais nenhum sistema em escopo.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Sem caminho para sistemas em escopo: fora do escopo."}
-   }
-  },
-  {
-   "id": "estacao-rh", "nome": "Estações do RH", "terceiro": false,
-   "por_arquitetura": {
-    "proprio": {"descricao": "Ficam numa VLAN isolada por firewall, sem acesso aos servidores da loja; a segmentação é testada todo ano.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Segmentação testada e nenhum acesso: fora do escopo."},
-    "javascript": {"descricao": "Ficam numa VLAN isolada por firewall, sem acesso aos servidores da loja; a segmentação é testada todo ano.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Segmentação testada e nenhum acesso: fora do escopo."},
-    "iframe": {"descricao": "Ficam numa VLAN isolada por firewall, sem acesso aos servidores da loja; a segmentação é testada todo ano.", "pan": false, "impacta": false, "segmentado": true, "motivo": "Segmentação testada e nenhum acesso: fora do escopo."}
-   }
-  },
-  {
-   "id": "gateway", "nome": "Gateway de pagamento", "terceiro": true,
-   "por_arquitetura": {
-    "proprio": {"descricao": "Empresa terceira que recebe o cartão do servidor de aplicação e autoriza a compra na adquirente.", "pan": true, "impacta": true, "segmentado": false, "motivo": "Processa e armazena PAN, mas é um TPSP: a Ipê exige contrato, matriz de responsabilidades e o AOC dele (12.8)."},
-    "javascript": {"descricao": "Empresa terceira que recebe o cartão direto do navegador do cliente e devolve um token.", "pan": true, "impacta": true, "segmentado": false, "motivo": "Processa e armazena PAN, mas é um TPSP: a Ipê exige contrato, matriz de responsabilidades e o AOC dele (12.8)."},
-    "iframe": {"descricao": "Empresa terceira que serve o formulário de cartão no iframe e devolve um token.", "pan": true, "impacta": true, "segmentado": false, "motivo": "Processa e armazena PAN, mas é um TPSP: a Ipê exige contrato, matriz de responsabilidades e o AOC dele (12.8)."}
-   }
-  }
- ]
-}
-</script>
-
-<script>
-(function() {
-    var PCI = JSON.parse(document.getElementById("pci-dados").textContent);
-    var ROTULO = { cde: "CDE", conectado: "Conectado / impacta", fora: "Fora do escopo", terceiro: "Terceiro (TPSP)" };
-    var COR = {
-        cde: "rgba(220, 38, 38, 0.30)", conectado: "rgba(234, 88, 12, 0.28)",
-        fora: "rgba(22, 163, 74, 0.25)", terceiro: "rgba(37, 99, 235, 0.25)"
-    };
-    var ATRIBUTOS = [
-        ["pan", "Armazena, processa ou transmite PAN"],
-        ["impacta", "Tem acesso ao escopo ou afeta sua segurança"],
-        ["segmentado", "Isolado dos sistemas em escopo por segmentação testada"]
-    ];
-    var arq = "proprio";
-    var modo = "exercicio";
-    var respostas = {};
-    var saqResposta = "";
-    var conferido = false;
-    var livres = {};
-    var badges = {};
-
-    function el(tag, texto, estilo) {
-        var e = document.createElement(tag);
-        if (texto !== undefined && texto !== null) e.textContent = texto;
-        if (estilo) e.setAttribute("style", estilo);
-        return e;
-    }
-    function arquitetura() {
-        return PCI.arquiteturas.filter(function(a) { return a.id === arq; })[0];
-    }
-
-    // Regra única de classificação (a mesma dos testes em Python).
-    function classificar(sistema, attrs) {
-        if (sistema.terceiro) return "terceiro";
-        if (attrs.pan) return "cde";
-        if (attrs.impacta || !attrs.segmentado) return "conectado";
-        return "fora";
-    }
-    function saqDe(attrsDe) {
-        var comPan = PCI.sistemas.some(function(s) { return !s.terceiro && attrsDe(s).pan; });
-        if (comPan) return "D";
-        return arquitetura().captura_no_site ? "A-EP" : "A";
-    }
-    function gabarito(s) {
-        return classificar(s, s.por_arquitetura[arq]);
-    }
-    function porque(s, attrs) {
-        if (s.terceiro) return "Prestador terceiro: valida a própria conformidade; a loja o gerencia pelo 12.8.";
-        if (attrs.pan) return "Armazena, processa ou transmite PAN.";
-        if (attrs.impacta) return "Não toca no PAN, mas tem acesso ao escopo ou afeta sua segurança.";
-        if (!attrs.segmentado) return "Não toca no PAN, mas está na mesma rede, sem segmentação.";
-        return "Sem PAN, sem impacto e isolado por segmentação testada.";
-    }
-    function copiarAtributos() {
-        livres = {};
-        PCI.sistemas.forEach(function(s) {
-            var a = s.por_arquitetura[arq];
-            livres[s.id] = { pan: a.pan, impacta: a.impacta, segmentado: a.segmentado };
-        });
-    }
-    function selo(cat) {
-        return el("span", ROTULO[cat], "display: inline-block; padding: 0.15rem 0.55rem; border-radius: var(--radius-pill); font-size: 0.8rem; font-weight: 600; background: " + COR[cat] + ";");
-    }
-
-    function renderizarBotoes() {
-        var boxA = document.getElementById("pci-arquiteturas");
-        boxA.replaceChildren();
-        PCI.arquiteturas.forEach(function(a) {
-            var b = el("button", a.nome);
-            b.type = "button";
-            b.className = a.id === arq ? "btn-primary" : "btn-secondary";
-            b.setAttribute("aria-pressed", a.id === arq ? "true" : "false");
-            b.style.fontSize = "0.85rem";
-            b.addEventListener("click", function() { selecionarArquiteturaPCI(a.id); });
-            boxA.appendChild(b);
-        });
-        document.getElementById("pci-arq-desc").textContent = arquitetura().descricao;
-
-        var boxM = document.getElementById("pci-modos");
-        boxM.replaceChildren();
-        [["exercicio", "Modo exercício"], ["livre", "Modo livre"]].forEach(function(par) {
-            var b = el("button", par[1]);
-            b.type = "button";
-            b.className = par[0] === modo ? "btn-primary" : "btn-secondary";
-            b.setAttribute("aria-pressed", par[0] === modo ? "true" : "false");
-            b.style.fontSize = "0.85rem";
-            b.addEventListener("click", function() { alternarModoPCI(par[0]); });
-            boxM.appendChild(b);
-        });
-        document.getElementById("pci-modo-ajuda").textContent = modo === "exercicio"
-            ? "Classifique cada sistema e escolha o SAQ; depois clique em Conferir respostas."
-            : "Altere os atributos dos sistemas da loja; a classificação e o SAQ mudam na hora. O gateway é terceiro e não pode ser editado.";
-        document.getElementById("pci-btn-conferir").hidden = modo !== "exercicio";
-        document.getElementById("pci-btn-restaurar").textContent = modo === "exercicio" ? "Limpar respostas" : "Restaurar atributos da arquitetura";
-    }
-
-    function cartaoBase(s) {
-        var card = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 0.75rem; background: var(--surface); min-width: 0;");
-        card.appendChild(el("strong", s.nome, "display: block; margin-bottom: 0.25rem;"));
-        card.appendChild(el("p", s.por_arquitetura[arq].descricao, "font-size: 0.85rem; margin: 0 0 0.6rem 0;"));
-        return card;
-    }
-
-    function cartaoExercicio(s) {
-        var card = cartaoBase(s);
-        var sel = el("select", null, "width: 100%;");
-        sel.className = "form-control";
-        sel.setAttribute("aria-label", "Classificação de " + s.nome);
-        sel.appendChild(el("option", "Classifique…"));
-        sel.options[0].value = "";
-        ["cde", "conectado", "fora", "terceiro"].forEach(function(cat) {
-            var o = el("option", ROTULO[cat]);
-            o.value = cat;
-            sel.appendChild(o);
-        });
-        sel.value = respostas[s.id] || "";
-        sel.addEventListener("change", function() {
-            respostas[s.id] = sel.value;
-            if (conferido) { conferido = false; renderizarTudo(); } else { renderizarResumo(); }
-        });
-        card.appendChild(sel);
-        if (conferido) {
-            var certo = gabarito(s);
-            var ok = respostas[s.id] === certo;
-            var linha = el("p", null, "font-size: 0.85rem; margin: 0.6rem 0 0 0;");
-            linha.appendChild(el("strong", ok ? "✓ Correto: " : "✗ Gabarito: ", "color: " + (ok ? "var(--tip-color)" : "var(--danger-color)") + ";"));
-            linha.appendChild(selo(certo));
-            linha.appendChild(el("span", " " + s.por_arquitetura[arq].motivo));
-            card.appendChild(linha);
-            card.style.borderColor = ok ? "var(--tip-border)" : "var(--danger-border)";
-        }
-        return card;
-    }
-
-    function cartaoLivre(s) {
-        var card = cartaoBase(s);
-        ATRIBUTOS.forEach(function(par) {
-            var rot = el("label", null, "display: flex; gap: 0.5rem; align-items: flex-start; font-size: 0.85rem; margin-bottom: 0.3rem;");
-            var cb = el("input");
-            cb.type = "checkbox";
-            cb.checked = livres[s.id][par[0]];
-            cb.disabled = s.terceiro;
-            cb.addEventListener("change", function() {
-                livres[s.id][par[0]] = cb.checked;
-                atualizarSelo(s);
-                renderizarSaq();
-                renderizarResumo();
-            });
-            rot.appendChild(cb);
-            rot.appendChild(el("span", par[1]));
-            card.appendChild(rot);
-        });
-        var linha = el("p", null, "font-size: 0.85rem; margin: 0.5rem 0 0 0;");
-        badges[s.id] = linha;
-        card.appendChild(linha);
-        atualizarSelo(s);
-        return card;
-    }
-
-    function atualizarSelo(s) {
-        var linha = badges[s.id];
-        if (!linha) return;
-        linha.replaceChildren();
-        linha.appendChild(selo(classificar(s, livres[s.id])));
-        linha.appendChild(el("span", " " + porque(s, livres[s.id])));
-    }
-
-    function renderizarSistemas() {
-        var box = document.getElementById("pci-sistemas");
-        box.replaceChildren();
-        badges = {};
-        PCI.sistemas.forEach(function(s) {
-            box.appendChild(modo === "exercicio" ? cartaoExercicio(s) : cartaoLivre(s));
-        });
-    }
-
-    function renderizarSaq() {
-        var box = document.getElementById("pci-saq");
-        box.replaceChildren();
-        if (modo === "livre") {
-            var calc = saqDe(function(s) { return livres[s.id]; });
-            var p = el("p", null, "margin: 0;");
-            p.appendChild(el("span", "SAQ sugerido: "));
-            p.appendChild(el("strong", calc));
-            p.appendChild(el("span", calc === "D"
-                ? " — algum sistema da loja armazena, processa ou transmite PAN."
-                : (arquitetura().captura_no_site
-                    ? " — a loja não toca no PAN, mas a página dela controla a captura."
-                    : " — a captura inteira está com o terceiro.")));
-            box.appendChild(p);
-            return;
-        }
-        var rot = el("label", "Qual SAQ a Ipê Store deve preencher nesta arquitetura? ", "display: block; margin-bottom: 0.4rem;");
-        rot.setAttribute("for", "pci-saq-select");
-        box.appendChild(rot);
-        var sel = el("select", null, "max-width: 12rem;");
-        sel.className = "form-control";
-        sel.id = "pci-saq-select";
-        sel.appendChild(el("option", "Escolha…"));
-        sel.options[0].value = "";
-        PCI.saq_opcoes.forEach(function(op) {
-            var o = el("option", "SAQ " + op);
-            o.value = op;
-            sel.appendChild(o);
-        });
-        sel.value = saqResposta;
-        sel.addEventListener("change", function() {
-            saqResposta = sel.value;
-            if (conferido) { conferido = false; renderizarTudo(); } else { renderizarResumo(); }
-        });
-        box.appendChild(sel);
-        if (conferido) {
-            var a = arquitetura();
-            var ok = saqResposta === a.saq;
-            var fb = el("p", null, "margin: 0.6rem 0 0 0;");
-            fb.appendChild(el("strong", ok ? "✓ Correto: SAQ " + a.saq + ". " : "✗ O SAQ desta arquitetura é o " + a.saq + ". ",
-                "color: " + (ok ? "var(--tip-color)" : "var(--danger-color)") + ";"));
-            fb.appendChild(el("span", a.explicacao_saq));
-            box.appendChild(fb);
-        }
-    }
-
-    function contagem(classificacao) {
-        var c = { cde: 0, conectado: 0, fora: 0, terceiro: 0 };
-        PCI.sistemas.forEach(function(s) { c[classificacao(s)]++; });
-        return c;
-    }
-    function linhaContagem(c) {
-        var p = el("p", null, "display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin: 0.4rem 0 0 0;");
-        ["cde", "conectado", "fora", "terceiro"].forEach(function(cat) {
-            var s = selo(cat);
-            s.textContent = ROTULO[cat] + ": " + c[cat];
-            p.appendChild(s);
-        });
-        p.appendChild(el("strong", "Em escopo: " + (c.cde + c.conectado) + " de " + PCI.sistemas.length + " sistemas"));
-        return p;
-    }
-
-    function renderizarResumo() {
-        var box = document.getElementById("pci-resumo");
-        box.replaceChildren();
-        if (modo === "livre") {
-            box.appendChild(el("strong", "Resultado com os atributos atuais"));
-            box.appendChild(linhaContagem(contagem(function(s) { return classificar(s, livres[s.id]); })));
-            return;
-        }
-        var respondidos = PCI.sistemas.filter(function(s) { return respostas[s.id]; }).length;
-        if (!conferido) {
-            box.appendChild(el("span", "Respondidos: " + respondidos + " de " + PCI.sistemas.length + " sistemas" +
-                (saqResposta ? ", SAQ escolhido." : ", SAQ pendente."), "color: var(--muted);"));
-            return;
-        }
-        var acertos = PCI.sistemas.filter(function(s) { return respostas[s.id] === gabarito(s); }).length;
-        var saqOk = saqResposta === arquitetura().saq;
-        box.appendChild(el("strong", "Acertos: " + acertos + " de " + PCI.sistemas.length + " sistemas; SAQ " + (saqOk ? "correto" : "incorreto") + "."));
-        box.appendChild(el("p", "Gabarito desta arquitetura:", "margin: 0.6rem 0 0 0;"));
-        box.appendChild(linhaContagem(contagem(gabarito)));
-    }
-
-    function renderizarTudo() {
-        renderizarBotoes();
-        renderizarSistemas();
-        renderizarSaq();
-        renderizarResumo();
-    }
-
-    window.selecionarArquiteturaPCI = function(id) {
-        if (!PCI.arquiteturas.some(function(a) { return a.id === id; })) return;
-        arq = id;
-        respostas = {};
-        saqResposta = "";
-        conferido = false;
-        copiarAtributos();
-        renderizarTudo();
-    };
-
-    window.alternarModoPCI = function(m) {
-        if (m !== "exercicio" && m !== "livre") return;
-        modo = m;
-        renderizarTudo();
-    };
-
-    window.conferirEscopoPCI = function() {
-        conferido = true;
-        renderizarTudo();
-    };
-
-    window.restaurarPCI = function() {
-        if (modo === "exercicio") {
-            respostas = {};
-            saqResposta = "";
-            conferido = false;
-        } else {
-            copiarAtributos();
-        }
-        renderizarTudo();
-    };
-
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("pci-contexto").textContent = PCI.contexto;
-        copiarAtributos();
-        renderizarTudo();
-        if (typeof initChecklist === "function") {
-            initChecklist("pci-dss");
-        }
-        if (typeof initQuiz === "function") {
-            initQuiz();
-        }
-    });
-})();
-</script>
+<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
 </main>
 </div>
 
@@ -3130,7 +2271,6 @@ dfn.glossario:focus-visible {
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3719,17 +2859,6 @@ dfn.glossario:focus-visible {
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -3943,7 +3072,6 @@ dfn.glossario:focus-visible {
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

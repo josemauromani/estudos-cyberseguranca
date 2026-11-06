@@ -55,7 +55,6 @@ class TestIndexDados(unittest.TestCase):
             "carreiras": list,
             "tempo_minutos": int,
             "pergunta_chave": str,
-            "simulador_nome": str,
             "fatos": list,
         }
         for slug, dados in ESTUDOS_DADOS.items():
@@ -133,7 +132,9 @@ class TestBuildIndex(unittest.TestCase):
 
         # Totais do catálogo (lede da tela inicial)
         self.assertIn(f"{len(ESTUDOS_DADOS)} módulos em {len(TRILHAS)} trilhas", conteudo)
-        self.assertIn("simuladores", conteudo.lower())
+        self.assertIn("checklist", conteudo.lower())
+        self.assertNotIn("simuladores", conteudo.lower())
+        self.assertNotIn("laboratório interativo", conteudo.lower())
 
         # Seções principais
         self.assertTrue(

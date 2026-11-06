@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Seguranca-em-Nuvem">
@@ -2121,7 +1737,6 @@ dfn.glossario:focus-visible {
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: A Nuvem É Segura, a Sua Configuração Talvez Não</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#controles" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Buckets, Metadados de Instância e Gestão de Postura</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#iso-27017-27018" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">ISO/IEC 27017 e 27018: Controles e Privacidade na Nuvem</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Auditor de Permissões S3 e Políticas IAM Cloud</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Segurança em Nuvem</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2137,14 +1752,14 @@ dfn.glossario:focus-visible {
   <h1>Responsabilidade Compartilhada e CSPM</h1>
   <p class="mhead-sub">Arquiteturas seguras em provedores de nuvem, gestão de postura e políticas de acesso a dados</p>
   <div class="chips"><span class="chip">⏱ 45 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Protect</span><span class="chip">🎯 ATT&amp;CK TA0001 Initial Access / TA0006 Credential Access</span><span class="chip">👤 AppSec &amp; DevSecOps · Blue Team &amp; Defesa · GRC &amp; Auditoria</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>3 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>8 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>7 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>3 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>8 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>7 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 21: Seguranca-em-Nuvem Body Fragment -->
 <article class="study-container" data-slug="seguranca-nuvem">
 
     <!-- SEÇÃO 1: RESPONSABILIDADE COMPARTILHADA -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 7</small></span><h2>Introdução: A Nuvem É Segura, a Sua Configuração Talvez Não</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: A Nuvem É Segura, a Sua Configuração Talvez Não</h2></div>
 
         <p class="lead-text">
             A Ipê Store guarda as imagens dos produtos e as notas fiscais dos clientes em buckets na AWS, e a aplicação da loja acessa os dois com uma role. Quase nenhum vazamento em nuvem vem de uma falha do provedor: vem de um bucket público por engano, de uma permissão <code>s3:*</code> "para funcionar" ou de uma instância que entrega as próprias credenciais a quem pedir. Este estudo mostra onde termina a responsabilidade do provedor e como ler, auditar e corrigir as permissões que são suas.
@@ -2193,7 +1808,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 2: BUCKETS, METADADOS E POSTURA -->
     <section class="study-section" id="controles" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 7</small></span><h2>Buckets, Metadados de Instância e Gestão de Postura</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Buckets, Metadados de Instância e Gestão de Postura</h2></div>
 
         <h3>Buckets públicos</h3>
         <p>
@@ -2250,7 +1865,7 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
     </section>
 
     <section class="study-section" id="iso-27017-27018" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 7</small></span><h2>ISO/IEC 27017 e 27018: Controles e Privacidade na Nuvem</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 6</small></span><h2>ISO/IEC 27017 e 27018: Controles e Privacidade na Nuvem</h2></div>
 
         <p class="lead-text">
             A ISO/IEC 27001 e a 27002 valem para qualquer ambiente, mas a nuvem muda quem faz o quê. Duas normas irmãs adaptam o conjunto: a <strong>ISO/IEC 27017</strong> trata dos controles de segurança em serviços de nuvem, e a <strong>ISO/IEC 27018</strong> trata da proteção de <strong>dados pessoais</strong> em nuvem pública.
@@ -2323,57 +1938,10 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 4 de 7</small></span><h2>Laboratório Prático: Auditor de Permissões S3 e Políticas IAM Cloud</h2></div>
-
-        <p class="lead-text">
-            Edite as três políticas em JSON e aplique. A auditoria aponta os riscos de cada uma, e as nove requisições abaixo são reavaliadas na hora, mostrando qual declaração permitiu ou negou cada uma.
-        </p>
-
-        <div class="lab-box nv-lab" id="nv-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Conta AWS 111122223333 (simulada)</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Buckets e role da loja da Ipê Store</h3>
-                    <p id="nv-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
-                </div>
-            </div>
-
-            <div class="lab-body">
-                <h4 style="margin-top: 0;">Missões</h4>
-                <ul id="nv-missoes" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.25rem; font-size: 0.85rem;"></ul>
-
-                <h4 style="margin-top: 1.5rem;">1. Buckets</h4>
-                <div id="nv-buckets" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 0.5rem; font-size: 0.83rem;"></div>
-
-                <h4 style="margin-top: 1.25rem;">2. Editor de políticas</h4>
-                <div id="nv-editor" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.45rem; font-size: 0.83rem;">
-                    <select class="form-control" id="nv-politica" aria-label="Política"></select>
-                    <textarea class="form-control" id="nv-json" rows="14" spellcheck="false" aria-label="Política em JSON" style="width: 100%; box-sizing: border-box; font-family: var(--font-mono); font-size: 0.74rem; resize: vertical;"></textarea>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
-                        <button class="btn-primary" type="button" onclick="aplicarPoliticaNuvem()">Aplicar política</button>
-                        <button class="btn-secondary" type="button" id="nv-desfazer">Voltar ao original</button>
-                        <button class="btn-secondary" type="button" id="nv-sugestao">Carregar uma solução</button>
-                    </div>
-                    <div id="nv-editor-status" aria-live="polite"></div>
-                </div>
-
-                <h4 style="margin-top: 1.25rem;">3. Auditoria</h4>
-                <div id="nv-auditoria" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem; font-size: 0.82rem;"></div>
-
-                <h4 style="margin-top: 1.25rem;">4. Requisições</h4>
-                <div id="nv-requisicoes" aria-live="polite" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.4rem; font-size: 0.82rem;"></div>
-
-                <div style="margin-top: 1.25rem;">
-                    <button class="btn-secondary" type="button" onclick="restaurarNuvem()">Restaurar laboratório</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 5 de 7</small></span><h2>Checklist de Segurança em Nuvem</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist de Segurança em Nuvem</h2></div>
 
         <p class="lead-text">
             Use esta lista para revisar uma conta de nuvem. O estado das caixas fica salvo no seu navegador.
@@ -2417,7 +1985,7 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 6 de 7</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2506,7 +2074,7 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 7 de 7</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2555,305 +2123,7 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
 
 </article>
 
-<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
-<script type="application/json" id="nv-dados">
-{
- "contexto": "Conta e ARNs fictícios (a conta 111122223333 é a usada nos exemplos da própria AWS). O avaliador cobre a lógica da mesma conta, com um subconjunto de condições.",
- "conta": "111122223333",
- "buckets": {
-  "ipestore-notas-fiscais": {"descricao": "Notas fiscais dos clientes (dados pessoais e fiscais)", "publico_intencional": false},
-  "ipestore-imagens-produtos": {"descricao": "Fotos dos produtos exibidas no site", "publico_intencional": true}
- },
- "bpa_inicial": {"ipestore-notas-fiscais": false, "ipestore-imagens-produtos": false},
- "nomes": {"bucket:ipestore-notas-fiscais": "Política do bucket ipestore-notas-fiscais", "bucket:ipestore-imagens-produtos": "Política do bucket ipestore-imagens-produtos", "identidade:app-loja": "Política da role app-loja"},
- "politicas": {
-  "bucket:ipestore-notas-fiscais": {"Version": "2012-10-17", "Statement": [
-   {"Sid": "LeituraPublica", "Effect": "Allow", "Principal": "*", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::ipestore-notas-fiscais/*"}
-  ]},
-  "bucket:ipestore-imagens-produtos": {"Version": "2012-10-17", "Statement": [
-   {"Sid": "ImagensPublicas", "Effect": "Allow", "Principal": "*", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::ipestore-imagens-produtos/*"}
-  ]},
-  "identidade:app-loja": {"Version": "2012-10-17", "Statement": [
-   {"Sid": "TudoNoS3", "Effect": "Allow", "Action": "s3:*", "Resource": "*"}
-  ]}
- },
- "corrigidas": {
-  "bucket:ipestore-notas-fiscais": {"Version": "2012-10-17", "Statement": [
-   {"Sid": "SomenteTLS", "Effect": "Deny", "Principal": "*", "Action": "s3:*", "Resource": ["arn:aws:s3:::ipestore-notas-fiscais", "arn:aws:s3:::ipestore-notas-fiscais/*"], "Condition": {"Bool": {"aws:SecureTransport": "false"}}}
-  ]},
-  "bucket:ipestore-imagens-produtos": {"Version": "2012-10-17", "Statement": [
-   {"Sid": "ImagensPublicas", "Effect": "Allow", "Principal": "*", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::ipestore-imagens-produtos/*"},
-   {"Sid": "SomenteTLS", "Effect": "Deny", "Principal": "*", "Action": "s3:*", "Resource": ["arn:aws:s3:::ipestore-imagens-produtos", "arn:aws:s3:::ipestore-imagens-produtos/*"], "Condition": {"Bool": {"aws:SecureTransport": "false"}}}
-  ]},
-  "identidade:app-loja": {"Version": "2012-10-17", "Statement": [
-   {"Sid": "ImagensLeituraEscrita", "Effect": "Allow", "Action": ["s3:GetObject", "s3:PutObject"], "Resource": "arn:aws:s3:::ipestore-imagens-produtos/*"},
-   {"Sid": "NotasSomenteLeitura", "Effect": "Allow", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::ipestore-notas-fiscais/*"}
-  ]}
- },
- "regras": {
-  "publico": "Acesso público (Principal *) sem condição",
-  "acao_curinga": "Ação com curinga (todas as ações de um serviço ou de todos)",
-  "recurso_curinga": "Recurso * (qualquer recurso da conta)",
-  "negacao_invertida": "NotAction ou NotResource em Allow concede mais do que parece",
-  "passrole_curinga": "iam:PassRole em qualquer role permite escalar privilégio",
-  "sem_tls": "Sem negação de conexões sem TLS (aws:SecureTransport)"
- },
- "requisicoes": [
-  {"id": "r1", "descricao": "Visitante anônimo baixa a nota fiscal de um cliente", "principal": "anonimo", "acao": "s3:GetObject", "recurso": "arn:aws:s3:::ipestore-notas-fiscais/2026/NF-1043.pdf", "contexto": {"aws:SourceIp": "203.0.113.77", "aws:SecureTransport": "true"}, "esperado_inicial": "permitido", "esperado_corrigido": "negado_implicito"},
-  {"id": "r2", "descricao": "Visitante anônimo carrega a foto de um produto no site", "principal": "anonimo", "acao": "s3:GetObject", "recurso": "arn:aws:s3:::ipestore-imagens-produtos/caixa-media.jpg", "contexto": {"aws:SourceIp": "198.51.100.140", "aws:SecureTransport": "true"}, "esperado_inicial": "permitido", "esperado_corrigido": "permitido"},
-  {"id": "r3", "descricao": "A aplicação lê a nota fiscal para o cliente logado", "principal": "arn:aws:iam::111122223333:role/app-loja", "acao": "s3:GetObject", "recurso": "arn:aws:s3:::ipestore-notas-fiscais/2026/NF-1042.pdf", "contexto": {"aws:SourceIp": "10.20.40.11", "aws:SecureTransport": "true"}, "esperado_inicial": "permitido", "esperado_corrigido": "permitido"},
-  {"id": "r4", "descricao": "A aplicação grava a foto de um produto novo", "principal": "arn:aws:iam::111122223333:role/app-loja", "acao": "s3:PutObject", "recurso": "arn:aws:s3:::ipestore-imagens-produtos/caixa-grande.jpg", "contexto": {"aws:SourceIp": "10.20.40.11", "aws:SecureTransport": "true"}, "esperado_inicial": "permitido", "esperado_corrigido": "permitido"},
-  {"id": "r5", "descricao": "Uma falha na aplicação tenta apagar o bucket de notas", "principal": "arn:aws:iam::111122223333:role/app-loja", "acao": "s3:DeleteBucket", "recurso": "arn:aws:s3:::ipestore-notas-fiscais", "contexto": {"aws:SourceIp": "10.20.40.11", "aws:SecureTransport": "true"}, "esperado_inicial": "permitido", "esperado_corrigido": "negado_implicito"},
-  {"id": "r6", "descricao": "Um componente antigo da aplicação lê nota fiscal por HTTP", "principal": "arn:aws:iam::111122223333:role/app-loja", "acao": "s3:GetObject", "recurso": "arn:aws:s3:::ipestore-notas-fiscais/2026/NF-1042.pdf", "contexto": {"aws:SourceIp": "10.20.40.12", "aws:SecureTransport": "false"}, "esperado_inicial": "permitido", "esperado_corrigido": "negado_explicito"},
-  {"id": "r7", "descricao": "A aplicação comprometida tenta sobrescrever uma nota fiscal", "principal": "arn:aws:iam::111122223333:role/app-loja", "acao": "s3:PutObject", "recurso": "arn:aws:s3:::ipestore-notas-fiscais/2026/NF-1042.pdf", "contexto": {"aws:SourceIp": "10.20.40.11", "aws:SecureTransport": "true"}, "esperado_inicial": "permitido", "esperado_corrigido": "negado_implicito"},
-  {"id": "r8", "descricao": "Visitante anônimo tenta enviar um arquivo para o bucket de imagens", "principal": "anonimo", "acao": "s3:PutObject", "recurso": "arn:aws:s3:::ipestore-imagens-produtos/webshell.php", "contexto": {"aws:SourceIp": "203.0.113.9", "aws:SecureTransport": "true"}, "esperado_inicial": "negado_implicito", "esperado_corrigido": "negado_implicito"},
-  {"id": "r9", "descricao": "A aplicação lê as permissões (ACL) de uma nota, algo de que não precisa", "principal": "arn:aws:iam::111122223333:role/app-loja", "acao": "s3:GetObjectAcl", "recurso": "arn:aws:s3:::ipestore-notas-fiscais/2026/NF-1042.pdf", "contexto": {"aws:SourceIp": "10.20.40.11", "aws:SecureTransport": "true"}, "esperado_inicial": "permitido", "esperado_corrigido": "negado_implicito"}
- ],
- "missoes": [
-  {"id": "publico", "texto": "Feche o vazamento das notas fiscais sem tirar as fotos dos produtos do ar."},
-  {"id": "minimo", "texto": "Reduza a role app-loja ao mínimo: a aplicação continua lendo notas e gravando imagens, e nada além disso (nem apagar, nem alterar, nem ler ACLs)."},
-  {"id": "tls", "texto": "Barre leituras de notas fiscais sem TLS com uma negação explícita."},
-  {"id": "auditoria", "texto": "Zere os achados de severidade alta na auditoria das três políticas."}
- ]
-}
-</script>
-
-<script>
-(function() {
-    var NV = JSON.parse(document.getElementById("nv-dados").textContent);
-    var CONTA = NV.conta;
-    var politicas = {}, bpa = {}, feitas = {};
-
-    function el(tag, texto, estilo) {
-        var e = document.createElement(tag);
-        if (texto !== undefined && texto !== null) e.textContent = texto;
-        if (estilo) e.setAttribute("style", estilo);
-        return e;
-    }
-    function copia(o) { return JSON.parse(JSON.stringify(o)); }
-    function lista(v) { return Array.isArray(v) ? v : [v]; }
-
-    // ===================================================== avaliador (espelhado nos testes)
-    function curinga(p, v, semCaixa) {
-        var rx = "^" + String(p).split("").map(function(c) { return c === "*" ? "[\\s\\S]*" : c === "?" ? "[\\s\\S]" : c.replace(/[.+^${}()|[\]\\]/g, "\\$&"); }).join("") + "$";
-        return new RegExp(rx, semCaixa ? "i" : "").test(v);
-    }
-    function ipNum(ip) { var p = String(ip).split(".").map(Number); return ((p[0] * 256 + p[1]) * 256 + p[2]) * 256 + p[3]; }
-    function naRede(ip, cidr) {
-        var c = String(cidr).split("/"), bits = c.length > 1 ? Number(c[1]) : 32, tam = Math.pow(2, 32 - bits);
-        var base = Math.floor(ipNum(c[0]) / tam) * tam, n = ipNum(ip);
-        return n >= base && n < base + tam;
-    }
-    function condicaoOk(cond, ctx) {
-        var ops = Object.keys(cond || {});
-        for (var i = 0; i < ops.length; i++) {
-            var op = ops[i], pares = cond[op], chaves = Object.keys(pares);
-            for (var j = 0; j < chaves.length; j++) {
-                var chave = chaves[j], vals = lista(pares[chave]).map(String);
-                var negado = op === "StringNotEquals" || op === "NotIpAddress";
-                if (!Object.prototype.hasOwnProperty.call(ctx, chave)) { if (!negado) return false; continue; }
-                var atual = String(ctx[chave]), ok;
-                if (op === "Bool") ok = vals.map(function(v) { return v.toLowerCase(); }).indexOf(atual.toLowerCase()) !== -1;
-                else if (op === "StringEquals") ok = vals.indexOf(atual) !== -1;
-                else if (op === "StringNotEquals") ok = vals.indexOf(atual) === -1;
-                else if (op === "StringLike") ok = vals.some(function(v) { return curinga(v, atual); });
-                else if (op === "IpAddress" || op === "NotIpAddress") { var dentro = vals.some(function(v) { return naRede(atual, v); }); ok = op === "IpAddress" ? dentro : !dentro; }
-                else return false;
-                if (!ok) return false;
-            }
-        }
-        return true;
-    }
-    function casaAcao(st, a) { return "Action" in st ? lista(st.Action).some(function(x) { return curinga(x, a, true); }) : !lista(st.NotAction).some(function(x) { return curinga(x, a, true); }); }
-    function casaRecurso(st, r) { return "Resource" in st ? lista(st.Resource).some(function(x) { return curinga(x, r); }) : !lista(st.NotResource).some(function(x) { return curinga(x, r); }); }
-    function casaPrincipal(st, quem) {
-        var p = st.Principal;
-        if (p === "*") return true;
-        var alvos = p && typeof p === "object" ? lista(p.AWS || []) : [];
-        return alvos.some(function(a) {
-            if (a === "*") return true;
-            return quem !== "anonimo" && (a === quem || (a === "arn:aws:iam::" + CONTA + ":root" && quem.indexOf("arn:aws:iam::" + CONTA + ":") === 0));
-        });
-    }
-    function publico(st) { var p = st.Principal; return p === "*" || (!!p && typeof p === "object" && lista(p.AWS || []).indexOf("*") !== -1); }
-    function bucketDe(r) { return r.split(":::")[1].split("/")[0]; }
-    window.avaliarRequisicaoNuvem = function(pols, bpas, req) {
-        var ctx = req.contexto, quem = req.principal, cands = [];
-        if (quem !== "anonimo") {
-            var papel = quem.split("/").pop(), nome = "identidade:" + papel;
-            (pols[nome] || { Statement: [] }).Statement.forEach(function(st, i) { cands.push([nome, i, st]); });
-        }
-        var b = bucketDe(req.recurso), nb = "bucket:" + b;
-        (pols[nb] || { Statement: [] }).Statement.forEach(function(st, i) {
-            if (!casaPrincipal(st, quem)) return;
-            if (st.Effect === "Allow" && publico(st) && bpas[b] && quem === "anonimo") return;
-            cands.push([nb, i, st]);
-        });
-        var aplic = cands.filter(function(c) { return casaAcao(c[2], req.acao) && casaRecurso(c[2], req.recurso) && condicaoOk(c[2].Condition, ctx); });
-        var negs = aplic.filter(function(c) { return c[2].Effect === "Deny"; }).map(function(c) { return c[0] + "#" + c[1]; });
-        if (negs.length) return { decisao: "negado_explicito", por: negs };
-        var perms = aplic.filter(function(c) { return c[2].Effect === "Allow"; }).map(function(c) { return c[0] + "#" + c[1]; });
-        if (perms.length) return { decisao: "permitido", por: perms };
-        return { decisao: "negado_implicito", por: [] };
-    };
-    window.auditarPoliticaNuvem = function(nome, pol) {
-        var meta = nome.indexOf("bucket:") === 0 ? (NV.buckets[nome.split(":")[1]] || {}) : {};
-        var achados = [], temTls = false;
-        pol.Statement.forEach(function(st, i) {
-            var acoes = lista(st.Action || []).map(function(a) { return String(a).toLowerCase(); });
-            var tls = st.Condition && st.Condition.Bool && st.Condition.Bool["aws:SecureTransport"];
-            if (st.Effect === "Deny" && (tls === "false" || tls === false)) temTls = true;
-            if (st.Effect !== "Allow") return;
-            if (nome.indexOf("bucket:") === 0 && publico(st) && !st.Condition) {
-                achados.push([i, "publico", meta.publico_intencional && acoes.every(function(a) { return a === "s3:getobject"; }) ? "info" : "alta"]);
-            }
-            if (acoes.indexOf("*") !== -1 || acoes.some(function(a) { return /:\*$/.test(a); })) achados.push([i, "acao_curinga", "alta"]);
-            if ("Resource" in st && lista(st.Resource).indexOf("*") !== -1) achados.push([i, "recurso_curinga", "media"]);
-            if ("NotAction" in st || "NotResource" in st) achados.push([i, "negacao_invertida", "media"]);
-            if (acoes.indexOf("iam:passrole") !== -1 && lista(st.Resource || []).indexOf("*") !== -1) achados.push([i, "passrole_curinga", "alta"]);
-        });
-        if (nome.indexOf("bucket:") === 0 && !temTls) achados.push([null, "sem_tls", "media"]);
-        return achados;
-    };
-    function validar(nome, pol) {
-        if (!pol || typeof pol !== "object" || Array.isArray(pol)) return "A política precisa ser um objeto JSON.";
-        if (pol.Version !== "2012-10-17") return "Use \"Version\": \"2012-10-17\".";
-        if (!Array.isArray(pol.Statement) || !pol.Statement.length) return "Statement precisa ser uma lista com pelo menos uma declaração.";
-        for (var i = 0; i < pol.Statement.length; i++) {
-            var st = pol.Statement[i];
-            if (!st || typeof st !== "object") return "Declaração " + i + " inválida.";
-            if (st.Effect !== "Allow" && st.Effect !== "Deny") return "Declaração " + i + ": Effect deve ser Allow ou Deny.";
-            if (("Action" in st) === ("NotAction" in st)) return "Declaração " + i + ": use Action ou NotAction (um dos dois).";
-            if (("Resource" in st) === ("NotResource" in st)) return "Declaração " + i + ": use Resource ou NotResource (um dos dois).";
-            if (nome.indexOf("bucket:") === 0 && !("Principal" in st)) return "Declaração " + i + ": política de bucket precisa de Principal.";
-            if (nome.indexOf("identidade:") === 0 && "Principal" in st) return "Declaração " + i + ": política de identidade não leva Principal.";
-            var ops = Object.keys(st.Condition || {});
-            var suportados = ["StringEquals", "StringNotEquals", "StringLike", "Bool", "IpAddress", "NotIpAddress"];
-            for (var k = 0; k < ops.length; k++) if (suportados.indexOf(ops[k]) === -1) return "Operador " + ops[k] + " não é suportado neste laboratório (use " + suportados.join(", ") + ").";
-        }
-        return null;
-    }
-
-    // ===================================================== missões
-    function concluir(id) { if (!feitas[id]) { feitas[id] = true; renderizarMissoes(); } }
-    function renderizarMissoes() {
-        var ul = document.getElementById("nv-missoes");
-        ul.replaceChildren();
-        NV.missoes.forEach(function(m) {
-            var li = el("li", (feitas[m.id] ? "✓ " : "○ ") + m.texto, "color: " + (feitas[m.id] ? "var(--tip-color)" : "var(--ink)") + ";");
-            li.setAttribute("data-missao", m.id);
-            li.setAttribute("data-feita", feitas[m.id] ? "sim" : "nao");
-            ul.appendChild(li);
-        });
-    }
-
-    // ===================================================== interface
-    function renderizarBuckets() {
-        var box = document.getElementById("nv-buckets");
-        box.replaceChildren();
-        Object.keys(NV.buckets).forEach(function(b) {
-            var c = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem 0.6rem; min-width: 0;");
-            c.appendChild(el("strong", b, "display: block; font-family: var(--font-mono); font-size: 0.78rem; overflow-wrap: anywhere;"));
-            c.appendChild(el("span", NV.buckets[b].descricao, "display: block; color: var(--muted);"));
-            var l = el("label", null, "display: flex; gap: 0.4rem; align-items: center; margin-top: 0.3rem;");
-            var cb = el("input"); cb.type = "checkbox"; cb.checked = !!bpa[b]; cb.setAttribute("data-bpa", b);
-            cb.addEventListener("change", function() { alternarBpaNuvem(b); });
-            l.appendChild(cb); l.appendChild(el("span", "Block Public Access neste bucket"));
-            c.appendChild(l);
-            box.appendChild(c);
-        });
-    }
-    window.alternarBpaNuvem = function(b) { bpa[b] = !bpa[b]; renderizarBuckets(); renderizarResultados(); };
-    function carregarEditor() {
-        var nome = document.getElementById("nv-politica").value;
-        document.getElementById("nv-json").value = JSON.stringify(politicas[nome], null, 2);
-        document.getElementById("nv-editor-status").replaceChildren();
-    }
-    window.aplicarPoliticaNuvem = function() {
-        var nome = document.getElementById("nv-politica").value, st = document.getElementById("nv-editor-status"), pol;
-        st.replaceChildren();
-        try { pol = JSON.parse(document.getElementById("nv-json").value); }
-        catch (e) { st.appendChild(el("span", "JSON inválido: " + e.message, "color: var(--danger-color);")); st.setAttribute("data-ok", "nao"); return false; }
-        var erro = validar(nome, pol);
-        if (erro) { st.appendChild(el("span", erro, "color: var(--danger-color);")); st.setAttribute("data-ok", "nao"); return false; }
-        politicas[nome] = pol;
-        st.setAttribute("data-ok", "sim");
-        st.appendChild(el("span", "Política aplicada.", "color: var(--tip-color);"));
-        renderizarResultados();
-        return true;
-    };
-    var ROT = { permitido: "Permitido", negado_explicito: "Negado (negação explícita)", negado_implicito: "Negado (negação implícita)" };
-    function renderizarResultados() {
-        var aud = document.getElementById("nv-auditoria");
-        aud.replaceChildren();
-        var altas = 0;
-        Object.keys(NV.nomes).forEach(function(nome) {
-            var ach = window.auditarPoliticaNuvem(nome, politicas[nome]);
-            altas += ach.filter(function(a) { return a[2] === "alta"; }).length;
-            var c = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.4rem 0.55rem; min-width: 0;");
-            c.setAttribute("data-auditoria", nome);
-            c.setAttribute("data-altas", String(ach.filter(function(a) { return a[2] === "alta"; }).length));
-            c.appendChild(el("strong", NV.nomes[nome], "display: block;"));
-            if (!ach.length) c.appendChild(el("span", "Nenhum achado.", "color: var(--tip-color);"));
-            ach.forEach(function(a) {
-                var cor = a[2] === "alta" ? "var(--danger-color)" : a[2] === "media" ? "rgb(202, 138, 4)" : "var(--muted)";
-                c.appendChild(el("div", (a[2] === "alta" ? "Alta" : a[2] === "media" ? "Média" : "Info") + (a[0] === null ? "" : " · declaração " + a[0]) + ": " + NV.regras[a[1]] + (a[2] === "info" ? " (intencional: conteúdo público)" : ""), "color: " + cor + ";"));
-            });
-            aud.appendChild(c);
-        });
-        var box = document.getElementById("nv-requisicoes");
-        box.replaceChildren();
-        var r = {};
-        NV.requisicoes.forEach(function(q) {
-            var res = window.avaliarRequisicaoNuvem(politicas, bpa, q);
-            r[q.id] = res.decisao;
-            var cor = res.decisao === "permitido" ? "var(--tip-color)" : "var(--danger-color)";
-            var c = el("div", null, "border-left: 4px solid " + cor + "; background: var(--sunk); border-radius: var(--radius-sm); padding: 0.4rem 0.6rem; min-width: 0;");
-            c.setAttribute("data-requisicao", q.id);
-            c.setAttribute("data-decisao", res.decisao);
-            c.appendChild(el("strong", q.id + ". " + q.descricao, "display: block;"));
-            c.appendChild(el("div", (q.principal === "anonimo" ? "anônimo" : q.principal) + " · " + q.acao + " · " + q.recurso + " · TLS " + (q.contexto["aws:SecureTransport"] === "true" ? "sim" : "não"), "font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); overflow-wrap: anywhere;"));
-            c.appendChild(el("div", ROT[res.decisao] + (res.por.length ? " — " + res.por.map(function(p) { var n = p.split("#"); var sid = politicas[n[0]].Statement[Number(n[1])].Sid; return NV.nomes[n[0]] + (sid ? " (" + sid + ")" : ", declaração " + n[1]); }).join("; ") : " — nenhuma declaração permite"), "font-weight: 600; color: " + cor + "; overflow-wrap: anywhere;"));
-            box.appendChild(c);
-        });
-        if (r.r1 !== "permitido" && r.r2 === "permitido") concluir("publico");
-        var appAltas = window.auditarPoliticaNuvem("identidade:app-loja", politicas["identidade:app-loja"]).filter(function(a) { return a[2] === "alta"; }).length;
-        if (r.r3 === "permitido" && r.r4 === "permitido" && r.r5 !== "permitido" && r.r7 !== "permitido" && r.r9 !== "permitido" && !appAltas) concluir("minimo");
-        if (r.r6 === "negado_explicito" && r.r3 === "permitido") concluir("tls");
-        if (!altas) concluir("auditoria");
-    }
-
-    window.restaurarNuvem = function() {
-        politicas = copia(NV.politicas); bpa = copia(NV.bpa_inicial); feitas = {};
-        renderizarMissoes(); renderizarBuckets();
-        document.getElementById("nv-politica").value = Object.keys(NV.nomes)[0];
-        carregarEditor(); renderizarResultados();
-        feitas = {}; renderizarMissoes();
-    };
-
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("nv-contexto").textContent = NV.contexto;
-        var sel = document.getElementById("nv-politica");
-        Object.keys(NV.nomes).forEach(function(n) { var o = el("option", NV.nomes[n]); o.value = n; sel.appendChild(o); });
-        sel.addEventListener("change", carregarEditor);
-        document.getElementById("nv-desfazer").addEventListener("click", function() {
-            var n = sel.value; politicas[n] = copia(NV.politicas[n]); carregarEditor(); renderizarResultados();
-        });
-        document.getElementById("nv-sugestao").addEventListener("click", function() {
-            document.getElementById("nv-json").value = JSON.stringify(NV.corrigidas[sel.value], null, 2);
-            var st = document.getElementById("nv-editor-status");
-            st.replaceChildren(el("span", "Solução carregada no editor. Leia, compare com o original e clique em Aplicar.", "color: var(--muted);"));
-        });
-        restaurarNuvem();
-        if (typeof initChecklist === "function") {
-            initChecklist("seguranca-nuvem");
-        }
-        if (typeof initQuiz === "function") {
-            initQuiz();
-        }
-    });
-})();
-</script>
+<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
 </main>
 </div>
 
@@ -2988,7 +2258,6 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3577,17 +2846,6 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -3801,7 +3059,6 @@ aws accessanalyzer validate-policy --policy-type IDENTITY_POLICY --policy-docume
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

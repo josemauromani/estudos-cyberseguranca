@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Backup-Imutavel-e-Recuperacao">
@@ -2120,7 +1736,6 @@ dfn.glossario:focus-visible {
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: O Atacante Procura o Backup Primeiro</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#recuperacao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Credenciais Separadas e Recuperação do Active Directory</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Teste de Sobrevivência do Backup</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Backup Resistente a Ransomware</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2136,14 +1751,14 @@ dfn.glossario:focus-visible {
   <h1>Backup Imutável e Recuperação de Identidade</h1>
   <p class="mhead-sub">Regra 3-2-1-1-0, imutabilidade, air gap e recuperação do Active Directory</p>
   <div class="chips"><span class="chip">⏱ 45 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Recover</span><span class="chip">🎯 ATT&amp;CK T1490 Inhibit System Recovery / T1485 Data Destruction (mitigação)</span><span class="chip">👤 Blue Team &amp; Defesa · GRC &amp; Auditoria · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 45: Backup-Imutavel-e-Recuperacao Body Fragment -->
 <article class="study-container" data-slug="backup-imutavel">
 
     <!-- SEÇÃO 1: O BACKUP COMO ALVO -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: O Atacante Procura o Backup Primeiro</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 5</small></span><h2>Introdução: O Atacante Procura o Backup Primeiro</h2></div>
 
         <p class="lead-text">
             No Estudo 42, o ransomware só virou extorsão porque o backup sumiu antes. Grupos de ransomware passam dias ou semanas na rede com a credencial de Domain Admin (Estudo 39), localizam o servidor de backup, apagam os pontos de restauração e só então criptografam. No Estudo 28, a cópia imutável era uma linha na planilha; aqui ela precisa sobreviver a esse atacante.
@@ -2193,7 +1808,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 2: CREDENCIAIS E RECUPERAÇÃO DO AD -->
     <section class="study-section" id="recuperacao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Credenciais Separadas e Recuperação do Active Directory</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 5</small></span><h2>Credenciais Separadas e Recuperação do Active Directory</h2></div>
 
         <h3>O console fora do domínio</h3>
         <ul>
@@ -2240,44 +1855,10 @@ aws s3api put-object-lock-configuration --bucket ipestore-backup-imutavel \
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 3 de 6</small></span><h2>Laboratório Prático: Teste de Sobrevivência do Backup</h2></div>
-
-        <p class="lead-text">
-            Monte a arquitetura de backup da Ipê Store e solte um atacante com credencial de Domain Admin. O rápido age em 2 dias; o paciente desativa os jobs e espera 21 dias antes de criptografar. Veja o que sobrevive e por quê.
-        </p>
-
-        <div class="lab-box bk-lab" id="bk-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Exercício de Sobrevivência</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Backup da Ipê Store contra um Domain Admin hostil</h3>
-                    <p id="bk-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
-                </div>
-            </div>
-
-            <div class="lab-body">
-                <h4 style="margin-top: 0;">Missões</h4>
-                <ul id="bk-missoes" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.25rem; font-size: 0.85rem;"></ul>
-
-                <h4 style="margin-top: 1.5rem;">1. Arquitetura</h4>
-                <div id="bk-arquitetura" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 0.5rem; font-size: 0.82rem;"></div>
-                <div id="bk-regra" style="display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; font-size: 0.76rem;"></div>
-
-                <h4 style="margin-top: 1.25rem;">2. Ataque</h4>
-                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                    <button class="btn-primary" type="button" data-perfil="rapido" onclick="executarAtaqueBackup('rapido')">Ataque rápido (2 dias)</button>
-                    <button class="btn-primary" type="button" data-perfil="paciente" onclick="executarAtaqueBackup('paciente')">Ataque paciente (21 dias)</button>
-                    <button class="btn-secondary" type="button" onclick="restaurarBackup()">Restaurar laboratório</button>
-                </div>
-                <div id="bk-resultado" aria-live="polite" style="margin-top: 0.6rem; font-size: 0.83rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem;"></div>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist de Backup Resistente a Ransomware</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 3 de 5</small></span><h2>Checklist de Backup Resistente a Ransomware</h2></div>
 
         <p class="lead-text">
             Use esta lista para revisar a arquitetura de backup de uma empresa. O estado das caixas fica salvo no seu navegador.
@@ -2317,7 +1898,7 @@ aws s3api put-object-lock-configuration --bucket ipestore-backup-imutavel \
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 4 de 5</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2394,7 +1975,7 @@ aws s3api put-object-lock-configuration --bucket ipestore-backup-imutavel \
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 5 de 5</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2441,213 +2022,7 @@ aws s3api put-object-lock-configuration --bucket ipestore-backup-imutavel \
 
 </article>
 
-<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
-<script type="application/json" id="bk-dados">
-{
- "contexto": "Arquitetura e ataque simulados, com regras simplificadas. Os controles e as falhas são os que aparecem em incidentes reais de ransomware.",
- "perfis": {"rapido": {"nome": "Ataque rápido", "dias": 2}, "paciente": {"nome": "Ataque paciente", "dias": 21}},
- "copias": {
-  "nas_smb": {"nome": "NAS com compartilhamento SMB (credencial do domínio)", "midia": "disco", "fora": false},
-  "site_remoto": {"nome": "Repositório em outro site (mesmo domínio)", "midia": "disco", "fora": true},
-  "linux_endurecido": {"nome": "Repositório Linux endurecido (imutável)", "midia": "disco", "fora": false},
-  "nuvem_object_lock": {"nome": "Nuvem com object lock", "midia": "objeto", "fora": true},
-  "fita_offline": {"nome": "Fita LTO", "midia": "fita", "fora": true}
- },
- "motivos": {
-  "nas_dominio": "o compartilhamento aceita a credencial do domínio: o atacante apagou tudo.",
-  "remoto_dominio": "o outro site está no mesmo domínio: distância não protege de quem tem a credencial.",
-  "ssh_dominio": "o SSH aceita contas do domínio e deu root ao atacante, que removeu a imutabilidade.",
-  "imutabilidade_expirou": "o atacante parou os jobs e esperou a imutabilidade dos pontos existentes expirar.",
-  "imutavel": "arquivos imutáveis e sem acesso administrativo pelo domínio.",
-  "governance_contornado": "o modo governance foi contornado com a credencial da nuvem guardada no servidor de backup comprometido.",
-  "object_lock": "o object lock impediu a exclusão até o fim da retenção.",
-  "fita_conectada": "a fita estava na biblioteca conectada e foi apagada pelo console de backup.",
-  "air_gap": "a fita estava ejetada e guardada fora: sem conexão, sem ataque."
- },
- "status": {
-  "recuperavel": "Recuperável: há cópia sobrevivente, testada, e o AD pode ser reconstruído.",
-  "nao_testado": "Cópias sobreviveram, mas a restauração nunca foi testada: a recuperação é uma aposta.",
-  "sem_ad": "Cópias sobreviveram, mas sem backup do DC ou sem a senha do DSRM fora do domínio não há como reconstruir o AD.",
-  "perdido": "Nenhuma cópia sobreviveu: resta negociar com o criminoso ou reconstruir do zero."
- },
- "arquitetura_inicial": {"servidor_no_dominio": true, "console_contas": "dominio", "console_mfa": false, "rede_gerencia_isolada": false,
-  "copias": ["nas_smb", "site_remoto", "nuvem_object_lock"], "linux_ssh_dominio": false, "object_lock_modo": "governance", "nuvem_credencial": "no_servidor",
-  "retencao_imutavel_dias": 7, "fita_ejetada": false, "teste_restauracao": false, "backup_dc": true, "dsrm_cofre": false},
- "arquitetura_referencia": {"servidor_no_dominio": false, "console_contas": "locais", "console_mfa": true, "rede_gerencia_isolada": true,
-  "copias": ["linux_endurecido", "nuvem_object_lock", "fita_offline"], "linux_ssh_dominio": false, "object_lock_modo": "compliance", "nuvem_credencial": "conta_separada_mfa",
-  "retencao_imutavel_dias": 30, "fita_ejetada": true, "teste_restauracao": true, "backup_dc": true, "dsrm_cofre": true},
- "missoes": [
-  {"id": "rapido", "texto": "Sobreviva ao ataque rápido com o ambiente recuperável."},
-  {"id": "paciente", "texto": "Sobreviva também ao ataque paciente, que espera a imutabilidade expirar."},
-  {"id": "nuvem", "texto": "Mantenha a cópia na nuvem viva mesmo com o servidor de backup comprometido."},
-  {"id": "regra", "texto": "Cumpra a regra 3-2-1-1-0."}
- ]
-}
-</script>
-
-<script>
-(function() {
-    var BK = JSON.parse(document.getElementById("bk-dados").textContent);
-    var arq = null, feitas = {};
-
-    function el(tag, texto, estilo) {
-        var e = document.createElement(tag);
-        if (texto !== undefined && texto !== null) e.textContent = texto;
-        if (estilo) e.setAttribute("style", estilo);
-        return e;
-    }
-    function copia(o) { return JSON.parse(JSON.stringify(o)); }
-
-    // ===================================================== motor (espelhado nos testes)
-    window.atacarBackup = function(a, perfil) {
-        var dias = BK.perfis[perfil].dias;
-        var alcanca = !a.rede_gerencia_isolada || a.servidor_no_dominio;
-        var console = alcanca && (a.servidor_no_dominio || (a.console_contas === "dominio" && !a.console_mfa));
-        var copias = {};
-        a.copias.forEach(function(c) {
-            if (c === "nas_smb") copias[c] = ["perdida", "nas_dominio"];
-            else if (c === "site_remoto") copias[c] = ["perdida", "remoto_dominio"];
-            else if (c === "linux_endurecido") copias[c] = a.linux_ssh_dominio ? ["perdida", "ssh_dominio"] : a.retencao_imutavel_dias < dias ? ["perdida", "imutabilidade_expirou"] : ["sobrevive", "imutavel"];
-            else if (c === "nuvem_object_lock") {
-                var expostas = a.nuvem_credencial === "no_servidor" && console;
-                copias[c] = a.object_lock_modo === "governance" && expostas ? ["perdida", "governance_contornado"] : a.retencao_imutavel_dias < dias ? ["perdida", "imutabilidade_expirou"] : ["sobrevive", "object_lock"];
-            } else if (c === "fita_offline") copias[c] = !a.fita_ejetada && console ? ["perdida", "fita_conectada"] : ["sobrevive", "air_gap"];
-        });
-        var sobrev = Object.keys(copias).filter(function(c) { return copias[c][0] === "sobrevive"; });
-        var ad = a.backup_dc && a.dsrm_cofre && sobrev.length > 0;
-        var status = !sobrev.length ? "perdido" : !ad ? "sem_ad" : !a.teste_restauracao ? "nao_testado" : "recuperavel";
-        return { console_comprometido: console, copias: copias, status: status };
-    };
-    window.regraBackup = function(a) {
-        var midias = { disco: true };
-        a.copias.forEach(function(c) { midias[BK.copias[c].midia] = true; });
-        return { tres_copias: 1 + a.copias.length >= 3, duas_midias: Object.keys(midias).length >= 2, uma_fora: a.copias.some(function(c) { return BK.copias[c].fora; }),
-            uma_imutavel_offline: a.copias.some(function(c) { return c === "linux_endurecido" || c === "nuvem_object_lock" || (c === "fita_offline" && a.fita_ejetada); }), zero_erros: !!a.teste_restauracao };
-    };
-
-    // ===================================================== missões
-    function concluir(id) { if (!feitas[id]) { feitas[id] = true; renderizarMissoes(); } }
-    function renderizarMissoes() {
-        var ul = document.getElementById("bk-missoes");
-        ul.replaceChildren();
-        BK.missoes.forEach(function(m) {
-            var li = el("li", (feitas[m.id] ? "✓ " : "○ ") + m.texto, "color: " + (feitas[m.id] ? "var(--tip-color)" : "var(--ink)") + ";");
-            li.setAttribute("data-missao", m.id);
-            li.setAttribute("data-feita", feitas[m.id] ? "sim" : "nao");
-            ul.appendChild(li);
-        });
-    }
-
-    // ===================================================== interface
-    function caixa(titulo) { var c = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem 0.6rem; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.3rem;"); c.appendChild(el("strong", titulo)); return c; }
-    function marca(rot, chave, ajuda) {
-        var l = el("label", null, "display: flex; gap: 0.4rem; align-items: flex-start;");
-        var cb = el("input"); cb.type = "checkbox"; cb.checked = !!arq[chave]; cb.setAttribute("data-campo", chave);
-        cb.addEventListener("change", function() { arq[chave] = cb.checked; renderizarArquitetura(); });
-        l.appendChild(cb);
-        var t = el("span"); t.appendChild(el("span", rot)); if (ajuda) t.appendChild(el("span", " " + ajuda, "color: var(--muted); font-size: 0.74rem;"));
-        l.appendChild(t);
-        return l;
-    }
-    function escolha(rot, chave, opcoes, conv) {
-        var l = el("label", null, "display: flex; flex-direction: column; gap: 0.15rem;");
-        l.appendChild(el("span", rot, "color: var(--muted);"));
-        var s = el("select"); s.className = "form-control"; s.setAttribute("data-campo", chave);
-        opcoes.forEach(function(o) { var op = el("option", o[1]); op.value = String(o[0]); s.appendChild(op); });
-        s.value = String(arq[chave]);
-        s.addEventListener("change", function() { arq[chave] = conv ? conv(s.value) : s.value; renderizarArquitetura(); });
-        l.appendChild(s);
-        return l;
-    }
-    function renderizarArquitetura() {
-        var box = document.getElementById("bk-arquitetura");
-        box.replaceChildren();
-        var a = caixa("Servidor e console de backup");
-        a.appendChild(marca("Servidor ingressado no domínio", "servidor_no_dominio"));
-        a.appendChild(escolha("Contas do console", "console_contas", [["dominio", "Contas do domínio"], ["locais", "Contas locais do servidor de backup"]]));
-        a.appendChild(marca("MFA no console", "console_mfa"));
-        a.appendChild(marca("Rede de gerência isolada", "rede_gerencia_isolada", "(o console só é alcançável por ela)"));
-        box.appendChild(a);
-        var b = caixa("Cópias");
-        Object.keys(BK.copias).forEach(function(k) {
-            var l = el("label", null, "display: flex; gap: 0.4rem; align-items: flex-start;");
-            var cb = el("input"); cb.type = "checkbox"; cb.checked = arq.copias.indexOf(k) !== -1; cb.setAttribute("data-copia", k);
-            cb.addEventListener("change", function() { var l2 = arq.copias.filter(function(x) { return x !== k; }); if (cb.checked) l2.push(k); arq.copias = Object.keys(BK.copias).filter(function(x) { return l2.indexOf(x) !== -1; }); renderizarArquitetura(); });
-            l.appendChild(cb); l.appendChild(el("span", BK.copias[k].nome));
-            b.appendChild(l);
-        });
-        b.appendChild(escolha("Retenção imutável", "retencao_imutavel_dias", [[7, "7 dias"], [14, "14 dias"], [30, "30 dias"], [60, "60 dias"]], Number));
-        if (arq.copias.indexOf("linux_endurecido") !== -1) b.appendChild(marca("SSH habilitado com contas do domínio no repositório Linux", "linux_ssh_dominio"));
-        if (arq.copias.indexOf("nuvem_object_lock") !== -1) {
-            b.appendChild(escolha("Modo do object lock", "object_lock_modo", [["governance", "Governance"], ["compliance", "Compliance"]]));
-            b.appendChild(escolha("Credencial da nuvem", "nuvem_credencial", [["no_servidor", "Chave guardada no servidor de backup"], ["conta_separada_mfa", "Conta separada, com MFA"]]));
-        }
-        if (arq.copias.indexOf("fita_offline") !== -1) b.appendChild(marca("Fita ejetada e guardada em cofre externo", "fita_ejetada"));
-        box.appendChild(b);
-        var c = caixa("Recuperação");
-        c.appendChild(marca("Restauração testada sem erros", "teste_restauracao"));
-        c.appendChild(marca("Backup do estado do sistema dos DCs", "backup_dc"));
-        c.appendChild(marca("Senha do DSRM em cofre fora do domínio", "dsrm_cofre"));
-        box.appendChild(c);
-        var r = window.regraBackup(arq), rb = document.getElementById("bk-regra");
-        rb.replaceChildren();
-        var nomes = { tres_copias: "3 cópias", duas_midias: "2 mídias", uma_fora: "1 fora do site", uma_imutavel_offline: "1 imutável ou offline", zero_erros: "0 erros" };
-        Object.keys(nomes).forEach(function(k) { rb.appendChild(el("span", (r[k] ? "✓ " : "✕ ") + nomes[k], "padding: 0.05rem 0.4rem; border-radius: var(--radius-sm); border: 1px solid " + (r[k] ? "var(--tip-color)" : "var(--danger-color)") + ";")); });
-        rb.setAttribute("data-ok", Object.keys(r).every(function(k) { return r[k]; }) ? "sim" : "nao");
-        if (Object.keys(r).every(function(k) { return r[k]; })) concluir("regra");
-        document.getElementById("bk-resultado").replaceChildren(el("p", "Arquitetura alterada: rode o ataque.", "margin: 0; color: var(--muted);"));
-    }
-    window.executarAtaqueBackup = function(perfil) {
-        var r = window.atacarBackup(arq, perfil), p = BK.perfis[perfil], box = document.getElementById("bk-resultado");
-        box.replaceChildren();
-        box.setAttribute("data-perfil", perfil);
-        box.setAttribute("data-status", r.status);
-        var alcanca = !arq.rede_gerencia_isolada || arq.servidor_no_dominio;
-        var passos = ["Dia 0: o atacante tem a credencial de Domain Admin de corp.ipestore.example.",
-            alcanca ? "Ele encontra o servidor de backup na rede." : "O servidor de backup está na rede de gerência isolada: fora do alcance.",
-            r.console_comprometido ? (arq.servidor_no_dominio ? "O servidor está no domínio: ele vira administrador local e controla o software de backup." : "O console aceita contas do domínio sem MFA: ele entra e controla os jobs.") : "O console de backup resiste: contas locais, MFA ou rede isolada.",
-            perfil === "paciente" ? "Ele desativa os jobs e espera " + p.dias + " dias sem ser notado." : "Ele age rápido, em " + p.dias + " dias.",
-            "Dia " + p.dias + ": apaga o que alcança e dispara o ransomware."];
-        var ol = el("ol", null, "margin: 0; padding-left: 1.2rem; font-size: 0.8rem; color: var(--muted);");
-        passos.forEach(function(t) { ol.appendChild(el("li", t)); });
-        box.appendChild(ol);
-        if (!arq.copias.length) box.appendChild(el("p", "Não há nenhuma cópia de backup configurada.", "margin: 0; color: var(--danger-color);"));
-        Object.keys(r.copias).forEach(function(c) {
-            var v = r.copias[c], ok = v[0] === "sobrevive";
-            var d = el("div", null, "border-left: 4px solid " + (ok ? "var(--tip-color)" : "var(--danger-color)") + "; padding: 0.3rem 0.55rem; background: var(--sunk); border-radius: var(--radius-sm);");
-            d.setAttribute("data-copia-resultado", c);
-            d.setAttribute("data-destino", v[0]);
-            d.appendChild(el("strong", BK.copias[c].nome + ": " + (ok ? "sobreviveu" : "perdida"), "color: " + (ok ? "var(--tip-color)" : "var(--danger-color)") + ";"));
-            d.appendChild(el("span", " — " + BK.motivos[v[1]]));
-            box.appendChild(d);
-        });
-        var cor = r.status === "recuperavel" ? "var(--tip-color)" : r.status === "perdido" ? "var(--danger-color)" : "rgb(202, 138, 4)";
-        box.appendChild(el("strong", BK.status[r.status], "color: " + cor + "; margin-top: 0.2rem;"));
-        if (r.status === "recuperavel") concluir(perfil);
-        if (r.console_comprometido && r.copias.nuvem_object_lock && r.copias.nuvem_object_lock[0] === "sobrevive") concluir("nuvem");
-        return r;
-    };
-
-    window.restaurarBackup = function() {
-        arq = copia(BK.arquitetura_inicial); feitas = {};
-        renderizarMissoes(); renderizarArquitetura();
-        feitas = {}; renderizarMissoes();
-        document.getElementById("bk-resultado").replaceChildren(el("p", "Ajuste a arquitetura e rode um dos ataques.", "margin: 0; color: var(--muted);"));
-    };
-    window.estadoBackup = function() { return arq; };
-
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("bk-contexto").textContent = BK.contexto;
-        restaurarBackup();
-        if (typeof initChecklist === "function") {
-            initChecklist("backup-imutavel");
-        }
-        if (typeof initQuiz === "function") {
-            initQuiz();
-        }
-    });
-})();
-</script>
+<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
 </main>
 </div>
 
@@ -2782,7 +2157,6 @@ aws s3api put-object-lock-configuration --bucket ipestore-backup-imutavel \
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3371,17 +2745,6 @@ aws s3api put-object-lock-configuration --bucket ipestore-backup-imutavel \
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -3595,7 +2958,6 @@ aws s3api put-object-lock-configuration --bucket ipestore-backup-imutavel \
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

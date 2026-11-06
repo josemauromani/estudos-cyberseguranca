@@ -128,15 +128,6 @@ class TestCurriculo(unittest.TestCase):
             self.assertNotIn("13 Trilhas", texto, nome)
             self.assertNotIn("13 trilhas", texto, nome)
 
-    def test_readme_contagem_por_nivel_bate_com_os_dados(self):
-        from collections import Counter
-        from index_dados import ESTUDOS_DADOS
-        n = Counter(e["nivel"] for e in ESTUDOS_DADOS.values())
-        esperado = (f"por nível (iniciante {n['iniciante']}, "
-                    f"intermediário {n['intermediario']}, avançado {n['avancado']})")
-        readme = (self.root / "README.md").read_text(encoding="utf-8")
-        self.assertIn(esperado, readme)
-
     def test_rotas_incluem_lideranca(self):
         from index_dados import CERTIFICACOES, ROTAS_PERFIL
         rotas = {r["id"]: r["modulos"] for r in ROTAS_PERFIL}

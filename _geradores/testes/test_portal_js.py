@@ -48,8 +48,8 @@ class TestPortalJs(unittest.TestCase):
 
     def test_status_em_andamento_com_porcentagem(self):
         antes = semear(**{f"cs_read_{SLUG}": json.dumps(SECOES[:3])})
-        self.assertEqual(len(SECOES), 6)
-        self.assertIn("50% lido", self.status(antes))
+        self.assertEqual(len(SECOES), 5)
+        self.assertIn("60% lido", self.status(antes))
 
     def test_status_por_checklist_sem_leitura(self):
         self.assertIn("0% lido", self.status(semear(**{f"cs_check_{SLUG}_chk-th-1": "true"})))
@@ -67,14 +67,14 @@ class TestPortalJs(unittest.TestCase):
         self.assertIn("0% lido", r["saida"])
 
     def test_continuar_estudando(self):
-        antes = semear(cs_last=json.dumps({"slug": SLUG, "secao": "simulador", "ts": 1}))
+        antes = semear(cs_last=json.dumps({"slug": SLUG, "secao": "checklist", "ts": 1}))
         r = self.rodar("const c=document.getElementById('continuar');"
                        "__fim({oculto:c.hidden,texto:c.textContent,href:(c.querySelector('a')||{}).href||''})", antes)
         self.assertEqual(r["erros"], [])
         self.assertFalse(r["saida"]["oculto"])
         self.assertIn(ESTUDOS_DADOS[SLUG]["titulo"], r["saida"]["texto"])
-        self.assertIn("🧪 Laboratório", r["saida"]["texto"])
-        self.assertIn("#simulador", r["saida"]["href"])
+        self.assertIn("Checklist", r["saida"]["texto"])
+        self.assertIn("#checklist", r["saida"]["href"])
 
     def test_sem_cs_last_continuar_oculto(self):
         r = self.rodar("const c=document.getElementById('continuar');__fim({o:c.hidden,t:c.textContent.trim()})")

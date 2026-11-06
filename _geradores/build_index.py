@@ -102,7 +102,6 @@ def calcular_estatisticas(catalogo: Dict[str, dict], dados: Dict[str, dict]) -> 
     """Calcula estatísticas de progresso, minutos e disponibilidade dos módulos."""
     total_estudos = len(dados)
     total_trilhas = len(TRILHAS)
-    total_simuladores = total_estudos
     tempo_total_minutos = sum(d["tempo_minutos"] for d in dados.values())
     horas_totais = round(tempo_total_minutos / 60, 1)
 
@@ -130,7 +129,6 @@ def calcular_estatisticas(catalogo: Dict[str, dict], dados: Dict[str, dict]) -> 
     return {
         "total_estudos": total_estudos,
         "total_trilhas": total_trilhas,
-        "total_simuladores": total_simuladores,
         "tempo_total_minutos": tempo_total_minutos,
         "horas_totais": horas_totais,
         "estudos_disponiveis": estudos_disponiveis,
@@ -169,13 +167,12 @@ def render_necessidades_grid(necessidades: List[dict], status_map: Optional[Dict
 def render_cartao(slug: str, d: dict, status_info: dict) -> str:
     """Cartão de módulo do catálogo (a.mc), com os atributos lidos pelo JS do portal.
 
-    Mostra número, tempo, título, subtítulo, nível, NIST, simulador e o status
+    Mostra número, tempo, título, subtítulo, nível, NIST e o status
     (.mc-status, vazio no HTML e preenchido pelo JS).
     """
     numero = list(ESTUDOS_DADOS).index(slug) + 1
     titulo = escape(d["titulo"])
     subtitulo = escape(d["subtitulo"])
-    simulador = escape(d["simulador_nome"])
     nist = escape(d["nist"], quote=True)
     nivel = d["nivel"]
     perfis = escape("|".join(d["carreiras"]), quote=True)
@@ -183,7 +180,7 @@ def render_cartao(slug: str, d: dict, status_info: dict) -> str:
     certs_str = escape("|".join(c["sigla"] for c in CERTIFICACOES if slug in c["modulos"]), quote=True)
     busca = escape(
         " ".join([
-            slug, d["titulo"], d["subtitulo"], d["pergunta_chave"], d["simulador_nome"],
+            slug, d["titulo"], d["subtitulo"], d["pergunta_chave"],
             d["nist"], " ".join(d["carreiras"]), " ".join(d["fatos"]),
         ]).lower(),
         quote=True,
@@ -212,7 +209,7 @@ def render_cartao(slug: str, d: dict, status_info: dict) -> str:
             <span class="mc-top"><span class="mc-num">Estudo {numero:02d}</span><span class="mc-tempo">⏱ {d['tempo_minutos']} min</span></span>
             <h3 class="mc-titulo">{titulo}</h3>
             <p class="mc-sub">{subtitulo}</p>
-            <span class="mc-tags"><span class="tag tag-nivel">{escape(NIVEIS[nivel])}</span><span class="tag">NIST {escape(d['nist'])}</span><span class="tag lab">🧪 {simulador}</span>{pendente}</span>
+            <span class="mc-tags"><span class="tag tag-nivel">{escape(NIVEIS[nivel])}</span><span class="tag">NIST {escape(d['nist'])}</span>{pendente}</span>
             <span class="mc-status"></span>
           </a>"""
 
@@ -739,7 +736,6 @@ PORTAL_JS = """
   const DADOS = __DADOS_PORTAL__;
   const ROTULOS_TIPO = {
     teoria: '📘 Teoria',
-    laboratorio: '🧪 Laboratório',
     checklist: '☑️ Checklist',
     questoes: '❓ Questões de concurso',
     referencias: '📚 Referências'
@@ -1326,7 +1322,7 @@ def gerar_index_html(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Plataforma de estudos autoinstrucional e prática em cibersegurança com {total} módulos temáticos, {stats["total_trilhas"]} trilhas e simuladores interativos em JavaScript.">
+  <meta name="description" content="Plataforma de estudos autoinstrucional em cibersegurança com {total} módulos temáticos, {stats["total_trilhas"]} trilhas, teoria, checklists e questões de fixação — 100% offline no navegador.">
   <title>Mapa da Cibersegurança — Catálogo e Portal Central</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%233b82f6' d='M32 4 8 14v16c0 15 10 26 24 30 14-4 24-15 24-30V14z'/%3E%3Cpath fill='%23ffffff' d='M28 40 19 31l4-4 5 5 13-13 4 4z'/%3E%3C/svg%3E">
   <style>
@@ -1366,7 +1362,7 @@ def gerar_index_html(
     <section class="view" data-view="catalogo">
       <div class="catalogo" id="secao-catalogo">
         <h1>Catálogo de módulos</h1>
-        <p class="lede">{total} módulos em {stats["total_trilhas"]} trilhas, com teoria, laboratório interativo, checklist e questões de concurso. Os simuladores são em JavaScript e tudo roda offline no seu navegador.</p>
+        <p class="lede">{total} módulos em {stats["total_trilhas"]} trilhas, com teoria, checklist e questões de concurso. Tudo roda offline no seu navegador.</p>
 
         <div id="continuar" class="continuar" hidden></div>
 

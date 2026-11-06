@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Seguranca-de-Bancos-de-Dados">
@@ -2120,7 +1736,6 @@ dfn.glossario:focus-visible {
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: Onde os Dados Realmente Moram</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#controles" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Menor Privilégio, Auditoria e Proteção dos Dados</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Matriz GRANT/REVOKE</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Hardening e Auditoria de Banco de Dados</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Concursos</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2136,14 +1751,14 @@ dfn.glossario:focus-visible {
   <h1>Bancos de Dados Relacionais: SQL, Privilégios e Auditoria</h1>
   <p class="mhead-sub">Modelo relacional, SQL DDL/DML/DCL, menor privilégio, auditoria nativa e proteção de dados em repouso</p>
   <div class="chips"><span class="chip">⏱ 50 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Protect / Detect</span><span class="chip">🎯 ATT&amp;CK T1190 Exploit Public-Facing Application / T1078 Valid Accounts / T1213 Data from Information Repositories</span><span class="chip">👤 Blue Team &amp; Defesa · AppSec &amp; DevSecOps · GRC &amp; Auditoria · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>5 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>5 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 30: Seguranca-de-Bancos-de-Dados Body Fragment -->
 <article class="study-container" data-slug="seguranca-bancos-dados">
 
     <!-- SEÇÃO 1: INTRODUÇÃO -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: Onde os Dados Realmente Moram</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 5</small></span><h2>Introdução: Onde os Dados Realmente Moram</h2></div>
 
         <p class="lead-text">
             Firewall, EDR e WAF protegem o caminho. O alvo final quase sempre é o banco de dados: cadastro de clientes, pagamentos, segredos de aplicação. Em boa parte dos vazamentos, o atacante não quebra o banco; ele usa uma conta que já tinha permissão demais. Este módulo ensina a dar a cada usuário só o que ele precisa, registrar quem fez o quê e proteger os dados mesmo quando alguém chega até eles.
@@ -2171,7 +1786,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 2: CONTROLES -->
     <section class="study-section" id="controles" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Menor Privilégio, Auditoria e Proteção dos Dados</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 5</small></span><h2>Menor Privilégio, Auditoria e Proteção dos Dados</h2></div>
 
         <h3>Roles, GRANT e REVOKE</h3>
         <p>
@@ -2319,63 +1934,10 @@ hostssl    loja   svc_loja  10.0.3.0/24   scram-sha-256</code></pre>
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 3 de 6</small></span><h2>Laboratório Prático: Matriz GRANT/REVOKE</h2></div>
-
-        <p class="lead-text">
-            O banco da loja começa com privilégios demais. Ajuste a matriz clicando nas caixas ou digitando <code>GRANT</code> e <code>REVOKE</code> no console: as duas formas ficam sincronizadas. Depois execute as consultas dos usuários, veja quais são permitidas ou negadas, acompanhe a trilha de auditoria e confira se você chegou ao menor privilégio.
-        </p>
-
-        <div class="lab-box bd-lab" id="bd-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Laboratório de Banco de Dados</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Matriz GRANT/REVOKE</h3>
-                    <p id="bd-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
-                </div>
-            </div>
-
-            <div class="lab-body">
-                <h4 style="margin-top: 0;">Objetivo de menor privilégio</h4>
-                <ul id="bd-objetivo" style="font-size: 0.9rem;"></ul>
-
-                <h4>Matriz de privilégios</h4>
-                <div class="table-responsive">
-                    <table class="data-table" id="bd-matriz">
-                        <thead><tr><th style="padding: 0.4rem 0.5rem;">Role / tabela</th><th style="padding: 0.4rem 0.5rem; text-align: center;"><abbr title="SELECT">SEL</abbr></th><th style="padding: 0.4rem 0.5rem; text-align: center;"><abbr title="INSERT">INS</abbr></th><th style="padding: 0.4rem 0.5rem; text-align: center;"><abbr title="UPDATE">UPD</abbr></th><th style="padding: 0.4rem 0.5rem; text-align: center;"><abbr title="DELETE">DEL</abbr></th></tr></thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-                <label style="display: block; margin: 0.75rem 0; font-size: 0.9rem;"><input type="checkbox" id="bd-mascara"> Mascaramento dinâmico de <code>clientes.cpf</code> (exceto para o role <code>financeiro</code>)</label>
-
-                <h4>Console SQL</h4>
-                <div style="background: #0f172a; color: #e2e8f0; border-radius: 6px; padding: 1rem; font-family: var(--font-mono); font-size: 0.85rem; border: 1px solid #334155;">
-                    <div id="bd-console" style="max-height: 260px; overflow-y: auto; white-space: pre-wrap; line-height: 1.45; margin-bottom: 0.5rem;" aria-live="polite"></div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem; border-top: 1px solid #1e293b; padding-top: 0.5rem;">
-                        <span style="color: #4ade80; font-weight: bold;">loja=#</span>
-                        <input type="text" id="bd-console-input" aria-label="Comando SQL" placeholder="GRANT SELECT ON produtos TO analista_bi;" style="flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: #f8fafc; font-family: inherit; font-size: inherit;">
-                        <button class="btn-primary" type="button" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="executarComandoSQL()">Executar</button>
-                    </div>
-                </div>
-
-                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
-                    <button class="btn-primary" type="button" onclick="executarConsultasBD()">Executar consultas dos usuários</button>
-                    <button class="btn-primary" type="button" onclick="verificarMenorPrivilegio()">Verificar menor privilégio</button>
-                    <button class="btn-secondary" type="button" onclick="restaurarBD()">Restaurar estado inicial</button>
-                </div>
-
-                <div id="bd-verificacao" style="margin-top: 1rem;" aria-live="polite"></div>
-                <div id="bd-resultados" style="margin-top: 1rem;"></div>
-
-                <h4>Trilha de auditoria</h4>
-                <ol id="bd-auditoria" style="font-family: var(--font-mono); font-size: 0.8rem; padding-left: 1.5rem;"></ol>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist de Hardening e Auditoria de Banco de Dados</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 3 de 5</small></span><h2>Checklist de Hardening e Auditoria de Banco de Dados</h2></div>
 
         <p class="lead-text">
             Use esta lista para revisar um banco de produção. O estado das caixas fica salvo no seu navegador.
@@ -2415,7 +1977,7 @@ hostssl    loja   svc_loja  10.0.3.0/24   scram-sha-256</code></pre>
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Concursos</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 4 de 5</small></span><h2>Questões de Fixação e Concursos</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2485,7 +2047,7 @@ hostssl    loja   svc_loja  10.0.3.0/24   scram-sha-256</code></pre>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 5 de 5</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2533,602 +2095,10 @@ hostssl    loja   svc_loja  10.0.3.0/24   scram-sha-256</code></pre>
 
 </article>
 
-<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
-<script type="application/json" id="bd-dados">
-{
- "contexto": "Loja online fictícia. Todos os nomes, CPFs e cartões são inventados para o laboratório.",
- "tabelas": {
-  "clientes": {
-   "colunas": [
-    "id",
-    "nome",
-    "cpf",
-    "email",
-    "cidade"
-   ]
-  },
-  "pedidos": {
-   "colunas": [
-    "id",
-    "cliente_id",
-    "valor",
-    "status"
-   ]
-  },
-  "pagamentos": {
-   "colunas": [
-    "id",
-    "pedido_id",
-    "cartao_final",
-    "valor"
-   ]
-  },
-  "produtos": {
-   "colunas": [
-    "id",
-    "nome",
-    "preco",
-    "estoque"
-   ]
-  }
- },
- "roles": {
-  "atendimento": {
-   "usuario": "maria",
-   "descricao": "Atendimento ao cliente: consulta cadastro e pedidos e corrige dados de contato."
-  },
-  "analista_bi": {
-   "usuario": "joao",
-   "descricao": "Business Intelligence: relatórios agregados de vendas e clientes."
-  },
-  "financeiro": {
-   "usuario": "carla",
-   "descricao": "Financeiro: conciliação e estorno de pagamentos."
-  },
-  "app_loja": {
-   "usuario": "svc_loja",
-   "descricao": "Conta de serviço da aplicação web da loja."
-  }
- },
- "inicial": {
-  "atendimento": {
-   "clientes": [
-    "SELECT",
-    "UPDATE",
-    "DELETE"
-   ],
-   "pedidos": [
-    "SELECT"
-   ],
-   "produtos": [
-    "SELECT"
-   ]
-  },
-  "analista_bi": {
-   "clientes": [
-    "SELECT"
-   ],
-   "pedidos": [
-    "SELECT"
-   ],
-   "pagamentos": [
-    "SELECT"
-   ],
-   "produtos": [
-    "SELECT"
-   ]
-  },
-  "financeiro": {
-   "pedidos": [
-    "SELECT"
-   ],
-   "pagamentos": [
-    "SELECT",
-    "UPDATE"
-   ]
-  },
-  "app_loja": {
-   "clientes": [
-    "SELECT",
-    "INSERT",
-    "UPDATE",
-    "DELETE"
-   ],
-   "pedidos": [
-    "SELECT",
-    "INSERT",
-    "UPDATE",
-    "DELETE"
-   ],
-   "pagamentos": [
-    "SELECT",
-    "INSERT",
-    "UPDATE",
-    "DELETE"
-   ],
-   "produtos": [
-    "SELECT",
-    "INSERT",
-    "UPDATE",
-    "DELETE"
-   ]
-  }
- },
- "alvo": {
-  "atendimento": {
-   "clientes": [
-    "SELECT",
-    "UPDATE"
-   ],
-   "pedidos": [
-    "SELECT"
-   ],
-   "produtos": [
-    "SELECT"
-   ]
-  },
-  "analista_bi": {
-   "clientes": [
-    "SELECT"
-   ],
-   "pedidos": [
-    "SELECT"
-   ],
-   "produtos": [
-    "SELECT"
-   ]
-  },
-  "financeiro": {
-   "clientes": [
-    "SELECT"
-   ],
-   "pedidos": [
-    "SELECT"
-   ],
-   "pagamentos": [
-    "SELECT",
-    "UPDATE"
-   ]
-  },
-  "app_loja": {
-   "clientes": [
-    "SELECT",
-    "INSERT",
-    "UPDATE"
-   ],
-   "pedidos": [
-    "SELECT",
-    "INSERT",
-    "UPDATE"
-   ],
-   "pagamentos": [
-    "INSERT"
-   ],
-   "produtos": [
-    "SELECT",
-    "UPDATE"
-   ]
-  }
- },
- "mascaramento": {
-  "tabela": "clientes",
-  "coluna": "cpf",
-  "excecao": "financeiro"
- },
- "consultas": [
-  {
-   "usuario": "maria",
-   "role": "atendimento",
-   "acao": "SELECT",
-   "tabela": "clientes",
-   "sql": "SELECT nome, email, cpf FROM clientes WHERE id = 1;",
-   "esperado_no_alvo": "permitida",
-   "resultado": [
-    {
-     "nome": "Ana Souza",
-     "email": "ana@exemplo.com",
-     "cpf": "123.456.789-09"
-    }
-   ]
-  },
-  {
-   "usuario": "maria",
-   "role": "atendimento",
-   "acao": "UPDATE",
-   "tabela": "clientes",
-   "sql": "UPDATE clientes SET email = 'ana.souza@exemplo.com' WHERE id = 1;",
-   "esperado_no_alvo": "permitida",
-   "resultado": []
-  },
-  {
-   "usuario": "maria",
-   "role": "atendimento",
-   "acao": "DELETE",
-   "tabela": "clientes",
-   "sql": "DELETE FROM clientes WHERE id = 2;",
-   "esperado_no_alvo": "negada",
-   "resultado": []
-  },
-  {
-   "usuario": "joao",
-   "role": "analista_bi",
-   "acao": "SELECT",
-   "tabela": "clientes",
-   "sql": "SELECT cidade, COUNT(*) FROM clientes GROUP BY cidade;",
-   "esperado_no_alvo": "permitida",
-   "resultado": [
-    {
-     "cidade": "Recife",
-     "count": 1
-    },
-    {
-     "cidade": "Curitiba",
-     "count": 1
-    }
-   ]
-  },
-  {
-   "usuario": "joao",
-   "role": "analista_bi",
-   "acao": "SELECT",
-   "tabela": "pagamentos",
-   "sql": "SELECT cartao_final, valor FROM pagamentos;",
-   "esperado_no_alvo": "negada",
-   "resultado": [
-    {
-     "cartao_final": "4242",
-     "valor": "189.90"
-    },
-    {
-     "cartao_final": "1881",
-     "valor": "54.00"
-    }
-   ]
-  },
-  {
-   "usuario": "joao",
-   "role": "analista_bi",
-   "acao": "SELECT",
-   "tabela": "clientes",
-   "sql": "SELECT nome, cpf FROM clientes;",
-   "esperado_no_alvo": "permitida",
-   "resultado": [
-    {
-     "nome": "Ana Souza",
-     "cpf": "123.456.789-09"
-    },
-    {
-     "nome": "Bruno Lima",
-     "cpf": "987.654.321-00"
-    }
-   ]
-  },
-  {
-   "usuario": "carla",
-   "role": "financeiro",
-   "acao": "UPDATE",
-   "tabela": "pagamentos",
-   "sql": "UPDATE pagamentos SET valor = 0 WHERE id = 7;",
-   "esperado_no_alvo": "permitida",
-   "resultado": []
-  },
-  {
-   "usuario": "carla",
-   "role": "financeiro",
-   "acao": "SELECT",
-   "tabela": "clientes",
-   "sql": "SELECT nome, cpf FROM clientes WHERE id = 1;",
-   "esperado_no_alvo": "permitida",
-   "resultado": [
-    {
-     "nome": "Ana Souza",
-     "cpf": "123.456.789-09"
-    }
-   ]
-  },
-  {
-   "usuario": "svc_loja",
-   "role": "app_loja",
-   "acao": "INSERT",
-   "tabela": "pedidos",
-   "sql": "INSERT INTO pedidos (cliente_id, valor, status) VALUES (1, 189.90, 'pago');",
-   "esperado_no_alvo": "permitida",
-   "resultado": []
-  },
-  {
-   "usuario": "svc_loja",
-   "role": "app_loja",
-   "acao": "DELETE",
-   "tabela": "clientes",
-   "sql": "DELETE FROM clientes;",
-   "esperado_no_alvo": "negada",
-   "resultado": []
-  }
- ]
-}
-</script>
+<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
+
 
 <!-- MOTOR DA MATRIZ GRANT/REVOKE -->
-<script>
-(function() {
-    var BD = JSON.parse(document.getElementById("bd-dados").textContent);
-    var PRIVS = ["SELECT", "INSERT", "UPDATE", "DELETE"];
-    var TABELAS = Object.keys(BD.tabelas);
-    var ROLES = Object.keys(BD.roles);
-    var estado = {};
-    var relogio = 0;
-
-    function el(tag, texto, estilo) {
-        var e = document.createElement(tag);
-        if (texto !== undefined && texto !== null) e.textContent = texto;
-        if (estilo) e.setAttribute("style", estilo);
-        return e;
-    }
-    function tem(pol, role, tabela, priv) {
-        return !!(pol[role] && pol[role][tabela] && pol[role][tabela].indexOf(priv) !== -1);
-    }
-    function copiarPolitica(pol) {
-        var r = {};
-        ROLES.forEach(function(role) {
-            r[role] = {};
-            TABELAS.forEach(function(t) { r[role][t] = PRIVS.filter(function(p) { return tem(pol, role, t, p); }); });
-        });
-        return r;
-    }
-    function definir(role, tabela, priv, ligado) {
-        var lista = estado[role][tabela];
-        var i = lista.indexOf(priv);
-        if (ligado && i === -1) lista.push(priv);
-        if (!ligado && i !== -1) lista.splice(i, 1);
-    }
-
-    function consoleLinha(texto, cor) {
-        var c = document.getElementById("bd-console");
-        c.appendChild(el("div", texto, cor ? "color: " + cor + ";" : null));
-        c.scrollTop = c.scrollHeight;
-    }
-
-    function renderizarObjetivo() {
-        var ul = document.getElementById("bd-objetivo");
-        ul.replaceChildren();
-        ROLES.forEach(function(role) {
-            var partes = TABELAS.filter(function(t) { return BD.alvo[role] && BD.alvo[role][t] && BD.alvo[role][t].length; })
-                .map(function(t) { return t + " (" + BD.alvo[role][t].join(", ") + ")"; });
-            var li = el("li");
-            li.appendChild(el("strong", role + " [" + BD.roles[role].usuario + "]: "));
-            li.appendChild(document.createTextNode(BD.roles[role].descricao + " Precisa de: " + (partes.length ? partes.join("; ") : "nada") + "."));
-            ul.appendChild(li);
-        });
-    }
-
-    function renderizarMatriz() {
-        var tbody = document.querySelector("#bd-matriz tbody");
-        tbody.replaceChildren();
-        ROLES.forEach(function(role) {
-            TABELAS.forEach(function(t) {
-                var tr = el("tr");
-                var nome = el("td", null, "padding: 0.4rem 0.5rem; line-height: 1.3;");
-                nome.appendChild(el("strong", role));
-                nome.appendChild(el("br"));
-                nome.appendChild(el("span", t, "color: var(--muted); font-size: 0.85em;"));
-                tr.appendChild(nome);
-                PRIVS.forEach(function(p) {
-                    var td = el("td", null, "text-align: center; padding: 0.4rem 0.5rem;");
-                    var cb = el("input");
-                    cb.type = "checkbox";
-                    cb.checked = tem(estado, role, t, p);
-                    cb.dataset.role = role;
-                    cb.dataset.tabela = t;
-                    cb.dataset.priv = p;
-                    cb.setAttribute("aria-label", p + " em " + t + " para " + role);
-                    cb.addEventListener("change", function() {
-                        definir(role, t, p, cb.checked);
-                        var sql = cb.checked ? "GRANT " + p + " ON " + t + " TO " + role + ";" : "REVOKE " + p + " ON " + t + " FROM " + role + ";";
-                        consoleLinha("-- gerado pela matriz", "#94a3b8");
-                        consoleLinha("loja=# " + sql, "#4ade80");
-                        consoleLinha(cb.checked ? "GRANT" : "REVOKE");
-                    });
-                    td.appendChild(cb);
-                    tr.appendChild(td);
-                });
-                tbody.appendChild(tr);
-            });
-        });
-    }
-
-    function sincronizarCaixas() {
-        document.querySelectorAll("#bd-matriz input[type=checkbox]").forEach(function(cb) {
-            cb.checked = tem(estado, cb.dataset.role, cb.dataset.tabela, cb.dataset.priv);
-        });
-    }
-
-    function lerPrivilegios(texto) {
-        var bruto = texto.trim().toUpperCase().replace(/\s+/g, " ");
-        if (bruto === "ALL" || bruto === "ALL PRIVILEGES") return {ok: PRIVS.slice()};
-        var lista = bruto.split(",").map(function(s) { return s.trim(); });
-        for (var i = 0; i < lista.length; i++) {
-            if (PRIVS.indexOf(lista[i]) === -1) return {erro: "ERRO: privilégio \"" + lista[i].toLowerCase() + "\" não é suportado neste laboratório (use SELECT, INSERT, UPDATE, DELETE ou ALL)."};
-        }
-        return {ok: lista};
-    }
-    function lerTabelas(texto) {
-        var bruto = texto.trim().replace(/\s+/g, " ");
-        if (/^all tables in schema public$/i.test(bruto)) return {ok: TABELAS.slice()};
-        bruto = bruto.replace(/^table /i, "");
-        var lista = bruto.split(",").map(function(s) { return s.trim().toLowerCase().replace(/^public\./, ""); });
-        for (var i = 0; i < lista.length; i++) {
-            if (TABELAS.indexOf(lista[i]) === -1) return {erro: "ERRO: a relação \"" + lista[i] + "\" não existe."};
-        }
-        return {ok: lista};
-    }
-
-    function mostrarPrivilegios() {
-        consoleLinha("Privilégios de acesso (role: tabela = privilégios)", "#94a3b8");
-        ROLES.forEach(function(role) {
-            TABELAS.forEach(function(t) {
-                var ps = estado[role][t];
-                if (ps.length) consoleLinha("  " + role + ": " + t + " = " + ps.join(", "));
-            });
-        });
-    }
-
-    window.executarComandoSQL = function(textoOpcional) {
-        var input = document.getElementById("bd-console-input");
-        var texto = (typeof textoOpcional === "string" ? textoOpcional : input.value).trim();
-        input.value = "";
-        if (!texto) return "";
-        consoleLinha("loja=# " + texto, "#4ade80");
-        var cmd = texto.replace(/;\s*$/, "").replace(/\s+/g, " ").trim();
-        var resposta;
-        var m;
-        if (/^help$/i.test(cmd)) {
-            resposta = "Comandos: GRANT <privilégios> ON <tabelas> TO <role> | REVOKE <privilégios> ON <tabelas> FROM <role> | \\dp | clear. Tabelas: " + TABELAS.join(", ") + ". Roles: " + ROLES.join(", ") + ".";
-        } else if (/^clear$/i.test(cmd)) {
-            document.getElementById("bd-console").replaceChildren();
-            return "clear";
-        } else if (/^(\\dp|show grants)$/i.test(cmd)) {
-            mostrarPrivilegios();
-            return "\\dp";
-        } else if (/^create role\b/i.test(cmd)) {
-            resposta = "AVISO: neste laboratório os roles já existem: " + ROLES.join(", ") + ".";
-        } else if ((m = cmd.match(/^(grant|revoke) (.+?) on (.+?) (to|from) ([a-z_][a-z0-9_]*)$/i))) {
-            var acao = m[1].toUpperCase();
-            var prep = m[4].toUpperCase();
-            if ((acao === "GRANT" && prep !== "TO") || (acao === "REVOKE" && prep !== "FROM")) {
-                resposta = "ERRO: erro de sintaxe: use GRANT ... TO role ou REVOKE ... FROM role.";
-            } else {
-                var privs = lerPrivilegios(m[2]);
-                var tabs = lerTabelas(m[3]);
-                var role = m[5].toLowerCase();
-                if (privs.erro) resposta = privs.erro;
-                else if (tabs.erro) resposta = tabs.erro;
-                else if (ROLES.indexOf(role) === -1) resposta = "ERRO: o role \"" + role + "\" não existe.";
-                else {
-                    tabs.ok.forEach(function(t) { privs.ok.forEach(function(p) { definir(role, t, p, acao === "GRANT"); }); });
-                    sincronizarCaixas();
-                    resposta = acao;
-                }
-            }
-        } else {
-            resposta = "ERRO: comando não reconhecido neste laboratório. Digite help.";
-        }
-        consoleLinha(resposta, resposta.indexOf("ERRO") === 0 ? "#f87171" : resposta.indexOf("AVISO") === 0 ? "#facc15" : null);
-        return resposta;
-    };
-
-    function mascarar(cpf) { return "***.***.***-" + String(cpf).slice(-2); }
-
-    window.executarConsultasBD = function() {
-        var area = document.getElementById("bd-resultados");
-        area.replaceChildren();
-        var mascara = document.getElementById("bd-mascara").checked;
-        var aud = document.getElementById("bd-auditoria");
-        BD.consultas.forEach(function(q) {
-            var ok = tem(estado, q.role, q.tabela, q.acao);
-            relogio++;
-            var hora = "2026-11-03 10:" + String(relogio % 60).padStart(2, "0") + ":00";
-            aud.appendChild(el("li", hora + " | " + q.usuario + " (" + q.role + ") | " + q.acao + " " + q.tabela + " | " + (ok ? "PERMITIDA" : "NEGADA: permissão negada para a tabela " + q.tabela)));
-
-            var caixa = el("div", null, "border-left: 4px solid " + (ok ? "#059669" : "#DC2626") + "; padding: 0.5rem 0.75rem; margin-bottom: 0.75rem; background: var(--ground);");
-            caixa.appendChild(el("strong", (ok ? "PERMITIDA" : "NEGADA") + " — " + q.usuario + " (" + q.role + ")"));
-            caixa.appendChild(el("code", q.sql, "display: block; margin: 0.25rem 0; white-space: pre-wrap;"));
-            if (ok && q.acao === "SELECT" && q.resultado.length) {
-                var colunas = Object.keys(q.resultado[0]);
-                var tabela = el("table", null, "font-size: 0.8rem; border-collapse: collapse;");
-                var cab = el("tr");
-                colunas.forEach(function(c) { cab.appendChild(el("th", c, "padding: 0.15rem 0.5rem; text-align: left;")); });
-                tabela.appendChild(cab);
-                q.resultado.forEach(function(linha) {
-                    var tr = el("tr");
-                    colunas.forEach(function(c) {
-                        var v = linha[c];
-                        var oculto = mascara && q.tabela === BD.mascaramento.tabela && c === BD.mascaramento.coluna && q.role !== BD.mascaramento.excecao;
-                        tr.appendChild(el("td", oculto ? mascarar(v) : String(v), "padding: 0.15rem 0.5rem;"));
-                    });
-                    tabela.appendChild(tr);
-                });
-                caixa.appendChild(tabela);
-            } else if (ok) {
-                caixa.appendChild(el("span", q.acao === "INSERT" ? "INSERT 0 1" : q.acao + " 1", "font-size: 0.8rem; color: var(--muted);"));
-            }
-            var esperado = q.esperado_no_alvo === (ok ? "permitida" : "negada");
-            caixa.appendChild(el("p", esperado ? "Comportamento igual ao da política de menor privilégio." : "Diferente da política de menor privilégio: o objetivo é " + q.esperado_no_alvo + ".", "margin: 0.25rem 0 0 0; font-size: 0.8rem; color: " + (esperado ? "var(--muted)" : "#DC2626") + ";"));
-            area.appendChild(caixa);
-        });
-    };
-
-    window.verificarMenorPrivilegio = function() {
-        var excesso = [];
-        var falta = [];
-        ROLES.forEach(function(role) {
-            TABELAS.forEach(function(t) {
-                PRIVS.forEach(function(p) {
-                    var atual = tem(estado, role, t, p);
-                    var alvo = tem(BD.alvo, role, t, p);
-                    if (atual && !alvo) excesso.push(p + " em " + t + " para " + role);
-                    if (!atual && alvo) falta.push(p + " em " + t + " para " + role);
-                });
-            });
-        });
-        var area = document.getElementById("bd-verificacao");
-        area.replaceChildren();
-        if (!excesso.length && !falta.length) {
-            area.appendChild(el("p", "Política igual ao objetivo de menor privilégio. Nenhum privilégio em excesso e nenhum faltando.", "font-weight: 700; color: #059669;"));
-            return {excesso: 0, falta: 0};
-        }
-        if (excesso.length) {
-            area.appendChild(el("p", "Privilégios em excesso (" + excesso.length + "):", "font-weight: 700; margin-bottom: 0.25rem;"));
-            var u1 = el("ul");
-            excesso.forEach(function(x) { u1.appendChild(el("li", x)); });
-            area.appendChild(u1);
-        }
-        if (falta.length) {
-            area.appendChild(el("p", "Privilégios faltando (" + falta.length + "):", "font-weight: 700; margin-bottom: 0.25rem;"));
-            var u2 = el("ul");
-            falta.forEach(function(x) { u2.appendChild(el("li", x)); });
-            area.appendChild(u2);
-        }
-        return {excesso: excesso.length, falta: falta.length};
-    };
-
-    window.restaurarBD = function() {
-        estado = copiarPolitica(BD.inicial);
-        relogio = 0;
-        document.getElementById("bd-mascara").checked = false;
-        document.getElementById("bd-console").replaceChildren();
-        document.getElementById("bd-resultados").replaceChildren();
-        document.getElementById("bd-verificacao").replaceChildren();
-        document.getElementById("bd-auditoria").replaceChildren();
-        consoleLinha("Conectado ao banco \"loja\" como administrador. Digite help para ver os comandos.", "#94a3b8");
-        renderizarMatriz();
-    };
-
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("bd-contexto").textContent = BD.contexto;
-        renderizarObjetivo();
-        restaurarBD();
-        document.getElementById("bd-console-input").addEventListener("keydown", function(e) {
-            if (e.key === "Enter") executarComandoSQL();
-        });
-        document.getElementById("bd-mascara").addEventListener("change", function(e) {
-            if (e.target.checked) {
-                consoleLinha("-- equivalente no SQL Server (Dynamic Data Masking):", "#94a3b8");
-                consoleLinha("ALTER TABLE clientes ALTER COLUMN cpf ADD MASKED WITH (FUNCTION = 'partial(0,\"***.***.***-\",2)');", "#4ade80");
-                consoleLinha("GRANT UNMASK TO financeiro;", "#4ade80");
-                consoleLinha("-- no PostgreSQL: view com o CPF mascarado ou a extensão PostgreSQL Anonymizer", "#94a3b8");
-            } else {
-                consoleLinha("-- mascaramento desativado", "#94a3b8");
-            }
-        });
-        if (typeof initChecklist === "function") {
-            initChecklist("seguranca-bancos-dados");
-        }
-        if (typeof initQuiz === "function") {
-            initQuiz();
-        }
-    });
-})();
-</script>
 </main>
 </div>
 
@@ -3263,7 +2233,6 @@ hostssl    loja   svc_loja  10.0.3.0/24   scram-sha-256</code></pre>
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3852,17 +2821,6 @@ hostssl    loja   svc_loja  10.0.3.0/24   scram-sha-256</code></pre>
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -4076,7 +3034,6 @@ hostssl    loja   svc_loja  10.0.3.0/24   scram-sha-256</code></pre>
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

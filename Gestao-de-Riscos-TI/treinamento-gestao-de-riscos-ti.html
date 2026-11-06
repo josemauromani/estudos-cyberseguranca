@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Gestao-de-Riscos-TI">
@@ -2122,7 +1738,6 @@ dfn.glossario:focus-visible {
     <li><a class="toc-item" href="#processo" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">ISO 31000, Matriz 5×5 e Cálculo Financeiro</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#iso-27005" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">ISO/IEC 27005:2022: Risco de Segurança da Informação</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#excecoes" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Gestão de Exceções de Segurança</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Calculadora de Matriz 5×5 e Risco Financeiro</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist do Processo de Gestão de Riscos</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Concursos</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2138,14 +1753,14 @@ dfn.glossario:focus-visible {
   <h1>ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)</h1>
   <p class="mhead-sub">Processo da ISO 31000:2018, metodologias de análise de risco, matrizes 5x5, cálculo financeiro de perdas e justificativa de ROI</p>
   <div class="chips"><span class="chip">⏱ 45 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Govern / Identify</span><span class="chip">🎯 ATT&amp;CK Governança Corporativa</span><span class="chip">👤 GRC &amp; Auditoria · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>4 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>8 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>8 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>4 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>8 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>8 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 25: Gestao-de-Riscos-TI Body Fragment -->
 <article class="study-container" data-slug="gestao-riscos-ti">
 
     <!-- SEÇÃO 1: INTRODUÇÃO -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 8</small></span><h2>Introdução: Risco Precisa Caber numa Decisão</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 7</small></span><h2>Introdução: Risco Precisa Caber numa Decisão</h2></div>
 
         <p class="lead-text">
             A diretoria não aprova "mais segurança". Ela aprova uma troca: gastar R$ 420 mil por ano para que um ransomware deixe de custar, em média, R$ 3 milhões por ano. Gestão de riscos é o processo que transforma ameaças técnicas nessa troca, com premissas que alguém pode questionar e revisar. Neste estudo você vai conduzir o processo da ISO 31000:2018, posicionar riscos numa matriz 5×5, calcular a perda esperada em reais e escolher o tratamento com melhor retorno, tudo para a <strong>Ipê Store</strong>, uma loja online fictícia que processa pagamentos com cartão.
@@ -2185,7 +1800,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 2: PROCESSO E ANÁLISE -->
     <section class="study-section" id="processo" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 8</small></span><h2>ISO 31000, Matriz 5×5 e Cálculo Financeiro</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 7</small></span><h2>ISO 31000, Matriz 5×5 e Cálculo Financeiro</h2></div>
 
         <h3>ISO 31000:2018: Princípios, Estrutura e Processo</h3>
         <p>
@@ -2357,7 +1972,7 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
 
     <!-- SEÇÃO: ISO/IEC 27005:2022 -->
     <section class="study-section" id="iso-27005" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 8</small></span><h2>ISO/IEC 27005:2022: Risco de Segurança da Informação</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 7</small></span><h2>ISO/IEC 27005:2022: Risco de Segurança da Informação</h2></div>
 
         <p class="lead-text">
             A ISO 31000 diz como gerir qualquer risco; a ISO/IEC 27001 exige que a organização avalie e trate os riscos de segurança da informação. A <strong>ISO/IEC 27005:2022</strong> é o elo entre as duas: orienta como conduzir esse processo, sem impor uma metodologia única.
@@ -2413,7 +2028,7 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
     </section>
 
     <section class="study-section" id="excecoes" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 8</small></span><h2>Gestão de Exceções de Segurança</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 7</small></span><h2>Gestão de Exceções de Segurança</h2></div>
 
         <p class="lead-text">
             Nem todo requisito ou controle pode ser cumprido no prazo: um sistema legado não suporta o algoritmo exigido, uma migração atrasa, um fornecedor não entrega o patch. Uma <strong>exceção de segurança</strong> é a <strong>aceitação formal e temporária de um risco</strong> quando um controle ou requisito não pode ser atendido agora. É a aceitação de risco (a quarta estratégia de tratamento) com dono, motivo e data para acabar.
@@ -2468,84 +2083,10 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 5 de 8</small></span><h2>Laboratório Prático: Calculadora de Matriz 5×5 e Risco Financeiro</h2></div>
-
-        <p class="lead-text">
-            Escolha um dos seis cenários da Ipê Store. Clique na célula da matriz onde você acha que o risco está e compare com o que os números dizem. Ajuste AV, EF e ARO, escolha um tratamento e acompanhe o registro de riscos: o plano precisa caber no orçamento anual e deixar cada risco residual dentro do apetite.
-        </p>
-
-        <div class="lab-box risco-lab" id="risco-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Laboratório de Gestão de Riscos</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Registro de Riscos da Ipê Store</h3>
-                    <p id="risco-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
-                </div>
-            </div>
-
-            <div class="lab-body">
-                <h4 style="margin-top: 0;">1. Cenário</h4>
-                <div id="risco-cenarios" role="group" aria-label="Cenários de risco" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
-                <dl id="risco-ficha" style="font-size: 0.9rem; margin: 1rem 0; display: grid; grid-template-columns: minmax(0, max-content) minmax(0, 1fr); gap: 0.25rem 0.75rem;"></dl>
-
-                <h4>2. Matriz qualitativa 5×5</h4>
-                <p style="font-size: 0.85rem; color: var(--muted); margin-top: 0;">Clique numa célula para registrar a sua estimativa (V). I = risco inerente pelos números; R = risco residual do tratamento escolhido.</p>
-                <div class="table-responsive">
-                    <table id="risco-matriz" style="border-collapse: collapse; margin: 0 auto; font-size: 0.8rem;">
-                        <caption style="caption-side: bottom; font-size: 0.8rem; color: var(--muted); padding-top: 0.4rem; text-align: left;">Linhas: probabilidade (1 Rara, 2 Improvável, 3 Possível, 4 Provável, 5 Quase certa). Colunas: impacto (1 Insignificante, 2 Menor, 3 Moderado, 4 Maior, 5 Catastrófico).</caption>
-                        <tbody></tbody>
-                    </table>
-                </div>
-                <div id="risco-matriz-feedback" style="margin: 0.75rem 0 1.5rem 0; font-size: 0.9rem;" aria-live="polite"></div>
-
-                <h4>3. Análise quantitativa e tratamento</h4>
-                <div id="risco-quantitativo">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem;">
-                        <label style="display: flex; flex-direction: column; font-size: 0.85rem; gap: 0.25rem;">Valor do Ativo (AV, R$)
-                            <input class="form-control" type="text" inputmode="decimal" id="risco-av">
-                        </label>
-                        <label style="display: flex; flex-direction: column; font-size: 0.85rem; gap: 0.25rem;">Fator de Exposição (EF, %)
-                            <input class="form-control" type="text" inputmode="decimal" id="risco-ef">
-                        </label>
-                        <label style="display: flex; flex-direction: column; font-size: 0.85rem; gap: 0.25rem;">Ocorrências por ano (ARO)
-                            <input class="form-control" type="text" inputmode="decimal" id="risco-aro">
-                        </label>
-                    </div>
-                    <div id="risco-erro" style="color: var(--danger-color); font-size: 0.85rem; margin-top: 0.4rem;" aria-live="polite"></div>
-                    <ul id="risco-calculo" style="font-family: var(--font-mono); font-size: 0.85rem; padding-left: 1.25rem;"></ul>
-
-                    <div class="table-responsive">
-                        <table class="data-table" id="risco-opcoes" style="font-size: 0.85rem;">
-                            <thead><tr><th>Escolha</th><th>Opção</th><th>Custo anual</th><th>ALE depois</th><th>Benefício líquido</th><th>ROSI</th><th>Residual</th></tr></thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                    <div id="risco-recomendacao" style="margin: 0.75rem 0 1.5rem 0; font-size: 0.9rem;" aria-live="polite"></div>
-                </div>
-
-                <h4>4. Registro de riscos e orçamento</h4>
-                <div class="table-responsive">
-                    <table class="data-table" id="risco-registro" style="font-size: 0.85rem;">
-                        <thead><tr><th>Cenário</th><th>Inerente</th><th>Tratamento</th><th>Custo anual</th><th>ALE antes</th><th>ALE residual</th><th>Residual</th></tr></thead>
-                        <tbody></tbody>
-                        <tfoot></tfoot>
-                    </table>
-                </div>
-                <div id="risco-orcamento" style="margin-top: 0.75rem; font-size: 0.9rem;"></div>
-
-                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
-                    <button class="btn-primary" type="button" onclick="verificarPlanoRisco()">Verificar plano de tratamento</button>
-                    <button class="btn-secondary" type="button" onclick="restaurarRisco()">Restaurar valores iniciais</button>
-                </div>
-                <div id="risco-verificacao" style="margin-top: 1rem; font-size: 0.9rem;" aria-live="polite"></div>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 6 de 8</small></span><h2>Checklist do Processo de Gestão de Riscos</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 5 de 7</small></span><h2>Checklist do Processo de Gestão de Riscos</h2></div>
 
         <p class="lead-text">
             Use esta lista para revisar o processo de riscos de uma organização ou preparar uma auditoria da ISO/IEC 27001. O estado das caixas fica salvo no seu navegador.
@@ -2589,7 +2130,7 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 7 de 8</small></span><h2>Questões de Fixação e Concursos</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 6 de 7</small></span><h2>Questões de Fixação e Concursos</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2698,7 +2239,7 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 8 de 8</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 7 de 7</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2754,518 +2295,7 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
 
 </article>
 
-<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
-<script type="application/json" id="risco-dados">
-{
- "empresa": "Ipê Store",
- "contexto": "Loja online fictícia que processa pagamentos com cartão. Valores inventados para o laboratório, em reais por ano.",
- "orcamento_anual": 1100000,
- "apetite": 9,
- "escala_probabilidade": [
-  {"nivel": 1, "rotulo": "Rara", "min": 0},
-  {"nivel": 2, "rotulo": "Improvável", "min": 0.1},
-  {"nivel": 3, "rotulo": "Possível", "min": 0.25},
-  {"nivel": 4, "rotulo": "Provável", "min": 0.5},
-  {"nivel": 5, "rotulo": "Quase certa", "min": 1}
- ],
- "escala_impacto": [
-  {"nivel": 1, "rotulo": "Insignificante", "min": 0},
-  {"nivel": 2, "rotulo": "Menor", "min": 50000},
-  {"nivel": 3, "rotulo": "Moderado", "min": 200000},
-  {"nivel": 4, "rotulo": "Maior", "min": 1000000},
-  {"nivel": 5, "rotulo": "Catastrófico", "min": 5000000}
- ],
- "faixas": [
-  {"nome": "Baixo", "min": 1, "max": 4, "cor": "rgba(22, 163, 74, 0.28)"},
-  {"nome": "Médio", "min": 5, "max": 9, "cor": "rgba(202, 138, 4, 0.30)"},
-  {"nome": "Alto", "min": 10, "max": 15, "cor": "rgba(234, 88, 12, 0.32)"},
-  {"nome": "Crítico", "min": 16, "max": 25, "cor": "rgba(220, 38, 38, 0.38)"}
- ],
- "cenarios": [
-  {
-   "id": "vazamento-cartoes",
-   "titulo": "Vazamento de cartões",
-   "ativo": "Dados de pagamento armazenados pelo checkout",
-   "ameaca": "Grupo criminoso que revende cartões",
-   "vulnerabilidade": "SQL injection no checkout e número do cartão guardado no banco",
-   "composicao_av": "Multas das bandeiras, investigação forense, chargebacks, notificação à ANPD e clientes perdidos",
-   "av": 12000000,
-   "ef": 0.6,
-   "aro": 0.25,
-   "recomendado": "tokenizacao",
-   "controles": [
-    {"id": "tokenizacao", "nome": "Tokenização no gateway: a loja deixa de guardar o cartão", "tratamento": "evitar", "custo_anual": 180000, "ef": 0.05, "aro": 0.25},
-    {"id": "waf-revisao", "nome": "WAF e revisão de código do checkout", "tratamento": "mitigar", "custo_anual": 240000, "ef": 0.6, "aro": 0.1},
-    {"id": "seguro-vazamento", "nome": "Seguro cibernético com cobertura de vazamento", "tratamento": "transferir", "custo_anual": 300000, "ef": 0.15, "aro": 0.25}
-   ]
-  },
-  {
-   "id": "ransomware-erp",
-   "titulo": "Ransomware no ERP",
-   "ativo": "ERP de pedidos, estoque e faturamento",
-   "ameaca": "Afiliado de ransomware como serviço",
-   "vulnerabilidade": "VPN sem MFA e backups acessíveis pelo domínio",
-   "composicao_av": "Pedidos parados, recuperação dos sistemas, horas extras, multas contratuais e extorsão por vazamento",
-   "av": 8000000,
-   "ef": 0.75,
-   "aro": 0.5,
-   "recomendado": "edr-backup",
-   "controles": [
-    {"id": "edr-backup", "nome": "EDR com resposta 24x7, MFA na VPN e backup imutável testado", "tratamento": "mitigar", "custo_anual": 420000, "ef": 0.25, "aro": 0.2},
-    {"id": "backup-imutavel", "nome": "Somente backup imutável testado", "tratamento": "mitigar", "custo_anual": 120000, "ef": 0.35, "aro": 0.5},
-    {"id": "seguro-ransomware", "nome": "Seguro cibernético com cobertura de interrupção", "tratamento": "transferir", "custo_anual": 350000, "ef": 0.3, "aro": 0.5}
-   ]
-  },
-  {
-   "id": "ddos-black-friday",
-   "titulo": "DDoS na Black Friday",
-   "ativo": "Site e API de vendas no pico do ano",
-   "ameaca": "Extorsionista com botnet de aluguel",
-   "vulnerabilidade": "Origem exposta e sem proteção volumétrica",
-   "composicao_av": "Faturamento de 24 horas da Black Friday",
-   "av": 3000000,
-   "ef": 0.4,
-   "aro": 0.5,
-   "recomendado": "cdn-anti-ddos",
-   "controles": [
-    {"id": "cdn-anti-ddos", "nome": "CDN com mitigação de DDoS e origem oculta", "tratamento": "mitigar", "custo_anual": 150000, "ef": 0.05, "aro": 0.5},
-    {"id": "datacenter-proprio", "nome": "Segundo data center próprio com links redundantes", "tratamento": "mitigar", "custo_anual": 600000, "ef": 0.2, "aro": 0.5}
-   ]
-  },
-  {
-   "id": "fraude-api",
-   "titulo": "Fraude na API de pagamento",
-   "ativo": "API de checkout e contas de clientes",
-   "ameaca": "Fraudadores com listas de senhas vazadas",
-   "vulnerabilidade": "Login sem limite de tentativas e sem MFA",
-   "composicao_av": "Chargebacks e taxas de uma campanha de fraude",
-   "av": 400000,
-   "ef": 0.5,
-   "aro": 4,
-   "recomendado": "garantia-chargeback",
-   "controles": [
-    {"id": "rate-limit-mfa", "nome": "Limite de tentativas, MFA no login e regras antifraude próprias", "tratamento": "mitigar", "custo_anual": 200000, "ef": 0.2, "aro": 2},
-    {"id": "garantia-chargeback", "nome": "Antifraude com garantia de chargeback", "tratamento": "transferir", "custo_anual": 260000, "ef": 0.05, "aro": 4}
-   ]
-  },
-  {
-   "id": "bec-financeiro",
-   "titulo": "BEC no financeiro",
-   "ativo": "Pagamentos a fornecedores",
-   "ameaca": "Golpista que se passa por fornecedor (Business Email Compromise)",
-   "vulnerabilidade": "Troca de conta bancária aceita por e-mail",
-   "composicao_av": "Lote mensal de pagamentos a fornecedores desviado",
-   "av": 1500000,
-   "ef": 0.6,
-   "aro": 0.3,
-   "recomendado": "callback-dmarc",
-   "controles": [
-    {"id": "callback-dmarc", "nome": "Confirmação por telefone de troca de conta e DMARC em p=reject", "tratamento": "mitigar", "custo_anual": 30000, "ef": 0.6, "aro": 0.05},
-    {"id": "seguro-crime", "nome": "Seguro contra crime cibernético", "tratamento": "transferir", "custo_anual": 90000, "ef": 0.15, "aro": 0.3}
-   ]
-  },
-  {
-   "id": "queda-gateway",
-   "titulo": "Queda do gateway de pagamento",
-   "ativo": "Integração com o gateway de pagamento",
-   "ameaca": "Indisponibilidade do fornecedor",
-   "vulnerabilidade": "Um único gateway contratado",
-   "composicao_av": "Vendas de 4 horas de checkout fora do ar",
-   "av": 250000,
-   "ef": 0.4,
-   "aro": 0.5,
-   "recomendado": "aceitar",
-   "controles": [
-    {"id": "segundo-gateway", "nome": "Segundo gateway com troca automática", "tratamento": "mitigar", "custo_anual": 120000, "ef": 0.1, "aro": 0.5},
-    {"id": "sla-credito", "nome": "SLA com crédito contratual por indisponibilidade", "tratamento": "transferir", "custo_anual": 20000, "ef": 0.3, "aro": 0.5}
-   ]
-  }
- ]
-}
-</script>
-
-<script>
-(function() {
-    var RISCO = JSON.parse(document.getElementById("risco-dados").textContent);
-    var BRL = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
-    var NUM = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
-    var ROTULO_TRATAMENTO = { mitigar: "Mitigar", transferir: "Transferir", evitar: "Evitar", aceitar: "Aceitar" };
-    var estado = {};
-    var atual = null;
-
-    function el(tag, texto, estilo) {
-        var e = document.createElement(tag);
-        if (texto !== undefined && texto !== null) e.textContent = texto;
-        if (estilo) e.setAttribute("style", estilo);
-        return e;
-    }
-    function nivel(escala, valor) {
-        var n = 0;
-        escala.forEach(function(item) { if (valor >= item.min) n = item.nivel; });
-        return n;
-    }
-    function faixa(pontuacao) {
-        for (var i = 0; i < RISCO.faixas.length; i++) {
-            var f = RISCO.faixas[i];
-            if (pontuacao >= f.min && pontuacao <= f.max) return f;
-        }
-        return RISCO.faixas[0];
-    }
-    function rotuloNivel(p, i) {
-        var s = p * i;
-        return s + " (" + faixa(s).nome + ")";
-    }
-    function cenario(id) {
-        return RISCO.cenarios.filter(function(c) { return c.id === id; })[0];
-    }
-    function pct(x) {
-        return Math.round(x * 100) + "%";
-    }
-
-    // Calcula o cenário com os valores atuais. Um controle nunca piora o cenário:
-    // usa o menor EF e o menor ARO entre o controle e os valores digitados.
-    function avaliar(c) {
-        var s = estado[c.id];
-        var sle = s.av * s.ef;
-        var ale = sle * s.aro;
-        var r = {
-            sle: sle, ale: ale,
-            p: nivel(RISCO.escala_probabilidade, s.aro),
-            i: nivel(RISCO.escala_impacto, sle),
-            opcoes: [], melhor: null
-        };
-        c.controles.forEach(function(ctl) {
-            var ef = Math.min(ctl.ef, s.ef);
-            var aro = Math.min(ctl.aro, s.aro);
-            var sleR = s.av * ef;
-            var aleR = sleR * aro;
-            var beneficio = ale - aleR - ctl.custo_anual;
-            r.opcoes.push({
-                id: ctl.id, nome: ctl.nome, tratamento: ctl.tratamento, custo: ctl.custo_anual,
-                ale: aleR, beneficio: beneficio, rosi: beneficio / ctl.custo_anual,
-                p: nivel(RISCO.escala_probabilidade, aro), i: nivel(RISCO.escala_impacto, sleR)
-            });
-        });
-        r.opcoes.forEach(function(o) {
-            if (o.beneficio > 0 && (!r.melhor || o.beneficio > r.melhor.beneficio)) r.melhor = o;
-        });
-        r.aceitar = { id: "aceitar", nome: "Aceitar o risco (sem novo controle)", tratamento: "aceitar", custo: 0,
-                      ale: ale, beneficio: 0, rosi: null, p: r.p, i: r.i };
-        return r;
-    }
-    function escolhido(c, r) {
-        var id = estado[c.id].controle;
-        if (id === "aceitar") return r.aceitar;
-        return r.opcoes.filter(function(o) { return o.id === id; })[0] || r.aceitar;
-    }
-
-    function celulaCor(td, pontuacao) {
-        td.style.background = faixa(pontuacao).cor;
-    }
-
-    function renderizarCenarios() {
-        var box = document.getElementById("risco-cenarios");
-        box.replaceChildren();
-        RISCO.cenarios.forEach(function(c) {
-            var b = el("button", c.titulo);
-            b.type = "button";
-            b.className = c.id === atual ? "btn-primary" : "btn-secondary";
-            b.setAttribute("aria-pressed", c.id === atual ? "true" : "false");
-            b.style.fontSize = "0.85rem";
-            b.addEventListener("click", function() { selecionarCenarioRisco(c.id); });
-            box.appendChild(b);
-        });
-    }
-
-    function renderizarFicha(c) {
-        var dl = document.getElementById("risco-ficha");
-        dl.replaceChildren();
-        [["Ativo", c.ativo], ["Ameaça", c.ameaca], ["Vulnerabilidade", c.vulnerabilidade], ["O que compõe o AV", c.composicao_av]]
-            .forEach(function(par) {
-                dl.appendChild(el("dt", par[0], "font-weight: 600;"));
-                dl.appendChild(el("dd", par[1], "margin: 0;"));
-            });
-    }
-
-    function renderizarMatriz(c, r) {
-        var s = estado[c.id];
-        var esc = escolhido(c, r);
-        var tbody = document.querySelector("#risco-matriz tbody");
-        tbody.replaceChildren();
-        for (var p = 5; p >= 1; p--) {
-            var tr = el("tr");
-            var thP = el("th", String(p), "text-align: center; padding: 0.25rem 0.5rem; font-weight: 600;");
-            thP.setAttribute("scope", "row");
-            thP.title = "Probabilidade " + p + ": " + RISCO.escala_probabilidade[p - 1].rotulo;
-            tr.appendChild(thP);
-            for (var i = 1; i <= 5; i++) {
-                var td = el("td", null, "padding: 0; border: 1px solid var(--rule);");
-                celulaCor(td, p * i);
-                var marcas = [];
-                if (p === r.p && i === r.i) marcas.push("I");
-                if (esc.id !== "aceitar" && p === esc.p && i === esc.i) marcas.push("R");
-                if (s.estimativa && p === s.estimativa.p && i === s.estimativa.i) marcas.push("V");
-                var b = el("button", marcas.length ? marcas.join(" ") : String(p * i),
-                    "width: min(3rem, 12vw); height: 2.6rem; border: none; background: transparent; color: var(--ink); cursor: pointer; font-family: var(--font-mono); " +
-                    (marcas.length ? "font-weight: 700; font-size: 0.9rem;" : "font-size: 0.75rem; opacity: 0.7;"));
-                b.type = "button";
-                b.setAttribute("aria-label", "Probabilidade " + p + ", impacto " + i + ", pontuação " + rotuloNivel(p, i) +
-                    (marcas.length ? ", marcas: " + marcas.join(", ") : ""));
-                (function(pp, ii) {
-                    b.addEventListener("click", function() { estimarRisco(pp, ii); });
-                })(p, i);
-                td.appendChild(b);
-                tr.appendChild(td);
-            }
-            tbody.appendChild(tr);
-        }
-        var trI = el("tr");
-        trI.appendChild(el("th", ""));
-        for (var j = 1; j <= 5; j++) {
-            var thI = el("th", String(j), "font-weight: 600; padding: 0.25rem 0; text-align: center;");
-            thI.setAttribute("scope", "col");
-            thI.title = "Impacto " + j + ": " + RISCO.escala_impacto[j - 1].rotulo;
-            trI.appendChild(thI);
-        }
-        tbody.appendChild(trI);
-
-        var fb = document.getElementById("risco-matriz-feedback");
-        fb.replaceChildren();
-        if (!s.estimativa) {
-            fb.appendChild(el("span", "Onde você posiciona este risco? Clique numa célula antes de olhar os números.", "color: var(--muted);"));
-            return;
-        }
-        var pe = s.estimativa.p, ie = s.estimativa.i;
-        var fe = faixa(pe * ie).nome, fq = faixa(r.p * r.i).nome;
-        var msg;
-        if (pe === r.p && ie === r.i) {
-            msg = "Sua estimativa coincide com a análise quantitativa: " + rotuloNivel(r.p, r.i) + ".";
-        } else if (fe === fq) {
-            msg = "Você estimou " + rotuloNivel(pe, ie) + "; os números indicam " + rotuloNivel(r.p, r.i) +
-                ". A célula difere, mas a faixa e a decisão são as mesmas.";
-        } else {
-            msg = "Você estimou " + rotuloNivel(pe, ie) + "; os números indicam " + rotuloNivel(r.p, r.i) +
-                ". Faixas diferentes levam a decisões diferentes: revise as premissas ou a leitura da escala.";
-        }
-        fb.appendChild(el("span", msg));
-    }
-
-    function renderizarQuantitativo(c, r) {
-        var s = estado[c.id];
-        var esc = escolhido(c, r);
-        var ul = document.getElementById("risco-calculo");
-        ul.replaceChildren();
-        ul.appendChild(el("li", "SLE = AV × EF = " + BRL.format(s.av) + " × " + NUM.format(s.ef * 100) + "% = " + BRL.format(r.sle)));
-        ul.appendChild(el("li", "ALE = SLE × ARO = " + BRL.format(r.sle) + " × " + NUM.format(s.aro) + " = " + BRL.format(r.ale) + " por ano"));
-        ul.appendChild(el("li", "Probabilidade " + r.p + " × impacto " + r.i + " = risco inerente " + rotuloNivel(r.p, r.i)));
-
-        var tbody = document.querySelector("#risco-opcoes tbody");
-        tbody.replaceChildren();
-        [r.aceitar].concat(r.opcoes).forEach(function(o) {
-            var tr = el("tr");
-            var tdR = el("td");
-            var radio = el("input");
-            radio.type = "radio";
-            radio.name = "risco-controle";
-            radio.value = o.id;
-            radio.checked = o.id === esc.id;
-            radio.setAttribute("aria-label", "Escolher: " + o.nome);
-            radio.addEventListener("change", function() { escolherControleRisco(o.id); });
-            tdR.appendChild(radio);
-            tr.appendChild(tdR);
-            var tdN = el("td");
-            tdN.appendChild(el("strong", ROTULO_TRATAMENTO[o.tratamento] + ": "));
-            tdN.appendChild(document.createTextNode(o.nome));
-            if (r.melhor && o.id === r.melhor.id) tdN.appendChild(el("span", " ★ maior benefício líquido", "color: var(--tip-color); font-weight: 600;"));
-            if (!r.melhor && o.id === "aceitar") tdN.appendChild(el("span", " ★ nenhum controle se paga", "color: var(--tip-color); font-weight: 600;"));
-            tr.appendChild(tdN);
-            tr.appendChild(el("td", BRL.format(o.custo)));
-            tr.appendChild(el("td", BRL.format(o.ale)));
-            tr.appendChild(el("td", BRL.format(o.beneficio), o.beneficio < 0 ? "color: var(--danger-color);" : null));
-            tr.appendChild(el("td", o.rosi === null ? "—" : pct(o.rosi), o.rosi !== null && o.rosi < 0 ? "color: var(--danger-color);" : null));
-            var tdF = el("td", rotuloNivel(o.p, o.i));
-            celulaCor(tdF, o.p * o.i);
-            tr.appendChild(tdF);
-            tbody.appendChild(tr);
-        });
-
-        var rec = document.getElementById("risco-recomendacao");
-        rec.replaceChildren();
-        var resid = esc.p * esc.i;
-        var texto = "Escolha atual: " + ROTULO_TRATAMENTO[esc.tratamento] + ". Residual " + rotuloNivel(esc.p, esc.i) + ", " +
-            (resid <= RISCO.apetite ? "dentro" : "acima") + " do apetite (até " + RISCO.apetite + ").";
-        if (esc.rosi !== null && esc.rosi < 0) texto += " Atenção: este controle custa mais do que a perda que evita.";
-        if (r.melhor && esc.id !== r.melhor.id && esc.id !== "aceitar" && esc.rosi > r.melhor.rosi) {
-            texto += " O ROSI desta opção é maior, mas ela evita menos prejuízo do que a opção marcada com ★.";
-        }
-        rec.appendChild(el("span", texto, resid > RISCO.apetite ? "color: var(--danger-color);" : null));
-    }
-
-    function renderizarRegistro() {
-        var tbody = document.querySelector("#risco-registro tbody");
-        var tfoot = document.querySelector("#risco-registro tfoot");
-        tbody.replaceChildren();
-        tfoot.replaceChildren();
-        var custo = 0, aleAntes = 0, aleDepois = 0;
-        RISCO.cenarios.forEach(function(c) {
-            var r = avaliar(c);
-            var esc = escolhido(c, r);
-            custo += esc.custo; aleAntes += r.ale; aleDepois += esc.ale;
-            var tr = el("tr", null, c.id === atual ? "outline: 2px solid var(--accent); outline-offset: -2px;" : null);
-            tr.appendChild(el("td", c.titulo));
-            var tdI = el("td", rotuloNivel(r.p, r.i));
-            celulaCor(tdI, r.p * r.i);
-            tr.appendChild(tdI);
-            tr.appendChild(el("td", ROTULO_TRATAMENTO[esc.tratamento]));
-            tr.appendChild(el("td", BRL.format(esc.custo)));
-            tr.appendChild(el("td", BRL.format(r.ale)));
-            tr.appendChild(el("td", BRL.format(esc.ale)));
-            var tdR = el("td", rotuloNivel(esc.p, esc.i));
-            celulaCor(tdR, esc.p * esc.i);
-            tr.appendChild(tdR);
-            tbody.appendChild(tr);
-        });
-        var tr = el("tr", null, "font-weight: 700;");
-        tr.appendChild(el("td", "Total"));
-        tr.appendChild(el("td", ""));
-        tr.appendChild(el("td", ""));
-        tr.appendChild(el("td", BRL.format(custo)));
-        tr.appendChild(el("td", BRL.format(aleAntes)));
-        tr.appendChild(el("td", BRL.format(aleDepois)));
-        tr.appendChild(el("td", ""));
-        tfoot.appendChild(tr);
-
-        var box = document.getElementById("risco-orcamento");
-        box.replaceChildren();
-        var uso = custo / RISCO.orcamento_anual;
-        box.appendChild(el("div", "Orçamento usado: " + BRL.format(custo) + " de " + BRL.format(RISCO.orcamento_anual) + " (" + pct(uso) + ")",
-            uso > 1 ? "color: var(--danger-color); font-weight: 600;" : null));
-        var barra = el("div", null, "height: 0.6rem; background: var(--sunk); border-radius: var(--radius-pill); overflow: hidden; margin-top: 0.3rem;");
-        barra.setAttribute("role", "progressbar");
-        barra.setAttribute("aria-label", "Uso do orçamento anual");
-        barra.setAttribute("aria-valuemin", "0");
-        barra.setAttribute("aria-valuemax", "100");
-        barra.setAttribute("aria-valuenow", String(Math.min(100, Math.round(uso * 100))));
-        barra.appendChild(el("div", null, "height: 100%; width: " + Math.min(100, uso * 100) + "%; background: " +
-            (uso > 1 ? "var(--danger-color)" : "var(--accent)") + ";"));
-        box.appendChild(barra);
-    }
-
-    function renderizarTudo() {
-        var c = cenario(atual);
-        var r = avaliar(c);
-        renderizarCenarios();
-        renderizarMatriz(c, r);
-        renderizarQuantitativo(c, r);
-        renderizarRegistro();
-    }
-
-    function lerNumero(id) {
-        // Aceita "12.000.000", "0,25" e "0.25": vírgula é decimal; ponto só é milhar em grupos de 3 dígitos.
-        var bruto = document.getElementById(id).value.trim().replace(/\s/g, "");
-        if (bruto.indexOf(",") !== -1) {
-            bruto = bruto.replace(/\./g, "").replace(",", ".");
-        } else if (/^\d{1,3}(\.\d{3})+$/.test(bruto)) {
-            bruto = bruto.replace(/\./g, "");
-        }
-        if (bruto === "" || isNaN(Number(bruto))) return NaN;
-        return Number(bruto);
-    }
-    function preencherEntradas() {
-        var s = estado[atual];
-        document.getElementById("risco-av").value = NUM.format(s.av);
-        document.getElementById("risco-ef").value = NUM.format(s.ef * 100);
-        document.getElementById("risco-aro").value = NUM.format(s.aro);
-        document.getElementById("risco-erro").textContent = "";
-    }
-    function atualizarEntradas() {
-        var av = lerNumero("risco-av"), ef = lerNumero("risco-ef"), aro = lerNumero("risco-aro");
-        var erro = document.getElementById("risco-erro");
-        if (!(av > 0)) { erro.textContent = "Informe um AV maior que zero."; return; }
-        if (!(ef > 0 && ef <= 100)) { erro.textContent = "O EF deve estar entre 0 e 100%."; return; }
-        if (!(aro > 0)) { erro.textContent = "Informe um ARO maior que zero (ex.: 0,25 para uma vez a cada 4 anos)."; return; }
-        erro.textContent = "";
-        var s = estado[atual];
-        s.av = av; s.ef = ef / 100; s.aro = aro;
-        renderizarTudo();
-    }
-
-    function estimarRisco(p, i) {
-        estado[atual].estimativa = { p: p, i: i };
-        renderizarTudo();
-    }
-
-    window.selecionarCenarioRisco = function(id) {
-        if (!cenario(id)) return;
-        atual = id;
-        renderizarFicha(cenario(id));
-        preencherEntradas();
-        renderizarTudo();
-    };
-
-    window.escolherControleRisco = function(id) {
-        estado[atual].controle = id;
-        renderizarTudo();
-    };
-
-    window.verificarPlanoRisco = function() {
-        var box = document.getElementById("risco-verificacao");
-        box.replaceChildren();
-        var custo = 0, beneficio = 0, beneficioMelhor = 0;
-        var problemas = [];
-        RISCO.cenarios.forEach(function(c) {
-            var r = avaliar(c);
-            var esc = escolhido(c, r);
-            custo += esc.custo;
-            beneficio += esc.beneficio;
-            beneficioMelhor += r.melhor ? r.melhor.beneficio : 0;
-            if (esc.p * esc.i > RISCO.apetite) {
-                problemas.push(c.titulo + ": residual " + rotuloNivel(esc.p, esc.i) + " acima do apetite. Trate o risco ou leve a aceitação ao dono do risco.");
-            }
-            if (esc.beneficio < 0) {
-                problemas.push(c.titulo + ": o controle escolhido custa mais do que a perda que evita (ROSI " + pct(esc.rosi) + ").");
-            }
-        });
-        if (custo > RISCO.orcamento_anual) {
-            problemas.push("O plano custa " + BRL.format(custo) + " e estoura o orçamento de " + BRL.format(RISCO.orcamento_anual) + ".");
-        }
-        var ul = el("ul", null, "padding-left: 1.25rem; margin: 0.5rem 0;");
-        problemas.forEach(function(p) { ul.appendChild(el("li", p, "color: var(--danger-color);")); });
-        if (problemas.length) {
-            box.appendChild(el("strong", "O plano ainda tem " + problemas.length + " ponto(s) a resolver:"));
-            box.appendChild(ul);
-        } else {
-            box.appendChild(el("strong", "Plano aprovado: cabe no orçamento e todos os residuais estão dentro do apetite.", "color: var(--tip-color);"));
-        }
-        box.appendChild(el("p", "Benefício líquido do seu plano: " + BRL.format(beneficio) + " por ano. Melhor plano possível com estes valores: " +
-            BRL.format(beneficioMelhor) + " por ano.", "margin: 0.5rem 0 0 0;"));
-    };
-
-    window.restaurarRisco = function() {
-        estado = {};
-        RISCO.cenarios.forEach(function(c) {
-            estado[c.id] = { av: c.av, ef: c.ef, aro: c.aro, controle: "aceitar", estimativa: null };
-        });
-        document.getElementById("risco-verificacao").replaceChildren();
-        selecionarCenarioRisco(RISCO.cenarios[0].id);
-    };
-
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("risco-contexto").textContent = RISCO.contexto +
-            " Apetite: até " + RISCO.apetite + " (" + faixa(RISCO.apetite).nome + "). Orçamento anual: " + BRL.format(RISCO.orcamento_anual) + ".";
-        ["risco-av", "risco-ef", "risco-aro"].forEach(function(id) {
-            document.getElementById(id).addEventListener("change", atualizarEntradas);
-        });
-        restaurarRisco();
-        if (typeof initChecklist === "function") {
-            initChecklist("gestao-riscos-ti");
-        }
-        if (typeof initQuiz === "function") {
-            initQuiz();
-        }
-    });
-})();
-</script>
+<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
 </main>
 </div>
 
@@ -3400,7 +2430,6 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3989,17 +3018,6 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -4213,7 +3231,6 @@ print(f"SLE={sle:,.0f}  ALE={ale:,.0f}  ROSI={rosi:.0%}")
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

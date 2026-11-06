@@ -78,8 +78,6 @@ class _Marcas(HTMLParser):
 
 def classificar(secao_html: str, eh_ultima: bool) -> str:
     m = _Marcas(secao_html)
-    if "lab-box" in m.classes:
-        return "laboratorio"
     if "checklist" in m.classes:
         return "checklist"
     if "quiz-item" in m.classes:

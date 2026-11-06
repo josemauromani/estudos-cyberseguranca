@@ -175,7 +175,7 @@ class TestPortal(unittest.TestCase):
         self.assertIn(escape(d["subtitulo"]), cartao)
         self.assertIn(escape(NIVEIS[d["nivel"]]), cartao)
         self.assertIn(f"NIST {escape(d['nist'])}", cartao)
-        self.assertIn(f"🧪 {escape(d['simulador_nome'])}", cartao)
+        self.assertNotIn("🧪", cartao)
         self.assertRegex(cartao, r'<span class="mc-status"[^>]*></span>')
         self.assertNotIn("Responde a", cartao)
         self.assertNotIn("<li>", cartao)
@@ -261,8 +261,6 @@ class TestPortalCss(unittest.TestCase):
             (".mc-status.andamento", "color-mix(in srgb, var(--tipo-checklist) 85%, var(--ink))",
              ".mc", "var(--surface)", ["var(--surface)"]),
             (".mc-status.novo", "var(--muted)", ".mc", "var(--surface)", ["var(--surface)"]),
-            (".mc .tag.lab", "color-mix(in srgb, var(--tipo-laboratorio) 75%, var(--ink))",
-             ".mc .tag", "var(--sunk)", ["var(--surface)"]),
             (".progresso-disp", "var(--muted)", ".progresso-disp", "var(--sunk)", ["var(--surface)"]),
             ('.seg button[aria-pressed="true"]', "var(--surface)",
              '.seg button[aria-pressed="true"]', "var(--ink)", ["var(--surface)"]),

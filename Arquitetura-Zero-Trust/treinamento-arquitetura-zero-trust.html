@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Arquitetura-Zero-Trust">
@@ -2122,7 +1738,6 @@ dfn.glossario:focus-visible {
     <li><a class="toc-item" href="#nist-sp-800-207" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">A Arquitetura Lógica Formal do NIST SP 800-207</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#microsegmentacao-ztna" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Microsegmentação e Perímetro Definido por Software (SDP / ZTNA)</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#contexto-postura" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Acesso Baseado em Contexto e Avaliação Contínua de Risco</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#laboratorio-pratico" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Interativo: Motor de Decisão Zero Trust (PDP/PEP)</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist-zero-trust" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Aplicação Prática: Implementação e Auditoria Zero Trust</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#questoes-fixacao" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Concursos Públicos</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos-essenciais" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais &bull; Trilha 2: Segurança Defensiva</span></span><span class="toc-contador"></span></a></li>
@@ -2138,7 +1753,7 @@ dfn.glossario:focus-visible {
   <h1>Princípios Zero Trust e Microsegmentação</h1>
   <p class="mhead-sub">Implementação prática do NIST SP 800-207, decisão de acesso contínua e perímetros definidos por software</p>
   <div class="chips"><span class="chip">⏱ 40 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Protect</span><span class="chip">🎯 ATT&amp;CK TA0008 Lateral Movement / TA0004 Privilege Escalation / T1078 Valid Accounts / T1021 Remote Services</span><span class="chip">👤 Blue Team &amp; Defesa · GRC &amp; Auditoria · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#axiomas-zero-trust" data-tipo="teoria"><span class="toc-tipo">Teoria</span>4 seções</a><a href="#laboratorio-pratico" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist-zero-trust" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#questoes-fixacao" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>3 questões</a><a href="#fatos-essenciais" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#axiomas-zero-trust" data-tipo="teoria"><span class="toc-tipo">Teoria</span>4 seções</a><a href="#checklist-zero-trust" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#questoes-fixacao" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>3 questões</a><a href="#fatos-essenciais" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- ==========================================================================
      Estudo 08: Arquitetura Zero Trust e Microsegmentação
@@ -2148,7 +1763,7 @@ dfn.glossario:focus-visible {
 <article class="study-container" data-slug="arquitetura-zero-trust">
 <!-- SEÇÃO 1: O COLAPSO DO PERÍMETRO E OS 3 AXIOMAS DO ZERO TRUST -->
 <section class="study-section" id="axiomas-zero-trust" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 8</small></span><h2>O Colapso do Perímetro Tradicional e os Três Axiomas do Zero Trust</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 7</small></span><h2>O Colapso do Perímetro Tradicional e os Três Axiomas do Zero Trust</h2></div>
 
   <p class="lead-text">
     O modelo tradicional de segurança perimetral &mdash; baseado na metáfora do "castelo fortificado cercado por um fosso" &mdash;
@@ -2214,7 +1829,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 2: ARQUITETURA FORMAL DO NIST SP 800-207 -->
 <section class="study-section" id="nist-sp-800-207" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 8</small></span><h2>A Arquitetura Lógica Formal do NIST SP 800-207</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 7</small></span><h2>A Arquitetura Lógica Formal do NIST SP 800-207</h2></div>
 
   <p>
     A publicação especial <strong>NIST SP 800-207 (Zero Trust Architecture)</strong> padronizou o modelo de referência
@@ -2259,7 +1874,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 3: MICROSEGMENTAÇÃO E ZTNA VS VPN -->
 <section class="study-section" id="microsegmentacao-ztna" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 8</small></span><h2>Microsegmentação e Perímetro Definido por Software (SDP / ZTNA)</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 7</small></span><h2>Microsegmentação e Perímetro Definido por Software (SDP / ZTNA)</h2></div>
 
   <p>
     A segmentação de redes tradicional (VLANs e firewalls de borda) opera no nível macro de sub-redes inteiras.
@@ -2293,7 +1908,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 4: ACESSO BASEADO EM CONTEXTO E POSTURA DO DISPOSITIVO -->
 <section class="study-section" id="contexto-postura" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 8</small></span><h2>Acesso Baseado em Contexto e Avaliação Contínua de Risco</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 7</small></span><h2>Acesso Baseado em Contexto e Avaliação Contínua de Risco</h2></div>
 
   <p>
     No Zero Trust, a autenticação primária (nome de usuário e senha) é apenas o primeiro de dezenas de sinais avaliados.
@@ -2340,111 +1955,10 @@ dfn.glossario:focus-visible {
 </section>
 
 <!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (MOTOR PDP/PEP) -->
-<section class="study-section" id="laboratorio-pratico" data-tipo="laboratorio">
-  <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 5 de 8</small></span><h2>Laboratório Interativo: Motor de Decisão Zero Trust (PDP/PEP)</h2></div>
-
-  <p>
-    Experimente na prática como um motor de decisão Policy Engine avalia múltiplos sinais de contexto em tempo real.
-    Neste laboratório em Vanilla JavaScript, você pode carregar cenários corporativos realistas ou parametrizar
-    livremente fatores de autenticação, saúde do endpoint, rede e horário, calculando o score de risco contextual
-    e observando a decisão formal do PEP (Permitir, Bloquear ou Exigir Desafio de MFA Adicional / Step-Up).
-  </p>
-
-  <div class="lab-box" id="zero-trust-lab">
-    <div class="lab-header">
-      <span class="lab-badge">LAB PRÁTICO INTERATIVO</span>
-      <h3>Simulador de Decisão Contínua NIST SP 800-207 (PDP/PEP)</h3>
-      <p>Configure atributos contextuais, calcule o score de risco em tempo real e visualize a resposta do gateway de acesso.</p>
-    </div>
-
-    <!-- Cenários Pré-Configurados -->
-    <div style="margin-bottom: 1.25rem;">
-      <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:0.5rem;">Cenários Pré-Configurados para Teste:</div>
-      <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
-        <button class="lab-btn" onclick="injetarCenarioZeroTrust('conforme')">💻 Notebook Corporativo Conforme (Segunda-feira 14h)</button>
-        <button class="lab-btn lab-btn-warning" onclick="injetarCenarioZeroTrust('byod')">📱 Dispositivo Pessoal BYOD (Sem Criptografia)</button>
-        <button class="lab-btn lab-btn-danger" onclick="injetarCenarioZeroTrust('viagem_impossivel')">🌍 Viagem Impossível / Rede Tor Anônima</button>
-        <button class="lab-btn lab-btn-danger" onclick="injetarCenarioZeroTrust('madrugada_critica')">🌙 Acesso Noturno a Dados Confidenciais</button>
-      </div>
-    </div>
-
-    <!-- Painel de Parâmetros de Contexto -->
-    <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1.25rem; margin-bottom: 1.25rem;">
-      <div style="font-weight:700; font-size:0.9rem; color:var(--ink); margin-bottom:0.75rem;">Sinais e Atributos de Contexto da Requisição:</div>
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; font-size:0.85rem;">
-        <!-- Fator de Autenticação -->
-        <div>
-          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Método de Autenticação:</label>
-          <select id="zt-param-auth" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="dispararAvaliacaoManual()">
-            <option value="fido2">MFA Chave Física FIDO2 / WebAuthn (Risco Mínimo)</option>
-            <option value="totp">MFA Aplicativo TOTP / Push Seguro</option>
-            <option value="sms">MFA por SMS (Vulnerável a SIM Swap)</option>
-            <option value="senha">Apenas Senha (Sem MFA - Alto Risco)</option>
-          </select>
-        </div>
-
-        <!-- Postura do Dispositivo -->
-        <div>
-          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Postura do Dispositivo (Endpoint):</label>
-          <select id="zt-param-device" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="dispararAvaliacaoManual()">
-            <option value="conforme">Conforme (BitLocker Ativo + EDR Saudável)</option>
-            <option value="parcial">Parcial (Antivírus Ativo, Sem Criptografia de Disco)</option>
-            <option value="desconhecido">Não-Conforme (Sem EDR corporativo / BYOD)</option>
-            <option value="infectado">Comprometido (EDR reporta alerta de malware)</option>
-          </select>
-        </div>
-
-        <!-- Rede e Origem -->
-        <div>
-          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Rede e Localização do IP:</label>
-          <select id="zt-param-net" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="dispararAvaliacaoManual()">
-            <option value="corporativa">Rede Conhecida / IP Residencial Habitual</option>
-            <option value="publica">Wi-Fi Público / Hotel / IP Desconhecido</option>
-            <option value="tor">Nó de Saída Tor / Proxy Anônimo / VPN Comercial</option>
-            <option value="impossivel">Alerta de Viagem Impossível (Dois países em minutos)</option>
-          </select>
-        </div>
-
-        <!-- Sensibilidade do Recurso -->
-        <div>
-          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Sensibilidade do Recurso Requisitado:</label>
-          <select id="zt-param-resource" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="dispararAvaliacaoManual()">
-            <option value="baixo">Intranet Comum / Políticas Públicas (Baixo)</option>
-            <option value="medio">CRM / Sistema de Vendas (Médio)</option>
-            <option value="alto">ERP Financeiro / Código-Fonte / Produção (Alto)</option>
-            <option value="critico">Bancos de Dados Transacionais / Chaves Criptográficas (Crítico)</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <!-- Painel de Decisão do Motor (PDP / Policy Engine) -->
-    <div style="background:var(--ground); border:1px solid var(--rule); border-radius:8px; padding:1.25rem;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
-        <div>
-          <h4 style="margin:0; font-size:1rem; color:var(--ink);">Decisão Formal do Policy Decision Point (PDP)</h4>
-          <span style="font-size:0.8rem; color:var(--muted);" id="zt-status-sub">Avaliando parâmetros de contexto...</span>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; font-weight:700;">Score de Risco Contextual</div>
-          <div id="zt-risk-score-display" style="font-size:1.75rem; font-weight:800; font-family:var(--font-display);">-- / 100</div>
-        </div>
-      </div>
-
-      <!-- Barra Visual de Risco -->
-      <div style="width:100%; height:8px; background:var(--sunk); border-radius:4px; overflow:hidden; margin-bottom:1rem;">
-        <div id="zt-risk-bar" style="width:0%; height:100%; background:#10b981; transition:width 0.4s ease, background 0.4s ease;"></div>
-      </div>
-
-      <!-- Veredicto Final do PEP -->
-      <div id="zt-veredicto-box" style="padding:1rem; border-radius:6px; font-size:0.9rem; line-height:1.6;"></div>
-    </div>
-  </div>
-</section>
 
 <!-- SEÇÃO 6: CHECKLIST PRÁTICO -->
 <section class="study-section" id="checklist-zero-trust" data-tipo="checklist">
-  <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 6 de 8</small></span><h2>Checklist de Aplicação Prática: Implementação e Auditoria Zero Trust</h2></div>
+  <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 5 de 7</small></span><h2>Checklist de Aplicação Prática: Implementação e Auditoria Zero Trust</h2></div>
 
   <p>
     Utilize este checklist técnico durante auditorias de conformidade com o NIST SP 800-207
@@ -2510,7 +2024,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 7: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
 <section class="study-section" id="questoes-fixacao" data-tipo="questoes">
-  <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 7 de 8</small></span><h2>Questões de Fixação e Concursos Públicos</h2></div>
+  <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 6 de 7</small></span><h2>Questões de Fixação e Concursos Públicos</h2></div>
 
   <p>
     Valide sua preparação respondendo a questões baseadas em provas de concursos para Analista de Segurança e Tecnologia
@@ -2589,7 +2103,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 8: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
 <section class="study-section" id="fatos-essenciais" data-tipo="referencias">
-  <div class="shead"><span class="stype">📚 Referências <small>· Seção 8 de 8</small></span><h2>Fatos Essenciais &bull; Trilha 2: Segurança Defensiva</h2></div>
+  <div class="shead"><span class="stype">📚 Referências <small>· Seção 7 de 7</small></span><h2>Fatos Essenciais &bull; Trilha 2: Segurança Defensiva</h2></div>
 
   <div class="facts-grid">
     <div class="facts-card">
@@ -2626,176 +2140,6 @@ dfn.glossario:focus-visible {
 </article>
 
 <!-- SCRIPT EMBUTIDO: SIMULADOR DE MOTOR ZERO TRUST PDP/PEP -->
-<script>
-/**
- * Simulador Interativo: Motor de Decisão Zero Trust (NIST SP 800-207 PDP/PEP)
- * Mapa da Cibersegurança
- */
-
-// Pesos e pontuações de risco para cálculo contextual
-function calcularScoreRisco(params) {
-  let score = 0;
-
-  // 1. Fator de Autenticação (Peso: até 30 pontos)
-  if (params.auth === "fido2") score += 0;
-  else if (params.auth === "totp") score += 10;
-  else if (params.auth === "sms") score += 20;
-  else if (params.auth === "senha") score += 30;
-
-  // 2. Postura do Dispositivo (Peso: até 35 pontos)
-  if (params.device === "conforme") score += 0;
-  else if (params.device === "parcial") score += 15;
-  else if (params.device === "desconhecido") score += 25;
-  else if (params.device === "infectado") score += 40;
-
-  // 3. Rede e Origem (Peso: até 25 pontos)
-  if (params.net === "corporativa") score += 0;
-  else if (params.net === "publica") score += 10;
-  else if (params.net === "tor") score += 25;
-  else if (params.net === "impossivel") score += 30;
-
-  // 4. Criticidade do Recurso Alvo (Multiplicador de sensibilidade)
-  if (params.resource === "baixo") score -= 5;
-  else if (params.resource === "medio") score += 0;
-  else if (params.resource === "alto") score += 10;
-  else if (params.resource === "critico") score += 20;
-
-  // Normalização entre 0 e 100
-  score = Math.max(0, Math.min(100, score));
-  return score;
-}
-
-// Avaliação completa da decisão Zero Trust
-function avaliarDecisaoZeroTrust(params) {
-  const score = calcularScoreRisco(params);
-  let decisao = "";
-  let acaoPep = "";
-  let cor = "";
-  let justificativas = [];
-
-  // Avaliação de regras de corte estrito (Hard Gates)
-  if (params.device === "infectado") {
-    decisao = "BLOQUEIO IMEDIATO (DISPOSITIVO COMPROMETIDO)";
-    acaoPep = "PEP descarta a conexão e isola o endpoint da rede via EDR.";
-    cor = "#ef4444";
-    justificativas.push("Alerta crítico de malware detectado no endpoint pelo agente EDR.");
-  } else if (params.net === "impossivel") {
-    decisao = "BLOQUEIO IMEDIATO (ANOMALIA DE VIAGEM IMPOSSÍVEL)";
-    acaoPep = "PEP rejeita o túnel e dispara notificação de alerta de alta severidade no SIEM.";
-    cor = "#ef4444";
-    justificativas.push("A mesma credencial foi utilizada em duas localizações geograficamente incompatíveis em curto intervalo de tempo.");
-  } else if (score >= 60) {
-    decisao = "ACESSO NEGADO (SCORE DE RISCO ELEVADO)";
-    acaoPep = "PEP encerra o handshake e fecha o túnel seguro ZTNA.";
-    cor = "#ef4444";
-    justificativas.push(`O score de risco contextual (${score}/100) ultrapassou o limiar máximo de segurança corporativa (60).`);
-  } else if (score >= 25 || params.resource === "critico" || params.device === "desconhecido") {
-    decisao = "EXIGIR DESAFIO DE MFA ADICIONAL (STEP-UP)";
-    acaoPep = "PEP suspende a conexão e redireciona o usuário para reautenticação com FIDO2.";
-    cor = "#f59e0b";
-    justificativas.push(`Score de risco moderado (${score}/100) ou acesso a recurso crítico a partir de contexto sensível.`);
-    justificativas.push("O Policy Administrator ordenou a aplicação de Step-Up Authentication.");
-  } else {
-    decisao = "ACESSO CONCEDIDO (TÚNEL ZTNA ESTABELECIDO)";
-    acaoPep = "PEP estabelece o canal TLS seguro Camada 7 exclusivamente para a porta da aplicação autorizada.";
-    cor = "#10b981";
-    justificativas.push(`Score de risco muito baixo (${score}/100). Dispositivo conforme e contexto compatível.`);
-  }
-
-  renderizarResultadoZeroTrust(score, decisao, acaoPep, cor, justificativas);
-  return { score, decisao, acaoPep, justificativas };
-}
-
-// Renderiza a decisão no painel
-function renderizarResultadoZeroTrust(score, decisao, acaoPep, cor, justificativas) {
-  const scoreDisplay = document.getElementById("zt-risk-score-display");
-  const scoreBar = document.getElementById("zt-risk-bar");
-  const subStatus = document.getElementById("zt-status-sub");
-  const veredictoBox = document.getElementById("zt-veredicto-box");
-
-  if (scoreDisplay) {
-    scoreDisplay.textContent = `${score} / 100`;
-    scoreDisplay.style.color = cor;
-  }
-
-  if (scoreBar) {
-    scoreBar.style.width = `${score}%`;
-    scoreBar.style.background = cor;
-  }
-
-  if (subStatus) {
-    subStatus.textContent = `Avaliação do Policy Engine concluída com sucesso (${justificativas.length} fatores avaliados).`;
-  }
-
-  if (veredictoBox) {
-    veredictoBox.style.background = cor === "#10b981" ? "rgba(16, 185, 129, 0.15)" : (cor === "#f59e0b" ? "rgba(245, 158, 11, 0.15)" : "rgba(220, 38, 38, 0.15)");
-    veredictoBox.style.border = `1px solid ${cor}`;
-    veredictoBox.style.color = "var(--ink)";
-
-    let htmlJust = "<ul>";
-    justificativas.forEach(j => {
-      htmlJust += `<li>${escapeHtml(j)}</li>`;
-    });
-    htmlJust += "</ul>";
-
-    veredictoBox.innerHTML = `
-      <div style="font-size:1.1rem; font-weight:800; color:${cor}; margin-bottom:0.4rem;">${escapeHtml(decisao)}</div>
-      <div style="margin-bottom:0.5rem;"><strong>Comando ao PEP (Plano de Dados):</strong> ${escapeHtml(acaoPep)}</div>
-      <div style="font-size:0.85rem; color:var(--muted);"><strong>Justificativa Técnica do Policy Engine (PDP):</strong></div>
-      ${htmlJust}
-    `;
-  }
-}
-
-// Carregador de cenários rápidos
-function injetarCenarioZeroTrust(cenario) {
-  const authEl = document.getElementById("zt-param-auth");
-  const devEl = document.getElementById("zt-param-device");
-  const netEl = document.getElementById("zt-param-net");
-  const resEl = document.getElementById("zt-param-resource");
-
-  if (cenario === "conforme") {
-    authEl.value = "fido2";
-    devEl.value = "conforme";
-    netEl.value = "corporativa";
-    resEl.value = "medio";
-  } else if (cenario === "byod") {
-    authEl.value = "totp";
-    devEl.value = "desconhecido";
-    netEl.value = "publica";
-    resEl.value = "alto";
-  } else if (cenario === "viagem_impossivel") {
-    authEl.value = "senha";
-    devEl.value = "parcial";
-    netEl.value = "impossivel";
-    resEl.value = "alto";
-  } else if (cenario === "madrugada_critica") {
-    authEl.value = "sms";
-    devEl.value = "desconhecido";
-    netEl.value = "tor";
-    resEl.value = "critico";
-  }
-
-  dispararAvaliacaoManual();
-}
-
-function dispararAvaliacaoManual() {
-  const auth = document.getElementById("zt-param-auth").value;
-  const device = document.getElementById("zt-param-device").value;
-  const net = document.getElementById("zt-param-net").value;
-  const resource = document.getElementById("zt-param-resource").value;
-
-  avaliarDecisaoZeroTrust({ auth, device, net, resource });
-}
-
-// Inicialização automática do checklist e do laboratório no carregamento da página
-document.addEventListener("DOMContentLoaded", function() {
-  if (typeof initChecklist === "function") {
-    initChecklist("arquitetura-zero-trust");
-  }
-  injetarCenarioZeroTrust("conforme");
-});
-</script>
 </main>
 </div>
 
@@ -2930,7 +2274,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3519,17 +2862,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -3743,7 +3075,6 @@ document.addEventListener("DOMContentLoaded", function() {
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

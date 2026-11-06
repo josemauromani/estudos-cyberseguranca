@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Plataforma de estudos autoinstrucional e prática em cibersegurança com 62 módulos temáticos, 14 trilhas e simuladores interativos em JavaScript.">
+  <meta name="description" content="Plataforma de estudos autoinstrucional em cibersegurança com 62 módulos temáticos, 14 trilhas, teoria, checklists e questões de fixação — 100% offline no navegador.">
   <title>Mapa da Cibersegurança — Catálogo e Portal Central</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%233b82f6' d='M32 4 8 14v16c0 15 10 26 24 30 14-4 24-15 24-30V14z'/%3E%3Cpath fill='%23ffffff' d='M28 40 19 31l4-4 5 5 13-13 4 4z'/%3E%3C/svg%3E">
   <style>
@@ -77,8 +77,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -166,8 +164,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -239,8 +235,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -311,8 +305,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -944,9 +936,6 @@ a.mc[href]:hover {
   font-size: 11px;
 }
 
-.mc .tag.lab {
-  color: color-mix(in srgb, var(--tipo-laboratorio) 75%, var(--ink));
-}
 
 .mc .tag-pendente {
   border: 1px dashed var(--rule-strong);
@@ -1710,7 +1699,7 @@ a.progresso-titulo:hover {
     <section class="view" data-view="catalogo">
       <div class="catalogo" id="secao-catalogo">
         <h1>Catálogo de módulos</h1>
-        <p class="lede">62 módulos em 14 trilhas, com teoria, laboratório interativo, checklist e questões de concurso. Os simuladores são em JavaScript e tudo roda offline no seu navegador.</p>
+        <p class="lede">62 módulos em 14 trilhas, com teoria, checklist e questões de concurso. Tudo roda offline no seu navegador.</p>
 
         <div id="continuar" class="continuar" hidden></div>
 
@@ -1731,15 +1720,15 @@ a.progresso-titulo:hover {
             data-nivel="iniciante"
             data-perfis="Blue Team &amp; Defesa|Red Team &amp; Pentest|AppSec &amp; DevSecOps|Operações SOC &amp; Resposta|GRC &amp; Auditoria"
             data-nist="Identify"
-            data-secoes="7"
+            data-secoes="6"
             data-rotas="blue_soc red_team devsecops_cloud grc pericia analista_si"
             data-certs="CISSP|Security+|ISFS|CSFPC"
-            data-busca="fundamentos-ciber tríade cia, ameaças e modelagem stride pilares da segurança da informação, vetores de ameaça e metodologia stride como identificar e categorizar vulnerabilidades arquiteturais em um sistema antes que sejam exploradas? stride threat canvas identify blue team &amp; defesa red team &amp; pentest appsec &amp; devsecops operações soc &amp; resposta grc &amp; auditoria tríade cia, autenticidade e não-repúdio taxonomia stride (spoofing a elevation of privilege) simulador stride threat canvas interativo checklist de auditoria com persistência local"
+            data-busca="fundamentos-ciber tríade cia, ameaças e modelagem stride pilares da segurança da informação, vetores de ameaça e metodologia stride como identificar e categorizar vulnerabilidades arquiteturais em um sistema antes que sejam exploradas? identify blue team &amp; defesa red team &amp; pentest appsec &amp; devsecops operações soc &amp; resposta grc &amp; auditoria tríade cia, autenticidade e não-repúdio taxonomia stride (spoofing a elevation of privilege) tópico — stride threat canvas interativo checklist de auditoria com persistência local"
             href="Fundamentos-Ciber/treinamento-fundamentos-ciber.html">
             <span class="mc-top"><span class="mc-num">Estudo 01</span><span class="mc-tempo">⏱ 40 min</span></span>
             <h3 class="mc-titulo">Tríade CIA, Ameaças e Modelagem STRIDE</h3>
             <p class="mc-sub">Pilares da segurança da informação, vetores de ameaça e metodologia STRIDE</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Identify</span><span class="tag lab">🧪 STRIDE Threat Canvas</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Identify</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Redes-e-Protocolos"
@@ -1748,15 +1737,15 @@ a.progresso-titulo:hover {
             data-nivel="iniciante"
             data-perfis="Blue Team &amp; Defesa|Red Team &amp; Pentest|Operações SOC &amp; Resposta"
             data-nist="Protect / Detect"
-            data-secoes="7"
+            data-secoes="6"
             data-rotas="blue_soc red_team pericia"
             data-certs="CEH|GSEC|Security+|eJPT|eCPPT|OSCP"
-            data-busca="redes-e-protocolos tcp/ip, dns, roteamento e inspeção de tráfego pilha de protocolos, handshake tcp, cidr e nat, http, wi-fi e vetores de ataque em rede o que cada campo dos cabeçalhos ip/tcp revela sobre a intenção do tráfego e possíveis anomalias? inspetor visual de cabeçalhos ip/tcp/udp protect / detect blue team &amp; defesa red team &amp; pentest operações soc &amp; resposta pilha tcp/ip em 4 camadas e modelo osi dissecação de flags syn/ack/fin/rst vulnerabilidades em dns e envenenamento arp simulador de montagem de pacotes e resposta de host sub-redes cidr, roteamento e nat (calculadora cidr) http/1.1, http/2 e http/3 e segurança do wi-fi (wpa2, 802.1x, wpa3)"
+            data-busca="redes-e-protocolos tcp/ip, dns, roteamento e inspeção de tráfego pilha de protocolos, handshake tcp, cidr e nat, http, wi-fi e vetores de ataque em rede o que cada campo dos cabeçalhos ip/tcp revela sobre a intenção do tráfego e possíveis anomalias? protect / detect blue team &amp; defesa red team &amp; pentest operações soc &amp; resposta pilha tcp/ip em 4 camadas e modelo osi dissecação de flags syn/ack/fin/rst vulnerabilidades em dns e envenenamento arp tópico — de montagem de pacotes e resposta de host sub-redes cidr, roteamento e nat (calculadora cidr) http/1.1, http/2 e http/3 e segurança do wi-fi (wpa2, 802.1x, wpa3)"
             href="Redes-e-Protocolos/treinamento-redes-e-protocolos.html">
             <span class="mc-top"><span class="mc-num">Estudo 02</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">TCP/IP, DNS, Roteamento e Inspeção de Tráfego</h3>
             <p class="mc-sub">Pilha de protocolos, handshake TCP, CIDR e NAT, HTTP, Wi-Fi e vetores de ataque em rede</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect / Detect</span><span class="tag lab">🧪 Inspetor Visual de Cabeçalhos IP/TCP/UDP</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect / Detect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Criptografia-Pratica"
@@ -1765,15 +1754,15 @@ a.progresso-titulo:hover {
             data-nivel="iniciante"
             data-perfis="Blue Team &amp; Defesa|AppSec &amp; DevSecOps|GRC &amp; Auditoria"
             data-nist="Protect"
-            data-secoes="7"
+            data-secoes="6"
             data-rotas="devsecops_cloud"
             data-certs="CISSP|CCSP|GSEC|Security+|CDPSE"
-            data-busca="criptografia-pratica criptografia simétrica, assimétrica, hashes e pki algoritmos modernos de cifragem, funções de resumo e infraestrutura de chaves públicas qual algoritmo criptográfico utilizar para garantir confidencialidade sem comprometer o desempenho? lab de cifras (web crypto api) protect blue team &amp; defesa appsec &amp; devsecops grc &amp; auditoria cifras aes-gcm e chacha20-poly1305 curvas elípticas (ecdsa/ed25519) vs rsa cadeia de confiança x.509 e revogação crl/ocsp lab nativo com web crypto api sem bibliotecas externas"
+            data-busca="criptografia-pratica criptografia simétrica, assimétrica, hashes e pki algoritmos modernos de cifragem, funções de resumo e infraestrutura de chaves públicas qual algoritmo criptográfico utilizar para garantir confidencialidade sem comprometer o desempenho? protect blue team &amp; defesa appsec &amp; devsecops grc &amp; auditoria cifras aes-gcm e chacha20-poly1305 curvas elípticas (ecdsa/ed25519) vs rsa cadeia de confiança x.509 e revogação crl/ocsp lab nativo com web crypto api sem bibliotecas externas"
             href="Criptografia-Pratica/treinamento-criptografia-pratica.html">
             <span class="mc-top"><span class="mc-num">Estudo 03</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Criptografia Simétrica, Assimétrica, Hashes e PKI</h3>
             <p class="mc-sub">Algoritmos modernos de cifragem, funções de resumo e infraestrutura de chaves públicas</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Lab de Cifras (Web Crypto API)</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Autenticacao-e-IAM"
@@ -1782,15 +1771,15 @@ a.progresso-titulo:hover {
             data-nivel="iniciante"
             data-perfis="AppSec &amp; DevSecOps|Blue Team &amp; Defesa|GRC &amp; Auditoria"
             data-nist="Protect"
-            data-secoes="9"
+            data-secoes="8"
             data-rotas="red_team devsecops_cloud"
             data-certs="CISSP|CCSP|Security+|CISA|CRISC"
-            data-busca="autenticacao-e-iam senhas, mfa, oauth 2.0, tokens jwt e rbac controle de acesso robusto, fatores múltiplos, autorização moderna e federação de identidades como garantir que apenas identidades legítimas acessem recursos corporativos críticos com privilégio mínimo? validador e decodificador jwt + matriz rbac protect appsec &amp; devsecops blue team &amp; defesa grc &amp; auditoria hashing com argon2, bcrypt e proteção de credenciais protocolos totp (rfc 6238) e webauthn/fido2 ataques a tokens jwt (algoritmo &#x27;none&#x27;, chave fraca) validador de jwt e matriz de permissões rbac"
+            data-busca="autenticacao-e-iam senhas, mfa, oauth 2.0, tokens jwt e rbac controle de acesso robusto, fatores múltiplos, autorização moderna e federação de identidades como garantir que apenas identidades legítimas acessem recursos corporativos críticos com privilégio mínimo? protect appsec &amp; devsecops blue team &amp; defesa grc &amp; auditoria hashing com argon2, bcrypt e proteção de credenciais protocolos totp (rfc 6238) e webauthn/fido2 ataques a tokens jwt (algoritmo &#x27;none&#x27;, chave fraca) validador de jwt e matriz de permissões rbac"
             href="Autenticacao-e-IAM/treinamento-autenticacao-e-iam.html">
             <span class="mc-top"><span class="mc-num">Estudo 04</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</h3>
             <p class="mc-sub">Controle de acesso robusto, fatores múltiplos, autorização moderna e federação de identidades</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Validador e Decodificador JWT + Matriz RBAC</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Segmentacao-e-Firewall"
@@ -1799,15 +1788,15 @@ a.progresso-titulo:hover {
             data-nivel="iniciante"
             data-perfis="Blue Team &amp; Defesa|Operações SOC &amp; Resposta|Analista de Segurança da Informação"
             data-nist="Protect"
-            data-secoes="8"
+            data-secoes="7"
             data-rotas="blue_soc analista_si"
             data-certs="CISSP|GSEC|Security+"
-            data-busca="segmentacao-e-firewall dmz, vlans, regras de firewall e filtragem arquitetura de perímetros, isolamento inter-vlan e ordem de precedência de regras de filtragem como isolar servidores públicos da rede corporativa sensível garantindo regra default drop? simulador de regras de firewall (pass / drop) protect blue team &amp; defesa operações soc &amp; resposta analista de segurança da informação arquitetura de dmz em 2 estágios tabela de estados conntrack (stateful vs stateless) trunking 802.1q e segregação inter-vlan simulador de filtragem com ordem de precedência first-match"
+            data-busca="segmentacao-e-firewall dmz, vlans, regras de firewall e filtragem arquitetura de perímetros, isolamento inter-vlan e ordem de precedência de regras de filtragem como isolar servidores públicos da rede corporativa sensível garantindo regra default drop? protect blue team &amp; defesa operações soc &amp; resposta analista de segurança da informação arquitetura de dmz em 2 estágios tabela de estados conntrack (stateful vs stateless) trunking 802.1q e segregação inter-vlan tópico — de filtragem com ordem de precedência first-match"
             href="Segmentacao-e-Firewall/treinamento-segmentacao-e-firewall.html">
             <span class="mc-top"><span class="mc-num">Estudo 05</span><span class="mc-tempo">⏱ 40 min</span></span>
             <h3 class="mc-titulo">DMZ, VLANs, Regras de Firewall e Filtragem</h3>
             <p class="mc-sub">Arquitetura de perímetros, isolamento inter-VLAN e ordem de precedência de regras de filtragem</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Simulador de Regras de Firewall (Pass / Drop)</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Fundamentos-de-Computacao-e-SO"
@@ -1816,15 +1805,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Blue Team &amp; Defesa|Red Team &amp; Pentest|Analista de Segurança da Informação"
             data-nist="Identify / Protect"
-            data-secoes="10"
+            data-secoes="9"
             data-rotas="blue_soc red_team devsecops_cloud pericia analista_si"
             data-certs="GSEC|Security+|eCPPT"
-            data-busca="fundamentos-de-computacao-e-so fundamentos de computação e so para segurança memória e processos, kernel e chamadas de sistema, binário e codificações, permissões e virtualização vistos pela segurança por que escrever 300 bytes num campo de 64 pode dar ao atacante o controle do servidor? inspetor de bytes identify / protect blue team &amp; defesa red team &amp; pentest analista de segurança da informação pilha, heap e o estouro de buffer aslr, dep/nx e stack canaries kernel, espaço de usuário e chamadas de sistema magic bytes, hexadecimal e base64 hipervisor, vm e container"
+            data-busca="fundamentos-de-computacao-e-so fundamentos de computação e so para segurança memória e processos, kernel e chamadas de sistema, binário e codificações, permissões e virtualização vistos pela segurança por que escrever 300 bytes num campo de 64 pode dar ao atacante o controle do servidor? identify / protect blue team &amp; defesa red team &amp; pentest analista de segurança da informação pilha, heap e o estouro de buffer aslr, dep/nx e stack canaries kernel, espaço de usuário e chamadas de sistema magic bytes, hexadecimal e base64 hipervisor, vm e container"
             href="Fundamentos-de-Computacao-e-SO/treinamento-fundamentos-de-computacao-e-so.html">
             <span class="mc-top"><span class="mc-num">Estudo 61</span><span class="mc-tempo">⏱ 40 min</span></span>
             <h3 class="mc-titulo">Fundamentos de Computação e SO para Segurança</h3>
             <p class="mc-sub">Memória e processos, kernel e chamadas de sistema, binário e codificações, permissões e virtualização vistos pela segurança</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Identify / Protect</span><span class="tag lab">🧪 Inspetor de Bytes</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Identify / Protect</span></span>
             <span class="mc-status"></span>
           </a>
           </div>
@@ -1838,15 +1827,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Blue Team &amp; Defesa|AppSec &amp; DevSecOps|Operações SOC &amp; Resposta|Analista de Segurança da Informação"
             data-nist="Protect"
-            data-secoes="8"
+            data-secoes="7"
             data-rotas="blue_soc devsecops_cloud pericia analista_si"
             data-certs="GSEC"
-            data-busca="hardening-sistemas bastionamento linux e windows (cis benchmarks) redução da superfície de ataque operacional em servidores corporativos linux e windows quais configurações padrão de fábrica expõem servidores corporativos a ataques imediatos? auditor interativo de configuração de servidor protect blue team &amp; defesa appsec &amp; devsecops operações soc &amp; resposta analista de segurança da informação cis benchmarks nível 1 e nível 2 bastionamento de ssh (/etc/ssh/sshd_config) e pam módulos de segurança do kernel (apparmor e selinux) auditor interativo de arquivos de configuração de so"
+            data-busca="hardening-sistemas bastionamento linux e windows (cis benchmarks) redução da superfície de ataque operacional em servidores corporativos linux e windows quais configurações padrão de fábrica expõem servidores corporativos a ataques imediatos? protect blue team &amp; defesa appsec &amp; devsecops operações soc &amp; resposta analista de segurança da informação cis benchmarks nível 1 e nível 2 bastionamento de ssh (/etc/ssh/sshd_config) e pam módulos de segurança do kernel (apparmor e selinux) auditor interativo de arquivos de configuração de so"
             href="Hardening-Sistemas/treinamento-hardening-sistemas.html">
             <span class="mc-top"><span class="mc-num">Estudo 06</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">Bastionamento Linux e Windows (CIS Benchmarks)</h3>
             <p class="mc-sub">Redução da superfície de ataque operacional em servidores corporativos Linux e Windows</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Auditor Interativo de Configuração de Servidor</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Seguranca-de-Redes-Defesa"
@@ -1855,15 +1844,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Blue Team &amp; Defesa|Operações SOC &amp; Resposta|Analista de Segurança da Informação"
             data-nist="Protect / Detect"
-            data-secoes="8"
+            data-secoes="7"
             data-rotas="blue_soc analista_si"
             data-certs="GSEC"
-            data-busca="seguranca-de-redes-defesa ids/ips, waf, vpns e proxies reversos sistemas de inspeção profunda de tráfego, mitigação de ameaças web e túneis criptografados como interceptar e bloquear tráfego hostil antes que ele atinja serviços internos sensíveis? analisador de regras snort/suricata vs tráfego protect / detect blue team &amp; defesa operações soc &amp; resposta analista de segurança da informação assinaturas snort/suricata e detecção heurística waf core rule set (crs) contra injeções web túneis seguros com wireguard e ipsec ikev2 analisador de payloads de tráfego com alertas em tempo real"
+            data-busca="seguranca-de-redes-defesa ids/ips, waf, vpns e proxies reversos sistemas de inspeção profunda de tráfego, mitigação de ameaças web e túneis criptografados como interceptar e bloquear tráfego hostil antes que ele atinja serviços internos sensíveis? protect / detect blue team &amp; defesa operações soc &amp; resposta analista de segurança da informação assinaturas snort/suricata e detecção heurística waf core rule set (crs) contra injeções web túneis seguros com wireguard e ipsec ikev2 analisador de payloads de tráfego com alertas em tempo real"
             href="Seguranca-de-Redes-Defesa/treinamento-seguranca-de-redes-defesa.html">
             <span class="mc-top"><span class="mc-num">Estudo 07</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">IDS/IPS, WAF, VPNs e Proxies Reversos</h3>
             <p class="mc-sub">Sistemas de inspeção profunda de tráfego, mitigação de ameaças web e túneis criptografados</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect / Detect</span><span class="tag lab">🧪 Analisador de Regras Snort/Suricata vs Tráfego</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect / Detect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Arquitetura-Zero-Trust"
@@ -1872,15 +1861,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Blue Team &amp; Defesa|GRC &amp; Auditoria|Analista de Segurança da Informação"
             data-nist="Protect"
-            data-secoes="8"
+            data-secoes="7"
             data-rotas="grc"
             data-certs=""
-            data-busca="arquitetura-zero-trust princípios zero trust e microsegmentação implementação prática do nist sp 800-207, decisão de acesso contínua e perímetros definidos por software por que não se deve mais confiar na rede interna mesmo após autenticação inicial bem-sucedida? motor de decisão de acesso zero trust (pdp/pep) protect blue team &amp; defesa grc &amp; auditoria analista de segurança da informação nist sp 800-207: never trust, always verify, assume breach componentes centrais: pdp (decision) e pep (enforcement) acesso contextual baseado em postura do dispositivo e risco motor de decisão de acesso em tempo real com score de risco"
+            data-busca="arquitetura-zero-trust princípios zero trust e microsegmentação implementação prática do nist sp 800-207, decisão de acesso contínua e perímetros definidos por software por que não se deve mais confiar na rede interna mesmo após autenticação inicial bem-sucedida? protect blue team &amp; defesa grc &amp; auditoria analista de segurança da informação nist sp 800-207: never trust, always verify, assume breach componentes centrais: pdp (decision) e pep (enforcement) acesso contextual baseado em postura do dispositivo e risco motor de decisão de acesso em tempo real com score de risco"
             href="Arquitetura-Zero-Trust/treinamento-arquitetura-zero-trust.html">
             <span class="mc-top"><span class="mc-num">Estudo 08</span><span class="mc-tempo">⏱ 40 min</span></span>
             <h3 class="mc-titulo">Princípios Zero Trust e Microsegmentação</h3>
             <p class="mc-sub">Implementação prática do NIST SP 800-207, decisão de acesso contínua e perímetros definidos por software</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Motor de Decisão de Acesso Zero Trust (PDP/PEP)</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Gestao-de-Vulnerabilidades"
@@ -1889,15 +1878,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Blue Team &amp; Defesa|GRC &amp; Auditoria|Operações SOC &amp; Resposta"
             data-nist="Identify / Protect"
-            data-secoes="8"
+            data-secoes="7"
             data-rotas="grc"
             data-certs="Security+|CRISC"
-            data-busca="gestao-de-vulnerabilidades cve, cvss v3.1/v4.0 e priorização de patches ciclo de vida de vulnerabilidades, cálculo de criticidade de riscos e correlação com ameaças ativas como determinar qual vulnerabilidade corrigir primeiro entre centenas de falhas detectadas em varreduras? calculadora interativa de score cvss v3.1 / v4.0 identify / protect blue team &amp; defesa grc &amp; auditoria operações soc &amp; resposta métricas base, temporal e ambiental do cvss novidades do cvss v4.0 e integração com epss catálogo cisa kev (known exploited vulnerabilities) calculadora vetorial com geração da string cvss"
+            data-busca="gestao-de-vulnerabilidades cve, cvss v3.1/v4.0 e priorização de patches ciclo de vida de vulnerabilidades, cálculo de criticidade de riscos e correlação com ameaças ativas como determinar qual vulnerabilidade corrigir primeiro entre centenas de falhas detectadas em varreduras? identify / protect blue team &amp; defesa grc &amp; auditoria operações soc &amp; resposta métricas base, temporal e ambiental do cvss novidades do cvss v4.0 e integração com epss catálogo cisa kev (known exploited vulnerabilities) calculadora vetorial com geração da string cvss"
             href="Gestao-de-Vulnerabilidades/treinamento-gestao-de-vulnerabilidades.html">
             <span class="mc-top"><span class="mc-num">Estudo 09</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">CVE, CVSS v3.1/v4.0 e Priorização de Patches</h3>
             <p class="mc-sub">Ciclo de vida de vulnerabilidades, cálculo de criticidade de riscos e correlação com ameaças ativas</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Identify / Protect</span><span class="tag lab">🧪 Calculadora Interativa de Score CVSS v3.1 / v4.0</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Identify / Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Seguranca-em-Endpoints-EDR"
@@ -1906,15 +1895,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Blue Team &amp; Defesa|Operações SOC &amp; Resposta|Perícia Forense &amp; Malware|Analista de Segurança da Informação"
             data-nist="Protect / Detect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="blue_soc pericia analista_si"
             data-certs="GSEC|Security+|CSFPC"
-            data-busca="seguranca-em-endpoints-edr antivírus, edr/xdr e proteção de host telemetria comportamental de processos, detecção de técnicas evasivas e contenção de hosts como identificar a presença de um adversário no endpoint antes que ocorra dano ou exfiltração? linha do tempo de telemetria e detecção edr protect / detect blue team &amp; defesa operações soc &amp; resposta perícia forense &amp; malware analista de segurança da informação evolução de antivírus baseado em assinatura para edr/xdr sysmon e event ids do windows (event id 1, 3, 10) árvores de processos maliciosos parent-child simulador de telemetria com isolamento de máquina da rede"
+            data-busca="seguranca-em-endpoints-edr antivírus, edr/xdr e proteção de host telemetria comportamental de processos, detecção de técnicas evasivas e contenção de hosts como identificar a presença de um adversário no endpoint antes que ocorra dano ou exfiltração? protect / detect blue team &amp; defesa operações soc &amp; resposta perícia forense &amp; malware analista de segurança da informação evolução de antivírus baseado em assinatura para edr/xdr sysmon e event ids do windows (event id 1, 3, 10) árvores de processos maliciosos parent-child tópico — de telemetria com isolamento de máquina da rede"
             href="Seguranca-em-Endpoints-EDR/treinamento-seguranca-em-endpoints-edr.html">
             <span class="mc-top"><span class="mc-num">Estudo 10</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Antivírus, EDR/XDR e Proteção de Host</h3>
             <p class="mc-sub">Telemetria comportamental de processos, detecção de técnicas evasivas e contenção de hosts</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect / Detect</span><span class="tag lab">🧪 Linha do Tempo de Telemetria e Detecção EDR</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect / Detect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Protecao-de-Dados-e-Conteudo"
@@ -1923,15 +1912,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Blue Team &amp; Defesa|Operações SOC &amp; Resposta|GRC &amp; Auditoria|Analista de Segurança da Informação"
             data-nist="Protect / Detect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="analista_si"
             data-certs="PDPF/PDPP|CDPSE"
-            data-busca="protecao-de-dados-e-conteudo dlp, antispam e filtro de conteúdo prevenção de perda de dados, autenticação de e-mail (spf, dkim, dmarc) e filtragem de conteúdo e url em proxy seguro como impedir que dados sensíveis saiam da organização por e-mail ou web sem bloquear o trabalho legítimo? gateway de conteúdo protect / detect blue team &amp; defesa operações soc &amp; resposta grc &amp; auditoria analista de segurança da informação dlp de rede, de endpoint e de nuvem (casb), com detectores por regex, checksum (luhn) e dicionário autenticação de e-mail com spf, dkim e dmarc (none, quarantine, reject) e antispam por reputação filtro de url por categoria em swg, inspeção tls e o equilíbrio entre falso positivo e falso negativo simulador gateway de conteúdo: antispam, dlp e filtro de url com veredito permitir, quarentena ou bloquear"
+            data-busca="protecao-de-dados-e-conteudo dlp, antispam e filtro de conteúdo prevenção de perda de dados, autenticação de e-mail (spf, dkim, dmarc) e filtragem de conteúdo e url em proxy seguro como impedir que dados sensíveis saiam da organização por e-mail ou web sem bloquear o trabalho legítimo? protect / detect blue team &amp; defesa operações soc &amp; resposta grc &amp; auditoria analista de segurança da informação dlp de rede, de endpoint e de nuvem (casb), com detectores por regex, checksum (luhn) e dicionário autenticação de e-mail com spf, dkim e dmarc (none, quarantine, reject) e antispam por reputação filtro de url por categoria em swg, inspeção tls e o equilíbrio entre falso positivo e falso negativo tópico — gateway de conteúdo: antispam, dlp e filtro de url com veredito permitir, quarentena ou bloquear"
             href="Protecao-de-Dados-e-Conteudo/treinamento-protecao-de-dados-e-conteudo.html">
             <span class="mc-top"><span class="mc-num">Estudo 29</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">DLP, AntiSpam e Filtro de Conteúdo</h3>
             <p class="mc-sub">Prevenção de perda de dados, autenticação de e-mail (SPF, DKIM, DMARC) e filtragem de conteúdo e URL em proxy seguro</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect / Detect</span><span class="tag lab">🧪 Gateway de Conteúdo</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect / Detect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Seguranca-de-Bancos-de-Dados"
@@ -1940,15 +1929,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Blue Team &amp; Defesa|AppSec &amp; DevSecOps|GRC &amp; Auditoria|Analista de Segurança da Informação"
             data-nist="Protect / Detect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="analista_si"
             data-certs="CISSP|CCSP|CISA|CDPSE"
-            data-busca="seguranca-de-bancos-de-dados bancos de dados relacionais: sql, privilégios e auditoria modelo relacional, sql ddl/dml/dcl, menor privilégio, auditoria nativa e proteção de dados em repouso quem pode ler e alterar cada tabela do banco, e como provar isso numa auditoria? matriz grant/revoke protect / detect blue team &amp; defesa appsec &amp; devsecops grc &amp; auditoria analista de segurança da informação modelo relacional, acid e as linguagens sql ddl, dml e dcl menor privilégio com roles, grant/revoke, views e row-level security tde, criptografia de coluna, mascaramento dinâmico, auditoria nativa e prepared statements contra sqli simulador matriz grant/revoke com consultas permitidas ou negadas e trilha de auditoria"
+            data-busca="seguranca-de-bancos-de-dados bancos de dados relacionais: sql, privilégios e auditoria modelo relacional, sql ddl/dml/dcl, menor privilégio, auditoria nativa e proteção de dados em repouso quem pode ler e alterar cada tabela do banco, e como provar isso numa auditoria? protect / detect blue team &amp; defesa appsec &amp; devsecops grc &amp; auditoria analista de segurança da informação modelo relacional, acid e as linguagens sql ddl, dml e dcl menor privilégio com roles, grant/revoke, views e row-level security tde, criptografia de coluna, mascaramento dinâmico, auditoria nativa e prepared statements contra sqli tópico — matriz grant/revoke com consultas permitidas ou negadas e trilha de auditoria"
             href="Seguranca-de-Bancos-de-Dados/treinamento-seguranca-de-bancos-de-dados.html">
             <span class="mc-top"><span class="mc-num">Estudo 30</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">Bancos de Dados Relacionais: SQL, Privilégios e Auditoria</h3>
             <p class="mc-sub">Modelo relacional, SQL DDL/DML/DCL, menor privilégio, auditoria nativa e proteção de dados em repouso</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect / Detect</span><span class="tag lab">🧪 Matriz GRANT/REVOKE</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect / Detect</span></span>
             <span class="mc-status"></span>
           </a>
           </div>
@@ -1962,15 +1951,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Red Team &amp; Pentest|Operações SOC &amp; Resposta"
             data-nist="Identify"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="red_team"
             data-certs="CEH|eJPT|eCPPT|OSCP"
-            data-busca="reconhecimento-e-osint superfície de ataque, dns, whois e shodan mapeamento ético de pegada digital, inteligência de fontes abertas e enumeração de ativos expostos o que um atacante consegue descobrir sobre nossa infraestrutura sem enviar um único pacote invasivo? terminal simulado de osint e enumeração identify red team &amp; pentest operações soc &amp; resposta reconhecimento passivo vs ativo e pegada digital google dorks, certificate transparency logs e whois consultas especializadas em shodan e censys terminal interativo com comandos de enumeração simulados"
+            data-busca="reconhecimento-e-osint superfície de ataque, dns, whois e shodan mapeamento ético de pegada digital, inteligência de fontes abertas e enumeração de ativos expostos o que um atacante consegue descobrir sobre nossa infraestrutura sem enviar um único pacote invasivo? identify red team &amp; pentest operações soc &amp; resposta reconhecimento passivo vs ativo e pegada digital google dorks, certificate transparency logs e whois consultas especializadas em shodan e censys terminal interativo com comandos de enumeração simulados"
             href="Reconhecimento-e-OSINT/treinamento-reconhecimento-e-osint.html">
             <span class="mc-top"><span class="mc-num">Estudo 11</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Superfície de Ataque, DNS, WHOIS e Shodan</h3>
             <p class="mc-sub">Mapeamento ético de pegada digital, inteligência de fontes abertas e enumeração de ativos expostos</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Identify</span><span class="tag lab">🧪 Terminal Simulado de OSINT e Enumeração</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Identify</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-OWASP-Top-10-Web"
@@ -1979,15 +1968,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="AppSec &amp; DevSecOps|Red Team &amp; Pentest|Analista de Segurança da Informação"
             data-nist="Protect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="red_team devsecops_cloud"
             data-certs="CEH|eJPT|eCPPT|OSCP"
-            data-busca="owasp-top-10-web falhas web (sqli, xss, csrf, broken auth) principais riscos de segurança em aplicações web e métodos definitivos de remediação em código como desenvolvedores podem eliminar falhas críticas de injeção diretamente na raiz do código? playground de injeção e sanitização web protect appsec &amp; devsecops red team &amp; pentest analista de segurança da informação categorias a01 a a10 do owasp top 10 prepared statements para imunização contra sql injection content security policy (csp) contra ataques xss playground interativo de injeção com filtros sanitizadores"
+            data-busca="owasp-top-10-web falhas web (sqli, xss, csrf, broken auth) principais riscos de segurança em aplicações web e métodos definitivos de remediação em código como desenvolvedores podem eliminar falhas críticas de injeção diretamente na raiz do código? protect appsec &amp; devsecops red team &amp; pentest analista de segurança da informação categorias a01 a a10 do owasp top 10 prepared statements para imunização contra sql injection content security policy (csp) contra ataques xss playground interativo de injeção com filtros sanitizadores"
             href="OWASP-Top-10-Web/treinamento-owasp-top-10-web.html">
             <span class="mc-top"><span class="mc-num">Estudo 12</span><span class="mc-tempo">⏱ 55 min</span></span>
             <h3 class="mc-titulo">Falhas Web (SQLi, XSS, CSRF, Broken Auth)</h3>
             <p class="mc-sub">Principais riscos de segurança em aplicações web e métodos definitivos de remediação em código</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Playground de Injeção e Sanitização Web</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Seguranca-em-APIs"
@@ -1996,15 +1985,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="AppSec &amp; DevSecOps|Red Team &amp; Pentest"
             data-nist="Protect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="red_team devsecops_cloud"
             data-certs="CEH|eJPT|eCPPT|OSCP|CDPSE"
-            data-busca="seguranca-em-apis owasp api security, rate limiting e tokens proteção de microsserviços, controle de autorização em nível de objeto (bola) e limitação de taxa por que firewalls convencionais falham em detectar abusos lógicos e quebras de bola em apis? simulador de chamadas de api com rate limiter protect appsec &amp; devsecops red team &amp; pentest owasp api security top 10 (foco em bola e broken auth) algoritmos de rate limiting: token bucket e leaky bucket validação rigorosa de esquemas e proteção contra mass assignment simulador de requisições rest com bloqueios http 429 e 403"
+            data-busca="seguranca-em-apis owasp api security, rate limiting e tokens proteção de microsserviços, controle de autorização em nível de objeto (bola) e limitação de taxa por que firewalls convencionais falham em detectar abusos lógicos e quebras de bola em apis? protect appsec &amp; devsecops red team &amp; pentest owasp api security top 10 (foco em bola e broken auth) algoritmos de rate limiting: token bucket e leaky bucket validação rigorosa de esquemas e proteção contra mass assignment tópico — de requisições rest com bloqueios http 429 e 403"
             href="Seguranca-em-APIs/treinamento-seguranca-em-apis.html">
             <span class="mc-top"><span class="mc-num">Estudo 13</span><span class="mc-tempo">⏱ 40 min</span></span>
             <h3 class="mc-titulo">OWASP API Security, Rate Limiting e Tokens</h3>
             <p class="mc-sub">Proteção de microsserviços, controle de autorização em nível de objeto (BOLA) e limitação de taxa</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Simulador de Chamadas de API com Rate Limiter</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Pentest-Metodologias"
@@ -2013,15 +2002,15 @@ a.progresso-titulo:hover {
             data-nivel="avancado"
             data-perfis="Red Team &amp; Pentest|GRC &amp; Auditoria"
             data-nist="Identify"
-            data-secoes="7"
+            data-secoes="6"
             data-rotas="red_team"
             data-certs="CEH|eJPT|eCPPT|OSCP"
-            data-busca="pentest-metodologias fases do pentest (ptes), escopo e relatório estruturação profissional de testes de intrusão, regras de engajamento, relatórios técnicos e executivos e a escada de certificações práticas (ejpt, ecppt e oscp) como conduzir um teste de invasão ético agregando valor real ao negócio sem indisponibilizar sistemas? construtor de matriz de achados e relatórios de pentest identify red team &amp; pentest grc &amp; auditoria as 7 fases do padrão ptes (do pré-engajamento ao relatório) modalidades white-box, gray-box e black-box regras de engajamento (roe) e comunicação de incidentes construtor interativo de matriz de achados e relatórios certificações práticas: ejpt, ecppt e oscp"
+            data-busca="pentest-metodologias fases do pentest (ptes), escopo e relatório estruturação profissional de testes de intrusão, regras de engajamento, relatórios técnicos e executivos e a escada de certificações práticas (ejpt, ecppt e oscp) como conduzir um teste de invasão ético agregando valor real ao negócio sem indisponibilizar sistemas? identify red team &amp; pentest grc &amp; auditoria as 7 fases do padrão ptes (do pré-engajamento ao relatório) modalidades white-box, gray-box e black-box regras de engajamento (roe) e comunicação de incidentes construtor interativo de matriz de achados e relatórios certificações práticas: ejpt, ecppt e oscp"
             href="Pentest-Metodologias/treinamento-pentest-metodologias.html">
             <span class="mc-top"><span class="mc-num">Estudo 14</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Fases do Pentest (PTES), Escopo e Relatório</h3>
             <p class="mc-sub">Estruturação profissional de testes de intrusão, regras de engajamento, relatórios técnicos e executivos e a escada de certificações práticas (eJPT, eCPPT e OSCP)</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Identify</span><span class="tag lab">🧪 Construtor de Matriz de Achados e Relatórios de Pentest</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Identify</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Engenharia-Social-e-Phishing"
@@ -2030,15 +2019,15 @@ a.progresso-titulo:hover {
             data-nivel="iniciante"
             data-perfis="Red Team &amp; Pentest|Blue Team &amp; Defesa|GRC &amp; Auditoria|Analista de Segurança da Informação"
             data-nist="Protect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="red_team"
             data-certs="CEH|ISFS|CSFPC"
-            data-busca="engenharia-social-e-phishing pretexting, spear phishing e defesas humanas gatilhos comportamentais, autenticação de e-mail (spf/dkim/dmarc) e conscientização corporativa como proteger a organização do elo mais explorado da cadeia de segurança: o fator humano? analisador de e-mails suspeitos (spot the indicators) protect red team &amp; pentest blue team &amp; defesa grc &amp; auditoria analista de segurança da informação táticas de pretexting, spear phishing e whaling autenticação de e-mail com spf, dkim e políticas dmarc tokens físicos fido2 contra ataques de adversary-in-the-middle analisador interativo de e-mails com detecção de indicadores"
+            data-busca="engenharia-social-e-phishing pretexting, spear phishing e defesas humanas gatilhos comportamentais, autenticação de e-mail (spf/dkim/dmarc) e conscientização corporativa como proteger a organização do elo mais explorado da cadeia de segurança: o fator humano? protect red team &amp; pentest blue team &amp; defesa grc &amp; auditoria analista de segurança da informação táticas de pretexting, spear phishing e whaling autenticação de e-mail com spf, dkim e políticas dmarc tokens físicos fido2 contra ataques de adversary-in-the-middle analisador interativo de e-mails com detecção de indicadores"
             href="Engenharia-Social-e-Phishing/treinamento-engenharia-social-e-phishing.html">
             <span class="mc-top"><span class="mc-num">Estudo 15</span><span class="mc-tempo">⏱ 40 min</span></span>
             <h3 class="mc-titulo">Pretexting, Spear Phishing e Defesas Humanas</h3>
             <p class="mc-sub">Gatilhos comportamentais, autenticação de e-mail (SPF/DKIM/DMARC) e conscientização corporativa</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Analisador de E-mails Suspeitos (Spot the Indicators)</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Exploracao-e-Escalada-de-Privilegio"
@@ -2047,15 +2036,15 @@ a.progresso-titulo:hover {
             data-nivel="avancado"
             data-perfis="Blue Team &amp; Defesa|Red Team &amp; Pentest|Analista de Segurança da Informação"
             data-nist="Detect / Protect"
-            data-secoes="10"
+            data-secoes="9"
             data-rotas="red_team"
             data-certs="CEH|eJPT|eCPPT|OSCP"
-            data-busca="exploracao-e-escalada-de-privilegio exploração e escalada de privilégio: detecção e defesa a cadeia de ataque — varredura, exploração, shell, escalada no linux e no windows — vista do lado do defensor: o que cada etapa deixa nos logs e como barrá-la um servidor web foi comprometido e viraram root. em que ponto da cadeia o defensor podia ter visto e parado o ataque? console do defensor detect / protect blue team &amp; defesa red team &amp; pentest analista de segurança da informação a cadeia: reconhecimento, exploração, acesso e escalada sinal de ouro: servidor web iniciando um shell (edr/sysmon) egress filtering barra e registra o reverse shell escalada nasce de privilégio a mais; auditd e eventos do windows registram correlação da cadeia numa linha do tempo no siem"
+            data-busca="exploracao-e-escalada-de-privilegio exploração e escalada de privilégio: detecção e defesa a cadeia de ataque — varredura, exploração, shell, escalada no linux e no windows — vista do lado do defensor: o que cada etapa deixa nos logs e como barrá-la um servidor web foi comprometido e viraram root. em que ponto da cadeia o defensor podia ter visto e parado o ataque? detect / protect blue team &amp; defesa red team &amp; pentest analista de segurança da informação a cadeia: reconhecimento, exploração, acesso e escalada sinal de ouro: servidor web iniciando um shell (edr/sysmon) egress filtering barra e registra o reverse shell escalada nasce de privilégio a mais; auditd e eventos do windows registram correlação da cadeia numa linha do tempo no siem"
             href="Exploracao-e-Escalada-de-Privilegio/treinamento-exploracao-e-escalada-de-privilegio.html">
             <span class="mc-top"><span class="mc-num">Estudo 62</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">Exploração e Escalada de Privilégio: Detecção e Defesa</h3>
             <p class="mc-sub">A cadeia de ataque — varredura, exploração, shell, escalada no Linux e no Windows — vista do lado do defensor: o que cada etapa deixa nos logs e como barrá-la</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Detect / Protect</span><span class="tag lab">🧪 Console do Defensor</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Detect / Protect</span></span>
             <span class="mc-status"></span>
           </a>
           </div>
@@ -2069,15 +2058,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Operações SOC &amp; Resposta|Blue Team &amp; Defesa|Analista de Segurança da Informação"
             data-nist="Detect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="blue_soc pericia"
             data-certs="GSEC|ITIL 4 F"
-            data-busca="operacoes-soc-e-siem rotina de soc l1/l2, logs e regras sigma estrutura operacional de um centro de monitoramento, ciclo de vida de alertas e regras sigma portáveis como separar ruído de alertas genuínos em fluxos corporativos de milhões de eventos por segundo? console siem com busca de logs e alertas detect operações soc &amp; resposta blue team &amp; defesa analista de segurança da informação estrutura de níveis soc n1 (triagem), n2 (investigação) e n3 (hunting) métricas operacionais: mttd e mttr formato de regras de detecção sigma e conversão para siem console interativo estilo siem com pesquisa de logs e alertas"
+            data-busca="operacoes-soc-e-siem rotina de soc l1/l2, logs e regras sigma estrutura operacional de um centro de monitoramento, ciclo de vida de alertas e regras sigma portáveis como separar ruído de alertas genuínos em fluxos corporativos de milhões de eventos por segundo? detect operações soc &amp; resposta blue team &amp; defesa analista de segurança da informação estrutura de níveis soc n1 (triagem), n2 (investigação) e n3 (hunting) métricas operacionais: mttd e mttr formato de regras de detecção sigma e conversão para siem console interativo estilo siem com pesquisa de logs e alertas"
             href="Operacoes-SOC-e-SIEM/treinamento-operacoes-soc-e-siem.html">
             <span class="mc-top"><span class="mc-num">Estudo 16</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">Rotina de SOC L1/L2, Logs e Regras Sigma</h3>
             <p class="mc-sub">Estrutura operacional de um centro de monitoramento, ciclo de vida de alertas e regras Sigma portáveis</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Detect</span><span class="tag lab">🧪 Console SIEM com Busca de Logs e Alertas</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Detect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Threat-Intelligence"
@@ -2086,15 +2075,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Operações SOC &amp; Resposta|Blue Team &amp; Defesa"
             data-nist="Identify / Detect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="blue_soc"
             data-certs="CSFPC"
-            data-busca="threat-intelligence iocs, ttps, mitre att&amp;ck e stix/taxii transformação de dados brutos de ameaças em inteligência acionável e compartilhamento padronizado por que focar em técnicas e táticas de adversários é infinitamente mais eficaz que caçar hashes e ips? mapeador de iocs e ttps na matriz att&amp;ck identify / detect operações soc &amp; resposta blue team &amp; defesa pirâmide da dor de david bianco e robustez defensiva navegação na matriz mitre att&amp;ck enterprise padrões de compartilhamento stix 2.1 e taxii mapeador interativo de iocs com visualização de técnicas"
+            data-busca="threat-intelligence iocs, ttps, mitre att&amp;ck e stix/taxii transformação de dados brutos de ameaças em inteligência acionável e compartilhamento padronizado por que focar em técnicas e táticas de adversários é infinitamente mais eficaz que caçar hashes e ips? identify / detect operações soc &amp; resposta blue team &amp; defesa pirâmide da dor de david bianco e robustez defensiva navegação na matriz mitre att&amp;ck enterprise padrões de compartilhamento stix 2.1 e taxii mapeador interativo de iocs com visualização de técnicas"
             href="Threat-Intelligence/treinamento-threat-intelligence.html">
             <span class="mc-top"><span class="mc-num">Estudo 17</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">IoCs, TTPs, MITRE ATT&amp;CK e STIX/TAXII</h3>
             <p class="mc-sub">Transformação de dados brutos de ameaças em inteligência acionável e compartilhamento padronizado</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Identify / Detect</span><span class="tag lab">🧪 Mapeador de IoCs e TTPs na Matriz ATT&amp;CK</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Identify / Detect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Resposta-a-Incidentes"
@@ -2103,15 +2092,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Operações SOC &amp; Resposta|Perícia Forense &amp; Malware|GRC &amp; Auditoria|Analista de Segurança da Informação"
             data-nist="Respond"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="blue_soc pericia analista_si"
             data-certs="CISM|CISSP|Security+|PDPF/PDPP|ITIL 4 F|CSFPC"
-            data-busca="resposta-a-incidentes ciclo nist sp 800-61 rev. 2 e rev. 3 (contenção e erradicação) gestão operacional de crises cibernéticas, ciclo clássico da rev. 2, reorganização da rev. 3 pelas funções do csf 2.0 e playbooks de contenção ágil quais passos imediatos tomar para conter um ataque ativo sem destruir evidências forenses vitais, seguindo o ciclo da rev. 2 e a organização da rev. 3? runbook interativo em árvore de decisão respond operações soc &amp; resposta perícia forense &amp; malware grc &amp; auditoria analista de segurança da informação ciclo em 4 fases do nist sp 800-61 rev. 2 e a reorganização da rev. 3 (2025) pelas funções do csf 2.0 contenção de curto prazo vs contenção de longo prazo condução de lições aprendidas e retrospectiva sem culpa simulador de crise em árvore de decisão com ramificações"
+            data-busca="resposta-a-incidentes ciclo nist sp 800-61 rev. 2 e rev. 3 (contenção e erradicação) gestão operacional de crises cibernéticas, ciclo clássico da rev. 2, reorganização da rev. 3 pelas funções do csf 2.0 e playbooks de contenção ágil quais passos imediatos tomar para conter um ataque ativo sem destruir evidências forenses vitais, seguindo o ciclo da rev. 2 e a organização da rev. 3? respond operações soc &amp; resposta perícia forense &amp; malware grc &amp; auditoria analista de segurança da informação ciclo em 4 fases do nist sp 800-61 rev. 2 e a reorganização da rev. 3 (2025) pelas funções do csf 2.0 contenção de curto prazo vs contenção de longo prazo condução de lições aprendidas e retrospectiva sem culpa tópico — de crise em árvore de decisão com ramificações"
             href="Resposta-a-Incidentes/treinamento-resposta-a-incidentes.html">
             <span class="mc-top"><span class="mc-num">Estudo 18</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação)</h3>
             <p class="mc-sub">Gestão operacional de crises cibernéticas, ciclo clássico da Rev. 2, reorganização da Rev. 3 pelas funções do CSF 2.0 e playbooks de contenção ágil</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Respond</span><span class="tag lab">🧪 Runbook Interativo em Árvore de Decisão</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Respond</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Forense-Digital"
@@ -2120,15 +2109,15 @@ a.progresso-titulo:hover {
             data-nivel="avancado"
             data-perfis="Perícia Forense &amp; Malware|Operações SOC &amp; Resposta|Analista de Segurança da Informação"
             data-nist="Respond"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="pericia"
             data-certs=""
-            data-busca="forense-digital cadeia de custódia, coleta de ram e artefatos metodologia pericial rigorosa, ordem de volatilidade, integridade de cópias e análise de artefatos do so como reconstruir os passos exatos de um invasor e produzir provas digitais legalmente irrefutáveis? analisador de timeline de evidências e logs forenses respond perícia forense &amp; malware operações soc &amp; resposta analista de segurança da informação norma iso/iec 27037 e ordem de volatilidade rfc 3227 bloqueadores de escrita físicos/lógicos e hashes sha-256 artefatos forenses de host: prefetch, shimcache, $mft e registro analisador interativo de super-timeline de eventos"
+            data-busca="forense-digital cadeia de custódia, coleta de ram e artefatos metodologia pericial rigorosa, ordem de volatilidade, integridade de cópias e análise de artefatos do so como reconstruir os passos exatos de um invasor e produzir provas digitais legalmente irrefutáveis? respond perícia forense &amp; malware operações soc &amp; resposta analista de segurança da informação norma iso/iec 27037 e ordem de volatilidade rfc 3227 bloqueadores de escrita físicos/lógicos e hashes sha-256 artefatos forenses de host: prefetch, shimcache, $mft e registro analisador interativo de super-timeline de eventos"
             href="Forense-Digital/treinamento-forense-digital.html">
             <span class="mc-top"><span class="mc-num">Estudo 19</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Cadeia de Custódia, Coleta de RAM e Artefatos</h3>
             <p class="mc-sub">Metodologia pericial rigorosa, ordem de volatilidade, integridade de cópias e análise de artefatos do SO</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Respond</span><span class="tag lab">🧪 Analisador de Timeline de Evidências e Logs Forenses</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Respond</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Analise-Basica-de-Malware"
@@ -2137,15 +2126,15 @@ a.progresso-titulo:hover {
             data-nivel="avancado"
             data-perfis="Perícia Forense &amp; Malware|Operações SOC &amp; Resposta"
             data-nist="Detect / Respond"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="pericia"
             data-certs="CEH|CSFPC"
-            data-busca="analise-basica-de-malware análise estática vs dinâmica e sandboxes inspeção inicial de artefatos maliciosos, cálculo de entropia, importações e relatórios de sandboxes o que o binário suspeito é capaz de fazer, e quais indicadores ele gera ao rodar em ambiente isolado? inspetor de metadados pe/elf e hashes detect / respond perícia forense &amp; malware operações soc &amp; resposta diferenças entre análise estática e dinâmica em sandbox estrutura do cabeçalho portable executable (pe) e seções cálculo de entropia de shannon para detectar packers (upx) inspetor interativo de metadados de binários e chamadas de api"
+            data-busca="analise-basica-de-malware análise estática vs dinâmica e sandboxes inspeção inicial de artefatos maliciosos, cálculo de entropia, importações e relatórios de sandboxes o que o binário suspeito é capaz de fazer, e quais indicadores ele gera ao rodar em ambiente isolado? detect / respond perícia forense &amp; malware operações soc &amp; resposta diferenças entre análise estática e dinâmica em sandbox estrutura do cabeçalho portable executable (pe) e seções cálculo de entropia de shannon para detectar packers (upx) inspetor interativo de metadados de binários e chamadas de api"
             href="Analise-Basica-de-Malware/treinamento-analise-basica-de-malware.html">
             <span class="mc-top"><span class="mc-num">Estudo 20</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Análise Estática vs Dinâmica e Sandboxes</h3>
             <p class="mc-sub">Inspeção inicial de artefatos maliciosos, cálculo de entropia, importações e relatórios de sandboxes</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Detect / Respond</span><span class="tag lab">🧪 Inspetor de Metadados PE/ELF e Hashes</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Detect / Respond</span></span>
             <span class="mc-status"></span>
           </a>
           </div>
@@ -2159,15 +2148,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="AppSec &amp; DevSecOps|Blue Team &amp; Defesa|GRC &amp; Auditoria"
             data-nist="Protect"
-            data-secoes="7"
+            data-secoes="6"
             data-rotas="devsecops_cloud"
             data-certs="CCSP|CDPSE"
-            data-busca="seguranca-em-nuvem responsabilidade compartilhada e cspm arquiteturas seguras em provedores de nuvem, gestão de postura e políticas de acesso a dados onde termina a obrigação do provedor de nuvem e onde começa a responsabilidade da sua organização? auditor de permissões s3 e políticas iam cloud protect appsec &amp; devsecops blue team &amp; defesa grc &amp; auditoria modelo de responsabilidade compartilhada (iaas, paas, saas) endurecimento de políticas iam e proteção de buckets s3 postura de segurança em nuvem com cspm e cwpp auditor interativo de arquivos de políticas json de nuvem"
+            data-busca="seguranca-em-nuvem responsabilidade compartilhada e cspm arquiteturas seguras em provedores de nuvem, gestão de postura e políticas de acesso a dados onde termina a obrigação do provedor de nuvem e onde começa a responsabilidade da sua organização? protect appsec &amp; devsecops blue team &amp; defesa grc &amp; auditoria modelo de responsabilidade compartilhada (iaas, paas, saas) endurecimento de políticas iam e proteção de buckets s3 postura de segurança em nuvem com cspm e cwpp auditor interativo de arquivos de políticas json de nuvem"
             href="Seguranca-em-Nuvem/treinamento-seguranca-em-nuvem.html">
             <span class="mc-top"><span class="mc-num">Estudo 21</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Responsabilidade Compartilhada e CSPM</h3>
             <p class="mc-sub">Arquiteturas seguras em provedores de nuvem, gestão de postura e políticas de acesso a dados</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Auditor de Permissões S3 e Políticas IAM Cloud</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-DevSecOps-e-CI-CD"
@@ -2176,15 +2165,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="AppSec &amp; DevSecOps"
             data-nist="Protect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="devsecops_cloud"
             data-certs="CISSP|CCSP|ITIL 4 F|CISA|CDPSE"
-            data-busca="devsecops-e-ci-cd shift-left, sast, dast, sca e containers automação de segurança no ciclo de entrega contínua, governança de dependências e proteção de containers como detectar e bloquear vulnerabilidades em código e dependências antes do deploy em produção? simulador de pipeline ci/cd com security gates protect appsec &amp; devsecops filosofia shift-left e ciclo ssdlc integração de testes sast, dast e sca com sbom boas práticas em dockerfiles e imagens distroless simulador de pipeline ci/cd com parametrização de thresholds de quebra"
+            data-busca="devsecops-e-ci-cd shift-left, sast, dast, sca e containers automação de segurança no ciclo de entrega contínua, governança de dependências e proteção de containers como detectar e bloquear vulnerabilidades em código e dependências antes do deploy em produção? protect appsec &amp; devsecops filosofia shift-left e ciclo ssdlc integração de testes sast, dast e sca com sbom boas práticas em dockerfiles e imagens distroless tópico — de pipeline ci/cd com parametrização de thresholds de quebra"
             href="DevSecOps-e-CI-CD/treinamento-devsecops-e-ci-cd.html">
             <span class="mc-top"><span class="mc-num">Estudo 22</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Shift-Left, SAST, DAST, SCA e Containers</h3>
             <p class="mc-sub">Automação de segurança no ciclo de entrega contínua, governança de dependências e proteção de containers</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Simulador de Pipeline CI/CD com Security Gates</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Seguranca-em-IoT-e-OT"
@@ -2193,15 +2182,15 @@ a.progresso-titulo:hover {
             data-nivel="avancado"
             data-perfis="Blue Team &amp; Defesa"
             data-nist="Protect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas=""
             data-certs=""
-            data-busca="seguranca-em-iot-e-ot redes industriais (scada/modbus) e iot proteção de sistemas de controle operacional, modelo purdue, protocolos legados e isolamento físico como proteger sistemas ciberfísicos que não suportam paradas, patches frequentes ou criptografia pesada? mapeador do modelo purdue (ti vs to) protect blue team &amp; defesa convergência ti e to e prioridades de disponibilidade níveis 0 a 5 do modelo purdue para sistemas ics/scada limitações de segurança do protocolo modbus tcp (porta 502) mapeador arquitetural interativo de zonas industriais"
+            data-busca="seguranca-em-iot-e-ot redes industriais (scada/modbus) e iot proteção de sistemas de controle operacional, modelo purdue, protocolos legados e isolamento físico como proteger sistemas ciberfísicos que não suportam paradas, patches frequentes ou criptografia pesada? protect blue team &amp; defesa convergência ti e to e prioridades de disponibilidade níveis 0 a 5 do modelo purdue para sistemas ics/scada limitações de segurança do protocolo modbus tcp (porta 502) mapeador arquitetural interativo de zonas industriais"
             href="Seguranca-em-IoT-e-OT/treinamento-seguranca-em-iot-e-ot.html">
             <span class="mc-top"><span class="mc-num">Estudo 23</span><span class="mc-tempo">⏱ 40 min</span></span>
             <h3 class="mc-titulo">Redes Industriais (SCADA/Modbus) e IoT</h3>
             <p class="mc-sub">Proteção de sistemas de controle operacional, Modelo Purdue, protocolos legados e isolamento físico</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Mapeador do Modelo Purdue (TI vs TO)</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-IA-e-Ciberseguranca"
@@ -2210,15 +2199,15 @@ a.progresso-titulo:hover {
             data-nivel="avancado"
             data-perfis="AppSec &amp; DevSecOps|Blue Team &amp; Defesa"
             data-nist="Protect / Detect"
-            data-secoes="7"
+            data-secoes="6"
             data-rotas="devsecops_cloud"
             data-certs=""
-            data-busca="ia-e-ciberseguranca ameaças a llms (owasp llm), deepfakes e defesa segurança de modelos fundacionais, vetores de injeção de prompt, envenenamento e uso defensivo de ia como impedir que usuários maliciosos manipulem instruções de sistemas baseados em inteligência artificial? lab de prompt injection e defesas protect / detect appsec &amp; devsecops blue team &amp; defesa owasp top 10 for llm applications (llm01 prompt injection) ataques de data poisoning e vazamento de dados sensíveis mecanismos de guardrails de entrada e sanitização de prompts laboratório interativo de bypass de chatbot e aplicação de defesas"
+            data-busca="ia-e-ciberseguranca ameaças a llms (owasp llm), deepfakes e defesa segurança de modelos fundacionais, vetores de injeção de prompt, envenenamento e uso defensivo de ia como impedir que usuários maliciosos manipulem instruções de sistemas baseados em inteligência artificial? protect / detect appsec &amp; devsecops blue team &amp; defesa owasp top 10 for llm applications (llm01 prompt injection) ataques de data poisoning e vazamento de dados sensíveis mecanismos de guardrails de entrada e sanitização de prompts exercício didático de bypass de chatbot e aplicação de defesas"
             href="IA-e-Ciberseguranca/treinamento-ia-e-ciberseguranca.html">
             <span class="mc-top"><span class="mc-num">Estudo 24</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Ameaças a LLMs (OWASP LLM), Deepfakes e Defesa</h3>
             <p class="mc-sub">Segurança de modelos fundacionais, vetores de injeção de prompt, envenenamento e uso defensivo de IA</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Protect / Detect</span><span class="tag lab">🧪 Lab de Prompt Injection e Defesas</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Protect / Detect</span></span>
             <span class="mc-status"></span>
           </a>
           </div>
@@ -2232,15 +2221,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="GRC &amp; Auditoria|Analista de Segurança da Informação"
             data-nist="Govern / Identify"
-            data-secoes="8"
+            data-secoes="7"
             data-rotas="grc analista_si"
             data-certs="CISM|CISSP|ISFS|CSFPC|CISA|ISO 27001 LA|CRISC|CGEIT"
-            data-busca="gestao-de-riscos-ti iso 31000 e avaliação qualitativa vs quantitativa (ale/sle) processo da iso 31000:2018, metodologias de análise de risco, matrizes 5x5, cálculo financeiro de perdas e justificativa de roi como conduzir o processo de riscos da iso 31000:2018 e quantificar em reais o impacto de uma ameaça para justificar orçamentos à diretoria? calculadora de matriz 5x5 e risco financeiro (ale/sle) govern / identify grc &amp; auditoria analista de segurança da informação processo da iso 31000:2018: contexto, identificação, análise, avaliação, tratamento, monitoramento e comunicação, ao lado do nist sp 800-30 fórmulas quantitativas: sle = av * ef e ale = sle * aro estratégias de tratamento de risco: mitigar, aceitar, transferir, evitar calculadora interativa com matriz 5x5 e cálculo de viabilidade rosi"
+            data-busca="gestao-de-riscos-ti iso 31000 e avaliação qualitativa vs quantitativa (ale/sle) processo da iso 31000:2018, metodologias de análise de risco, matrizes 5x5, cálculo financeiro de perdas e justificativa de roi como conduzir o processo de riscos da iso 31000:2018 e quantificar em reais o impacto de uma ameaça para justificar orçamentos à diretoria? govern / identify grc &amp; auditoria analista de segurança da informação processo da iso 31000:2018: contexto, identificação, análise, avaliação, tratamento, monitoramento e comunicação, ao lado do nist sp 800-30 fórmulas quantitativas: sle = av * ef e ale = sle * aro estratégias de tratamento de risco: mitigar, aceitar, transferir, evitar calculadora interativa com matriz 5x5 e cálculo de viabilidade rosi"
             href="Gestao-de-Riscos-TI/treinamento-gestao-de-riscos-ti.html">
             <span class="mc-top"><span class="mc-num">Estudo 25</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)</h3>
             <p class="mc-sub">Processo da ISO 31000:2018, metodologias de análise de risco, matrizes 5x5, cálculo financeiro de perdas e justificativa de ROI</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Govern / Identify</span><span class="tag lab">🧪 Calculadora de Matriz 5x5 e Risco Financeiro (ALE/SLE)</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Govern / Identify</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-ISO-27001-e-27002"
@@ -2249,15 +2238,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="GRC &amp; Auditoria|Analista de Segurança da Informação"
             data-nist="Govern"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="grc analista_si"
             data-certs="CISM|CISSP|ISFS|ITIL 4 F|CISA|ISO 27001 LA|CRISC|CGEIT"
-            data-busca="iso-27001-e-27002 sgsi, anexo a, cis controls e nist 800-53 estrutura do sgsi, os 93 controles do anexo a, declaração de aplicabilidade e crosswalk com cis controls v8.1 e nist sp 800-53 rev. 5 como estruturar um sgsi auditável e mapear os controles do anexo a para cis controls v8.1 (ig1/ig2/ig3) e nist sp 800-53 rev. 5? matriz de controles e declaração de aplicabilidade (soa) govern grc &amp; auditoria analista de segurança da informação estrutura hls da iso/iec 27001:2022 (cláusulas 4 a 10) os 93 controles consolidados em 4 temas organizacionais, com crosswalk para cis controls v8.1 (ig1/ig2/ig3) e nist sp 800-53 rev. 5 elaboração e manutenção da declaração de aplicabilidade (soa) matriz interativa de aplicabilidade com sumário percentual"
+            data-busca="iso-27001-e-27002 sgsi, anexo a, cis controls e nist 800-53 estrutura do sgsi, os 93 controles do anexo a, declaração de aplicabilidade e crosswalk com cis controls v8.1 e nist sp 800-53 rev. 5 como estruturar um sgsi auditável e mapear os controles do anexo a para cis controls v8.1 (ig1/ig2/ig3) e nist sp 800-53 rev. 5? govern grc &amp; auditoria analista de segurança da informação estrutura hls da iso/iec 27001:2022 (cláusulas 4 a 10) os 93 controles consolidados em 4 temas organizacionais, com crosswalk para cis controls v8.1 (ig1/ig2/ig3) e nist sp 800-53 rev. 5 elaboração e manutenção da declaração de aplicabilidade (soa) matriz interativa de aplicabilidade com sumário percentual"
             href="ISO-27001-e-27002/treinamento-iso-27001-e-27002.html">
             <span class="mc-top"><span class="mc-num">Estudo 26</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">SGSI, Anexo A, CIS Controls e NIST 800-53</h3>
             <p class="mc-sub">Estrutura do SGSI, os 93 controles do Anexo A, Declaração de Aplicabilidade e crosswalk com CIS Controls v8.1 e NIST SP 800-53 Rev. 5</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Govern</span><span class="tag lab">🧪 Matriz de Controles e Declaração de Aplicabilidade (SoA)</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Govern</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-LGPD-e-Privacidade"
@@ -2266,15 +2255,15 @@ a.progresso-titulo:hover {
             data-nivel="iniciante"
             data-perfis="GRC &amp; Auditoria"
             data-nist="Govern / Protect"
-            data-secoes="7"
+            data-secoes="6"
             data-rotas="grc"
             data-certs="CCSP|ISFS|PDPF/PDPP|CSFPC|ISO 27001 LA|CDPSE"
-            data-busca="lgpd-e-privacidade bases legais, direitos do titular e ripd/dpia conformidade com a lei 13.709/2018, governança de dados pessoais e relatórios de impacto à privacidade qual base legal legitima o tratamento de dados pessoais e como demonstrar conformidade perante a anpd? construtor de avaliação de impacto à privacidade (ripd) govern / protect grc &amp; auditoria as 10 bases legais da lgpd para dados pessoais e sensíveis garantia dos direitos dos titulares e atuação do dpo/encarregado protocolo de notificação de incidentes à anpd (art. 48) construtor interativo de relatório de impacto à privacidade (ripd)"
+            data-busca="lgpd-e-privacidade bases legais, direitos do titular e ripd/dpia conformidade com a lei 13.709/2018, governança de dados pessoais e relatórios de impacto à privacidade qual base legal legitima o tratamento de dados pessoais e como demonstrar conformidade perante a anpd? govern / protect grc &amp; auditoria as 10 bases legais da lgpd para dados pessoais e sensíveis garantia dos direitos dos titulares e atuação do dpo/encarregado protocolo de notificação de incidentes à anpd (art. 48) construtor interativo de relatório de impacto à privacidade (ripd)"
             href="LGPD-e-Privacidade/treinamento-lgpd-e-privacidade.html">
             <span class="mc-top"><span class="mc-num">Estudo 27</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Bases Legais, Direitos do Titular e RIPD/DPIA</h3>
             <p class="mc-sub">Conformidade com a Lei 13.709/2018, governança de dados pessoais e relatórios de impacto à privacidade</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Govern / Protect</span><span class="tag lab">🧪 Construtor de Avaliação de Impacto à Privacidade (RIPD)</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Govern / Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Continuidade-e-Disaster-Recovery"
@@ -2283,15 +2272,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="GRC &amp; Auditoria|Blue Team &amp; Defesa"
             data-nist="Recover"
-            data-secoes="7"
+            data-secoes="6"
             data-rotas="grc"
             data-certs="CISM|CISSP|CISA|ISO 27001 LA|CRISC"
-            data-busca="continuidade-e-disaster-recovery bcp, drp, cálculo de rto/rpo e regra 3-2-1 planejamento de continuidade de negócios, estratégias de recuperação de desastres e resiliência a desastres quanto tempo a organização suporta ficar inoperante e qual volume de dados pode ser perdido em um desastre? calculadora de rto/rpo e validador da estratégia 3-2-1 recover grc &amp; auditoria blue team &amp; defesa diferenciação operacional entre bcp, drp e análise bia definição e cálculo de slas de rto e rpo estratégia de backup 3-2-1 e cópias imutáveis/air-gapped calculadora interativa de resiliência e simulação de perdas"
+            data-busca="continuidade-e-disaster-recovery bcp, drp, cálculo de rto/rpo e regra 3-2-1 planejamento de continuidade de negócios, estratégias de recuperação de desastres e resiliência a desastres quanto tempo a organização suporta ficar inoperante e qual volume de dados pode ser perdido em um desastre? recover grc &amp; auditoria blue team &amp; defesa diferenciação operacional entre bcp, drp e análise bia definição e cálculo de slas de rto e rpo estratégia de backup 3-2-1 e cópias imutáveis/air-gapped calculadora interativa de resiliência e simulação de perdas"
             href="Continuidade-e-Disaster-Recovery/treinamento-continuidade-e-disaster-recovery.html">
             <span class="mc-top"><span class="mc-num">Estudo 28</span><span class="mc-tempo">⏱ 40 min</span></span>
             <h3 class="mc-titulo">BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1</h3>
             <p class="mc-sub">Planejamento de continuidade de negócios, estratégias de recuperação de desastres e resiliência a desastres</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Recover</span><span class="tag lab">🧪 Calculadora de RTO/RPO e Validador da Estratégia 3-2-1</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Recover</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-PCI-DSS"
@@ -2300,15 +2289,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="GRC &amp; Auditoria|Blue Team &amp; Defesa|Analista de Segurança da Informação"
             data-nist="Govern / Protect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="analista_si"
             data-certs="CISM"
-            data-busca="pci-dss pci dss v4.0.1: escopo cde e os 12 requisitos os 6 objetivos e 12 requisitos do padrão de cartões, delimitação do cde, segmentação para reduzir escopo e tipos de saq quais sistemas entram no escopo do pci dss e como reduzir esse escopo sem abrir mão da conformidade? delimitador de escopo cde govern / protect grc &amp; auditoria blue team &amp; defesa analista de segurança da informação 6 objetivos e 12 requisitos do pci dss v4.0.1, com a diferença entre abordagem definida e customizada pan versus dados sensíveis de autenticação (sad) e tokenização versus truncamento versus criptografia cde, sistemas conectados, segmentação validada por teste, saq a, a-ep, b, c e d, roc, qsa e aoc simulador delimitador de escopo cde: sistemas dentro, conectados ou fora do escopo, com sugestão de saq"
+            data-busca="pci-dss pci dss v4.0.1: escopo cde e os 12 requisitos os 6 objetivos e 12 requisitos do padrão de cartões, delimitação do cde, segmentação para reduzir escopo e tipos de saq quais sistemas entram no escopo do pci dss e como reduzir esse escopo sem abrir mão da conformidade? govern / protect grc &amp; auditoria blue team &amp; defesa analista de segurança da informação 6 objetivos e 12 requisitos do pci dss v4.0.1, com a diferença entre abordagem definida e customizada pan versus dados sensíveis de autenticação (sad) e tokenização versus truncamento versus criptografia cde, sistemas conectados, segmentação validada por teste, saq a, a-ep, b, c e d, roc, qsa e aoc tópico — delimitador de escopo cde: sistemas dentro, conectados ou fora do escopo, com sugestão de saq"
             href="PCI-DSS/treinamento-pci-dss.html">
             <span class="mc-top"><span class="mc-num">Estudo 31</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos</h3>
             <p class="mc-sub">Os 6 objetivos e 12 requisitos do padrão de cartões, delimitação do CDE, segmentação para reduzir escopo e tipos de SAQ</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Govern / Protect</span><span class="tag lab">🧪 Delimitador de Escopo CDE</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Govern / Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Auditoria-de-TI"
@@ -2317,15 +2306,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="GRC &amp; Auditoria|Analista de Segurança da Informação"
             data-nist="Govern"
-            data-secoes="11"
+            data-secoes="10"
             data-rotas="grc"
             data-certs="CISM|CISSP|ITIL 4 F|CISA|ISO 27001 LA|CRISC|CGEIT"
-            data-busca="auditoria-de-ti auditoria de ti: sox, itgc e cobit controles gerais de ti, teste de desenho e de efetividade, amostragem e deficiências o controle está no papel. como você prova que ele funcionou o ano inteiro? testador de itgc govern grc &amp; auditoria analista de segurança da informação sox 404 e icfr 4 domínios de itgc tod vs toe e amostragem por frequência deficiência, deficiência significativa e fraqueza material"
+            data-busca="auditoria-de-ti auditoria de ti: sox, itgc e cobit controles gerais de ti, teste de desenho e de efetividade, amostragem e deficiências o controle está no papel. como você prova que ele funcionou o ano inteiro? govern grc &amp; auditoria analista de segurança da informação sox 404 e icfr 4 domínios de itgc tod vs toe e amostragem por frequência deficiência, deficiência significativa e fraqueza material"
             href="Auditoria-de-TI/treinamento-auditoria-de-ti.html">
             <span class="mc-top"><span class="mc-num">Estudo 58</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Auditoria de TI: SOX, ITGC e COBIT</h3>
             <p class="mc-sub">Controles gerais de TI, teste de desenho e de efetividade, amostragem e deficiências</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Govern</span><span class="tag lab">🧪 Testador de ITGC</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Govern</span></span>
             <span class="mc-status"></span>
           </a>
           </div>
@@ -2339,15 +2328,15 @@ a.progresso-titulo:hover {
             data-nivel="iniciante"
             data-perfis="Blue Team &amp; Defesa|Red Team &amp; Pentest|Operações SOC &amp; Resposta|Perícia Forense &amp; Malware|AppSec &amp; DevSecOps|GRC &amp; Auditoria|Analista de Segurança da Informação"
             data-nist="Protect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="analista_si"
             data-certs=""
-            data-busca="ingles-tecnico-ciber inglês técnico para segurança da informação leitura de advisories, registros cve/nvd e rfcs, vocabulário essencial, falsos cognatos e redação técnica em inglês como ler um boletim de segurança em inglês e extrair versão afetada, impacto e mitigação sem erro de interpretação? leitor de advisory protect blue team &amp; defesa red team &amp; pentest operações soc &amp; resposta perícia forense &amp; malware appsec &amp; devsecops grc &amp; auditoria analista de segurança da informação estrutura de um advisory: summary, affected versions, impact, mitigation e workaround verbos modais normativos must, should e may conforme a rfc 2119 falsos cognatos da área (exploit, eventually, actually) e diferença entre registro formal e informal simulador leitor de advisory: termos clicáveis, perguntas de compreensão e flashcards de glossário"
+            data-busca="ingles-tecnico-ciber inglês técnico para segurança da informação leitura de advisories, registros cve/nvd e rfcs, vocabulário essencial, falsos cognatos e redação técnica em inglês como ler um boletim de segurança em inglês e extrair versão afetada, impacto e mitigação sem erro de interpretação? protect blue team &amp; defesa red team &amp; pentest operações soc &amp; resposta perícia forense &amp; malware appsec &amp; devsecops grc &amp; auditoria analista de segurança da informação estrutura de um advisory: summary, affected versions, impact, mitigation e workaround verbos modais normativos must, should e may conforme a rfc 2119 falsos cognatos da área (exploit, eventually, actually) e diferença entre registro formal e informal tópico — leitor de advisory: termos clicáveis, perguntas de compreensão e flashcards de glossário"
             href="Ingles-Tecnico-Ciber/treinamento-ingles-tecnico-ciber.html">
             <span class="mc-top"><span class="mc-num">Estudo 32</span><span class="mc-tempo">⏱ 40 min</span></span>
             <h3 class="mc-titulo">Inglês Técnico para Segurança da Informação</h3>
             <p class="mc-sub">Leitura de advisories, registros CVE/NVD e RFCs, vocabulário essencial, falsos cognatos e redação técnica em inglês</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Leitor de Advisory</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Certificacoes-e-Carreira"
@@ -2356,15 +2345,15 @@ a.progresso-titulo:hover {
             data-nivel="iniciante"
             data-perfis="Blue Team &amp; Defesa|Red Team &amp; Pentest|Operações SOC &amp; Resposta|Perícia Forense &amp; Malware|AppSec &amp; DevSecOps|GRC &amp; Auditoria|Analista de Segurança da Informação"
             data-nist="Protect"
-            data-secoes="7"
+            data-secoes="6"
             data-rotas="analista_si"
             data-certs=""
-            data-busca="certificacoes-e-carreira formação, certificações e carreira graduações e pós em segurança, 18 certificações (de security+, isfs e itil 4 a cissp, cism, cisa, crisc, cdpse e cgeit, e a escada prática ejpt, ecppt e oscp), trajetórias de grc e papéis do nice framework qual combinação de formação e certificações leva ao perfil de carreira desejado, e que lacunas ainda restam? planejador de certificações protect blue team &amp; defesa red team &amp; pentest operações soc &amp; resposta perícia forense &amp; malware appsec &amp; devsecops grc &amp; auditoria analista de segurança da informação graduações (ciência da computação, sistemas de informação) e pós-graduações em segurança da informação certificações de entrada, gestão e especialidade: órgão emissor, domínios, experiência exigida e cpe nice framework (nist sp 800-181) para descrever papéis profissionais simulador planejador de certificações: domínios cobertos pelo currículo, lacunas e ordem de estudo"
+            data-busca="certificacoes-e-carreira formação, certificações e carreira graduações e pós em segurança, 18 certificações (de security+, isfs e itil 4 a cissp, cism, cisa, crisc, cdpse e cgeit, e a escada prática ejpt, ecppt e oscp), trajetórias de grc e papéis do nice framework qual combinação de formação e certificações leva ao perfil de carreira desejado, e que lacunas ainda restam? protect blue team &amp; defesa red team &amp; pentest operações soc &amp; resposta perícia forense &amp; malware appsec &amp; devsecops grc &amp; auditoria analista de segurança da informação graduações (ciência da computação, sistemas de informação) e pós-graduações em segurança da informação certificações de entrada, gestão e especialidade: órgão emissor, domínios, experiência exigida e cpe nice framework (nist sp 800-181) para descrever papéis profissionais tópico — planejador de certificações: domínios cobertos pelo currículo, lacunas e ordem de estudo"
             href="Certificacoes-e-Carreira/treinamento-certificacoes-e-carreira.html">
             <span class="mc-top"><span class="mc-num">Estudo 33</span><span class="mc-tempo">⏱ 35 min</span></span>
             <h3 class="mc-titulo">Formação, Certificações e Carreira</h3>
             <p class="mc-sub">Graduações e pós em segurança, 18 certificações (de Security+, ISFS e ITIL 4 a CISSP, CISM, CISA, CRISC, CDPSE e CGEIT, e a escada prática eJPT, eCPPT e OSCP), trajetórias de GRC e papéis do NICE Framework</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Planejador de Certificações</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           </div>
@@ -2378,15 +2367,15 @@ a.progresso-titulo:hover {
             data-nivel="iniciante"
             data-perfis="Blue Team &amp; Defesa|Operações SOC &amp; Resposta|Red Team &amp; Pentest|Analista de Segurança da Informação"
             data-nist="Protect / Detect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="blue_soc red_team analista_si"
             data-certs="GSEC|eJPT|eCPPT|OSCP"
-            data-busca="linux-para-seguranca linux para segurança: shell, permissões e logs linha de comando, permissões, usuários, processos e logs para investigar um servidor linux que comandos revelam, em poucos minutos, se um servidor linux foi comprometido? terminal de investigação linux protect / detect blue team &amp; defesa operações soc &amp; resposta red team &amp; pentest analista de segurança da informação permissões octais, suid/sgid e sudoers investigação de auth.log e journalctl processos, portas e persistência em cron terminal simulado com missões de investigação"
+            data-busca="linux-para-seguranca linux para segurança: shell, permissões e logs linha de comando, permissões, usuários, processos e logs para investigar um servidor linux que comandos revelam, em poucos minutos, se um servidor linux foi comprometido? protect / detect blue team &amp; defesa operações soc &amp; resposta red team &amp; pentest analista de segurança da informação permissões octais, suid/sgid e sudoers investigação de auth.log e journalctl processos, portas e persistência em cron terminal simulado com missões de investigação"
             href="Linux-para-Seguranca/treinamento-linux-para-seguranca.html">
             <span class="mc-top"><span class="mc-num">Estudo 34</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">Linux para Segurança: Shell, Permissões e Logs</h3>
             <p class="mc-sub">Linha de comando, permissões, usuários, processos e logs para investigar um servidor Linux</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect / Detect</span><span class="tag lab">🧪 Terminal de Investigação Linux</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect / Detect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Python-para-Seguranca"
@@ -2395,15 +2384,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Blue Team &amp; Defesa|Operações SOC &amp; Resposta|AppSec &amp; DevSecOps|Analista de Segurança da Informação"
             data-nist="Detect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="devsecops_cloud"
             data-certs="eCPPT|OSCP"
-            data-busca="python-para-seguranca python para segurança: automação, regex e parsing scripts para ler logs, extrair indicadores com regex e consultar apis de reputação como transformar uma triagem manual de logs em um script repetível? montador de detector detect blue team &amp; defesa operações soc &amp; resposta appsec &amp; devsecops analista de segurança da informação regex aplicada a logs reais agregação com counter e limiares de alerta consulta a apis de reputação com requests montador visual de detector com código python gerado"
+            data-busca="python-para-seguranca python para segurança: automação, regex e parsing scripts para ler logs, extrair indicadores com regex e consultar apis de reputação como transformar uma triagem manual de logs em um script repetível? detect blue team &amp; defesa operações soc &amp; resposta appsec &amp; devsecops analista de segurança da informação regex aplicada a logs reais agregação com counter e limiares de alerta consulta a apis de reputação com requests montador visual de detector com código python gerado"
             href="Python-para-Seguranca/treinamento-python-para-seguranca.html">
             <span class="mc-top"><span class="mc-num">Estudo 35</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">Python para Segurança: Automação, Regex e Parsing</h3>
             <p class="mc-sub">Scripts para ler logs, extrair indicadores com regex e consultar APIs de reputação</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Detect</span><span class="tag lab">🧪 Montador de Detector</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Detect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-PowerShell-e-Windows-Interno"
@@ -2412,15 +2401,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Blue Team &amp; Defesa|Operações SOC &amp; Resposta|Perícia Forense &amp; Malware|Analista de Segurança da Informação"
             data-nist="Detect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="blue_soc pericia analista_si"
             data-certs="GSEC|eJPT|eCPPT|OSCP"
-            data-busca="powershell-e-windows-interno powershell, event log e registro do windows pipeline de objetos, eventos de segurança, sysmon e chaves de persistência no registro que eventos do windows contam a história de uma intrusão? visualizador de eventos detect blue team &amp; defesa operações soc &amp; resposta perícia forense &amp; malware analista de segurança da informação pipeline de objetos e get-winevent event ids essenciais e tipos de logon sysmon e scriptblock logging linha do tempo de intrusão para investigar"
+            data-busca="powershell-e-windows-interno powershell, event log e registro do windows pipeline de objetos, eventos de segurança, sysmon e chaves de persistência no registro que eventos do windows contam a história de uma intrusão? detect blue team &amp; defesa operações soc &amp; resposta perícia forense &amp; malware analista de segurança da informação pipeline de objetos e get-winevent event ids essenciais e tipos de logon sysmon e scriptblock logging linha do tempo de intrusão para investigar"
             href="PowerShell-e-Windows-Interno/treinamento-powershell-e-windows-interno.html">
             <span class="mc-top"><span class="mc-num">Estudo 36</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">PowerShell, Event Log e Registro do Windows</h3>
             <p class="mc-sub">Pipeline de objetos, eventos de segurança, Sysmon e chaves de persistência no Registro</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Detect</span><span class="tag lab">🧪 Visualizador de Eventos</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Detect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Laboratorio-Domestico-e-Portfolio"
@@ -2429,15 +2418,15 @@ a.progresso-titulo:hover {
             data-nivel="iniciante"
             data-perfis="Blue Team &amp; Defesa|Red Team &amp; Pentest|AppSec &amp; DevSecOps|Operações SOC &amp; Resposta|GRC &amp; Auditoria|Perícia Forense &amp; Malware|Analista de Segurança da Informação"
             data-nist="Protect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="analista_si"
             data-certs="eJPT|OSCP"
-            data-busca="laboratorio-domestico-e-portfolio laboratório doméstico, ctfs e portfólio montar um laboratório isolado, praticar em ctfs e transformar a prática em portfólio como provar numa entrevista o que você sabe fazer? planejador de homelab protect blue team &amp; defesa red team &amp; pentest appsec &amp; devsecops operações soc &amp; resposta grc &amp; auditoria perícia forense &amp; malware analista de segurança da informação topologia mínima de laboratório isolado orçamento de ram e cpu por vm ctfs, write-ups e portfólio no github planejador de homelab com checklist de isolamento"
+            data-busca="laboratorio-domestico-e-portfolio laboratório doméstico, ctfs e portfólio montar um laboratório isolado, praticar em ctfs e transformar a prática em portfólio como provar numa entrevista o que você sabe fazer? protect blue team &amp; defesa red team &amp; pentest appsec &amp; devsecops operações soc &amp; resposta grc &amp; auditoria perícia forense &amp; malware analista de segurança da informação topologia mínima de laboratório isolado orçamento de ram e cpu por vm ctfs, write-ups e portfólio no github planejador de homelab com checklist de isolamento"
             href="Laboratorio-Domestico-e-Portfolio/treinamento-laboratorio-domestico-e-portfolio.html">
             <span class="mc-top"><span class="mc-num">Estudo 37</span><span class="mc-tempo">⏱ 35 min</span></span>
             <h3 class="mc-titulo">Laboratório Doméstico, CTFs e Portfólio</h3>
             <p class="mc-sub">Montar um laboratório isolado, praticar em CTFs e transformar a prática em portfólio</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Planejador de Homelab</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           </div>
@@ -2451,15 +2440,15 @@ a.progresso-titulo:hover {
             data-nivel="iniciante"
             data-perfis="Blue Team &amp; Defesa|Red Team &amp; Pentest|Operações SOC &amp; Resposta|Analista de Segurança da Informação"
             data-nist="Protect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="red_team analista_si"
             data-certs="CISSP|GSEC|eJPT|eCPPT|OSCP"
-            data-busca="active-directory-fundamentos active directory: domínios, gpo e kerberos estrutura do ad, precedência de gpo, kerberos e ntlm e o modelo de camadas de administração como o ad decide quem é você e o que você pode fazer em cada máquina? kerberos passo a passo protect blue team &amp; defesa red team &amp; pentest operações soc &amp; resposta analista de segurança da informação floresta, domínio, ou e controladores de domínio precedência de gpo (lsdou) kerberos (as, tgs, ap) e ntlm simulador da troca kerberos e calculadora de gpo"
+            data-busca="active-directory-fundamentos active directory: domínios, gpo e kerberos estrutura do ad, precedência de gpo, kerberos e ntlm e o modelo de camadas de administração como o ad decide quem é você e o que você pode fazer em cada máquina? protect blue team &amp; defesa red team &amp; pentest operações soc &amp; resposta analista de segurança da informação floresta, domínio, ou e controladores de domínio precedência de gpo (lsdou) kerberos (as, tgs, ap) e ntlm tópico — da troca kerberos e calculadora de gpo"
             href="Active-Directory-Fundamentos/treinamento-active-directory-fundamentos.html">
             <span class="mc-top"><span class="mc-num">Estudo 38</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">Active Directory: Domínios, GPO e Kerberos</h3>
             <p class="mc-sub">Estrutura do AD, precedência de GPO, Kerberos e NTLM e o modelo de camadas de administração</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Kerberos Passo a Passo</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌱 Iniciante</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Ataques-e-Defesa-no-AD"
@@ -2468,15 +2457,15 @@ a.progresso-titulo:hover {
             data-nivel="avancado"
             data-perfis="Blue Team &amp; Defesa|Red Team &amp; Pentest|Operações SOC &amp; Resposta"
             data-nist="Protect / Detect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="blue_soc red_team"
             data-certs="CEH|eCPPT|OSCP"
-            data-busca="ataques-e-defesa-no-ad ataques ao ad e detecção: kerberoasting, pass-the-hash e dcsync caminhos de ataque no ad, sinais de detecção e mitigações que quebram cada caminho qual é o caminho mais curto de um usuário comum até domain admin, e como fechá-lo? mapa de caminhos de ataque protect / detect blue team &amp; defesa red team &amp; pentest operações soc &amp; resposta caminhos de ataque em grafo kerberoasting, pass-the-hash e dcsync sinais de detecção nos eventos do windows mapa interativo para quebrar caminhos de ataque"
+            data-busca="ataques-e-defesa-no-ad ataques ao ad e detecção: kerberoasting, pass-the-hash e dcsync caminhos de ataque no ad, sinais de detecção e mitigações que quebram cada caminho qual é o caminho mais curto de um usuário comum até domain admin, e como fechá-lo? protect / detect blue team &amp; defesa red team &amp; pentest operações soc &amp; resposta caminhos de ataque em grafo kerberoasting, pass-the-hash e dcsync sinais de detecção nos eventos do windows mapa interativo para quebrar caminhos de ataque"
             href="Ataques-e-Defesa-no-AD/treinamento-ataques-e-defesa-no-ad.html">
             <span class="mc-top"><span class="mc-num">Estudo 39</span><span class="mc-tempo">⏱ 55 min</span></span>
             <h3 class="mc-titulo">Ataques ao AD e Detecção: Kerberoasting, Pass-the-Hash e DCSync</h3>
             <p class="mc-sub">Caminhos de ataque no AD, sinais de detecção e mitigações que quebram cada caminho</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Protect / Detect</span><span class="tag lab">🧪 Mapa de Caminhos de Ataque</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Protect / Detect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-PAM-e-Acessos-Privilegiados"
@@ -2485,15 +2474,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Blue Team &amp; Defesa|GRC &amp; Auditoria|Analista de Segurança da Informação"
             data-nist="Protect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="grc analista_si"
             data-certs="CISSP|Security+|CISA"
-            data-busca="pam-e-acessos-privilegiados gestão de acessos privilegiados (pam) inventário, cofre, rotação, gravação de sessão e acesso just-in-time a contas privilegiadas quem tem poder de administrador hoje, e por quanto tempo deveria ter? auditor de contas privilegiadas protect blue team &amp; defesa grc &amp; auditoria analista de segurança da informação inventário de contas privilegiadas cofre, rotação e gravação de sessão just-in-time, jea e break-glass auditor interativo de contas privilegiadas"
+            data-busca="pam-e-acessos-privilegiados gestão de acessos privilegiados (pam) inventário, cofre, rotação, gravação de sessão e acesso just-in-time a contas privilegiadas quem tem poder de administrador hoje, e por quanto tempo deveria ter? protect blue team &amp; defesa grc &amp; auditoria analista de segurança da informação inventário de contas privilegiadas cofre, rotação e gravação de sessão just-in-time, jea e break-glass auditor interativo de contas privilegiadas"
             href="PAM-e-Acessos-Privilegiados/treinamento-pam-e-acessos-privilegiados.html">
             <span class="mc-top"><span class="mc-num">Estudo 40</span><span class="mc-tempo">⏱ 40 min</span></span>
             <h3 class="mc-titulo">Gestão de Acessos Privilegiados (PAM)</h3>
             <p class="mc-sub">Inventário, cofre, rotação, gravação de sessão e acesso just-in-time a contas privilegiadas</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Auditor de Contas Privilegiadas</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Identidade-Hibrida-e-Nuvem"
@@ -2502,15 +2491,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Blue Team &amp; Defesa|AppSec &amp; DevSecOps|Analista de Segurança da Informação"
             data-nist="Protect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="devsecops_cloud"
             data-certs=""
-            data-busca="identidade-hibrida-e-nuvem entra id, identidade híbrida e acesso condicional sincronização híbrida, acesso condicional, mfa resistente a phishing e pim que política de acesso bloqueia o atacante sem travar o usuário legítimo? avaliador de acesso condicional protect blue team &amp; defesa appsec &amp; devsecops analista de segurança da informação phs, pta e federação acesso condicional por risco e dispositivo mfa resistente a phishing e pim avaliador de políticas com logins simulados"
+            data-busca="identidade-hibrida-e-nuvem entra id, identidade híbrida e acesso condicional sincronização híbrida, acesso condicional, mfa resistente a phishing e pim que política de acesso bloqueia o atacante sem travar o usuário legítimo? protect blue team &amp; defesa appsec &amp; devsecops analista de segurança da informação phs, pta e federação acesso condicional por risco e dispositivo mfa resistente a phishing e pim avaliador de políticas com logins simulados"
             href="Identidade-Hibrida-e-Nuvem/treinamento-identidade-hibrida-e-nuvem.html">
             <span class="mc-top"><span class="mc-num">Estudo 41</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Entra ID, Identidade Híbrida e Acesso Condicional</h3>
             <p class="mc-sub">Sincronização híbrida, acesso condicional, MFA resistente a phishing e PIM</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Avaliador de Acesso Condicional</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           </div>
@@ -2524,15 +2513,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Blue Team &amp; Defesa|Operações SOC &amp; Resposta|Perícia Forense &amp; Malware|Analista de Segurança da Informação"
             data-nist="Respond / Recover"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="blue_soc pericia analista_si"
             data-certs="Security+|CSFPC"
-            data-busca="ransomware-prevencao-a-recuperacao ransomware: prevenção, contenção e recuperação anatomia do ataque, dupla extorsão, decisões de contenção e retomada da operação nas primeiras horas de um ransomware, que decisões reduzem o estrago e quais o pioram? linha do tempo do ransomware respond / recover blue team &amp; defesa operações soc &amp; resposta perícia forense &amp; malware analista de segurança da informação anatomia do ataque e dupla extorsão decisões de contenção e seus custos ordem de recuperação e descriptografadores públicos linha do tempo interativa com pontos de decisão"
+            data-busca="ransomware-prevencao-a-recuperacao ransomware: prevenção, contenção e recuperação anatomia do ataque, dupla extorsão, decisões de contenção e retomada da operação nas primeiras horas de um ransomware, que decisões reduzem o estrago e quais o pioram? respond / recover blue team &amp; defesa operações soc &amp; resposta perícia forense &amp; malware analista de segurança da informação anatomia do ataque e dupla extorsão decisões de contenção e seus custos ordem de recuperação e descriptografadores públicos linha do tempo interativa com pontos de decisão"
             href="Ransomware-Prevencao-a-Recuperacao/treinamento-ransomware-prevencao-a-recuperacao.html">
             <span class="mc-top"><span class="mc-num">Estudo 42</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">Ransomware: Prevenção, Contenção e Recuperação</h3>
             <p class="mc-sub">Anatomia do ataque, dupla extorsão, decisões de contenção e retomada da operação</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Respond / Recover</span><span class="tag lab">🧪 Linha do Tempo do Ransomware</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Respond / Recover</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Gestao-de-Crise-e-Comunicacao"
@@ -2541,15 +2530,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="GRC &amp; Auditoria|Operações SOC &amp; Resposta|Analista de Segurança da Informação"
             data-nist="Respond"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="grc analista_si"
             data-certs="CISM"
-            data-busca="gestao-de-crise-e-comunicacao gestão de crise cibernética e comunicação de incidentes comitê de crise, registro de decisões e comunicação a público interno, clientes, imprensa e anpd quem precisa saber do incidente, quando e com que mensagem? relógio da crise respond grc &amp; auditoria operações soc &amp; resposta analista de segurança da informação comitê de crise e matriz raci registro de decisões e porta-voz único comunicação à anpd em 3 dias úteis relógio da crise com notificações e prazos"
+            data-busca="gestao-de-crise-e-comunicacao gestão de crise cibernética e comunicação de incidentes comitê de crise, registro de decisões e comunicação a público interno, clientes, imprensa e anpd quem precisa saber do incidente, quando e com que mensagem? respond grc &amp; auditoria operações soc &amp; resposta analista de segurança da informação comitê de crise e matriz raci registro de decisões e porta-voz único comunicação à anpd em 3 dias úteis relógio da crise com notificações e prazos"
             href="Gestao-de-Crise-e-Comunicacao/treinamento-gestao-de-crise-e-comunicacao.html">
             <span class="mc-top"><span class="mc-num">Estudo 43</span><span class="mc-tempo">⏱ 40 min</span></span>
             <h3 class="mc-titulo">Gestão de Crise Cibernética e Comunicação de Incidentes</h3>
             <p class="mc-sub">Comitê de crise, registro de decisões e comunicação a público interno, clientes, imprensa e ANPD</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Respond</span><span class="tag lab">🧪 Relógio da Crise</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Respond</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Exercicios-Tabletop"
@@ -2558,15 +2547,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="GRC &amp; Auditoria|Operações SOC &amp; Resposta|Analista de Segurança da Informação"
             data-nist="Respond / Recover"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="grc"
             data-certs="CISM"
-            data-busca="exercicios-tabletop exercícios tabletop: planejar, conduzir e avaliar tipos de exercício, injects, facilitação e relatório pós-ação com plano de melhorias como descobrir as falhas do plano de resposta antes de um incidente real? gerador de tabletop respond / recover grc &amp; auditoria operações soc &amp; resposta analista de segurança da informação tipos de exercício (nist sp 800-84) injects e papel do facilitador relatório pós-ação e plano de melhorias gerador de tabletop com cronômetro e relatório"
+            data-busca="exercicios-tabletop exercícios tabletop: planejar, conduzir e avaliar tipos de exercício, injects, facilitação e relatório pós-ação com plano de melhorias como descobrir as falhas do plano de resposta antes de um incidente real? respond / recover grc &amp; auditoria operações soc &amp; resposta analista de segurança da informação tipos de exercício (nist sp 800-84) injects e papel do facilitador relatório pós-ação e plano de melhorias gerador de tabletop com cronômetro e relatório"
             href="Exercicios-Tabletop/treinamento-exercicios-tabletop.html">
             <span class="mc-top"><span class="mc-num">Estudo 44</span><span class="mc-tempo">⏱ 35 min</span></span>
             <h3 class="mc-titulo">Exercícios Tabletop: Planejar, Conduzir e Avaliar</h3>
             <p class="mc-sub">Tipos de exercício, injects, facilitação e relatório pós-ação com plano de melhorias</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Respond / Recover</span><span class="tag lab">🧪 Gerador de Tabletop</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Respond / Recover</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Backup-Imutavel-e-Recuperacao"
@@ -2575,15 +2564,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Blue Team &amp; Defesa|GRC &amp; Auditoria|Analista de Segurança da Informação"
             data-nist="Recover"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="pericia"
             data-certs="CISSP|Security+|CISA"
-            data-busca="backup-imutavel-e-recuperacao backup imutável e recuperação de identidade regra 3-2-1-1-0, imutabilidade, air gap e recuperação do active directory seu backup sobrevive a um atacante que já é administrador do domínio? teste de sobrevivência do backup recover blue team &amp; defesa grc &amp; auditoria analista de segurança da informação regra 3-2-1-1-0 imutabilidade, object lock e air gap recuperação do active directory teste de sobrevivência do backup a um admin de domínio"
+            data-busca="backup-imutavel-e-recuperacao backup imutável e recuperação de identidade regra 3-2-1-1-0, imutabilidade, air gap e recuperação do active directory seu backup sobrevive a um atacante que já é administrador do domínio? recover blue team &amp; defesa grc &amp; auditoria analista de segurança da informação regra 3-2-1-1-0 imutabilidade, object lock e air gap recuperação do active directory teste de sobrevivência do backup a um admin de domínio"
             href="Backup-Imutavel-e-Recuperacao/treinamento-backup-imutavel-e-recuperacao.html">
             <span class="mc-top"><span class="mc-num">Estudo 45</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Backup Imutável e Recuperação de Identidade</h3>
             <p class="mc-sub">Regra 3-2-1-1-0, imutabilidade, air gap e recuperação do Active Directory</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Recover</span><span class="tag lab">🧪 Teste de Sobrevivência do Backup</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Recover</span></span>
             <span class="mc-status"></span>
           </a>
           </div>
@@ -2597,15 +2586,15 @@ a.progresso-titulo:hover {
             data-nivel="avancado"
             data-perfis="Operações SOC &amp; Resposta|Blue Team &amp; Defesa"
             data-nist="Detect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="blue_soc"
             data-certs="Security+"
-            data-busca="engenharia-de-deteccao engenharia de detecção: detection-as-code e cobertura att&amp;ck regras versionadas, testadas e medidas pela cobertura de técnicas quantas técnicas att&amp;ck suas regras realmente detectam, e como você sabe? bancada de detecções detect operações soc &amp; resposta blue team &amp; defesa detecção como código: versionar, revisar, testar regras sigma com filtros e condições cobertura att&amp;ck medida por teste, não por existência da regra precisão e volume de alertas antes da produção"
+            data-busca="engenharia-de-deteccao engenharia de detecção: detection-as-code e cobertura att&amp;ck regras versionadas, testadas e medidas pela cobertura de técnicas quantas técnicas att&amp;ck suas regras realmente detectam, e como você sabe? detect operações soc &amp; resposta blue team &amp; defesa detecção como código: versionar, revisar, testar regras sigma com filtros e condições cobertura att&amp;ck medida por teste, não por existência da regra precisão e volume de alertas antes da produção"
             href="Engenharia-de-Deteccao/treinamento-engenharia-de-deteccao.html">
             <span class="mc-top"><span class="mc-num">Estudo 46</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Engenharia de Detecção: Detection-as-Code e Cobertura ATT&amp;CK</h3>
             <p class="mc-sub">Regras versionadas, testadas e medidas pela cobertura de técnicas</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Detect</span><span class="tag lab">🧪 Bancada de Detecções</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Detect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Threat-Hunting"
@@ -2614,15 +2603,15 @@ a.progresso-titulo:hover {
             data-nivel="avancado"
             data-perfis="Operações SOC &amp; Resposta|Blue Team &amp; Defesa|Perícia Forense &amp; Malware"
             data-nist="Detect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="blue_soc pericia"
             data-certs=""
-            data-busca="threat-hunting threat hunting: caça por hipótese e linhas de base procurar o que nenhum alerta pegou, partindo de uma hipótese se um invasor estiver na rede sem disparar alertas, por onde você começa a procurar? caçada guiada detect operações soc &amp; resposta blue team &amp; defesa perícia forense &amp; malware caça por hipótese, não por alerta linha de base e contagem de ocorrências raras ciclo de caça peak toda caça bem-sucedida vira detecção"
+            data-busca="threat-hunting threat hunting: caça por hipótese e linhas de base procurar o que nenhum alerta pegou, partindo de uma hipótese se um invasor estiver na rede sem disparar alertas, por onde você começa a procurar? detect operações soc &amp; resposta blue team &amp; defesa perícia forense &amp; malware caça por hipótese, não por alerta linha de base e contagem de ocorrências raras ciclo de caça peak toda caça bem-sucedida vira detecção"
             href="Threat-Hunting/treinamento-threat-hunting.html">
             <span class="mc-top"><span class="mc-num">Estudo 47</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Threat Hunting: Caça por Hipótese e Linhas de Base</h3>
             <p class="mc-sub">Procurar o que nenhum alerta pegou, partindo de uma hipótese</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Detect</span><span class="tag lab">🧪 Caçada Guiada</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Detect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Monitoramento-de-Rede-NSM"
@@ -2631,15 +2620,15 @@ a.progresso-titulo:hover {
             data-nivel="avancado"
             data-perfis="Operações SOC &amp; Resposta|Blue Team &amp; Defesa|Perícia Forense &amp; Malware"
             data-nist="Detect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="blue_soc pericia"
             data-certs="CISSP|GSEC"
-            data-busca="monitoramento-de-rede-nsm monitoramento de rede: zeek, pcap e netflow logs de conexão, beaconing, túnel dns e fingerprints tls como achar um implante que fala com o atacante a cada 60 segundos, mesmo com o tráfego cifrado? analisador de conexões detect operações soc &amp; resposta blue team &amp; defesa perícia forense &amp; malware pcap, zeek e netflow: custo vs valor beaconing pela regularidade dos intervalos túnel dns por entropia e volume de subdomínios ja3/ja4 ajudam, mas não provam sozinhos"
+            data-busca="monitoramento-de-rede-nsm monitoramento de rede: zeek, pcap e netflow logs de conexão, beaconing, túnel dns e fingerprints tls como achar um implante que fala com o atacante a cada 60 segundos, mesmo com o tráfego cifrado? detect operações soc &amp; resposta blue team &amp; defesa perícia forense &amp; malware pcap, zeek e netflow: custo vs valor beaconing pela regularidade dos intervalos túnel dns por entropia e volume de subdomínios ja3/ja4 ajudam, mas não provam sozinhos"
             href="Monitoramento-de-Rede-NSM/treinamento-monitoramento-de-rede-nsm.html">
             <span class="mc-top"><span class="mc-num">Estudo 48</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Monitoramento de Rede: Zeek, PCAP e NetFlow</h3>
             <p class="mc-sub">Logs de conexão, beaconing, túnel DNS e fingerprints TLS</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Detect</span><span class="tag lab">🧪 Analisador de Conexões</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Detect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-SOAR-e-Automacao-de-Resposta"
@@ -2648,15 +2637,15 @@ a.progresso-titulo:hover {
             data-nivel="avancado"
             data-perfis="Operações SOC &amp; Resposta|Blue Team &amp; Defesa|Analista de Segurança da Informação"
             data-nist="Respond"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="blue_soc analista_si"
             data-certs=""
-            data-busca="soar-e-automacao-de-resposta soar: playbooks e automação de resposta enriquecer, decidir e conter, com aprovação humana onde o erro custa caro o que o seu playbook deve fazer sozinho, e o que ele nunca deve fazer sem perguntar? montador de playbook respond operações soc &amp; resposta blue team &amp; defesa analista de segurança da informação playbook: gatilho, enriquecimento, decisão, ação aprovação humana para ações de alto impacto mtta e mttr como medida da automação exceções para ativos críticos"
+            data-busca="soar-e-automacao-de-resposta soar: playbooks e automação de resposta enriquecer, decidir e conter, com aprovação humana onde o erro custa caro o que o seu playbook deve fazer sozinho, e o que ele nunca deve fazer sem perguntar? respond operações soc &amp; resposta blue team &amp; defesa analista de segurança da informação playbook: gatilho, enriquecimento, decisão, ação aprovação humana para ações de alto impacto mtta e mttr como medida da automação exceções para ativos críticos"
             href="SOAR-e-Automacao-de-Resposta/treinamento-soar-e-automacao-de-resposta.html">
             <span class="mc-top"><span class="mc-num">Estudo 49</span><span class="mc-tempo">⏱ 40 min</span></span>
             <h3 class="mc-titulo">SOAR: Playbooks e Automação de Resposta</h3>
             <p class="mc-sub">Enriquecer, decidir e conter, com aprovação humana onde o erro custa caro</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Respond</span><span class="tag lab">🧪 Montador de Playbook</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Respond</span></span>
             <span class="mc-status"></span>
           </a>
           </div>
@@ -2670,15 +2659,15 @@ a.progresso-titulo:hover {
             data-nivel="avancado"
             data-perfis="AppSec &amp; DevSecOps|Blue Team &amp; Defesa|Red Team &amp; Pentest"
             data-nist="Protect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="red_team devsecops_cloud"
             data-certs="CCSP|GSEC"
-            data-busca="seguranca-de-containers segurança de containers: imagens, build e runtime da imagem base ao processo em execução o que separa um container comprometido do servidor que o hospeda? auditor de dockerfile protect appsec &amp; devsecops blue team &amp; defesa red team &amp; pentest imagem mínima, usuário não root e tag fixa segredos nunca em camadas da imagem --privileged e docker.sock abrem caminho ao host assinatura e registro confiável"
+            data-busca="seguranca-de-containers segurança de containers: imagens, build e runtime da imagem base ao processo em execução o que separa um container comprometido do servidor que o hospeda? protect appsec &amp; devsecops blue team &amp; defesa red team &amp; pentest imagem mínima, usuário não root e tag fixa segredos nunca em camadas da imagem --privileged e docker.sock abrem caminho ao host assinatura e registro confiável"
             href="Seguranca-de-Containers/treinamento-seguranca-de-containers.html">
             <span class="mc-top"><span class="mc-num">Estudo 50</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Segurança de Containers: Imagens, Build e Runtime</h3>
             <p class="mc-sub">Da imagem base ao processo em execução</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Auditor de Dockerfile</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Seguranca-em-Kubernetes"
@@ -2687,15 +2676,15 @@ a.progresso-titulo:hover {
             data-nivel="avancado"
             data-perfis="AppSec &amp; DevSecOps|Blue Team &amp; Defesa|Red Team &amp; Pentest"
             data-nist="Protect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="red_team devsecops_cloud"
             data-certs="CEH|CCSP"
-            data-busca="seguranca-em-kubernetes segurança em kubernetes: rbac, pod security e networkpolicy quem pode fazer o quê no cluster, e o que cada pod alcança uma conta de serviço comprometida consegue chegar a administrador do cluster? cluster em miniatura protect appsec &amp; devsecops blue team &amp; defesa red team &amp; pentest rbac: create pods, bind e escalate são privilégio pod security standards: privileged, baseline, restricted networkpolicy com negação por padrão token de conta de serviço é credencial"
+            data-busca="seguranca-em-kubernetes segurança em kubernetes: rbac, pod security e networkpolicy quem pode fazer o quê no cluster, e o que cada pod alcança uma conta de serviço comprometida consegue chegar a administrador do cluster? protect appsec &amp; devsecops blue team &amp; defesa red team &amp; pentest rbac: create pods, bind e escalate são privilégio pod security standards: privileged, baseline, restricted networkpolicy com negação por padrão token de conta de serviço é credencial"
             href="Seguranca-em-Kubernetes/treinamento-seguranca-em-kubernetes.html">
             <span class="mc-top"><span class="mc-num">Estudo 51</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">Segurança em Kubernetes: RBAC, Pod Security e NetworkPolicy</h3>
             <p class="mc-sub">Quem pode fazer o quê no cluster, e o que cada pod alcança</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Cluster em Miniatura</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Infraestrutura-como-Codigo-Segura"
@@ -2704,15 +2693,15 @@ a.progresso-titulo:hover {
             data-nivel="avancado"
             data-perfis="AppSec &amp; DevSecOps|GRC &amp; Auditoria"
             data-nist="Protect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="devsecops_cloud"
             data-certs="CCSP"
-            data-busca="infraestrutura-como-codigo-segura infraestrutura como código segura: terraform e policy-as-code barrar a configuração insegura antes do apply como impedir que um bucket público chegue à produção, em vez de achá-lo depois? revisor de plano terraform protect appsec &amp; devsecops grc &amp; auditoria plano antes do apply, política antes do plano state do terraform contém segredos policy-as-code com exceções com prazo drift: o ambiente diverge do código"
+            data-busca="infraestrutura-como-codigo-segura infraestrutura como código segura: terraform e policy-as-code barrar a configuração insegura antes do apply como impedir que um bucket público chegue à produção, em vez de achá-lo depois? protect appsec &amp; devsecops grc &amp; auditoria plano antes do apply, política antes do plano state do terraform contém segredos policy-as-code com exceções com prazo drift: o ambiente diverge do código"
             href="Infraestrutura-como-Codigo-Segura/treinamento-infraestrutura-como-codigo-segura.html">
             <span class="mc-top"><span class="mc-num">Estudo 52</span><span class="mc-tempo">⏱ 40 min</span></span>
             <h3 class="mc-titulo">Infraestrutura como Código Segura: Terraform e Policy-as-Code</h3>
             <p class="mc-sub">Barrar a configuração insegura antes do apply</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Protect</span><span class="tag lab">🧪 Revisor de Plano Terraform</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Deteccao-e-Resposta-em-Nuvem"
@@ -2721,15 +2710,15 @@ a.progresso-titulo:hover {
             data-nivel="avancado"
             data-perfis="Operações SOC &amp; Resposta|Blue Team &amp; Defesa|Perícia Forense &amp; Malware|AppSec &amp; DevSecOps"
             data-nist="Detect / Respond"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="devsecops_cloud pericia"
             data-certs="CISSP|CCSP"
-            data-busca="deteccao-e-resposta-em-nuvem detecção e resposta a incidentes em nuvem trilhas de auditoria, detecção nativa e contenção de credencial vazada uma chave de acesso vazou no github há três dias: o que o atacante fez, e como você o tira de lá? conta comprometida detect / respond operações soc &amp; resposta blue team &amp; defesa perícia forense &amp; malware appsec &amp; devsecops eventos de dados não vêm ligados por padrão credencial vazada: revogar, girar, investigar criação de usuário e de chave como persistência snapshot antes de desligar"
+            data-busca="deteccao-e-resposta-em-nuvem detecção e resposta a incidentes em nuvem trilhas de auditoria, detecção nativa e contenção de credencial vazada uma chave de acesso vazou no github há três dias: o que o atacante fez, e como você o tira de lá? detect / respond operações soc &amp; resposta blue team &amp; defesa perícia forense &amp; malware appsec &amp; devsecops eventos de dados não vêm ligados por padrão credencial vazada: revogar, girar, investigar criação de usuário e de chave como persistência snapshot antes de desligar"
             href="Deteccao-e-Resposta-em-Nuvem/treinamento-deteccao-e-resposta-em-nuvem.html">
             <span class="mc-top"><span class="mc-num">Estudo 53</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">Detecção e Resposta a Incidentes em Nuvem</h3>
             <p class="mc-sub">Trilhas de auditoria, detecção nativa e contenção de credencial vazada</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Detect / Respond</span><span class="tag lab">🧪 Conta Comprometida</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Detect / Respond</span></span>
             <span class="mc-status"></span>
           </a>
           </div>
@@ -2743,15 +2732,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="GRC &amp; Auditoria|Analista de Segurança da Informação"
             data-nist="Govern"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="grc analista_si"
             data-certs="CISM"
-            data-busca="regulacao-setor-financeiro regulação cibernética do setor financeiro resolução cmn 4.893 e resolução bcb 85, com as alterações de dezembro de 2025 o que o banco central exige da sua política de segurança, e o que muda quando o sistema vai para a nuvem? verificador de aderência govern grc &amp; auditoria analista de segurança da informação cmn 4.893/2021, alterada pela cmn 5.274/2025 bcb 85/2021 para instituições de pagamento responsabilidade não se transfere ao fornecedor de nuvem teste de intrusão anual e controles mínimos"
+            data-busca="regulacao-setor-financeiro regulação cibernética do setor financeiro resolução cmn 4.893 e resolução bcb 85, com as alterações de dezembro de 2025 o que o banco central exige da sua política de segurança, e o que muda quando o sistema vai para a nuvem? govern grc &amp; auditoria analista de segurança da informação cmn 4.893/2021, alterada pela cmn 5.274/2025 bcb 85/2021 para instituições de pagamento responsabilidade não se transfere ao fornecedor de nuvem teste de intrusão anual e controles mínimos"
             href="Regulacao-Setor-Financeiro/treinamento-regulacao-setor-financeiro.html">
             <span class="mc-top"><span class="mc-num">Estudo 54</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Regulação Cibernética do Setor Financeiro</h3>
             <p class="mc-sub">Resolução CMN 4.893 e Resolução BCB 85, com as alterações de dezembro de 2025</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Govern</span><span class="tag lab">🧪 Verificador de Aderência</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Govern</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Fraude-em-Pagamentos-e-Pix"
@@ -2760,15 +2749,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="Operações SOC &amp; Resposta|GRC &amp; Auditoria|Analista de Segurança da Informação"
             data-nist="Detect / Protect"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="grc"
             data-certs="Security+"
-            data-busca="fraude-em-pagamentos-e-pix fraude em pagamentos: pix, golpes e antifraude golpes com pix, sinais de risco, regras antifraude e o med 2.0 quais sinais separam um pix legítimo de um golpe, e quanto atrito o cliente honesto aceita? mesa antifraude detect / protect operações soc &amp; resposta grc &amp; auditoria analista de segurança da informação golpe de falsa central e conta laranja pontuação de risco com sinais combinados fraude evitada vs cliente bloqueado med 2.0 e bloqueio cautelar"
+            data-busca="fraude-em-pagamentos-e-pix fraude em pagamentos: pix, golpes e antifraude golpes com pix, sinais de risco, regras antifraude e o med 2.0 quais sinais separam um pix legítimo de um golpe, e quanto atrito o cliente honesto aceita? detect / protect operações soc &amp; resposta grc &amp; auditoria analista de segurança da informação golpe de falsa central e conta laranja pontuação de risco com sinais combinados fraude evitada vs cliente bloqueado med 2.0 e bloqueio cautelar"
             href="Fraude-em-Pagamentos-e-Pix/treinamento-fraude-em-pagamentos-e-pix.html">
             <span class="mc-top"><span class="mc-num">Estudo 55</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Fraude em Pagamentos: Pix, Golpes e Antifraude</h3>
             <p class="mc-sub">Golpes com Pix, sinais de risco, regras antifraude e o MED 2.0</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Detect / Protect</span><span class="tag lab">🧪 Mesa Antifraude</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Detect / Protect</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Legislacao-e-Crimes-Ciberneticos"
@@ -2777,15 +2766,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="GRC &amp; Auditoria|Perícia Forense &amp; Malware|Analista de Segurança da Informação"
             data-nist="Govern"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="grc pericia"
             data-certs="ISFS|PDPF/PDPP|CSFPC"
-            data-busca="legislacao-e-crimes-ciberneticos legislação brasileira e crimes cibernéticos tipos penais, guarda de registros e preservação de provas o que guardar, por quanto tempo e como, para que o caso chegue ao processo penal? enquadramento de casos govern grc &amp; auditoria perícia forense &amp; malware analista de segurança da informação art. 154-a: invasão de dispositivo informático fraude eletrônica: art. 171 §2º-a (redação de 2026) marco civil: conexão 1 ano, aplicações 6 meses pnciber (2023) e e-ciber (2025)"
+            data-busca="legislacao-e-crimes-ciberneticos legislação brasileira e crimes cibernéticos tipos penais, guarda de registros e preservação de provas o que guardar, por quanto tempo e como, para que o caso chegue ao processo penal? govern grc &amp; auditoria perícia forense &amp; malware analista de segurança da informação art. 154-a: invasão de dispositivo informático fraude eletrônica: art. 171 §2º-a (redação de 2026) marco civil: conexão 1 ano, aplicações 6 meses pnciber (2023) e e-ciber (2025)"
             href="Legislacao-e-Crimes-Ciberneticos/treinamento-legislacao-e-crimes-ciberneticos.html">
             <span class="mc-top"><span class="mc-num">Estudo 56</span><span class="mc-tempo">⏱ 40 min</span></span>
             <h3 class="mc-titulo">Legislação Brasileira e Crimes Cibernéticos</h3>
             <p class="mc-sub">Tipos penais, guarda de registros e preservação de provas</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Govern</span><span class="tag lab">🧪 Enquadramento de Casos</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Govern</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Gestao-de-Riscos-de-Terceiros"
@@ -2794,15 +2783,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="GRC &amp; Auditoria|Analista de Segurança da Informação"
             data-nist="Govern"
-            data-secoes="6"
+            data-secoes="5"
             data-rotas="grc analista_si"
             data-certs="CISM|CISSP|PDPF/PDPP|ITIL 4 F|CISA|CRISC|CDPSE"
-            data-busca="gestao-de-riscos-de-terceiros gestão de riscos de terceiros e fornecedores due diligence, cláusulas mínimas, monitoramento e plano de saída seu fornecedor crítico tem acesso aos seus dados: como você sabe que ele protege, e como sai do contrato se precisar? avaliador de fornecedores govern grc &amp; auditoria analista de segurança da informação due diligence proporcional à criticidade cláusulas: incidente, auditoria, subcontratação, saída quarta parte: o fornecedor do fornecedor nist csf 2.0 gv.sc e iso 27002 5.19–5.23"
+            data-busca="gestao-de-riscos-de-terceiros gestão de riscos de terceiros e fornecedores due diligence, cláusulas mínimas, monitoramento e plano de saída seu fornecedor crítico tem acesso aos seus dados: como você sabe que ele protege, e como sai do contrato se precisar? govern grc &amp; auditoria analista de segurança da informação due diligence proporcional à criticidade cláusulas: incidente, auditoria, subcontratação, saída quarta parte: o fornecedor do fornecedor nist csf 2.0 gv.sc e iso 27002 5.19–5.23"
             href="Gestao-de-Riscos-de-Terceiros/treinamento-gestao-de-riscos-de-terceiros.html">
             <span class="mc-top"><span class="mc-num">Estudo 57</span><span class="mc-tempo">⏱ 40 min</span></span>
             <h3 class="mc-titulo">Gestão de Riscos de Terceiros e Fornecedores</h3>
             <p class="mc-sub">Due diligence, cláusulas mínimas, monitoramento e plano de saída</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Govern</span><span class="tag lab">🧪 Avaliador de Fornecedores</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Govern</span></span>
             <span class="mc-status"></span>
           </a>
           </div>
@@ -2816,15 +2805,15 @@ a.progresso-titulo:hover {
             data-nivel="intermediario"
             data-perfis="GRC &amp; Auditoria|Analista de Segurança da Informação"
             data-nist="Govern"
-            data-secoes="9"
+            data-secoes="8"
             data-rotas="grc analista_si"
             data-certs="CISM|CISSP|CRISC|CGEIT"
-            data-busca="lideranca-e-programa-de-seguranca liderança e programa de segurança: o papel do ciso linha de reporte, governança, kpi e kri, relato ao conselho e orçamento de segurança o siem gerou 40 mil alertas no trimestre. o que disso o conselho precisa saber? do siem ao conselho govern grc &amp; auditoria analista de segurança da informação modelo das três linhas (iia, 2020) função govern do nist csf 2.0 kpi, kri e métrica de vaidade business case e limites do rosi"
+            data-busca="lideranca-e-programa-de-seguranca liderança e programa de segurança: o papel do ciso linha de reporte, governança, kpi e kri, relato ao conselho e orçamento de segurança o siem gerou 40 mil alertas no trimestre. o que disso o conselho precisa saber? govern grc &amp; auditoria analista de segurança da informação modelo das três linhas (iia, 2020) função govern do nist csf 2.0 kpi, kri e métrica de vaidade business case e limites do rosi"
             href="Lideranca-e-Programa-de-Seguranca/treinamento-lideranca-e-programa-de-seguranca.html">
             <span class="mc-top"><span class="mc-num">Estudo 59</span><span class="mc-tempo">⏱ 45 min</span></span>
             <h3 class="mc-titulo">Liderança e Programa de Segurança: o Papel do CISO</h3>
             <p class="mc-sub">Linha de reporte, governança, KPI e KRI, relato ao conselho e orçamento de segurança</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Govern</span><span class="tag lab">🧪 Do SIEM ao Conselho</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌿 Intermediário</span><span class="tag">NIST Govern</span></span>
             <span class="mc-status"></span>
           </a>
           <a class="mc" id="estudo-Estruturacao-da-Area-de-Seguranca"
@@ -2833,15 +2822,15 @@ a.progresso-titulo:hover {
             data-nivel="avancado"
             data-perfis="GRC &amp; Auditoria"
             data-nist="Govern"
-            data-secoes="9"
+            data-secoes="8"
             data-rotas="grc"
             data-certs="CISM|CGEIT"
-            data-busca="estruturacao-da-area-de-seguranca estruturação da área de segurança: maturidade, time e sourcing plano de 90 dias, perfis do nist csf 2.0, desenho do time, soc interno, mssp e mdr, conscientização e aquisições você chegou como primeiro ciso da empresa. o que acontece nos primeiros 90 dias? alocador de programa govern grc &amp; auditoria perfil atual e perfil alvo (nist csf 2.0) níveis (tiers) 1 a 4 soc interno, mssp, mdr e híbrido plano de 90 dias"
+            data-busca="estruturacao-da-area-de-seguranca estruturação da área de segurança: maturidade, time e sourcing plano de 90 dias, perfis do nist csf 2.0, desenho do time, soc interno, mssp e mdr, conscientização e aquisições você chegou como primeiro ciso da empresa. o que acontece nos primeiros 90 dias? govern grc &amp; auditoria perfil atual e perfil alvo (nist csf 2.0) níveis (tiers) 1 a 4 soc interno, mssp, mdr e híbrido plano de 90 dias"
             href="Estruturacao-da-Area-de-Seguranca/treinamento-estruturacao-da-area-de-seguranca.html">
             <span class="mc-top"><span class="mc-num">Estudo 60</span><span class="mc-tempo">⏱ 50 min</span></span>
             <h3 class="mc-titulo">Estruturação da Área de Segurança: Maturidade, Time e Sourcing</h3>
             <p class="mc-sub">Plano de 90 dias, perfis do NIST CSF 2.0, desenho do time, SOC interno, MSSP e MDR, conscientização e aquisições</p>
-            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Govern</span><span class="tag lab">🧪 Alocador de Programa</span></span>
+            <span class="mc-tags"><span class="tag tag-nivel">🌳 Avançado</span><span class="tag">NIST Govern</span></span>
             <span class="mc-status"></span>
           </a>
           </div>
@@ -4294,10 +4283,9 @@ a.progresso-titulo:hover {
   // --------------------------------------------------------------------------
   // 4. Estado dos módulos (cs_done_, cs_read_, cs_check_, cs_quiz_, cs_last)
   // --------------------------------------------------------------------------
-  const DADOS = {"trilhas":{"1":"Fundamentos & Redes","2":"Segurança Defensiva","3":"Segurança Ofensiva","4":"Operações, SOC & Resposta","5":"Especialidades & Fronteiras","6":"Governança, Riscos & Conformidade","7":"Carreira & Formação","8":"Ferramentas & Automação do Analista","9":"Identidade Corporativa & Active Directory","10":"Resiliência, Crise & Ransomware","11":"Detecção Avançada & Threat Hunting","12":"Nuvem, Containers & Kubernetes","13":"Setor Regulado no Brasil","14":"Liderança & Estratégia"},"niveis":[["iniciante","🌱 Iniciante"],["intermediario","🌿 Intermediário"],["avancado","🌳 Avançado"]],"carreiras":["Blue Team & Defesa","Red Team & Pentest","AppSec & DevSecOps","Operações SOC & Resposta","GRC & Auditoria","Perícia Forense & Malware","Analista de Segurança da Informação"],"modulos":{"Fundamentos-Ciber":{"secoes":{"fundamentacao-teorica":"teoria","panorama-ameacas":"teoria","modelagem-stride":"teoria","simulador-stride":"laboratorio","checklist-pratico":"checklist","quiz-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":3},"Redes-e-Protocolos":{"secoes":{"modelos-rede":"teoria","dissecacao-protocolos":"teoria","enderecamento-http-wifi":"teoria","laboratorio-inspetor":"laboratorio","checklist-pratico":"checklist","questoes-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":6},"Criptografia-Pratica":{"secoes":{"pilares-criptograficos":"teoria","algoritmos-modos":"teoria","ciclo-de-certificados":"teoria","laboratorio-cripto":"laboratorio","checklist-cripto":"checklist","questoes-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":4},"Autenticacao-e-IAM":{"secoes":{"pilares-iam":"teoria","senhas-e-mfa":"teoria","federacao-oauth-oidc":"teoria","anatomia-jwt":"teoria","modelos-controle-acesso":"teoria","laboratorio-pratico":"laboratorio","checklist-iam":"checklist","questoes-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":3},"Segmentacao-e-Firewall":{"secoes":{"zonas-confianca-dmz":"teoria","vlans-e-8021q":"teoria","arquiteturas-firewall":"teoria","regras-e-precedencia":"teoria","laboratorio-pratico":"laboratorio","checklist-segmentacao":"checklist","questoes-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":3},"Hardening-Sistemas":{"secoes":{"fundamentos-hardening-cis":"teoria","hardening-linux":"teoria","hardening-windows":"teoria","automacao-scap":"teoria","laboratorio-pratico":"laboratorio","checklist-hardening":"checklist","questoes-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":3},"Seguranca-de-Redes-Defesa":{"secoes":{"ids-vs-ips":"teoria","waf-camada-7":"teoria","proxies-e-mtls":"teoria","vpns-seguras":"teoria","laboratorio-pratico":"laboratorio","checklist-defesa-redes":"checklist","questoes-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":3},"Arquitetura-Zero-Trust":{"secoes":{"axiomas-zero-trust":"teoria","nist-sp-800-207":"teoria","microsegmentacao-ztna":"teoria","contexto-postura":"teoria","laboratorio-pratico":"laboratorio","checklist-zero-trust":"checklist","questoes-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":3},"Gestao-de-Vulnerabilidades":{"secoes":{"ecossistema-cve":"teoria","padroes-cvss":"teoria","triade-priorizacao":"teoria","remediacao-mitigacao-sla":"teoria","laboratorio-pratico":"laboratorio","checklist-gestao-vulns":"checklist","questoes-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":3},"Seguranca-em-Endpoints-EDR":{"secoes":{"introducao":"teoria","telemetria":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":6,"q":3},"Reconhecimento-e-OSINT":{"secoes":{"introducao":"teoria","tecnicas":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":6,"q":3},"OWASP-Top-10-Web":{"secoes":{"introducao":"teoria","falhas":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Seguranca-em-APIs":{"secoes":{"introducao":"teoria","controles":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Pentest-Metodologias":{"secoes":{"introducao":"teoria","regras":"teoria","certificacoes-praticas":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":8,"q":7},"Engenharia-Social-e-Phishing":{"secoes":{"introducao":"teoria","defesas":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Operacoes-SOC-e-SIEM":{"secoes":{"introducao":"teoria","deteccao":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Threat-Intelligence":{"secoes":{"introducao":"teoria","compartilhamento":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Resposta-a-Incidentes":{"secoes":{"introducao":"teoria","ciclo":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":5},"Forense-Digital":{"secoes":{"introducao":"teoria","artefatos":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Analise-Basica-de-Malware":{"secoes":{"introducao":"teoria","dinamica":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Seguranca-em-Nuvem":{"secoes":{"introducao":"teoria","controles":"teoria","iso-27017-27018":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":8,"q":7},"DevSecOps-e-CI-CD":{"secoes":{"introducao":"teoria","cadeia":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Seguranca-em-IoT-e-OT":{"secoes":{"introducao":"teoria","protocolos":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"IA-e-Ciberseguranca":{"secoes":{"introducao":"teoria","defesas":"teoria","governanca-ia":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":8,"q":7},"Gestao-de-Riscos-TI":{"secoes":{"introducao":"teoria","processo":"teoria","iso-27005":"teoria","excecoes":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":8,"q":8},"ISO-27001-e-27002":{"secoes":{"introducao":"teoria","sgsi":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"LGPD-e-Privacidade":{"secoes":{"introducao":"teoria","obrigacoes":"teoria","iso-27701":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":8,"q":7},"Continuidade-e-Disaster-Recovery":{"secoes":{"introducao":"teoria","estrategias":"teoria","iso-22301":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":8,"q":7},"Protecao-de-Dados-e-Conteudo":{"secoes":{"introducao":"teoria","filtros":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Seguranca-de-Bancos-de-Dados":{"secoes":{"introducao":"teoria","controles":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":5},"PCI-DSS":{"secoes":{"introducao":"teoria","escopo":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Ingles-Tecnico-Ciber":{"secoes":{"introducao":"teoria","linguagem":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Certificacoes-e-Carreira":{"secoes":{"introducao":"teoria","certificacoes":"teoria","trajetorias":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":8,"q":9},"Linux-para-Seguranca":{"secoes":{"introducao":"teoria","investigacao":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Python-para-Seguranca":{"secoes":{"introducao":"teoria","apis":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"PowerShell-e-Windows-Interno":{"secoes":{"introducao":"teoria","eventos":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Laboratorio-Domestico-e-Portfolio":{"secoes":{"introducao":"teoria","pratica":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Active-Directory-Fundamentos":{"secoes":{"introducao":"teoria","gpo-kerberos":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Ataques-e-Defesa-no-AD":{"secoes":{"introducao":"teoria","tecnicas":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"PAM-e-Acessos-Privilegiados":{"secoes":{"introducao":"teoria","controles":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Identidade-Hibrida-e-Nuvem":{"secoes":{"introducao":"teoria","ataques":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Ransomware-Prevencao-a-Recuperacao":{"secoes":{"introducao":"teoria","resposta":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Gestao-de-Crise-e-Comunicacao":{"secoes":{"introducao":"teoria","comunicacao":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Exercicios-Tabletop":{"secoes":{"introducao":"teoria","depois":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Backup-Imutavel-e-Recuperacao":{"secoes":{"introducao":"teoria","recuperacao":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Engenharia-de-Deteccao":{"secoes":{"introducao":"teoria","engenharia":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":7},"Threat-Hunting":{"secoes":{"introducao":"teoria","dados":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":7},"Monitoramento-de-Rede-NSM":{"secoes":{"introducao":"teoria","analise":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":7},"SOAR-e-Automacao-de-Resposta":{"secoes":{"introducao":"teoria","automacao":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":7},"Seguranca-de-Containers":{"secoes":{"introducao":"teoria","imagem-e-runtime":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":7},"Seguranca-em-Kubernetes":{"secoes":{"introducao":"teoria","controles-do-cluster":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":7},"Infraestrutura-como-Codigo-Segura":{"secoes":{"introducao":"teoria","plano-politica-state":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":7},"Deteccao-e-Resposta-em-Nuvem":{"secoes":{"introducao":"teoria","eventos-linha-contencao":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Regulacao-Setor-Financeiro":{"secoes":{"introducao":"teoria","exigencias":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":7},"Fraude-em-Pagamentos-e-Pix":{"secoes":{"introducao":"teoria","sinais-e-med":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Legislacao-e-Crimes-Ciberneticos":{"secoes":{"introducao":"teoria","tipos-registros-e-custodia":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Gestao-de-Riscos-de-Terceiros":{"secoes":{"introducao":"teoria","ciclo-evidencias-e-clausulas":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Auditoria-de-TI":{"secoes":{"introducao":"teoria","sox-404":"teoria","itgc":"teoria","cobit":"teoria","ciclo-do-teste":"teoria","assurance":"teoria","correlacao-grc":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":8,"q":9},"Lideranca-e-Programa-de-Seguranca":{"secoes":{"introducao":"teoria","governanca":"teoria","risco-de-negocio":"teoria","metricas-conselho":"teoria","orcamento":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":5,"q":8},"Estruturacao-da-Area-de-Seguranca":{"secoes":{"introducao":"teoria","maturidade":"teoria","time-e-sourcing":"teoria","conscientizacao":"teoria","fusoes-e-aquisicoes":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":6,"q":7},"Fundamentos-de-Computacao-e-SO":{"secoes":{"introducao":"teoria","memoria-e-processos":"teoria","kernel-e-syscalls":"teoria","binario-e-codificacoes":"teoria","arquivos-e-permissoes":"teoria","virtualizacao":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":6,"q":7},"Exploracao-e-Escalada-de-Privilegio":{"secoes":{"introducao":"teoria","reconhecimento":"teoria","exploracao-web":"teoria","acesso-e-shell":"teoria","escalada-linux":"teoria","escalada-windows":"teoria","simulador":"laboratorio","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6}}};
+  const DADOS = {"trilhas":{"1":"Fundamentos & Redes","2":"Segurança Defensiva","3":"Segurança Ofensiva","4":"Operações, SOC & Resposta","5":"Especialidades & Fronteiras","6":"Governança, Riscos & Conformidade","7":"Carreira & Formação","8":"Ferramentas & Automação do Analista","9":"Identidade Corporativa & Active Directory","10":"Resiliência, Crise & Ransomware","11":"Detecção Avançada & Threat Hunting","12":"Nuvem, Containers & Kubernetes","13":"Setor Regulado no Brasil","14":"Liderança & Estratégia"},"niveis":[["iniciante","🌱 Iniciante"],["intermediario","🌿 Intermediário"],["avancado","🌳 Avançado"]],"carreiras":["Blue Team & Defesa","Red Team & Pentest","AppSec & DevSecOps","Operações SOC & Resposta","GRC & Auditoria","Perícia Forense & Malware","Analista de Segurança da Informação"],"modulos":{"Fundamentos-Ciber":{"secoes":{"fundamentacao-teorica":"teoria","panorama-ameacas":"teoria","modelagem-stride":"teoria","checklist-pratico":"checklist","quiz-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":3},"Redes-e-Protocolos":{"secoes":{"modelos-rede":"teoria","dissecacao-protocolos":"teoria","enderecamento-http-wifi":"teoria","checklist-pratico":"checklist","questoes-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":6},"Criptografia-Pratica":{"secoes":{"pilares-criptograficos":"teoria","algoritmos-modos":"teoria","ciclo-de-certificados":"teoria","checklist-cripto":"checklist","questoes-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":4},"Autenticacao-e-IAM":{"secoes":{"pilares-iam":"teoria","senhas-e-mfa":"teoria","federacao-oauth-oidc":"teoria","anatomia-jwt":"teoria","modelos-controle-acesso":"teoria","checklist-iam":"checklist","questoes-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":3},"Segmentacao-e-Firewall":{"secoes":{"zonas-confianca-dmz":"teoria","vlans-e-8021q":"teoria","arquiteturas-firewall":"teoria","regras-e-precedencia":"teoria","checklist-segmentacao":"checklist","questoes-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":3},"Hardening-Sistemas":{"secoes":{"fundamentos-hardening-cis":"teoria","hardening-linux":"teoria","hardening-windows":"teoria","automacao-scap":"teoria","checklist-hardening":"checklist","questoes-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":3},"Seguranca-de-Redes-Defesa":{"secoes":{"ids-vs-ips":"teoria","waf-camada-7":"teoria","proxies-e-mtls":"teoria","vpns-seguras":"teoria","checklist-defesa-redes":"checklist","questoes-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":3},"Arquitetura-Zero-Trust":{"secoes":{"axiomas-zero-trust":"teoria","nist-sp-800-207":"teoria","microsegmentacao-ztna":"teoria","contexto-postura":"teoria","checklist-zero-trust":"checklist","questoes-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":3},"Gestao-de-Vulnerabilidades":{"secoes":{"ecossistema-cve":"teoria","padroes-cvss":"teoria","triade-priorizacao":"teoria","remediacao-mitigacao-sla":"teoria","checklist-gestao-vulns":"checklist","questoes-fixacao":"questoes","fatos-essenciais":"referencias"},"chk":6,"q":3},"Seguranca-em-Endpoints-EDR":{"secoes":{"introducao":"teoria","telemetria":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":6,"q":3},"Reconhecimento-e-OSINT":{"secoes":{"introducao":"teoria","tecnicas":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":6,"q":3},"OWASP-Top-10-Web":{"secoes":{"introducao":"teoria","falhas":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Seguranca-em-APIs":{"secoes":{"introducao":"teoria","controles":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Pentest-Metodologias":{"secoes":{"introducao":"teoria","regras":"teoria","certificacoes-praticas":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":8,"q":7},"Engenharia-Social-e-Phishing":{"secoes":{"introducao":"teoria","defesas":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Operacoes-SOC-e-SIEM":{"secoes":{"introducao":"teoria","deteccao":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Threat-Intelligence":{"secoes":{"introducao":"teoria","compartilhamento":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Resposta-a-Incidentes":{"secoes":{"introducao":"teoria","ciclo":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":5},"Forense-Digital":{"secoes":{"introducao":"teoria","artefatos":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Analise-Basica-de-Malware":{"secoes":{"introducao":"teoria","dinamica":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Seguranca-em-Nuvem":{"secoes":{"introducao":"teoria","controles":"teoria","iso-27017-27018":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":8,"q":7},"DevSecOps-e-CI-CD":{"secoes":{"introducao":"teoria","cadeia":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Seguranca-em-IoT-e-OT":{"secoes":{"introducao":"teoria","protocolos":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"IA-e-Ciberseguranca":{"secoes":{"introducao":"teoria","defesas":"teoria","governanca-ia":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":8,"q":7},"Gestao-de-Riscos-TI":{"secoes":{"introducao":"teoria","processo":"teoria","iso-27005":"teoria","excecoes":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":8,"q":8},"ISO-27001-e-27002":{"secoes":{"introducao":"teoria","sgsi":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"LGPD-e-Privacidade":{"secoes":{"introducao":"teoria","obrigacoes":"teoria","iso-27701":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":8,"q":7},"Continuidade-e-Disaster-Recovery":{"secoes":{"introducao":"teoria","estrategias":"teoria","iso-22301":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":8,"q":7},"Protecao-de-Dados-e-Conteudo":{"secoes":{"introducao":"teoria","filtros":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Seguranca-de-Bancos-de-Dados":{"secoes":{"introducao":"teoria","controles":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":5},"PCI-DSS":{"secoes":{"introducao":"teoria","escopo":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Ingles-Tecnico-Ciber":{"secoes":{"introducao":"teoria","linguagem":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Certificacoes-e-Carreira":{"secoes":{"introducao":"teoria","certificacoes":"teoria","trajetorias":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":8,"q":9},"Linux-para-Seguranca":{"secoes":{"introducao":"teoria","investigacao":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Python-para-Seguranca":{"secoes":{"introducao":"teoria","apis":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"PowerShell-e-Windows-Interno":{"secoes":{"introducao":"teoria","eventos":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Laboratorio-Domestico-e-Portfolio":{"secoes":{"introducao":"teoria","pratica":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Active-Directory-Fundamentos":{"secoes":{"introducao":"teoria","gpo-kerberos":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Ataques-e-Defesa-no-AD":{"secoes":{"introducao":"teoria","tecnicas":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"PAM-e-Acessos-Privilegiados":{"secoes":{"introducao":"teoria","controles":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Identidade-Hibrida-e-Nuvem":{"secoes":{"introducao":"teoria","ataques":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Ransomware-Prevencao-a-Recuperacao":{"secoes":{"introducao":"teoria","resposta":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Gestao-de-Crise-e-Comunicacao":{"secoes":{"introducao":"teoria","comunicacao":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Exercicios-Tabletop":{"secoes":{"introducao":"teoria","depois":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Backup-Imutavel-e-Recuperacao":{"secoes":{"introducao":"teoria","recuperacao":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Engenharia-de-Deteccao":{"secoes":{"introducao":"teoria","engenharia":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":7},"Threat-Hunting":{"secoes":{"introducao":"teoria","dados":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":7},"Monitoramento-de-Rede-NSM":{"secoes":{"introducao":"teoria","analise":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":7},"SOAR-e-Automacao-de-Resposta":{"secoes":{"introducao":"teoria","automacao":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":7},"Seguranca-de-Containers":{"secoes":{"introducao":"teoria","imagem-e-runtime":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":7},"Seguranca-em-Kubernetes":{"secoes":{"introducao":"teoria","controles-do-cluster":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":7},"Infraestrutura-como-Codigo-Segura":{"secoes":{"introducao":"teoria","plano-politica-state":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":7},"Deteccao-e-Resposta-em-Nuvem":{"secoes":{"introducao":"teoria","eventos-linha-contencao":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Regulacao-Setor-Financeiro":{"secoes":{"introducao":"teoria","exigencias":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":7},"Fraude-em-Pagamentos-e-Pix":{"secoes":{"introducao":"teoria","sinais-e-med":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Legislacao-e-Crimes-Ciberneticos":{"secoes":{"introducao":"teoria","tipos-registros-e-custodia":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Gestao-de-Riscos-de-Terceiros":{"secoes":{"introducao":"teoria","ciclo-evidencias-e-clausulas":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6},"Auditoria-de-TI":{"secoes":{"introducao":"teoria","sox-404":"teoria","itgc":"teoria","cobit":"teoria","ciclo-do-teste":"teoria","assurance":"teoria","correlacao-grc":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":8,"q":9},"Lideranca-e-Programa-de-Seguranca":{"secoes":{"introducao":"teoria","governanca":"teoria","risco-de-negocio":"teoria","metricas-conselho":"teoria","orcamento":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":5,"q":8},"Estruturacao-da-Area-de-Seguranca":{"secoes":{"introducao":"teoria","maturidade":"teoria","time-e-sourcing":"teoria","conscientizacao":"teoria","fusoes-e-aquisicoes":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":6,"q":7},"Fundamentos-de-Computacao-e-SO":{"secoes":{"introducao":"teoria","memoria-e-processos":"teoria","kernel-e-syscalls":"teoria","binario-e-codificacoes":"teoria","arquivos-e-permissoes":"teoria","virtualizacao":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":6,"q":7},"Exploracao-e-Escalada-de-Privilegio":{"secoes":{"introducao":"teoria","reconhecimento":"teoria","exploracao-web":"teoria","acesso-e-shell":"teoria","escalada-linux":"teoria","escalada-windows":"teoria","checklist":"checklist","quiz":"questoes","fatos":"referencias"},"chk":7,"q":6}}};
   const ROTULOS_TIPO = {
     teoria: '📘 Teoria',
-    laboratorio: '🧪 Laboratório',
     checklist: '☑️ Checklist',
     questoes: '❓ Questões de concurso',
     referencias: '📚 Referências'

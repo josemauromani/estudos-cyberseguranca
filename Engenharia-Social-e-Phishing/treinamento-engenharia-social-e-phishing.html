@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Engenharia-Social-e-Phishing">
@@ -2120,7 +1736,6 @@ dfn.glossario:focus-visible {
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: O Ataque Que Pede Licença</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#defesas" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Como Ler um E-mail Suspeito e Como Defender a Empresa</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Analisador de E-mails Suspeitos</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Defesa contra Engenharia Social</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2136,14 +1751,14 @@ dfn.glossario:focus-visible {
   <h1>Pretexting, Spear Phishing e Defesas Humanas</h1>
   <p class="mhead-sub">Gatilhos comportamentais, autenticação de e-mail (SPF/DKIM/DMARC) e conscientização corporativa</p>
   <div class="chips"><span class="chip">⏱ 40 min</span><span class="chip">📈 Iniciante</span><span class="chip">🛡 NIST Protect</span><span class="chip">🎯 ATT&amp;CK TA0001 Initial Access (Phishing)</span><span class="chip">👤 Red Team &amp; Pentest · Blue Team &amp; Defesa · GRC &amp; Auditoria · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 15: Engenharia-Social-e-Phishing Body Fragment -->
 <article class="study-container" data-slug="engenharia-social">
 
     <!-- SEÇÃO 1: O FATOR HUMANO -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: O Ataque Que Pede Licença</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 5</small></span><h2>Introdução: O Ataque Que Pede Licença</h2></div>
 
         <p class="lead-text">
             A estação EST-FIN-07 (Estudo 36) não foi invadida por uma falha técnica: a Fernanda abriu um anexo e clicou em "Habilitar conteúdo". A engenharia social explora decisões rápidas tomadas sob pressão, e por isso funciona com gente atenta e bem treinada. O objetivo deste estudo é reconhecer os sinais num e-mail real, entender por que eles funcionam e montar uma defesa que não dependa de ninguém ser perfeito.
@@ -2192,7 +1807,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 2: LER UM E-MAIL E DEFENDER -->
     <section class="study-section" id="defesas" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Como Ler um E-mail Suspeito e Como Defender a Empresa</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 5</small></span><h2>Como Ler um E-mail Suspeito e Como Defender a Empresa</h2></div>
 
         <h3>Onde o E-mail Se Entrega</h3>
         <ul>
@@ -2239,38 +1854,10 @@ dfn.glossario:focus-visible {
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 3 de 6</small></span><h2>Laboratório Prático: Analisador de E-mails Suspeitos</h2></div>
-
-        <p class="lead-text">
-            Esta é a caixa de entrada da Ipê Store na manhã de 12/11. Abra cada mensagem, clique nos trechos que são indicadores de golpe (cabeçalhos, frases, links e anexos), escolha o veredito e confira. Clicar num trecho inocente conta como falso positivo.
-        </p>
-
-        <div class="lab-box ph-lab" id="ph-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Laboratório de Phishing</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Caixa de entrada — Ipê Store</h3>
-                    <p id="ph-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
-                </div>
-            </div>
-
-            <div class="lab-body">
-                <div id="ph-caixa" role="group" aria-label="Mensagens" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem;"></div>
-                <div id="ph-email" style="margin-top: 1rem;"></div>
-                <p id="ph-status" aria-live="polite" style="margin: 0.5rem 0 0 0; font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); overflow-wrap: anywhere; min-height: 1.2em;"></p>
-                <div id="ph-resultado" aria-live="polite" style="margin-top: 0.75rem; font-size: 0.88rem;"></div>
-                <p id="ph-placar" style="margin: 1rem 0 0 0; font-weight: 600;"></p>
-                <div style="margin-top: 1rem;">
-                    <button class="btn-secondary" type="button" onclick="restaurarPhishing()">Restaurar laboratório</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist de Defesa contra Engenharia Social</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 3 de 5</small></span><h2>Checklist de Defesa contra Engenharia Social</h2></div>
 
         <p class="lead-text">
             Use esta lista para avaliar a defesa da organização contra phishing e engenharia social. O estado das caixas fica salvo no seu navegador.
@@ -2310,7 +1897,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 4 de 5</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2393,7 +1980,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 5 de 5</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2441,306 +2028,7 @@ dfn.glossario:focus-visible {
 
 </article>
 
-<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
-<script type="application/json" id="ph-dados">
-{
- "contexto": "Mensagens fictícias de 12/11/2025. Todos os domínios usam o sufixo reservado .example; o domínio da empresa é ipestore.example.",
- "dominio_interno": "ipestore.example",
- "gatilhos": {"urgencia": "Urgência", "medo": "Medo de perder algo", "autoridade": "Autoridade", "sigilo": "Sigilo", "prova_social": "Prova social"},
- "emails": [
-  {
-   "id": "fatura", "remetente_exibido": "Fornecedor Embalagens", "assunto": "URGENTE: fatura vencida - bloqueio do fornecimento hoje",
-   "from": "cobranca@fornecedor-embaiagens.example", "return_path": "bounce@mailer-x9.example", "veredito": "phishing",
-   "explicacao_veredito": "Este é o e-mail que abriu a EST-FIN-07 (Estudo 36). Domínio parecido com o do fornecedor real, envelope de outro domínio, urgência e um anexo com macro que pede para habilitar conteúdo.",
-   "trechos": [
-    {"id": "h1", "parte": "cabecalho", "texto": "From: \"Fornecedor Embalagens\" <cobranca@fornecedor-embaiagens.example>",
-     "indicador": {"tipo": "dominio_parecido", "explicacao": "O fornecedor real é fornecedor-embalagens.example; aqui o \"l\" virou \"i\" (embaiagens). É typosquatting."}},
-    {"id": "h2", "parte": "cabecalho", "texto": "To: fernanda.alves@ipestore.example", "nota": "Destinatário correto; nada de anormal."},
-    {"id": "h3", "parte": "cabecalho", "texto": "Return-Path: <bounce@mailer-x9.example>",
-     "indicador": {"tipo": "return_path", "explicacao": "O envelope vem de um serviço de disparo que não tem relação com o fornecedor."}},
-    {"id": "h4", "parte": "cabecalho", "texto": "Authentication-Results: mx.ipestore.example; spf=pass smtp.mailfrom=mailer-x9.example; dkim=none; dmarc=none header.from=fornecedor-embaiagens.example",
-     "indicador": {"tipo": "autenticacao", "explicacao": "O SPF passa para o serviço de disparo, não há DKIM e o domínio do From nem tem DMARC: um domínio recém-registrado pelo atacante."}},
-    {"id": "h5", "parte": "cabecalho", "texto": "Subject: URGENTE: fatura vencida - bloqueio do fornecimento hoje",
-     "indicador": {"tipo": "urgencia", "gatilho": "urgencia", "explicacao": "Caixa alta, prazo de horas e ameaça de bloqueio: pressa para impedir a verificação."}},
-    {"id": "h6", "parte": "cabecalho", "texto": "Date: Wed, 12 Nov 2025 09:31:12 -0300", "nota": "Data e fuso normais."},
-    {"id": "c1", "parte": "corpo", "texto": "Prezado cliente,",
-     "indicador": {"tipo": "saudacao_generica", "explicacao": "Um fornecedor de verdade sabe com quem fala; a saudação genérica serve para mandar a mesma isca a muita gente."}},
-    {"id": "c2", "parte": "corpo", "texto": "Identificamos que a fatura de novembro está vencida. Para evitar o bloqueio do fornecimento de embalagens, regularize ainda hoje.",
-     "indicador": {"tipo": "medo", "gatilho": "medo", "explicacao": "Ameaça de interromper o fornecimento para que a pessoa aja antes de pensar."}},
-    {"id": "c3", "parte": "corpo", "texto": "A fatura está em anexo. Se o documento abrir em modo protegido, clique em \"Habilitar conteúdo\" para visualizar.",
-     "indicador": {"tipo": "habilitar_conteudo", "explicacao": "Fatura não precisa de macro. Pedir para habilitar conteúdo é pedir para executar o código do anexo."}},
-    {"id": "a1", "parte": "anexo", "texto": "📎 Fatura_Novembro.docm (48 KB)",
-     "indicador": {"tipo": "anexo_macro", "explicacao": "A extensão .docm é um documento do Word com macro. Faturas chegam em PDF."}},
-    {"id": "c4", "parte": "corpo", "texto": "Atenciosamente, Departamento Financeiro — Fornecedor Embalagens", "nota": "Assinatura comum; copiá-la é fácil, então ela não prova nada, para um lado ou para o outro."}
-   ]
-  },
-  {
-   "id": "ceo", "remetente_exibido": "Ricardo Menezes (CEO)", "assunto": "Assunto confidencial",
-   "from": "ricardo.menezes.ipe@webmail-gratis.example", "return_path": "ricardo.menezes.ipe@webmail-gratis.example",
-   "reply_to": "pagamentos.diretoria@caixapostal-segura.example", "veredito": "phishing",
-   "explicacao_veredito": "BEC de whaling: nome do CEO num webmail, resposta desviada para outro domínio e um pedido de transferência urgente e sigilosa, fora do processo. Nenhum link ou anexo para os filtros pegarem.",
-   "trechos": [
-    {"id": "h1", "parte": "cabecalho", "texto": "From: \"Ricardo Menezes (CEO)\" <ricardo.menezes.ipe@webmail-gratis.example>",
-     "indicador": {"tipo": "webmail", "gatilho": "autoridade", "explicacao": "O nome é do CEO, mas o endereço é de um webmail gratuito. O e-mail dele é @ipestore.example."}},
-    {"id": "h2", "parte": "cabecalho", "texto": "Reply-To: pagamentos.diretoria@caixapostal-segura.example",
-     "indicador": {"tipo": "reply_to", "explicacao": "A resposta vai para um terceiro domínio, onde o golpista acompanha a conversa."}},
-    {"id": "h3", "parte": "cabecalho", "texto": "To: contas@ipestore.example", "nota": "Endereço da área de contas a pagar, alvo típico de BEC; o destinatário em si não é indicador."},
-    {"id": "h4", "parte": "cabecalho", "texto": "Authentication-Results: mx.ipestore.example; spf=pass; dkim=pass header.d=webmail-gratis.example; dmarc=pass header.from=webmail-gratis.example",
-     "nota": "Tudo passa, mas para o webmail. A autenticação prova que veio do webmail, não do CEO."},
-    {"id": "h5", "parte": "cabecalho", "texto": "Subject: Assunto confidencial", "nota": "Assunto vago é comum em BEC, mas sozinho não prova nada."},
-    {"id": "c1", "parte": "corpo", "texto": "Ana, estou em reunião com o conselho e não consigo falar ao telefone.",
-     "indicador": {"tipo": "evita_verificacao", "gatilho": "autoridade", "explicacao": "A desculpa para não atender bloqueia justamente a verificação por telefone, que desmontaria o golpe."}},
-    {"id": "c2", "parte": "corpo", "texto": "Preciso que você faça hoje uma transferência de R$ 186.400,00 para fechar a aquisição de um fornecedor. Os dados bancários seguem abaixo.",
-     "indicador": {"tipo": "pedido_fora_processo", "gatilho": "urgencia", "explicacao": "Pagamento alto, urgente e por e-mail, fora do fluxo de aprovação. O processo existe para que ninguém pague sozinho."}},
-    {"id": "c3", "parte": "corpo", "texto": "O assunto é confidencial até o anúncio: não comente com ninguém da equipe.",
-     "indicador": {"tipo": "sigilo", "gatilho": "sigilo", "explicacao": "O sigilo impede a segunda opinião que identificaria a fraude."}},
-    {"id": "c4", "parte": "corpo", "texto": "Enviado do meu celular", "nota": "Comum em mensagens reais; aqui serve para justificar o tom curto, mas sozinho não é indicador."}
-   ]
-  },
-  {
-   "id": "m365", "remetente_exibido": "Microsoft 365", "assunto": "Sua senha expira em 24 horas",
-   "from": "no-reply@m365-seguranca.example", "return_path": "bounce@m365-seguranca.example", "veredito": "phishing",
-   "explicacao_veredito": "Coleta de credenciais com AiTM: o link exibe o endereço oficial de login, mas leva a um domínio do atacante que repassa senha e código ao site real e rouba a sessão. Só FIDO2 ou passkey resistiriam.",
-   "trechos": [
-    {"id": "h1", "parte": "cabecalho", "texto": "From: \"Microsoft 365\" <no-reply@m365-seguranca.example>",
-     "indicador": {"tipo": "dominio_parecido", "explicacao": "O nome exibido é Microsoft 365, mas o domínio não pertence à Microsoft."}},
-    {"id": "h2", "parte": "cabecalho", "texto": "To: fernanda.alves@ipestore.example", "nota": "Destinatário correto."},
-    {"id": "h3", "parte": "cabecalho", "texto": "Return-Path: <bounce@m365-seguranca.example>", "nota": "Mesmo domínio do From: o atacante montou o domínio inteiro, então o envelope é coerente."},
-    {"id": "h4", "parte": "cabecalho", "texto": "Authentication-Results: mx.ipestore.example; spf=pass; dkim=pass header.d=m365-seguranca.example; dmarc=pass header.from=m365-seguranca.example",
-     "nota": "Passa em tudo, para o domínio do atacante. Autenticação aprovada não significa remetente honesto."},
-    {"id": "h5", "parte": "cabecalho", "texto": "Subject: Sua senha expira em 24 horas",
-     "indicador": {"tipo": "medo", "gatilho": "medo", "explicacao": "Ameaça de perder o acesso, com prazo curto."}},
-    {"id": "c1", "parte": "corpo", "texto": "Sua senha corporativa expira hoje. Para manter o acesso ao e-mail e ao Teams, confirme sua conta no link abaixo.",
-     "indicador": {"tipo": "urgencia", "gatilho": "urgencia", "explicacao": "Pressa para confirmar a conta por um link, sem passar pelo portal conhecido."}},
-    {"id": "l1", "parte": "link", "texto": "https://login.microsoftonline.com/ipestore", "href": "https://ipestore.m365-verify.example/session",
-     "indicador": {"tipo": "link_divergente", "explicacao": "O texto mostra o endereço oficial de login, mas o destino real é outro domínio. Passe o mouse ou foque o link para ver."}},
-    {"id": "c2", "parte": "corpo", "texto": "Mais de 300 colegas da Ipê Store já confirmaram a conta nesta semana.",
-     "indicador": {"tipo": "prova_social", "gatilho": "prova_social", "explicacao": "\"Todo mundo já fez\" reduz a desconfiança e acelera o clique."}},
-    {"id": "c3", "parte": "corpo", "texto": "Equipe Microsoft 365", "nota": "Assinatura genérica; não ajuda a decidir."}
-   ]
-  },
-  {
-   "id": "rh", "remetente_exibido": "Recursos Humanos", "assunto": "Escolha do plano de saúde termina sexta (14/11)",
-   "from": "rh@ipestore.example", "return_path": "rh@ipestore.example", "veredito": "legitimo",
-   "explicacao_veredito": "Mensagem interna autenticada pelo domínio da empresa, personalizada, com link para o portal conhecido e um prazo real já divulgado. Urgência sozinha não faz um golpe.",
-   "trechos": [
-    {"id": "h1", "parte": "cabecalho", "texto": "From: \"Recursos Humanos\" <rh@ipestore.example>", "nota": "Domínio da própria empresa."},
-    {"id": "h2", "parte": "cabecalho", "texto": "To: fernanda.alves@ipestore.example", "nota": "Destinatário correto."},
-    {"id": "h3", "parte": "cabecalho", "texto": "Return-Path: <rh@ipestore.example>", "nota": "Envelope no mesmo domínio do remetente."},
-    {"id": "h4", "parte": "cabecalho", "texto": "Authentication-Results: mx.ipestore.example; spf=pass; dkim=pass header.d=ipestore.example; dmarc=pass header.from=ipestore.example", "nota": "Autenticação aprovada para o domínio da empresa."},
-    {"id": "h5", "parte": "cabecalho", "texto": "Subject: Escolha do plano de saúde termina sexta (14/11)", "nota": "Há prazo, mas é um prazo real, já anunciado na intranet. Urgência sozinha não é indicador."},
-    {"id": "c1", "parte": "corpo", "texto": "Olá, Fernanda,", "nota": "Saudação personalizada."},
-    {"id": "c2", "parte": "corpo", "texto": "O prazo para escolher o plano de saúde de 2026 termina nesta sexta-feira, 14/11. A escolha é feita no portal do RH, com o seu login de sempre (SSO).", "nota": "Leva ao portal conhecido, com o login corporativo normal; não pede senha por e-mail."},
-    {"id": "l1", "parte": "link", "texto": "https://rh.ipestore.example/beneficios", "href": "https://rh.ipestore.example/beneficios", "nota": "O texto e o destino real são iguais e pertencem ao domínio da empresa."},
-    {"id": "c3", "parte": "corpo", "texto": "Dúvidas: ramal 2040 ou rh@ipestore.example.", "nota": "Oferece canais conhecidos para confirmar."}
-   ]
-  }
- ]
-}
-</script>
-
-<script>
-(function() {
-    var PH = JSON.parse(document.getElementById("ph-dados").textContent);
-    var atual = null;
-    var marcados = {};
-    var vereditos = {};
-    var conferidos = {};
-
-    function el(tag, texto, estilo) {
-        var e = document.createElement(tag);
-        if (texto !== undefined && texto !== null) e.textContent = texto;
-        if (estilo) e.setAttribute("style", estilo);
-        return e;
-    }
-    function email(id) { return PH.emails.filter(function(e) { return e.id === id; })[0]; }
-    function marcado(eid, tid) { return !!(marcados[eid] && marcados[eid][tid]); }
-
-    function avaliar(e) {
-        var acertos = 0, faltas = 0, falsos = 0;
-        e.trechos.forEach(function(t) {
-            var m = marcado(e.id, t.id);
-            if (t.indicador && m) acertos++;
-            else if (t.indicador) faltas++;
-            else if (m) falsos++;
-        });
-        return { acertos: acertos, faltas: faltas, falsos: falsos, total: e.trechos.filter(function(t) { return t.indicador; }).length,
-                 veredito: vereditos[e.id] === e.veredito };
-    }
-
-    function renderizarCaixa() {
-        var box = document.getElementById("ph-caixa");
-        box.replaceChildren();
-        PH.emails.forEach(function(e) {
-            var b = el("button", null, "display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.1rem; text-align: left; padding: 0.5rem 0.7rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); cursor: pointer; font: inherit; color: var(--ink); background: " + (e.id === atual ? "var(--sunk)" : "var(--surface)") + ";");
-            b.type = "button";
-            b.setAttribute("aria-pressed", e.id === atual ? "true" : "false");
-            b.setAttribute("data-email", e.id);
-            var topo = el("span", null, "display: flex; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;");
-            topo.appendChild(el("strong", e.remetente_exibido, "font-size: 0.88rem;"));
-            if (conferidos[e.id]) {
-                var r = avaliar(e), ok = r.veredito && !r.faltas && !r.falsos;
-                topo.appendChild(el("span", ok ? "✓ conferido" : "conferido, com ajustes", "font-size: 0.75rem; color: " + (ok ? "var(--tip-color)" : "var(--danger-color)") + ";"));
-            }
-            b.appendChild(topo);
-            b.appendChild(el("span", e.assunto, "font-size: 0.82rem; overflow-wrap: anywhere;"));
-            b.addEventListener("click", function() { selecionarEmailPhishing(e.id); });
-            box.appendChild(b);
-        });
-    }
-
-    function estiloTrecho(e, t) {
-        var base = "display: block; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; padding: 0.3rem 0.45rem; border-radius: var(--radius-sm); overflow-wrap: anywhere; background: transparent; ";
-        var m = marcado(e.id, t.id);
-        if (conferidos[e.id]) {
-            if (t.indicador && m) return base + "border: 2px solid var(--tip-color); background: rgba(22, 163, 74, 0.15);";
-            if (t.indicador) return base + "border: 2px dashed rgba(234, 88, 12, 0.9);";
-            if (m) return base + "border: 2px solid var(--danger-color); background: rgba(220, 38, 38, 0.15);";
-            return base + "border: 1px solid transparent;";
-        }
-        return base + (m ? "border: 2px solid var(--danger-color); background: rgba(220, 38, 38, 0.15);" : "border: 1px dashed var(--rule);");
-    }
-
-    function botaoTrecho(e, t, extra) {
-        var b = el("button", t.texto, estiloTrecho(e, t) + (extra || ""));
-        b.type = "button";
-        b.setAttribute("aria-pressed", marcado(e.id, t.id) ? "true" : "false");
-        b.setAttribute("data-trecho", t.id);
-        b.title = marcado(e.id, t.id) ? "Marcado como indicador" : "Clique para marcar como indicador";
-        b.addEventListener("click", function() { marcarTrechoPhishing(e.id, t.id); });
-        if (t.parte === "link") {
-            var mostrar = function() { document.getElementById("ph-status").textContent = "Destino real do link: " + t.href; };
-            var esconder = function() { document.getElementById("ph-status").textContent = ""; };
-            b.addEventListener("mouseenter", mostrar);
-            b.addEventListener("focus", mostrar);
-            b.addEventListener("mouseleave", esconder);
-            b.addEventListener("blur", esconder);
-        }
-        return b;
-    }
-
-    function renderizarEmail() {
-        var box = document.getElementById("ph-email");
-        box.replaceChildren();
-        var e = email(atual);
-        if (!e) return;
-        var card = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-md); background: var(--surface); padding: 0.75rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.6rem; min-width: 0;");
-        card.appendChild(el("strong", "Cabeçalhos", "font-size: 0.8rem; text-transform: uppercase; color: var(--muted);"));
-        var cab = el("div", null, "display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.25rem; font-family: var(--font-mono); font-size: 0.74rem;");
-        e.trechos.filter(function(t) { return t.parte === "cabecalho"; }).forEach(function(t) { cab.appendChild(botaoTrecho(e, t)); });
-        card.appendChild(cab);
-        card.appendChild(el("strong", "Mensagem", "font-size: 0.8rem; text-transform: uppercase; color: var(--muted); margin-top: 0.3rem;"));
-        card.appendChild(el("div", e.assunto, "font-weight: 700; font-size: 1rem;"));
-        card.appendChild(el("div", e.remetente_exibido, "font-size: 0.85rem; color: var(--muted);"));
-        var corpo = el("div", null, "display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.3rem; font-size: 0.9rem;");
-        e.trechos.filter(function(t) { return t.parte !== "cabecalho"; }).forEach(function(t) {
-            var extra = t.parte === "link" ? "color: var(--accent); text-decoration: underline;" : t.parte === "anexo" ? "font-weight: 600;" : "";
-            corpo.appendChild(botaoTrecho(e, t, extra));
-        });
-        card.appendChild(corpo);
-        var vd = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; font-size: 0.88rem; border-top: 1px solid var(--rule); padding-top: 0.6rem;");
-        vd.setAttribute("role", "radiogroup");
-        vd.setAttribute("aria-label", "Veredito");
-        vd.appendChild(el("strong", "Veredito:"));
-        [["phishing", "Reportar como golpe"], ["legitimo", "Legítimo"]].forEach(function(par) {
-            var r = el("label", null, "display: flex; gap: 0.3rem; align-items: center;");
-            var inp = el("input");
-            inp.type = "radio"; inp.name = "ph-veredito"; inp.value = par[0];
-            inp.checked = vereditos[e.id] === par[0];
-            inp.addEventListener("change", function() { vereditos[e.id] = par[0]; });
-            r.appendChild(inp); r.appendChild(document.createTextNode(par[1]));
-            vd.appendChild(r);
-        });
-        var bc = el("button", "Conferir este e-mail");
-        bc.type = "button"; bc.className = "btn-primary";
-        bc.addEventListener("click", conferirEmailPhishing);
-        vd.appendChild(bc);
-        card.appendChild(vd);
-        box.appendChild(card);
-    }
-
-    function renderizarResultado() {
-        var box = document.getElementById("ph-resultado");
-        box.replaceChildren();
-        var e = email(atual);
-        if (!e || !conferidos[e.id]) return;
-        var r = avaliar(e);
-        box.setAttribute("data-acertos", String(r.acertos));
-        box.setAttribute("data-faltas", String(r.faltas));
-        box.setAttribute("data-falsos", String(r.falsos));
-        box.setAttribute("data-veredito", r.veredito ? "certo" : "errado");
-        box.appendChild(el("strong", (r.veredito ? "✓ Veredito correto. " : "✗ Veredito incorreto. ") + e.explicacao_veredito,
-            "display: block; color: " + (r.veredito ? "var(--tip-color)" : "var(--danger-color)") + ";"));
-        box.appendChild(el("p", "Indicadores encontrados: " + r.acertos + " de " + r.total + ". Falsos positivos: " + r.falsos + ".", "margin: 0.4rem 0;"));
-        var ul = el("ul", null, "margin: 0; padding-left: 1.2rem;");
-        e.trechos.forEach(function(t) {
-            var m = marcado(e.id, t.id);
-            if (!t.indicador && !m) return;
-            var pref = t.indicador ? (m ? "✓ " : "Não marcado: ") : "Falso positivo: ";
-            var cor = t.indicador ? (m ? "var(--tip-color)" : "rgb(234, 88, 12)") : "var(--danger-color)";
-            var li = el("li", null, "margin-bottom: 0.3rem;");
-            li.appendChild(el("strong", pref, "color: " + cor + ";"));
-            var g = t.indicador && t.indicador.gatilho ? " [" + PH.gatilhos[t.indicador.gatilho] + "]" : "";
-            li.appendChild(document.createTextNode((t.indicador ? t.indicador.explicacao + g : t.nota || "Este trecho não é indicador.")));
-            ul.appendChild(li);
-        });
-        box.appendChild(ul);
-    }
-
-    function renderizarPlacar() {
-        var total = 0, achados = 0, falsos = 0, certos = 0, feitos = 0;
-        PH.emails.forEach(function(e) {
-            if (!conferidos[e.id]) return;
-            var r = avaliar(e);
-            feitos++; total += r.total; achados += r.acertos; falsos += r.falsos; if (r.veredito) certos++;
-        });
-        document.getElementById("ph-placar").textContent = feitos
-            ? "Placar: " + feitos + " de " + PH.emails.length + " e-mails conferidos; " + certos + " vereditos certos; " + achados + " de " + total + " indicadores; " + falsos + " falsos positivos."
-            : "Placar: nenhum e-mail conferido ainda.";
-    }
-
-    window.selecionarEmailPhishing = function(id) {
-        if (!email(id)) return;
-        atual = id;
-        document.getElementById("ph-status").textContent = "";
-        renderizarCaixa();
-        renderizarEmail();
-        renderizarResultado();
-    };
-    window.marcarTrechoPhishing = function(eid, tid) {
-        marcados[eid] = marcados[eid] || {};
-        marcados[eid][tid] = !marcados[eid][tid];
-        if (conferidos[eid]) { conferidos[eid] = false; renderizarCaixa(); renderizarPlacar(); document.getElementById("ph-resultado").replaceChildren(); }
-        renderizarEmail();
-        var b = document.querySelector('#ph-email [data-trecho="' + tid + '"]');
-        if (b) b.focus();
-    };
-    window.conferirEmailPhishing = function() {
-        if (!atual) return;
-        conferidos[atual] = true;
-        renderizarCaixa();
-        renderizarEmail();
-        renderizarResultado();
-        renderizarPlacar();
-    };
-    window.restaurarPhishing = function() {
-        marcados = {}; vereditos = {}; conferidos = {};
-        selecionarEmailPhishing(PH.emails[0].id);
-        renderizarPlacar();
-    };
-
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("ph-contexto").textContent = PH.contexto;
-        restaurarPhishing();
-        if (typeof initChecklist === "function") {
-            initChecklist("engenharia-social");
-        }
-        if (typeof initQuiz === "function") {
-            initQuiz();
-        }
-    });
-})();
-</script>
+<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
 </main>
 </div>
 
@@ -2875,7 +2163,6 @@ dfn.glossario:focus-visible {
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3464,17 +2751,6 @@ dfn.glossario:focus-visible {
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -3688,7 +2964,6 @@ dfn.glossario:focus-visible {
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

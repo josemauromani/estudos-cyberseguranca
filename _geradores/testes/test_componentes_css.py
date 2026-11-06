@@ -1,4 +1,4 @@
-"""Testes dos componentes do novo design (base.css) e da preservação dos simuladores (laboratorio.css)."""
+"""Testes dos componentes do novo design (base.css) do design system (base.css)."""
 
 import re
 import sys
@@ -21,7 +21,7 @@ CLASSES_T3 = [
     ".callout", ".callout.tip", ".callout.warning", ".callout.danger", ".callout.law", ".callout.key",
     ".callout-title", ".callout-icon", ".table-responsive", ".data-table", ".terminal-box", ".terminal-header",
     ".terminal-title", ".terminal-copy-btn", ".diagram-box", ".diagram-header", ".diagram-title",
-    ".diagram-svg-wrap", ".lab-box", ".lab-header", ".lab-body", ".checklist", ".checklist-head",
+    ".diagram-svg-wrap", ".checklist", ".checklist-head",
     ".checklist-item", ".checklist-item.completed", ".quiz-score", ".quiz-filtros", ".quiz-item",
     '.quiz-item[data-res="acertei"]', '.quiz-item[data-res="errei"]', '.quiz-item[data-res="revisar"]',
     ".quiz-question", ".quiz-details", ".quiz-toggle", ".quiz-answer", ".quiz-selfeval", ".facts-grid",
@@ -63,7 +63,7 @@ class TestComponentesCss(unittest.TestCase):
                                   "section-tag", "section-header", "study-header", "study-title",
                                   "study-lead", "study-track-kicker", "study-meta-bar", "content-section",
                                   "check-item", "callout-tip", "top-nav", "top-nav-inner", "nav-title",
-                                  "nav-actions", "study-footer"}
+                                  "nav-actions", "study-footer", "btn", "lab-box", "lab-header", "lab-body", "lab-badge", "lab-actions"}
         self.assertEqual((antigas & usadas) - novas - removidas_de_proposito, set())
 
     def test_gaveta_abaixo_de_1024(self):

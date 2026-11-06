@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Ingles-Tecnico-Ciber">
@@ -2120,7 +1736,6 @@ dfn.glossario:focus-visible {
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: A Segurança Acontece em Inglês</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#linguagem" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Verbos Normativos, Falsos Cognatos e Redação</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Leitor de Advisory</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Leitura de um Advisory</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2136,14 +1751,14 @@ dfn.glossario:focus-visible {
   <h1>Inglês Técnico para Segurança da Informação</h1>
   <p class="mhead-sub">Leitura de advisories, registros CVE/NVD e RFCs, vocabulário essencial, falsos cognatos e redação técnica em inglês</p>
   <div class="chips"><span class="chip">⏱ 40 min</span><span class="chip">📈 Iniciante</span><span class="chip">🛡 NIST Protect</span><span class="chip">🎯 ATT&amp;CK N/A (módulo de carreira)</span><span class="chip">👤 Blue Team &amp; Defesa · Red Team &amp; Pentest · Operações SOC &amp; Resposta · Perícia Forense &amp; Malware · AppSec &amp; DevSecOps · GRC &amp; Auditoria · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 32: Ingles-Tecnico-Ciber Body Fragment -->
 <article class="study-container" data-slug="ingles-tecnico">
 
     <!-- SEÇÃO 1: INTRODUÇÃO E ANATOMIA DO ADVISORY -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: A Segurança Acontece em Inglês</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 5</small></span><h2>Introdução: A Segurança Acontece em Inglês</h2></div>
 
         <p class="lead-text">
             O boletim do fabricante sai em inglês, o registro do CVE é em inglês, a RFC é em inglês e a prova da certificação também. Na hora de um incidente, ninguém espera a tradução. Este estudo não é um curso de inglês: é um treino de leitura e escrita para as situações que um analista enfrenta toda semana. Ler um advisory sem errar a versão afetada, entender o peso de um MUST numa norma e escrever um resumo curto e claro.
@@ -2203,7 +1818,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 2: VERBOS, FALSOS COGNATOS, SIGLAS E REDAÇÃO -->
     <section class="study-section" id="linguagem" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Verbos Normativos, Falsos Cognatos e Redação</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 5</small></span><h2>Verbos Normativos, Falsos Cognatos e Redação</h2></div>
 
         <h3>MUST, SHOULD e MAY: a RFC 2119</h3>
         <p>
@@ -2322,40 +1937,10 @@ Information Security Analyst, Ipê Store</code></pre>
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 3 de 6</small></span><h2>Laboratório Prático: Leitor de Advisory</h2></div>
-
-        <p class="lead-text">
-            Leia o boletim abaixo, totalmente fictício. Os termos sublinhados são clicáveis e mostram tradução e definição. Depois responda às perguntas de compreensão e treine o glossário com os flashcards, que guardam o seu progresso neste navegador.
-        </p>
-
-        <div class="lab-box ing-lab" id="ing-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Laboratório de Leitura Técnica</span>
-                    <h3 id="ing-titulo" style="margin: 0.4rem 0 0.2rem 0;"></h3>
-                    <p id="ing-aviso" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
-                </div>
-            </div>
-
-            <div class="lab-body">
-                <div id="ing-legenda" style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; font-size: 0.8rem;"></div>
-                <div id="ing-advisory" lang="en" style="border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 1rem; background: var(--surface); line-height: 1.7; overflow-wrap: anywhere;"></div>
-                <div id="ing-definicao" aria-live="polite" style="margin: 0.75rem 0; padding: 0.75rem; border-radius: var(--radius-md); background: var(--sunk); font-size: 0.9rem;"></div>
-
-                <h4 style="margin-top: 1.5rem;">Perguntas de compreensão</h4>
-                <div id="ing-perguntas" style="display: grid; gap: 1rem;"></div>
-                <p id="ing-placar" style="font-weight: 600; margin: 0.75rem 0 0 0;" aria-live="polite"></p>
-
-                <h4 style="margin-top: 1.5rem;">Flashcards do glossário</h4>
-                <div id="ing-flashcards"></div>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist de Leitura de um Advisory</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 3 de 5</small></span><h2>Checklist de Leitura de um Advisory</h2></div>
 
         <p class="lead-text">
             Use esta lista sempre que chegar um boletim de segurança. O estado das caixas fica salvo no seu navegador.
@@ -2395,7 +1980,7 @@ Information Security Analyst, Ipê Store</code></pre>
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 4 de 5</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2478,7 +2063,7 @@ Information Security Analyst, Ipê Store</code></pre>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 5 de 5</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2527,353 +2112,7 @@ Information Security Analyst, Ipê Store</code></pre>
 
 </article>
 
-<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
-<script type="application/json" id="ing-dados">
-{
- "aviso": "Boletim fictício: fabricante, produto, CVE (ano 2099) e domínios .example foram inventados para o laboratório.",
- "chave_storage": "cs_ingles_flashcards",
- "advisory": {
-  "titulo": "QSA-2099-007: QuillGate VPN — Unauthenticated Remote Code Execution",
-  "cve": "CVE-2099-12345",
-  "secoes": [
-   {"titulo": "Overview", "texto": "Vendor: Quillon Systems\nProduct: QuillGate VPN appliance\n[[CVE|cve]] ID: CVE-2099-12345\n[[CVSS|cvss]] v3.1 base score: 9.8 Critical (AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H)\nWeakness: [[CWE|cwe]]-306, Missing Authentication for Critical Function\nType: unauthenticated [[RCE|rce]]"},
-   {"titulo": "Summary", "texto": "A [[vulnerability|vulnerability]] in the [[web management interface|management-interface]] of QuillGate VPN [[appliances|appliance]] allows an [[unauthenticated|unauthenticated]] remote attacker to [[execute arbitrary code|arbitrary-code]] with root [[privileges|privileges]]. Quillon Systems is aware of [[exploitation in the wild|in-the-wild]], and the [[issue|issue]] has been added to the [[KEV|kev]] catalog. Customers [[MUST|must]] apply the fix as soon as possible."},
-   {"titulo": "Affected Versions", "texto": "QuillGate 7.2.0 [[through|through]] 7.2.4 and 7.3.0 are affected. Versions [[prior to|prior-to]] 7.2.0 are not affected, because the [[vulnerable|vulnerable]] [[endpoint|endpoint]] was introduced in 7.2.0. QuillGate 6.x has reached [[end of life|eol]] and is [[deprecated|deprecated]]; it will not receive security fixes."},
-   {"titulo": "Impact", "texto": "Successful [[exploitation|exploitation]] allows an attacker to take full control of the appliance, read the [[credentials|credentials]] stored in its configuration and move into the internal network. A public [[proof-of-concept|poc]] [[exploit|exploit]] is available. Customers who [[assume|assume]] that the interface is reachable only from the internal network should [[actually|actually]] check their firewall rules: older installations expose it on the external interface by default."},
-   {"titulo": "Mitigation", "texto": "[[Upgrade|upgrade]] to QuillGate 7.2.5 or 7.3.1, which [[address|address]] this vulnerability. Administrators [[SHOULD|should]] also [[rotate|rotate]] all credentials stored on the appliance and review the [[logs|logs]] for the [[indicators of compromise|ioc]] listed below. Customers who [[eventually|eventually]] upgrade without checking for compromise may leave an attacker [[backdoor|backdoor]] in place."},
-   {"titulo": "Workaround", "texto": "If you cannot upgrade immediately, disable the web management interface on the external interface. This [[workaround|workaround]] reduces the [[attack surface|attack-surface]] but does not fix the vulnerability, and it [[MUST NOT|must-not]] be considered a permanent solution. You [[MAY|may]] keep the interface enabled on the internal management network."},
-   {"titulo": "Indicators of Compromise", "texto": "Requests to /api/v2/diag/exec from unknown IP addresses; new executable files in /var/tmp; outbound connections from the appliance to any host other than updates.quillon.example."},
-   {"titulo": "Contact", "texto": "This issue was reported through [[coordinated disclosure|coordinated-disclosure]]. Report security issues to the Quillon [[PSIRT|psirt]] at psirt@quillon.example."}
-  ]
- },
- "glossario": {
-  "vulnerability": {"termo": "vulnerability", "tipo": "tecnico", "traducao": "vulnerabilidade", "definicao": "Fraqueza que pode ser explorada para violar a segurança do sistema."},
-  "management-interface": {"termo": "web management interface", "tipo": "tecnico", "traducao": "interface web de gerenciamento", "definicao": "Painel administrativo acessado pelo navegador para configurar o equipamento."},
-  "appliance": {"termo": "appliance", "tipo": "tecnico", "traducao": "equipamento dedicado", "definicao": "Hardware ou máquina virtual pronta, vendida para uma função específica, como VPN ou firewall."},
-  "unauthenticated": {"termo": "unauthenticated", "tipo": "tecnico", "traducao": "não autenticado", "definicao": "Sem login: o atacante não precisa de usuário nem senha."},
-  "arbitrary-code": {"termo": "execute arbitrary code", "tipo": "tecnico", "traducao": "executar código arbitrário", "definicao": "Rodar qualquer comando ou programa que o atacante escolher."},
-  "privileges": {"termo": "privileges", "tipo": "tecnico", "traducao": "privilégios", "definicao": "Permissões da conta; root é o nível máximo num sistema Unix."},
-  "in-the-wild": {"termo": "exploitation in the wild", "tipo": "tecnico", "traducao": "exploração em ataques reais", "definicao": "A falha já está sendo usada por atacantes fora de laboratório; a prioridade de correção sobe."},
-  "issue": {"termo": "issue", "tipo": "falso-cognato", "traducao": "problema, falha, chamado", "definicao": "Não é \"edição\". Em advisories, é a própria falha; em projetos, um chamado ou tíquete."},
-  "kev": {"termo": "KEV", "tipo": "sigla", "traducao": "Vulnerabilidades Sabidamente Exploradas", "definicao": "Known Exploited Vulnerabilities: catálogo da CISA com falhas comprovadamente exploradas."},
-  "must": {"termo": "MUST", "tipo": "modal", "traducao": "deve (obrigatório)", "definicao": "RFC 2119: requisito absoluto. Sinônimos: REQUIRED e SHALL."},
-  "through": {"termo": "through", "tipo": "tecnico", "traducao": "até, inclusive", "definicao": "Em intervalos de versão, inclui o último número: \"7.2.0 through 7.2.4\" inclui a 7.2.4."},
-  "prior-to": {"termo": "prior to", "tipo": "tecnico", "traducao": "anterior a", "definicao": "Exclui a versão citada: \"prior to 7.2.0\" significa até a 7.1.x."},
-  "vulnerable": {"termo": "vulnerable", "tipo": "tecnico", "traducao": "vulnerável", "definicao": "Que contém a falha e pode ser explorado."},
-  "endpoint": {"termo": "endpoint", "tipo": "tecnico", "traducao": "endpoint (rota da API)", "definicao": "Aqui, um caminho da API web. Em outros contextos, a estação ou servidor protegido pelo EDR."},
-  "eol": {"termo": "EoL", "tipo": "sigla", "traducao": "fim de vida", "definicao": "End of Life: o fabricante não lança mais correções, nem de segurança."},
-  "deprecated": {"termo": "deprecated", "tipo": "falso-cognato", "traducao": "descontinuado", "definicao": "Não é \"depreciado\" no sentido contábil: é algo que não deve mais ser usado e será removido."},
-  "exploitation": {"termo": "exploitation", "tipo": "tecnico", "traducao": "exploração (de uma falha)", "definicao": "O ato de usar a vulnerabilidade para obter acesso ou efeito indevido."},
-  "credentials": {"termo": "credentials", "tipo": "tecnico", "traducao": "credenciais", "definicao": "Usuários, senhas, chaves e tokens usados para autenticar."},
-  "poc": {"termo": "PoC", "tipo": "sigla", "traducao": "prova de conceito", "definicao": "Proof of Concept: código que demonstra que a falha é explorável; reduz o esforço de quem ataca."},
-  "exploit": {"termo": "exploit", "tipo": "falso-cognato", "traducao": "código de exploração; explorar uma falha", "definicao": "Não é \"explorar\" no sentido de investigar (explore). É o código ou o ato de tirar proveito de uma vulnerabilidade."},
-  "assume": {"termo": "assume", "tipo": "falso-cognato", "traducao": "supor, presumir", "definicao": "Não é \"assumir uma responsabilidade\" (take on). \"Customers who assume\" = clientes que supõem."},
-  "actually": {"termo": "actually", "tipo": "falso-cognato", "traducao": "na verdade, de fato", "definicao": "Não é \"atualmente\" (currently). Introduz uma correção do que se supunha."},
-  "upgrade": {"termo": "upgrade", "tipo": "tecnico", "traducao": "atualizar (para versão mais nova)", "definicao": "Instalar uma versão superior do software ou firmware."},
-  "address": {"termo": "address", "tipo": "falso-cognato", "traducao": "tratar, corrigir", "definicao": "Como verbo, \"which address this vulnerability\" = que corrigem esta vulnerabilidade. Não é \"endereçar\"."},
-  "should": {"termo": "SHOULD", "tipo": "modal", "traducao": "deveria (recomendado)", "definicao": "RFC 2119: recomendação forte; pode haver motivo válido para não seguir, com o risco entendido. Sinônimo: RECOMMENDED."},
-  "rotate": {"termo": "rotate", "tipo": "tecnico", "traducao": "trocar (credenciais)", "definicao": "Substituir senhas, chaves e tokens por novos e invalidar os antigos."},
-  "logs": {"termo": "logs", "tipo": "tecnico", "traducao": "registros (logs)", "definicao": "Registros de eventos do sistema usados para investigar o que aconteceu."},
-  "ioc": {"termo": "IoC", "tipo": "sigla", "traducao": "indicadores de comprometimento", "definicao": "Indicators of Compromise: sinais técnicos de invasão, como IPs, arquivos e requisições suspeitas."},
-  "eventually": {"termo": "eventually", "tipo": "falso-cognato", "traducao": "por fim, mais cedo ou mais tarde", "definicao": "Não é \"eventualmente\" (occasionally). \"Customers who eventually upgrade\" = clientes que acabam atualizando."},
-  "backdoor": {"termo": "backdoor", "tipo": "tecnico", "traducao": "porta dos fundos", "definicao": "Acesso escondido deixado pelo atacante para voltar mesmo depois da correção."},
-  "workaround": {"termo": "workaround", "tipo": "tecnico", "traducao": "paliativo, solução de contorno", "definicao": "Medida temporária que reduz o risco sem corrigir a falha."},
-  "attack-surface": {"termo": "attack surface", "tipo": "tecnico", "traducao": "superfície de ataque", "definicao": "O conjunto de pontos que um atacante pode tentar usar para entrar."},
-  "must-not": {"termo": "MUST NOT", "tipo": "modal", "traducao": "não deve (proibido)", "definicao": "RFC 2119: proibição absoluta. Sinônimo: SHALL NOT."},
-  "may": {"termo": "MAY", "tipo": "modal", "traducao": "pode (opcional)", "definicao": "RFC 2119: opcional, a critério de quem implementa. Sinônimo: OPTIONAL."},
-  "coordinated-disclosure": {"termo": "coordinated disclosure", "tipo": "tecnico", "traducao": "divulgação coordenada", "definicao": "O pesquisador avisa o fabricante e só publica depois que a correção existe ou o prazo combinado vence."},
-  "psirt": {"termo": "PSIRT", "tipo": "sigla", "traducao": "time de resposta a incidentes de produto", "definicao": "Product Security Incident Response Team: equipe do fabricante que recebe relatos e publica advisories."},
-  "cve": {"termo": "CVE", "tipo": "sigla", "traducao": "identificador público de vulnerabilidade", "definicao": "Common Vulnerabilities and Exposures: o identificador único da falha, no formato CVE-ANO-NÚMERO."},
-  "cvss": {"termo": "CVSS", "tipo": "sigla", "traducao": "sistema de pontuação de vulnerabilidades", "definicao": "Common Vulnerability Scoring System: nota de 0 a 10 com um vetor que explica a nota."},
-  "cwe": {"termo": "CWE", "tipo": "sigla", "traducao": "catálogo de tipos de fraqueza", "definicao": "Common Weakness Enumeration: classifica a causa da falha, como CWE-306 (falta de autenticação)."},
-  "rce": {"termo": "RCE", "tipo": "sigla", "traducao": "execução remota de código", "definicao": "Remote Code Execution: o atacante roda comandos no sistema a partir da rede."},
-  "realize": {"termo": "realize", "tipo": "falso-cognato", "traducao": "perceber", "definicao": "Não é \"realizar\" (carry out). \"We realized the server was exposed\" = percebemos que o servidor estava exposto."},
-  "sensible": {"termo": "sensible", "tipo": "falso-cognato", "traducao": "sensato", "definicao": "Não é \"sensível\". Dado sensível é sensitive data."}
- },
- "perguntas": [
-  {
-   "enunciado": "Quais versões do QuillGate precisam de correção?",
-   "opcoes": [
-    {"texto": "7.2.0 a 7.2.4 (inclusive) e 7.3.0", "correta": true, "comentario": "Correto. \"Through\" inclui a 7.2.4, e a 7.3.0 é citada à parte."},
-    {"texto": "Todas as versões anteriores a 7.2.5", "correta": false, "comentario": "Não. \"Versions prior to 7.2.0 are not affected\": a 7.1.x nunca teve a rota vulnerável. A 6.x não é afetada, mas está sem suporte (EoL), o que é outro problema."},
-    {"texto": "Apenas a 7.3.0", "correta": false, "comentario": "Não. A série 7.2 de 7.2.0 até 7.2.4 também é afetada."},
-    {"texto": "7.2.5 e 7.3.1", "correta": false, "comentario": "Não. Essas são as versões corrigidas, citadas em Mitigation."}
-   ]
-  },
-  {
-   "enunciado": "Qual é o impacto descrito?",
-   "opcoes": [
-    {"texto": "Um atacante sem login executa código como root no equipamento", "correta": true, "comentario": "Correto. \"Unauthenticated remote attacker\" e \"execute arbitrary code with root privileges\"."},
-    {"texto": "Um usuário autenticado consegue ler a configuração", "correta": false, "comentario": "Não. O ponto crítico é justamente não precisar de autenticação, e o efeito vai além de leitura."},
-    {"texto": "O equipamento fica indisponível por alguns minutos", "correta": false, "comentario": "Não. O advisory descreve controle total do equipamento, não negação de serviço."}
-   ]
-  },
-  {
-   "enunciado": "O que o advisory manda fazer para resolver o problema?",
-   "opcoes": [
-    {"texto": "Atualizar para 7.2.5 ou 7.3.1, trocar as credenciais e procurar indicadores de comprometimento", "correta": true, "comentario": "Correto. A atualização corrige a falha; trocar credenciais e revisar logs trata uma possível invasão anterior."},
-    {"texto": "Desligar a interface de gerenciamento externa e encerrar o caso", "correta": false, "comentario": "Não. Isso é o workaround, que \"MUST NOT be considered a permanent solution\"."},
-    {"texto": "Voltar para a versão 6.x, que não é afetada", "correta": false, "comentario": "Não. A 6.x está em fim de vida (EoL) e não recebe nenhuma correção de segurança."}
-   ]
-  },
-  {
-   "enunciado": "O que significa \"it MUST NOT be considered a permanent solution\"?",
-   "opcoes": [
-    {"texto": "É proibido tratar o workaround como solução definitiva", "correta": true, "comentario": "Correto. MUST NOT é proibição absoluta pela RFC 2119."},
-    {"texto": "Não é recomendado, mas pode ser aceitável em alguns casos", "correta": false, "comentario": "Não. Isso seria SHOULD NOT. MUST NOT não admite exceção."},
-    {"texto": "O fabricante ainda não decidiu se o workaround é permanente", "correta": false, "comentario": "Não. A frase é uma instrução clara, não uma dúvida do fabricante."}
-   ]
-  },
-  {
-   "enunciado": "O que \"Quillon Systems is aware of exploitation in the wild\" diz sobre a urgência?",
-   "opcoes": [
-    {"texto": "A falha já está sendo explorada em ataques reais, então a correção é urgente", "correta": true, "comentario": "Correto. \"In the wild\" significa fora do laboratório; por isso a falha entrou no KEV."},
-    {"texto": "Pesquisadores demonstraram a falha em laboratório", "correta": false, "comentario": "Não. Isso é uma prova de conceito (PoC), citada à parte em Impact."},
-    {"texto": "A falha pode vir a ser explorada no futuro", "correta": false, "comentario": "Não. \"Is aware of exploitation\" fala de algo que já está acontecendo."}
-   ]
-  }
- ]
-}
-</script>
-
-<script>
-(function() {
-    var ING = JSON.parse(document.getElementById("ing-dados").textContent);
-    var RE_TERMO = /\[\[([^|\]]+)\|([^\]]+)\]\]/g;
-    var TIPOS = {
-        "tecnico": ["Termo técnico", "rgba(37, 99, 235, 0.55)"],
-        "falso-cognato": ["Falso cognato", "rgba(220, 38, 38, 0.65)"],
-        "modal": ["Verbo normativo (RFC 2119)", "rgba(124, 58, 237, 0.65)"],
-        "sigla": ["Sigla", "rgba(5, 150, 105, 0.65)"]
-    };
-    var respostas = {};
-    var deck = Object.keys(ING.glossario);
-    var indice = 0;
-    var virado = false;
-    var conhecidos = {};
-
-    function el(tag, texto, estilo) {
-        var e = document.createElement(tag);
-        if (texto !== undefined && texto !== null) e.textContent = texto;
-        if (estilo) e.setAttribute("style", estilo);
-        return e;
-    }
-    function selo(tipo) {
-        return el("span", TIPOS[tipo][0], "display: inline-block; padding: 0.1rem 0.5rem; border-radius: var(--radius-pill); font-size: 0.75rem; font-weight: 600; border: 2px solid " + TIPOS[tipo][1] + ";");
-    }
-
-    function lerProgresso() {
-        try {
-            var bruto = window.localStorage.getItem(ING.chave_storage);
-            var lista = bruto ? JSON.parse(bruto) : [];
-            conhecidos = {};
-            if (Array.isArray(lista)) lista.forEach(function(k) { if (ING.glossario[k]) conhecidos[k] = true; });
-        } catch (e) {
-            conhecidos = {};
-        }
-    }
-    function salvarProgresso() {
-        try {
-            window.localStorage.setItem(ING.chave_storage, JSON.stringify(Object.keys(conhecidos)));
-        } catch (e) { /* armazenamento indisponível: o progresso vale só nesta visita */ }
-    }
-
-    function linhaComTermos(linha) {
-        var frag = document.createDocumentFragment();
-        var ultimo = 0, m;
-        RE_TERMO.lastIndex = 0;
-        while ((m = RE_TERMO.exec(linha)) !== null) {
-            if (m.index > ultimo) frag.appendChild(document.createTextNode(linha.slice(ultimo, m.index)));
-            var chave = m[2];
-            var b = el("button", m[1], "background: none; border: none; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; " +
-                "text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; text-decoration-color: " + TIPOS[ING.glossario[chave].tipo][1] + ";");
-            b.type = "button";
-            b.className = "ing-termo";
-            b.setAttribute("data-termo", chave);
-            b.setAttribute("aria-label", m[1] + ": ver tradução");
-            b.addEventListener("click", function(ev) { mostrarTermoIngles(ev.currentTarget.getAttribute("data-termo"), ev.currentTarget); });
-            frag.appendChild(b);
-            ultimo = m.index + m[0].length;
-        }
-        if (ultimo < linha.length) frag.appendChild(document.createTextNode(linha.slice(ultimo)));
-        return frag;
-    }
-
-    function renderizarAdvisory() {
-        document.getElementById("ing-titulo").textContent = ING.advisory.titulo;
-        document.getElementById("ing-aviso").textContent = ING.aviso;
-        var leg = document.getElementById("ing-legenda");
-        leg.replaceChildren();
-        Object.keys(TIPOS).forEach(function(t) { leg.appendChild(selo(t)); });
-        var box = document.getElementById("ing-advisory");
-        box.replaceChildren();
-        ING.advisory.secoes.forEach(function(s) {
-            box.appendChild(el("h5", s.titulo, "margin: 0.9rem 0 0.25rem 0; font-size: 0.95rem;"));
-            s.texto.split("\n").forEach(function(linha) {
-                var p = el("p", null, "margin: 0 0 0.35rem 0;");
-                p.appendChild(linhaComTermos(linha));
-                box.appendChild(p);
-            });
-        });
-        box.firstChild.style.marginTop = "0";
-    }
-
-    window.mostrarTermoIngles = function(chave, origem) {
-        var g = ING.glossario[chave];
-        if (!g) return;
-        var box = document.getElementById("ing-definicao");
-        box.replaceChildren();
-        var topo = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 0.3rem;");
-        var t = el("strong", g.termo);
-        t.setAttribute("lang", "en");
-        topo.appendChild(t);
-        topo.appendChild(selo(g.tipo));
-        box.appendChild(topo);
-        box.appendChild(el("p", "Tradução: " + g.traducao, "margin: 0 0 0.25rem 0; font-weight: 600;"));
-        box.appendChild(el("p", g.definicao, "margin: 0;"));
-        if (origem && origem.parentNode) {
-            var par = origem.closest("p");
-            par.parentNode.insertBefore(box, par.nextSibling);
-        }
-    };
-
-    function renderizarPerguntas() {
-        var box = document.getElementById("ing-perguntas");
-        box.replaceChildren();
-        ING.perguntas.forEach(function(p, i) {
-            var card = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 0.75rem;");
-            card.appendChild(el("p", (i + 1) + ". " + p.enunciado, "margin: 0 0 0.5rem 0; font-weight: 600;"));
-            var ops = el("div", null, "display: grid; gap: 0.4rem;");
-            p.opcoes.forEach(function(o, j) {
-                var escolhida = respostas[i] === j;
-                var respondida = respostas[i] !== undefined;
-                var cor = respondida && (o.correta ? "rgba(22, 163, 74, 0.25)" : (escolhida ? "rgba(220, 38, 38, 0.28)" : "transparent"));
-                var b = el("button", o.texto, "text-align: left; padding: 0.5rem 0.7rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); background: " + (cor || "var(--surface)") + "; color: var(--ink); cursor: pointer; font: inherit; font-size: 0.88rem;");
-                b.type = "button";
-                b.setAttribute("aria-pressed", escolhida ? "true" : "false");
-                b.addEventListener("click", function() { responderPerguntaIngles(i, j); });
-                ops.appendChild(b);
-            });
-            card.appendChild(ops);
-            if (respostas[i] !== undefined) {
-                var o = p.opcoes[respostas[i]];
-                card.appendChild(el("p", (o.correta ? "✓ " : "✗ ") + o.comentario, "margin: 0.5rem 0 0 0; font-size: 0.85rem; color: " + (o.correta ? "var(--tip-color)" : "var(--danger-color)") + ";"));
-            }
-            box.appendChild(card);
-        });
-        var feitas = Object.keys(respostas).length;
-        var certas = Object.keys(respostas).filter(function(i) { return ING.perguntas[i].opcoes[respostas[i]].correta; }).length;
-        document.getElementById("ing-placar").textContent = "Acertos: " + certas + " de " + feitas + " respondidas (" + ING.perguntas.length + " no total).";
-    }
-
-    window.responderPerguntaIngles = function(i, j) {
-        if (!ING.perguntas[i] || !ING.perguntas[i].opcoes[j]) return;
-        respostas[i] = j;
-        renderizarPerguntas();
-    };
-
-    function pendentes() {
-        return deck.filter(function(k) { return !conhecidos[k]; });
-    }
-
-    function renderizarFlashcards() {
-        var box = document.getElementById("ing-flashcards");
-        box.replaceChildren();
-        var total = deck.length, sabe = total - pendentes().length;
-        box.appendChild(el("p", "Dominados: " + sabe + " de " + total + " termos.", "margin: 0 0 0.6rem 0; font-weight: 600;"));
-        var barra = el("div", null, "height: 0.5rem; background: var(--sunk); border-radius: var(--radius-pill); overflow: hidden; margin-bottom: 0.75rem;");
-        barra.appendChild(el("div", null, "height: 100%; width: " + Math.round(sabe / total * 100) + "%; background: var(--accent);"));
-        box.appendChild(barra);
-        var acoes = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;");
-        if (!pendentes().length) {
-            box.appendChild(el("p", "Você marcou todos os termos como conhecidos. Reinicie para revisar.", "margin: 0;"));
-        } else {
-            var k = deck[indice];
-            var g = ING.glossario[k];
-            var card = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 1.25rem; text-align: center; background: var(--surface); min-height: 6rem;");
-            var frente = el("p", g.termo, "font-size: 1.3rem; font-weight: 700; margin: 0 0 0.4rem 0;");
-            frente.setAttribute("lang", "en");
-            card.appendChild(frente);
-            card.appendChild(selo(g.tipo));
-            if (virado) {
-                card.appendChild(el("p", g.traducao, "margin: 0.6rem 0 0.25rem 0; font-weight: 600;"));
-                card.appendChild(el("p", g.definicao, "margin: 0; font-size: 0.88rem;"));
-            }
-            box.appendChild(card);
-            var bVirar = el("button", virado ? "Esconder tradução" : "Virar");
-            bVirar.type = "button";
-            bVirar.className = "btn-primary";
-            bVirar.addEventListener("click", virarFlashcard);
-            acoes.appendChild(bVirar);
-            var bSei = el("button", "Sei");
-            bSei.type = "button";
-            bSei.className = "btn-secondary";
-            bSei.addEventListener("click", function() { marcarFlashcard(true); });
-            acoes.appendChild(bSei);
-            var bRev = el("button", "Revisar depois");
-            bRev.type = "button";
-            bRev.className = "btn-secondary";
-            bRev.addEventListener("click", function() { marcarFlashcard(false); });
-            acoes.appendChild(bRev);
-        }
-        var bReset = el("button", "Reiniciar progresso");
-        bReset.type = "button";
-        bReset.className = "btn-secondary";
-        bReset.addEventListener("click", reiniciarFlashcards);
-        acoes.appendChild(bReset);
-        box.appendChild(acoes);
-    }
-
-    function proximo() {
-        var resto = pendentes();
-        if (!resto.length) return;
-        for (var passo = 1; passo <= deck.length; passo++) {
-            var k = deck[(indice + passo) % deck.length];
-            if (!conhecidos[k]) { indice = deck.indexOf(k); return; }
-        }
-    }
-
-    window.virarFlashcard = function() {
-        virado = !virado;
-        renderizarFlashcards();
-    };
-
-    window.marcarFlashcard = function(sabe) {
-        if (!pendentes().length) return;
-        if (sabe) {
-            conhecidos[deck[indice]] = true;
-            salvarProgresso();
-        }
-        virado = false;
-        proximo();
-        renderizarFlashcards();
-    };
-
-    window.reiniciarFlashcards = function() {
-        conhecidos = {};
-        salvarProgresso();
-        indice = 0;
-        virado = false;
-        renderizarFlashcards();
-    };
-
-    document.addEventListener("DOMContentLoaded", function() {
-        renderizarAdvisory();
-        document.getElementById("ing-definicao").appendChild(el("span", "Clique num termo sublinhado para ver a tradução e a definição.", "color: var(--muted);"));
-        renderizarPerguntas();
-        lerProgresso();
-        indice = 0;
-        if (conhecidos[deck[0]]) proximo();
-        renderizarFlashcards();
-        if (typeof initChecklist === "function") {
-            initChecklist("ingles-tecnico");
-        }
-        if (typeof initQuiz === "function") {
-            initQuiz();
-        }
-    });
-})();
-</script>
+<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
 </main>
 </div>
 
@@ -3008,7 +2247,6 @@ Information Security Analyst, Ipê Store</code></pre>
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3597,17 +2835,6 @@ Information Security Analyst, Ipê Store</code></pre>
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -3821,7 +3048,6 @@ Information Security Analyst, Ipê Store</code></pre>
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Legislacao-e-Crimes-Ciberneticos">
@@ -2120,7 +1736,6 @@ dfn.glossario:focus-visible {
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: O Incidente Que Precisa Virar Prova</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#tipos-registros-e-custodia" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Tipos Penais, Guarda de Registros e Cadeia de Custódia</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Enquadramento de Casos</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Preparação Jurídica e Preservação</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2136,14 +1751,14 @@ dfn.glossario:focus-visible {
   <h1>Legislação Brasileira e Crimes Cibernéticos</h1>
   <p class="mhead-sub">Tipos penais, guarda de registros e preservação de provas</p>
   <div class="chips"><span class="chip">⏱ 40 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Govern</span><span class="chip">🎯 ATT&amp;CK N/A (legislação)</span><span class="chip">👤 GRC &amp; Auditoria · Perícia Forense &amp; Malware · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 56: Legislacao-e-Crimes-Ciberneticos Body Fragment -->
 <article class="study-container" data-slug="legislacao-e-crimes-ciberneticos">
 
     <!-- SEÇÃO 1: DO INCIDENTE AO PROCESSO PENAL -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: O Incidente Que Precisa Virar Prova</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 5</small></span><h2>Introdução: O Incidente Que Precisa Virar Prova</h2></div>
 
         <p class="lead-text">
             Antônio, cliente da Ipê Pay (instituição de pagamento fictícia), caiu no golpe da falsa central e fez ele mesmo um Pix de R$ 15.000 para uma "conta segura". A mesa antifraude registrou tudo: horário, dispositivo, conta recebedora. Dez dias depois, a polícia pede à Ipê Pay o que ela tem sobre o caso. Agora as perguntas são outras. Que crime foi esse: furto, estelionato ou invasão? Quem guarda o IP do golpista e por quanto tempo? Os logs exportados por um analista, sem hash e sem registro de quem os coletou, valem como prova? Este módulo trata da esfera penal do incidente: o enquadramento da conduta, os registros que a investigação pode pedir e a preservação das provas para que o caso chegue ao processo.
@@ -2182,13 +1797,13 @@ dfn.glossario:focus-visible {
                 <span class="callout-icon">🛡️</span>
                 <strong>Escopo do módulo</strong>
             </div>
-            <p>O foco é o lado de quem investiga e de quem preserva: enquadrar, pedir os registros certos e não estragar a prova. Os casos do simulador são fictícios, sem pessoas, contas, endereços IP ou serviços reais, e o módulo não descreve como cometer as condutas.</p>
+            <p>O foco é o lado de quem investiga e de quem preserva: enquadrar, pedir os registros certos e não estragar a prova. Os casos da checklist são fictícios, sem pessoas, contas, endereços IP ou serviços reais, e o módulo não descreve como cometer as condutas.</p>
         </div>
     </section>
 
     <!-- SEÇÃO 2: TIPOS PENAIS, REGISTROS E CUSTÓDIA -->
     <section class="study-section" id="tipos-registros-e-custodia" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Tipos Penais, Guarda de Registros e Cadeia de Custódia</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 5</small></span><h2>Tipos Penais, Guarda de Registros e Cadeia de Custódia</h2></div>
 
         <h3>Três tipos penais que o analista precisa reconhecer</h3>
         <p>
@@ -2275,34 +1890,10 @@ sha256sum analise/copia-trabalho.jsonl
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 3 de 6</small></span><h2>Laboratório Prático: Enquadramento de Casos</h2></div>
-
-        <p class="lead-text">
-            Cinco casos fictícios da Ipê Pay e da Ipê Store chegaram à equipe de segurança. Para cada um: (1) escolha o tipo penal, ou diga que não é crime; (2) marque os registros que a investigação precisa e indique a quem pedir cada um; (3) ponha os passos de preservação de provas na ordem certa. Ao corrigir, o simulador explica cada escolha com o dispositivo legal correspondente. Cada caso vale até 3 pontos: um pelo tipo, um pelos registros sem nenhum erro e um pela ordem dos passos.
-        </p>
-
-        <div class="lab-box lcc-lab" id="lcc-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Tipo penal, registros e cadeia de custódia</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Enquadramento de Casos: Ipê Pay e Ipê Store</h3>
-                    <p id="lcc-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
-                </div>
-            </div>
-
-            <div class="lab-body" style="min-width: 0;">
-                <div id="lcc-casos" role="group" aria-label="Escolha o caso" style="display: flex; flex-wrap: wrap; gap: 0.4rem;"></div>
-                <div id="lcc-placar" aria-live="polite" style="margin-top: 0.6rem; font-size: 0.85rem; font-weight: 600;"></div>
-                <div id="lcc-caso" style="margin-top: 0.8rem; min-width: 0; overflow-wrap: anywhere;"></div>
-                <p style="font-size: 0.76rem; color: var(--muted); margin: 0.8rem 0 0 0;">Material educativo, não é orientação jurídica. Penas conferidas no Código Penal compilado (planalto.gov.br) em 02/11/2026.</p>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist de Preparação Jurídica e Preservação</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 3 de 5</small></span><h2>Checklist de Preparação Jurídica e Preservação</h2></div>
 
         <p class="lead-text">
             Use como roteiro para preparar a resposta a incidentes para a esfera penal. O estado das caixas fica salvo no seu navegador.
@@ -2342,7 +1933,7 @@ sha256sum analise/copia-trabalho.jsonl
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 4 de 5</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2419,7 +2010,7 @@ sha256sum analise/copia-trabalho.jsonl
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 5 de 5</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2468,435 +2059,7 @@ sha256sum analise/copia-trabalho.jsonl
 </section>
 
 </article>
-<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
-<script type="application/json" id="lcc-dados">
-{
- "contexto": "Casos fictícios da Ipê Pay (instituição de pagamento fictícia) e da Ipê Store (varejista fictícia), com data de referência 02/11/2026. Pessoas, contas e serviços inventados.",
- "tipos": {
-  "invasao": {"nome": "Invasão de dispositivo informático",
-   "dispositivo": "Código Penal, art. 154-A (incluído pela Lei 12.737/2012)",
-   "pena": "Reclusão de 1 a 4 anos e multa (redação dada pela Lei 14.155/2021).",
-   "nucleo": "Entrar em dispositivo informático de uso alheio, sem autorização, para obter, adulterar ou destruir dados."},
-  "furto_fraude": {"nome": "Furto mediante fraude eletrônica",
-   "dispositivo": "Código Penal, art. 155, §4º-B (incluído pela Lei 14.155/2021); aumentos no §4º-C",
-   "pena": "Reclusão de 4 a 10 anos e multa (redação dada pela Lei 15.397/2026).",
-   "nucleo": "O próprio agente subtrai o bem; a fraude por dispositivo eletrônico ou informático serve para burlar a vigilância da vítima."},
-  "fraude_eletronica": {"nome": "Fraude eletrônica",
-   "dispositivo": "Código Penal, art. 171, §2º-A (incluído pela Lei 14.155/2021); aumento do §2º-B se usado servidor fora do país",
-   "pena": "Redação dada pela Lei 15.397/2026; confira a pena no texto vigente.",
-   "nucleo": "A vítima, ou um terceiro, é induzida a erro por meio eletrônico e entrega ela mesma o bem ou a informação."},
-  "nao_crime": {"nome": "Não é crime: ilícito civil, trabalhista ou LGPD",
-   "dispositivo": "Sem tipo penal: política interna, contrato de trabalho e LGPD (Estudo 27)",
-   "pena": "Sem pena criminal; cabem medidas disciplinares, responsabilidade civil e, havendo dados pessoais, as regras da LGPD e da ANPD.",
-   "nucleo": "Acesso autorizado, erro ou descumprimento de política, sem invasão de dispositivo alheio nem vantagem obtida por fraude."}
- },
- "destinos": {
-  "propria_empresa": "A própria empresa (equipe de segurança)",
-  "provedor_conexao": "Provedor de conexão (operadora de internet)",
-  "provedor_aplicacao": "Provedor de aplicação (e-mail, mensagens, nuvem, sites)"
- },
- "registros": {
-  "logs_internos": {"nome": "Logs internos da própria empresa (aplicativo, VPN, EDR, painel, transações)",
-   "destino": "propria_empresa", "prazo_dias": null, "ordem_judicial": false,
-   "fundamento": "São da própria empresa: preserve com hash e registro de custódia, conforme a política de retenção. Não dependem de ordem judicial."},
-  "conexao": {"nome": "Registros de conexão (IP atribuído, data, hora e duração)",
-   "destino": "provedor_conexao", "prazo_dias": 365, "ordem_judicial": true,
-   "fundamento": "Marco Civil, art. 13: o provedor de conexão guarda os registros de conexão por 1 ano. O fornecimento depende de ordem judicial."},
-  "aplicacao": {"nome": "Registros de acesso a aplicações (IP, data e hora de uso do serviço)",
-   "destino": "provedor_aplicacao", "prazo_dias": 180, "ordem_judicial": true,
-   "fundamento": "Marco Civil, art. 15: o provedor de aplicação guarda os registros de acesso a aplicações por 6 meses. O fornecimento depende de ordem judicial."},
-  "conteudo": {"nome": "Conteúdo de comunicações privadas (mensagens, e-mails)",
-   "destino": "provedor_aplicacao", "prazo_dias": null, "ordem_judicial": true,
-   "fundamento": "O conteúdo de comunicações privadas só é fornecido pelo provedor de aplicação mediante ordem judicial. Peça só quando for indispensável e a vítima não tiver cópia."}
- },
- "ordem_canonica": ["isolar", "fixar", "coletar_hash", "registrar", "analisar_copia", "comunicar"],
- "passos": {
-  "isolar": {"texto": "Isolar o vestígio e não alterar o original",
-   "fundamento": "Antes de qualquer manuseio, o vestígio é isolado: ligar, desligar, reiniciar ou navegar no original altera dados e metadados (cadeia de custódia, CPP, arts. 158-A a 158-F)."},
-  "fixar": {"texto": "Documentar o estado em que foi encontrado (fotos, telas, data e hora)",
-   "fundamento": "A fixação descreve o vestígio como foi encontrado, antes da coleta, e mostra a quem ler o laudo o ponto de partida."},
-  "coletar_hash": {"texto": "Coletar a cópia forense e calcular o hash SHA-256 do original e da cópia",
-   "fundamento": "O hash prova que a cópia é idêntica ao original: qualquer bit alterado muda o valor (Estudo 19)."},
-  "registrar": {"texto": "Registrar quem coletou, quando e como, e lacrar o material",
-   "fundamento": "O registro de cada pessoa que manuseou o vestígio dá rastreabilidade à prova; sem ele, a defesa pode questionar a integridade."},
-  "analisar_copia": {"texto": "Analisar só a cópia de trabalho, conferindo o hash",
-   "fundamento": "A análise nunca é feita no original: a cópia de trabalho pode ser refeita a partir da cópia preservada, e o hash confirma que nada mudou."},
-  "comunicar": {"texto": "Entregar o material à autoridade com o registro de custódia (boletim de ocorrência)",
-   "fundamento": "A investigação penal começa com a notícia do crime à polícia; o material segue com o registro de custódia e os hashes."}
- },
- "casos": [
-  {"id": "C1", "empresa": "Ipê Store", "titulo": "Estação do gerente financeiro acessada de fora", "dias_desde_fato": 40, "tipo": "invasao",
-   "relato": "Há 40 dias, a estação de trabalho do gerente financeiro da Ipê Store foi acessada remotamente por alguém de fora da empresa, por meio de uma ferramenta de acesso remoto instalada depois de um e-mail falso. O invasor copiou planilhas de fornecedores para uma conta num serviço de armazenamento em nuvem. Não houve transferência de dinheiro.",
-   "vestigio": "Estação de trabalho do gerente (disco e memória) e logs do proxy e do EDR.",
-   "registros": ["logs_internos", "aplicacao", "conexao"],
-   "ordem_correta": ["isolar", "fixar", "coletar_hash", "registrar", "analisar_copia", "comunicar"],
-   "ordem_inicial": ["coletar_hash", "analisar_copia", "isolar", "comunicar", "registrar", "fixar"],
-   "explicacao_tipo": "Entrar sem autorização no dispositivo de uso alheio para obter dados é o núcleo do art. 154-A. Ninguém obteve dinheiro da vítima, então não é furto nem fraude eletrônica. A cópia das planilhas pode também ser incidente de segurança (Estudo 27), mas essa é outra esfera.",
-   "explicacao_registros": "Os logs do proxy e do EDR são da própria Ipê Store. A conta de armazenamento em nuvem é de um provedor de aplicação: os registros de acesso (6 meses, art. 15) mostram de que IP o invasor a usou. Com IP, data e hora, o provedor de conexão (1 ano, art. 13) identifica o assinante. Os dois pedidos externos dependem de ordem judicial."},
-  {"id": "C2", "empresa": "Ipê Pay", "titulo": "Falsa central: o Pix de Antônio", "dias_desde_fato": 10, "tipo": "fraude_eletronica",
-   "relato": "Há 10 dias, Antônio, cliente da Ipê Pay, recebeu mensagens e uma chamada por um aplicativo de mensagens de uma suposta central de segurança. Convencido de que a conta tinha sido invadida, fez ele mesmo um Pix de R$ 15.000 para uma \"conta segura\". Por orientação do golpista, apagou a conversa logo depois.",
-   "vestigio": "Celular da vítima (comprovante e o que restou da conversa) e registros da transação na Ipê Pay.",
-   "registros": ["logs_internos", "aplicacao", "conteudo", "conexao"],
-   "ordem_correta": ["fixar", "coletar_hash", "registrar", "comunicar"],
-   "ordem_inicial": ["comunicar", "coletar_hash", "fixar", "registrar"],
-   "explicacao_tipo": "A vítima, induzida a erro por contato telefônico e mensagens, transferiu ela mesma o dinheiro: é a fraude eletrônica do art. 171, §2º-A. Não é furto mediante fraude, porque ninguém subtraiu o valor. Se o golpista usou servidor fora do país, pesa o aumento do §2º-B.",
-   "explicacao_registros": "Os logs da transação e da conta recebedora estão na própria Ipê Pay. A conta do golpista no aplicativo de mensagens é de um provedor de aplicação: registros de acesso (6 meses, art. 15) e, como a vítima apagou a conversa, o conteúdo das mensagens, que só sai com ordem judicial. Com o IP, o provedor de conexão (1 ano, art. 13) identifica o assinante."},
-  {"id": "C3", "empresa": "Ipê Pay", "titulo": "Conta sequestrada pelo e-mail", "dias_desde_fato": 20, "tipo": "furto_fraude",
-   "relato": "Há 20 dias, um golpista entrou no e-mail de Rafael, 70 anos, com uma senha vazada, redefiniu a senha do aplicativo da Ipê Pay, habilitou o aplicativo no próprio aparelho e transferiu R$ 4.800 para uma conta de passagem. Rafael só percebeu no dia seguinte.",
-   "vestigio": "Registros da sessão e do dispositivo no aplicativo da Ipê Pay e o celular da vítima.",
-   "registros": ["logs_internos", "aplicacao", "conexao"],
-   "ordem_correta": ["fixar", "coletar_hash", "registrar", "analisar_copia", "comunicar"],
-   "ordem_inicial": ["analisar_copia", "registrar", "fixar", "comunicar", "coletar_hash"],
-   "explicacao_tipo": "Aqui a vítima não entregou nada: o golpista usou a fraude (a senha redefinida, o aplicativo no aparelho dele) para burlar a vigilância e subtraiu ele mesmo o dinheiro. É o furto mediante fraude eletrônica do art. 155, §4º-B. Como a vítima é idosa, incide o aumento do §4º-C (de 1/3 ao dobro).",
-   "explicacao_registros": "Os logs do aplicativo (dispositivo novo, redefinição de senha, IP da sessão) estão na própria Ipê Pay. O provedor do e-mail é provedor de aplicação: registros de acesso à conta invadida (6 meses, art. 15). Com o IP, o provedor de conexão (1 ano, art. 13) identifica o assinante. Os pedidos externos dependem de ordem judicial."},
-  {"id": "C4", "empresa": "Ipê Store", "titulo": "Planilha de clientes no e-mail pessoal", "dias_desde_fato": 5, "tipo": "nao_crime",
-   "relato": "Há 5 dias, o DLP da Ipê Store alertou que uma analista de marketing enviou para o próprio e-mail pessoal uma planilha com nomes e telefones de 3.000 clientes, para terminar uma campanha em casa. Ela tinha acesso legítimo à planilha, e não há sinal de venda nem de uso dos dados.",
-   "vestigio": "Estação da analista, alerta do DLP e logs do e-mail corporativo.",
-   "registros": ["logs_internos"],
-   "ordem_correta": ["isolar", "fixar", "coletar_hash", "registrar", "analisar_copia"],
-   "ordem_inicial": ["fixar", "analisar_copia", "registrar", "isolar", "coletar_hash"],
-   "explicacao_tipo": "Não houve invasão de dispositivo alheio, porque ela usou o próprio acesso autorizado, nem vantagem obtida por fraude. É violação de política interna e possivelmente incidente de segurança com dados pessoais: esfera trabalhista e LGPD, com avaliação da comunicação à ANPD (Estudo 27), e não penal.",
-   "explicacao_registros": "Tudo o que importa está nos logs internos da própria Ipê Store (DLP e e-mail corporativo). Pedir ao provedor o conteúdo do e-mail pessoal exigiria ordem judicial, e não há crime que a justifique; a planilha enviada já está registrada no servidor corporativo."},
-  {"id": "C5", "empresa": "Ipê Store", "titulo": "Painel da loja alterado oito meses atrás", "dias_desde_fato": 240, "tipo": "invasao",
-   "relato": "Uma auditoria descobriu agora que, há 240 dias (cerca de oito meses), alguém entrou no painel administrativo da loja virtual da Ipê Store com a credencial de um funcionário, roubada por uma página falsa hospedada num serviço de sites, e apagou o histórico de pedidos de uma semana.",
-   "vestigio": "Servidor da loja virtual e logs do painel administrativo, que guardam o IP do acesso.",
-   "registros": ["logs_internos", "conexao"],
-   "ordem_correta": ["isolar", "coletar_hash", "registrar", "analisar_copia", "comunicar"],
-   "ordem_inicial": ["registrar", "comunicar", "analisar_copia", "coletar_hash", "isolar"],
-   "explicacao_tipo": "Entrar sem autorização no servidor da loja, com credencial roubada, para destruir dados é invasão de dispositivo informático (art. 154-A). Ninguém obteve dinheiro da vítima.",
-   "explicacao_registros": "Os logs do painel são da própria Ipê Store e trazem o IP do invasor. O provedor de conexão guarda os registros por 1 ano (art. 13): 240 dias ainda estão no prazo. Já os registros de acesso à página falsa, no provedor de aplicação, tinham guarda obrigatória de só 6 meses (art. 15): passados 240 dias, podem não existir mais. Lição: peça a preservação logo no início."}
- ]
-}
-</script>
-<script>
-(function() {
-    var D = JSON.parse(document.getElementById("lcc-dados").textContent);
-    var estado = { atual: D.casos[0].id, casos: {} };
-    D.casos.forEach(function(c) {
-        estado.casos[c.id] = { tipo: null, escolhas: {}, ordem: c.ordem_inicial.slice(), resultado: null };
-    });
-
-    function $(id) { return document.getElementById(id); }
-    function el(tag, texto, estilo) {
-        var e = document.createElement(tag);
-        if (texto !== undefined && texto !== null) e.textContent = texto;
-        if (estilo) e.setAttribute("style", estilo);
-        return e;
-    }
-    function has(o, k) { return o !== null && typeof o === "object" && Object.prototype.hasOwnProperty.call(o, k); }
-    function casoPorId(id) {
-        for (var i = 0; i < D.casos.length; i++) if (D.casos[i].id === id) return D.casos[i];
-        return null;
-    }
-
-    // ================================================ regras (espelhadas nos testes)
-    window.prazoVencido = function(registro, dias) {
-        return registro.prazo_dias !== null && registro.prazo_dias !== undefined && dias > registro.prazo_dias;
-    };
-
-    window.corrigirTipo = function(caso, escolha) {
-        return escolha === caso.tipo;
-    };
-
-    window.classificarRegistros = function(caso, escolhas) {
-        var res = {};
-        caso.registros.forEach(function(rid) {
-            if (!has(escolhas, rid)) res[rid] = "faltou";
-            else if (escolhas[rid] !== D.registros[rid].destino) res[rid] = "destinatario_errado";
-            else res[rid] = "acerto";
-        });
-        Object.keys(escolhas).forEach(function(rid) {
-            if (caso.registros.indexOf(rid) >= 0 || !has(D.registros, rid)) return;
-            res[rid] = window.prazoVencido(D.registros[rid], caso.dias_desde_fato) ? "vencido" : "desnecessario";
-        });
-        return res;
-    };
-
-    window.corrigirOrdem = function(caso, ordem) {
-        var certa = caso.ordem_correta, posicoes = 0;
-        for (var i = 0; i < certa.length && i < ordem.length; i++) if (ordem[i] === certa[i]) posicoes++;
-        return { posicoes: posicoes, total: certa.length, ok: posicoes === certa.length && ordem.length === certa.length };
-    };
-
-    window.moverPasso = function(ordem, i, delta) {
-        var j = i + delta, nova = ordem.slice();
-        if (i >= 0 && i < nova.length && j >= 0 && j < nova.length) {
-            var tmp = nova[i];
-            nova[i] = nova[j];
-            nova[j] = tmp;
-        }
-        return nova;
-    };
-
-    window.corrigirCaso = function(caso, tipo, escolhas, ordem) {
-        var t = window.corrigirTipo(caso, tipo);
-        var r = window.classificarRegistros(caso, escolhas);
-        var o = window.corrigirOrdem(caso, ordem);
-        // "vencido" é só alerta: o prazo do Marco Civil é mínimo, o registro pode ainda existir
-        var regOk = Object.keys(r).every(function(k) { return r[k] === "acerto" || r[k] === "vencido"; });
-        return { tipo_ok: t, registros: r, registros_ok: regOk, ordem: o,
-                 pontos: (t ? 1 : 0) + (regOk ? 1 : 0) + (o.ok ? 1 : 0) };
-    };
-
-    // ================================================ interface
-    var ROTULO_STATUS = {
-        acerto: "Certo",
-        faltou: "Faltou pedir",
-        destinatario_errado: "Pedido ao destinatário errado",
-        desnecessario: "Desnecessário neste caso",
-        vencido: "Alerta: passou o prazo mínimo de guarda"
-    };
-    var COR_STATUS = {
-        acerto: "var(--tip-color)", faltou: "var(--danger-color)", destinatario_errado: "var(--danger-color)",
-        desnecessario: "var(--warning-color)", vencido: "var(--warning-color)"
-    };
-
-    function renderPlacar() {
-        var pontos = 0, corrigidos = 0;
-        D.casos.forEach(function(c) {
-            var r = estado.casos[c.id].resultado;
-            if (r) { corrigidos++; pontos += r.pontos; }
-        });
-        $("lcc-placar").textContent = "Placar: " + pontos + " de " + (D.casos.length * 3) + " pontos · casos corrigidos: " +
-            corrigidos + " de " + D.casos.length;
-    }
-
-    function renderSeletor() {
-        var box = $("lcc-casos");
-        box.replaceChildren();
-        D.casos.forEach(function(c) {
-            var r = estado.casos[c.id].resultado;
-            var b = el("button", c.id + (r ? " (" + r.pontos + "/3)" : ""));
-            b.type = "button";
-            b.className = c.id === estado.atual ? "btn-primary" : "btn-secondary";
-            b.setAttribute("aria-pressed", c.id === estado.atual ? "true" : "false");
-            b.setAttribute("aria-label", "Caso " + c.id + ": " + c.titulo);
-            b.addEventListener("click", function() { estado.atual = c.id; renderTudo(); });
-            box.appendChild(b);
-        });
-    }
-
-    function grupo(titulo) {
-        var fs = el("fieldset", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem 0.7rem; margin: 0.8rem 0 0 0; min-width: 0;");
-        fs.appendChild(el("legend", titulo, "font-weight: 700; font-size: 0.9rem; padding: 0 0.3rem;"));
-        return fs;
-    }
-
-    function renderEtapaTipo(caso, st) {
-        var fs = grupo("1. Tipo penal");
-        Object.keys(D.tipos).forEach(function(tid) {
-            var t = D.tipos[tid];
-            var lb = el("label", null, "display: flex; gap: 0.5rem; align-items: flex-start; font-size: 0.85rem; margin: 0.25rem 0;");
-            var inp = document.createElement("input");
-            inp.type = "radio";
-            inp.name = "lcc-tipo-" + caso.id;
-            inp.value = tid;
-            inp.checked = st.tipo === tid;
-            inp.setAttribute("aria-label", t.nome);
-            inp.addEventListener("change", function() { st.tipo = tid; });
-            lb.appendChild(inp);
-            lb.appendChild(el("span", t.nome));
-            fs.appendChild(lb);
-        });
-        return fs;
-    }
-
-    function renderEtapaRegistros(caso, st) {
-        var fs = grupo("2. Registros a pedir e a quem");
-        Object.keys(D.registros).forEach(function(rid) {
-            var r = D.registros[rid];
-            var linha = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.3rem 0.7rem; align-items: center; margin: 0.35rem 0; font-size: 0.85rem;");
-            var lb = el("label", null, "display: flex; gap: 0.5rem; align-items: flex-start; flex: 1 1 14rem; min-width: 0;");
-            var chk = document.createElement("input");
-            chk.type = "checkbox";
-            chk.id = "lcc-reg-" + caso.id + "-" + rid;
-            chk.checked = has(st.escolhas, rid);
-            lb.appendChild(chk);
-            lb.appendChild(el("span", r.nome));
-            lb.setAttribute("for", chk.id);
-            var sel = el("select", null, "flex: 1 1 12rem; min-width: 0; max-width: 100%; font-size: 0.8rem;");
-            sel.className = "form-control";
-            sel.setAttribute("aria-label", "A quem pedir: " + r.nome);
-            Object.keys(D.destinos).forEach(function(did) {
-                var op = el("option", D.destinos[did]);
-                op.value = did;
-                sel.appendChild(op);
-            });
-            sel.value = has(st.escolhas, rid) ? st.escolhas[rid] : "propria_empresa";
-            sel.disabled = !chk.checked;
-            chk.addEventListener("change", function() {
-                if (chk.checked) st.escolhas[rid] = sel.value; else delete st.escolhas[rid];
-                sel.disabled = !chk.checked;
-            });
-            sel.addEventListener("change", function() { if (chk.checked) st.escolhas[rid] = sel.value; });
-            linha.appendChild(lb);
-            linha.appendChild(sel);
-            fs.appendChild(linha);
-        });
-        return fs;
-    }
-
-    function renderEtapaOrdem(caso, st) {
-        var fs = grupo("3. Ordem dos passos de preservação");
-        var lista = el("ol", null, "margin: 0.3rem 0 0 0; padding-left: 1.4rem; font-size: 0.85rem;");
-        st.ordem.forEach(function(pid, i) {
-            var li = el("li", null, "margin: 0.3rem 0;");
-            var linha = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.3rem 0.6rem; align-items: center;");
-            linha.appendChild(el("span", D.passos[pid].texto, "flex: 1 1 12rem; min-width: 0;"));
-            var botoes = el("span", null, "display: inline-flex; gap: 0.3rem;");
-            [[-1, "↑", "para cima"], [1, "↓", "para baixo"]].forEach(function(cfg) {
-                var b = el("button", cfg[1]);
-                b.type = "button";
-                b.className = "btn-secondary";
-                b.setAttribute("aria-label", "Mover \"" + D.passos[pid].texto + "\" " + cfg[2]);
-                b.setAttribute("data-passo", pid);
-                b.setAttribute("data-dir", String(cfg[0]));
-                b.disabled = (cfg[0] < 0 && i === 0) || (cfg[0] > 0 && i === st.ordem.length - 1);
-                b.addEventListener("click", function() {
-                    st.ordem = window.moverPasso(st.ordem, i, cfg[0]);
-                    renderCaso();
-                    var alvo = document.querySelector("#lcc-caso button[data-passo=\"" + pid + "\"][data-dir=\"" + cfg[0] + "\"]");
-                    if (alvo && alvo.disabled) alvo = document.querySelector("#lcc-caso button[data-passo=\"" + pid + "\"]:not([disabled])");
-                    if (alvo) alvo.focus();
-                });
-                botoes.appendChild(b);
-            });
-            linha.appendChild(botoes);
-            li.appendChild(linha);
-            lista.appendChild(li);
-        });
-        fs.appendChild(lista);
-        return fs;
-    }
-
-    function renderFeedback(caso, st) {
-        var box = el("div", null, "margin-top: 0.8rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.6rem; font-size: 0.82rem;");
-        box.id = "lcc-feedback";
-        box.setAttribute("role", "region");
-        box.setAttribute("aria-label", "Correção do caso " + caso.id);
-        box.setAttribute("tabindex", "-1");
-        var r = st.resultado;
-        if (!r) return box;
-        box.appendChild(el("strong", "Pontos neste caso: " + r.pontos + " de 3", "font-size: 0.9rem;"));
-
-        // tipo penal
-        var tc = D.tipos[caso.tipo];
-        var cTipo = el("div", null, "border-left: 4px solid " + (r.tipo_ok ? "var(--tip-color)" : "var(--danger-color)") + "; padding: 0.3rem 0.6rem;");
-        cTipo.appendChild(el("strong", r.tipo_ok ? "Tipo penal: certo." :
-            "Tipo penal: " + (st.tipoCorrigido ? "você escolheu \"" + D.tipos[st.tipoCorrigido].nome + "\"" : "nenhum escolhido") + "; o enquadramento é \"" + tc.nome + "\"."));
-        cTipo.appendChild(el("div", tc.dispositivo + ". " + tc.pena, "margin-top: 0.2rem; font-weight: 600;"));
-        cTipo.appendChild(el("div", caso.explicacao_tipo, "margin-top: 0.2rem;"));
-        box.appendChild(cTipo);
-
-        // registros
-        var cReg = el("div", null, "border-left: 4px solid " + (r.registros_ok ? "var(--tip-color)" : "var(--danger-color)") + "; padding: 0.3rem 0.6rem;");
-        cReg.appendChild(el("strong", r.registros_ok ? "Registros: todos certos." : "Registros: há o que corrigir."));
-        var ul = el("ul", null, "margin: 0.3rem 0 0 0; padding-left: 1.2rem;");
-        Object.keys(r.registros).forEach(function(rid) {
-            var s = r.registros[rid], reg = D.registros[rid];
-            var li = el("li", null, "margin: 0.2rem 0;");
-            li.setAttribute("data-status", s);
-            li.appendChild(el("strong", ROTULO_STATUS[s] + ": ", "color: " + COR_STATUS[s] + ";"));
-            var txt = reg.nome + " → " + D.destinos[reg.destino] + ". " + reg.fundamento;
-            if (s === "vencido") txt += " Passaram " + caso.dias_desde_fato + " dias desde o fato, além dos " + reg.prazo_dias + " dias de guarda obrigatória: o registro pode já ter sido apagado, mas o provedor pode ter guardado por mais tempo. Pedir a preservação não custa e não tira ponto; só não conte com ele.";
-            li.appendChild(el("span", txt));
-            ul.appendChild(li);
-        });
-        cReg.appendChild(ul);
-        cReg.appendChild(el("div", caso.explicacao_registros, "margin-top: 0.2rem;"));
-        box.appendChild(cReg);
-
-        // ordem
-        var cOrd = el("div", null, "border-left: 4px solid " + (r.ordem.ok ? "var(--tip-color)" : "var(--danger-color)") + "; padding: 0.3rem 0.6rem;");
-        cOrd.appendChild(el("strong", "Ordem: " + r.ordem.posicoes + " de " + r.ordem.total + " passos na posição certa. Ordem correta:"));
-        var ol = el("ol", null, "margin: 0.3rem 0 0 0; padding-left: 1.3rem;");
-        caso.ordem_correta.forEach(function(pid, i) {
-            var certo = st.ordemCorrigida[i] === pid;
-            var li = el("li", null, "margin: 0.2rem 0;");
-            li.appendChild(el("strong", (certo ? "✔ " : "✘ ") + D.passos[pid].texto + ". ", "color: " + (certo ? "var(--tip-color)" : "var(--danger-color)") + ";"));
-            li.appendChild(el("span", D.passos[pid].fundamento));
-            ol.appendChild(li);
-        });
-        cOrd.appendChild(ol);
-        box.appendChild(cOrd);
-        return box;
-    }
-
-    function renderCaso() {
-        var caso = casoPorId(estado.atual), st = estado.casos[caso.id];
-        var box = $("lcc-caso");
-        box.replaceChildren();
-        var card = el("div", null, "border: 1px solid var(--rule); border-left: 4px solid var(--accent, var(--rule)); border-radius: var(--radius-sm); padding: 0.6rem 0.8rem; min-width: 0;");
-        card.appendChild(el("h4", caso.id + " · " + caso.titulo, "margin: 0;"));
-        card.appendChild(el("div", caso.empresa + " · " + caso.dias_desde_fato + " dias desde o fato", "font-size: 0.8rem; color: var(--muted); margin-top: 0.15rem;"));
-        card.appendChild(el("p", caso.relato, "margin: 0.4rem 0 0 0; font-size: 0.88rem;"));
-        card.appendChild(el("p", "Vestígio principal: " + caso.vestigio, "margin: 0.3rem 0 0 0; font-size: 0.82rem; font-style: italic;"));
-        box.appendChild(card);
-        box.appendChild(renderEtapaTipo(caso, st));
-        box.appendChild(renderEtapaRegistros(caso, st));
-        box.appendChild(renderEtapaOrdem(caso, st));
-        var acoes = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem;");
-        var bCorr = el("button", "Corrigir este caso");
-        bCorr.type = "button";
-        bCorr.className = "btn-primary";
-        bCorr.addEventListener("click", function() { window.corrigirCasoAtualLcc(); });
-        var bLimpa = el("button", "Recomeçar este caso");
-        bLimpa.type = "button";
-        bLimpa.className = "btn-secondary";
-        bLimpa.addEventListener("click", function() {
-            estado.casos[caso.id] = { tipo: null, escolhas: {}, ordem: caso.ordem_inicial.slice(), resultado: null };
-            renderTudo();
-        });
-        acoes.appendChild(bCorr);
-        acoes.appendChild(bLimpa);
-        box.appendChild(acoes);
-        var fb = renderFeedback(caso, st);
-        fb.setAttribute("aria-live", "polite");
-        box.appendChild(fb);
-    }
-
-    function renderTudo() {
-        renderSeletor();
-        renderPlacar();
-        renderCaso();
-    }
-
-    window.corrigirCasoAtualLcc = function() {
-        var caso = casoPorId(estado.atual), st = estado.casos[caso.id];
-        st.resultado = window.corrigirCaso(caso, st.tipo, st.escolhas, st.ordem);
-        st.tipoCorrigido = st.tipo;
-        st.ordemCorrigida = st.ordem.slice();
-        renderTudo();
-        var fb = $("lcc-feedback");
-        if (fb) fb.focus();
-        return st.resultado;
-    };
-
-    // atalho para conferência manual no navegador: escolhe o caso e preenche as respostas
-    window.responderCasoLcc = function(id, tipo, escolhas, ordem) {
-        if (!casoPorId(id)) return null;
-        estado.atual = id;
-        var st = estado.casos[id];
-        st.tipo = tipo;
-        st.escolhas = {};
-        Object.keys(escolhas || {}).forEach(function(k) { if (has(D.registros, k)) st.escolhas[k] = escolhas[k]; });
-        if (ordem) st.ordem = ordem.slice();
-        return window.corrigirCasoAtualLcc();
-    };
-
-    document.addEventListener("DOMContentLoaded", function() {
-        $("lcc-contexto").textContent = D.contexto;
-        renderTudo();
-
-        if (typeof initChecklist === "function") {
-            initChecklist("legislacao-e-crimes-ciberneticos");
-        }
-        if (typeof initQuiz === "function") {
-            initQuiz();
-        }
-    });
-})();
-</script>
+<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
 </main>
 </div>
 
@@ -3031,7 +2194,6 @@ sha256sum analise/copia-trabalho.jsonl
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3620,17 +2782,6 @@ sha256sum analise/copia-trabalho.jsonl
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -3844,7 +2995,6 @@ sha256sum analise/copia-trabalho.jsonl
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

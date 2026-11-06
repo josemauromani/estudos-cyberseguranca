@@ -582,9 +582,6 @@ a.mc[href]:hover {
   font-size: 11px;
 }
 
-.mc .tag.lab {
-  color: color-mix(in srgb, var(--tipo-laboratorio) 75%, var(--ink));
-}
 
 .mc .tag-pendente {
   border: 1px dashed var(--rule-strong);

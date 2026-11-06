@@ -34,10 +34,10 @@ Cada módulo é redigido em um arquivo fragmento `_geradores/<slug_snake_case>_b
 ### 2.2 As regras do corpo
 
 1. Há exatamente um `<article class="study-container" data-slug="...">`, na raiz do arquivo.
-2. Os filhos diretos do `article` são `<section class="study-section" id="..." data-tipo="...">`, com os atributos nessa ordem (`class`, `id`, `data-tipo`). Os `<script>` e `<style>` do simulador também podem ser filhos diretos do `article`.
+2. Os filhos diretos do `article` são `<section class="study-section" id="..." data-tipo="...">`, com os atributos nessa ordem (`class`, `id`, `data-tipo`).
 3. Cada seção começa com um `<h2>`, e o `id` é único.
 4. Não há `<footer>` nem classes de cabeçalho ou etiqueta de seção (o chassi as gera).
-5. Existe ao menos uma seção de cada tipo: `laboratorio`, `checklist`, `questoes` e `referencias`.
+5. Existe ao menos uma seção de cada tipo: `checklist`, `questoes` e `referencias` (além de uma ou mais seções `teoria`).
 6. O checklist usa `ul.checklist > li.checklist-item`, cada item com `input[type=checkbox][id]` e `label[for]` correspondente.
 7. Cada `.quiz-item` tem `.quiz-question` e a resposta no formato aberto (3.5), ou o formato de múltipla escolha.
 8. Todo `div.callout` tem um modificador: `tip`, `warning`, `danger`, `law` ou `key`.
@@ -49,7 +49,6 @@ O `data-tipo` define o ícone e o rótulo que o chassi mostra na navegação. O 
 | `data-tipo` | Rótulo gerado | Conteúdo |
 |---|---|---|
 | `data-tipo="teoria"` | 📘 Teoria | Fundamentação, arquitetura, tabelas, diagramas, terminais e callouts |
-| `data-tipo="laboratorio"` | 🧪 Laboratório | Simulador interativo em JavaScript puro (`.lab-box`) |
 | `data-tipo="checklist"` | ☑️ Checklist | Lista de 4 a 8 itens práticos de verificação ou auditoria |
 | `data-tipo="questoes"` | ❓ Questões de concurso | Questões de fixação com resposta comentada |
 | `data-tipo="referencias"` | 📚 Referências | Padrões oficiais (RFCs, NIST SPs, CIS Benchmarks, OWASP, fabricantes) e leituras |
@@ -65,10 +64,6 @@ Esqueleto mínimo (copiado do padrão de `_geradores/threat_hunting_body.html`):
         ...
     </section>
 
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <h2>Laboratório Prático: Caçada Guiada</h2>
-        ...
-    </section>
 
     <section class="study-section" id="checklist" data-tipo="checklist">
         <h2>Checklist de uma Caçada</h2>
@@ -85,7 +80,6 @@ Esqueleto mínimo (copiado do padrão de `_geradores/threat_hunting_body.html`):
         ...
     </section>
 
-    <script>/* JavaScript do simulador, filho direto do article */</script>
 </article>
 ```
 
@@ -102,7 +96,6 @@ Corrija o corpo e compile de novo; não há opção para ignorar o validador.
 ### 2.5 Orientações editoriais por tipo de seção
 
 - **Teoria:** explique princípios, protocolos e metodologias com clareza. Use tabelas comparativas, diagramas, callouts para boas práticas e armadilhas, e `.terminal-box` para comandos e configurações reais. Abra com o problema de segurança real.
-- **Laboratório:** cada módulo **deve conter um simulador interativo em JavaScript puro (Vanilla JS)**. Ele deve permitir manipulação ativa (alterar parâmetros, acionar filtros, inspecionar pacotes, validar hashes) e operar 100% offline.
 - **Checklist:** 4 a 8 itens que o estudante possa reutilizar como modelo de trabalho em auditorias reais. O estado das caixas é gravado no `localStorage` pelo `base.js`.
 - **Questões:** no mínimo 3 a 4 questões com foco analítico (estilo certificação ou concurso). Toda resposta traz explicação pedagógica que justifica o porquê de estar correta ou incorreta.
 - **Referências:** lista concisa de fontes oficiais.
@@ -115,11 +108,10 @@ Corrija o corpo e compile de novo; não há opção para ignorar o validador.
 
 - `tokens.css`: variáveis de design. Os nomes antigos foram preservados; os novos incluem a escala tipográfica `--tipo-*` e as cores de console `--console*`. Use sempre as variáveis, nunca cores fixas.
 - `base.css`: os componentes descritos abaixo.
-- `laboratorio.css`: regras específicas dos simuladores.
 - `index.css`: o portal.
 - Fontes: ficam embutidas no HTML a partir de `_geradores/fontes/` (licença OFL, texto em `OFL.txt`). Não há CDN nem requisição externa.
 
-Os temas claro e escuro são automáticos; teste o simulador nos dois.
+Os temas claro e escuro são automáticos; teste o módulo nos dois.
 
 ### 3.1 Texto de abertura (`p.lead-text`)
 
@@ -169,40 +161,6 @@ A classe `callout` recebe **um** modificador (`tip`, `warning`, `danger`, `law` 
 
 O segundo argumento de `copyCode` é o `id` do `<code>` a copiar.
 
-### 3.4 Painel do Simulador (`.lab-box`) e checklist
-
-O simulador mora na seção `data-tipo="laboratorio"`:
-
-```html
-<div class="lab-box" id="th-lab">
-    <div class="lab-header">
-        <div>
-            <span class="lab-badge">Caça por hipótese</span>
-            <h3>Caçada Guiada na frota da Ipê Store</h3>
-        </div>
-    </div>
-    <div class="lab-body">
-        <!-- controles e saída do simulador -->
-    </div>
-</div>
-```
-
-Opcional: o simulador pode informar o progresso ao sumário lateral com `CS.labProgress(feitos, total)` (por exemplo `CS.labProgress(3, 5)` mostra "3/5" ao lado do laboratório). Valores inválidos limpam o contador.
-
-O checklist é uma lista não ordenada; cada item tem checkbox com `id` e `label` ligado por `for`. Não é preciso chamar `initChecklist` nem informar `data-checklist-slug` (opcional e ignorado nas páginas geradas): o `base.js` usa o slug do módulo (`ESTUDOS_DADOS`) como chave `cs_check_<slug>_<id>`.
-
-```html
-<ul class="checklist">
-    <li class="checklist-item">
-        <input type="checkbox" id="chk-th-1">
-        <label for="chk-th-1"><strong>Hipótese:</strong> escrita antes da busca, testável e com técnica mapeada.</label>
-    </li>
-    <li class="checklist-item">
-        <input type="checkbox" id="chk-th-2">
-        <label for="chk-th-2"><strong>Visibilidade:</strong> a fonte escolhida enxerga o comportamento em toda a população.</label>
-    </li>
-</ul>
-```
 
 ### 3.5 Questões com resposta revelável (`.quiz-item`)
 
@@ -316,23 +274,6 @@ O glossário é central: os verbetes ficam em `_geradores/glossario_dados.py` (l
 
 ---
 
-## 4. Diretrizes Técnicas para Simuladores em JavaScript
-
-1. **Vanilla JavaScript Apenas:** Proibido o uso de frameworks externos (React, Vue, jQuery) ou bibliotecas de terceiros via CDN. Todo código deve ser executável nativamente em navegadores modernos.
-2. **Web APIs Nativas Recomendadas:**
-   - Criptografia: `window.crypto.subtle` (SHA-256, AES-GCM, HMAC).
-   - Armazenamento: `window.localStorage` (com chaves prefixadas por `cs_`).
-   - Manipulação de Texto e Bytes: `TextEncoder`, `TextDecoder`, `Uint8Array`.
-3. **Prevenção de XSS nos Simuladores:**
-   - Ao renderizar dados digitados pelo usuário, utilize sempre `element.textContent = valor` ou escape devidamente strings antes de concatená-las.
-   - Em simuladores didáticos de injeção (ex.: lab de XSS), use elementos `iframe` com atributo `sandbox` ou sanitizadores visuais para evitar efeitos colaterais na própria página.
-4. **Isolamento de Estado:**
-   - Encapsule funções do simulador em escopos dedicados para evitar conflito de nomes de variáveis globais.
-5. **Acessibilidade e Responsividade:**
-   - Todos os inputs de formulário devem conter `<label>` associado ou atributo `aria-label`.
-   - Layouts devem se adaptar sem quebras em larguras de tela de 360px a 1920px.
-
----
 
 ## 5. Convenções de Arquivos e Identificadores
 
@@ -356,7 +297,6 @@ Antes de publicar ou compilar um novo estudo, confirme se todos os critérios ab
 - [ ] O slug e título constam exatamente como registrados em `_geradores/estudos.txt` e os metadados em `ESTUDOS_DADOS` (`_geradores/index_dados.py`). Ao adicionar, remover ou reordenar módulos, rode `./_geradores/gerar.sh todos`: cada página traz "Estudo NN de <total>" e os links anterior/próximo.
 - [ ] O arquivo `_geradores/<slug>_body.html` foi criado e passa no `contrato.validar_corpo` (o `montar.py` não aborta), com ao menos uma seção de cada tipo obrigatório.
 - [ ] O corpo não traz cabeçalho, rodapé, "Seção 0X" nem etiquetas de seção escritas à mão.
-- [ ] O simulador prático em JS funciona sem disparar erros no console do navegador (`F12`).
 - [ ] Os checklists gravam o estado no `localStorage` e o restauram ao recarregar a página.
 - [ ] Todas as questões possuem resposta comentada com justificativa pedagógica.
 - [ ] Todo `div.callout` tem modificador (`tip`, `warning`, `danger`, `law` ou `key`).

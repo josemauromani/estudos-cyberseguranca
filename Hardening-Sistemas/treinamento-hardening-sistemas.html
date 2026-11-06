@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Hardening-Sistemas">
@@ -2122,7 +1738,6 @@ dfn.glossario:focus-visible {
     <li><a class="toc-item" href="#hardening-linux" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Bastionamento Profundo em Ambientes Linux</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#hardening-windows" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Bastionamento em Ambientes Windows Server e Active Directory</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#automacao-scap" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Automação Contínua de Conformidade e Linhas de Base</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#laboratorio-pratico" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Interativo: Auditor de Configuração de Servidor (CIS Benchmark)</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist-hardening" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Aplicação Prática: Auditoria de Hardening de Servidores</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#questoes-fixacao" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Concursos Públicos</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos-essenciais" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais &bull; Transição da Trilha 2: Segurança Defensiva</span></span><span class="toc-contador"></span></a></li>
@@ -2138,7 +1753,7 @@ dfn.glossario:focus-visible {
   <h1>Bastionamento Linux e Windows (CIS Benchmarks)</h1>
   <p class="mhead-sub">Redução da superfície de ataque operacional em servidores corporativos Linux e Windows</p>
   <div class="chips"><span class="chip">⏱ 50 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Protect</span><span class="chip">🎯 ATT&amp;CK TA0005 Defense Evasion / TA0004 Privilege Escalation / T1548 Abuse Elevation Control Mechanism / T1053 Scheduled Task/Job / T1078 Valid Accounts</span><span class="chip">👤 Blue Team &amp; Defesa · AppSec &amp; DevSecOps · Operações SOC &amp; Resposta · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#fundamentos-hardening-cis" data-tipo="teoria"><span class="toc-tipo">Teoria</span>4 seções</a><a href="#laboratorio-pratico" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist-hardening" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#questoes-fixacao" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>3 questões</a><a href="#fatos-essenciais" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#fundamentos-hardening-cis" data-tipo="teoria"><span class="toc-tipo">Teoria</span>4 seções</a><a href="#checklist-hardening" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#questoes-fixacao" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>3 questões</a><a href="#fatos-essenciais" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- ==========================================================================
      Estudo 06: Hardening de Sistemas
@@ -2148,7 +1763,7 @@ dfn.glossario:focus-visible {
 <article class="study-container" data-slug="hardening-sistemas">
 <!-- SEÇÃO 1: O QUE É HARDENING E OS CIS BENCHMARKS -->
 <section class="study-section" id="fundamentos-hardening-cis" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 8</small></span><h2>O que é Hardening e o Padrão Normativo CIS Benchmarks</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 7</small></span><h2>O que é Hardening e o Padrão Normativo CIS Benchmarks</h2></div>
 
   <p class="lead-text">
     Instalações padrão de sistemas operacionais priorizam conveniência e compatibilidade retroativa,
@@ -2217,7 +1832,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 2: HARDENING EM AMBIENTES LINUX -->
 <section class="study-section" id="hardening-linux" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 8</small></span><h2>Bastionamento Profundo em Ambientes Linux</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 7</small></span><h2>Bastionamento Profundo em Ambientes Linux</h2></div>
 
   <p>
     O ecossistema Linux é a espinha dorsal de servidores corporativos e ambientes de nuvem.
@@ -2334,7 +1949,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 3: HARDENING EM AMBIENTES WINDOWS -->
 <section class="study-section" id="hardening-windows" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 8</small></span><h2>Bastionamento em Ambientes Windows Server e Active Directory</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 7</small></span><h2>Bastionamento em Ambientes Windows Server e Active Directory</h2></div>
 
   <p>
     Em ambientes corporativos baseados em Microsoft Windows Server e domínios de Active Directory (AD),
@@ -2391,7 +2006,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 4: AUTOMAÇÃO E LINHAS DE BASE -->
 <section class="study-section" id="automacao-scap" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 8</small></span><h2>Automação Contínua de Conformidade e Linhas de Base</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 7</small></span><h2>Automação Contínua de Conformidade e Linhas de Base</h2></div>
 
   <p>
     Executar comandos manuais em centenas de servidores em produção é inviável e sujeito a erros humanos graves.
@@ -2424,90 +2039,10 @@ dfn.glossario:focus-visible {
 </section>
 
 <!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (AUDITOR CIS BENCHMARK) -->
-<section class="study-section" id="laboratorio-pratico" data-tipo="laboratorio">
-  <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 5 de 8</small></span><h2>Laboratório Interativo: Auditor de Configuração de Servidor (CIS Benchmark)</h2></div>
-
-  <p>
-    Avalie na prática o nível de segurança e conformidade de arquivos reais de configuração corporativos.
-    Neste laboratório desenvolvido em Vanilla JavaScript, você pode carregar snippets de configuração comumente
-    encontrados em servidores vulneráveis, disparar uma auditoria de conformidade com os CIS Benchmarks,
-    analisar os achados técnicos de segurança e aplicar correções automáticas de bastionamento com um único clique.
-  </p>
-
-  <div class="lab-box" id="hardening-lab">
-    <div class="lab-header">
-      <span class="lab-badge">LAB PRÁTICO INTERATIVO</span>
-      <h3>Auditor Interativo de Linha de Base e CIS Benchmarks</h3>
-      <p>Inspecione configurações vulneráveis de SO, calcule o score de conformidade e aplique hardening em tempo real.</p>
-    </div>
-
-    <!-- Seletor de Templates de Configuração -->
-    <div style="margin-bottom: 1.25rem;">
-      <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:0.5rem;">Selecione o Arquivo de Configuração do Servidor para Auditar:</div>
-      <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
-        <button class="lab-btn" id="btn-tmpl-sshd" onclick="carregarSnippetConfig('sshd')">🐧 Linux: /etc/ssh/sshd_config</button>
-        <button class="lab-btn" id="btn-tmpl-sysctl" onclick="carregarSnippetConfig('sysctl')">⚙️ Linux: /etc/sysctl.conf (Kernel)</button>
-        <button class="lab-btn" id="btn-tmpl-windows" onclick="carregarSnippetConfig('windows')">🪟 Windows Server: Registro / GPO</button>
-      </div>
-    </div>
-
-    <!-- Editor de Configuração -->
-    <div style="margin-bottom: 1.25rem;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-        <label style="font-weight:700; font-size:0.875rem; color:var(--ink);" id="label-arquivo-atual">Conteúdo do Arquivo de Configuração:</label>
-        <span style="font-size:0.75rem; color:var(--muted);">(Você pode editar o texto livremente abaixo)</span>
-      </div>
-      <textarea id="config-text-input" rows="8" style="width:100%; font-family:var(--font-mono); font-size:0.825rem; padding:0.75rem; border-radius:6px; border:1px solid var(--rule); background:var(--ground); color:var(--ink); resize:vertical;"></textarea>
-    </div>
-
-    <!-- Botões de Ação -->
-    <div style="display:flex; flex-wrap:wrap; gap:0.75rem; margin-bottom:1.5rem; align-items:center;">
-      <button class="lab-btn" style="background:#2563eb; color:#fff;" onclick="auditarConfiguracaoServidor()">🔍 Executar Auditoria de Conformidade CIS</button>
-      <button class="lab-btn lab-btn-success" onclick="aplicarHardeningAutomatico()">🛡️ Aplicar Hardening Automático Recomendado</button>
-    </div>
-
-    <!-- Painel de Resultados: Score e Estatísticas -->
-    <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1.25rem; margin-bottom:1.5rem;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
-        <div>
-          <h4 style="margin:0; font-size:1rem; color:var(--ink);">Resultado da Auditoria de Conformidade CIS</h4>
-          <span style="font-size:0.8rem; color:var(--muted);" id="auditoria-status-sub">Pressione o botão de auditoria para avaliar o snippet.</span>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; font-weight:700;">Índice de Bastionamento</div>
-          <div id="cis-score-display" style="font-size:1.75rem; font-weight:800; color:var(--ink); font-family:var(--font-display);">-- %</div>
-        </div>
-      </div>
-
-      <!-- Barra de Progresso Visual do Score -->
-      <div style="width:100%; height:8px; background:var(--sunk); border-radius:4px; overflow:hidden; margin-bottom:1rem;">
-        <div id="cis-score-bar" style="width:0%; height:100%; background:#ef4444; transition:width 0.4s ease, background 0.4s ease;"></div>
-      </div>
-
-      <!-- Tabela de Achados e Não-Conformidades -->
-      <div style="overflow-x:auto;">
-        <table style="width:100%; border-collapse:collapse; font-size:0.825rem;">
-          <thead>
-            <tr style="border-bottom:2px solid var(--rule); text-align:left;">
-              <th style="padding:0.5rem; color:var(--muted); width:80px;">Severidade</th>
-              <th style="padding:0.5rem; color:var(--muted);">Parâmetro Auditado</th>
-              <th style="padding:0.5rem; color:var(--muted);">Valor Atual</th>
-              <th style="padding:0.5rem; color:var(--muted);">Recomendação CIS</th>
-              <th style="padding:0.5rem; color:var(--muted);">Risco Técnico Associado</th>
-            </tr>
-          </thead>
-          <tbody id="cis-findings-tbody">
-            <!-- Renderizado dinamicamente via JS -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- SEÇÃO 6: CHECKLIST PRÁTICO -->
 <section class="study-section" id="checklist-hardening" data-tipo="checklist">
-  <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 6 de 8</small></span><h2>Checklist de Aplicação Prática: Auditoria de Hardening de Servidores</h2></div>
+  <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 5 de 7</small></span><h2>Checklist de Aplicação Prática: Auditoria de Hardening de Servidores</h2></div>
 
   <p>
     Utilize este checklist técnico durante implantações de servidores em produção, homologação de novas imagens douradas
@@ -2573,7 +2108,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 7: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
 <section class="study-section" id="questoes-fixacao" data-tipo="questoes">
-  <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 7 de 8</small></span><h2>Questões de Fixação e Concursos Públicos</h2></div>
+  <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 6 de 7</small></span><h2>Questões de Fixação e Concursos Públicos</h2></div>
 
   <p>
     Consolide seu conhecimento respondendo a questões baseadas em provas de concursos públicos de alto escalão
@@ -2658,7 +2193,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 8: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
 <section class="study-section" id="fatos-essenciais" data-tipo="referencias">
-  <div class="shead"><span class="stype">📚 Referências <small>· Seção 8 de 8</small></span><h2>Fatos Essenciais &bull; Transição da Trilha 2: Segurança Defensiva</h2></div>
+  <div class="shead"><span class="stype">📚 Referências <small>· Seção 7 de 7</small></span><h2>Fatos Essenciais &bull; Transição da Trilha 2: Segurança Defensiva</h2></div>
 
   <div class="facts-grid">
     <div class="facts-card">
@@ -2695,375 +2230,6 @@ dfn.glossario:focus-visible {
 </article>
 
 <!-- SCRIPT EMBUTIDO: SIMULADOR DE AUDITORIA CIS BENCHMARK -->
-<script>
-/**
- * Simulador Interativo: Auditor de Configuração e CIS Benchmarks
- * Mapa da Cibersegurança
- */
-
-// Banco de Snippets de Configuração (Vulneráveis vs Corrigidos)
-const snippetsConfig = {
-  sshd: {
-    nome: "/etc/ssh/sshd_config (Servidor SSH Linux)",
-    vulneravel: `# Configuração Padrão Vulnerável de sshd_config
-Port 22
-PermitRootLogin yes
-PasswordAuthentication yes
-PermitEmptyPasswords yes
-X11Forwarding yes
-MaxAuthTries 10
-# Cifras antigas permitidas
-Ciphers 3des-cbc,aes128-cbc,aes256-cbc`,
-    corrigido: `# Configuração em Conformidade com CIS Benchmark Level 1 & 2
-Port 22
-PermitRootLogin no
-PasswordAuthentication no
-PermitEmptyPasswords no
-X11Forwarding no
-MaxAuthTries 3
-AllowGroups ssh-users-admin
-KexAlgorithms curve25519-sha256,diffie-hellman-group16-sha512
-Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com
-MACs hmac-sha2-512-etm@openssh.com`,
-    regras: [
-      {
-        param: "PermitRootLogin",
-        esperado: "no",
-        severidade: "Crítica",
-        mitre: "T1078 (Valid Accounts)",
-        risco: "Permite que atacantes façam força bruta direta contra o usuário root com privilégios irrestritos.",
-        recomendacao: "Definir 'PermitRootLogin no' e utilizar sudo para elevação."
-      },
-      {
-        param: "PasswordAuthentication",
-        esperado: "no",
-        severidade: "Alta",
-        mitre: "T1110 (Brute Force)",
-        risco: "Expõe o servidor a ataques de dicionário e adivinhação de senhas.",
-        recomendacao: "Definir 'PasswordAuthentication no' e exigir chaves públicas ed25519."
-      },
-      {
-        param: "PermitEmptyPasswords",
-        esperado: "no",
-        severidade: "Crítica",
-        mitre: "T1078 (Default Accounts)",
-        risco: "Permite login remoto em contas sem senha definida.",
-        recomendacao: "Definir 'PermitEmptyPasswords no'."
-      },
-      {
-        param: "X11Forwarding",
-        esperado: "no",
-        severidade: "Média",
-        mitre: "T1055 (Process Injection)",
-        risco: "Permite sequestro de sessões gráficas X11 se o servidor for comprometido.",
-        recomendacao: "Definir 'X11Forwarding no'."
-      },
-      {
-        param: "MaxAuthTries",
-        max: 4,
-        severidade: "Média",
-        mitre: "T1110 (Password Guessing)",
-        risco: "Muitas tentativas por conexão facilitam força bruta automatizada.",
-        recomendacao: "Definir 'MaxAuthTries 3'."
-      }
-    ]
-  },
-  sysctl: {
-    nome: "/etc/sysctl.conf (Parâmetros do Kernel Linux)",
-    vulneravel: `# Configuração Padrão Fraca de /etc/sysctl.conf
-net.ipv4.ip_forward = 1
-net.ipv4.tcp_syncookies = 0
-kernel.randomize_va_space = 0
-net.ipv4.conf.all.accept_redirects = 1
-kernel.dmesg_restrict = 0`,
-    corrigido: `# Configuração em Conformidade com CIS Benchmark
-net.ipv4.ip_forward = 0
-net.ipv4.tcp_syncookies = 1
-kernel.randomize_va_space = 2
-net.ipv4.conf.all.accept_redirects = 0
-net.ipv4.conf.default.accept_redirects = 0
-kernel.dmesg_restrict = 1
-fs.protected_hardlinks = 1
-fs.protected_symlinks = 1`,
-    regras: [
-      {
-        param: "net.ipv4.ip_forward",
-        esperado: "0",
-        severidade: "Alta",
-        mitre: "TA0008 (Lateral Movement)",
-        risco: "Transforma o servidor em roteador, facilitando trânsito de tráfego entre sub-redes não autorizadas.",
-        recomendacao: "Definir 'net.ipv4.ip_forward = 0'."
-      },
-      {
-        param: "net.ipv4.tcp_syncookies",
-        esperado: "1",
-        severidade: "Alta",
-        mitre: "T1498 (Network DoS)",
-        risco: "Servidor desprotegido contra negação de serviço por inundação TCP SYN.",
-        recomendacao: "Definir 'net.ipv4.tcp_syncookies = 1'."
-      },
-      {
-        param: "kernel.randomize_va_space",
-        esperado: "2",
-        severidade: "Crítica",
-        mitre: "T1203 (Exploitation for Client Execution)",
-        risco: "ASLR desativado! Endereços de memória estáticos facilitam exploits de buffer overflow.",
-        recomendacao: "Definir 'kernel.randomize_va_space = 2' (ASLR Completo)."
-      },
-      {
-        param: "net.ipv4.conf.all.accept_redirects",
-        esperado: "0",
-        severidade: "Média",
-        mitre: "T1557 (Adversary-in-the-Middle)",
-        risco: "Aceita redirecionamentos ICMP, permitindo alteração maliciosa de rotas pelo invasor.",
-        recomendacao: "Definir 'net.ipv4.conf.all.accept_redirects = 0'."
-      },
-      {
-        param: "kernel.dmesg_restrict",
-        esperado: "1",
-        severidade: "Média",
-        mitre: "T1082 (System Information Discovery)",
-        risco: "Usuários comuns podem ler mensagens de diagnóstico do kernel no dmesg para descobrir vulnerabilidades.",
-        recomendacao: "Definir 'kernel.dmesg_restrict = 1'."
-      }
-    ]
-  },
-  windows: {
-    nome: "Registro / GPO (Segurança do Windows Server)",
-    vulneravel: `# Configurações Inseguras do Registro do Windows Server
-[HKLM\\SYSTEM\\CurrentControlSet\\Services\\LanmanServer\\Parameters]
-SMB1 = 1
-
-[HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa]
-RunAsPPL = 0
-LmCompatibilityLevel = 1
-
-[HKLM\\SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\WDigest]
-UseLogonCredential = 1`,
-    corrigido: `# Configurações em Conformidade com CIS Benchmark para Windows
-[HKLM\\SYSTEM\\CurrentControlSet\\Services\\LanmanServer\\Parameters]
-SMB1 = 0
-
-[HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa]
-RunAsPPL = 1
-LmCompatibilityLevel = 5
-
-[HKLM\\SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\WDigest]
-UseLogonCredential = 0`,
-    regras: [
-      {
-        param: "SMB1",
-        esperado: "0",
-        severidade: "Crítica",
-        mitre: "T1210 (Exploitation of Remote Services)",
-        risco: "Protocolo SMBv1 ativo expõe o sistema a worms e exploits de dia zero (tipo WannaCry).",
-        recomendacao: "Desativar completamente o SMBv1 (SMB1 = 0)."
-      },
-      {
-        param: "RunAsPPL",
-        esperado: "1",
-        severidade: "Crítica",
-        mitre: "T1003.001 (LSASS Memory Dumping)",
-        risco: "Processo LSASS desprotegido, permitindo extração de senhas com ferramentas como Mimikatz.",
-        recomendacao: "Habilitar LSA Protection definindo 'RunAsPPL = 1'."
-      },
-      {
-        param: "UseLogonCredential",
-        esperado: "0",
-        severidade: "Crítica",
-        mitre: "T1552 (Unsecured Credentials)",
-        risco: "WDigest armazena credenciais em texto claro na memória do Windows.",
-        recomendacao: "Definir 'UseLogonCredential = 0'."
-      },
-      {
-        param: "LmCompatibilityLevel",
-        esperado: "5",
-        severidade: "Alta",
-        mitre: "T1187 (Forced Authentication / NTLMv1)",
-        risco: "Permite autenticação NTLMv1 fraca facilmente quebrada por força bruta.",
-        recomendacao: "Definir LmCompatibilityLevel = 5 (Recusar LM e NTLM, exigir NTLMv2)."
-      }
-    ]
-  }
-};
-
-let templateAtualKey = "sshd";
-
-// Carrega o snippet selecionado no editor
-function carregarSnippetConfig(tipo) {
-  if (!snippetsConfig[tipo]) return;
-  templateAtualKey = tipo;
-
-  const inputEl = document.getElementById("config-text-input");
-  const labelEl = document.getElementById("label-arquivo-atual");
-  if (inputEl) inputEl.value = snippetsConfig[tipo].vulneravel;
-  if (labelEl) labelEl.textContent = "Arquivo: " + snippetsConfig[tipo].nome;
-
-  // Atualiza classes visuais dos botões
-  ["sshd", "sysctl", "windows"].forEach(k => {
-    const btn = document.getElementById("btn-tmpl-" + k);
-    if (btn) {
-      if (k === tipo) {
-        btn.classList.add("selected");
-        btn.style.outline = "2px solid #2563eb";
-      } else {
-        btn.classList.remove("selected");
-        btn.style.outline = "none";
-      }
-    }
-  });
-
-  auditarConfiguracaoServidor();
-}
-
-// Aplica o template de hardening já corrigido
-function aplicarHardeningAutomatico() {
-  const inputEl = document.getElementById("config-text-input");
-  if (!inputEl) return;
-  inputEl.value = snippetsConfig[templateAtualKey].corrigido;
-  auditarConfiguracaoServidor();
-}
-
-// Analisador do texto contra as regras CIS do template ativo
-function auditarConfiguracaoServidor() {
-  const inputEl = document.getElementById("config-text-input");
-  if (!inputEl) return;
-
-  const texto = inputEl.value;
-  const linhas = texto.split("\n");
-  const configMap = {};
-
-  // Parse simplificado chave = valor ou chave valor
-  linhas.forEach(linha => {
-    linha = linha.trim();
-    if (!linha || linha.startsWith("#") || linha.startsWith("[")) return;
-
-    let partes = [];
-    if (linha.includes("=")) {
-      partes = linha.split("=").map(p => p.trim());
-    } else {
-      partes = linha.split(/\s+/).map(p => p.trim());
-    }
-
-    if (partes.length >= 2) {
-      configMap[partes[0]] = partes[1];
-    }
-  });
-
-  const template = snippetsConfig[templateAtualKey];
-  const totalRegras = template.regras.length;
-  let conformes = 0;
-  const achados = [];
-
-  template.regras.forEach(r => {
-    const valorAtual = configMap[r.param];
-
-    let estaConforme = false;
-    if (r.esperado !== undefined) {
-      estaConforme = (valorAtual !== undefined && valorAtual.toLowerCase() === r.esperado.toLowerCase());
-    } else if (r.max !== undefined) {
-      estaConforme = (valorAtual !== undefined && parseInt(valorAtual, 10) <= r.max);
-    }
-
-    if (estaConforme) {
-      conformes++;
-    } else {
-      achados.push({
-        param: r.param,
-        valorAtual: valorAtual !== undefined ? valorAtual : "(Ausente / Não Definido)",
-        esperado: r.esperado !== undefined ? r.esperado : `<= ${r.max}`,
-        severidade: r.severidade,
-        mitre: r.mitre,
-        risco: r.risco,
-        recomendacao: r.recomendacao
-      });
-    }
-  });
-
-  const scorePct = Math.round((conformes / totalRegras) * 100);
-  renderizarResultadoAuditoria(scorePct, achados, totalRegras, conformes);
-}
-
-// Renderiza o score e a tabela de achados
-function renderizarResultadoAuditoria(score, achados, total, conformes) {
-  const scoreDisplay = document.getElementById("cis-score-display");
-  const scoreBar = document.getElementById("cis-score-bar");
-  const subStatus = document.getElementById("auditoria-status-sub");
-  const tbody = document.getElementById("cis-findings-tbody");
-
-  if (scoreDisplay) {
-    scoreDisplay.textContent = score + "%";
-    if (score === 100) {
-      scoreDisplay.style.color = "#10b981";
-    } else if (score >= 60) {
-      scoreDisplay.style.color = "#f59e0b";
-    } else {
-      scoreDisplay.style.color = "#ef4444";
-    }
-  }
-
-  if (scoreBar) {
-    scoreBar.style.width = score + "%";
-    if (score === 100) {
-      scoreBar.style.background = "#10b981";
-    } else if (score >= 60) {
-      scoreBar.style.background = "#f59e0b";
-    } else {
-      scoreBar.style.background = "#ef4444";
-    }
-  }
-
-  if (subStatus) {
-    if (score === 100) {
-      subStatus.innerHTML = `<strong style="color:#10b981;">🛡️ Parabéns!</strong> Todas as ${total} verificações estão em conformidade com o CIS Benchmark.`;
-    } else {
-      subStatus.innerHTML = `<strong style="color:#ef4444;">⚠️ Atenção:</strong> ${achados.length} não-conformidades encontradas (${conformes}/${total} conformes).`;
-    }
-  }
-
-  if (!tbody) return;
-  tbody.innerHTML = "";
-
-  if (achados.length === 0) {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td colspan="5" style="padding:1rem; text-align:center; color:#10b981; font-weight:700;">
-        ✓ Nenhuma não-conformidade detectada! O arquivo está totalmente bastionado segundo as diretrizes CIS.
-      </td>
-    `;
-    tbody.appendChild(tr);
-    return;
-  }
-
-  achados.forEach(a => {
-    let badgeSev = '<span class="badge red">CRÍTICA</span>';
-    if (a.severidade === "Alta") badgeSev = '<span class="badge amber">ALTA</span>';
-    if (a.severidade === "Média") badgeSev = '<span class="badge slate">MÉDIA</span>';
-
-    const tr = document.createElement("tr");
-    tr.style.borderBottom = "1px solid var(--rule)";
-    tr.innerHTML = `
-      <td style="padding:0.5rem;">${badgeSev}</td>
-      <td style="padding:0.5rem; font-family:var(--font-mono); font-weight:700;">${escapeHtml(a.param)}</td>
-      <td style="padding:0.5rem; font-family:var(--font-mono); color:#ef4444;">${escapeHtml(a.valorAtual)}</td>
-      <td style="padding:0.5rem; font-family:var(--font-mono); color:#10b981;">${escapeHtml(a.esperado)}</td>
-      <td style="padding:0.5rem; font-size:0.8rem; color:var(--muted);">
-        <div>${escapeHtml(a.risco)}</div>
-        <div style="font-size:0.75rem; color:var(--ink); margin-top:0.2rem;"><strong>Recomendação:</strong> ${escapeHtml(a.recomendacao)}</div>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-// Inicialização automática do checklist e do laboratório no carregamento da página
-document.addEventListener("DOMContentLoaded", function() {
-  if (typeof initChecklist === "function") {
-    initChecklist("hardening-sistemas");
-  }
-  carregarSnippetConfig("sshd");
-});
-</script>
 </main>
 </div>
 
@@ -3198,7 +2364,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3787,17 +2952,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -4011,7 +3165,6 @@ document.addEventListener("DOMContentLoaded", function() {
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

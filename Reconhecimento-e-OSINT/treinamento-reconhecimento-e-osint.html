@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Reconhecimento-e-OSINT">
@@ -2120,7 +1736,6 @@ dfn.glossario:focus-visible {
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução e Contexto Prático: A Visão do Adversário</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#tecnicas" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Técnicas e Fontes Canônicas de Inteligência Técnica</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Terminal Simulado de OSINT e Enumeração</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Auditoria e Redução de Superfície Externa</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Concursos</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2136,14 +1751,14 @@ dfn.glossario:focus-visible {
   <h1>Superfície de Ataque, DNS, WHOIS e Shodan</h1>
   <p class="mhead-sub">Mapeamento ético de pegada digital, inteligência de fontes abertas e enumeração de ativos expostos</p>
   <div class="chips"><span class="chip">⏱ 45 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Identify</span><span class="chip">🎯 ATT&amp;CK TA0043 Reconnaissance</span><span class="chip">👤 Red Team &amp; Pentest · Operações SOC &amp; Resposta</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>3 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>3 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 11: Reconhecimento-e-OSINT Body Fragment -->
 <article class="study-container" data-slug="reconhecimento-osint">
 
     <!-- SEÇÃO 1: INTRODUÇÃO E CONTEXTO PRÁTICO -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução e Contexto Prático: A Visão do Adversário</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 5</small></span><h2>Introdução e Contexto Prático: A Visão do Adversário</h2></div>
 
         <p class="lead-text">
             No ciclo de vida de uma operação de segurança ofensiva (Red Team e Testes de Intrusão), o <strong>Reconhecimento</strong> é a fase inicial e mais determinante para o sucesso. Segundo o framework <em>MITRE ATT&CK</em>, a tática de <strong>Reconhecimento (TA0043)</strong> engloba todas as ações que um adversário executa para coletar ativamente ou passivamente informações estratégicas sobre o alvo antes de qualquer tentativa de acesso inicial.
@@ -2211,7 +1826,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 2: TÉCNICAS E FONTES CANÔNICAS DE INTELIGÊNCIA TÉCNICA -->
     <section class="study-section" id="tecnicas" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Técnicas e Fontes Canônicas de Inteligência Técnica</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 5</small></span><h2>Técnicas e Fontes Canônicas de Inteligência Técnica</h2></div>
 
         <p class="lead-text">
             Um analista de segurança defensiva ou ofensiva deve dominar as quatro fontes fundamentais de reconhecimento de infraestrutura externa:
@@ -2288,96 +1903,10 @@ site:alvo.com.br filetype:pdf | filetype:xlsx "confidencial" OR "interno"</code>
     </section>
 
     <!-- SEÇÃO 3: LABORATÓRIO / SIMULADOR INTERATIVO -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 3 de 6</small></span><h2>Laboratório Prático: Terminal Simulado de OSINT e Enumeração</h2></div>
-
-        <p class="lead-text">
-            Utilize o emulador de terminal abaixo para realizar o reconhecimento técnico sobre a organização fictícia <code>corp-financeira.com.br</code>. Utilize comandos como <code>whois</code>, <code>dig</code>, <code>crtsh</code>, <code>shodan</code> e <code>dork</code> para mapear a superfície de ataque externa sem enviar pacotes invasivos ao alvo.
-        </p>
-
-        <div class="lab-box osint-lab" id="osint-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Laboratório de Reconhecimento</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Terminal Simulado de Reconhecimento OSINT</h3>
-                    <p style="margin: 0; font-size: 0.9rem; color: var(--muted);">Explore comandos de inteligência em fontes abertas e preencha a matriz de superfície de ataque.</p>
-                </div>
-                <div>
-                    <span class="status-indicator-badge" id="osint-score-badge" style="background: rgba(220, 38, 38, 0.15); color: #DC2626; border: 1px solid #DC2626; padding: 0.35rem 0.75rem; border-radius: 4px; font-weight: 700; font-size: 0.85rem;">
-                        SUPERFÍCIE: 0% MAPEADA
-                    </span>
-                </div>
-            </div>
-
-            <!-- Botões de Atalho Rápido para Praticidade -->
-            <div style="margin: 1.25rem 0 0.75rem 0;">
-                <div style="font-size: 0.8rem; font-weight: 700; color: var(--muted); margin-bottom: 0.4rem; text-transform: uppercase;">
-                    Comandos Rápidos Recomendados (Clique para Inserir ou Digite Abaixo):
-                </div>
-                <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
-                    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="preencherComando('help')">help</button>
-                    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="preencherComando('whois corp-financeira.com.br')">whois corp-financeira.com.br</button>
-                    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="preencherComando('dig corp-financeira.com.br any')">dig corp-financeira.com.br any</button>
-                    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="preencherComando('crtsh corp-financeira.com.br')">crtsh corp-financeira.com.br</button>
-                    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="preencherComando('shodan search &quot;org:CorpFinanceira&quot;')">shodan search "org:CorpFinanceira"</button>
-                    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="preencherComando('dork site:corp-financeira.com.br filetype:env')">dork site:corp-financeira.com.br filetype:env</button>
-                    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="preencherComando('mapa')">mapa (Ver Superfície)</button>
-                    <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="preencherComando('clear')">clear</button>
-                </div>
-            </div>
-
-            <!-- Janela do Terminal Shell -->
-            <div style="background: #0f172a; color: #f8fafc; border-radius: 6px; padding: 1.25rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; border: 1px solid #334155; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);">
-                <div id="osint-terminal-output" style="max-height: 420px; overflow-y: auto; white-space: pre-wrap; line-height: 1.45; margin-bottom: 0.75rem;">
-<!-- Boas-vindas do terminal -->
-<span style="color: #38bdf8;">======================================================================</span>
-<span style="color: #38bdf8;">  OSINT RECON SHELL v2.4 — AMBIENTE AUTÔNOMO DE ENUMERAÇÃO PASSIVA</span>
-<span style="color: #38bdf8;">======================================================================</span>
-Alvo de Investigação: <span style="color: #facc15; font-weight: bold;">corp-financeira.com.br</span>
-Modo: Reconhecimento Passivo e Não-Invasivo.
-Digite <span style="color: #4ade80; font-weight: bold;">help</span> ou clique nos comandos rápidos acima para iniciar.
-                </div>
-
-                <!-- Linha de Entrada do Prompt -->
-                <div style="display: flex; align-items: center; border-top: 1px solid #1e293b; padding-top: 0.5rem;">
-                    <span style="color: #4ade80; margin-right: 0.5rem; font-weight: bold;">analista@osint-box:~$</span>
-                    <input type="text" id="osint-cli-input" style="flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: #f8fafc; font-family: inherit; font-size: inherit;" placeholder="Digite um comando aqui..." onkeydown="tratarInputTerminal(event)" autofocus>
-                    <button class="btn" style="padding: 0.25rem 0.75rem; font-size: 0.75rem; background: #DC2626; color: white;" onclick="executarComandoOsint()">Executar</button>
-                </div>
-            </div>
-
-            <!-- Tabela Dinâmica de Superfície de Ataque Descoberta -->
-            <div style="margin-top: 1.5rem; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 1.25rem;">
-                <h4 style="margin-top: 0; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-                    <span>Matriz da Superfície de Ataque Descoberta</span>
-                    <span id="osint-progresso-txt" style="font-size: 0.85rem; color: var(--muted); font-weight: normal;">0 de 5 descobertas identificadas</span>
-                </h4>
-                <div class="table-responsive">
-                    <table class="data-table" style="font-size: 0.85rem; margin-top: 0.5rem;">
-                        <thead>
-                            <tr>
-                                <th>Categoria</th>
-                                <th>Ativo / Descoberta</th>
-                                <th>Fonte OSINT</th>
-                                <th>Risco / Impacto Técnico</th>
-                            </tr>
-                        </thead>
-                        <tbody id="osint-matriz-tbody">
-                            <tr id="matriz-vazia-row">
-                                <td colspan="4" style="text-align: center; color: var(--muted); padding: 1.5rem;">
-                                    Nenhum ativo descoberto ainda. Execute comandos no terminal acima para mapear a infraestrutura do alvo.
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 4: CHECKLIST DE APLICAÇÃO PRÁTICA -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist de Auditoria e Redução de Superfície Externa</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 3 de 5</small></span><h2>Checklist de Auditoria e Redução de Superfície Externa</h2></div>
 
         <p class="lead-text">
             Aplique este checklist defensivo para auditar a pegada digital pública da sua organização e sanar vulnerabilidades expostas antes que sejam descobertas por atores maliciosos.
@@ -2425,7 +1954,7 @@ Digite <span style="color: #4ade80; font-weight: bold;">help</span> ou clique no
 
     <!-- SEÇÃO 5: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Concursos</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 4 de 5</small></span><h2>Questões de Fixação e Concursos</h2></div>
 
         <p class="lead-text">
             Consolide seus conhecimentos com questões baseadas em provas de certificação ofensiva (CEH, OSCP) e concursos de segurança cibernética:
@@ -2479,7 +2008,7 @@ Digite <span style="color: #4ade80; font-weight: bold;">help</span> ou clique no
 
     <!-- SEÇÃO 6: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 5 de 5</small></span><h2>Fatos Essenciais e Próximos Passos</h2></div>
 
         <p class="lead-text">
             O reconhecimento é o alicerce sobre o qual toda a operação de segurança ofensiva e defensiva é construída. Memorize estes princípios:
@@ -2523,289 +2052,6 @@ Digite <span style="color: #4ade80; font-weight: bold;">help</span> ou clique no
 </article>
 
 <!-- SCRIPT VANILLA DO TERMINAL SIMULADO OSINT -->
-<script>
-(function() {
-    // Estado de descobertas mapeadas pelo usuário
-    const DESCOBERTAS = {
-        whois: {
-            feita: false,
-            categoria: "Rede / ASN",
-            ativo: "Bloco CIDR: 200.140.88.0/24 (AS264812)",
-            fonte: "whois corp-financeira.com.br",
-            risco: "Mapeia todo o perímetro de IPs públicos alocados à entidade."
-        },
-        dns: {
-            feita: false,
-            categoria: "Serviços DNS",
-            ativo: "Servidores MX e SPF com IPs autorizados",
-            fonte: "dig corp-financeira.com.br any",
-            risco: "Revela provedor de e-mail corporativo e infraestrutura autorizada."
-        },
-        crtsh: {
-            feita: false,
-            categoria: "Subdomínios",
-            ativo: "vpn.corp-financeira.com.br e api-dev.corp-financeira.com.br",
-            fonte: "crtsh (Certificate Transparency)",
-            risco: "Ambientes de homologação e VPN expostos sem documentação."
-        },
-        shodan: {
-            feita: false,
-            categoria: "Portas Abertas",
-            ativo: "200.140.88.15:3389 (RDP) e 200.140.88.42:9200 (Elastic)",
-            fonte: "shodan search \"org:CorpFinanceira\"",
-            risco: "Acesso remoto RDP e banco de dados NoSQL sem autenticação."
-        },
-        dork: {
-            feita: false,
-            categoria: "Credenciais Vazadas",
-            ativo: "Arquivo .env com DB_PASSWORD exposto em subdiretório",
-            fonte: "Google Dorks (filetype:env)",
-            risco: "Vazamento direto de segredos de conexão ao banco de dados."
-        }
-    };
-
-    let historicoComandos = [];
-    let indiceHistorico = -1;
-
-    // Respostas simuladas dos comandos
-    const RESPOSTAS = {
-        help: `Comandos OSINT disponíveis no terminal:
-  whois <dominio>               Consulta registros de propriedade, ASN e blocos CIDR.
-  dig <dominio> [tipo]          Consulta registros DNS (ex: dig corp-financeira.com.br any).
-  crtsh <dominio>               Consulta logs de Certificate Transparency para descobrir subdomínios.
-  shodan search "<filtro>"      Pesquisa serviços e portas indexados no Shodan (ex: org:CorpFinanceira).
-  dork <termo>                  Executa pesquisa avançada no Google Hacking Database.
-  mapa                          Exibe a matriz gráfica da superfície de ataque descoberta.
-  clear                         Limpa a tela do terminal.`,
-
-        whois: `[WHOIS CONSULTA REGISTRO.BR / LACNIC]
-Domínio:          corp-financeira.com.br
-Entidade:         Corporação Financeira Nacional S.A.
-CNPJ:             12.345.678/0001-90
-Titular / País:   Brasil (BR)
-ASN Alocado:      AS264812 (CORP-FINANCEIRA-BGP)
-Blocos IPv4:      200.140.88.0/24 (256 endereços roteáveis)
-Servidores DNS:   ns1.corp-financeira.com.br
-                  ns2.corp-financeira.com.br
-Contato Técnico:  admin-sec@corp-financeira.com.br
-Status:           Publicado / Ativo`,
-
-        dig: `; <<>> DiG 9.18.1-1ubuntu1-Ubuntu <<>> corp-financeira.com.br any
-;; QUESTION SECTION:
-;corp-financeira.com.br.    IN  ANY
-
-;; ANSWER SECTION:
-corp-financeira.com.br. 3600  IN  A      200.140.88.10
-corp-financeira.com.br. 3600  IN  MX     10 mail.corp-financeira.com.br.
-corp-financeira.com.br. 3600  IN  TXT    "v=spf1 ip4:200.140.88.0/24 include:_spf.google.com ~all"
-corp-financeira.com.br. 86400 IN  NS     ns1.corp-financeira.com.br.
-corp-financeira.com.br. 86400 IN  NS     ns2.corp-financeira.com.br.
-
-;; Tentativa de AXFR (Transferência de Zona):
-;; Transferência negada pelo servidor autoritativo (REFUSED). Boa prática ativa!`,
-
-        crtsh: `[CERTIFICATE TRANSPARENCY SEARCH — crt.sh/%.corp-financeira.com.br]
-Id Log       Data Emissão    Identidade (Nome Comum / SAN)
---------------------------------------------------------------------------------
-10482910     2026-08-10      corp-financeira.com.br
-10482911     2026-08-10      www.corp-financeira.com.br
-10920412     2026-09-01      vpn.corp-financeira.com.br (Gateway GlobalProtect)
-11204918     2026-09-14      api-dev.corp-financeira.com.br (Ambiente Homologação)
-11204919     2026-09-14      painel-admin.corp-financeira.com.br (Portal Interno)
-11481023     2026-10-02      mail.corp-financeira.com.br
-
-=> 4 subdomínios adicionais descobertos através de registros públicos de SSL!`,
-
-        shodan: `[SHODAN RECON — Filtro: org:"CorpFinanceira"]
-Total de resultados encontrados: 3 hosts públicos indexados
-
-Host 1: 200.140.88.10 (Brasil - São Paulo)
-  Porta 80/tcp  (HTTP - Nginx 1.24.0)
-  Porta 443/tcp (HTTPS - Certificado emitido para corp-financeira.com.br)
-
-Host 2: 200.140.88.15 (Brasil - São Paulo)
-  Porta 3389/tcp (Microsoft Terminal Services - RDP HABILITADO EXPOSTO!)
-  Alerta: Porta administrativa de Área de Trabalho Remota aberta na Internet!
-
-Host 3: 200.140.88.42 (Brasil - São Paulo)
-  Porta 9200/tcp (Elasticsearch 7.17.0 - CLUSTER DESPROTEGIDO!)
-  Banner: "cluster_name": "corp-telemetria-elastic", "status": "green"
-  ALERTA CRÍTICO: Banco de dados indexado sem autenticação habilitada!`,
-
-        dork: `[GOOGLE DORK SIMULADO — Busca: site:corp-financeira.com.br filetype:env]
-Resultado 1:
-URL: https://api-dev.corp-financeira.com.br/.env
-Trecho Indexado:
-  APP_ENV=development
-  APP_KEY=base64:3f982c019a...
-  DB_HOST=10.0.1.50
-  DB_DATABASE=finance_db
-  DB_USERNAME=root
-  DB_PASSWORD=SuperSecretFinance2026!
-
-ALERTA DE SEGURANÇA: Chaves de produção/homologação expostas publicamente via .env!`
-    };
-
-    window.preencherComando = function(cmd) {
-        const input = document.getElementById("osint-cli-input");
-        if (input) {
-            input.value = cmd;
-            input.focus();
-        }
-    };
-
-    window.tratarInputTerminal = function(event) {
-        if (event.key === "Enter") {
-            window.executarComandoOsint();
-        } else if (event.key === "ArrowUp") {
-            if (historicoComandos.length > 0 && indiceHistorico > 0) {
-                indiceHistorico--;
-                document.getElementById("osint-cli-input").value = historicoComandos[indiceHistorico];
-            }
-        } else if (event.key === "ArrowDown") {
-            if (indiceHistorico < historicoComandos.length - 1) {
-                indiceHistorico++;
-                document.getElementById("osint-cli-input").value = historicoComandos[indiceHistorico];
-            } else {
-                indiceHistorico = historicoComandos.length;
-                document.getElementById("osint-cli-input").value = "";
-            }
-        }
-    };
-
-    window.executarComandoOsint = function() {
-        const input = document.getElementById("osint-cli-input");
-        const terminal = document.getElementById("osint-terminal-output");
-        if (!input || !terminal) return;
-
-        const cmd = input.value.trim();
-        if (!cmd) return;
-
-        historicoComandos.push(cmd);
-        indiceHistorico = historicoComandos.length;
-        input.value = "";
-
-        // Adiciona linha do usuário
-        terminal.innerHTML += `\n<span style="color: #4ade80;">analista@osint-box:~$</span> <span style="color: #f8fafc;">${escapeHtml(cmd)}</span>\n`;
-
-        const cmdLower = cmd.toLowerCase();
-
-        if (cmdLower === "clear" || cmdLower === "limpar") {
-            terminal.innerHTML = `<span style="color: #38bdf8;">Terminal OSINT reinicializado. Digite 'help' para ver os comandos.</span>\n`;
-            return;
-        }
-
-        if (cmdLower === "help" || cmdLower === "ajuda") {
-            terminal.innerHTML += RESPOSTAS.help + "\n";
-        } else if (cmdLower.startsWith("whois")) {
-            terminal.innerHTML += RESPOSTAS.whois + "\n";
-            marcarDescoberta("whois");
-        } else if (cmdLower.startsWith("dig")) {
-            terminal.innerHTML += RESPOSTAS.dig + "\n";
-            marcarDescoberta("dns");
-        } else if (cmdLower.startsWith("crtsh")) {
-            terminal.innerHTML += RESPOSTAS.crtsh + "\n";
-            marcarDescoberta("crtsh");
-        } else if (cmdLower.startsWith("shodan")) {
-            terminal.innerHTML += RESPOSTAS.shodan + "\n";
-            marcarDescoberta("shodan");
-        } else if (cmdLower.startsWith("dork")) {
-            terminal.innerHTML += RESPOSTAS.dork + "\n";
-            marcarDescoberta("dork");
-        } else if (cmdLower === "mapa") {
-            renderizarMapaNoTerminal();
-        } else {
-            terminal.innerHTML += `<span style="color: #f87171;">Comando desconhecido: "${escapeHtml(cmd)}". Digite 'help' para listar os comandos aceitos.</span>\n`;
-        }
-
-        terminal.scrollTop = terminal.scrollHeight;
-    };
-
-    function marcarDescoberta(chave) {
-        if (!DESCOBERTAS[chave]) return;
-        DESCOBERTAS[chave].feita = true;
-        atualizarMatrizSuperficie();
-    }
-
-    function atualizarMatrizSuperficie() {
-        const tbody = document.getElementById("osint-matriz-tbody");
-        const badge = document.getElementById("osint-score-badge");
-        const progressoTxt = document.getElementById("osint-progresso-txt");
-        if (!tbody) return;
-
-        let total = Object.keys(DESCOBERTAS).length;
-        let feitas = Object.values(DESCOBERTAS).filter(d => d.feita).length;
-        let percent = Math.round((feitas / total) * 100);
-
-        if (badge) {
-            badge.textContent = `SUPERFÍCIE: ${percent}% MAPEADA`;
-            if (percent === 100) {
-                badge.style.background = "rgba(16, 185, 129, 0.2)";
-                badge.style.color = "#10B981";
-                badge.style.borderColor = "#10B981";
-            }
-        }
-
-        if (progressoTxt) {
-            progressoTxt.textContent = `${feitas} de ${total} descobertas identificadas`;
-        }
-
-        if (feitas === 0) {
-            tbody.innerHTML = `
-                <tr id="matriz-vazia-row">
-                    <td colspan="4" style="text-align: center; color: var(--muted); padding: 1.5rem;">
-                        Nenhum ativo descoberto ainda. Execute comandos no terminal acima para mapear a infraestrutura do alvo.
-                    </td>
-                </tr>`;
-            return;
-        }
-
-        let html = "";
-        for (const [k, d] of Object.entries(DESCOBERTAS)) {
-            if (d.feita) {
-                html += `
-                    <tr>
-                        <td><strong>${d.categoria}</strong></td>
-                        <td><code>${d.ativo}</code></td>
-                        <td><span style="font-family: monospace; font-size: 0.8rem; background: var(--surface); padding: 0.15rem 0.4rem; border-radius: 3px; border: 1px solid var(--rule);">${d.fonte}</span></td>
-                        <td style="color: #DC2626; font-size: 0.8rem;">⚠️ ${d.risco}</td>
-                    </tr>
-                `;
-            }
-        }
-        tbody.innerHTML = html;
-    }
-
-    function renderizarMapaNoTerminal() {
-        const terminal = document.getElementById("osint-terminal-output");
-        if (!terminal) return;
-
-        let total = Object.keys(DESCOBERTAS).length;
-        let feitas = Object.values(DESCOBERTAS).filter(d => d.feita).length;
-
-        terminal.innerHTML += `
-[RESUMO DA SUPERFÍCIE DE ATAQUE DESCOBERTA (${feitas}/${total})]
-----------------------------------------------------------------------
-${DESCOBERTAS.whois.feita ? " [X] ASN & Bloco CIDR: 200.140.88.0/24 mapeado via WHOIS" : " [ ] ASN & Bloco CIDR: Pendente (use 'whois')"}
-${DESCOBERTAS.dns.feita ? " [X] DNS & SPF: Registros mapeados via DIG" : " [ ] DNS & SPF: Pendente (use 'dig')"}
-${DESCOBERTAS.crtsh.feita ? " [X] Subdomínios: vpn, api-dev, painel-admin via crt.sh" : " [ ] Subdomínios: Pendente (use 'crtsh')"}
-${DESCOBERTAS.shodan.feita ? " [X] Serviços Expostos: RDP (3389) e Elastic (9200) via Shodan" : " [ ] Serviços Expostos: Pendente (use 'shodan')"}
-${DESCOBERTAS.dork.feita ? " [X] Arquivo Sensível: .env com senha de banco via Google Dork" : " [ ] Arquivo Sensível: Pendente (use 'dork')"}
-----------------------------------------------------------------------
-` + (feitas === total ? "<span style=\"color: #4ade80; font-weight: bold;\">PARABÉNS! Você descobriu 100% da superfície externa do alvo!</span>\n" : "Continue investigando para completar todos os itens da superfície.\n");
-    }
-
-    // Inicialização ao carregar a página
-    document.addEventListener("DOMContentLoaded", function() {
-        if (typeof initChecklist === "function") {
-            initChecklist("reconhecimento-osint");
-        }
-        if (typeof initQuiz === "function") {
-            initQuiz();
-        }
-    });
-})();
-</script>
 </main>
 </div>
 
@@ -2940,7 +2186,6 @@ ${DESCOBERTAS.dork.feita ? " [X] Arquivo Sensível: .env com senha de banco via 
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3529,17 +2774,6 @@ ${DESCOBERTAS.dork.feita ? " [X] Arquivo Sensível: .env com senha de banco via 
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -3753,7 +2987,6 @@ ${DESCOBERTAS.dork.feita ? " [X] Arquivo Sensível: .env com senha de banco via 
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

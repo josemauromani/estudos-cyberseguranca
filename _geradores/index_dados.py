@@ -961,11 +961,10 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 40,
         "nivel": "iniciante",
         "pergunta_chave": "Como identificar e categorizar vulnerabilidades arquiteturais em um sistema antes que sejam exploradas?",
-        "simulador_nome": "STRIDE Threat Canvas",
         "fatos": [
             "Tríade CIA, Autenticidade e Não-Repúdio",
             "Taxonomia STRIDE (Spoofing a Elevation of Privilege)",
-            "Simulador STRIDE Threat Canvas interativo",
+            "Tópico — sTRIDE Threat Canvas interativo",
             "Checklist de auditoria com persistência local",
         ],
     },
@@ -979,12 +978,11 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "iniciante",
         "pergunta_chave": "O que cada campo dos cabeçalhos IP/TCP revela sobre a intenção do tráfego e possíveis anomalias?",
-        "simulador_nome": "Inspetor Visual de Cabeçalhos IP/TCP/UDP",
         "fatos": [
             "Pilha TCP/IP em 4 camadas e modelo OSI",
             "Dissecação de flags SYN/ACK/FIN/RST",
             "Vulnerabilidades em DNS e envenenamento ARP",
-            "Simulador de montagem de pacotes e resposta de host",
+            "Tópico — de montagem de pacotes e resposta de host",
             "Sub-redes CIDR, roteamento e NAT (calculadora CIDR)",
             "HTTP/1.1, HTTP/2 e HTTP/3 e segurança do Wi-Fi (WPA2, 802.1X, WPA3)",
         ],
@@ -999,7 +997,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "iniciante",
         "pergunta_chave": "Qual algoritmo criptográfico utilizar para garantir confidencialidade sem comprometer o desempenho?",
-        "simulador_nome": "Lab de Cifras (Web Crypto API)",
         "fatos": [
             "Cifras AES-GCM e ChaCha20-Poly1305",
             "Curvas Elípticas (ECDSA/Ed25519) vs RSA",
@@ -1017,7 +1014,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "iniciante",
         "pergunta_chave": "Como garantir que apenas identidades legítimas acessem recursos corporativos críticos com privilégio mínimo?",
-        "simulador_nome": "Validador e Decodificador JWT + Matriz RBAC",
         "fatos": [
             "Hashing com Argon2, bcrypt e proteção de credenciais",
             "Protocolos TOTP (RFC 6238) e WebAuthn/FIDO2",
@@ -1035,12 +1031,11 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 40,
         "nivel": "iniciante",
         "pergunta_chave": "Como isolar servidores públicos da rede corporativa sensível garantindo regra Default Drop?",
-        "simulador_nome": "Simulador de Regras de Firewall (Pass / Drop)",
         "fatos": [
             "Arquitetura de DMZ em 2 estágios",
             "Tabela de estados conntrack (Stateful vs Stateless)",
             "Trunking 802.1Q e segregação inter-VLAN",
-            "Simulador de filtragem com ordem de precedência First-Match",
+            "Tópico — de filtragem com ordem de precedência First-Match",
         ],
     },
     "Hardening-Sistemas": {
@@ -1053,7 +1048,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "intermediario",
         "pergunta_chave": "Quais configurações padrão de fábrica expõem servidores corporativos a ataques imediatos?",
-        "simulador_nome": "Auditor Interativo de Configuração de Servidor",
         "fatos": [
             "CIS Benchmarks Nível 1 e Nível 2",
             "Bastionamento de SSH (/etc/ssh/sshd_config) e PAM",
@@ -1071,7 +1065,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "intermediario",
         "pergunta_chave": "Como interceptar e bloquear tráfego hostil antes que ele atinja serviços internos sensíveis?",
-        "simulador_nome": "Analisador de Regras Snort/Suricata vs Tráfego",
         "fatos": [
             "Assinaturas Snort/Suricata e detecção heurística",
             "WAF Core Rule Set (CRS) contra injeções web",
@@ -1089,7 +1082,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 40,
         "nivel": "intermediario",
         "pergunta_chave": "Por que não se deve mais confiar na rede interna mesmo após autenticação inicial bem-sucedida?",
-        "simulador_nome": "Motor de Decisão de Acesso Zero Trust (PDP/PEP)",
         "fatos": [
             "NIST SP 800-207: Never Trust, Always Verify, Assume Breach",
             "Componentes centrais: PDP (Decision) e PEP (Enforcement)",
@@ -1107,7 +1099,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "intermediario",
         "pergunta_chave": "Como determinar qual vulnerabilidade corrigir primeiro entre centenas de falhas detectadas em varreduras?",
-        "simulador_nome": "Calculadora Interativa de Score CVSS v3.1 / v4.0",
         "fatos": [
             "Métricas Base, Temporal e Ambiental do CVSS",
             "Novidades do CVSS v4.0 e integração com EPSS",
@@ -1125,12 +1116,11 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "intermediario",
         "pergunta_chave": "Como identificar a presença de um adversário no endpoint antes que ocorra dano ou exfiltração?",
-        "simulador_nome": "Linha do Tempo de Telemetria e Detecção EDR",
         "fatos": [
             "Evolução de antivírus baseado em assinatura para EDR/XDR",
             "Sysmon e Event IDs do Windows (Event ID 1, 3, 10)",
             "Árvores de processos maliciosos parent-child",
-            "Simulador de telemetria com isolamento de máquina da rede",
+            "Tópico — de telemetria com isolamento de máquina da rede",
         ],
     },
     "Reconhecimento-e-OSINT": {
@@ -1143,7 +1133,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "intermediario",
         "pergunta_chave": "O que um atacante consegue descobrir sobre nossa infraestrutura sem enviar um único pacote invasivo?",
-        "simulador_nome": "Terminal Simulado de OSINT e Enumeração",
         "fatos": [
             "Reconhecimento passivo vs ativo e pegada digital",
             "Google Dorks, Certificate Transparency Logs e WHOIS",
@@ -1161,7 +1150,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 55,
         "nivel": "intermediario",
         "pergunta_chave": "Como desenvolvedores podem eliminar falhas críticas de injeção diretamente na raiz do código?",
-        "simulador_nome": "Playground de Injeção e Sanitização Web",
         "fatos": [
             "Categorias A01 a A10 do OWASP Top 10",
             "Prepared Statements para imunização contra SQL Injection",
@@ -1179,12 +1167,11 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 40,
         "nivel": "intermediario",
         "pergunta_chave": "Por que firewalls convencionais falham em detectar abusos lógicos e quebras de BOLA em APIs?",
-        "simulador_nome": "Simulador de Chamadas de API com Rate Limiter",
         "fatos": [
             "OWASP API Security Top 10 (foco em BOLA e Broken Auth)",
             "Algoritmos de rate limiting: Token Bucket e Leaky Bucket",
             "Validação rigorosa de esquemas e proteção contra Mass Assignment",
-            "Simulador de requisições REST com bloqueios HTTP 429 e 403",
+            "Tópico — de requisições REST com bloqueios HTTP 429 e 403",
         ],
     },
     "Pentest-Metodologias": {
@@ -1197,7 +1184,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "avancado",
         "pergunta_chave": "Como conduzir um teste de invasão ético agregando valor real ao negócio sem indisponibilizar sistemas?",
-        "simulador_nome": "Construtor de Matriz de Achados e Relatórios de Pentest",
         "fatos": [
             "As 7 fases do padrão PTES (do pré-engajamento ao relatório)",
             "Modalidades White-Box, Gray-Box e Black-Box",
@@ -1216,7 +1202,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 40,
         "nivel": "iniciante",
         "pergunta_chave": "Como proteger a organização do elo mais explorado da cadeia de segurança: o fator humano?",
-        "simulador_nome": "Analisador de E-mails Suspeitos (Spot the Indicators)",
         "fatos": [
             "Táticas de pretexting, spear phishing e whaling",
             "Autenticação de e-mail com SPF, DKIM e políticas DMARC",
@@ -1234,7 +1219,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "intermediario",
         "pergunta_chave": "Como separar ruído de alertas genuínos em fluxos corporativos de milhões de eventos por segundo?",
-        "simulador_nome": "Console SIEM com Busca de Logs e Alertas",
         "fatos": [
             "Estrutura de níveis SOC N1 (triagem), N2 (investigação) e N3 (hunting)",
             "Métricas operacionais: MTTD e MTTR",
@@ -1252,7 +1236,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "intermediario",
         "pergunta_chave": "Por que focar em técnicas e táticas de adversários é infinitamente mais eficaz que caçar hashes e IPs?",
-        "simulador_nome": "Mapeador de IoCs e TTPs na Matriz ATT&CK",
         "fatos": [
             "Pirâmide da Dor de David Bianco e robustez defensiva",
             "Navegação na Matriz MITRE ATT&CK Enterprise",
@@ -1270,12 +1253,11 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "intermediario",
         "pergunta_chave": "Quais passos imediatos tomar para conter um ataque ativo sem destruir evidências forenses vitais, seguindo o ciclo da Rev. 2 e a organização da Rev. 3?",
-        "simulador_nome": "Runbook Interativo em Árvore de Decisão",
         "fatos": [
             "Ciclo em 4 fases do NIST SP 800-61 Rev. 2 e a reorganização da Rev. 3 (2025) pelas funções do CSF 2.0",
             "Contenção de curto prazo vs contenção de longo prazo",
             "Condução de lições aprendidas e retrospectiva sem culpa",
-            "Simulador de crise em árvore de decisão com ramificações",
+            "Tópico — de crise em árvore de decisão com ramificações",
         ],
     },
     "Forense-Digital": {
@@ -1288,7 +1270,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "avancado",
         "pergunta_chave": "Como reconstruir os passos exatos de um invasor e produzir provas digitais legalmente irrefutáveis?",
-        "simulador_nome": "Analisador de Timeline de Evidências e Logs Forenses",
         "fatos": [
             "Norma ISO/IEC 27037 e ordem de volatilidade RFC 3227",
             "Bloqueadores de escrita físicos/lógicos e hashes SHA-256",
@@ -1306,7 +1287,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "avancado",
         "pergunta_chave": "O que o binário suspeito é capaz de fazer, e quais indicadores ele gera ao rodar em ambiente isolado?",
-        "simulador_nome": "Inspetor de Metadados PE/ELF e Hashes",
         "fatos": [
             "Diferenças entre análise estática e dinâmica em sandbox",
             "Estrutura do cabeçalho Portable Executable (PE) e seções",
@@ -1324,7 +1304,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "intermediario",
         "pergunta_chave": "Onde termina a obrigação do provedor de nuvem e onde começa a responsabilidade da sua organização?",
-        "simulador_nome": "Auditor de Permissões S3 e Políticas IAM Cloud",
         "fatos": [
             "Modelo de Responsabilidade Compartilhada (IaaS, PaaS, SaaS)",
             "Endurecimento de políticas IAM e proteção de buckets S3",
@@ -1342,12 +1321,11 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "intermediario",
         "pergunta_chave": "Como detectar e bloquear vulnerabilidades em código e dependências antes do deploy em produção?",
-        "simulador_nome": "Simulador de Pipeline CI/CD com Security Gates",
         "fatos": [
             "Filosofia Shift-Left e ciclo SSDLC",
             "Integração de testes SAST, DAST e SCA com SBOM",
             "Boas práticas em Dockerfiles e imagens distroless",
-            "Simulador de pipeline CI/CD com parametrização de thresholds de quebra",
+            "Tópico — de pipeline CI/CD com parametrização de thresholds de quebra",
         ],
     },
     "Seguranca-em-IoT-e-OT": {
@@ -1360,7 +1338,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 40,
         "nivel": "avancado",
         "pergunta_chave": "Como proteger sistemas ciberfísicos que não suportam paradas, patches frequentes ou criptografia pesada?",
-        "simulador_nome": "Mapeador do Modelo Purdue (TI vs TO)",
         "fatos": [
             "Convergência TI e TO e prioridades de disponibilidade",
             "Níveis 0 a 5 do Modelo Purdue para sistemas ICS/SCADA",
@@ -1378,12 +1355,11 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "avancado",
         "pergunta_chave": "Como impedir que usuários maliciosos manipulem instruções de sistemas baseados em inteligência artificial?",
-        "simulador_nome": "Lab de Prompt Injection e Defesas",
         "fatos": [
             "OWASP Top 10 for LLM Applications (LLM01 Prompt Injection)",
             "Ataques de Data Poisoning e vazamento de dados sensíveis",
             "Mecanismos de guardrails de entrada e sanitização de prompts",
-            "Laboratório interativo de bypass de chatbot e aplicação de defesas",
+            "exercício didático de bypass de chatbot e aplicação de defesas",
         ],
     },
     "Gestao-de-Riscos-TI": {
@@ -1396,7 +1372,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "intermediario",
         "pergunta_chave": "Como conduzir o processo de riscos da ISO 31000:2018 e quantificar em reais o impacto de uma ameaça para justificar orçamentos à diretoria?",
-        "simulador_nome": "Calculadora de Matriz 5x5 e Risco Financeiro (ALE/SLE)",
         "fatos": [
             "Processo da ISO 31000:2018: contexto, identificação, análise, avaliação, tratamento, monitoramento e comunicação, ao lado do NIST SP 800-30",
             "Fórmulas quantitativas: SLE = AV * EF e ALE = SLE * ARO",
@@ -1414,7 +1389,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "intermediario",
         "pergunta_chave": "Como estruturar um SGSI auditável e mapear os controles do Anexo A para CIS Controls v8.1 (IG1/IG2/IG3) e NIST SP 800-53 Rev. 5?",
-        "simulador_nome": "Matriz de Controles e Declaração de Aplicabilidade (SoA)",
         "fatos": [
             "Estrutura HLS da ISO/IEC 27001:2022 (cláusulas 4 a 10)",
             "Os 93 controles consolidados em 4 temas organizacionais, com crosswalk para CIS Controls v8.1 (IG1/IG2/IG3) e NIST SP 800-53 Rev. 5",
@@ -1432,7 +1406,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "iniciante",
         "pergunta_chave": "Qual base legal legitima o tratamento de dados pessoais e como demonstrar conformidade perante a ANPD?",
-        "simulador_nome": "Construtor de Avaliação de Impacto à Privacidade (RIPD)",
         "fatos": [
             "As 10 bases legais da LGPD para dados pessoais e sensíveis",
             "Garantia dos direitos dos titulares e atuação do DPO/Encarregado",
@@ -1450,7 +1423,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 40,
         "nivel": "intermediario",
         "pergunta_chave": "Quanto tempo a organização suporta ficar inoperante e qual volume de dados pode ser perdido em um desastre?",
-        "simulador_nome": "Calculadora de RTO/RPO e Validador da Estratégia 3-2-1",
         "fatos": [
             "Diferenciação operacional entre BCP, DRP e análise BIA",
             "Definição e cálculo de SLAs de RTO e RPO",
@@ -1468,12 +1440,11 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "intermediario",
         "pergunta_chave": "Como impedir que dados sensíveis saiam da organização por e-mail ou web sem bloquear o trabalho legítimo?",
-        "simulador_nome": "Gateway de Conteúdo",
         "fatos": [
             "DLP de rede, de endpoint e de nuvem (CASB), com detectores por regex, checksum (Luhn) e dicionário",
             "Autenticação de e-mail com SPF, DKIM e DMARC (none, quarantine, reject) e antispam por reputação",
             "Filtro de URL por categoria em SWG, inspeção TLS e o equilíbrio entre falso positivo e falso negativo",
-            "Simulador Gateway de Conteúdo: AntiSpam, DLP e filtro de URL com veredito Permitir, Quarentena ou Bloquear",
+            "Tópico — gateway de Conteúdo: AntiSpam, DLP e filtro de URL com veredito Permitir, Quarentena ou Bloquear",
         ],
     },
     "Seguranca-de-Bancos-de-Dados": {
@@ -1486,12 +1457,11 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "intermediario",
         "pergunta_chave": "Quem pode ler e alterar cada tabela do banco, e como provar isso numa auditoria?",
-        "simulador_nome": "Matriz GRANT/REVOKE",
         "fatos": [
             "Modelo relacional, ACID e as linguagens SQL DDL, DML e DCL",
             "Menor privilégio com roles, GRANT/REVOKE, views e Row-Level Security",
             "TDE, criptografia de coluna, mascaramento dinâmico, auditoria nativa e prepared statements contra SQLi",
-            "Simulador Matriz GRANT/REVOKE com consultas permitidas ou negadas e trilha de auditoria",
+            "Tópico — matriz GRANT/REVOKE com consultas permitidas ou negadas e trilha de auditoria",
         ],
     },
     "PCI-DSS": {
@@ -1504,12 +1474,11 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "intermediario",
         "pergunta_chave": "Quais sistemas entram no escopo do PCI DSS e como reduzir esse escopo sem abrir mão da conformidade?",
-        "simulador_nome": "Delimitador de Escopo CDE",
         "fatos": [
             "6 objetivos e 12 requisitos do PCI DSS v4.0.1, com a diferença entre abordagem definida e customizada",
             "PAN versus dados sensíveis de autenticação (SAD) e tokenização versus truncamento versus criptografia",
             "CDE, sistemas conectados, segmentação validada por teste, SAQ A, A-EP, B, C e D, ROC, QSA e AOC",
-            "Simulador Delimitador de Escopo CDE: sistemas dentro, conectados ou fora do escopo, com sugestão de SAQ",
+            "Tópico — delimitador de Escopo CDE: sistemas dentro, conectados ou fora do escopo, com sugestão de SAQ",
         ],
     },
     "Ingles-Tecnico-Ciber": {
@@ -1522,12 +1491,11 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 40,
         "nivel": "iniciante",
         "pergunta_chave": "Como ler um boletim de segurança em inglês e extrair versão afetada, impacto e mitigação sem erro de interpretação?",
-        "simulador_nome": "Leitor de Advisory",
         "fatos": [
             "Estrutura de um advisory: Summary, Affected Versions, Impact, Mitigation e Workaround",
             "Verbos modais normativos MUST, SHOULD e MAY conforme a RFC 2119",
             "Falsos cognatos da área (exploit, eventually, actually) e diferença entre registro formal e informal",
-            "Simulador Leitor de Advisory: termos clicáveis, perguntas de compreensão e flashcards de glossário",
+            "Tópico — leitor de Advisory: termos clicáveis, perguntas de compreensão e flashcards de glossário",
         ],
     },
     "Certificacoes-e-Carreira": {
@@ -1540,12 +1508,11 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 35,
         "nivel": "iniciante",
         "pergunta_chave": "Qual combinação de formação e certificações leva ao perfil de carreira desejado, e que lacunas ainda restam?",
-        "simulador_nome": "Planejador de Certificações",
         "fatos": [
             "Graduações (Ciência da Computação, Sistemas de Informação) e pós-graduações em segurança da informação",
             "Certificações de entrada, gestão e especialidade: órgão emissor, domínios, experiência exigida e CPE",
             "NICE Framework (NIST SP 800-181) para descrever papéis profissionais",
-            "Simulador Planejador de Certificações: domínios cobertos pelo currículo, lacunas e ordem de estudo",
+            "Tópico — planejador de Certificações: domínios cobertos pelo currículo, lacunas e ordem de estudo",
         ],
     },
     "Linux-para-Seguranca": {
@@ -1558,7 +1525,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "iniciante",
         "pergunta_chave": "Que comandos revelam, em poucos minutos, se um servidor Linux foi comprometido?",
-        "simulador_nome": "Terminal de Investigação Linux",
         "fatos": [
             "Permissões octais, SUID/SGID e sudoers",
             "Investigação de auth.log e journalctl",
@@ -1576,7 +1542,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "intermediario",
         "pergunta_chave": "Como transformar uma triagem manual de logs em um script repetível?",
-        "simulador_nome": "Montador de Detector",
         "fatos": [
             "Regex aplicada a logs reais",
             "Agregação com Counter e limiares de alerta",
@@ -1594,7 +1559,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "intermediario",
         "pergunta_chave": "Que eventos do Windows contam a história de uma intrusão?",
-        "simulador_nome": "Visualizador de Eventos",
         "fatos": [
             "Pipeline de objetos e Get-WinEvent",
             "Event IDs essenciais e tipos de logon",
@@ -1612,7 +1576,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 35,
         "nivel": "iniciante",
         "pergunta_chave": "Como provar numa entrevista o que você sabe fazer?",
-        "simulador_nome": "Planejador de Homelab",
         "fatos": [
             "Topologia mínima de laboratório isolado",
             "Orçamento de RAM e CPU por VM",
@@ -1630,12 +1593,11 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "iniciante",
         "pergunta_chave": "Como o AD decide quem é você e o que você pode fazer em cada máquina?",
-        "simulador_nome": "Kerberos Passo a Passo",
         "fatos": [
             "Floresta, domínio, OU e controladores de domínio",
             "Precedência de GPO (LSDOU)",
             "Kerberos (AS, TGS, AP) e NTLM",
-            "Simulador da troca Kerberos e calculadora de GPO",
+            "Tópico — da troca Kerberos e calculadora de GPO",
         ],
     },
     "Ataques-e-Defesa-no-AD": {
@@ -1648,7 +1610,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 55,
         "nivel": "avancado",
         "pergunta_chave": "Qual é o caminho mais curto de um usuário comum até Domain Admin, e como fechá-lo?",
-        "simulador_nome": "Mapa de Caminhos de Ataque",
         "fatos": [
             "Caminhos de ataque em grafo",
             "Kerberoasting, Pass-the-Hash e DCSync",
@@ -1666,7 +1627,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 40,
         "nivel": "intermediario",
         "pergunta_chave": "Quem tem poder de administrador hoje, e por quanto tempo deveria ter?",
-        "simulador_nome": "Auditor de Contas Privilegiadas",
         "fatos": [
             "Inventário de contas privilegiadas",
             "Cofre, rotação e gravação de sessão",
@@ -1684,7 +1644,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "intermediario",
         "pergunta_chave": "Que política de acesso bloqueia o atacante sem travar o usuário legítimo?",
-        "simulador_nome": "Avaliador de Acesso Condicional",
         "fatos": [
             "PHS, PTA e federação",
             "Acesso condicional por risco e dispositivo",
@@ -1702,7 +1661,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "intermediario",
         "pergunta_chave": "Nas primeiras horas de um ransomware, que decisões reduzem o estrago e quais o pioram?",
-        "simulador_nome": "Linha do Tempo do Ransomware",
         "fatos": [
             "Anatomia do ataque e dupla extorsão",
             "Decisões de contenção e seus custos",
@@ -1720,7 +1678,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 40,
         "nivel": "intermediario",
         "pergunta_chave": "Quem precisa saber do incidente, quando e com que mensagem?",
-        "simulador_nome": "Relógio da Crise",
         "fatos": [
             "Comitê de crise e matriz RACI",
             "Registro de decisões e porta-voz único",
@@ -1738,7 +1695,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 35,
         "nivel": "intermediario",
         "pergunta_chave": "Como descobrir as falhas do plano de resposta antes de um incidente real?",
-        "simulador_nome": "Gerador de Tabletop",
         "fatos": [
             "Tipos de exercício (NIST SP 800-84)",
             "Injects e papel do facilitador",
@@ -1756,7 +1712,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "intermediario",
         "pergunta_chave": "Seu backup sobrevive a um atacante que já é administrador do domínio?",
-        "simulador_nome": "Teste de Sobrevivência do Backup",
         "fatos": [
             "Regra 3-2-1-1-0",
             "Imutabilidade, object lock e air gap",
@@ -1774,7 +1729,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "avancado",
         "pergunta_chave": "Quantas técnicas ATT&CK suas regras realmente detectam, e como você sabe?",
-        "simulador_nome": "Bancada de Detecções",
         "fatos": [
             "Detecção como código: versionar, revisar, testar",
             "Regras Sigma com filtros e condições",
@@ -1792,7 +1746,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "avancado",
         "pergunta_chave": "Se um invasor estiver na rede sem disparar alertas, por onde você começa a procurar?",
-        "simulador_nome": "Caçada Guiada",
         "fatos": [
             "Caça por hipótese, não por alerta",
             "Linha de base e contagem de ocorrências raras",
@@ -1810,7 +1763,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "avancado",
         "pergunta_chave": "Como achar um implante que fala com o atacante a cada 60 segundos, mesmo com o tráfego cifrado?",
-        "simulador_nome": "Analisador de Conexões",
         "fatos": [
             "PCAP, Zeek e NetFlow: custo vs valor",
             "Beaconing pela regularidade dos intervalos",
@@ -1828,7 +1780,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 40,
         "nivel": "avancado",
         "pergunta_chave": "O que o seu playbook deve fazer sozinho, e o que ele nunca deve fazer sem perguntar?",
-        "simulador_nome": "Montador de Playbook",
         "fatos": [
             "Playbook: gatilho, enriquecimento, decisão, ação",
             "Aprovação humana para ações de alto impacto",
@@ -1846,7 +1797,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "avancado",
         "pergunta_chave": "O que separa um container comprometido do servidor que o hospeda?",
-        "simulador_nome": "Auditor de Dockerfile",
         "fatos": [
             "Imagem mínima, usuário não root e tag fixa",
             "Segredos nunca em camadas da imagem",
@@ -1864,7 +1814,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "avancado",
         "pergunta_chave": "Uma conta de serviço comprometida consegue chegar a administrador do cluster?",
-        "simulador_nome": "Cluster em Miniatura",
         "fatos": [
             "RBAC: create pods, bind e escalate são privilégio",
             "Pod Security Standards: privileged, baseline, restricted",
@@ -1882,7 +1831,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 40,
         "nivel": "avancado",
         "pergunta_chave": "Como impedir que um bucket público chegue à produção, em vez de achá-lo depois?",
-        "simulador_nome": "Revisor de Plano Terraform",
         "fatos": [
             "Plano antes do apply, política antes do plano",
             "State do Terraform contém segredos",
@@ -1900,7 +1848,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "avancado",
         "pergunta_chave": "Uma chave de acesso vazou no GitHub há três dias: o que o atacante fez, e como você o tira de lá?",
-        "simulador_nome": "Conta Comprometida",
         "fatos": [
             "Eventos de dados não vêm ligados por padrão",
             "Credencial vazada: revogar, girar, investigar",
@@ -1918,7 +1865,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "intermediario",
         "pergunta_chave": "O que o Banco Central exige da sua política de segurança, e o que muda quando o sistema vai para a nuvem?",
-        "simulador_nome": "Verificador de Aderência",
         "fatos": [
             "CMN 4.893/2021, alterada pela CMN 5.274/2025",
             "BCB 85/2021 para instituições de pagamento",
@@ -1936,7 +1882,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "intermediario",
         "pergunta_chave": "Quais sinais separam um Pix legítimo de um golpe, e quanto atrito o cliente honesto aceita?",
-        "simulador_nome": "Mesa Antifraude",
         "fatos": [
             "Golpe de falsa central e conta laranja",
             "Pontuação de risco com sinais combinados",
@@ -1954,7 +1899,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 40,
         "nivel": "intermediario",
         "pergunta_chave": "O que guardar, por quanto tempo e como, para que o caso chegue ao processo penal?",
-        "simulador_nome": "Enquadramento de Casos",
         "fatos": [
             "Art. 154-A: invasão de dispositivo informático",
             "Fraude eletrônica: art. 171 §2º-A (redação de 2026)",
@@ -1972,7 +1916,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 40,
         "nivel": "intermediario",
         "pergunta_chave": "Seu fornecedor crítico tem acesso aos seus dados: como você sabe que ele protege, e como sai do contrato se precisar?",
-        "simulador_nome": "Avaliador de Fornecedores",
         "fatos": [
             "Due diligence proporcional à criticidade",
             "Cláusulas: incidente, auditoria, subcontratação, saída",
@@ -1990,7 +1933,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "intermediario",
         "pergunta_chave": "O controle está no papel. Como você prova que ele funcionou o ano inteiro?",
-        "simulador_nome": "Testador de ITGC",
         "fatos": [
             "SOX 404 e ICFR",
             "4 domínios de ITGC",
@@ -2008,7 +1950,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 45,
         "nivel": "intermediario",
         "pergunta_chave": "O SIEM gerou 40 mil alertas no trimestre. O que disso o conselho precisa saber?",
-        "simulador_nome": "Do SIEM ao Conselho",
         "fatos": [
             "Modelo das três linhas (IIA, 2020)",
             "Função Govern do NIST CSF 2.0",
@@ -2026,7 +1967,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "avancado",
         "pergunta_chave": "Você chegou como primeiro CISO da empresa. O que acontece nos primeiros 90 dias?",
-        "simulador_nome": "Alocador de Programa",
         "fatos": [
             "Perfil atual e perfil alvo (NIST CSF 2.0)",
             "Níveis (tiers) 1 a 4",
@@ -2044,7 +1984,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 40,
         "nivel": "intermediario",
         "pergunta_chave": "Por que escrever 300 bytes num campo de 64 pode dar ao atacante o controle do servidor?",
-        "simulador_nome": "Inspetor de Bytes",
         "fatos": [
             "Pilha, heap e o estouro de buffer",
             "ASLR, DEP/NX e stack canaries",
@@ -2063,7 +2002,6 @@ ESTUDOS_DADOS: Dict[str, Dict[str, Any]] = {
         "tempo_minutos": 50,
         "nivel": "avancado",
         "pergunta_chave": "Um servidor web foi comprometido e viraram root. Em que ponto da cadeia o defensor podia ter visto e parado o ataque?",
-        "simulador_nome": "Console do Defensor",
         "fatos": [
             "A cadeia: reconhecimento, exploração, acesso e escalada",
             "Sinal de ouro: servidor web iniciando um shell (EDR/Sysmon)",

@@ -18,10 +18,9 @@ BASE_JS = GERADORES / "base.js"
 
 ITENS_TOC = [
     ("s1", "teoria", "📘", "Teoria", "Fundamentos"),
-    ("s2", "laboratorio", "🧪", "Laboratório", "Simulador"),
-    ("s3", "checklist", "☑️", "Checklist", "Checklist final"),
-    ("s4", "questoes", "❓", "Questões de concurso", "Questões"),
-    ("s5", "referencias", "📚", "Referências", "Referências"),
+    ("s2", "checklist", "☑️", "Checklist", "Checklist final"),
+    ("s3", "questoes", "❓", "Questões de concurso", "Questões"),
+    ("s4", "referencias", "📚", "Referências", "Referências"),
 ]
 
 
@@ -40,7 +39,7 @@ def _toc_itens() -> str:
 def _secao(sid: str, tipo: str, icone: str, rotulo: str, n: int, corpo: str) -> str:
     return (
         f'<section class="study-section" id="{sid}" data-tipo="{tipo}" style="min-height:1200px">\n'
-        f'<div class="shead"><span class="stype">{icone} {rotulo} · Seção {n} de 5</span><h2>{rotulo}</h2></div>\n'
+        f'<div class="shead"><span class="stype">{icone} {rotulo} · Seção {n} de 4</span><h2>{rotulo}</h2></div>\n'
         f"{corpo}\n</section>"
     )
 
@@ -72,10 +71,9 @@ def pagina_fixture() -> str:
     )
     secoes = [
         _secao("s1", "teoria", "📘", "Teoria", 1, "<p>Texto de teoria.</p>"),
-        _secao("s2", "laboratorio", "🧪", "Laboratório", 2, '<div class="lab-box"><div class="lab-body">Simulador</div></div>'),
-        _secao("s3", "checklist", "☑️", "Checklist", 3, checklist),
-        _secao("s4", "questoes", "❓", "Questões de concurso", 4, _flashcard("q1", 1) + _flashcard("q2", 2) + multipla),
-        _secao("s5", "referencias", "📚", "Referências", 5, "<ul><li>Referência</li></ul>"),
+        _secao("s2", "checklist", "☑️", "Checklist", 2, checklist),
+        _secao("s3", "questoes", "❓", "Questões de concurso", 3, _flashcard("q1", 1) + _flashcard("q2", 2) + multipla),
+        _secao("s4", "referencias", "📚", "Referências", 4, "<ul><li>Referência</li></ul>"),
     ]
     return f"""<!DOCTYPE html>
 <html lang="pt-BR">
@@ -147,37 +145,38 @@ class TestBaseJs(unittest.TestCase):
             barra: document.querySelector('.toc-progresso').style.getPropertyValue('--progresso')}), 300);""")
         self.assertEqual(r["saida"]["on"], "#s3")
         self.assertEqual(r["saida"]["atual"], "true")
-        self.assertIn("Checklist", r["saida"]["tipo"])
+        self.assertIn("Questões", r["saida"]["tipo"])
         self.assertEqual(r["saida"]["lidas"][:2], ["s1", "s2"])
         self.assertTrue(r["saida"]["lida"])
-        self.assertEqual(r["saida"]["pct"], "40%")
-        self.assertEqual(r["saida"]["barra"], "40%")
+        self.assertEqual(r["saida"]["pct"], "50%")
+        self.assertEqual(r["saida"]["barra"], "50%")
 
     def test_rolagem_sequencial_ate_o_fim_marca_tudo(self):
         r = executar(pagina_fixture(), self.SCRIPT_PASSO + """
-          ['s1', 's2', 's3', 's4', 's5'].forEach(ir);
+          ['s1', 's2', 's3', 's4'].forEach(ir);
           window.scrollTo(0, document.documentElement.scrollHeight); window.dispatchEvent(new Event('scroll'));
           setTimeout(() => __fim({lidas: lidas(),
             pronto: document.querySelector('.btn-concluir').classList.contains('pronto')}), 300);""")
-        self.assertEqual(r["saida"]["lidas"], ["s1", "s2", "s3", "s4", "s5"])
+        self.assertEqual(r["saida"]["lidas"], ["s1", "s2", "s3", "s4"])
         self.assertTrue(r["saida"]["pronto"])
 
     def test_salto_do_sumario_nao_marca_secoes_puladas(self):
         r = executar(pagina_fixture(), self.SCRIPT_PASSO + """
-          ir('s1'); ir('s5');
+          ir('s1'); ir('s4');
           window.scrollTo(0, document.documentElement.scrollHeight); window.dispatchEvent(new Event('scroll'));
           setTimeout(() => __fim({lidas: lidas(),
             pronto: document.querySelector('.btn-concluir').classList.contains('pronto')}), 300);""")
-        self.assertEqual(r["saida"]["lidas"], ["s1", "s5"])
+        self.assertEqual(r["saida"]["lidas"], ["s1", "s4"])
         self.assertFalse(r["saida"]["pronto"])
 
     def test_salto_so_conta_secoes_que_foram_atuais(self):
         r = executar(pagina_fixture(), self.SCRIPT_PASSO + """
-          ir('s1'); ir('s3'); ir('s5');
+          ir('s1'); ir('s3'); ir('s4');
           setTimeout(() => __fim({lidas: lidas()}), 300);""")
         self.assertNotIn("s2", r["saida"]["lidas"])
-        self.assertNotIn("s4", r["saida"]["lidas"])
         self.assertIn("s3", r["saida"]["lidas"])
+        # Seção atual ainda não entra em cs_read até sair dela.
+        self.assertEqual(r["saida"]["lidas"], ["s1", "s3"])
 
     def test_initchecklist_ignora_argumento_com_data_slug(self):
         r = executar(pagina_fixture(), """
@@ -192,7 +191,7 @@ class TestBaseJs(unittest.TestCase):
             executar(pagina_fixture(), "document.querySelector('#c2').click(); __fim(1)", perfil=Path(perfil))
             r = executar(pagina_fixture(), """__fim({marcado: document.querySelector('#c2').checked,
                 cab: document.querySelector('.checklist-head').textContent,
-                cnt: document.querySelector('a[href="#s3"] .toc-contador').textContent})""", perfil=Path(perfil))
+                cnt: document.querySelector('a[href="#s2"] .toc-contador').textContent})""", perfil=Path(perfil))
         self.assertTrue(r["saida"]["marcado"])
         self.assertIn("1 de 3", r["saida"]["cab"])
         self.assertEqual(r["saida"]["cnt"], "1/3")
@@ -211,7 +210,7 @@ class TestBaseJs(unittest.TestCase):
         r = executar(pagina_fixture(), """
           const d = document.querySelector('[data-q="q2"] details'); d.open = true; d.dispatchEvent(new Event('toggle'));
           document.querySelector('[data-q="q2"] .quiz-selfeval [data-v="acertei"]').click();
-          __fim({cnt: document.querySelector('a[href="#s4"] .toc-contador').textContent,
+          __fim({cnt: document.querySelector('a[href="#s3"] .toc-contador').textContent,
                  placar: document.querySelector('.quiz-score').textContent})""")
         self.assertEqual(r["saida"]["cnt"], "1/3")
         self.assertIn("1", r["saida"]["placar"])
@@ -221,7 +220,7 @@ class TestBaseJs(unittest.TestCase):
           document.querySelector('#alt-errada').click(); document.querySelector('#alt-certa').click();
           __fim({res: document.querySelector('[data-q="q3"]').dataset.res,
                  chave: localStorage.getItem('cs_quiz_Teste_q3'),
-                 cnt: document.querySelector('a[href="#s4"] .toc-contador').textContent})""")
+                 cnt: document.querySelector('a[href="#s3"] .toc-contador').textContent})""")
         self.assertEqual(r["saida"], {"res": "errei", "chave": "errei", "cnt": "0/3"})
 
     def test_multipla_escolha_acerto(self):
@@ -271,12 +270,8 @@ class TestBaseJs(unittest.TestCase):
           setTimeout(() => __fim({porOverlay, porItem, foco: document.activeElement === t}), 100)""", largura=400)
         self.assertEqual(r["saida"], {"porOverlay": True, "porItem": True, "foco": True})
 
-    def test_lab_progress_no_sumario(self):
-        r = executar(pagina_fixture(), "CS.labProgress(2, 4); __fim(document.querySelector('a[href=\"#s2\"] .toc-contador').textContent)")
-        self.assertEqual(r["saida"], "2/4")
-
-    def test_lab_sem_progresso_sem_contador(self):
-        r = executar(pagina_fixture(), "__fim(document.querySelector('a[href=\"#s2\"] .toc-contador').textContent)")
+    def test_teoria_sem_contador_de_progresso(self):
+        r = executar(pagina_fixture(), "__fim(document.querySelector('a[href=\"#s1\"] .toc-contador').textContent)")
         self.assertEqual(r["saida"], "")
 
     def test_api_publica_preservada(self):

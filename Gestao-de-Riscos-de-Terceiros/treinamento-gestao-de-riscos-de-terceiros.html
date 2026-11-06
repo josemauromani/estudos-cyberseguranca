@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Gestao-de-Riscos-de-Terceiros">
@@ -2120,7 +1736,6 @@ dfn.glossario:focus-visible {
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: O Fornecedor Também Faz Parte da Sua Superfície de Ataque</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#ciclo-evidencias-e-clausulas" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Due Diligence, Cláusulas Mínimas, Monitoramento e Plano de Saída</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Avaliador de Fornecedores</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist do Programa de Riscos de Terceiros</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2136,14 +1751,14 @@ dfn.glossario:focus-visible {
   <h1>Gestão de Riscos de Terceiros e Fornecedores</h1>
   <p class="mhead-sub">Due diligence, cláusulas mínimas, monitoramento e plano de saída</p>
   <div class="chips"><span class="chip">⏱ 40 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Govern</span><span class="chip">🎯 ATT&amp;CK T1195 Supply Chain Compromise / T1199 Trusted Relationship</span><span class="chip">👤 GRC &amp; Auditoria · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 57: Gestao-de-Riscos-de-Terceiros Body Fragment -->
 <article class="study-container" data-slug="gestao-de-riscos-de-terceiros">
 
     <!-- SEÇÃO 1: O FORNECEDOR QUE GUARDA SEUS DADOS -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: O Fornecedor Também Faz Parte da Sua Superfície de Ataque</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 5</small></span><h2>Introdução: O Fornecedor Também Faz Parte da Sua Superfície de Ataque</h2></div>
 
         <p class="lead-text">
             A Ipê Pay (instituição de pagamento fictícia) vai fechar três contratos em novembro de 2026: um provedor de nuvem para o ambiente de recuperação de desastres, um gateway de SMS com pontuação antifraude e uma empresa de cobrança que vai receber a lista de clientes inadimplentes. Os três mandaram questionários respondidos, certificados e relatórios. A área de compras quer assinar até o fim do mês. A pergunta da segurança é outra: esses documentos provam o que parecem provar? O certificado ISO 27001 cobre o serviço que vai ser contratado? O relatório SOC 2 mostra controles funcionando ao longo de meses ou só no dia da foto? Quem são os subcontratados que também vão tocar nos dados? E, se o contrato der errado, como a Ipê Pay recupera os dados e sai? Este módulo trata do ciclo de vida do terceiro: avaliar, contratar, monitorar e sair.
@@ -2173,14 +1788,14 @@ dfn.glossario:focus-visible {
                 <strong>Por que isso é segurança, e não só compras</strong>
             </div>
             <p>
-                O MITRE ATT&amp;CK descreve dois caminhos pelo fornecedor: <strong>T1195 Supply Chain Compromise</strong>, quando o atacante compromete um produto ou atualização antes de chegar ao cliente (o caso da atualização adulterada do SolarWinds Orion, em 2020), e <strong>T1199 Trusted Relationship</strong>, quando usa o acesso legítimo que um prestador tem ao ambiente do cliente (o ataque de 2021 que usou a ferramenta de gestão remota Kaseya VSA para levar ransomware aos clientes de prestadores de serviços gerenciados). Nos dois, o controle que falhou não estava na sua rede. Os fornecedores e os dados dos casos do simulador são fictícios.
+                O MITRE ATT&amp;CK descreve dois caminhos pelo fornecedor: <strong>T1195 Supply Chain Compromise</strong>, quando o atacante compromete um produto ou atualização antes de chegar ao cliente (o caso da atualização adulterada do SolarWinds Orion, em 2020), e <strong>T1199 Trusted Relationship</strong>, quando usa o acesso legítimo que um prestador tem ao ambiente do cliente (o ataque de 2021 que usou a ferramenta de gestão remota Kaseya VSA para levar ransomware aos clientes de prestadores de serviços gerenciados). Nos dois, o controle que falhou não estava na sua rede. Os fornecedores e os dados dos casos da checklist são fictícios.
             </p>
         </div>
     </section>
 
     <!-- SEÇÃO 2: CICLO DE VIDA, EVIDÊNCIAS E CLÁUSULAS -->
     <section class="study-section" id="ciclo-evidencias-e-clausulas" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Due Diligence, Cláusulas Mínimas, Monitoramento e Plano de Saída</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 5</small></span><h2>Due Diligence, Cláusulas Mínimas, Monitoramento e Plano de Saída</h2></div>
 
         <h3>O ciclo de vida do terceiro</h3>
         <p>
@@ -2213,7 +1828,7 @@ dfn.glossario:focus-visible {
 
         <h3>Criticidade, risco inerente e risco residual</h3>
         <p>
-            São três medidas diferentes, e confundi-las é o erro mais comum. A <strong>criticidade</strong> diz quanto o fornecedor importa para a Ipê Pay: que dados recebe e quanto a operação depende dele. Ela define a profundidade da due diligence e as cláusulas exigidas, e não muda com os controles do fornecedor. O <strong>risco inerente</strong> combina esse impacto com a probabilidade, que cresce com o acesso que o fornecedor terá e com a existência de subcontratados. O <strong>risco residual</strong> é o que sobra depois dos controles do fornecedor, mas só dos controles <em>comprovados</em> por evidência válida. O simulador usa estas regras (uma convenção didática; cada empresa calibra a sua):
+            São três medidas diferentes, e confundi-las é o erro mais comum. A <strong>criticidade</strong> diz quanto o fornecedor importa para a Ipê Pay: que dados recebe e quanto a operação depende dele. Ela define a profundidade da due diligence e as cláusulas exigidas, e não muda com os controles do fornecedor. O <strong>risco inerente</strong> combina esse impacto com a probabilidade, que cresce com o acesso que o fornecedor terá e com a existência de subcontratados. O <strong>risco residual</strong> é o que sobra depois dos controles do fornecedor, mas só dos controles <em>comprovados</em> por evidência válida.. A checklist usa estas regras (uma convenção didática; cada empresa calibra a sua):
         </p>
         <div class="table-responsive">
             <table class="data-table">
@@ -2311,34 +1926,10 @@ Grafica Pitanga;impressao de material promocional;0;0;0;baixa;questionario;2028-
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 3 de 6</small></span><h2>Laboratório Prático: Avaliador de Fornecedores</h2></div>
-
-        <p class="lead-text">
-            Três fornecedores fictícios aguardam a decisão da Ipê Pay. Para cada um, leia o questionário e as evidências e: (1) classifique a criticidade; (2) indique a faixa do risco inerente; (3) marque as evidências que você aceita como válidas; (4) escolha as cláusulas obrigatórias; (5) decida entre contratar, contratar com condições ou recusar. Ao corrigir, o simulador mostra o cálculo completo, o risco residual (o real e o que resultaria das evidências que você aceitou), as condições e o que falta no plano de saída. Cada fornecedor vale até 5 pontos.
-        </p>
-
-        <div class="lab-box grt-lab" id="grt-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Criticidade, evidências, cláusulas e saída</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Avaliador de Fornecedores: Ipê Pay</h3>
-                    <p id="grt-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
-                </div>
-            </div>
-
-            <div class="lab-body" style="min-width: 0;">
-                <div id="grt-fornecedores" role="group" aria-label="Escolha o fornecedor" style="display: flex; flex-wrap: wrap; gap: 0.4rem;"></div>
-                <div id="grt-placar" aria-live="polite" style="margin-top: 0.6rem; font-size: 0.85rem; font-weight: 600;"></div>
-                <div id="grt-fornecedor" style="margin-top: 0.8rem; min-width: 0; overflow-wrap: anywhere;"></div>
-                <p style="font-size: 0.76rem; color: var(--muted); margin: 0.8rem 0 0 0;">Fornecedores, certificados e relatórios inventados. As regras de pontuação são uma convenção didática; cada programa de terceiros calibra as suas.</p>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist do Programa de Riscos de Terceiros</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 3 de 5</small></span><h2>Checklist do Programa de Riscos de Terceiros</h2></div>
 
         <p class="lead-text">
             Use como roteiro para montar ou auditar um programa de gestão de terceiros. O estado das caixas fica salvo no seu navegador.
@@ -2378,7 +1969,7 @@ Grafica Pitanga;impressao de material promocional;0;0;0;baixa;questionario;2028-
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 4 de 5</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2418,7 +2009,7 @@ Grafica Pitanga;impressao de material promocional;0;0;0;baixa;questionario;2028-
 
         <div class="quiz-item" data-q="q4">
             <div class="quiz-question">
-                <strong>Questão 4 (Criticidade e risco):</strong> O provedor de nuvem é o fornecedor mais crítico da Ipê Pay e, mesmo assim, o simulador recomenda contratá-lo sem condições. Isso é contraditório?
+                <strong>Questão 4 (Criticidade e risco):</strong> O provedor de nuvem é o fornecedor mais crítico da Ipê Pay e, mesmo assim, a checklist recomenda contratá-lo sem condições. Isso é contraditório?
             </div>
             <details class="quiz-details">
                 <summary class="quiz-toggle">Ver resposta explicada</summary>
@@ -2455,7 +2046,7 @@ Grafica Pitanga;impressao de material promocional;0;0;0;baixa;questionario;2028-
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 5 de 5</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2504,611 +2095,7 @@ Grafica Pitanga;impressao de material promocional;0;0;0;baixa;questionario;2028-
 </section>
 
 </article>
-<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
-<script type="application/json" id="grt-dados">
-{
- "contexto": "Ipê Pay Instituição de Pagamento S.A. (fictícia) avalia três fornecedores fictícios em novembro de 2026. Empresas, certificados, relatórios e pessoas inventados. Apetite a risco de terceiros: residual até 9 (Médio).",
- "data_ref": "2026-11-02",
- "apetite": 9,
- "limite_recusa": 16,
- "faixas": [
-  {"nome": "Baixo", "min": 1, "max": 4},
-  {"nome": "Médio", "min": 5, "max": 9},
-  {"nome": "Alto", "min": 10, "max": 15},
-  {"nome": "Crítico", "min": 16, "max": 25}
- ],
- "eixos": {
-  "dados": {"titulo": "Dados que o fornecedor recebe",
-   "niveis": ["Nenhum dado da Ipê Pay", "Dados internos, sem dados pessoais", "Dados pessoais de clientes", "Dados financeiros em tempo real ou de autenticação"]},
-  "acesso": {"titulo": "Acesso a sistemas da Ipê Pay",
-   "niveis": ["Nenhum acesso", "Portal ou troca de arquivos", "Integração por API com produção", "Administração da infraestrutura"]},
-  "dependencia": {"titulo": "Dependência da operação",
-   "niveis": ["Troca em dias, sem efeito no cliente", "Troca em semanas, efeito limitado", "Parada afeta clientes", "Parada interrompe contas e Pix"]}
- },
- "clausulas": {
-  "notificacao_incidente": {"nome": "Notificação de incidente com prazo contratual",
-   "explicacao": "O fornecedor avisa a Ipê Pay de incidente que afete os dados ou o serviço num prazo fixado no contrato (por exemplo, 24 horas da detecção), com conteúdo mínimo e contato definido. Sem prazo escrito, você descobre pelo jornal."},
-  "direito_auditoria": {"nome": "Direito de auditoria",
-   "explicacao": "A Ipê Pay pode auditar o fornecedor, diretamente ou por auditor independente, e recebe os relatórios anuais (SOC 2 Tipo II, certificado renovado). Sem ela, só resta a autodeclaração."},
-  "subcontratacao": {"nome": "Subcontratação com aviso prévio",
-   "explicacao": "Subcontratados que tocam nos dados só entram com aviso prévio e direito de objeção, e herdam as mesmas obrigações de segurança (ISO 27002, 5.21)."},
-  "localizacao_dados": {"nome": "Localização dos dados",
-   "explicacao": "O contrato indica os países e regiões onde os dados podem ser armazenados e processados; mudança depende de aviso e aprovação."},
-  "devolucao_eliminacao": {"nome": "Devolução e eliminação de dados",
-   "explicacao": "No fim do contrato, os dados voltam à Ipê Pay e depois são eliminados, com comprovação, inclusive nos subcontratados."},
-  "plano_saida": {"nome": "Plano de saída",
-   "explicacao": "Transição assistida com o serviço mantido, exportação em formato aberto, alternativa identificada e gatilhos de saída. Exigido dos fornecedores críticos."},
-  "acesso_regulador": {"nome": "Acesso do Banco Central a contratos, documentos e dados",
-   "explicacao": "Exigência da Res. CMN 4.893 (alterada pela CMN 5.274/2025) e da Res. BCB 85 para a contratação relevante de processamento, armazenamento de dados e computação em nuvem: o regulador acessa contratos, documentos e dados do serviço."}
- },
- "clausulas_por_criticidade": {
-  "baixa": ["notificacao_incidente", "devolucao_eliminacao"],
-  "media": ["notificacao_incidente", "direito_auditoria", "subcontratacao", "devolucao_eliminacao"],
-  "critica": ["notificacao_incidente", "direito_auditoria", "subcontratacao", "localizacao_dados", "devolucao_eliminacao", "plano_saida"]
- },
- "clausulas_nuvem_relevante": ["acesso_regulador", "localizacao_dados"],
- "itens_saida": {
-  "exportacao_formato_aberto": "Exportação completa dos dados em formato aberto e documentado",
-  "prazo_transicao": "Período de transição com o serviço mantido (por exemplo, 90 dias)",
-  "transferencia_antes_exclusao": "Transferência dos dados ao novo prestador ou à Ipê Pay antes de qualquer exclusão",
-  "eliminacao_certificada": "Eliminação comprovada por certificado, inclusive nos subcontratados",
-  "fornecedor_alternativo": "Alternativa identificada (outro fornecedor ou serviço interno) e testada",
-  "gatilhos_saida": "Gatilhos de saída definidos (incidente grave, descumprimento reiterado, mudança de controle)"
- },
- "saida_por_criticidade": {
-  "baixa": ["eliminacao_certificada"],
-  "media": ["exportacao_formato_aberto", "transferencia_antes_exclusao", "eliminacao_certificada"],
-  "critica": ["exportacao_formato_aberto", "prazo_transicao", "transferencia_antes_exclusao", "eliminacao_certificada", "fornecedor_alternativo", "gatilhos_saida"]
- },
- "fornecedores": [
-  {"id": "F1", "nome": "Cumaru Nuvem", "servico": "Provedor de nuvem para o ambiente de recuperação de desastres do núcleo de contas e do Pix",
-   "nuvem_relevante": true,
-   "eixos": {"dados": 3, "acesso": 3, "dependencia": 3},
-   "questionario": [
-    {"pergunta": "Que dados da Ipê Pay o serviço recebe?", "resposta": "Réplica integral do núcleo de contas de pagamento e do módulo Pix, inclusive saldos e transações em tempo real."},
-    {"pergunta": "Que acesso o fornecedor terá?", "resposta": "Administra hipervisores, rede e armazenamento físico das regiões contratadas."},
-    {"pergunta": "Quanto a operação depende do serviço?", "resposta": "Em desastre no ambiente principal, assume a operação de contas e do Pix."},
-    {"pergunta": "Onde os dados ficam?", "resposta": "Regiões Sul-1 e Sul-2, ambas no Brasil; o contrato proposto lista as duas regiões."},
-    {"pergunta": "Usa subcontratados no serviço?", "resposta": "Sim: Pinhal Data Centers, que opera as instalações físicas das duas regiões."},
-    {"pergunta": "Prazo de notificação de incidente?", "resposta": "Até 24 horas da detecção, com relatório final em 10 dias."},
-    {"pergunta": "Aceita as cláusulas-padrão da Ipê Pay?", "resposta": "Sim, inclusive auditoria e acesso do Banco Central."}
-   ],
-   "quarta_parte": [
-    {"nome": "Pinhal Data Centers", "servico": "Instalações físicas das regiões Sul-1 e Sul-2", "critico": true, "declarado": true}
-   ],
-   "evidencias": [
-    {"id": "F1-iso", "tipo": "iso27001", "titulo": "Certificado ISO/IEC 27001:2022",
-     "detalhe": "Escopo: operação dos serviços de computação, armazenamento e rede em nuvem nas regiões Sul-1 e Sul-2, incluindo a administração da infraestrutura. Válido até 15/03/2028.",
-     "cobre_servico": true, "validade": "2028-03-15"},
-    {"id": "F1-soc2", "tipo": "soc2", "titulo": "Relatório SOC 2 Tipo II",
-     "detalhe": "Período de 12 meses (01/07/2025 a 30/06/2026), emitido há 4 meses. Uma exceção: uma revisão trimestral de acessos foi concluída com 10 dias de atraso, sem acesso indevido encontrado. Organizações subcontratadas: Pinhal Data Centers.",
-     "tipo_relatorio": "II", "periodo_meses": 12, "emitido_ha_meses": 4,
-     "excecoes": [{"texto": "Revisão trimestral de acessos concluída com 10 dias de atraso, sem acesso indevido", "relevante": false}]},
-    {"id": "F1-pentest", "tipo": "pentest", "titulo": "Sumário de teste de intrusão",
-     "detalhe": "Empresa independente, realizado há 4 meses no painel e nas APIs de gestão. Dois achados médios, nenhum crítico em aberto; reteste concluído.",
-     "meses_desde": 4, "criticos_abertos": 0, "independente": true},
-    {"id": "F1-sub", "tipo": "subcontratados", "titulo": "Declaração de subcontratados",
-     "detalhe": "Declara um subcontratado: Pinhal Data Centers (instalações físicas). Bate com o relatório SOC 2."}
-   ],
-   "plano_saida": ["exportacao_formato_aberto", "prazo_transicao", "transferencia_antes_exclusao", "eliminacao_certificada", "fornecedor_alternativo", "gatilhos_saida"],
-   "recusa_clausulas": [],
-   "explicacao": "Criticidade máxima e risco inerente Crítico, mas com evidências válidas e completas, subcontratado declarado e plano de saída completo: o residual cai para dentro do apetite. Criticidade alta exige mais evidência e mais cláusulas, não impede a contratação. Como é contratação relevante de nuvem, entram também a localização dos dados e o acesso do Banco Central."},
-  {"id": "F2", "nome": "Sabiá Mensageria", "servico": "Gateway de SMS para códigos de confirmação e pontuação antifraude das transações",
-   "nuvem_relevante": false,
-   "eixos": {"dados": 3, "acesso": 2, "dependencia": 1},
-   "questionario": [
-    {"pergunta": "Que dados da Ipê Pay o serviço recebe?", "resposta": "Nome e telefone do cliente e, para cada transação, valor, conta de destino e identificador do dispositivo, em tempo real."},
-    {"pergunta": "Que acesso o fornecedor terá?", "resposta": "Integração por API com o motor de pagamentos em produção."},
-    {"pergunta": "Quanto a operação depende do serviço?", "resposta": "Se parar, o aplicativo usa notificação push para o código e regras antifraude internas mais simples; a troca de fornecedor leva semanas."},
-    {"pergunta": "Usa subcontratados no serviço?", "resposta": "Sim: Bem-te-vi Telecom, agregador que encaminha as mensagens às operadoras."},
-    {"pergunta": "Tem certificação ISO 27001?", "resposta": "Sim, certificado anexo."},
-    {"pergunta": "Prazo de notificação de incidente?", "resposta": "Até 48 horas; aceita negociar 24 horas."},
-    {"pergunta": "Aceita as cláusulas-padrão da Ipê Pay?", "resposta": "Sim, inclusive auditoria por auditor independente."}
-   ],
-   "quarta_parte": [
-    {"nome": "Bem-te-vi Telecom", "servico": "Agregador de SMS", "critico": true, "declarado": true}
-   ],
-   "evidencias": [
-    {"id": "F2-iso", "tipo": "iso27001", "titulo": "Certificado ISO/IEC 27001:2022",
-     "detalhe": "Escopo: desenvolvimento de software e suporte administrativo na sede de Joinville. Válido até 30/06/2027. A plataforma de envio e o motor antifraude rodam em data center de terceiros, fora do escopo.",
-     "cobre_servico": false, "validade": "2027-06-30"},
-    {"id": "F2-soc2", "tipo": "soc2", "titulo": "Relatório SOC 2 Tipo II",
-     "detalhe": "Período de 6 meses (01/01/2026 a 30/06/2026), emitido há 3 meses, cobrindo a plataforma de envio e o motor antifraude. Uma exceção: em 3 de 25 amostras, contas de ex-funcionários foram desativadas mais de 30 dias depois do desligamento. Organizações subcontratadas: Bem-te-vi Telecom.",
-     "tipo_relatorio": "II", "periodo_meses": 6, "emitido_ha_meses": 3,
-     "excecoes": [{"texto": "Contas de ex-funcionários desativadas mais de 30 dias após o desligamento (3 de 25 amostras)", "relevante": true}]},
-    {"id": "F2-pentest", "tipo": "pentest", "titulo": "Sumário de teste de intrusão",
-     "detalhe": "Empresa independente, há 8 meses, na API e no portal. Um achado crítico encontrado e corrigido, com reteste; nenhum crítico em aberto.",
-     "meses_desde": 8, "criticos_abertos": 0, "independente": true},
-    {"id": "F2-sub", "tipo": "subcontratados", "titulo": "Declaração de subcontratados",
-     "detalhe": "Declara um subcontratado: Bem-te-vi Telecom (agregador de SMS). Bate com o relatório SOC 2."}
-   ],
-   "plano_saida": ["exportacao_formato_aberto", "eliminacao_certificada", "gatilhos_saida"],
-   "recusa_clausulas": [],
-   "explicacao": "Crítico pelos dados de transação em tempo real. O certificado ISO é verdadeiro, mas o escopo não cobre a plataforma contratada: não reduz risco. O SOC 2 Tipo II vale, com uma exceção relevante (desligamento lento) que vira condição. Residual Alto, acima do apetite, sem bloqueio: contratar com condições, fechando as lacunas do plano de saída e exigindo evidência do escopo correto."},
-  {"id": "F3", "nome": "Jatobá Cobranças", "servico": "Cobrança extrajudicial de clientes inadimplentes da Ipê Pay",
-   "nuvem_relevante": false,
-   "eixos": {"dados": 2, "acesso": 1, "dependencia": 1},
-   "questionario": [
-    {"pergunta": "Que dados da Ipê Pay o serviço recebe?", "resposta": "Nome, documento, telefone, endereço e valor devido dos clientes inadimplentes."},
-    {"pergunta": "Que acesso o fornecedor terá?", "resposta": "Recebe um arquivo semanal por SFTP; não acessa sistemas da Ipê Pay."},
-    {"pergunta": "Quanto a operação depende do serviço?", "resposta": "A cobrança pode passar a outra empresa; a troca leva semanas."},
-    {"pergunta": "Usa subcontratados no serviço?", "resposta": "Não utilizamos subcontratados."},
-    {"pergunta": "Tem relatório de auditoria independente?", "resposta": "Sim, SOC 2 completo, aprovado sem ressalvas."},
-    {"pergunta": "Direito de auditoria?", "resposta": "Não aceitamos auditorias de clientes; enviamos questionário anual respondido."},
-    {"pergunta": "Prazo de notificação de incidente?", "resposta": "Aceita 24 horas."}
-   ],
-   "quarta_parte": [
-    {"nome": "Guará Contact", "servico": "Central de atendimento terceirizada que liga para os devedores", "critico": true, "declarado": false},
-    {"nome": "Lince CRM", "servico": "CRM em nuvem que armazena a base de devedores", "critico": true, "declarado": false}
-   ],
-   "evidencias": [
-    {"id": "F3-soc2", "tipo": "soc2", "titulo": "Relatório SOC 2 (enviado como \"SOC 2 completo\")",
-     "detalhe": "Primeira página: relatório SOC 2 Tipo I com data-base de 31/08/2026, sobre o desenho dos controles naquela data; não há período de teste. Organizações subcontratadas excluídas do relatório: Guará Contact (central de atendimento) e Lince CRM (CRM em nuvem).",
-     "tipo_relatorio": "I", "periodo_meses": 0, "emitido_ha_meses": 2, "excecoes": []},
-    {"id": "F3-pentest", "tipo": "pentest", "titulo": "Relatório de teste de intrusão",
-     "detalhe": "Realizado há 20 meses pela equipe interna de TI do próprio fornecedor; não houve reteste.",
-     "meses_desde": 20, "criticos_abertos": 0, "independente": false},
-    {"id": "F3-sub", "tipo": "subcontratados", "titulo": "Declaração de subcontratados",
-     "detalhe": "Declara: \"Não utilizamos subcontratados no serviço.\""}
-   ],
-   "plano_saida": ["exportacao_formato_aberto"],
-   "recusa_clausulas": ["direito_auditoria"],
-   "explicacao": "Criticidade média (dados pessoais, troca em semanas). Nenhuma evidência vale: o SOC 2 é Tipo I, o teste de intrusão é antigo e interno, e a declaração de subcontratados omite a central de atendimento e o CRM que aparecem no próprio relatório. A omissão eleva o residual a Alto e, sobretudo, o fornecedor recusa o direito de auditoria, cláusula obrigatória para a criticidade média: recusar."}
- ]
-}
-</script>
-<script>
-(function() {
-    var D = JSON.parse(document.getElementById("grt-dados").textContent);
-    var ROTULO_CRIT = { baixa: "Baixa", media: "Média", critica: "Crítica" };
-    var ROTULO_DECISAO = { contratar: "Contratar", condicoes: "Contratar com condições", recusar: "Recusar" };
-    var ROTULO_TIPO_EV = { iso27001: "ISO/IEC 27001", soc2: "SOC 2", pentest: "Teste de intrusão", subcontratados: "Subcontratados" };
-    var estado = { atual: D.fornecedores[0].id, f: {} };
-
-    function novoEstado() { return { criticidade: null, faixa: null, aceitas: {}, clausulas: {}, decisao: null, resultado: null }; }
-    D.fornecedores.forEach(function(f) { estado.f[f.id] = novoEstado(); });
-
-    function $(id) { return document.getElementById(id); }
-    function el(tag, texto, estilo) {
-        var e = document.createElement(tag);
-        if (texto !== undefined && texto !== null) e.textContent = texto;
-        if (estilo) e.setAttribute("style", estilo);
-        return e;
-    }
-    function fornPorId(id) {
-        for (var i = 0; i < D.fornecedores.length; i++) if (D.fornecedores[i].id === id) return D.fornecedores[i];
-        return null;
-    }
-    function temRelevante(ev) {
-        return (ev.excecoes || []).some(function(x) { return x.relevante; });
-    }
-
-    // ================================================ regras (espelhadas nos testes)
-    window.impactoFornecedor = function(f) {
-        var d = f.eixos.dados, p = f.eixos.dependencia;
-        return Math.min(5, 1 + Math.max(d, p) + (Math.min(d, p) >= 2 ? 1 : 0));
-    };
-
-    window.probabilidadeFornecedor = function(f) {
-        return Math.min(5, 1 + f.eixos.acesso + (f.quarta_parte.length ? 1 : 0));
-    };
-
-    window.criticidadeFornecedor = function(f) {
-        var i = window.impactoFornecedor(f);
-        return i >= 4 ? "critica" : (i >= 2 ? "media" : "baixa");
-    };
-
-    window.riscoInerente = function(f) {
-        return window.impactoFornecedor(f) * window.probabilidadeFornecedor(f);
-    };
-
-    window.faixaRisco = function(pontos) {
-        for (var i = 0; i < D.faixas.length; i++) {
-            if (pontos >= D.faixas[i].min && pontos <= D.faixas[i].max) return D.faixas[i].nome;
-        }
-        return null;
-    };
-
-    window.validarEvidencia = function(ev, f) {
-        if (ev.tipo === "iso27001") {
-            if (!ev.cobre_servico) return { valida: false, motivo: "O escopo do certificado não cobre o serviço contratado." };
-            if (ev.validade < D.data_ref) return { valida: false, motivo: "Certificado vencido." };
-            return { valida: true, motivo: "Escopo cobre o serviço e o certificado está na validade." };
-        }
-        if (ev.tipo === "soc2") {
-            if (ev.tipo_relatorio !== "II") return { valida: false, motivo: "É um SOC 2 Tipo I: avalia o desenho numa data, não o funcionamento ao longo de um período." };
-            if (ev.periodo_meses < 6) return { valida: false, motivo: "Período coberto curto demais (menos de 6 meses)." };
-            if (ev.emitido_ha_meses > 12) return { valida: false, motivo: "Relatório com mais de 12 meses." };
-            return { valida: true, motivo: "SOC 2 Tipo II de " + ev.periodo_meses + " meses, emitido há " + ev.emitido_ha_meses + " meses" +
-                (temRelevante(ev) ? ", com exceção relevante (vale 1 ponto em vez de 2)." : ", sem exceção relevante.") };
-        }
-        if (ev.tipo === "pentest") {
-            if (!ev.independente) return { valida: false, motivo: "Teste feito pela própria equipe do fornecedor, sem independência." };
-            if (ev.meses_desde > 12) return { valida: false, motivo: "Teste com mais de 12 meses." };
-            if (ev.criticos_abertos > 0) return { valida: false, motivo: "Há achados críticos em aberto." };
-            return { valida: true, motivo: "Independente, recente e sem achado crítico em aberto." };
-        }
-        if (ev.tipo === "subcontratados") {
-            var ocultos = f.quarta_parte.filter(function(q) { return q.critico && !q.declarado; });
-            if (ocultos.length) return { valida: false, motivo: "Subcontratado crítico não declarado: " +
-                ocultos.map(function(q) { return q.nome + " (" + q.servico + ")"; }).join("; ") + "." };
-            return { valida: true, motivo: "Todos os subcontratados críticos foram declarados." };
-        }
-        return { valida: false, motivo: "Tipo de evidência desconhecido." };
-    };
-
-    function contribuicao(ev, aceita) {
-        var nominal = ev.tipo === "soc2" ? 2 - (temRelevante(ev) ? 1 : 0) : (ev.tipo === "subcontratados" ? 0 : 1);
-        if (aceita) return nominal;
-        return ev.tipo === "subcontratados" ? -1 : 0;
-    }
-
-    // aceitas: null usa a validade real; um objeto {id: true} usa as escolhas do aluno
-    window.reducaoRisco = function(f, aceitas) {
-        var total = 0;
-        f.evidencias.forEach(function(ev) {
-            var ok = aceitas ? aceitas[ev.id] === true : window.validarEvidencia(ev, f).valida;
-            total += contribuicao(ev, ok);
-        });
-        return Math.max(-1, Math.min(4, total));
-    };
-
-    window.riscoResidual = function(inerente, r) {
-        return Math.max(1, Math.floor((inerente * (100 - 20 * r) + 50) / 100));
-    };
-
-    window.clausulasObrigatorias = function(f) {
-        var base = D.clausulas_por_criticidade[window.criticidadeFornecedor(f)].slice();
-        if (f.nuvem_relevante) {
-            D.clausulas_nuvem_relevante.forEach(function(c) { if (base.indexOf(c) < 0) base.push(c); });
-        }
-        return Object.keys(D.clausulas).filter(function(c) { return base.indexOf(c) >= 0; });
-    };
-
-    window.lacunasSaida = function(f) {
-        return D.saida_por_criticidade[window.criticidadeFornecedor(f)].filter(function(i) {
-            return f.plano_saida.indexOf(i) < 0;
-        });
-    };
-
-    window.decidirFornecedor = function(f, aceitas) {
-        var r = window.reducaoRisco(f, aceitas || null);
-        var res = window.riscoResidual(window.riscoInerente(f), r);
-        var obrig = window.clausulasObrigatorias(f);
-        var bloqueios = f.recusa_clausulas.filter(function(c) { return obrig.indexOf(c) >= 0; });
-        var invalidas = f.evidencias.filter(function(ev) {
-            return !(aceitas ? aceitas[ev.id] === true : window.validarEvidencia(ev, f).valida);
-        }).map(function(ev) { return ev.id; });
-        var lac = window.lacunasSaida(f);
-        var pendencias = invalidas.concat(lac);
-        var dec;
-        if (bloqueios.length || res >= D.limite_recusa) dec = "recusar";
-        else if (res <= D.apetite && !pendencias.length) dec = "contratar";
-        else dec = "condicoes";
-        return { decisao: dec, residual: res, reducao: r, bloqueios: bloqueios, invalidas: invalidas,
-                 lacunas: lac, pendencias: pendencias };
-    };
-
-    // resp: {criticidade, faixa, aceitas: {id: true}, clausulas: {id: true}, decisao}
-    window.corrigirFornecedor = function(f, resp) {
-        var evStatus = {}, evOk = true;
-        f.evidencias.forEach(function(ev) {
-            var a = resp.aceitas[ev.id] === true, v = window.validarEvidencia(ev, f).valida;
-            evStatus[ev.id] = a === v ? "acerto" : (a ? "aceitou_invalida" : "rejeitou_valida");
-            if (a !== v) evOk = false;
-        });
-        var obrig = window.clausulasObrigatorias(f), clStatus = {}, clOk = true;
-        Object.keys(D.clausulas).forEach(function(c) {
-            var esc = resp.clausulas[c] === true;
-            if (obrig.indexOf(c) >= 0) clStatus[c] = esc ? "acerto" : "faltou";
-            else if (esc) clStatus[c] = "excesso";
-            if (clStatus[c] && clStatus[c] !== "acerto") clOk = false;
-        });
-        var gab = window.decidirFornecedor(f, null);
-        var inerente = window.riscoInerente(f);
-        var out = {
-            criticidade_ok: resp.criticidade === window.criticidadeFornecedor(f),
-            faixa_ok: resp.faixa === window.faixaRisco(inerente),
-            evidencias: evStatus, evidencias_ok: evOk,
-            clausulas: clStatus, clausulas_ok: clOk,
-            decisao_ok: resp.decisao === gab.decisao,
-            residual_aluno: window.riscoResidual(inerente, window.reducaoRisco(f, resp.aceitas)),
-            residual_real: gab.residual,
-            gabarito: gab
-        };
-        out.pontos = (out.criticidade_ok ? 1 : 0) + (out.faixa_ok ? 1 : 0) + (out.evidencias_ok ? 1 : 0) +
-            (out.clausulas_ok ? 1 : 0) + (out.decisao_ok ? 1 : 0);
-        return out;
-    };
-
-    // ================================================ interface
-    var ROTULO_EV = { acerto: "Certo", aceitou_invalida: "Você aceitou, mas não vale", rejeitou_valida: "Você recusou, mas vale" };
-    var ROTULO_CL = { acerto: "Certo", faltou: "Faltou", excesso: "Desproporcional para a criticidade" };
-    var COR = { ok: "var(--tip-color)", erro: "var(--danger-color)", aviso: "var(--warning-color)" };
-
-    function renderPlacar() {
-        var pontos = 0, corrigidos = 0;
-        D.fornecedores.forEach(function(f) {
-            var r = estado.f[f.id].resultado;
-            if (r) { corrigidos++; pontos += r.pontos; }
-        });
-        $("grt-placar").textContent = "Placar: " + pontos + " de " + (D.fornecedores.length * 5) +
-            " pontos · fornecedores avaliados: " + corrigidos + " de " + D.fornecedores.length;
-    }
-
-    function renderSeletor() {
-        var box = $("grt-fornecedores");
-        box.replaceChildren();
-        D.fornecedores.forEach(function(f) {
-            var r = estado.f[f.id].resultado;
-            var b = el("button", f.id + " · " + f.nome + (r ? " (" + r.pontos + "/5)" : ""));
-            b.type = "button";
-            b.className = f.id === estado.atual ? "btn-primary" : "btn-secondary";
-            b.setAttribute("aria-pressed", f.id === estado.atual ? "true" : "false");
-            b.setAttribute("aria-label", "Fornecedor " + f.id + ": " + f.nome);
-            b.addEventListener("click", function() { estado.atual = f.id; renderTudo(); });
-            box.appendChild(b);
-        });
-    }
-
-    function grupo(titulo) {
-        var fs = el("fieldset", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem 0.7rem; margin: 0.8rem 0 0 0; min-width: 0;");
-        fs.appendChild(el("legend", titulo, "font-weight: 700; font-size: 0.9rem; padding: 0 0.3rem;"));
-        return fs;
-    }
-
-    function opcao(tipo, nome, valor, rotulo, marcado, aoMudar) {
-        var lb = el("label", null, "display: flex; gap: 0.5rem; align-items: flex-start; font-size: 0.85rem; margin: 0.25rem 0; min-width: 0;");
-        var inp = document.createElement("input");
-        inp.type = tipo;
-        inp.name = nome;
-        inp.value = valor;
-        inp.checked = marcado;
-        inp.setAttribute("aria-label", rotulo);
-        inp.addEventListener("change", function() { aoMudar(inp.checked); });
-        lb.appendChild(inp);
-        lb.appendChild(el("span", rotulo, "min-width: 0;"));
-        return lb;
-    }
-
-    function renderFicha(f) {
-        var card = el("div", null, "border: 1px solid var(--rule); border-left: 4px solid var(--accent, var(--rule)); border-radius: var(--radius-sm); padding: 0.6rem 0.8rem; min-width: 0;");
-        card.appendChild(el("h4", f.id + " · " + f.nome, "margin: 0;"));
-        card.appendChild(el("div", f.servico, "font-size: 0.82rem; color: var(--muted); margin-top: 0.15rem;"));
-        card.appendChild(el("strong", "Questionário respondido pelo fornecedor (autodeclaração)", "display: block; margin-top: 0.5rem; font-size: 0.85rem;"));
-        var dl = el("ul", null, "margin: 0.3rem 0 0 0; padding-left: 1.2rem; font-size: 0.83rem;");
-        f.questionario.forEach(function(q) {
-            var li = el("li", null, "margin: 0.2rem 0;");
-            li.appendChild(el("strong", q.pergunta + " "));
-            li.appendChild(el("span", q.resposta));
-            dl.appendChild(li);
-        });
-        card.appendChild(dl);
-        card.appendChild(el("strong", "Proposta de plano de saída", "display: block; margin-top: 0.5rem; font-size: 0.85rem;"));
-        var ps = el("ul", null, "margin: 0.3rem 0 0 0; padding-left: 1.2rem; font-size: 0.83rem;");
-        f.plano_saida.forEach(function(i) { ps.appendChild(el("li", D.itens_saida[i])); });
-        card.appendChild(ps);
-        return card;
-    }
-
-    function renderEtapas(f, st) {
-        var frag = document.createDocumentFragment();
-
-        var fs1 = grupo("1. Criticidade");
-        Object.keys(ROTULO_CRIT).forEach(function(c) {
-            fs1.appendChild(opcao("radio", "grt-crit-" + f.id, c, ROTULO_CRIT[c], st.criticidade === c,
-                function() { st.criticidade = c; }));
-        });
-        frag.appendChild(fs1);
-
-        var fs2 = grupo("2. Faixa do risco inerente (impacto × probabilidade)");
-        D.faixas.forEach(function(fx) {
-            fs2.appendChild(opcao("radio", "grt-faixa-" + f.id, fx.nome, fx.nome + " (" + fx.min + " a " + fx.max + ")",
-                st.faixa === fx.nome, function() { st.faixa = fx.nome; }));
-        });
-        frag.appendChild(fs2);
-
-        var fs3 = grupo("3. Evidências: marque as que você aceita como válidas");
-        f.evidencias.forEach(function(ev) {
-            var box = el("div", null, "margin: 0.35rem 0; padding: 0.35rem 0.5rem; border: 1px dashed var(--rule); border-radius: var(--radius-sm); min-width: 0;");
-            box.appendChild(opcao("checkbox", "grt-ev-" + ev.id, ev.id, "Aceito: " + ev.titulo + " (" + ROTULO_TIPO_EV[ev.tipo] + ")",
-                st.aceitas[ev.id] === true, function(on) { if (on) st.aceitas[ev.id] = true; else delete st.aceitas[ev.id]; }));
-            box.appendChild(el("div", ev.detalhe, "font-size: 0.8rem; margin: 0.15rem 0 0 1.6rem;"));
-            fs3.appendChild(box);
-        });
-        frag.appendChild(fs3);
-
-        var fs4 = grupo("4. Cláusulas obrigatórias no contrato");
-        Object.keys(D.clausulas).forEach(function(c) {
-            fs4.appendChild(opcao("checkbox", "grt-cl-" + f.id, c, D.clausulas[c].nome, st.clausulas[c] === true,
-                function(on) { if (on) st.clausulas[c] = true; else delete st.clausulas[c]; }));
-        });
-        frag.appendChild(fs4);
-
-        var fs5 = grupo("5. Decisão");
-        Object.keys(ROTULO_DECISAO).forEach(function(dc) {
-            fs5.appendChild(opcao("radio", "grt-dec-" + f.id, dc, ROTULO_DECISAO[dc], st.decisao === dc,
-                function() { st.decisao = dc; }));
-        });
-        frag.appendChild(fs5);
-        return frag;
-    }
-
-    function bloco(ok, titulo) {
-        var c = el("div", null, "border-left: 4px solid " + (ok === true ? COR.ok : (ok === false ? COR.erro : COR.aviso)) + "; padding: 0.3rem 0.6rem;");
-        c.appendChild(el("strong", titulo));
-        return c;
-    }
-
-    function renderFeedback(f, st) {
-        var box = el("div", null, "margin-top: 0.8rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.6rem; font-size: 0.82rem;");
-        box.id = "grt-feedback";
-        box.setAttribute("role", "region");
-        box.setAttribute("aria-label", "Correção do fornecedor " + f.id);
-        box.setAttribute("tabindex", "-1");
-        var r = st.resultado;
-        if (!r) return box;
-        var g = r.gabarito;
-        var imp = window.impactoFornecedor(f), prob = window.probabilidadeFornecedor(f), ine = window.riscoInerente(f);
-        box.appendChild(el("strong", "Pontos neste fornecedor: " + r.pontos + " de 5", "font-size: 0.9rem;"));
-
-        var c1 = bloco(r.criticidade_ok && r.faixa_ok, "Criticidade " + ROTULO_CRIT[window.criticidadeFornecedor(f)] +
-            (r.criticidade_ok ? " (certo)" : " (você marcou " + (st.respCorrigida.criticidade ? ROTULO_CRIT[st.respCorrigida.criticidade] : "nada") + ")") +
-            " · risco inerente " + ine + ", " + window.faixaRisco(ine) +
-            (r.faixa_ok ? " (certo)" : " (você marcou " + (st.respCorrigida.faixa || "nada") + ")"));
-        c1.appendChild(el("div", "Dados " + f.eixos.dados + " (" + D.eixos.dados.niveis[f.eixos.dados] + "), dependência " +
-            f.eixos.dependencia + " (" + D.eixos.dependencia.niveis[f.eixos.dependencia] + ") → impacto " + imp +
-            ". Acesso " + f.eixos.acesso + " (" + D.eixos.acesso.niveis[f.eixos.acesso] + ")" +
-            (f.quarta_parte.length ? " + quarta parte" : "") + " → probabilidade " + prob + ". Inerente = " + imp + " × " + prob + " = " + ine + ".",
-            "margin-top: 0.2rem;"));
-        box.appendChild(c1);
-
-        var c2 = bloco(r.evidencias_ok, r.evidencias_ok ? "Evidências: todas avaliadas certo." : "Evidências: há o que corrigir.");
-        var ul = el("ul", null, "margin: 0.3rem 0 0 0; padding-left: 1.2rem;");
-        f.evidencias.forEach(function(ev) {
-            var s = r.evidencias[ev.id], v = window.validarEvidencia(ev, f);
-            var li = el("li", null, "margin: 0.2rem 0;");
-            li.setAttribute("data-status", s);
-            li.appendChild(el("strong", ROTULO_EV[s] + ": ", "color: " + (s === "acerto" ? COR.ok : COR.erro) + ";"));
-            li.appendChild(el("span", ev.titulo + " → " + (v.valida ? "válida. " : "não vale. ") + v.motivo));
-            ul.appendChild(li);
-        });
-        c2.appendChild(ul);
-        box.appendChild(c2);
-
-        var c3 = bloco(r.residual_aluno === r.residual_real ? true : null,
-            "Risco residual: " + r.residual_real + " (" + window.faixaRisco(r.residual_real) + "), redução de " + g.reducao +
-            " ponto(s). Apetite da Ipê Pay: até " + D.apetite + ".");
-        if (r.residual_aluno !== r.residual_real) {
-            c3.appendChild(el("div", "Com as evidências que você aceitou, o residual seria " + r.residual_aluno + " (" +
-                window.faixaRisco(r.residual_aluno) + "): é a diferença entre ler o documento e só recebê-lo.", "margin-top: 0.2rem;"));
-        }
-        box.appendChild(c3);
-
-        var c4 = bloco(r.clausulas_ok, r.clausulas_ok ? "Cláusulas: exatamente as obrigatórias." : "Cláusulas: há o que corrigir.");
-        var ulc = el("ul", null, "margin: 0.3rem 0 0 0; padding-left: 1.2rem;");
-        Object.keys(r.clausulas).forEach(function(c) {
-            var s = r.clausulas[c];
-            var li = el("li", null, "margin: 0.2rem 0;");
-            li.setAttribute("data-status", s);
-            li.appendChild(el("strong", ROTULO_CL[s] + ": ", "color: " + (s === "acerto" ? COR.ok : (s === "faltou" ? COR.erro : COR.aviso)) + ";"));
-            li.appendChild(el("span", D.clausulas[c].nome + ". " + D.clausulas[c].explicacao +
-                (f.recusa_clausulas.indexOf(c) >= 0 ? " O fornecedor recusa esta cláusula." : "")));
-            ulc.appendChild(li);
-        });
-        c4.appendChild(ulc);
-        box.appendChild(c4);
-
-        var c5 = bloco(g.lacunas.length ? false : true, g.lacunas.length ?
-            "Plano de saída: faltam " + g.lacunas.length + " item(ns) exigido(s) para a criticidade " + ROTULO_CRIT[window.criticidadeFornecedor(f)] + "." :
-            "Plano de saída: completo para a criticidade.");
-        if (g.lacunas.length) {
-            var ull = el("ul", null, "margin: 0.3rem 0 0 0; padding-left: 1.2rem;");
-            g.lacunas.forEach(function(i) {
-                var li = el("li", D.itens_saida[i]);
-                li.setAttribute("data-lacuna", i);
-                ull.appendChild(li);
-            });
-            c5.appendChild(ull);
-        }
-        box.appendChild(c5);
-
-        var c6 = bloco(r.decisao_ok, "Decisão: " + ROTULO_DECISAO[g.decisao] +
-            (r.decisao_ok ? " (certo)." : " (você marcou " + (st.respCorrigida.decisao ? ROTULO_DECISAO[st.respCorrigida.decisao] : "nada") + ")."));
-        var motivos = el("ul", null, "margin: 0.3rem 0 0 0; padding-left: 1.2rem;");
-        var pref = g.decisao === "recusar" ? "Pendência que também impediria contratar: " : "Condição: ";
-        g.bloqueios.forEach(function(c) { motivos.appendChild(el("li", "Bloqueio: o fornecedor recusa a cláusula obrigatória \"" + D.clausulas[c].nome + "\".")); });
-        g.invalidas.forEach(function(id) {
-            var ev = f.evidencias.filter(function(e) { return e.id === id; })[0];
-            motivos.appendChild(el("li", pref + "substituir \"" + ev.titulo + "\" por evidência válida. " + window.validarEvidencia(ev, f).motivo));
-        });
-        f.evidencias.forEach(function(ev) {
-            if (ev.tipo === "soc2" && ev.tipo_relatorio === "II" && temRelevante(ev)) {
-                ev.excecoes.forEach(function(x) { if (x.relevante) motivos.appendChild(el("li", pref + "plano de correção para a exceção do SOC 2: " + x.texto + ".")); });
-            }
-        });
-        g.lacunas.forEach(function(i) { motivos.appendChild(el("li", pref + "incluir no plano de saída: " + D.itens_saida[i] + ".")); });
-        if (motivos.childNodes.length) c6.appendChild(motivos);
-        c6.appendChild(el("div", f.explicacao, "margin-top: 0.3rem;"));
-        box.appendChild(c6);
-        return box;
-    }
-
-    function renderFornecedor() {
-        var f = fornPorId(estado.atual), st = estado.f[f.id];
-        var box = $("grt-fornecedor");
-        box.replaceChildren();
-        box.appendChild(renderFicha(f));
-        box.appendChild(renderEtapas(f, st));
-        var acoes = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem;");
-        var bCorr = el("button", "Avaliar este fornecedor");
-        bCorr.type = "button";
-        bCorr.className = "btn-primary";
-        bCorr.addEventListener("click", function() { window.corrigirFornecedorAtualGrt(); });
-        var bLimpa = el("button", "Recomeçar este fornecedor");
-        bLimpa.type = "button";
-        bLimpa.className = "btn-secondary";
-        bLimpa.addEventListener("click", function() { estado.f[f.id] = novoEstado(); renderTudo(); });
-        acoes.appendChild(bCorr);
-        acoes.appendChild(bLimpa);
-        box.appendChild(acoes);
-        var fb = renderFeedback(f, st);
-        fb.setAttribute("aria-live", "polite");
-        box.appendChild(fb);
-    }
-
-    function renderTudo() {
-        renderSeletor();
-        renderPlacar();
-        renderFornecedor();
-    }
-
-    function copiaMapa(m) {
-        var o = {};
-        Object.keys(m).forEach(function(k) { if (m[k] === true) o[k] = true; });
-        return o;
-    }
-
-    window.corrigirFornecedorAtualGrt = function() {
-        var f = fornPorId(estado.atual), st = estado.f[f.id];
-        st.respCorrigida = { criticidade: st.criticidade, faixa: st.faixa, aceitas: copiaMapa(st.aceitas),
-                             clausulas: copiaMapa(st.clausulas), decisao: st.decisao };
-        st.resultado = window.corrigirFornecedor(f, st.respCorrigida);
-        renderTudo();
-        var fb = $("grt-feedback");
-        if (fb) fb.focus();
-        return st.resultado;
-    };
-
-    // atalho para conferência manual no navegador: escolhe o fornecedor e preenche as respostas
-    window.responderFornecedorGrt = function(id, criticidade, faixa, aceitas, clausulas, decisao) {
-        var f = fornPorId(id);
-        if (!f) return null;
-        estado.atual = id;
-        var st = estado.f[id];
-        st.criticidade = criticidade;
-        st.faixa = faixa;
-        st.aceitas = {};
-        (aceitas || []).forEach(function(k) { st.aceitas[k] = true; });
-        st.clausulas = {};
-        (clausulas || []).forEach(function(k) { if (Object.prototype.hasOwnProperty.call(D.clausulas, k)) st.clausulas[k] = true; });
-        st.decisao = decisao;
-        return window.corrigirFornecedorAtualGrt();
-    };
-
-    document.addEventListener("DOMContentLoaded", function() {
-        $("grt-contexto").textContent = D.contexto;
-        renderTudo();
-
-        if (typeof initChecklist === "function") {
-            initChecklist("gestao-de-riscos-de-terceiros");
-        }
-        if (typeof initQuiz === "function") {
-            initQuiz();
-        }
-    });
-})();
-</script>
+<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
 </main>
 </div>
 
@@ -3243,7 +2230,6 @@ Grafica Pitanga;impressao de material promocional;0;0;0;baixa;questionario;2028-
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3832,17 +2818,6 @@ Grafica Pitanga;impressao de material promocional;0;0;0;baixa;questionario;2028-
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -4056,7 +3031,6 @@ Grafica Pitanga;impressao de material promocional;0;0;0;baixa;questionario;2028-
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

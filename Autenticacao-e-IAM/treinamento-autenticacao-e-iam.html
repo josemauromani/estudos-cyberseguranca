@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Autenticacao-e-IAM">
@@ -2123,7 +1739,6 @@ dfn.glossario:focus-visible {
     <li><a class="toc-item" href="#federacao-oauth-oidc" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Federação de Identidades, OAuth 2.0 e OpenID Connect (OIDC)</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#anatomia-jwt" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Anatomia, Ciclo de Vida e Vetores de Ataque em Tokens JWT</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#modelos-controle-acesso" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Modelos de Controle de Acesso: DAC, MAC, RBAC e ABAC</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#laboratorio-pratico" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Interativo: Decodificador JWT e Avaliador de Matriz RBAC</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist-iam" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Aplicação Prática: Auditoria e Implementação de IAM</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#questoes-fixacao" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Concursos Públicos</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos-essenciais" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2139,7 +1754,7 @@ dfn.glossario:focus-visible {
   <h1>Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</h1>
   <p class="mhead-sub">Controle de acesso robusto, fatores múltiplos, autorização moderna e federação de identidades</p>
   <div class="chips"><span class="chip">⏱ 45 min</span><span class="chip">📈 Iniciante</span><span class="chip">🛡 NIST Protect</span><span class="chip">🎯 ATT&amp;CK TA0006 Credential Access / TA0004 Privilege Escalation / T1556 Modify Authentication Process / T1078 Valid Accounts</span><span class="chip">👤 AppSec &amp; DevSecOps · Blue Team &amp; Defesa · GRC &amp; Auditoria</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#pilares-iam" data-tipo="teoria"><span class="toc-tipo">Teoria</span>5 seções</a><a href="#laboratorio-pratico" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist-iam" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#questoes-fixacao" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>3 questões</a><a href="#fatos-essenciais" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#pilares-iam" data-tipo="teoria"><span class="toc-tipo">Teoria</span>5 seções</a><a href="#checklist-iam" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#questoes-fixacao" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>3 questões</a><a href="#fatos-essenciais" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- ==========================================================================
      Estudo 04: Autenticação e Gestão de Identidades (IAM)
@@ -2149,7 +1764,7 @@ dfn.glossario:focus-visible {
 <article class="study-container" data-slug="autenticacao-e-iam">
 <!-- SEÇÃO 1: PILARES DE IAM E O CICLO IAAA -->
 <section class="study-section" id="pilares-iam" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 9</small></span><h2>Fundamentos de IAM, Governança e o Ciclo IAAA</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 8</small></span><h2>Fundamentos de IAM, Governança e o Ciclo IAAA</h2></div>
 
   <p class="lead-text">
     A identidade é o novo perímetro da segurança cibernética. Em um cenário corporativo híbrido e descentralizado,
@@ -2223,7 +1838,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 2: ARMAZENAMENTO SEGURO DE SENHAS E MFA -->
 <section class="study-section" id="senhas-e-mfa" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 9</small></span><h2>Armazenamento Seguro de Senhas &amp; Autenticação Multifator (MFA)</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 8</small></span><h2>Armazenamento Seguro de Senhas &amp; Autenticação Multifator (MFA)</h2></div>
 
   <p>
     Senhas continuam sendo o mecanismo de autenticação primária mais difundido, porém o mais suscetível a erros de implementação.
@@ -2325,7 +1940,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 3: FEDERAÇÃO, OAUTH 2.0 E OPENID CONNECT -->
 <section class="study-section" id="federacao-oauth-oidc" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 9</small></span><h2>Federação de Identidades, OAuth 2.0 e OpenID Connect (OIDC)</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 8</small></span><h2>Federação de Identidades, OAuth 2.0 e OpenID Connect (OIDC)</h2></div>
 
   <p>
     Em ecossistemas modernos com dezenas de aplicações e microsserviços, exigir que cada software armazene suas próprias senhas
@@ -2389,7 +2004,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 4: ANATOMIA E ATAQUES A TOKENS JWT -->
 <section class="study-section" id="anatomia-jwt" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 9</small></span><h2>Anatomia, Ciclo de Vida e Vetores de Ataque em Tokens JWT</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 8</small></span><h2>Anatomia, Ciclo de Vida e Vetores de Ataque em Tokens JWT</h2></div>
 
   <p>
     O <strong>JSON Web Token (JWT - RFC 7519)</strong> é o padrão aberto dominante para transmissão compacta e autossuficiente
@@ -2478,7 +2093,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 5: MODELOS DE CONTROLE DE ACESSO (RBAC vs ABAC) -->
 <section class="study-section" id="modelos-controle-acesso" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 5 de 9</small></span><h2>Modelos de Controle de Acesso: DAC, MAC, RBAC e ABAC</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 5 de 8</small></span><h2>Modelos de Controle de Acesso: DAC, MAC, RBAC e ABAC</h2></div>
 
   <p>
     Após a identidade do usuário ser comprovada pela autenticação, o subsistema de autorização deve decidir
@@ -2535,129 +2150,10 @@ dfn.glossario:focus-visible {
 </section>
 
 <!-- SEÇÃO 6: LABORATÓRIO INTERATIVO (JWT & RBAC MATRIX) -->
-<section class="study-section" id="laboratorio-pratico" data-tipo="laboratorio">
-  <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 6 de 9</small></span><h2>Laboratório Interativo: Decodificador JWT e Avaliador de Matriz RBAC</h2></div>
-
-  <p>
-    Experimente na prática o ciclo de inspeção, manipulação e avaliação de segurança de tokens JWT.
-    Neste laboratório interativo desenvolvido em Vanilla JavaScript, você pode inspecionar tokens legítimos,
-    editar claims em tempo real, simular ataques reais (como a injeção do algoritmo <code>none</code> ou forja de assinatura)
-    e avaliar em tempo de execução como um motor de autorização RBAC processa requisições corporativas.
-  </p>
-
-  <div class="lab-box" id="jwt-rbac-lab">
-    <div class="lab-header">
-      <span class="lab-badge">LAB PRÁTICO INTERATIVO</span>
-      <h3>Simulador de Segurança de Tokens JWT e Controle RBAC</h3>
-      <p>Decodifique o token, altere declarações críticas e teste o impacto em permissões corporativas.</p>
-    </div>
-
-    <!-- Controles rápidos de cenário -->
-    <div style="margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
-      <button class="lab-btn" onclick="carregarCenarioJwt('viewer')">👤 Carregar Token Legítimo (Viewer)</button>
-      <button class="lab-btn" onclick="carregarCenarioJwt('admin')">👑 Carregar Token Legítimo (Admin)</button>
-      <button class="lab-btn" onclick="carregarCenarioJwt('expirado')">⏳ Carregar Token Expirado</button>
-      <button class="lab-btn lab-btn-danger" onclick="injetarAtaqueNone()">⚠️ Injetar Ataque 'alg': 'none'</button>
-      <button class="lab-btn lab-btn-warning" onclick="forjarAssinaturaInvalida()">❌ Forjar Assinatura Inválida</button>
-    </div>
-
-    <!-- Campo de entrada do token codificado -->
-    <div style="margin-bottom: 1.5rem;">
-      <label style="display:block; font-weight:700; font-size:0.875rem; margin-bottom:0.4rem; color:var(--ink);">Token JWT Codificado (Compact JWS):</label>
-      <textarea id="jwt-raw-input" rows="3" style="width:100%; font-family:var(--font-mono); font-size:0.85rem; padding:0.75rem; border-radius:6px; border:1px solid var(--rule); background:var(--ground); color:var(--ink); resize:vertical;" oninput="processarEntradaTokenManual()"></textarea>
-    </div>
-
-    <!-- Visualizador colorido das 3 partes -->
-    <div style="margin-bottom: 1.5rem; background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1rem;">
-      <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:0.5rem;">Visualização Estrutural do Token</div>
-      <div id="jwt-colored-view" style="font-family:var(--font-mono); font-size:0.9rem; word-break:break-all; line-height:1.6;"></div>
-    </div>
-
-    <!-- Inspeção e Edição de Claims JSON -->
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1rem; margin-bottom: 1.5rem;">
-      <!-- Header Box -->
-      <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1rem; border-top:3px solid #f43f5e;">
-        <h4 style="color:#f43f5e; margin:0 0 0.5rem 0; font-size:0.95rem;">Header (JSON Decodificado)</h4>
-        <pre id="jwt-header-display" style="background:var(--ground); padding:0.75rem; border-radius:6px; font-size:0.8rem; font-family:var(--font-mono); overflow-x:auto; margin:0;"></pre>
-      </div>
-
-      <!-- Payload Box -->
-      <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1rem; border-top:3px solid #818cf8;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-          <h4 style="color:#818cf8; margin:0; font-size:0.95rem;">Payload (Declarações / Claims)</h4>
-          <span id="jwt-exp-status-badge" class="badge" style="font-size:0.7rem;"></span>
-        </div>
-        <pre id="jwt-payload-display" style="background:var(--ground); padding:0.75rem; border-radius:6px; font-size:0.8rem; font-family:var(--font-mono); overflow-x:auto; margin:0 0 0.75rem 0;"></pre>
-        
-        <!-- Formulário rápido de edição de claims -->
-        <div style="font-size:0.8rem; display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
-          <div>
-            <label style="display:block; font-weight:600; color:var(--muted); margin-bottom:0.2rem;">Papel (role):</label>
-            <select id="jwt-claim-role" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="atualizarClaimRole(this.value)">
-              <option value="viewer">viewer (Visualizador)</option>
-              <option value="operator">operator (Operador)</option>
-              <option value="admin">admin (Administrador)</option>
-            </select>
-          </div>
-          <div>
-            <label style="display:block; font-weight:600; color:var(--muted); margin-bottom:0.2rem;">Validade (exp):</label>
-            <select id="jwt-claim-exp" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="atualizarClaimExp(this.value)">
-              <option value="valido">Válido (+1 hora)</option>
-              <option value="expirado">Expirado (-1 hora)</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Signature Box -->
-      <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1rem; border-top:3px solid #06b6d4;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-          <h4 style="color:#06b6d4; margin:0; font-size:0.95rem;">Assinatura Criptográfica</h4>
-          <span id="jwt-sig-status-badge" class="badge" style="font-size:0.7rem;"></span>
-        </div>
-        <div style="margin-bottom:0.5rem;">
-          <label style="font-size:0.75rem; color:var(--muted); display:block; margin-bottom:0.2rem;">Segredo Simétrico HMAC do Backend:</label>
-          <div style="display:flex; gap:0.5rem;">
-            <input type="text" id="jwt-secret-input" value="minha-chave-secreta-corporativa-2026" style="flex:1; font-family:var(--font-mono); font-size:0.8rem; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);">
-            <button class="lab-btn" style="padding:0.35rem 0.6rem; font-size:0.75rem;" onclick="reassinarComSegredoAtual()">Reassinar</button>
-          </div>
-        </div>
-        <div id="jwt-signature-display" style="font-family:var(--font-mono); font-size:0.8rem; word-break:break-all; background:var(--ground); padding:0.5rem; border-radius:4px; color:var(--muted);"></div>
-      </div>
-    </div>
-
-    <!-- Avaliador de Matriz RBAC em Tempo Real -->
-    <div style="background:var(--ground); border:1px solid var(--rule); border-radius:8px; padding:1.25rem;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
-        <div>
-          <h4 style="margin:0; font-size:1rem; color:var(--ink);">Motor de Decisão de Controle de Acesso (RBAC)</h4>
-          <p style="margin:0.2rem 0 0 0; font-size:0.85rem; color:var(--muted);">Avaliação imediata dos privilégios de acesso às operações corporativas com base no token atual:</p>
-        </div>
-        <div id="jwt-overall-status-banner" style="font-size:0.85rem; font-weight:700; padding:0.4rem 0.8rem; border-radius:6px;"></div>
-      </div>
-
-      <div style="overflow-x:auto;">
-        <table style="width:100%; border-collapse:collapse; font-size:0.875rem;">
-          <thead>
-            <tr style="border-bottom:2px solid var(--rule); text-align:left;">
-              <th style="padding:0.6rem; color:var(--muted);">Operação / Endpoint</th>
-              <th style="padding:0.6rem; color:var(--muted);">Papel Exigido</th>
-              <th style="padding:0.6rem; color:var(--muted);">Decisão do Backend</th>
-              <th style="padding:0.6rem; color:var(--muted);">Justificativa Técnica</th>
-            </tr>
-          </thead>
-          <tbody id="rbac-matrix-rows">
-            <!-- Linhas geradas dinamicamente via JS -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- SEÇÃO 7: CHECKLIST PRÁTICO -->
 <section class="study-section" id="checklist-iam" data-tipo="checklist">
-  <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 7 de 9</small></span><h2>Checklist de Aplicação Prática: Auditoria e Implementação de IAM</h2></div>
+  <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 6 de 8</small></span><h2>Checklist de Aplicação Prática: Auditoria e Implementação de IAM</h2></div>
 
   <p>
     Utilize este checklist técnico durante revisões de arquitetura, auditorias de conformidade (ISO 27001 / LGPD / SOC 2)
@@ -2723,7 +2219,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 8: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
 <section class="study-section" id="questoes-fixacao" data-tipo="questoes">
-  <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 8 de 9</small></span><h2>Questões de Fixação e Concursos Públicos</h2></div>
+  <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 7 de 8</small></span><h2>Questões de Fixação e Concursos Públicos</h2></div>
 
   <p>
     Avalie seu entendimento técnico resolvendo questões baseadas em bancas de concursos públicos de alto nível (Cespe/Cebraspe, FGV)
@@ -2818,7 +2314,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 9: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
 <section class="study-section" id="fatos-essenciais" data-tipo="referencias">
-  <div class="shead"><span class="stype">📚 Referências <small>· Seção 9 de 9</small></span><h2>Fatos Essenciais e Próximos Passos</h2></div>
+  <div class="shead"><span class="stype">📚 Referências <small>· Seção 8 de 8</small></span><h2>Fatos Essenciais e Próximos Passos</h2></div>
 
   <div class="facts-grid">
     <div class="facts-card">
@@ -2855,407 +2351,6 @@ dfn.glossario:focus-visible {
 </article>
 
 <!-- SCRIPT EMBUTIDO: SIMULADOR DE SEGURANÇA JWT & MATRIZ RBAC -->
-<script>
-/**
- * Simulador Interativo: Laboratório de Tokens JWT & Matriz RBAC
- * Mapa da Cibersegurança
- */
-
-// Estado interno do simulador
-const estadoSimulador = {
-  header: { alg: "HS256", typ: "JWT" },
-  payload: {
-    sub: "usr_99812",
-    name: "Ana Silva",
-    role: "viewer",
-    exp: Math.floor(Date.now() / 1000) + 3600, // +1h
-    iat: Math.floor(Date.now() / 1000) - 60
-  },
-  signatureStatus: "valida", // "valida", "invalida", "none"
-  secret: "minha-chave-secreta-corporativa-2026",
-  rawToken: ""
-};
-
-// Funções auxiliares para codificação/decodificação Base64URL segura
-function base64UrlEncodeStr(str) {
-  const bytes = new TextEncoder().encode(str);
-  let binary = "";
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary)
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
-}
-
-function base64UrlDecodeStr(b64url) {
-  let b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
-  while (b64.length % 4 !== 0) {
-    b64 += "=";
-  }
-  const binary = atob(b64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return new TextDecoder().decode(bytes);
-}
-
-// Gera hash simulado determinístico para assinatura HMAC de demonstração
-function calcularAssinaturaSimulada(headerB64, payloadB64, secret) {
-  const input = headerB64 + "." + payloadB64 + "." + secret;
-  let hash = 0;
-  for (let i = 0; i < input.length; i++) {
-    hash = ((hash << 5) - hash) + input.charCodeAt(i);
-    hash |= 0;
-  }
-  // Retorna string estilizada similar a base64url de 43 caracteres
-  const hex = Math.abs(hash).toString(16).padStart(8, "0") + "fa7e9b2c4d018a356ef128472910ab38c7d19";
-  return base64UrlEncodeStr(hex).slice(0, 43);
-}
-
-// Reconstrói e exibe o token codificado com base no estado atual
-function sincronizarTokenComEstado() {
-  const headerB64 = base64UrlEncodeStr(JSON.stringify(estadoSimulador.header));
-  const payloadB64 = base64UrlEncodeStr(JSON.stringify(estadoSimulador.payload));
-
-  let sigB64 = "";
-  if (estadoSimulador.header.alg === "none") {
-    sigB64 = "";
-  } else if (estadoSimulador.signatureStatus === "invalida") {
-    sigB64 = "ASSINATURA_FORJADA_INVALIDA_XYZ1234567890ABC";
-  } else {
-    sigB64 = calcularAssinaturaSimulada(headerB64, payloadB64, estadoSimulador.secret);
-  }
-
-  estadoSimulador.rawToken = headerB64 + "." + payloadB64 + (sigB64 ? "." + sigB64 : ".");
-  atualizarInterfaceCompleta();
-}
-
-// Atualiza a interface gráfica, renderização colorida e tabela RBAC
-function atualizarInterfaceCompleta() {
-  const rawInput = document.getElementById("jwt-raw-input");
-  if (rawInput) rawInput.value = estadoSimulador.rawToken;
-
-  const partes = estadoSimulador.rawToken.split(".");
-  const hB64 = partes[0] || "";
-  const pB64 = partes[1] || "";
-  const sB64 = partes[2] || "";
-
-  // Visualização colorida
-  const coloredView = document.getElementById("jwt-colored-view");
-  if (coloredView) {
-    coloredView.innerHTML = `
-      <span style="color:#f43f5e; font-weight:700;" title="Header (Cabeçalho)">${escapeHtml(hB64)}</span><span style="color:var(--muted); font-weight:700;">.</span><span style="color:#818cf8; font-weight:700;" title="Payload (Claims)">${escapeHtml(pB64)}</span><span style="color:var(--muted); font-weight:700;">.</span><span style="color:#06b6d4; font-weight:700;" title="Signature (Assinatura)">${escapeHtml(sB64 || (estadoSimulador.header.alg === 'none' ? '[Assinatura Omitida - none]' : ''))}</span>
-    `;
-  }
-
-  // Bloco Header
-  const headerDisplay = document.getElementById("jwt-header-display");
-  if (headerDisplay) {
-    headerDisplay.textContent = JSON.stringify(estadoSimulador.header, null, 2);
-  }
-
-  // Bloco Payload
-  const payloadDisplay = document.getElementById("jwt-payload-display");
-  if (payloadDisplay) {
-    payloadDisplay.textContent = JSON.stringify(estadoSimulador.payload, null, 2);
-  }
-
-  // Status de Expiração
-  const expStatusBadge = document.getElementById("jwt-exp-status-badge");
-  const agoraUnix = Math.floor(Date.now() / 1000);
-  const estaExpirado = (estadoSimulador.payload.exp && estadoSimulador.payload.exp < agoraUnix);
-  if (expStatusBadge) {
-    if (estaExpirado) {
-      expStatusBadge.className = "badge red";
-      expStatusBadge.textContent = "EXPIRADO";
-    } else {
-      expStatusBadge.className = "badge green";
-      expStatusBadge.textContent = "DENTRO DO PRAZO";
-    }
-  }
-
-  // Bloco Signature e Status
-  const sigStatusBadge = document.getElementById("jwt-sig-status-badge");
-  const sigDisplay = document.getElementById("jwt-signature-display");
-  if (sigStatusBadge) {
-    if (estadoSimulador.header.alg === "none") {
-      sigStatusBadge.className = "badge red";
-      sigStatusBadge.textContent = "ALG: NONE (SEM ASSINATURA)";
-    } else if (estadoSimulador.signatureStatus === "invalida") {
-      sigStatusBadge.className = "badge red";
-      sigStatusBadge.textContent = "ASSINATURA FORJADA";
-    } else {
-      sigStatusBadge.className = "badge green";
-      sigStatusBadge.textContent = "ASSINATURA ÍNTEGRA";
-    }
-  }
-
-  if (sigDisplay) {
-    if (estadoSimulador.header.alg === "none") {
-      sigDisplay.textContent = "(Nenhuma assinatura incluída devido a 'alg': 'none')";
-    } else {
-      sigDisplay.textContent = sB64 || "(Vazia)";
-    }
-  }
-
-  // Sincroniza selects de formulário rápido
-  const roleSelect = document.getElementById("jwt-claim-role");
-  if (roleSelect && estadoSimulador.payload.role) {
-    roleSelect.value = estadoSimulador.payload.role;
-  }
-  const expSelect = document.getElementById("jwt-claim-exp");
-  if (expSelect) {
-    expSelect.value = estaExpirado ? "expirado" : "valido";
-  }
-
-  // Avaliação da Matriz RBAC
-  avaliarPermissoesRbac();
-}
-
-// Avalia a matriz RBAC contra o estado do token e renderiza a tabela
-function avaliarPermissoesRbac() {
-  const agoraUnix = Math.floor(Date.now() / 1000);
-  const estaExpirado = (estadoSimulador.payload.exp && estadoSimulador.payload.exp < agoraUnix);
-  const temAssinaturaValida = (estadoSimulador.header.alg !== "none" && estadoSimulador.signatureStatus === "valida");
-  const papelAtual = estadoSimulador.payload.role || "nenhum";
-
-  const banner = document.getElementById("jwt-overall-status-banner");
-  if (banner) {
-    if (estadoSimulador.header.alg === "none") {
-      banner.style.background = "rgba(220, 38, 38, 0.15)";
-      banner.style.color = "#ef4444";
-      banner.style.border = "1px solid #ef4444";
-      banner.textContent = "🔴 REJEIÇÃO GLOBAL: Algoritmo 'none' Detectado (Ataque Barrado)";
-    } else if (estadoSimulador.signatureStatus === "invalida") {
-      banner.style.background = "rgba(220, 38, 38, 0.15)";
-      banner.style.color = "#ef4444";
-      banner.style.border = "1px solid #ef4444";
-      banner.textContent = "🔴 REJEIÇÃO GLOBAL: HTTP 401 Unauthorized (Assinatura Inválida)";
-    } else if (estaExpirado) {
-      banner.style.background = "rgba(245, 158, 11, 0.15)";
-      banner.style.color = "#f59e0b";
-      banner.style.border = "1px solid #f59e0b";
-      banner.textContent = "🟡 REJEIÇÃO GLOBAL: HTTP 401 Unauthorized (Token Expirado)";
-    } else {
-      banner.style.background = "rgba(16, 185, 129, 0.15)";
-      banner.style.color = "#10b981";
-      banner.style.border = "1px solid #10b981";
-      banner.textContent = `🟢 TOKEN VÁLIDO: Autenticado como '${escapeHtml(papelAtual.toUpperCase())}'`;
-    }
-  }
-
-  // Tabela de permissões operacionais
-  const operacoes = [
-    {
-      nome: "GET /api/v1/relatorios",
-      desc: "Visualizar Relatórios Operacionais",
-      papeisPermitidos: ["viewer", "operator", "admin"],
-      minRole: "viewer"
-    },
-    {
-      nome: "POST /api/v1/exportar-financeiro",
-      desc: "Exportar Balanço Financeiro",
-      papeisPermitidos: ["operator", "admin"],
-      minRole: "operator"
-    },
-    {
-      nome: "PUT /api/v1/configuracoes-seguranca",
-      desc: "Modificar Parâmetros Globais de Segurança",
-      papeisPermitidos: ["admin"],
-      minRole: "admin"
-    },
-    {
-      nome: "DELETE /api/v1/usuarios/:id",
-      desc: "Excluir Definitivamente Contas de Usuários",
-      papeisPermitidos: ["admin"],
-      minRole: "admin"
-    }
-  ];
-
-  const tbody = document.getElementById("rbac-matrix-rows");
-  if (!tbody) return;
-
-  tbody.innerHTML = "";
-
-  operacoes.forEach(op => {
-    let decisaoStatus = "";
-    let decisaoBadge = "";
-    let justificativa = "";
-
-    if (estadoSimulador.header.alg === "none") {
-      decisaoBadge = '<span class="badge red">403 FORBIDDEN</span>';
-      justificativa = "Servidor rejeitou requisição por cabeçalho 'alg: none' não confiável.";
-    } else if (estadoSimulador.signatureStatus === "invalida") {
-      decisaoBadge = '<span class="badge red">401 UNAUTHORIZED</span>';
-      justificativa = "Assinatura criptográfica não corresponde ao segredo do backend.";
-    } else if (estaExpirado) {
-      decisaoBadge = '<span class="badge amber">401 TOKEN EXPIRADO</span>';
-      justificativa = "A data atual ultrapassou o timestamp registrado na claim 'exp'.";
-    } else if (!op.papeisPermitidos.includes(papelAtual)) {
-      decisaoBadge = '<span class="badge red">403 ACESSO NEGADO</span>';
-      justificativa = `Papel '${papelAtual}' não possui o privilégio exigido (exige: ${op.minRole}).`;
-    } else {
-      decisaoBadge = '<span class="badge green">200 AUTORIZADO</span>';
-      justificativa = `Permissão concedida com sucesso para o papel corporativo '${papelAtual}'.`;
-    }
-
-    const tr = document.createElement("tr");
-    tr.style.borderBottom = "1px solid var(--rule)";
-    tr.innerHTML = `
-      <td style="padding:0.6rem;">
-        <strong style="font-family:var(--font-mono); font-size:0.8rem; color:var(--ink);">${escapeHtml(op.nome)}</strong>
-        <div style="font-size:0.75rem; color:var(--muted);">${escapeHtml(op.desc)}</div>
-      </td>
-      <td style="padding:0.6rem; font-family:var(--font-mono); font-size:0.8rem; color:var(--ink);">
-        ${op.papeisPermitidos.join(", ")}
-      </td>
-      <td style="padding:0.6rem;">${decisaoBadge}</td>
-      <td style="padding:0.6rem; font-size:0.8rem; color:var(--muted);">${escapeHtml(justificativa)}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-// Carregadores rápidos de cenários
-function carregarCenarioJwt(cenario) {
-  const agoraUnix = Math.floor(Date.now() / 1000);
-  estadoSimulador.header = { alg: "HS256", typ: "JWT" };
-  estadoSimulador.signatureStatus = "valida";
-
-  if (cenario === "viewer") {
-    estadoSimulador.payload = {
-      sub: "usr_10024",
-      name: "Carlos Mendes",
-      role: "viewer",
-      exp: agoraUnix + 3600,
-      iat: agoraUnix
-    };
-  } else if (cenario === "admin") {
-    estadoSimulador.payload = {
-      sub: "usr_00001",
-      name: "Mariana Costa",
-      role: "admin",
-      exp: agoraUnix + 7200,
-      iat: agoraUnix
-    };
-  } else if (cenario === "expirado") {
-    estadoSimulador.payload = {
-      sub: "usr_10024",
-      name: "Carlos Mendes",
-      role: "viewer",
-      exp: agoraUnix - 3600, // 1h no passado
-      iat: agoraUnix - 7200
-    };
-  }
-  sincronizarTokenComEstado();
-}
-
-// Injeção do ataque alg: none
-function injetarAtaqueNone() {
-  estadoSimulador.header = { alg: "none", typ: "JWT" };
-  estadoSimulador.signatureStatus = "none";
-  // O atacante tipicamente se auto-promove para admin junto
-  estadoSimulador.payload.role = "admin";
-  sincronizarTokenComEstado();
-}
-
-// Simulação de assinatura forjada
-function forjarAssinaturaInvalida() {
-  estadoSimulador.header = { alg: "HS256", typ: "JWT" };
-  estadoSimulador.signatureStatus = "invalida";
-  estadoSimulador.payload.role = "admin";
-  sincronizarTokenComEstado();
-}
-
-// Atualização de claims via selects
-function atualizarClaimRole(novoRole) {
-  estadoSimulador.payload.role = novoRole;
-  if (estadoSimulador.signatureStatus === "valida") {
-    // Reassina para manter íntegro
-    sincronizarTokenComEstado();
-  } else {
-    atualizarInterfaceCompleta();
-  }
-}
-
-function atualizarClaimExp(opcao) {
-  const agoraUnix = Math.floor(Date.now() / 1000);
-  if (opcao === "expirado") {
-    estadoSimulador.payload.exp = agoraUnix - 1800;
-  } else {
-    estadoSimulador.payload.exp = agoraUnix + 3600;
-  }
-  sincronizarTokenComEstado();
-}
-
-function reassinarComSegredoAtual() {
-  const inputSecret = document.getElementById("jwt-secret-input");
-  if (inputSecret) {
-    estadoSimulador.secret = inputSecret.value || "segredo";
-  }
-  estadoSimulador.header.alg = "HS256";
-  estadoSimulador.signatureStatus = "valida";
-  sincronizarTokenComEstado();
-}
-
-// Função para quando o usuário cola um token manualmente no textarea
-function processarEntradaTokenManual() {
-  const input = document.getElementById("jwt-raw-input");
-  if (!input) return;
-  const token = input.value.trim();
-  decodificarTokenJwt(token);
-}
-
-// Decodificador de string compacta JWS
-function decodificarTokenJwt(tokenCompacto) {
-  try {
-    const partes = tokenCompacto.split(".");
-    if (partes.length < 2) return;
-
-    const headerObj = JSON.parse(base64UrlDecodeStr(partes[0]));
-    const payloadObj = JSON.parse(base64UrlDecodeStr(partes[1]));
-
-    estadoSimulador.header = headerObj;
-    estadoSimulador.payload = payloadObj;
-    estadoSimulador.rawToken = tokenCompacto;
-
-    const sigPart = partes[2] || "";
-    if (headerObj.alg === "none") {
-      estadoSimulador.signatureStatus = "none";
-    } else {
-      // Verifica se bate com a assinatura esperada
-      const esperada = calcularAssinaturaSimulada(partes[0], partes[1], estadoSimulador.secret);
-      if (sigPart && sigPart === esperada) {
-        estadoSimulador.signatureStatus = "valida";
-      } else {
-        estadoSimulador.signatureStatus = "invalida";
-      }
-    }
-    atualizarInterfaceCompleta();
-  } catch (err) {
-    console.warn("Erro ao decodificar token digitado manualmente:", err);
-  }
-}
-
-// Assinador de token utilitário (compatibilidade com teste)
-function assinarTokenSimulado(header, payload, secret) {
-  const hB64 = base64UrlEncodeStr(JSON.stringify(header));
-  const pB64 = base64UrlEncodeStr(JSON.stringify(payload));
-  const sigB64 = calcularAssinaturaSimulada(hB64, pB64, secret);
-  return hB64 + "." + pB64 + "." + sigB64;
-}
-
-// Inicialização automática do checklist e do laboratório no carregamento da página
-document.addEventListener("DOMContentLoaded", function() {
-  if (typeof initChecklist === "function") {
-    initChecklist("autenticacao-iam");
-  }
-  carregarCenarioJwt("viewer");
-});
-</script>
 </main>
 </div>
 
@@ -3390,7 +2485,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3979,17 +3073,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -4203,7 +3286,6 @@ document.addEventListener("DOMContentLoaded", function() {
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

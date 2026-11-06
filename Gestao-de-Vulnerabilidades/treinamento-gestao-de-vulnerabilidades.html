@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Gestao-de-Vulnerabilidades">
@@ -2122,7 +1738,6 @@ dfn.glossario:focus-visible {
     <li><a class="toc-item" href="#padroes-cvss" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">O Padrão CVSS v3.1 e as Inovações do CVSS v4.0</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#triade-priorizacao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">A Tríade Moderna de Priorização: CVSS + EPSS + CISA KEV</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#remediacao-mitigacao-sla" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Remediação, Mitigação e SLAs de Correção Corporativos</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#laboratorio-pratico" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Interativo: Calculadora Vetorial CVSS v3.1 e Priorizador de Risco</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist-gestao-vulns" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Aplicação Prática: Gestão de Vulnerabilidades Baseada em Risco</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#questoes-fixacao" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Concursos Públicos</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos-essenciais" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais &bull; Trilha 2: Segurança Defensiva</span></span><span class="toc-contador"></span></a></li>
@@ -2138,7 +1753,7 @@ dfn.glossario:focus-visible {
   <h1>CVE, CVSS v3.1/v4.0 e Priorização de Patches</h1>
   <p class="mhead-sub">Ciclo de vida de vulnerabilidades, cálculo de criticidade de riscos e correlação com ameaças ativas</p>
   <div class="chips"><span class="chip">⏱ 45 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Identify / Protect</span><span class="chip">🎯 ATT&amp;CK TA0001 Initial Access / T1190 Exploit Public-Facing Application</span><span class="chip">👤 Blue Team &amp; Defesa · GRC &amp; Auditoria · Operações SOC &amp; Resposta</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#ecossistema-cve" data-tipo="teoria"><span class="toc-tipo">Teoria</span>4 seções</a><a href="#laboratorio-pratico" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist-gestao-vulns" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#questoes-fixacao" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>3 questões</a><a href="#fatos-essenciais" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#ecossistema-cve" data-tipo="teoria"><span class="toc-tipo">Teoria</span>4 seções</a><a href="#checklist-gestao-vulns" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#questoes-fixacao" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>3 questões</a><a href="#fatos-essenciais" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- ==========================================================================
      Estudo 09: Gestão de Vulnerabilidades
@@ -2148,7 +1763,7 @@ dfn.glossario:focus-visible {
 <article class="study-container" data-slug="gestao-de-vulnerabilidades">
 <!-- SEÇÃO 1: O CICLO DE VIDA DA VULNERABILIDADE E O ECOSSISTEMA CVE -->
 <section class="study-section" id="ecossistema-cve" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 8</small></span><h2>O Ciclo de Vida da Vulnerabilidade e o Ecossistema Global (CVE / NVD)</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 7</small></span><h2>O Ciclo de Vida da Vulnerabilidade e o Ecossistema Global (CVE / NVD)</h2></div>
 
   <p class="lead-text">
     Em uma grande organização, ferramentas de varredura automatizada frequentemente reportam milhares de vulnerabilidades
@@ -2222,7 +1837,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 2: O PADRÃO CVSS V3.1 E AS INOVAÇÕES DO CVSS V4.0 -->
 <section class="study-section" id="padroes-cvss" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 8</small></span><h2>O Padrão CVSS v3.1 e as Inovações do CVSS v4.0</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 7</small></span><h2>O Padrão CVSS v3.1 e as Inovações do CVSS v4.0</h2></div>
 
   <p>
     O <strong>Common Vulnerability Scoring System (CVSS)</strong>, mantido pelo consórcio global <strong>FIRST (Forum of Incident Response and Security Teams)</strong>,
@@ -2328,7 +1943,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 3: A TRÍADE MODERNA DE PRIORIZAÇÃO (CVSS + EPSS + KEV) -->
 <section class="study-section" id="triade-priorizacao" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 8</small></span><h2>A Tríade Moderna de Priorização: CVSS + EPSS + CISA KEV</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 7</small></span><h2>A Tríade Moderna de Priorização: CVSS + EPSS + CISA KEV</h2></div>
 
   <p>
     O maior erro conceitual em gestão de vulnerabilidades é assumir que <em>Severidade Teórica (CVSS)</em> é igual a <em>Risco Real</em>.
@@ -2381,7 +1996,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 4: REMEDIAÇÃO, MITIGAÇÃO E SLAS -->
 <section class="study-section" id="remediacao-mitigacao-sla" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 8</small></span><h2>Remediação, Mitigação e SLAs de Correção Corporativos</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 7</small></span><h2>Remediação, Mitigação e SLAs de Correção Corporativos</h2></div>
 
   <p>
     Diante de uma vulnerabilidade confirmada, a equipe de segurança e sustentação de TI possui três cursos de ação possíveis:
@@ -2455,166 +2070,10 @@ dfn.glossario:focus-visible {
 </section>
 
 <!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (CALCULADORA CVSS & PRIORIZADOR) -->
-<section class="study-section" id="laboratorio-pratico" data-tipo="laboratorio">
-  <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 5 de 8</small></span><h2>Laboratório Interativo: Calculadora Vetorial CVSS v3.1 e Priorizador de Risco</h2></div>
-
-  <p>
-    Experimente na prática a mecânica matemática oficial do algoritmo CVSS v3.1 e o cruzamento com dados de ameaças ativas.
-    Neste laboratório em Vanilla JavaScript, você pode carregar casos históricos famosos de vulnerabilidades
-    (como o Log4Shell e o EternalBlue) ou ajustar manualmente cada métrica de Exploitability e Impacto,
-    observando a geração em tempo real do Score Base (0.0 a 10.0), da string de vetor e da recomendação corporativa de SLA.
-  </p>
-
-  <div class="lab-box" id="cvss-lab">
-    <div class="lab-header">
-      <span class="lab-badge">LAB PRÁTICO INTERATIVO</span>
-      <h3>Calculadora Vetorial CVSS v3.1 &bull; Motor Matemático Oficial</h3>
-      <p>Configure os parâmetros de exploração e impacto, gere a string vetorial oficial e avalie o SLA de correção.</p>
-    </div>
-
-    <!-- Cenários de CVEs Reais -->
-    <div style="margin-bottom: 1.25rem;">
-      <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:0.5rem;">Carregar Casos Históricos de Vulnerabilidades Reais:</div>
-      <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
-        <button class="lab-btn lab-btn-danger" onclick="carregarCenarioCve('log4shell')">🚨 Log4Shell (CVE-2021-44228) &bull; RCE Crítico</button>
-        <button class="lab-btn lab-btn-danger" onclick="carregarCenarioCve('eternalblue')">☣️ EternalBlue (CVE-2017-0144) &bull; SMBv1 RCE</button>
-        <button class="lab-btn" onclick="carregarCenarioCve('local_escalation')">🔑 Escalação Local de Privilégio (Linux Kernel)</button>
-        <button class="lab-btn" onclick="carregarCenarioCve('xss_refletido')">🌐 XSS Refletido Web (Médio Impacto)</button>
-      </div>
-    </div>
-
-    <!-- Painel de Seleção das Métricas CVSS v3.1 -->
-    <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1.25rem; margin-bottom: 1.25rem;">
-      <h4 style="margin:0 0 0.75rem 0; font-size:0.95rem; color:var(--ink);">Métricas do Grupo Base (Base Metrics):</h4>
-      
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:0.75rem; font-size:0.825rem;">
-        <!-- Attack Vector -->
-        <div>
-          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Attack Vector (AV):</label>
-          <select id="cvss-av" style="width:100%; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
-            <option value="N">Network (N - Remoto Internet)</option>
-            <option value="A">Adjacent (A - Rede Local/Wi-Fi)</option>
-            <option value="L">Local (L - Acesso Local/Console)</option>
-            <option value="P">Physical (P - Acesso Físico)</option>
-          </select>
-        </div>
-
-        <!-- Attack Complexity -->
-        <div>
-          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Attack Complexity (AC):</label>
-          <select id="cvss-ac" style="width:100%; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
-            <option value="L">Low (L - Condições Triviais)</option>
-            <option value="H">High (H - Exige Condições Especiais)</option>
-          </select>
-        </div>
-
-        <!-- Privileges Required -->
-        <div>
-          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Privileges Required (PR):</label>
-          <select id="cvss-pr" style="width:100%; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
-            <option value="N">None (N - Anônimo / Sem Senha)</option>
-            <option value="L">Low (L - Usuário Comum)</option>
-            <option value="H">High (H - Administrador)</option>
-          </select>
-        </div>
-
-        <!-- User Interaction -->
-        <div>
-          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">User Interaction (UI):</label>
-          <select id="cvss-ui" style="width:100%; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
-            <option value="N">None (N - Autônomo / Sem Vítima)</option>
-            <option value="R">Required (R - Depende de Clique da Vítima)</option>
-          </select>
-        </div>
-
-        <!-- Scope -->
-        <div>
-          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Scope (S):</label>
-          <select id="cvss-s" style="width:100%; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
-            <option value="U">Unchanged (U - Apenas o Componente)</option>
-            <option value="C">Changed (C - Afeta Outros Sistemas / Sandbox Escape)</option>
-          </select>
-        </div>
-
-        <!-- Confidentiality Impact -->
-        <div>
-          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Confidentiality (C):</label>
-          <select id="cvss-c" style="width:100%; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
-            <option value="H">High (H - Vazamento Total)</option>
-            <option value="L">Low (L - Vazamento Parcial)</option>
-            <option value="N">None (N - Nenhum)</option>
-          </select>
-        </div>
-
-        <!-- Integrity Impact -->
-        <div>
-          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Integrity (I):</label>
-          <select id="cvss-i" style="width:100%; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
-            <option value="H">High (H - Modificação Total / RCE)</option>
-            <option value="L">Low (L - Modificação Parcial)</option>
-            <option value="N">None (N - Nenhum)</option>
-          </select>
-        </div>
-
-        <!-- Availability Impact -->
-        <div>
-          <label style="display:block; color:var(--muted); margin-bottom:0.25rem; font-weight:600;">Availability (A):</label>
-          <select id="cvss-a" style="width:100%; padding:0.35rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
-            <option value="H">High (H - Queda Total / Travamento)</option>
-            <option value="L">Low (L - Degradação Parcial)</option>
-            <option value="N">None (N - Nenhum)</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Fatores Complementares de Priorização de Risco -->
-      <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--rule); display:flex; flex-wrap:wrap; gap:1.5rem; align-items:center;">
-        <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; font-weight:600; font-size:0.85rem;">
-          <input type="checkbox" id="cvss-cisa-kev" onchange="calcularScoreCvss()">
-          <span>⚠️ Presente no Catálogo CISA KEV (Explorada Ativamente na Internet)</span>
-        </label>
-        <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem;">
-          <label style="font-weight:600; color:var(--muted);">Score EPSS (Probabilidade de Exploit):</label>
-          <input type="number" id="cvss-epss" value="97.4" min="0" max="100" step="0.1" style="width:70px; padding:0.3rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);" onchange="calcularScoreCvss()">
-          <span>%</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Painel de Resultados: Score Base, Vetor e SLA -->
-    <div style="background:var(--ground); border:1px solid var(--rule); border-radius:8px; padding:1.25rem;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
-        <div>
-          <div style="display:flex; align-items:center; gap:0.6rem;">
-            <h4 style="margin:0; font-size:1.1rem; color:var(--ink);">Resultado do Cálculo CVSS v3.1</h4>
-            <span id="cvss-severity-badge" class="badge red">CRÍTICA</span>
-          </div>
-          <div style="font-size:0.8rem; color:var(--muted); margin-top:0.3rem;">Fórmula oficial de arredondamento ceiling do FIRST.</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; font-weight:700;">Score Base Calculado</div>
-          <div id="cvss-score-num" style="font-size:2rem; font-weight:800; color:#ef4444; font-family:var(--font-display);">10.0</div>
-        </div>
-      </div>
-
-      <!-- String Vetorial Gerada -->
-      <div style="margin-bottom:1rem;">
-        <label style="display:block; font-size:0.75rem; color:var(--muted); text-transform:uppercase; font-weight:700; margin-bottom:0.25rem;">Vetor CVSS v3.1 Oficial Padronizado:</label>
-        <div style="display:flex; gap:0.5rem;">
-          <input type="text" id="cvss-vector-string" readonly style="flex:1; font-family:var(--font-mono); font-size:0.8rem; padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--surface); color:var(--ink);">
-          <button class="lab-btn" style="padding:0.4rem 0.8rem; font-size:0.75rem;" onclick="copiarVetorCvss()">Copiar Vetor</button>
-        </div>
-      </div>
-
-      <!-- Veredicto de Priorização e SLA -->
-      <div id="cvss-sla-box" style="padding:1rem; border-radius:6px; font-size:0.85rem; line-height:1.6; border:1px solid #ef4444; background:rgba(220, 38, 38, 0.15);"></div>
-    </div>
-  </div>
-</section>
 
 <!-- SEÇÃO 6: CHECKLIST PRÁTICO -->
 <section class="study-section" id="checklist-gestao-vulns" data-tipo="checklist">
-  <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 6 de 8</small></span><h2>Checklist de Aplicação Prática: Gestão de Vulnerabilidades Baseada em Risco</h2></div>
+  <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 5 de 7</small></span><h2>Checklist de Aplicação Prática: Gestão de Vulnerabilidades Baseada em Risco</h2></div>
 
   <p>
     Utilize este checklist técnico durante revisões de governança, auditorias de conformidade com o NIST CSF 2.0
@@ -2680,7 +2139,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 7: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
 <section class="study-section" id="questoes-fixacao" data-tipo="questoes">
-  <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 7 de 8</small></span><h2>Questões de Fixação e Concursos Públicos</h2></div>
+  <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 6 de 7</small></span><h2>Questões de Fixação e Concursos Públicos</h2></div>
 
   <p>
     Valide sua preparação respondendo a questões baseadas em provas de concursos para Analista de Tecnologia e Segurança
@@ -2764,7 +2223,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 8: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
 <section class="study-section" id="fatos-essenciais" data-tipo="referencias">
-  <div class="shead"><span class="stype">📚 Referências <small>· Seção 8 de 8</small></span><h2>Fatos Essenciais &bull; Trilha 2: Segurança Defensiva</h2></div>
+  <div class="shead"><span class="stype">📚 Referências <small>· Seção 7 de 7</small></span><h2>Fatos Essenciais &bull; Trilha 2: Segurança Defensiva</h2></div>
 
   <div class="facts-grid">
     <div class="facts-card">
@@ -2801,241 +2260,6 @@ dfn.glossario:focus-visible {
 </article>
 
 <!-- SCRIPT EMBUTIDO: CALCULADORA CVSS V3.1 E PRIORIZADOR EPSS/KEV -->
-<script>
-/**
- * Calculadora Interativa CVSS v3.1 e Priorizador de Risco
- * Implementação matemática oficial das fórmulas do FIRST
- * Mapa da Cibersegurança
- */
-
-// Pesos oficiais das métricas do CVSS v3.1
-const CVSS_WEIGHTS = {
-  AV: { N: 0.85, A: 0.62, L: 0.55, P: 0.20 },
-  AC: { L: 0.77, H: 0.44 },
-  PR_U: { N: 0.85, L: 0.62, H: 0.27 }, // Scope Unchanged
-  PR_C: { N: 0.85, L: 0.68, H: 0.50 }, // Scope Changed
-  UI: { N: 0.85, R: 0.62 },
-  C: { H: 0.56, L: 0.22, N: 0.00 },
-  I: { H: 0.56, L: 0.22, N: 0.00 },
-  A: { H: 0.56, L: 0.22, N: 0.00 }
-};
-
-// Cenários históricos pré-configurados
-const CENARIOS_CVE = {
-  log4shell: {
-    nome: "Log4Shell (CVE-2021-44228)",
-    av: "N", ac: "L", pr: "N", ui: "N", s: "C", c: "H", i: "H", a: "H",
-    kev: true, epss: 97.4
-  },
-  eternalblue: {
-    nome: "EternalBlue (CVE-2017-0144)",
-    av: "N", ac: "L", pr: "N", ui: "N", s: "U", c: "H", i: "H", a: "H",
-    kev: true, epss: 96.1
-  },
-  local_escalation: {
-    nome: "Escalação Local de Privilégio (Linux Kernel)",
-    av: "L", ac: "L", pr: "L", ui: "N", s: "U", c: "H", i: "H", a: "H",
-    kev: false, epss: 1.4
-  },
-  xss_refletido: {
-    nome: "XSS Refletido em Aplicação Web",
-    av: "N", ac: "L", pr: "N", ui: "R", s: "C", c: "L", i: "L", a: "N",
-    kev: false, epss: 4.8
-  }
-};
-
-// Carrega os parâmetros de um cenário específico
-function carregarCenarioCve(chave) {
-  const c = CENARIOS_CVE[chave];
-  if (!c) return;
-
-  document.getElementById("cvss-av").value = c.av;
-  document.getElementById("cvss-ac").value = c.ac;
-  document.getElementById("cvss-pr").value = c.pr;
-  document.getElementById("cvss-ui").value = c.ui;
-  document.getElementById("cvss-s").value = c.s;
-  document.getElementById("cvss-c").value = c.c;
-  document.getElementById("cvss-i").value = c.i;
-  document.getElementById("cvss-a").value = c.a;
-  document.getElementById("cvss-cisa-kev").checked = c.kev;
-  document.getElementById("cvss-epss").value = c.epss;
-
-  calcularScoreCvss();
-}
-
-// Gera a string oficial de vetor CVSS v3.1
-function gerarStringVetorCvss() {
-  const av = document.getElementById("cvss-av").value;
-  const ac = document.getElementById("cvss-ac").value;
-  const pr = document.getElementById("cvss-pr").value;
-  const ui = document.getElementById("cvss-ui").value;
-  const s = document.getElementById("cvss-s").value;
-  const c = document.getElementById("cvss-c").value;
-  const i = document.getElementById("cvss-i").value;
-  const a = document.getElementById("cvss-a").value;
-
-  return `CVSS:3.1/AV:${av}/AC:${ac}/PR:${pr}/UI:${ui}/S:${s}/C:${c}/I:${i}/A:${a}`;
-}
-
-// Função oficial de arredondamento ceiling do CVSS v3.1
-function roundUp(input) {
-  const intInput = Math.round(input * 100000);
-  if (intInput % 10000 === 0) {
-    return intInput / 100000;
-  }
-  return (Math.floor(intInput / 10000) + 1) / 10;
-}
-
-// Cálculo matemático das fórmulas oficiais do CVSS v3.1
-function calcularScoreCvss() {
-  const av = document.getElementById("cvss-av").value;
-  const ac = document.getElementById("cvss-ac").value;
-  const pr = document.getElementById("cvss-pr").value;
-  const ui = document.getElementById("cvss-ui").value;
-  const s = document.getElementById("cvss-s").value;
-  const c = document.getElementById("cvss-c").value;
-  const i = document.getElementById("cvss-i").value;
-  const a = document.getElementById("cvss-a").value;
-
-  const isKev = document.getElementById("cvss-cisa-kev").checked;
-  const epss = parseFloat(document.getElementById("cvss-epss").value) || 0;
-
-  // 1. Cálculo de Impact Sub-Score (ISS)
-  const cWeight = CVSS_WEIGHTS.C[c];
-  const iWeight = CVSS_WEIGHTS.I[i];
-  const aWeight = CVSS_WEIGHTS.A[a];
-  const iss = 1 - ((1 - cWeight) * (1 - iWeight) * (1 - aWeight));
-
-  let impact = 0;
-  if (s === "U") {
-    impact = 6.42 * iss;
-  } else {
-    impact = 7.52 * (iss - 0.029) - 3.25 * Math.pow(iss - 0.02, 15);
-  }
-
-  // 2. Cálculo de Exploitability Sub-Score
-  const prWeight = (s === "U") ? CVSS_WEIGHTS.PR_U[pr] : CVSS_WEIGHTS.PR_C[pr];
-  const exploitability = 8.22 * CVSS_WEIGHTS.AV[av] * CVSS_WEIGHTS.AC[ac] * prWeight * CVSS_WEIGHTS.UI[ui];
-
-  // 3. Cálculo do Base Score
-  let baseScore = 0;
-  if (impact <= 0) {
-    baseScore = 0.0;
-  } else if (s === "U") {
-    baseScore = roundUp(Math.min(impact + exploitability, 10));
-  } else {
-    baseScore = roundUp(Math.min(1.08 * (impact + exploitability), 10));
-  }
-
-  baseScore = Math.max(0.0, Math.min(10.0, baseScore));
-
-  const vectorString = gerarStringVetorCvss();
-  renderizarResultadoCvss(baseScore, vectorString, isKev, epss);
-  return { baseScore, vectorString, isKev, epss };
-}
-
-// Renderiza o resultado nos componentes da interface
-function renderizarResultadoCvss(score, vectorString, isKev, epss) {
-  const scoreNumEl = document.getElementById("cvss-score-num");
-  const sevBadgeEl = document.getElementById("cvss-severity-badge");
-  const vectorInput = document.getElementById("cvss-vector-string");
-  const slaBox = document.getElementById("cvss-sla-box");
-
-  if (vectorInput) vectorInput.value = vectorString;
-  if (scoreNumEl) scoreNumEl.textContent = score.toFixed(1);
-
-  let severidade = "BAIXA";
-  let cor = "#0891b2";
-  let badgeClass = "badge blue";
-
-  if (score >= 9.0) {
-    severidade = "CRÍTICA";
-    cor = "#ef4444";
-    badgeClass = "badge red";
-  } else if (score >= 7.0) {
-    severidade = "ALTA";
-    cor = "#f59e0b";
-    badgeClass = "badge amber";
-  } else if (score >= 4.0) {
-    severidade = "MÉDIA";
-    cor = "#0891b2";
-    badgeClass = "badge blue";
-  } else if (score > 0) {
-    severidade = "BAIXA";
-    cor = "var(--muted)";
-    badgeClass = "badge slate";
-  } else {
-    severidade = "NENHUMA";
-    cor = "var(--muted)";
-    badgeClass = "badge slate";
-  }
-
-  if (scoreNumEl) scoreNumEl.style.color = cor;
-  if (sevBadgeEl) {
-    sevBadgeEl.className = badgeClass;
-    sevBadgeEl.textContent = severidade;
-  }
-
-  // Avaliação de Priorização de Risco Real e SLA
-  if (slaBox) {
-    let slaPrazo = "";
-    let slaStatus = "";
-    let boxCor = "";
-
-    if (isKev) {
-      slaStatus = "🚨 SLA DE EMERGÊNCIA IMEDIATA (EXPLORAÇÃO ATIVA NO CISA KEV)";
-      slaPrazo = "Correção Obrigatória em até 48 HORAS (ou isolamento emergencial do ativo).";
-      boxCor = "#ef4444";
-    } else if (epss >= 50.0) {
-      slaStatus = "⚠️ SLA DE ALTA PRIORIDADE (ALTO RISCO DE ATAQUE IMINENTE - EPSS > 50%)";
-      slaPrazo = "Correção em até 7 DIAS.";
-      boxCor = "#f59e0b";
-    } else if (score >= 9.0) {
-      slaStatus = "🟡 PRIORIDADE ALTA (CVSS CRÍTICO SEM EXPLOIT ATIVO CONFIRMADO)";
-      slaPrazo = "Correção em até 15 DIAS (próxima janela de manutenção programada).";
-      boxCor = "#f59e0b";
-    } else if (score >= 7.0) {
-      slaStatus = "🔵 PRIORIDADE MÉDIA (SEVERIDADE ALTA / BAIXO EPSS)";
-      slaPrazo = "Correção em até 30 DIAS no ciclo mensal de patches.";
-      boxCor = "#0891b2";
-    } else {
-      slaStatus = "⚪ BAIXA PRIORIDADE (SEVERIDADE MODERADA/BAIXA)";
-      slaPrazo = "Correção em até 90 DIAS na manutenção trimestral.";
-      boxCor = "var(--rule)";
-    }
-
-    slaBox.style.borderColor = boxCor;
-    slaBox.style.background = boxCor === "#ef4444" ? "rgba(220, 38, 38, 0.15)" : (boxCor === "#f59e0b" ? "rgba(245, 158, 11, 0.15)" : "rgba(8, 145, 178, 0.15)");
-    slaBox.innerHTML = `
-      <div style="font-weight:800; font-size:0.95rem; color:${boxCor}; margin-bottom:0.3rem;">${escapeHtml(slaStatus)}</div>
-      <div><strong>Prazo SLA Recomendado:</strong> ${escapeHtml(slaPrazo)}</div>
-      <div style="font-size:0.8rem; color:var(--muted); margin-top:0.4rem;">
-        <strong>Diagnóstico de Inteligência:</strong> CVSS Base = <strong>${score.toFixed(1)}</strong> | CISA KEV = <strong>${isKev ? "SIM (ATIVO)" : "NÃO"}</strong> | Probabilidade EPSS = <strong>${epss.toFixed(1)}%</strong>.
-      </div>
-    `;
-  }
-}
-
-function copiarVetorCvss() {
-  const input = document.getElementById("cvss-vector-string");
-  if (!input) return;
-  input.select();
-  navigator.clipboard.writeText(input.value).then(() => {
-    alert("Vetor CVSS copiado com sucesso para a área de transferência!");
-  }).catch(() => {
-    document.execCommand("copy");
-    alert("Vetor CVSS copiado!");
-  });
-}
-
-// Inicialização automática do checklist e do laboratório no carregamento da página
-document.addEventListener("DOMContentLoaded", function() {
-  if (typeof initChecklist === "function") {
-    initChecklist("gestao-vulnerabilidades");
-  }
-  carregarCenarioCve("log4shell");
-});
-</script>
 </main>
 </div>
 
@@ -3170,7 +2394,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3759,17 +2982,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -3983,7 +3195,6 @@ document.addEventListener("DOMContentLoaded", function() {
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

@@ -5,11 +5,10 @@ Regras (spec §3.1): as mensagens têm o formato "<slug> §<n>: <onde>: <descri�
 from dataclasses import dataclass
 from html.parser import HTMLParser
 
-TIPOS = ("teoria", "laboratorio", "checklist", "questoes", "referencias")
+TIPOS = ("teoria", "checklist", "questoes", "referencias")
 
 ROTULOS = {
     "teoria": ("📘", "Teoria"),
-    "laboratorio": ("🧪", "Laboratório"),
     "checklist": ("☑️", "Checklist"),
     "questoes": ("❓", "Questões de concurso"),
     "referencias": ("📚", "Referências"),
@@ -238,7 +237,7 @@ def validar_corpo(html, slug):
 
     # §5
     presentes = {s.get("data-tipo") for s in secoes}
-    for t in ("laboratorio", "checklist", "questoes", "referencias"):
+    for t in ("checklist", "questoes", "referencias"):
         if t not in presentes:
             erro(5, "corpo", f'falta seção do tipo "{t}"')
 

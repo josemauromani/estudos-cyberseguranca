@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Laboratorio-Domestico-e-Portfolio">
@@ -2120,7 +1736,6 @@ dfn.glossario:focus-visible {
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: Mostrar em Vez de Dizer</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#pratica" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">CTFs, Write-ups, Portfólio e Limites Legais</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Planejador de Homelab</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist do Laboratório e do Portfólio</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2136,14 +1751,14 @@ dfn.glossario:focus-visible {
   <h1>Laboratório Doméstico, CTFs e Portfólio</h1>
   <p class="mhead-sub">Montar um laboratório isolado, praticar em CTFs e transformar a prática em portfólio</p>
   <div class="chips"><span class="chip">⏱ 35 min</span><span class="chip">📈 Iniciante</span><span class="chip">🛡 NIST Protect</span><span class="chip">🎯 ATT&amp;CK N/A (módulo de carreira)</span><span class="chip">👤 Blue Team &amp; Defesa · Red Team &amp; Pentest · AppSec &amp; DevSecOps · Operações SOC &amp; Resposta · GRC &amp; Auditoria · Perícia Forense &amp; Malware · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 37: Laboratorio-Domestico-e-Portfolio Body Fragment -->
 <article class="study-container" data-slug="laboratorio-portfolio">
 
     <!-- SEÇÃO 1: O LABORATÓRIO -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: Mostrar em Vez de Dizer</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 5</small></span><h2>Introdução: Mostrar em Vez de Dizer</h2></div>
 
         <p class="lead-text">
             Numa entrevista, "sei investigar um ataque ao AD" vale pouco; um repositório com a regra que detecta Kerberoasting, o print do alerta e o passo a passo de como você testou vale muito. Um laboratório em casa é onde essa prova é produzida sem risco para ninguém. Este estudo mostra como montar um laboratório que cabe na sua máquina, isolado da sua rede, e como transformar o que você praticou neste currículo num portfólio.
@@ -2209,7 +1824,7 @@ VBoxManage snapshot "Kali" restore "limpa-antes-do-lab"</code></pre>
 
     <!-- SEÇÃO 2: PRÁTICA, PORTFÓLIO E LIMITES -->
     <section class="study-section" id="pratica" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>CTFs, Write-ups, Portfólio e Limites Legais</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 5</small></span><h2>CTFs, Write-ups, Portfólio e Limites Legais</h2></div>
 
         <h3>CTFs e Plataformas</h3>
         <p>
@@ -2280,68 +1895,10 @@ Tudo foi feito no meu laboratório ou em plataformas que autorizam os testes.</c
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 3 de 6</small></span><h2>Laboratório Prático: Planejador de Homelab</h2></div>
-
-        <p class="lead-text">
-            Informe a configuração do seu computador, escolha as VMs (ou um perfil pronto) e veja se tudo cabe. O planejador desenha a topologia, gera o checklist de isolamento e sugere projetos de portfólio ligados aos estudos deste currículo.
-        </p>
-
-        <div class="lab-box hl-lab" id="hl-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Planejador de Laboratório</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Meu homelab</h3>
-                    <p id="hl-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
-                </div>
-            </div>
-
-            <div class="lab-body">
-                <h4 style="margin-top: 0;">1. Seu computador</h4>
-                <div id="hl-host" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: 0.6rem; font-size: 0.85rem;">
-                    <label style="display: flex; flex-direction: column; gap: 0.25rem;">RAM total (GB)
-                        <input class="form-control" type="number" min="4" max="512" step="1" id="hl-ram">
-                    </label>
-                    <label style="display: flex; flex-direction: column; gap: 0.25rem;">Núcleos lógicos
-                        <input class="form-control" type="number" min="2" max="128" step="1" id="hl-nucleos">
-                    </label>
-                    <label style="display: flex; flex-direction: column; gap: 0.25rem;">Disco livre (GB)
-                        <input class="form-control" type="number" min="20" max="10000" step="10" id="hl-disco">
-                    </label>
-                    <label style="display: flex; flex-direction: column; gap: 0.25rem;">Processador
-                        <select class="form-control" id="hl-arquitetura">
-                            <option value="x86">x86 (Intel ou AMD)</option>
-                            <option value="arm">Mac com Apple Silicon (ARM)</option>
-                        </select>
-                    </label>
-                </div>
-
-                <h4 style="margin-top: 1.25rem;">2. VMs do laboratório</h4>
-                <div id="hl-perfis" style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem;"></div>
-                <div id="hl-catalogo" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 0.5rem;"></div>
-
-                <h4 style="margin-top: 1.25rem;">3. Recursos</h4>
-                <div id="hl-recursos" aria-live="polite" style="font-size: 0.88rem;"></div>
-
-                <h4 style="margin-top: 1.25rem;">4. Topologia</h4>
-                <div id="hl-topologia" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.4rem; font-size: 0.85rem;"></div>
-
-                <h4 style="margin-top: 1.25rem;">5. Checklist de isolamento</h4>
-                <ul id="hl-checklist" style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem;"></ul>
-
-                <h4 style="margin-top: 1.25rem;">6. Roteiro de portfólio</h4>
-                <ol id="hl-portfolio" style="margin: 0; padding-left: 1.4rem; font-size: 0.85rem; display: grid; gap: 0.4rem;"></ol>
-
-                <div style="margin-top: 1.25rem;">
-                    <button class="btn-secondary" type="button" onclick="restaurarHomelab()">Restaurar laboratório</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist do Laboratório e do Portfólio</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 3 de 5</small></span><h2>Checklist do Laboratório e do Portfólio</h2></div>
 
         <p class="lead-text">
             Use esta lista para montar o laboratório com segurança e manter o portfólio vivo. O estado das caixas fica salvo no seu navegador.
@@ -2381,7 +1938,7 @@ Tudo foi feito no meu laboratório ou em plataformas que autorizam os testes.</c
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 4 de 5</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2464,7 +2021,7 @@ Tudo foi feito no meu laboratório ou em plataformas que autorizam os testes.</c
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 5 de 5</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2512,266 +2069,7 @@ Tudo foi feito no meu laboratório ou em plataformas que autorizam os testes.</c
 
 </article>
 
-<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
-<script type="application/json" id="hl-dados">
-{
- "contexto": "Recursos recomendados pela documentação de cada sistema, arredondados para laboratório. O planejador reserva 4 GB de RAM para o sistema do seu computador.",
- "reserva_host_gb": 4,
- "limite_apertado": 0.85,
- "vcpu_por_nucleo": 2,
- "funcoes": {"firewall": "Firewall", "dc": "Controlador de domínio", "estacao": "Estação de trabalho", "siem": "SIEM", "atacante": "Atacante", "alvo": "Alvo vulnerável"},
- "catalogo": [
-  {"id": "opnsense", "nome": "OPNsense", "funcao": "firewall", "ram": 2, "vcpu": 1, "disco": 20, "arm": false, "nota": "Firewall do laboratório; só existe para x86."},
-  {"id": "winserver", "nome": "Windows Server 2022 com AD DS", "funcao": "dc", "ram": 4, "vcpu": 2, "disco": 60, "arm": false, "nota": "Versão de avaliação de 180 dias; controlador de domínio."},
-  {"id": "win11", "nome": "Windows 11 Enterprise", "funcao": "estacao", "ram": 4, "vcpu": 2, "disco": 64, "arm": true, "nota": "Versão de avaliação; estação ingressada no domínio. Há versão ARM."},
-  {"id": "wazuh", "nome": "Wazuh (all-in-one)", "funcao": "siem", "ram": 8, "vcpu": 4, "disco": 50, "arm": true, "nota": "Indexador, servidor e painel numa VM; a instalação rápida pede 4 vCPU e 8 GB."},
-  {"id": "kali", "nome": "Kali Linux", "funcao": "atacante", "ram": 2, "vcpu": 2, "disco": 40, "arm": true, "nota": "Máquina de ataque; há imagem ARM64."},
-  {"id": "ubuntu-web", "nome": "Ubuntu Server com DVWA e Juice Shop", "funcao": "alvo", "ram": 2, "vcpu": 1, "disco": 25, "arm": true, "nota": "Aplicações web vulneráveis para treinar OWASP."},
-  {"id": "metasploitable", "nome": "Metasploitable 2", "funcao": "alvo", "ram": 1, "vcpu": 1, "disco": 8, "arm": false, "nota": "Linux propositalmente vulnerável, só x86; jamais exposto à rede."}
- ],
- "perfis": [
-  {"id": "soc", "nome": "SOC / Blue Team", "vms": ["opnsense", "winserver", "win11", "wazuh", "kali"]},
-  {"id": "red", "nome": "Red Team / Web", "vms": ["opnsense", "kali", "ubuntu-web", "metasploitable"]},
-  {"id": "ad", "nome": "AD completo", "vms": ["opnsense", "winserver", "win11", "kali"]}
- ],
- "exemplos": [
-  {"nome": "Notebook 16 GB com perfil SOC", "perfil": "soc", "host": {"ram": 16, "nucleos": 8, "disco": 256, "arm": false}, "esperado": "nao_cabe"},
-  {"nome": "Desktop 32 GB com perfil SOC", "perfil": "soc", "host": {"ram": 32, "nucleos": 12, "disco": 500, "arm": false}, "esperado": "cabe"},
-  {"nome": "Notebook 16 GB com AD completo", "perfil": "ad", "host": {"ram": 16, "nucleos": 8, "disco": 256, "arm": false}, "esperado": "apertado"},
-  {"nome": "Notebook 16 GB com Red Team", "perfil": "red", "host": {"ram": 16, "nucleos": 8, "disco": 256, "arm": false}, "esperado": "cabe"},
-  {"nome": "Mac Apple Silicon com Red Team", "perfil": "red", "host": {"ram": 16, "nucleos": 8, "disco": 256, "arm": true}, "esperado": "incompativel"},
-  {"nome": "Desktop 32 GB com pouco disco e perfil SOC", "perfil": "soc", "host": {"ram": 32, "nucleos": 12, "disco": 120, "arm": false}, "esperado": "nao_cabe"},
-  {"nome": "Notebook 16 GB só com Wazuh e Kali", "vms": ["wazuh", "kali"], "host": {"ram": 16, "nucleos": 8, "disco": 256, "arm": false}, "esperado": "apertado"},
-  {"nome": "Mac Apple Silicon com Kali e Metasploitable", "vms": ["kali", "metasploitable"], "host": {"ram": 16, "nucleos": 8, "disco": 256, "arm": true}, "esperado": "incompativel"},
-  {"nome": "Mac Apple Silicon com Kali e aplicação web", "vms": ["kali", "ubuntu-web"], "host": {"ram": 16, "nucleos": 8, "disco": 256, "arm": true}, "esperado": "cabe"},
-  {"nome": "Notebook 16 GB de 2 núcleos lógicos com Red Team", "perfil": "red", "host": {"ram": 16, "nucleos": 2, "disco": 256, "arm": false}, "esperado": "apertado"}
- ],
- "isolamento": [
-  {"com": [], "sem": [], "texto": "Coloque as VMs numa rede interna ou host-only; nunca em bridge com a rede de casa."},
-  {"com": [], "sem": [], "texto": "Tire um snapshot limpo de cada VM antes do primeiro exercício e volte a ele depois de cada um."},
-  {"com": [], "sem": [], "texto": "Mantenha o hipervisor e o sistema do seu computador atualizados: uma fuga de VM afeta a máquina real."},
-  {"com": ["kali", "ubuntu-web", "metasploitable"], "sem": [], "texto": "Desative pasta compartilhada, área de transferência e arrastar-e-soltar nas VMs de ataque e de alvo."},
-  {"com": ["metasploitable"], "sem": [], "texto": "A Metasploitable 2 tem dezenas de falhas conhecidas: ela nunca pode ser alcançável da rede de casa nem da internet."},
-  {"com": ["kali"], "sem": [], "texto": "Ferramentas de ataque só contra VMs do laboratório; nunca contra a rede de casa, do vizinho ou do trabalho."},
-  {"com": ["winserver", "win11"], "sem": [], "texto": "Use as avaliações oficiais da Microsoft e senhas exclusivas do laboratório, diferentes de qualquer conta real."},
-  {"com": [], "sem": ["opnsense"], "texto": "Sem firewall no laboratório: deixe as VMs só na rede interna, sem NAT, e ligue o acesso à internet apenas para atualizar."}
- ],
- "portfolio": [
-  {"requer": ["winserver", "kali", "wazuh"], "projeto": "Execute Kerberoasting no laboratório e publique a regra Sigma que detecta o pedido de tickets com RC4, com o print do alerta no Wazuh.", "modulos": ["Active-Directory-Fundamentos", "Ataques-e-Defesa-no-AD", "Operacoes-SOC-e-SIEM"]},
-  {"requer": ["winserver", "win11"], "projeto": "Monte o domínio com uma GPO de linha de base (firewall, log de ScriptBlock) e documente a configuração efetiva com gpresult.", "modulos": ["Active-Directory-Fundamentos", "PowerShell-e-Windows-Interno", "Hardening-Sistemas"]},
-  {"requer": ["wazuh"], "projeto": "Crie uma regra de força bruta com correlação, gere falsos positivos de propósito e documente o ajuste.", "modulos": ["Operacoes-SOC-e-SIEM", "Linux-para-Seguranca"]},
-  {"requer": ["opnsense"], "projeto": "Documente a segmentação do laboratório: regras do firewall, diagrama e o teste que prova que os alvos não alcançam sua rede.", "modulos": ["Segmentacao-e-Firewall", "Seguranca-de-Redes-Defesa"]},
-  {"requer": ["ubuntu-web", "kali"], "projeto": "Explore SQL injection e XSS na aplicação vulnerável, corrija o código e publique o antes e o depois.", "modulos": ["OWASP-Top-10-Web", "Seguranca-de-Bancos-de-Dados"]},
-  {"requer": ["metasploitable", "kali"], "projeto": "Escreva um mini relatório de pentest da Metasploitable 2: escopo, achados com CVSS e recomendações.", "modulos": ["Pentest-Metodologias", "Gestao-de-Vulnerabilidades"]},
-  {"requer": [], "projeto": "Publique um script Python que resume o auth.log (IPs com falhas, logins aceitos), com README e exemplo de saída.", "modulos": ["Python-para-Seguranca", "Linux-para-Seguranca"]}
- ]
-}
-</script>
-
-<script>
-(function() {
-    var HL = JSON.parse(document.getElementById("hl-dados").textContent);
-    var ROTULO = { cabe: "Cabe com folga", apertado: "Cabe, mas apertado", nao_cabe: "Não cabe", incompativel: "Incompatível com o processador" };
-    var COR = { cabe: "var(--tip-color)", apertado: "rgb(202, 138, 4)", nao_cabe: "var(--danger-color)", incompativel: "var(--danger-color)" };
-    var MODULOS = { "Active-Directory-Fundamentos": 38, "Ataques-e-Defesa-no-AD": 39, "Operacoes-SOC-e-SIEM": 16, "PowerShell-e-Windows-Interno": 36,
-        "Hardening-Sistemas": 6, "Linux-para-Seguranca": 34, "Segmentacao-e-Firewall": 5, "Seguranca-de-Redes-Defesa": 7, "OWASP-Top-10-Web": 12,
-        "Seguranca-de-Bancos-de-Dados": 30, "Pentest-Metodologias": 14, "Gestao-de-Vulnerabilidades": 9, "Python-para-Seguranca": 35 };
-    var selecionadas = [];
-
-    function el(tag, texto, estilo) {
-        var e = document.createElement(tag);
-        if (texto !== undefined && texto !== null) e.textContent = texto;
-        if (estilo) e.setAttribute("style", estilo);
-        return e;
-    }
-    function vm(id) { return HL.catalogo.filter(function(v) { return v.id === id; })[0]; }
-    function host() {
-        return {
-            ram: Number(document.getElementById("hl-ram").value) || 0,
-            nucleos: Number(document.getElementById("hl-nucleos").value) || 0,
-            disco: Number(document.getElementById("hl-disco").value) || 0,
-            arm: document.getElementById("hl-arquitetura").value === "arm"
-        };
-    }
-
-    // Regra espelhada nos testes em Python.
-    function veredito(h, vms) {
-        if (h.arm && vms.some(function(id) { return !vm(id).arm; })) return "incompativel";
-        var ram = vms.reduce(function(s, id) { return s + vm(id).ram; }, 0) + HL.reserva_host_gb;
-        var vcpu = vms.reduce(function(s, id) { return s + vm(id).vcpu; }, 0);
-        var disco = vms.reduce(function(s, id) { return s + vm(id).disco; }, 0);
-        if (ram > h.ram || disco > h.disco) return "nao_cabe";
-        if (ram > HL.limite_apertado * h.ram || vcpu > HL.vcpu_por_nucleo * h.nucleos) return "apertado";
-        return "cabe";
-    }
-    window.vereditoHomelab = function(h, vms) { return veredito(h, vms); };
-
-    function barra(rotulo, usado, total, unidade) {
-        var pct = total > 0 ? usado / total : 1;
-        var cor = pct > 1 ? "var(--danger-color)" : pct > HL.limite_apertado ? "rgb(202, 138, 4)" : "var(--tip-color)";
-        var d = el("div", null, "margin-bottom: 0.45rem;");
-        d.appendChild(el("div", rotulo + ": " + usado + " de " + total + " " + unidade + " (" + Math.round(pct * 100) + "%)", "font-size: 0.82rem;"));
-        var b = el("div", null, "height: 0.55rem; background: var(--sunk); border-radius: var(--radius-pill); overflow: hidden;");
-        b.setAttribute("role", "img");
-        b.setAttribute("aria-label", rotulo + ": " + Math.round(pct * 100) + "% usado");
-        b.appendChild(el("div", null, "height: 100%; width: " + Math.min(100, pct * 100) + "%; background: " + cor + ";"));
-        d.appendChild(b);
-        return d;
-    }
-
-    function renderizarCatalogo() {
-        var box = document.getElementById("hl-catalogo");
-        box.replaceChildren();
-        var h = host();
-        HL.catalogo.forEach(function(v) {
-            var on = selecionadas.indexOf(v.id) !== -1, incompat = h.arm && !v.arm;
-            var rot = el("label", null, "display: flex; gap: 0.5rem; align-items: flex-start; border: 1px solid " + (incompat && on ? "var(--danger-color)" : "var(--rule)") + "; border-radius: var(--radius-sm); padding: 0.45rem 0.6rem; font-size: 0.84rem; min-width: 0;");
-            var cb = el("input");
-            cb.type = "checkbox";
-            cb.checked = on;
-            cb.setAttribute("data-vm", v.id);
-            cb.addEventListener("change", function() { alternarVmHomelab(v.id); });
-            rot.appendChild(cb);
-            var t = el("span", null, "min-width: 0;");
-            t.appendChild(el("strong", v.nome, "display: block;"));
-            t.appendChild(el("span", HL.funcoes[v.funcao] + " · " + v.ram + " GB · " + v.vcpu + " vCPU · " + v.disco + " GB" + (incompat ? " · só x86" : ""),
-                "display: block; font-family: var(--font-mono); font-size: 0.72rem; color: " + (incompat ? "var(--danger-color)" : "var(--muted)") + ";"));
-            t.appendChild(el("span", v.nota, "display: block; font-size: 0.75rem; color: var(--muted);"));
-            rot.appendChild(t);
-            box.appendChild(rot);
-        });
-    }
-
-    function renderizarRecursos() {
-        var box = document.getElementById("hl-recursos");
-        box.replaceChildren();
-        var h = host();
-        var ram = selecionadas.reduce(function(s, id) { return s + vm(id).ram; }, 0) + HL.reserva_host_gb;
-        var vcpu = selecionadas.reduce(function(s, id) { return s + vm(id).vcpu; }, 0);
-        var disco = selecionadas.reduce(function(s, id) { return s + vm(id).disco; }, 0);
-        if (!selecionadas.length) {
-            box.setAttribute("data-veredito", "vazio");
-            box.appendChild(el("p", "Nenhuma VM escolhida. Marque as VMs ou use um perfil pronto.", "margin: 0;"));
-            return;
-        }
-        var v = veredito(h, selecionadas);
-        box.setAttribute("data-veredito", v);
-        box.appendChild(barra("RAM (VMs + " + HL.reserva_host_gb + " GB do host)", ram, h.ram, "GB"));
-        box.appendChild(barra("vCPU (até " + HL.vcpu_por_nucleo + " por núcleo lógico)", vcpu, HL.vcpu_por_nucleo * h.nucleos, "vCPU"));
-        box.appendChild(barra("Disco", disco, h.disco, "GB"));
-        box.appendChild(el("p", ROTULO[v] + ".", "margin: 0.4rem 0 0.2rem 0; font-weight: 700; color: " + COR[v] + ";"));
-        var dicas = [];
-        if (v === "incompativel") dicas.push("Imagens só x86 (" + selecionadas.filter(function(id) { return !vm(id).arm; }).map(function(id) { return vm(id).nome; }).join(", ") + ") não rodam num Mac com Apple Silicon. Troque por alternativas ARM, use um computador x86 de segunda mão como servidor do laboratório ou um laboratório em nuvem.");
-        if (v === "nao_cabe" && ram > h.ram) dicas.push("Faltam " + (ram - h.ram) + " GB de RAM. Ligue só as VMs do exercício do dia: o Wazuh e o Windows 11 são os mais pesados.");
-        if (v === "nao_cabe" && disco > h.disco) dicas.push("Faltam " + (disco - h.disco) + " GB de disco. Use discos dinâmicos e apague snapshots antigos, ou um SSD externo.");
-        if (v === "apertado") dicas.push("Funciona, mas o computador vai ficar lento com tudo ligado. Desligue as VMs que o exercício não usa.");
-        if (v === "cabe") dicas.push("Sobra espaço para snapshots e para ligar tudo ao mesmo tempo.");
-        dicas.forEach(function(d) { box.appendChild(el("p", d, "margin: 0.2rem 0 0 0;")); });
-    }
-
-    function renderizarTopologia() {
-        var box = document.getElementById("hl-topologia");
-        box.replaceChildren();
-        var bloco = function(texto, estilo) { return el("div", texto, "padding: 0.45rem 0.6rem; border-radius: var(--radius-sm); text-align: center; overflow-wrap: anywhere; " + estilo); };
-        var temFw = selecionadas.indexOf("opnsense") !== -1;
-        box.appendChild(bloco("Internet", "background: var(--sunk);"));
-        box.appendChild(el("div", temFw ? "↓ NAT do seu computador" : "✕ sem saída: rede interna isolada", "text-align: center; font-size: 0.75rem; color: " + (temFw ? "var(--muted)" : "var(--danger-color)") + ";"));
-        if (temFw) {
-            box.appendChild(bloco("OPNsense (firewall do laboratório)", "border: 2px solid var(--accent); font-weight: 600;"));
-            box.appendChild(el("div", "↓", "text-align: center; color: var(--muted);"));
-        }
-        var rede = el("div", null, "border: 2px dashed var(--rule); border-radius: var(--radius-md); padding: 0.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr)); gap: 0.4rem;");
-        rede.setAttribute("data-topologia", selecionadas.filter(function(id) { return id !== "opnsense"; }).join(","));
-        var titulo = el("div", "Rede interna do laboratório", "grid-column: 1 / -1; font-size: 0.75rem; color: var(--muted);");
-        rede.appendChild(titulo);
-        var outros = selecionadas.filter(function(id) { return id !== "opnsense"; });
-        if (!outros.length) rede.appendChild(el("div", "Nenhuma VM na rede ainda.", "grid-column: 1 / -1; font-size: 0.8rem;"));
-        outros.forEach(function(id) {
-            var v = vm(id);
-            var cor = v.funcao === "atacante" ? "rgba(220, 38, 38, 0.18)" : v.funcao === "alvo" ? "rgba(202, 138, 4, 0.22)" : v.funcao === "siem" ? "rgba(37, 99, 235, 0.2)" : "rgba(22, 163, 74, 0.18)";
-            var b = bloco(v.nome, "background: " + cor + ";");
-            b.appendChild(el("div", HL.funcoes[v.funcao], "font-size: 0.7rem; color: var(--muted);"));
-            rede.appendChild(b);
-        });
-        if (selecionadas.indexOf("wazuh") !== -1 && outros.length > 1) rede.appendChild(el("div", "As demais VMs enviam logs ao Wazuh.", "grid-column: 1 / -1; font-size: 0.75rem; color: var(--muted);"));
-        box.appendChild(rede);
-        if (!temFw && selecionadas.length) box.appendChild(el("p", "Sem firewall: mantenha tudo na rede interna, sem NAT.", "margin: 0; font-size: 0.8rem; color: var(--danger-color);"));
-    }
-
-    function renderizarChecklist() {
-        var ul = document.getElementById("hl-checklist");
-        ul.replaceChildren();
-        HL.isolamento.filter(function(i) {
-            var com = !i.com.length || i.com.some(function(id) { return selecionadas.indexOf(id) !== -1; });
-            var sem = !i.sem.length || i.sem.every(function(id) { return selecionadas.indexOf(id) === -1; });
-            return com && sem && (selecionadas.length || (!i.com.length && !i.sem.length));
-        }).forEach(function(i) { ul.appendChild(el("li", i.texto, "margin-bottom: 0.25rem;")); });
-        ul.setAttribute("data-itens", String(ul.childNodes.length));
-    }
-
-    function renderizarPortfolio() {
-        var ol = document.getElementById("hl-portfolio");
-        ol.replaceChildren();
-        var possiveis = HL.portfolio.filter(function(p) { return p.requer.every(function(id) { return selecionadas.indexOf(id) !== -1; }); });
-        possiveis.forEach(function(p) {
-            var li = el("li");
-            li.appendChild(el("span", p.projeto));
-            li.appendChild(el("span", " Base: " + p.modulos.map(function(m) { return "Estudo " + MODULOS[m]; }).join(", ") + ".", "color: var(--muted);"));
-            ol.appendChild(li);
-        });
-        ol.setAttribute("data-projetos", String(possiveis.length));
-    }
-
-    window.calcularHomelab = function() {
-        renderizarCatalogo();
-        renderizarRecursos();
-        renderizarTopologia();
-        renderizarChecklist();
-        renderizarPortfolio();
-    };
-    window.alternarVmHomelab = function(id) {
-        if (!vm(id)) return;
-        var i = selecionadas.indexOf(id);
-        if (i === -1) selecionadas.push(id); else selecionadas.splice(i, 1);
-        selecionadas.sort(function(a, b) { return HL.catalogo.indexOf(vm(a)) - HL.catalogo.indexOf(vm(b)); });
-        calcularHomelab();
-    };
-    window.aplicarPerfilHomelab = function(id) {
-        var p = HL.perfis.filter(function(x) { return x.id === id; })[0];
-        if (!p) return;
-        selecionadas = p.vms.slice();
-        selecionadas.sort(function(a, b) { return HL.catalogo.indexOf(vm(a)) - HL.catalogo.indexOf(vm(b)); });
-        calcularHomelab();
-    };
-    window.restaurarHomelab = function() {
-        document.getElementById("hl-ram").value = "16";
-        document.getElementById("hl-nucleos").value = "8";
-        document.getElementById("hl-disco").value = "256";
-        document.getElementById("hl-arquitetura").value = "x86";
-        aplicarPerfilHomelab("ad");
-    };
-
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("hl-contexto").textContent = HL.contexto;
-        var pb = document.getElementById("hl-perfis");
-        HL.perfis.forEach(function(p) {
-            var b = el("button", "Perfil: " + p.nome, "font-size: 0.8rem;");
-            b.type = "button"; b.className = "btn-secondary";
-            b.addEventListener("click", function() { aplicarPerfilHomelab(p.id); });
-            pb.appendChild(b);
-        });
-        ["hl-ram", "hl-nucleos", "hl-disco"].forEach(function(id) { document.getElementById(id).addEventListener("input", calcularHomelab); });
-        document.getElementById("hl-arquitetura").addEventListener("change", calcularHomelab);
-        restaurarHomelab();
-        if (typeof initChecklist === "function") {
-            initChecklist("laboratorio-portfolio");
-        }
-        if (typeof initQuiz === "function") {
-            initQuiz();
-        }
-    });
-})();
-</script>
+<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
 </main>
 </div>
 
@@ -2906,7 +2204,6 @@ Tudo foi feito no meu laboratório ou em plataformas que autorizam os testes.</c
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3495,17 +2792,6 @@ Tudo foi feito no meu laboratório ou em plataformas que autorizam os testes.</c
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -3719,7 +3005,6 @@ Tudo foi feito no meu laboratório ou em plataformas que autorizam os testes.</c
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

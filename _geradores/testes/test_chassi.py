@@ -27,7 +27,6 @@ def corpo_valido(titulo_secao="Fundamentos") -> str:
     return f"""<article class="study-container">
 <section class="study-section" id="s1" data-tipo="teoria"><h2>{titulo_secao}</h2><p>Texto.</p></section>
 <section class="study-section" id="s2" data-tipo="teoria"><h2>Mais teoria</h2><p>Texto.</p></section>
-<section class="study-section" id="s3" data-tipo="laboratorio"><h2>Simulador</h2><div class="lab-box">Lab</div></section>
 <section class="study-section" id="s4" data-tipo="checklist"><h2>Checklist final</h2>
 <ul class="checklist"><li class="checklist-item"><input type="checkbox" id="c1"><label for="c1">Item 1</label></li>
 <li class="checklist-item"><input type="checkbox" id="c2"><label for="c2">Item 2</label></li></ul></section>
@@ -40,7 +39,7 @@ def corpo_valido(titulo_secao="Fundamentos") -> str:
 </article>"""
 
 
-CORPO_SEM_LAB = corpo_valido().replace('data-tipo="laboratorio"', 'data-tipo="teoria"')
+CORPO_INVALIDO = corpo_valido().replace('data-tipo="checklist"', 'data-tipo="teoria"')
 
 
 def montar_fixture(slug, titulo_secao="Fundamentos", corpo=None) -> str:
@@ -64,9 +63,9 @@ class TestChassi(unittest.TestCase):
 
     def test_sumario_um_item_por_secao(self):
         html = montar_fixture(SLUG)
-        self.assertEqual(html.count('class="toc-item'), 6)
-        for i in range(1, 7):
-            self.assertIn(f"Seção {i} de 6", html)
+        self.assertEqual(html.count('class="toc-item'), 5)
+        for i in range(1, 6):
+            self.assertIn(f"Seção {i} de 5", html)
 
     def test_roadmap_com_quantidades(self):
         html = montar_fixture(SLUG)
@@ -104,13 +103,13 @@ class TestChassi(unittest.TestCase):
 
     def test_corpo_invalido_aborta(self):
         with self.assertRaises(ContratoInvalido) as cm:
-            montar_fixture(SLUG, corpo=CORPO_SEM_LAB)
+            montar_fixture(SLUG, corpo=CORPO_INVALIDO)
         self.assertTrue(any("§5" in e for e in cm.exception.erros))
 
     def test_cli_corpo_invalido_sai_com_1(self):
         with tempfile.TemporaryDirectory() as tmp:
             body = Path(tmp) / "threat_hunting_body.html"
-            body.write_text(CORPO_SEM_LAB, encoding="utf-8")
+            body.write_text(CORPO_INVALIDO, encoding="utf-8")
             r = subprocess.run([sys.executable, str(GERADORES / "montar.py"), str(body), str(Path(tmp) / "o.html")],
                                capture_output=True, text=True)
         self.assertEqual(r.returncode, 1)
@@ -133,15 +132,15 @@ class TestChassi(unittest.TestCase):
     def test_cabecalho_h2_com_atributos_e_multilinha(self):
         corpo = corpo_valido().replace("<h2>Fundamentos</h2>", '<h2 class="x"\n id="h">Fundamentos\n e mais</h2>')
         saida = aplicar_cabecalhos_de_secao(corpo, extrair_secoes(corpo))
-        self.assertIn('<span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2 class="x"\n id="h">Fundamentos\n e mais</h2></div>', saida)
-        self.assertEqual(saida.count('class="shead"'), 6)
+        self.assertIn('<span class="stype">📘 Teoria <small>· Seção 1 de 5</small></span><h2 class="x"\n id="h">Fundamentos\n e mais</h2></div>', saida)
+        self.assertEqual(saida.count('class="shead"'), 5)
 
     def test_cabecalho_ignora_secao_em_script(self):
         corpo = corpo_valido().replace(
             "</article>", '<script>var h = \'<section class="study-section" id="x"><h2>fake</h2></section>\';</script></article>')
         saida = aplicar_cabecalhos_de_secao(corpo, extrair_secoes(corpo))
-        self.assertEqual(saida.count('class="shead"'), 6)
-        self.assertIn("Seção 6 de 6", saida)
+        self.assertEqual(saida.count('class="shead"'), 5)
+        self.assertIn("Seção 5 de 5", saida)
         self.assertIn("<section class=\"study-section\" id=\"x\"><h2>fake</h2>", saida)
 
     def test_cabecalho_levanta_com_contagem_divergente(self):
@@ -186,7 +185,7 @@ class TestChassi(unittest.TestCase):
             secoes: document.querySelectorAll('section.study-section').length}), 300);
         """)
         self.assertEqual(r["erros"], [])
-        self.assertEqual(r["saida"]["itens"], 6)
+        self.assertEqual(r["saida"]["itens"], 5)
         self.assertEqual(r["saida"]["itens"], r["saida"]["secoes"])
 
 

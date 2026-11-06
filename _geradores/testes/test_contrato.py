@@ -16,11 +16,6 @@ CORPO_VALIDO = """<!-- Estudo X -->
     <div class="callout tip"><p>Dica</p></div>
     <div class="callout warning"><p>Atenção</p></div>
   </section>
-  <section class="study-section" id="s2" data-tipo="laboratorio">
-    <h2>Laboratório X</h2>
-    <!--lab-->
-    <div class="lab-box"><br><input type="text" id="campo"></div>
-  </section>
   <section class="study-section" id="s3" data-tipo="checklist">
     <h2>Checklist</h2>
     <ul class="checklist" data-checklist-slug="x">
@@ -58,7 +53,7 @@ def msgs(html):
 
 class TestContrato(unittest.TestCase):
     def test_constantes(self):
-        self.assertEqual(TIPOS, ("teoria", "laboratorio", "checklist", "questoes", "referencias"))
+        self.assertEqual(TIPOS, ("teoria", "checklist", "questoes", "referencias"))
         self.assertEqual(ROTULOS["questoes"], ("❓", "Questões de concurso"))
         self.assertEqual(set(ROTULOS), set(TIPOS))
 
@@ -93,12 +88,20 @@ class TestContrato(unittest.TestCase):
         html = CORPO_VALIDO.replace(' id="s5"', "")
         self.assertIn("X §2: section (sem id): id ausente", msgs(html))
 
+    def test_regra_2_laboratorio_invalido(self):
+        lab = (
+            '<section class="study-section" id="s2" data-tipo="laboratorio">'
+            "<h2>Lab</h2><p>x</p></section>"
+        )
+        html = CORPO_VALIDO.replace("</article>", lab + "</article>")
+        self.assertIn('X §2: section#s2: data-tipo "laboratorio" inválido', msgs(html))
+
     def test_regra_2_script_e_style_permitidos(self):
         script = ('<script>var h = \'<section class="study-section" id="x">\'; '
                   "var t = '<h2>';</script>")
         html = CORPO_VALIDO.replace("</article>", script + "<style>.a{color:red}</style></article>")
         self.assertEqual(msgs(html), [])
-        self.assertEqual([s.id for s in extrair_secoes(html)], ["s1", "s2", "s3", "s4", "s5"])
+        self.assertEqual([s.id for s in extrair_secoes(html)], ["s1", "s3", "s4", "s5"])
 
     def test_regra_2_style_sozinho(self):
         html = CORPO_VALIDO.replace("</article>", "<style>.a{}</style></article>")
@@ -137,9 +140,17 @@ class TestContrato(unittest.TestCase):
         html = CORPO_VALIDO.replace("<p>Texto.</p>", '<div class="hero-header"></div>')
         self.assertTrue(any(e.startswith("X §4:") and "hero-header" in e for e in msgs(html)))
 
-    def test_regra_5_falta_laboratorio(self):
-        html = CORPO_VALIDO.replace('data-tipo="laboratorio"', 'data-tipo="teoria"')
-        self.assertIn('X §5: corpo: falta seção do tipo "laboratorio"', msgs(html))
+    def test_regra_5_falta_checklist(self):
+        html = CORPO_VALIDO.replace('data-tipo="checklist"', 'data-tipo="teoria"')
+        self.assertIn('X §5: corpo: falta seção do tipo "checklist"', msgs(html))
+
+    def test_regra_5_falta_questoes(self):
+        html = CORPO_VALIDO.replace('data-tipo="questoes"', 'data-tipo="teoria"')
+        self.assertIn('X §5: corpo: falta seção do tipo "questoes"', msgs(html))
+
+    def test_regra_5_falta_referencias(self):
+        html = CORPO_VALIDO.replace('data-tipo="referencias"', 'data-tipo="teoria"')
+        self.assertIn('X §5: corpo: falta seção do tipo "referencias"', msgs(html))
 
     def test_regra_6_checklist_sem_label_for(self):
         html = CORPO_VALIDO.replace('<label for="c2">', "<label>")
@@ -174,11 +185,13 @@ class TestContrato(unittest.TestCase):
 
     def test_extrair_secoes_ignora_aninhadas(self):
         html = CORPO_VALIDO.replace(
-            "<!--lab-->",
-            '<section class="study-section" id="interna" data-tipo="teoria"><h2>Interna</h2></section><h2>Passo</h2>')
+            "<p>Texto.</p>",
+            '<p>Texto.</p><section class="study-section" id="interna" data-tipo="teoria"><h2>Interna</h2></section>',
+            1,
+        )
         secoes = extrair_secoes(html)
-        self.assertEqual([s.id for s in secoes], ["s1", "s2", "s3", "s4", "s5"])
-        self.assertEqual(secoes[1].titulo_html, "Laboratório X")
+        self.assertEqual([s.id for s in secoes], ["s1", "s3", "s4", "s5"])
+        self.assertEqual(secoes[0].titulo_html, "Conceitos &amp; Fundamentos")
 
     def test_titulo_html_cru(self):
         secoes = extrair_secoes(CORPO_VALIDO)

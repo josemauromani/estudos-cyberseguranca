@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Segmentacao-e-Firewall">
@@ -2122,7 +1738,6 @@ dfn.glossario:focus-visible {
     <li><a class="toc-item" href="#vlans-e-8021q" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Segregação em Camada 2: VLANs e Trunking IEEE 802.1Q</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#arquiteturas-firewall" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Arquitetura de Firewalls: Stateless, Stateful e NGFW</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#regras-e-precedencia" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Formulação de Políticas e Ordem de Precedência de Regras</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#laboratorio-pratico" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Interativo: Simulador de Regras de Firewall e Tabela conntrack</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist-segmentacao" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Aplicação Prática: Auditoria de Segmentação e Firewalls</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#questoes-fixacao" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Concursos Públicos</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos-essenciais" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais &bull; Conclusão da Trilha 1: Fundamentos &amp; Redes Seguras</span></span><span class="toc-contador"></span></a></li>
@@ -2138,7 +1753,7 @@ dfn.glossario:focus-visible {
   <h1>DMZ, VLANs, Regras de Firewall e Filtragem</h1>
   <p class="mhead-sub">Arquitetura de perímetros, isolamento inter-VLAN e ordem de precedência de regras de filtragem</p>
   <div class="chips"><span class="chip">⏱ 40 min</span><span class="chip">📈 Iniciante</span><span class="chip">🛡 NIST Protect</span><span class="chip">🎯 ATT&amp;CK TA0008 Lateral Movement / TA0011 Command and Control / T1190 Exploit Public-Facing Application / T1021 Remote Services</span><span class="chip">👤 Blue Team &amp; Defesa · Operações SOC &amp; Resposta · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#zonas-confianca-dmz" data-tipo="teoria"><span class="toc-tipo">Teoria</span>4 seções</a><a href="#laboratorio-pratico" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist-segmentacao" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#questoes-fixacao" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>3 questões</a><a href="#fatos-essenciais" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#zonas-confianca-dmz" data-tipo="teoria"><span class="toc-tipo">Teoria</span>4 seções</a><a href="#checklist-segmentacao" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#questoes-fixacao" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>3 questões</a><a href="#fatos-essenciais" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- ==========================================================================
      Estudo 05: Segmentação de Redes, DMZ e Filtragem de Firewall
@@ -2148,7 +1763,7 @@ dfn.glossario:focus-visible {
 <article class="study-container" data-slug="segmentacao-e-firewall">
 <!-- SEÇÃO 1: SEGMENTAÇÃO DE REDES E DMZ -->
 <section class="study-section" id="zonas-confianca-dmz" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 8</small></span><h2>Zonas de Confiança, Redes Planas e Arquitetura de DMZ</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 7</small></span><h2>Zonas de Confiança, Redes Planas e Arquitetura de DMZ</h2></div>
 
   <p class="lead-text">
     Em um cenário contemporâneo onde o comprometimento inicial de um endpoint ou servidor web é uma possibilidade
@@ -2218,7 +1833,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 2: SEGREGAÇÃO EM CAMADA 2 (VLANS & 802.1Q) -->
 <section class="study-section" id="vlans-e-8021q" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 8</small></span><h2>Segregação em Camada 2: VLANs e Trunking IEEE 802.1Q</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 7</small></span><h2>Segregação em Camada 2: VLANs e Trunking IEEE 802.1Q</h2></div>
 
   <p>
     Implementar segmentação física comprando switches e cabos separados para cada departamento corporativo seria
@@ -2292,7 +1907,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 3: ARQUITETURA DE FIREWALLS (STATELESS vs STATEFUL vs NGFW) -->
 <section class="study-section" id="arquiteturas-firewall" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 8</small></span><h2>Arquitetura de Firewalls: Stateless, Stateful e NGFW</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 7</small></span><h2>Arquitetura de Firewalls: Stateless, Stateful e NGFW</h2></div>
 
   <p>
     Um firewall é um dispositivo ou software que monitora e controla o tráfego de rede de entrada e saída com base em
@@ -2343,7 +1958,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 4: FORMULAÇÃO DE REGRAS E ORDEM DE PRECEDÊNCIA -->
 <section class="study-section" id="regras-e-precedencia" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 8</small></span><h2>Formulação de Políticas e Ordem de Precedência de Regras</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 7</small></span><h2>Formulação de Políticas e Ordem de Precedência de Regras</h2></div>
 
   <p>
     Configurar regras de firewall exige precisão matemática. Ao contrário de uma linguagem declarativa genérica,
@@ -2395,124 +2010,10 @@ dfn.glossario:focus-visible {
 </section>
 
 <!-- SEÇÃO 5: LABORATÓRIO INTERATIVO (FIREWALL SIMULATOR & CONNTRACK) -->
-<section class="study-section" id="laboratorio-pratico" data-tipo="laboratorio">
-  <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 5 de 8</small></span><h2>Laboratório Interativo: Simulador de Regras de Firewall e Tabela conntrack</h2></div>
-
-  <p>
-    Experimente na prática a mecânica de avaliação sequencial <em>First-Match</em> de um firewall corporativo.
-    Neste laboratório em Vanilla JavaScript, você pode injetar pacotes de rede realistas, acompanhar passo a passo
-    qual regra realizou o match, verificar a atuação da tabela de conexões ativas (<em>conntrack</em>) e reordenar
-    regras para entender ao vivo o impacto devastador do <em>Rule Shadowing</em>.
-  </p>
-
-  <div class="lab-box" id="firewall-lab">
-    <div class="lab-header">
-      <span class="lab-badge">LAB PRÁTICO INTERATIVO</span>
-      <h3>Simulador de Filtragem Stateful e Inspeção de Regras</h3>
-      <p>InjAudite políticas de perímetro, dispare pacotes simulados e visualize a resolução do motor de firewall.</p>
-    </div>
-
-    <!-- Cenários rápidos de injeção de pacotes -->
-    <div style="margin-bottom: 1.5rem;">
-      <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:0.5rem;">Disparar Cenários Práticos de Tráfego:</div>
-      <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-        <button class="lab-btn" onclick="injetarPacoteCenario('web_legitimo')">🌐 Internet &rarr; DMZ Web (HTTPS 443)</button>
-        <button class="lab-btn" onclick="injetarPacoteCenario('dmz_para_banco')">💾 DMZ Web &rarr; Banco SQL (Porta 5432)</button>
-        <button class="lab-btn lab-btn-danger" onclick="injetarPacoteCenario('invasao_ssh_direto')">🚨 Internet &rarr; Banco SQL (SSH 22)</button>
-        <button class="lab-btn lab-btn-danger" onclick="injetarPacoteCenario('c2_conexao_reversa')">⚠️ DMZ Web &rarr; Internet (C2 Porta 4444)</button>
-        <button class="lab-btn lab-btn-warning" onclick="injetarPacoteCenario('scan_rdp')">🔍 Varredura Externa (RDP 3389)</button>
-      </div>
-    </div>
-
-    <!-- Painel de entrada manual do pacote -->
-    <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1.25rem; margin-bottom: 1.5rem;">
-      <div style="font-weight:700; font-size:0.9rem; color:var(--ink); margin-bottom:0.75rem;">Detalhes do Pacote Injetado:</div>
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:0.75rem; font-size:0.85rem;">
-        <div>
-          <label style="display:block; color:var(--muted); margin-bottom:0.2rem;">IP Origem:</label>
-          <input type="text" id="pkt-src-ip" value="203.0.113.50" style="width:100%; font-family:var(--font-mono); padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);">
-        </div>
-        <div>
-          <label style="display:block; color:var(--muted); margin-bottom:0.2rem;">IP Destino:</label>
-          <input type="text" id="pkt-dst-ip" value="192.168.10.10" style="width:100%; font-family:var(--font-mono); padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);">
-        </div>
-        <div>
-          <label style="display:block; color:var(--muted); margin-bottom:0.2rem;">Protocolo:</label>
-          <select id="pkt-proto" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);">
-            <option value="TCP">TCP</option>
-            <option value="UDP">UDP</option>
-            <option value="ICMP">ICMP</option>
-          </select>
-        </div>
-        <div>
-          <label style="display:block; color:var(--muted); margin-bottom:0.2rem;">Porta Destino:</label>
-          <input type="number" id="pkt-dst-port" value="443" style="width:100%; font-family:var(--font-mono); padding:0.4rem; border-radius:4px; border:1px solid var(--rule); background:var(--ground); color:var(--ink);">
-        </div>
-      </div>
-      <div style="margin-top:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
-        <span style="font-size:0.8rem; color:var(--muted);">Simula o primeiro pacote (TCP SYN) tentando estabelecer sessão.</span>
-        <button class="lab-btn" style="background:#2563eb; color:#fff;" onclick="dispararInjecaoManual()">🚀 Inspecionar Pacote no Firewall</button>
-      </div>
-    </div>
-
-    <!-- Tabela Ordenada de Regras de Firewall (First-Match) -->
-    <div style="background:var(--ground); border:1px solid var(--rule); border-radius:8px; padding:1.25rem; margin-bottom: 1.5rem;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
-        <div>
-          <h4 style="margin:0; font-size:1rem; color:var(--ink);">Conjunto de Regras do Firewall (Ordem de Avaliação First-Match)</h4>
-          <p style="margin:0.2rem 0 0 0; font-size:0.8rem; color:var(--muted);">As regras são avaliadas sequencialmente de cima para baixo. Clique nas setas para reordenar e testar Rule Shadowing.</p>
-        </div>
-        <button class="lab-btn" style="font-size:0.75rem;" onclick="restaurarRegrasOriginais()">↺ Restaurar Ordem Recomendada</button>
-      </div>
-
-      <div style="overflow-x:auto;">
-        <table style="width:100%; border-collapse:collapse; font-size:0.825rem;" id="tabela-regras-firewall">
-          <thead>
-            <tr style="border-bottom:2px solid var(--rule); text-align:left;">
-              <th style="padding:0.5rem; color:var(--muted); width:40px;">#</th>
-              <th style="padding:0.5rem; color:var(--muted); width:70px;">Ordem</th>
-              <th style="padding:0.5rem; color:var(--muted); width:90px;">Ação</th>
-              <th style="padding:0.5rem; color:var(--muted);">Origem (Src)</th>
-              <th style="padding:0.5rem; color:var(--muted);">Destino (Dst)</th>
-              <th style="padding:0.5rem; color:var(--muted);">Proto/Porta</th>
-              <th style="padding:0.5rem; color:var(--muted);">Descrição / Zona</th>
-            </tr>
-          </thead>
-          <tbody id="firewall-rules-tbody">
-            <!-- Renderizado via JavaScript -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Painel de Decisão do Pacote e Tabela de Estados conntrack -->
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:1rem;">
-      <!-- Resultado da Inspeção -->
-      <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1rem;">
-        <h4 style="margin:0 0 0.75rem 0; font-size:0.95rem; color:var(--ink);">Decisão Final da Filtragem</h4>
-        <div id="veredicto-banner" style="padding:0.75rem; border-radius:6px; font-size:0.9rem; font-weight:700; margin-bottom:0.75rem;">
-          Aguardando disparo de pacote...
-        </div>
-        <div id="veredicto-detalhe" style="font-size:0.85rem; color:var(--muted); line-height:1.5;"></div>
-      </div>
-
-      <!-- Tabela de Estados Conntrack -->
-      <div style="background:var(--surface); border:1px solid var(--rule); border-radius:8px; padding:1rem;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
-          <h4 style="margin:0; font-size:0.95rem; color:var(--ink);">Tabela de Conexões Ativas (conntrack)</h4>
-          <span id="conntrack-count" class="badge slate" style="font-size:0.7rem;">0 conexões ativas</span>
-        </div>
-        <div id="conntrack-table-container" style="max-height:160px; overflow-y:auto; font-family:var(--font-mono); font-size:0.75rem;">
-          <div style="color:var(--muted); padding:0.5rem 0;">Nenhuma sessão ativa registrada no estado ESTABLISHED.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- SEÇÃO 6: CHECKLIST PRÁTICO -->
 <section class="study-section" id="checklist-segmentacao" data-tipo="checklist">
-  <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 6 de 8</small></span><h2>Checklist de Aplicação Prática: Auditoria de Segmentação e Firewalls</h2></div>
+  <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 5 de 7</small></span><h2>Checklist de Aplicação Prática: Auditoria de Segmentação e Firewalls</h2></div>
 
   <p>
     Utilize este checklist técnico durante auditorias de rede, implementação de novos perímetros
@@ -2572,7 +2073,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 7: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
 <section class="study-section" id="questoes-fixacao" data-tipo="questoes">
-  <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 7 de 8</small></span><h2>Questões de Fixação e Concursos Públicos</h2></div>
+  <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 6 de 7</small></span><h2>Questões de Fixação e Concursos Públicos</h2></div>
 
   <p>
     Teste sua preparação respondendo a questões focadas em concursos públicos de alto nível para Perito Criminal da PF,
@@ -2657,7 +2158,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 8: FATOS ESSENCIAIS E CONCLUSÃO DA TRILHA 1 -->
 <section class="study-section" id="fatos-essenciais" data-tipo="referencias">
-  <div class="shead"><span class="stype">📚 Referências <small>· Seção 8 de 8</small></span><h2>Fatos Essenciais &bull; Conclusão da Trilha 1: Fundamentos &amp; Redes Seguras</h2></div>
+  <div class="shead"><span class="stype">📚 Referências <small>· Seção 7 de 7</small></span><h2>Fatos Essenciais &bull; Conclusão da Trilha 1: Fundamentos &amp; Redes Seguras</h2></div>
 
   <div class="facts-grid">
     <div class="facts-card">
@@ -2694,358 +2195,6 @@ dfn.glossario:focus-visible {
 </article>
 
 <!-- SCRIPT EMBUTIDO: SIMULADOR DE FIREWALL COM FIRST-MATCH E CONNTRACK -->
-<script>
-/**
- * Simulador Interativo: Filtragem de Firewall (First-Match) & Tabela Conntrack
- * Mapa da Cibersegurança
- */
-
-// Estado das regras ativas do simulador
-let regrasFirewall = [
-  {
-    id: 1,
-    acao: "ACCEPT",
-    src: "203.0.113.0/24",
-    dst: "192.168.10.10",
-    proto: "TCP",
-    port: 443,
-    desc: "Permitir HTTPS da Internet para Servidor Web (DMZ)"
-  },
-  {
-    id: 2,
-    acao: "ACCEPT",
-    src: "192.168.10.10",
-    dst: "10.0.2.50",
-    proto: "TCP",
-    port: 5432,
-    desc: "Permitir queries SQL do Web Server (DMZ) para Banco de Dados"
-  },
-  {
-    id: 3,
-    acao: "ACCEPT",
-    src: "10.0.1.100",
-    dst: "10.0.2.0/24",
-    proto: "TCP",
-    port: 22,
-    desc: "Permitir SSH exclusivamente da Estação do Administrador (LAN)"
-  },
-  {
-    id: 4,
-    acao: "DROP",
-    src: "192.168.10.0/24",
-    dst: "0.0.0.0/0",
-    proto: "TCP",
-    port: 4444,
-    desc: "Bloquear tentativas de C2 / Shell Reversa originadas da DMZ"
-  },
-  {
-    id: 5,
-    acao: "DROP",
-    src: "0.0.0.0/0",
-    dst: "0.0.0.0/0",
-    proto: "ANY",
-    port: 0,
-    desc: "Política Padrão: Default Drop (Descarte Implícito de Borda)"
-  }
-];
-
-// Tabela simulada de estados de conexão (conntrack)
-const tabelaConntrack = [];
-
-// Funções de correspondência de IP e sub-redes simplificada para o simulador
-function ipMatches(ipRegra, ipPacote) {
-  if (ipRegra === "0.0.0.0/0" || ipRegra === "Qualquer" || ipRegra === "ANY") return true;
-  if (ipRegra === ipPacote) return true;
-  if (ipRegra.endsWith("/24")) {
-    const prefixoRegra = ipRegra.split("/")[0].split(".").slice(0, 3).join(".");
-    const prefixoPacote = ipPacote.split(".").slice(0, 3).join(".");
-    return prefixoRegra === prefixoPacote;
-  }
-  return false;
-}
-
-function portMatches(portRegra, portPacote) {
-  if (portRegra === 0 || portRegra === "ANY" || portRegra === "Qualquer") return true;
-  return Number(portRegra) === Number(portPacote);
-}
-
-function protoMatches(protoRegra, protoPacote) {
-  if (protoRegra === "ANY" || protoRegra === "Qualquer") return true;
-  return protoRegra.toUpperCase() === protoPacote.toUpperCase();
-}
-
-// Renderiza a tabela de regras na interface
-function renderizarTabelaRegras(idRegraVencedora = null) {
-  const tbody = document.getElementById("firewall-rules-tbody");
-  if (!tbody) return;
-
-  tbody.innerHTML = "";
-
-  regrasFirewall.forEach((regra, index) => {
-    const isDefaultDrop = (index === regrasFirewall.length - 1 && regra.desc.includes("Default Drop"));
-    const tr = document.createElement("tr");
-    tr.style.borderBottom = "1px solid var(--rule)";
-
-    if (idRegraVencedora === regra.id) {
-      tr.style.background = regra.acao === "ACCEPT" ? "rgba(16, 185, 129, 0.18)" : "rgba(220, 38, 38, 0.18)";
-      tr.style.outline = regra.acao === "ACCEPT" ? "2px solid #10b981" : "2px solid #ef4444";
-    }
-
-    const badgeAcao = regra.acao === "ACCEPT"
-      ? '<span class="badge green">ACCEPT</span>'
-      : '<span class="badge red">DROP</span>';
-
-    const botoesOrdem = isDefaultDrop
-      ? '<span style="color:var(--muted); font-size:0.75rem;">(Fixa)</span>'
-      : `
-        <button class="lab-btn" style="padding:0.15rem 0.35rem; font-size:0.7rem;" onclick="reordenarRegra(${regra.id}, -1)" ${index === 0 ? "disabled" : ""}>▲</button>
-        <button class="lab-btn" style="padding:0.15rem 0.35rem; font-size:0.7rem;" onclick="reordenarRegra(${regra.id}, 1)" ${index >= regrasFirewall.length - 2 ? "disabled" : ""}>▼</button>
-      `;
-
-    tr.innerHTML = `
-      <td style="padding:0.5rem; font-family:var(--font-mono); font-weight:700;">${index + 1}</td>
-      <td style="padding:0.5rem;">${botoesOrdem}</td>
-      <td style="padding:0.5rem;">${badgeAcao}</td>
-      <td style="padding:0.5rem; font-family:var(--font-mono);">${escapeHtml(regra.src)}</td>
-      <td style="padding:0.5rem; font-family:var(--font-mono);">${escapeHtml(regra.dst)}</td>
-      <td style="padding:0.5rem; font-family:var(--font-mono);">${regra.proto}/${regra.port === 0 ? "ANY" : regra.port}</td>
-      <td style="padding:0.5rem; font-size:0.8rem; color:var(--muted);">${escapeHtml(regra.desc)}</td>
-    `;
-
-    tbody.appendChild(tr);
-  });
-}
-
-// Avaliação do pacote de acordo com a política sequencial First-Match
-function avaliarPacoteFirewall(pacote) {
-  let regraMatch = null;
-  let indexMatch = -1;
-
-  for (let i = 0; i < regrasFirewall.length; i++) {
-    const r = regrasFirewall[i];
-    if (
-      ipMatches(r.src, pacote.src) &&
-      ipMatches(r.dst, pacote.dst) &&
-      protoMatches(r.proto, pacote.proto) &&
-      portMatches(r.port, pacote.port)
-    ) {
-      regraMatch = r;
-      indexMatch = i;
-      break; // Interrupção First-Match obrigatória
-    }
-  }
-
-  // Atualização da tabela de conexões ativas se aceito
-  if (regraMatch && regraMatch.acao === "ACCEPT") {
-    tabelaConntrack.unshift({
-      timestamp: new Date().toLocaleTimeString(),
-      proto: pacote.proto,
-      src: `${pacote.src}:${Math.floor(Math.random() * 40000) + 1024}`,
-      dst: `${pacote.dst}:${pacote.port}`,
-      state: "ESTABLISHED"
-    });
-    if (tabelaConntrack.length > 5) tabelaConntrack.pop();
-  }
-
-  // Atualiza a visualização
-  renderizarTabelaRegras(regraMatch ? regraMatch.id : null);
-  renderizarVeredicto(pacote, regraMatch, indexMatch);
-  renderizarConntrack();
-
-  return { pacote, regraMatch, indexMatch };
-}
-
-// Renderiza a explicação técnica no painel de decisão
-function renderizarVeredicto(pacote, regra, index) {
-  const banner = document.getElementById("veredicto-banner");
-  const detalhe = document.getElementById("veredicto-detalhe");
-  if (!banner || !detalhe) return;
-
-  if (!regra) {
-    banner.style.background = "rgba(220, 38, 38, 0.2)";
-    banner.style.color = "#ef4444";
-    banner.textContent = "🔴 PACOTE DESCARTADO (Sem correspondência)";
-    detalhe.textContent = "O pacote não deu match em nenhuma regra configurada.";
-    return;
-  }
-
-  if (regra.acao === "ACCEPT") {
-    banner.style.background = "rgba(16, 185, 129, 0.2)";
-    banner.style.color = "#10b981";
-    banner.innerHTML = `🟢 PERMITIDO (ACCEPT) na Regra #${index + 1}`;
-    detalhe.innerHTML = `
-      <strong>Correspondência:</strong> Regra #${index + 1} &bull; <em>"${escapeHtml(regra.desc)}"</em>.<br>
-      <strong>Ação de Estado:</strong> O pacote TCP SYN estabeleceu uma nova sessão válida no kernel. A conexão foi registrada na tabela <code>conntrack</code> no estado <strong>ESTABLISHED</strong>, permitindo respostas automáticas.
-    `;
-  } else {
-    banner.style.background = "rgba(220, 38, 38, 0.2)";
-    banner.style.color = "#ef4444";
-    banner.innerHTML = `🔴 BLOQUEADO (DROP) na Regra #${index + 1}`;
-    detalhe.innerHTML = `
-      <strong>Correspondência:</strong> Regra #${index + 1} &bull; <em>"${escapeHtml(regra.desc)}"</em>.<br>
-      <strong>Segurança:</strong> O pacote foi sumariamente descartado sem resposta (DROP silencioso). Nenhuma entrada de estado foi criada na tabela <code>conntrack</code>.
-    `;
-  }
-}
-
-// Renderiza as conexões ativas da tabela conntrack
-function renderizarConntrack() {
-  const container = document.getElementById("conntrack-table-container");
-  const badgeCount = document.getElementById("conntrack-count");
-  if (!container) return;
-
-  if (badgeCount) {
-    badgeCount.textContent = `${tabelaConntrack.length} sessões ativas`;
-  }
-
-  if (tabelaConntrack.length === 0) {
-    container.innerHTML = '<div style="color:var(--muted); padding:0.5rem 0;">Nenhuma sessão ativa registrada no estado ESTABLISHED.</div>';
-    return;
-  }
-
-  let html = '<table style="width:100%; border-collapse:collapse;">';
-  html += '<tr style="color:var(--muted); border-bottom:1px solid var(--rule); text-align:left;"><th>Hora</th><th>Proto</th><th>Origem</th><th>Destino</th><th>Estado</th></tr>';
-
-  tabelaConntrack.forEach(sessao => {
-    html += `
-      <tr style="border-bottom:1px solid var(--rule);">
-        <td style="padding:0.25rem 0; color:var(--muted);">${sessao.timestamp}</td>
-        <td style="padding:0.25rem 0;">${sessao.proto}</td>
-        <td style="padding:0.25rem 0;">${escapeHtml(sessao.src)}</td>
-        <td style="padding:0.25rem 0;">${escapeHtml(sessao.dst)}</td>
-        <td style="padding:0.25rem 0; color:#10b981; font-weight:700;">${sessao.state}</td>
-      </tr>
-    `;
-  });
-  html += '</table>';
-  container.innerHTML = html;
-}
-
-// Reordena regras para demonstrar Rule Shadowing
-function reordenarRegra(idRegra, direcao) {
-  const idx = regrasFirewall.findIndex(r => r.id === idRegra);
-  if (idx < 0) return;
-
-  const novoIdx = idx + direcao;
-  // A última regra (Default Drop) não pode sair do final
-  if (novoIdx < 0 || novoIdx >= regrasFirewall.length - 1) return;
-
-  const temp = regrasFirewall[idx];
-  regrasFirewall[idx] = regrasFirewall[novoIdx];
-  regrasFirewall[novoIdx] = temp;
-
-  renderizarTabelaRegras();
-  dispararInjecaoManual();
-}
-
-// Restaura ordem padrão recomendada
-function restaurarRegrasOriginais() {
-  regrasFirewall = [
-    {
-      id: 1,
-      acao: "ACCEPT",
-      src: "203.0.113.0/24",
-      dst: "192.168.10.10",
-      proto: "TCP",
-      port: 443,
-      desc: "Permitir HTTPS da Internet para Servidor Web (DMZ)"
-    },
-    {
-      id: 2,
-      acao: "ACCEPT",
-      src: "192.168.10.10",
-      dst: "10.0.2.50",
-      proto: "TCP",
-      port: 5432,
-      desc: "Permitir queries SQL do Web Server (DMZ) para Banco de Dados"
-    },
-    {
-      id: 3,
-      acao: "ACCEPT",
-      src: "10.0.1.100",
-      dst: "10.0.2.0/24",
-      proto: "TCP",
-      port: 22,
-      desc: "Permitir SSH exclusivamente da Estação do Administrador (LAN)"
-    },
-    {
-      id: 4,
-      acao: "DROP",
-      src: "192.168.10.0/24",
-      dst: "0.0.0.0/0",
-      proto: "TCP",
-      port: 4444,
-      desc: "Bloquear tentativas de C2 / Shell Reversa originadas da DMZ"
-    },
-    {
-      id: 5,
-      acao: "DROP",
-      src: "0.0.0.0/0",
-      dst: "0.0.0.0/0",
-      proto: "ANY",
-      port: 0,
-      desc: "Política Padrão: Default Drop (Descarte Implícito de Borda)"
-    }
-  ];
-  renderizarTabelaRegras();
-  dispararInjecaoManual();
-}
-
-// Injeção de cenários prontos
-function injetarPacoteCenario(tipo) {
-  const srcEl = document.getElementById("pkt-src-ip");
-  const dstEl = document.getElementById("pkt-dst-ip");
-  const protoEl = document.getElementById("pkt-proto");
-  const portEl = document.getElementById("pkt-dst-port");
-
-  if (tipo === "web_legitimo") {
-    srcEl.value = "203.0.113.50";
-    dstEl.value = "192.168.10.10";
-    protoEl.value = "TCP";
-    portEl.value = "443";
-  } else if (tipo === "dmz_para_banco") {
-    srcEl.value = "192.168.10.10";
-    dstEl.value = "10.0.2.50";
-    protoEl.value = "TCP";
-    portEl.value = "5432";
-  } else if (tipo === "invasao_ssh_direto") {
-    srcEl.value = "198.51.100.88";
-    dstEl.value = "10.0.2.50";
-    protoEl.value = "TCP";
-    portEl.value = "22";
-  } else if (tipo === "c2_conexao_reversa") {
-    srcEl.value = "192.168.10.10";
-    dstEl.value = "203.0.113.99";
-    protoEl.value = "TCP";
-    portEl.value = "4444";
-  } else if (tipo === "scan_rdp") {
-    srcEl.value = "198.51.100.12";
-    dstEl.value = "192.168.10.10";
-    protoEl.value = "TCP";
-    portEl.value = "3389";
-  }
-
-  dispararInjecaoManual();
-}
-
-function dispararInjecaoManual() {
-  const src = document.getElementById("pkt-src-ip").value.trim();
-  const dst = document.getElementById("pkt-dst-ip").value.trim();
-  const proto = document.getElementById("pkt-proto").value;
-  const port = parseInt(document.getElementById("pkt-dst-port").value, 10) || 0;
-
-  avaliarPacoteFirewall({ src, dst, proto, port });
-}
-
-// Inicialização automática do checklist e do laboratório no carregamento da página
-document.addEventListener("DOMContentLoaded", function() {
-  if (typeof initChecklist === "function") {
-    initChecklist("segmentacao-firewall");
-  }
-  renderizarTabelaRegras();
-  injetarPacoteCenario("web_legitimo");
-});
-</script>
 </main>
 </div>
 
@@ -3180,7 +2329,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3769,17 +2917,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -3993,7 +3130,6 @@ document.addEventListener("DOMContentLoaded", function() {
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

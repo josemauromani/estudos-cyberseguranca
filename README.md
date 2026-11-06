@@ -16,7 +16,6 @@ O projeto **Mapa da Cibersegurança** foi desenvolvido para oferecer uma trilha 
    - Cada módulo compila em um único arquivo HTML5 autocontido, com Design System CSS, utilitários JavaScript e fontes (licença OFL, em `_geradores/fontes/`) totalmente embutidos (*inlined*). Não há CDN nem requisição externa. Funciona instantaneamente em qualquer navegador, mesmo sem conexão à internet.
 3. **Interatividade Prática em Cada Módulo:**
    - Teoria pragmática e direta ao ponto (sem jargões desnecessários).
-   - **Simuladores práticos em JavaScript Vanilla:** ferramentas interativas reais (analisadores de regras, decodificadores JWT, laboratórios de criptografia, calculadoras CVSS e terminais simulados).
    - **Checklists operacionais:** salvamento automático de progresso em `localStorage`.
    - **Quizzes de fixação:** perguntas comentadas com fundamentação técnica e normativa.
 4. **Duplo Mapeamento Normativo:**
@@ -122,70 +121,70 @@ flowchart TD
     T7 --> CERTS
 ```
 
-| # | Slug / Pasta | Título do Estudo | Trilha Temática | Função NIST CSF 2.0 | Simulador Interativo em JavaScript |
-|:---:|---|---|---|:---:|---|
-| **01** | `Fundamentos-Ciber` | Tríade CIA, Ameaças e Modelagem STRIDE | Trilha 1: Fundamentos & Redes | Identify | STRIDE Threat Canvas interativo |
-| **02** | `Redes-e-Protocolos` | TCP/IP, DNS, Roteamento e Inspeção de Tráfego | Trilha 1: Fundamentos & Redes | Protect / Detect | Inspetor visual de cabeçalhos IP/TCP/UDP |
-| **03** | `Criptografia-Pratica` | Criptografia Simétrica, Assimétrica, Hashes e PKI | Trilha 1: Fundamentos & Redes | Protect | Lab de Cifras (Web Crypto API SHA-256 + AES) |
-| **04** | `Autenticacao-e-IAM` | Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC | Trilha 1: Fundamentos & Redes | Protect | Validador/Decodificador JWT + Teste de RBAC |
-| **05** | `Segmentacao-e-Firewall` | DMZ, VLANs, Regras de Firewall e Filtragem | Trilha 1: Fundamentos & Redes | Protect | Simulador de Regras de Firewall (Pass/Drop) |
-| **06** | `Hardening-Sistemas` | Bastionamento Linux e Windows (CIS Benchmarks) | Trilha 2: Segurança Defensiva | Protect | Auditor interativo de configurações (`/etc/ssh`, etc.) |
-| **07** | `Seguranca-de-Redes-Defesa` | IDS/IPS, WAF, VPNs e Proxies Reversos | Trilha 2: Segurança Defensiva | Protect / Detect | Analisador de regras Snort/Suricata vs Tráfego |
-| **08** | `Arquitetura-Zero-Trust` | Princípios Zero Trust e Microsegmentação | Trilha 2: Segurança Defensiva | Protect | Motor de Decisão de Acesso Zero Trust |
-| **09** | `Gestao-de-Vulnerabilidades` | CVE, CVSS v3.1/v4.0 e Priorização de Patches | Trilha 2: Segurança Defensiva | Identify / Protect | Calculadora interativa de Score CVSS v3.1/v4.0 |
-| **10** | `Seguranca-em-Endpoints-EDR` | Antivírus, EDR/XDR e Proteção de Host | Trilha 2: Segurança Defensiva | Protect / Detect | Linha do tempo de telemetria e detecção EDR |
-| **11** | `Reconhecimento-e-OSINT` | Superfície de Ataque, DNS, WHOIS e Shodan | Trilha 3: Segurança Ofensiva | Identify | Terminal simulado de OSINT e enumeração |
-| **12** | `OWASP-Top-10-Web` | Falhas Web (SQLi, XSS, CSRF, Broken Auth) | Trilha 3: Segurança Ofensiva | Protect | Playground de injeção e sanitização web |
-| **13** | `Seguranca-em-APIs` | OWASP API Security, Rate Limiting e Tokens | Trilha 3: Segurança Ofensiva | Protect | Simulador de chamadas de API com Rate Limiter |
-| **14** | `Pentest-Metodologias` | Fases do Pentest (PTES), Escopo e Relatório | Trilha 3: Segurança Ofensiva | Identify | Construtor de matriz de achados e relatórios |
-| **15** | `Engenharia-Social-e-Phishing` | Pretexting, Spear Phishing e Defesas Humanas | Trilha 3: Segurança Ofensiva | Protect | Analisador de e-mails suspeitos (Spot the Indicators) |
-| **16** | `Operacoes-SOC-e-SIEM` | Rotina de SOC L1/L2, Logs e Regras Sigma | Trilha 4: Operações & SOC | Detect | Console SIEM com busca de logs e alertas |
-| **17** | `Threat-Intelligence` | IoCs, TTPs, MITRE ATT&CK e STIX/TAXII | Trilha 4: Operações & SOC | Identify / Detect | Mapeador de IoCs e TTPs na matriz ATT&CK |
-| **18** | `Resposta-a-Incidentes` | Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação) | Trilha 4: Operações & SOC | Respond | Runbook interativo em árvore de decisão |
-| **19** | `Forense-Digital` | Cadeia de Custódia, Coleta de RAM e Artefatos | Trilha 4: Operações & SOC | Respond | Analisador de timeline de evidências e logs |
-| **20** | `Analise-Basica-de-Malware` | Análise Estática vs Dinâmica e Sandboxes | Trilha 4: Operações & SOC | Detect / Respond | Inspetor de metadados PE/ELF e hashes |
-| **21** | `Seguranca-em-Nuvem` | Responsabilidade Compartilhada e CSPM | Trilha 5: Especialidades | Protect | Auditor de permissões S3 e políticas IAM Cloud |
-| **22** | `DevSecOps-e-CI-CD` | Shift-Left, SAST, DAST, SCA e Containers | Trilha 5: Especialidades | Protect | Simulador de pipeline CI/CD com security gates |
-| **23** | `Seguranca-em-IoT-e-OT` | Redes Industriais (SCADA/Modbus) e IoT | Trilha 5: Especialidades | Protect | Mapeador do Modelo Purdue (TI vs TO) |
-| **24** | `IA-e-Ciberseguranca` | Ameaças a LLMs (OWASP LLM), Deepfakes e Defesa | Trilha 5: Especialidades | Protect / Detect | Lab de Prompt Injection e defesas |
-| **25** | `Gestao-de-Riscos-TI` | ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE) | Trilha 6: Governança & Riscos | Govern / Identify | Calculadora de matriz 5x5 e risco financeiro |
-| **26** | `ISO-27001-e-27002` | SGSI, Anexo A, CIS Controls e NIST 800-53 | Trilha 6: Governança & Riscos | Govern | Matriz de Controles e Declaração de Aplicabilidade |
-| **27** | `LGPD-e-Privacidade` | Bases Legais, Direitos do Titular e RIPD/DPIA | Trilha 6: Governança & Riscos | Govern / Protect | Construtor de Avaliação de Impacto (RIPD) |
-| **28** | `Continuidade-e-Disaster-Recovery` | BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1 | Trilha 6: Governança & Riscos | Recover | Calculadora de RTO/RPO e estratégia 3-2-1 |
-| **29** | `Protecao-de-Dados-e-Conteudo` | DLP, AntiSpam e Filtro de Conteúdo | Trilha 2: Segurança Defensiva | Protect / Detect | Gateway de Conteúdo |
-| **30** | `Seguranca-de-Bancos-de-Dados` | Bancos de Dados Relacionais: SQL, Privilégios e Auditoria | Trilha 2: Segurança Defensiva | Protect / Detect | Matriz GRANT/REVOKE |
-| **31** | `PCI-DSS` | PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos | Trilha 6: Governança & Riscos | Govern / Protect | Delimitador de Escopo CDE |
-| **32** | `Ingles-Tecnico-Ciber` | Inglês Técnico para Segurança da Informação | Trilha 7: Carreira & Formação | Protect | Leitor de Advisory |
-| **33** | `Certificacoes-e-Carreira` | Formação, Certificações e Carreira | Trilha 7: Carreira & Formação | Protect | Planejador de Certificações |
-| **34** | `Linux-para-Seguranca` | Linux para Segurança: Shell, Permissões e Logs | Trilha 8: Ferramentas & Automação | Protect / Detect | Terminal de Investigação Linux |
-| **35** | `Python-para-Seguranca` | Python para Segurança: Automação, Regex e Parsing | Trilha 8: Ferramentas & Automação | Detect | Montador de Detector |
-| **36** | `PowerShell-e-Windows-Interno` | PowerShell, Event Log e Registro do Windows | Trilha 8: Ferramentas & Automação | Detect | Visualizador de Eventos |
-| **37** | `Laboratorio-Domestico-e-Portfolio` | Laboratório Doméstico, CTFs e Portfólio | Trilha 8: Ferramentas & Automação | Protect | Planejador de Homelab |
-| **38** | `Active-Directory-Fundamentos` | Active Directory: Domínios, GPO e Kerberos | Trilha 9: Identidade & AD | Protect | Kerberos Passo a Passo |
-| **39** | `Ataques-e-Defesa-no-AD` | Ataques ao AD e Detecção: Kerberoasting, Pass-the-Hash e DCSync | Trilha 9: Identidade & AD | Protect / Detect | Mapa de Caminhos de Ataque |
-| **40** | `PAM-e-Acessos-Privilegiados` | Gestão de Acessos Privilegiados (PAM) | Trilha 9: Identidade & AD | Protect | Auditor de Contas Privilegiadas |
-| **41** | `Identidade-Hibrida-e-Nuvem` | Entra ID, Identidade Híbrida e Acesso Condicional | Trilha 9: Identidade & AD | Protect | Avaliador de Acesso Condicional |
-| **42** | `Ransomware-Prevencao-a-Recuperacao` | Ransomware: Prevenção, Contenção e Recuperação | Trilha 10: Resiliência & Ransomware | Respond / Recover | Linha do Tempo do Ransomware |
-| **43** | `Gestao-de-Crise-e-Comunicacao` | Gestão de Crise Cibernética e Comunicação de Incidentes | Trilha 10: Resiliência & Ransomware | Respond | Relógio da Crise |
-| **44** | `Exercicios-Tabletop` | Exercícios Tabletop: Planejar, Conduzir e Avaliar | Trilha 10: Resiliência & Ransomware | Respond / Recover | Gerador de Tabletop |
-| **45** | `Backup-Imutavel-e-Recuperacao` | Backup Imutável e Recuperação de Identidade | Trilha 10: Resiliência & Ransomware | Recover | Teste de Sobrevivência do Backup |
-| **46** | `Engenharia-de-Deteccao` | Engenharia de Detecção: Detection-as-Code e Cobertura ATT&CK | Trilha 11: Detecção Avançada | Detect | Bancada de Detecções |
-| **47** | `Threat-Hunting` | Threat Hunting: Caça por Hipótese e Linhas de Base | Trilha 11: Detecção Avançada | Detect | Caçada Guiada |
-| **48** | `Monitoramento-de-Rede-NSM` | Monitoramento de Rede: Zeek, PCAP e NetFlow | Trilha 11: Detecção Avançada | Detect | Analisador de Conexões |
-| **49** | `SOAR-e-Automacao-de-Resposta` | SOAR: Playbooks e Automação de Resposta | Trilha 11: Detecção Avançada | Respond | Montador de Playbook |
-| **50** | `Seguranca-de-Containers` | Segurança de Containers: Imagens, Build e Runtime | Trilha 12: Nuvem & Kubernetes | Protect | Auditor de Dockerfile |
-| **51** | `Seguranca-em-Kubernetes` | Segurança em Kubernetes: RBAC, Pod Security e NetworkPolicy | Trilha 12: Nuvem & Kubernetes | Protect | Cluster em Miniatura |
-| **52** | `Infraestrutura-como-Codigo-Segura` | Infraestrutura como Código Segura: Terraform e Policy-as-Code | Trilha 12: Nuvem & Kubernetes | Protect | Revisor de Plano Terraform |
-| **53** | `Deteccao-e-Resposta-em-Nuvem` | Detecção e Resposta a Incidentes em Nuvem | Trilha 12: Nuvem & Kubernetes | Detect / Respond | Conta Comprometida |
-| **54** | `Regulacao-Setor-Financeiro` | Regulação Cibernética do Setor Financeiro | Trilha 13: Setor Regulado BR | Govern | Verificador de Aderência |
-| **55** | `Fraude-em-Pagamentos-e-Pix` | Fraude em Pagamentos: Pix, Golpes e Antifraude | Trilha 13: Setor Regulado BR | Detect / Protect | Mesa Antifraude |
-| **56** | `Legislacao-e-Crimes-Ciberneticos` | Legislação Brasileira e Crimes Cibernéticos | Trilha 13: Setor Regulado BR | Govern | Enquadramento de Casos |
-| **57** | `Gestao-de-Riscos-de-Terceiros` | Gestão de Riscos de Terceiros e Fornecedores | Trilha 13: Setor Regulado BR | Govern | Avaliador de Fornecedores |
-| **58** | `Auditoria-de-TI` | Auditoria de TI: SOX, ITGC e COBIT | Trilha 6: Governança & Riscos | Govern | Testador de ITGC |
-| **59** | `Lideranca-e-Programa-de-Seguranca` | Liderança e Programa de Segurança: o Papel do CISO | Trilha 14: Liderança & Estratégia | Govern | Do SIEM ao Conselho |
-| **60** | `Estruturacao-da-Area-de-Seguranca` | Estruturação da Área de Segurança: Maturidade, Time e Sourcing | Trilha 14: Liderança & Estratégia | Govern | Alocador de Programa |
-| **61** | `Fundamentos-de-Computacao-e-SO` | Fundamentos de Computação e SO para Segurança | Trilha 1: Fundamentos & Redes | Identify / Protect | Inspetor de Bytes |
-| **62** | `Exploracao-e-Escalada-de-Privilegio` | Exploração e Escalada de Privilégio: Detecção e Defesa | Trilha 3: Segurança Ofensiva | Detect / Protect | Console do Defensor |
+| # | Slug / Pasta | Título do Estudo | Trilha Temática | Função NIST CSF 2.0 |
+|:---:|---|---|---|:---:|
+| **01** | `Fundamentos-Ciber` | Tríade CIA, Ameaças e Modelagem STRIDE | Trilha 1: Fundamentos & Redes | Identify |
+| **02** | `Redes-e-Protocolos` | TCP/IP, DNS, Roteamento e Inspeção de Tráfego | Trilha 1: Fundamentos & Redes | Protect / Detect |
+| **03** | `Criptografia-Pratica` | Criptografia Simétrica, Assimétrica, Hashes e PKI | Trilha 1: Fundamentos & Redes | Protect |
+| **04** | `Autenticacao-e-IAM` | Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC | Trilha 1: Fundamentos & Redes | Protect |
+| **05** | `Segmentacao-e-Firewall` | DMZ, VLANs, Regras de Firewall e Filtragem | Trilha 1: Fundamentos & Redes | Protect |
+| **06** | `Hardening-Sistemas` | Bastionamento Linux e Windows (CIS Benchmarks) | Trilha 2: Segurança Defensiva | Protect |
+| **07** | `Seguranca-de-Redes-Defesa` | IDS/IPS, WAF, VPNs e Proxies Reversos | Trilha 2: Segurança Defensiva | Protect / Detect |
+| **08** | `Arquitetura-Zero-Trust` | Princípios Zero Trust e Microsegmentação | Trilha 2: Segurança Defensiva | Protect |
+| **09** | `Gestao-de-Vulnerabilidades` | CVE, CVSS v3.1/v4.0 e Priorização de Patches | Trilha 2: Segurança Defensiva | Identify / Protect |
+| **10** | `Seguranca-em-Endpoints-EDR` | Antivírus, EDR/XDR e Proteção de Host | Trilha 2: Segurança Defensiva | Protect / Detect |
+| **11** | `Reconhecimento-e-OSINT` | Superfície de Ataque, DNS, WHOIS e Shodan | Trilha 3: Segurança Ofensiva | Identify |
+| **12** | `OWASP-Top-10-Web` | Falhas Web (SQLi, XSS, CSRF, Broken Auth) | Trilha 3: Segurança Ofensiva | Protect |
+| **13** | `Seguranca-em-APIs` | OWASP API Security, Rate Limiting e Tokens | Trilha 3: Segurança Ofensiva | Protect |
+| **14** | `Pentest-Metodologias` | Fases do Pentest (PTES), Escopo e Relatório | Trilha 3: Segurança Ofensiva | Identify |
+| **15** | `Engenharia-Social-e-Phishing` | Pretexting, Spear Phishing e Defesas Humanas | Trilha 3: Segurança Ofensiva | Protect |
+| **16** | `Operacoes-SOC-e-SIEM` | Rotina de SOC L1/L2, Logs e Regras Sigma | Trilha 4: Operações & SOC | Detect |
+| **17** | `Threat-Intelligence` | IoCs, TTPs, MITRE ATT&CK e STIX/TAXII | Trilha 4: Operações & SOC | Identify / Detect |
+| **18** | `Resposta-a-Incidentes` | Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradicação) | Trilha 4: Operações & SOC | Respond |
+| **19** | `Forense-Digital` | Cadeia de Custódia, Coleta de RAM e Artefatos | Trilha 4: Operações & SOC | Respond |
+| **20** | `Analise-Basica-de-Malware` | Análise Estática vs Dinâmica e Sandboxes | Trilha 4: Operações & SOC | Detect / Respond |
+| **21** | `Seguranca-em-Nuvem` | Responsabilidade Compartilhada e CSPM | Trilha 5: Especialidades | Protect |
+| **22** | `DevSecOps-e-CI-CD` | Shift-Left, SAST, DAST, SCA e Containers | Trilha 5: Especialidades | Protect |
+| **23** | `Seguranca-em-IoT-e-OT` | Redes Industriais (SCADA/Modbus) e IoT | Trilha 5: Especialidades | Protect |
+| **24** | `IA-e-Ciberseguranca` | Ameaças a LLMs (OWASP LLM), Deepfakes e Defesa | Trilha 5: Especialidades | Protect / Detect |
+| **25** | `Gestao-de-Riscos-TI` | ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE) | Trilha 6: Governança & Riscos | Govern / Identify |
+| **26** | `ISO-27001-e-27002` | SGSI, Anexo A, CIS Controls e NIST 800-53 | Trilha 6: Governança & Riscos | Govern |
+| **27** | `LGPD-e-Privacidade` | Bases Legais, Direitos do Titular e RIPD/DPIA | Trilha 6: Governança & Riscos | Govern / Protect |
+| **28** | `Continuidade-e-Disaster-Recovery` | BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1 | Trilha 6: Governança & Riscos | Recover |
+| **29** | `Protecao-de-Dados-e-Conteudo` | DLP, AntiSpam e Filtro de Conteúdo | Trilha 2: Segurança Defensiva | Protect / Detect |
+| **30** | `Seguranca-de-Bancos-de-Dados` | Bancos de Dados Relacionais: SQL, Privilégios e Auditoria | Trilha 2: Segurança Defensiva | Protect / Detect |
+| **31** | `PCI-DSS` | PCI DSS v4.0.1: Escopo CDE e os 12 Requisitos | Trilha 6: Governança & Riscos | Govern / Protect |
+| **32** | `Ingles-Tecnico-Ciber` | Inglês Técnico para Segurança da Informação | Trilha 7: Carreira & Formação | Protect |
+| **33** | `Certificacoes-e-Carreira` | Formação, Certificações e Carreira | Trilha 7: Carreira & Formação | Protect |
+| **34** | `Linux-para-Seguranca` | Linux para Segurança: Shell, Permissões e Logs | Trilha 8: Ferramentas & Automação | Protect / Detect |
+| **35** | `Python-para-Seguranca` | Python para Segurança: Automação, Regex e Parsing | Trilha 8: Ferramentas & Automação | Detect |
+| **36** | `PowerShell-e-Windows-Interno` | PowerShell, Event Log e Registro do Windows | Trilha 8: Ferramentas & Automação | Detect |
+| **37** | `Laboratorio-Domestico-e-Portfolio` | Laboratório Doméstico, CTFs e Portfólio | Trilha 8: Ferramentas & Automação | Protect |
+| **38** | `Active-Directory-Fundamentos` | Active Directory: Domínios, GPO e Kerberos | Trilha 9: Identidade & AD | Protect |
+| **39** | `Ataques-e-Defesa-no-AD` | Ataques ao AD e Detecção: Kerberoasting, Pass-the-Hash e DCSync | Trilha 9: Identidade & AD | Protect / Detect |
+| **40** | `PAM-e-Acessos-Privilegiados` | Gestão de Acessos Privilegiados (PAM) | Trilha 9: Identidade & AD | Protect |
+| **41** | `Identidade-Hibrida-e-Nuvem` | Entra ID, Identidade Híbrida e Acesso Condicional | Trilha 9: Identidade & AD | Protect |
+| **42** | `Ransomware-Prevencao-a-Recuperacao` | Ransomware: Prevenção, Contenção e Recuperação | Trilha 10: Resiliência & Ransomware | Respond / Recover |
+| **43** | `Gestao-de-Crise-e-Comunicacao` | Gestão de Crise Cibernética e Comunicação de Incidentes | Trilha 10: Resiliência & Ransomware | Respond |
+| **44** | `Exercicios-Tabletop` | Exercícios Tabletop: Planejar, Conduzir e Avaliar | Trilha 10: Resiliência & Ransomware | Respond / Recover |
+| **45** | `Backup-Imutavel-e-Recuperacao` | Backup Imutável e Recuperação de Identidade | Trilha 10: Resiliência & Ransomware | Recover |
+| **46** | `Engenharia-de-Deteccao` | Engenharia de Detecção: Detection-as-Code e Cobertura ATT&CK | Trilha 11: Detecção Avançada | Detect |
+| **47** | `Threat-Hunting` | Threat Hunting: Caça por Hipótese e Linhas de Base | Trilha 11: Detecção Avançada | Detect |
+| **48** | `Monitoramento-de-Rede-NSM` | Monitoramento de Rede: Zeek, PCAP e NetFlow | Trilha 11: Detecção Avançada | Detect |
+| **49** | `SOAR-e-Automacao-de-Resposta` | SOAR: Playbooks e Automação de Resposta | Trilha 11: Detecção Avançada | Respond |
+| **50** | `Seguranca-de-Containers` | Segurança de Containers: Imagens, Build e Runtime | Trilha 12: Nuvem & Kubernetes | Protect |
+| **51** | `Seguranca-em-Kubernetes` | Segurança em Kubernetes: RBAC, Pod Security e NetworkPolicy | Trilha 12: Nuvem & Kubernetes | Protect |
+| **52** | `Infraestrutura-como-Codigo-Segura` | Infraestrutura como Código Segura: Terraform e Policy-as-Code | Trilha 12: Nuvem & Kubernetes | Protect |
+| **53** | `Deteccao-e-Resposta-em-Nuvem` | Detecção e Resposta a Incidentes em Nuvem | Trilha 12: Nuvem & Kubernetes | Detect / Respond |
+| **54** | `Regulacao-Setor-Financeiro` | Regulação Cibernética do Setor Financeiro | Trilha 13: Setor Regulado BR | Govern |
+| **55** | `Fraude-em-Pagamentos-e-Pix` | Fraude em Pagamentos: Pix, Golpes e Antifraude | Trilha 13: Setor Regulado BR | Detect / Protect |
+| **56** | `Legislacao-e-Crimes-Ciberneticos` | Legislação Brasileira e Crimes Cibernéticos | Trilha 13: Setor Regulado BR | Govern |
+| **57** | `Gestao-de-Riscos-de-Terceiros` | Gestão de Riscos de Terceiros e Fornecedores | Trilha 13: Setor Regulado BR | Govern |
+| **58** | `Auditoria-de-TI` | Auditoria de TI: SOX, ITGC e COBIT | Trilha 6: Governança & Riscos | Govern |
+| **59** | `Lideranca-e-Programa-de-Seguranca` | Liderança e Programa de Segurança: o Papel do CISO | Trilha 14: Liderança & Estratégia | Govern |
+| **60** | `Estruturacao-da-Area-de-Seguranca` | Estruturação da Área de Segurança: Maturidade, Time e Sourcing | Trilha 14: Liderança & Estratégia | Govern |
+| **61** | `Fundamentos-de-Computacao-e-SO` | Fundamentos de Computação e SO para Segurança | Trilha 1: Fundamentos & Redes | Identify / Protect |
+| **62** | `Exploracao-e-Escalada-de-Privilegio` | Exploração e Escalada de Privilégio: Detecção e Defesa | Trilha 3: Segurança Ofensiva | Detect / Protect |
 
 ---
 
@@ -244,8 +243,8 @@ flowchart LR
 
 ### Estrutura do Pipeline
 
-- `_geradores/estudos.txt`: Catálogo canônico dos 60 estudos com metadados estruturais (slug, título, pasta, arquivo HTML, número da trilha, cor do tema e função NIST CSF 2.0).
-- `_geradores/CURRICULO.md`: Matriz pedagógica detalhada com competências, pré-requisitos e especificações de cada simulador interativo.
+- `_geradores/estudos.txt`: Catálogo canônico dos 62 módulos com metadados estruturais (slug, título, pasta, arquivo HTML, número da trilha, cor do tema e função NIST CSF 2.0).
+- `_geradores/CURRICULO.md`: Matriz pedagógica detalhada com competências, pré-requisitos e competências e pré-requisitos de cada módulo.
 - `_geradores/GUIA-DO-AUTOR.md`: Manual editorial e técnico para criação de novos módulos ou expansão de conteúdo.
 - `_geradores/base.css` e `_geradores/base.js`: Design System responsivo com suporte a temas claro e escuro, além de controladores de quizzes, checklists e utilitários de simulação.
 - `_geradores/montar.py`: Compilador que processa fragmentos HTML (`*_body.html`) e injeta os assets necessários, gerando treinamentos autossuficientes.

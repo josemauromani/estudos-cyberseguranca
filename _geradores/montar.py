@@ -26,7 +26,6 @@ ROOT_DIR = GERADORES_DIR.parent
 DEFAULT_ESTUDOS_TXT = GERADORES_DIR / "estudos.txt"
 DEFAULT_BASE_CSS = GERADORES_DIR / "base.css"
 TOKENS_CSS = GERADORES_DIR / "tokens.css"
-LABORATORIO_CSS = GERADORES_DIR / "laboratorio.css"
 DEFAULT_BASE_JS = GERADORES_DIR / "base.js"
 
 if str(GERADORES_DIR) not in sys.path:
@@ -63,7 +62,7 @@ def carregar_css(base_css: Optional[Path] = None) -> str:
 
     base = Path(base_css) if base_css else DEFAULT_BASE_CSS
     partes = [css_fontes()]
-    for arquivo in (TOKENS_CSS, base, LABORATORIO_CSS):
+    for arquivo in (TOKENS_CSS, base):
         if arquivo.exists():
             partes.append(arquivo.read_text(encoding="utf-8"))
     return "\n".join(partes)

@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Gestao-de-Crise-e-Comunicacao">
@@ -2120,7 +1736,6 @@ dfn.glossario:focus-visible {
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: Quando o Incidente Vira Crise</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#comunicacao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Comunicação: Públicos, Mensagens e a Resolução CD/ANPD nº 15/2024</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Relógio da Crise</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Prontidão para Crise</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2136,14 +1751,14 @@ dfn.glossario:focus-visible {
   <h1>Gestão de Crise Cibernética e Comunicação de Incidentes</h1>
   <p class="mhead-sub">Comitê de crise, registro de decisões e comunicação a público interno, clientes, imprensa e ANPD</p>
   <div class="chips"><span class="chip">⏱ 40 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Respond</span><span class="chip">🎯 ATT&amp;CK N/A (gestão e comunicação)</span><span class="chip">👤 GRC &amp; Auditoria · Operações SOC &amp; Resposta · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 43: Gestao-de-Crise-e-Comunicacao Body Fragment -->
 <article class="study-container" data-slug="gestao-crise">
 
     <!-- SEÇÃO 1: CRISE E COMITÊ -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: Quando o Incidente Vira Crise</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 5</small></span><h2>Introdução: Quando o Incidente Vira Crise</h2></div>
 
         <p class="lead-text">
             O time técnico contém o ataque; a empresa precisa decidir o que dizer, a quem e quando. Um <strong>incidente</strong> é resolvido pelo processo de resposta. Uma <strong>crise</strong> é quando o incidente ameaça a operação, a reputação ou as obrigações legais da empresa e exige decisões que só a direção pode tomar. O ransomware da Ipê Store (Estudo 42) virou crise no momento em que se confirmou que dados de clientes tinham saído. Este estudo trata do lado de fora da sala técnica: o comitê, o registro das decisões e a comunicação.
@@ -2195,7 +1810,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 2: COMUNICAÇÃO E ANPD -->
     <section class="study-section" id="comunicacao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Comunicação: Públicos, Mensagens e a Resolução CD/ANPD nº 15/2024</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 5</small></span><h2>Comunicação: Públicos, Mensagens e a Resolução CD/ANPD nº 15/2024</h2></div>
 
         <h3>Princípios da Mensagem</h3>
         <ul>
@@ -2246,58 +1861,10 @@ dfn.glossario:focus-visible {
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 3 de 6</small></span><h2>Laboratório Prático: Relógio da Crise</h2></div>
-
-        <p class="lead-text">
-            Sábado, 08/11/2025, 02:00: a Ipê Store confirma que dados de clientes foram copiados antes do ransomware. Calcule os prazos, decida quem notificar e quando, e monte a mensagem aos titulares.
-        </p>
-
-        <div class="lab-box crise-lab" id="crise-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Laboratório de Gestão de Crise</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Comitê de crise da Ipê Store</h3>
-                    <p id="crise-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
-                </div>
-            </div>
-
-            <div class="lab-body">
-                <h4 style="margin-top: 0;">1. Relógio dos prazos</h4>
-                <div style="display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; align-items: flex-end; font-size: 0.85rem;">
-                    <label style="display: flex; flex-direction: column; gap: 0.25rem;">Data do conhecimento
-                        <input class="form-control" type="date" id="crise-data" min="2025-01-01" max="2026-12-31">
-                    </label>
-                    <label style="display: flex; gap: 0.4rem; align-items: center;"><input type="checkbox" id="crise-pequeno"> Agente de pequeno porte</label>
-                </div>
-                <div id="crise-prazos" aria-live="polite" style="margin-top: 0.75rem; font-size: 0.88rem;"></div>
-
-                <h4 style="margin-top: 1.5rem;">2. Quem notificar e quando</h4>
-                <div id="crise-destinatarios" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem;"></div>
-                <div style="margin-top: 0.75rem;">
-                    <button class="btn-primary" type="button" onclick="conferirNotificacoesCrise()">Conferir notificações</button>
-                </div>
-                <div id="crise-resultado-notif" aria-live="polite" style="margin-top: 0.75rem; font-size: 0.88rem;"></div>
-
-                <h4 style="margin-top: 1.5rem;">3. Mensagem aos titulares</h4>
-                <p style="font-size: 0.85rem; margin: 0 0 0.5rem 0;">Marque o que entra na comunicação. A prévia mostra como o cliente vai ler.</p>
-                <div id="crise-mensagem" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem; font-size: 0.85rem;"></div>
-                <div id="crise-previa" style="margin-top: 0.75rem; border: 1px dashed var(--rule); border-radius: var(--radius-md); padding: 0.75rem; font-size: 0.85rem; background: var(--surface);"></div>
-                <div style="margin-top: 0.75rem;">
-                    <button class="btn-primary" type="button" onclick="conferirMensagemCrise()">Conferir mensagem</button>
-                </div>
-                <div id="crise-resultado-msg" aria-live="polite" style="margin-top: 0.75rem; font-size: 0.88rem;"></div>
-
-                <div style="margin-top: 1.25rem;">
-                    <button class="btn-secondary" type="button" onclick="restaurarCrise()">Restaurar laboratório</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist de Prontidão para Crise</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 3 de 5</small></span><h2>Checklist de Prontidão para Crise</h2></div>
 
         <p class="lead-text">
             Use esta lista para preparar a empresa antes da crise. O estado das caixas fica salvo no seu navegador.
@@ -2337,7 +1904,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 4 de 5</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2420,7 +1987,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 5 de 5</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2468,292 +2035,7 @@ dfn.glossario:focus-visible {
 
 </article>
 
-<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
-<script type="application/json" id="crise-dados">
-{
- "contexto": "Cenário fictício: a Ipê Store (empresa não financeira) teve 118 GB copiados antes do ransomware do Estudo 42. Os arquivos tinham nome, CPF, e-mail e endereço de clientes; nenhum dado de cartão, porque a loja usa tokenização.",
- "conhecimento": "2025-11-08T02:00",
- "regras": {"anpd_dias": 3, "titulares_dias": 3, "complementacao_dias": 20, "declaracao_dias": 3, "registro_anos": 5},
- "feriados": [
-  "2025-01-01", "2025-04-18", "2025-04-21", "2025-05-01", "2025-09-07", "2025-10-12", "2025-11-02", "2025-11-15", "2025-11-20", "2025-12-25",
-  "2026-01-01", "2026-04-03", "2026-04-21", "2026-05-01", "2026-09-07", "2026-10-12", "2026-11-02", "2026-11-15", "2026-11-20", "2026-12-25",
-  "2027-01-01", "2027-03-26", "2027-04-21", "2027-05-01", "2027-09-07", "2027-10-12", "2027-11-02", "2027-11-15", "2027-11-20", "2027-12-25"
- ],
- "prazos_esperados": {
-  "normal": {"anpd": "2025-11-12", "titulares": "2025-11-12", "declaracao": "2025-11-17", "complementacao": "2025-12-11", "registro": "2030-11-08"},
-  "pequeno_porte": {"anpd": "2025-11-17", "titulares": "2025-11-17", "declaracao": "2025-11-21", "complementacao": "2026-01-15", "registro": "2030-11-08"}
- },
- "opcoes_prazo": {
-  "imediato": "Imediatamente, nas primeiras horas",
-  "antes_publico": "Antes de qualquer comunicação externa",
-  "3du": "Até 3 dias úteis do conhecimento",
-  "apolice": "No prazo da apólice",
-  "sob_demanda": "Declaração pronta; falar quando procurado ou junto com o comunicado público"
- },
- "destinatarios": [
-  {"id": "anpd", "nome": "ANPD", "correto": "notificar", "prazo_correto": "3du",
-   "explicacao": "Dados de identificação de clientes em larga escala, com risco de golpes: há risco relevante. Prazo de três dias úteis (art. 6º), complementação em vinte."},
-  {"id": "titulares", "nome": "Clientes afetados (titulares)", "correto": "notificar", "prazo_correto": "3du",
-   "explicacao": "Mesmo prazo de três dias úteis (art. 9º), de forma direta e individualizada, em linguagem simples."},
-  {"id": "seguradora", "nome": "Seguradora (apólice cyber)", "correto": "notificar", "prazo_correto": "apolice",
-   "explicacao": "A obrigação é contratual: a apólice costuma exigir aviso imediato e aprovação dos fornecedores de resposta. Atrasar pode comprometer a cobertura."},
-  {"id": "funcionarios", "nome": "Funcionários", "correto": "notificar", "prazo_correto": "antes_publico",
-   "explicacao": "Precisam saber antes do público: o que aconteceu, o que podem dizer e a quem encaminhar perguntas de clientes e da imprensa."},
-  {"id": "imprensa", "nome": "Imprensa", "correto": "notificar", "prazo_correto": "sob_demanda",
-   "explicacao": "A declaração inicial fica pronta antes de avisar os clientes, porque a notícia vai circular. Quem fala é o porta-voz."},
-  {"id": "policia", "nome": "Polícia (boletim de ocorrência)", "correto": "notificar", "prazo_correto": "imediato",
-   "explicacao": "Não há prazo legal, mas registrar cedo ajuda a investigação e costuma ser exigido pela seguradora."},
-  {"id": "fornecedor_erp", "nome": "Fornecedor do ERP", "correto": "notificar", "prazo_correto": "imediato",
-   "explicacao": "O acesso do fornecedor pode estar envolvido (conta órfã do Estudo 40) e ele é necessário para restaurar o sistema."},
-  {"id": "adquirente", "nome": "Adquirente e bandeiras de cartão", "correto": "nao_se_aplica", "prazo_correto": null,
-   "explicacao": "Nenhum dado de cartão foi afetado: a loja tokeniza (Estudo 31). Registre essa análise, porque o adquirente pode perguntar."},
-  {"id": "banco_central", "nome": "Banco Central do Brasil", "correto": "nao_se_aplica", "prazo_correto": null,
-   "explicacao": "As regras de comunicação ao Banco Central valem para instituições financeiras e de pagamento. A Ipê Store é uma loja, não uma instituição financeira."}
- ],
- "itens_mensagem": [
-  {"id": "natureza", "tipo": "obrigatorio", "inciso": "I", "texto": "Quais dados foram afetados: nome, CPF, e-mail e endereço de entrega. Nenhum dado de cartão foi exposto.",
-   "explicacao": "Art. 9º, I: natureza e categoria dos dados pessoais afetados."},
-  {"id": "medidas_protecao", "tipo": "obrigatorio", "inciso": "II", "texto": "Como os dados eram protegidos: acesso restrito, cópias de segurança e cartões tokenizados pelo meio de pagamento.",
-   "explicacao": "Art. 9º, II: medidas técnicas e de segurança usadas, sem expor segredo comercial."},
-  {"id": "riscos", "tipo": "obrigatorio", "inciso": "III", "texto": "Riscos para você: tentativas de golpe por e-mail, telefone ou mensagem usando seus dados.",
-   "explicacao": "Art. 9º, III: riscos e possíveis impactos aos titulares."},
-  {"id": "demora", "tipo": "condicional", "inciso": "IV", "texto": "Os motivos pelos quais esta comunicação atrasou.",
-   "explicacao": "Art. 9º, IV: só é exigido se a comunicação sair depois do prazo. Neste cenário, enviada no prazo, não é necessário."},
-  {"id": "mitigacao", "tipo": "obrigatorio", "inciso": "V", "texto": "O que estamos fazendo: o ataque foi contido, as senhas internas foram trocadas e o monitoramento foi reforçado.",
-   "explicacao": "Art. 9º, V: medidas adotadas ou a adotar para reverter ou mitigar os efeitos."},
-  {"id": "data", "tipo": "obrigatorio", "inciso": "VI", "texto": "Tomamos conhecimento do incidente em 08/11/2025.",
-   "explicacao": "Art. 9º, VI: data do conhecimento do incidente."},
-  {"id": "contato", "tipo": "obrigatorio", "inciso": "VII", "texto": "Dúvidas: central de atendimento e encarregado de dados pelo e-mail dpo@ipestore.example.",
-   "explicacao": "Art. 9º, VII: contato para informações e dados do encarregado."},
-  {"id": "recomendacoes", "tipo": "boa_pratica", "inciso": null, "texto": "Recomendações: desconfie de mensagens que peçam pagamento ou senha; a Ipê Store não pede dados por telefone.",
-   "explicacao": "Art. 9º, § 5º: recomendações para mitigar os efeitos podem ser consideradas boa prática."},
-  {"id": "grupo", "tipo": "distrator", "inciso": null, "texto": "O nome do grupo criminoso e o endereço do site onde ele ameaça publicar os dados.",
-   "explicacao": "Não ajuda o titular e leva curiosos ao site criminoso, ampliando a exposição."},
-  {"id": "tecnico", "tipo": "distrator", "inciso": null, "texto": "Detalhes técnicos da falha: VPN sem MFA e a conta erp_admin.",
-   "explicacao": "Expõe a empresa a novos ataques e não é o que o inciso II pede: medidas de proteção, observados os segredos comercial e industrial."},
-  {"id": "resgate", "tipo": "distrator", "inciso": null, "texto": "O valor do resgate pedido pelos criminosos.",
-   "explicacao": "Irrelevante para o titular e alimenta especulação; é assunto do comitê, não do comunicado."},
-  {"id": "garantia", "tipo": "distrator", "inciso": null, "texto": "Garantimos que nenhum dado será publicado.",
-   "explicacao": "A empresa não controla isso. Uma promessa falsa reduz a atenção do cliente aos golpes e expõe a empresa."},
-  {"id": "link", "tipo": "distrator", "inciso": null, "texto": "Clique no link e confirme seu CPF e senha para verificarmos sua conta.",
-   "explicacao": "É exatamente o padrão de phishing que os golpistas vão usar. Um comunicado legítimo nunca pede senha."}
- ]
-}
-</script>
-
-<script>
-(function() {
-    var CRISE = JSON.parse(document.getElementById("crise-dados").textContent);
-    var DIA = 86400000;
-    var SEMANA = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"];
-    var ROTULOS = {
-        anpd: "Comunicação à ANPD",
-        titulares: "Comunicação aos titulares",
-        declaracao: "Declaração da comunicação aos titulares",
-        complementacao: "Complementação à ANPD",
-        registro: "Guarda mínima do registro"
-    };
-    var marcados = {};
-
-    function el(tag, texto, estilo) {
-        var e = document.createElement(tag);
-        if (texto !== undefined && texto !== null) e.textContent = texto;
-        if (estilo) e.setAttribute("style", estilo);
-        return e;
-    }
-    function lerData(iso) {
-        var p = iso.split("-");
-        return new Date(Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2])));
-    }
-    function iso(d) { return d.toISOString().slice(0, 10); }
-    function formatar(d) {
-        var p = iso(d).split("-");
-        return SEMANA[d.getUTCDay()] + ", " + p[2] + "/" + p[1] + "/" + p[0];
-    }
-    // Mesma regra dos testes: exclui o dia de início, pula fins de semana e feriados nacionais.
-    function somarDiasUteis(inicio, n) {
-        var d = new Date(inicio.getTime());
-        while (n > 0) {
-            d = new Date(d.getTime() + DIA);
-            var dow = d.getUTCDay();
-            if (dow !== 0 && dow !== 6 && CRISE.feriados.indexOf(iso(d)) === -1) n--;
-        }
-        return d;
-    }
-    function prazos(conhecimento, pequeno) {
-        var r = CRISE.regras, f = pequeno ? 2 : 1;
-        var anpd = somarDiasUteis(conhecimento, r.anpd_dias * f);
-        var titulares = somarDiasUteis(conhecimento, r.titulares_dias * f);
-        var registro = new Date(Date.UTC(conhecimento.getUTCFullYear() + r.registro_anos, conhecimento.getUTCMonth(), conhecimento.getUTCDate()));
-        return {
-            anpd: anpd, titulares: titulares,
-            declaracao: somarDiasUteis(titulares, r.declaracao_dias),
-            complementacao: somarDiasUteis(anpd, r.complementacao_dias * f),
-            registro: registro
-        };
-    }
-
-    window.calcularPrazosCrise = function() {
-        var box = document.getElementById("crise-prazos");
-        box.replaceChildren();
-        var valor = document.getElementById("crise-data").value;
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(valor) || valor < "2025-01-01" || valor > "2026-12-31") {
-            box.appendChild(el("p", "Escolha uma data entre 2025 e 2026. O laboratório tem os feriados nacionais de 2025 a 2027, para que os prazos longos não passem do calendário cadastrado.", "margin: 0; color: var(--danger-color);"));
-            return;
-        }
-        var pequeno = document.getElementById("crise-pequeno").checked;
-        var conhecimento = lerData(valor);
-        var p = prazos(conhecimento, pequeno);
-        var f = pequeno ? 2 : 1;
-        var regras = {
-            anpd: CRISE.regras.anpd_dias * f + " dias úteis do conhecimento (art. 6º)",
-            titulares: CRISE.regras.titulares_dias * f + " dias úteis do conhecimento (art. 9º)",
-            declaracao: CRISE.regras.declaracao_dias + " dias úteis após o prazo dos titulares (art. 9º, § 4º)",
-            complementacao: CRISE.regras.complementacao_dias * f + " dias úteis da comunicação, supondo envio no último dia (art. 6º, § 3º)",
-            registro: CRISE.regras.registro_anos + " anos, no mínimo, a partir do registro (art. 10)"
-        };
-        var lista = el("div", null, "display: grid; gap: 0.4rem;");
-        Object.keys(ROTULOS).forEach(function(k) {
-            var linha = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.2rem 0.75rem; justify-content: space-between; border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.4rem 0.6rem;");
-            linha.setAttribute("data-prazo", k);
-            linha.setAttribute("data-data", iso(p[k]));
-            var esq = el("div", null, "min-width: 0;");
-            esq.appendChild(el("strong", ROTULOS[k], "display: block;"));
-            esq.appendChild(el("span", regras[k], "font-size: 0.78rem; color: var(--muted);"));
-            linha.appendChild(esq);
-            linha.appendChild(el("span", (k === "registro" ? "até " : "") + formatar(p[k]), "font-family: var(--font-mono); font-weight: 600;"));
-            lista.appendChild(linha);
-        });
-        box.appendChild(lista);
-        box.appendChild(el("p", "Contagem usada: exclui o dia do conhecimento e não conta sábados, domingos e feriados nacionais. Feriados estaduais e municipais não estão incluídos; confirme a contagem com o jurídico.",
-            "margin: 0.5rem 0 0 0; font-size: 0.78rem; color: var(--muted);"));
-    };
-
-    function renderizarDestinatarios() {
-        var box = document.getElementById("crise-destinatarios");
-        box.replaceChildren();
-        CRISE.destinatarios.forEach(function(d) {
-            var card = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.5rem 0.65rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem; min-width: 0;");
-            card.setAttribute("data-destinatario", d.id);
-            card.appendChild(el("strong", d.nome, "font-size: 0.9rem;"));
-            var linha = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.5rem;");
-            var dec = el("select", null, "flex: 1 1 140px; min-width: 0;");
-            dec.className = "form-control";
-            dec.setAttribute("aria-label", "Decisão para " + d.nome);
-            [["", "Decisão…"], ["notificar", "Notificar"], ["nao_se_aplica", "Não se aplica"]].forEach(function(o) {
-                var op = el("option", o[1]); op.value = o[0]; dec.appendChild(op);
-            });
-            var prz = el("select", null, "flex: 2 1 200px; min-width: 0;");
-            prz.className = "form-control";
-            prz.setAttribute("aria-label", "Prazo para " + d.nome);
-            var op0 = el("option", "Prazo…"); op0.value = ""; prz.appendChild(op0);
-            Object.keys(CRISE.opcoes_prazo).forEach(function(k) {
-                var op = el("option", CRISE.opcoes_prazo[k]); op.value = k; prz.appendChild(op);
-            });
-            dec.addEventListener("change", function() { prz.disabled = dec.value === "nao_se_aplica"; if (prz.disabled) prz.value = ""; });
-            linha.appendChild(dec);
-            linha.appendChild(prz);
-            card.appendChild(linha);
-            box.appendChild(card);
-        });
-    }
-
-    window.conferirNotificacoesCrise = function() {
-        var acertos = 0;
-        CRISE.destinatarios.forEach(function(d) {
-            var card = document.querySelector('[data-destinatario="' + d.id + '"]');
-            var sels = card.querySelectorAll("select");
-            var dec = sels[0].value, prz = sels[1].value;
-            var ok = dec === d.correto && (d.correto === "nao_se_aplica" || prz === d.prazo_correto);
-            if (ok) acertos++;
-            var velho = card.querySelector(".crise-feedback");
-            if (velho) card.removeChild(velho);
-            var msg = ok ? "✓ Correto. " : (dec === "" ? "Escolha uma decisão. " : dec !== d.correto ? "✗ A decisão certa é: " + (d.correto === "notificar" ? "notificar" : "não se aplica") + ". " : "✗ O prazo certo é: " + CRISE.opcoes_prazo[d.prazo_correto] + ". ");
-            var fb = el("p", msg + d.explicacao, "margin: 0; font-size: 0.82rem; color: " + (ok ? "var(--tip-color)" : "var(--danger-color)") + ";");
-            fb.className = "crise-feedback";
-            card.appendChild(fb);
-        });
-        var box = document.getElementById("crise-resultado-notif");
-        box.replaceChildren();
-        box.setAttribute("data-acertos", String(acertos));
-        box.appendChild(el("strong", "Acertos: " + acertos + " de " + CRISE.destinatarios.length + " destinatários."));
-    };
-
-    function renderizarMensagem() {
-        var box = document.getElementById("crise-mensagem");
-        box.replaceChildren();
-        CRISE.itens_mensagem.forEach(function(i) {
-            var rot = el("label", null, "display: flex; gap: 0.5rem; align-items: flex-start;");
-            var cb = el("input");
-            cb.type = "checkbox";
-            cb.checked = !!marcados[i.id];
-            cb.setAttribute("data-item", i.id);
-            cb.addEventListener("change", function() { marcados[i.id] = cb.checked; renderizarPrevia(); document.getElementById("crise-resultado-msg").replaceChildren(); });
-            rot.appendChild(cb);
-            rot.appendChild(el("span", i.texto));
-            box.appendChild(rot);
-        });
-    }
-
-    function renderizarPrevia() {
-        var box = document.getElementById("crise-previa");
-        box.replaceChildren();
-        box.appendChild(el("strong", "Assunto: Comunicado importante sobre seus dados na Ipê Store", "display: block; margin-bottom: 0.4rem;"));
-        var sel = CRISE.itens_mensagem.filter(function(i) { return marcados[i.id]; });
-        if (!sel.length) { box.appendChild(el("p", "(nada marcado ainda)", "margin: 0; color: var(--muted);")); return; }
-        box.appendChild(el("p", "Olá. Identificamos um incidente de segurança que envolveu dados de clientes, e você está entre as pessoas afetadas.", "margin: 0 0 0.4rem 0;"));
-        sel.forEach(function(i) { box.appendChild(el("p", i.texto, "margin: 0 0 0.4rem 0;")); });
-    }
-
-    window.conferirMensagemCrise = function() {
-        var faltam = [], indevidos = [], notas = [];
-        CRISE.itens_mensagem.forEach(function(i) {
-            var m = !!marcados[i.id];
-            if (i.tipo === "obrigatorio" && !m) faltam.push(i);
-            if (i.tipo === "distrator" && m) indevidos.push(i);
-            if (i.tipo === "condicional" && m) notas.push(i.explicacao);
-            if (i.tipo === "boa_pratica" && !m) notas.push("Considere incluir: " + i.texto + " (" + i.explicacao + ")");
-        });
-        var box = document.getElementById("crise-resultado-msg");
-        box.replaceChildren();
-        box.setAttribute("data-faltam", String(faltam.length));
-        box.setAttribute("data-indevidos", String(indevidos.length));
-        var ok = !faltam.length && !indevidos.length;
-        box.appendChild(el("strong", ok ? "✓ A mensagem tem tudo o que o art. 9º exige e nada que prejudique o titular." : "A mensagem precisa de ajustes.",
-            "display: block; color: " + (ok ? "var(--tip-color)" : "var(--danger-color)") + ";"));
-        var ul = el("ul", null, "margin: 0.4rem 0 0 0; padding-left: 1.2rem;");
-        faltam.forEach(function(i) { ul.appendChild(el("li", "Falta (inciso " + i.inciso + "): " + i.explicacao)); });
-        indevidos.forEach(function(i) { ul.appendChild(el("li", "Retire: \"" + i.texto + "\" — " + i.explicacao)); });
-        notas.forEach(function(n) { ul.appendChild(el("li", n, "color: var(--muted);")); });
-        if (ul.childNodes.length) box.appendChild(ul);
-    };
-
-    window.restaurarCrise = function() {
-        document.getElementById("crise-data").value = CRISE.conhecimento.slice(0, 10);
-        document.getElementById("crise-pequeno").checked = false;
-        marcados = {};
-        calcularPrazosCrise();
-        renderizarDestinatarios();
-        renderizarMensagem();
-        renderizarPrevia();
-        document.getElementById("crise-resultado-notif").replaceChildren();
-        document.getElementById("crise-resultado-msg").replaceChildren();
-    };
-
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("crise-contexto").textContent = CRISE.contexto;
-        document.getElementById("crise-data").addEventListener("change", calcularPrazosCrise);
-        document.getElementById("crise-pequeno").addEventListener("change", calcularPrazosCrise);
-        restaurarCrise();
-        if (typeof initChecklist === "function") {
-            initChecklist("gestao-crise");
-        }
-        if (typeof initQuiz === "function") {
-            initQuiz();
-        }
-    });
-})();
-</script>
+<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
 </main>
 </div>
 
@@ -2888,7 +2170,6 @@ dfn.glossario:focus-visible {
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3477,17 +2758,6 @@ dfn.glossario:focus-visible {
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -3701,7 +2971,6 @@ dfn.glossario:focus-visible {
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,

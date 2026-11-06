@@ -79,8 +79,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -168,8 +166,6 @@
     /* Tipos de seção */
     --tipo-teoria: #60A5FA;
     --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-    --tipo-laboratorio: #2DD4BF;
-    --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
     --tipo-checklist: #FBBF24;
     --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
     --tipo-questoes: #E879F9;
@@ -241,8 +237,6 @@
   /* Tipos de seção */
   --tipo-teoria: #60A5FA;
   --tipo-teoria-bg: rgba(96, 165, 250, 0.10);
-  --tipo-laboratorio: #2DD4BF;
-  --tipo-laboratorio-bg: rgba(45, 212, 191, 0.09);
   --tipo-checklist: #FBBF24;
   --tipo-checklist-bg: rgba(251, 191, 36, 0.09);
   --tipo-questoes: #E879F9;
@@ -313,8 +307,6 @@
   /* Tipos de seção */
   --tipo-teoria: #2563EB;
   --tipo-teoria-bg: #EFF5FF;
-  --tipo-laboratorio: #0D9488;
-  --tipo-laboratorio-bg: #ECFDF8;
   --tipo-checklist: #B45309;
   --tipo-checklist-bg: #FFF8EB;
   --tipo-questoes: #C026D3;
@@ -365,9 +357,8 @@
 /* ==========================================================================
    ESTUDOS DE CIBERSEGURANÇA — COMPONENTES (base.css)
    Visual "editorial técnico" do mockup de módulo aprovado: sumário lateral,
-   seções tipadas e placas console em terminal, laboratório e diagrama.
-   Os tokens vêm de tokens.css (embutido antes); as regras internas dos
-   simuladores vêm de laboratorio.css (embutido depois).
+   seções tipadas e placas console em terminal e diagrama.
+   Os tokens vêm de tokens.css (embutido antes).
    Tipografia: Barlow Semi Condensed, IBM Plex Sans, IBM Plex Mono.
    ========================================================================== */
 
@@ -876,7 +867,6 @@ summary:focus-visible,
    6. Seção tipada (.study-section[data-tipo] + .shead)
    -------------------------------------------------------------------------- */
 [data-tipo="teoria"] { --c: var(--tipo-teoria); --soft: var(--tipo-teoria-bg); }
-[data-tipo="laboratorio"] { --c: var(--tipo-laboratorio); --soft: var(--tipo-laboratorio-bg); }
 [data-tipo="checklist"] { --c: var(--tipo-checklist); --soft: var(--tipo-checklist-bg); }
 [data-tipo="questoes"] { --c: var(--tipo-questoes); --soft: var(--tipo-questoes-bg); }
 [data-tipo="referencias"] { --c: var(--tipo-referencias); --soft: var(--tipo-referencias-bg); }
@@ -1129,63 +1119,6 @@ td {
   height: auto;
   display: inline-block;
   margin: 0 auto;
-}
-
-/* --------------------------------------------------------------------------
-   11. Laboratório (.lab-box): cabeçalho console + corpo claro.
-       Controles e saída internos ficam em laboratorio.css.
-   -------------------------------------------------------------------------- */
-.lab-box {
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--tipo-laboratorio) 35%, var(--rule));
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 18px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Tokens de texto redefinidos na placa: estilos inline dos corpos que usam
-   var(--ink) e var(--muted) continuam legíveis sobre o fundo console. */
-.lab-header {
-  --ink: #F1F7FA;
-  --muted: #9FB3C1;
-  background: var(--console);
-  color: var(--console-ink);
-  padding: 14px 18px;
-}
-
-.lab-header::before {
-  content: "// laboratório interativo";
-  display: block;
-  font: 500 11px var(--font-mono);
-  letter-spacing: 0.04em;
-  color: #2DD4BF;
-}
-
-.lab-header h3, .lab-header h4 {
-  font: 700 19px/1.25 var(--font-display);
-  color: #F1F7FA;
-  margin: 2px 0;
-}
-
-.lab-header p {
-  margin: 0;
-  font-size: 13px;
-  color: #9FB3C1;
-}
-
-.lab-header .lab-badge {
-  display: inline-block;
-  font: 500 11px var(--font-mono);
-  border: 1px solid #2DD4BF;
-  color: #2DD4BF;
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  margin-top: 4px;
-}
-
-.lab-body {
-  padding: 18px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1692,7 +1625,6 @@ td {
   .mhead h1 { font-size: 27px; }
   .shead h2 { font-size: 22px; }
   .roadmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lab-body { padding: 14px; }
   .quiz-filtros { margin-left: 0; }
   .study-done { flex-direction: column; align-items: stretch; }
   .study-done .btn-concluir { width: 100%; }
@@ -1725,7 +1657,7 @@ td {
     max-width: 100% !important;
     padding: 0 !important;
   }
-  .mhead, .lab-box, .checklist, .quiz-item, .quiz-section {
+  .mhead, .checklist, .quiz-item, .quiz-section {
     border: 1px solid #CCC !important;
     box-shadow: none !important;
     break-inside: avoid;
@@ -1781,322 +1713,6 @@ dfn.glossario:focus-visible {
   font-weight: 600;
 }
 
-/* ==========================================================================
-   ESTUDOS DE CIBERSEGURANÇA — LABORATÓRIO (laboratorio.css)
-   Regras internas dos simuladores, preservadas do base.css anterior ao
-   redesenho (commit a671fbe, §8 e §9) para que os 57 laboratórios continuem
-   com a mesma aparência. A moldura (.lab-box, .lab-header, .lab-body) é do
-   novo design e fica em base.css. Embutido por montar.py depois de base.css.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Controles e saída do simulador (.lab-controls, .lab-output)
-   -------------------------------------------------------------------------- */
-.lab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  background-color: var(--ground);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--rule);
-}
-
-.lab-controls > * {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.lab-controls label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.lab-controls input[type="text"],
-.lab-controls input[type="number"],
-.lab-controls select,
-.lab-controls textarea {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.lab-controls input:focus,
-.lab-controls select:focus,
-.lab-controls textarea:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.lab-output {
-  background-color: var(--console);
-  color: #38BDF8;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid #1E293B;
-  min-height: 100px;
-  max-height: 400px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.55;
-}
-
-/* --------------------------------------------------------------------------
-   2. Controles e grade do laboratório interativo
-   -------------------------------------------------------------------------- */
-.lab-controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
-  background-color: var(--ground);
-  border-bottom: 1px solid var(--rule);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.form-control {
-  background-color: var(--surface);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--t1-blue);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.form-range {
-  width: 100%;
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.flags-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.25rem;
-}
-
-.flag-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.flag-toggle:hover {
-  border-color: var(--t1-blue);
-}
-
-.flag-toggle input[type="checkbox"] {
-  accent-color: var(--t1-blue);
-  cursor: pointer;
-}
-
-.lab-actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--rule);
-}
-
-.packet-display-wrap {
-  padding: 1.5rem;
-  background-color: var(--surface);
-}
-
-.packet-display-wrap h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-
-.packet-header-grid {
-  display: grid;
-  grid-template-columns: repeat(32, 1fr);
-  gap: 4px;
-  background-color: var(--ground);
-  padding: 0.75rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
-}
-
-.header-field-cell {
-  background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 75px;
-}
-
-.header-field-cell.span-8 {
-  grid-column: span 8;
-}
-
-.header-field-cell.span-16 {
-  grid-column: span 16;
-}
-
-.header-field-cell.span-32 {
-  grid-column: span 32;
-}
-
-.header-field-cell .field-title {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-}
-
-.header-field-cell .field-val {
-  font-size: 0.88rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.header-field-cell .field-val.highlight {
-  color: var(--t1-blue);
-}
-
-.header-field-cell .field-val.flag-badge {
-  background-color: var(--sunk);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-  .packet-header-grid {
-    grid-template-columns: repeat(16, 1fr);
-  }
-  .header-field-cell.span-8 {
-    grid-column: span 16;
-  }
-}
-
-.edr-grid-container {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* --------------------------------------------------------------------------
-   3. Botões e controles padrão
-   -------------------------------------------------------------------------- */
-.btn-primary {
-  background-color: var(--t1-blue);
-  color: #FFFFFF;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background-color: var(--sunk);
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1.15rem;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  background-color: var(--surface);
-  border-color: var(--muted);
-}
-
-/* --------------------------------------------------------------------------
-   4. Celular e impressão
-   -------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .lab-controls { flex-direction: column; align-items: stretch; }
-  .btn { overflow-wrap: anywhere; }
-  .edr-grid-container { grid-template-columns: minmax(0, 1fr); }
-}
-
-@media print {
-  .lab-controls button {
-    display: none !important;
-  }
-}
-
   </style>
 </head>
 <body data-slug="Continuidade-e-Disaster-Recovery">
@@ -2121,7 +1737,6 @@ dfn.glossario:focus-visible {
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: Quanto Tempo a Empresa Aguenta Parada?</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#estrategias" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Sites, Replicação, Backup e Testes</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#iso-22301" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">ISO 22301:2019: o SGCN</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#simulador" data-tipo="laboratorio"><span class="toc-icone">🧪</span><span><span class="toc-tipo">Laboratório</span><span class="toc-titulo">Laboratório Prático: Calculadora de RTO/RPO e Validador da Estratégia 3-2-1</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Continuidade</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -2137,14 +1752,14 @@ dfn.glossario:focus-visible {
   <h1>BCP, DRP, Cálculo de RTO/RPO e Regra 3-2-1</h1>
   <p class="mhead-sub">Planejamento de continuidade de negócios, estratégias de recuperação de desastres e resiliência a desastres</p>
   <div class="chips"><span class="chip">⏱ 40 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Recover</span><span class="chip">🎯 ATT&amp;CK TA0040 Impact (Mitigação)</span><span class="chip">👤 GRC &amp; Auditoria · Blue Team &amp; Defesa</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>3 seções</a><a href="#simulador" data-tipo="laboratorio"><span class="toc-tipo">Laboratório</span></a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>8 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>7 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>3 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>8 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>7 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 28: Continuidade-e-Disaster-Recovery Body Fragment -->
 <article class="study-container" data-slug="continuidade">
 
     <!-- SEÇÃO 1: BIA E MÉTRICAS -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 7</small></span><h2>Introdução: Quanto Tempo a Empresa Aguenta Parada?</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: Quanto Tempo a Empresa Aguenta Parada?</h2></div>
 
         <p class="lead-text">
             Na Black Friday, cada hora sem o checkout custa à Ipê Store dezenas de milhares de reais; a folha de pagamento pode esperar alguns dias. Proteger tudo do mesmo jeito é caro demais ou fraco demais. A continuidade de negócios começa perguntando ao negócio quanto tempo e quantos dados cada processo pode perder, e só depois escolhe a tecnologia.
@@ -2188,7 +1803,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 2: ESTRATÉGIAS -->
     <section class="study-section" id="estrategias" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 7</small></span><h2>Sites, Replicação, Backup e Testes</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>Sites, Replicação, Backup e Testes</h2></div>
 
         <h3>Sites de recuperação</h3>
         <div class="table-responsive">
@@ -2249,7 +1864,7 @@ Restauração nunca testada: some 50% de incerteza ao tempo e não confie no res
     </section>
 
     <section class="study-section" id="iso-22301" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 7</small></span><h2>ISO 22301:2019: o SGCN</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 6</small></span><h2>ISO 22301:2019: o SGCN</h2></div>
         <p class="lead-text">
             BIA, RTO, plano e teste são peças. A ISO 22301:2019 junta todas num <strong>sistema de gestão de continuidade de negócios (SGCN)</strong>: um ciclo que a empresa mantém, mede e melhora, e que um auditor externo consegue verificar.
         </p>
@@ -2324,46 +1939,10 @@ Restauração nunca testada: some 50% de incerteza ao tempo e não confie no res
     </section>
 
     <!-- SEÇÃO 3: SIMULADOR -->
-    <section class="study-section" id="simulador" data-tipo="laboratorio">
-        <div class="shead"><span class="stype">🧪 Laboratório <small>· Seção 4 de 7</small></span><h2>Laboratório Prático: Calculadora de RTO/RPO e Validador da Estratégia 3-2-1</h2></div>
-
-        <p class="lead-text">
-            Primeiro, defina com o negócio o RTO e o RPO de cada sistema, respeitando a BIA. Depois, monte a estratégia de cada um e simule quatro desastres. A meta é cumprir todos os objetivos, seguir a regra 3-2-1-1-0 e caber no orçamento mensal.
-        </p>
-
-        <div class="lab-box dr-lab" id="dr-lab">
-            <div class="lab-header">
-                <div>
-                    <span class="lab-badge">Plano de Recuperação</span>
-                    <h3 style="margin: 0.4rem 0 0.2rem 0;">Sistemas críticos da Ipê Store</h3>
-                    <p id="dr-contexto" style="margin: 0; font-size: 0.9rem; color: var(--muted);"></p>
-                </div>
-            </div>
-
-            <div class="lab-body">
-                <h4 style="margin-top: 0;">Missões</h4>
-                <ul id="dr-missoes" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.25rem; font-size: 0.85rem;"></ul>
-
-                <h4 style="margin-top: 1.5rem;">1. BIA: objetivos de recuperação</h4>
-                <div id="dr-bia" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 0.5rem; font-size: 0.82rem;"></div>
-
-                <h4 style="margin-top: 1.25rem;">2. Estratégia por sistema</h4>
-                <div id="dr-estrategias" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 0.5rem; font-size: 0.8rem;"></div>
-                <div id="dr-orcamento" aria-live="polite" style="margin-top: 0.5rem; font-size: 0.86rem; font-weight: 600;"></div>
-
-                <h4 style="margin-top: 1.25rem;">3. Simulação de desastres</h4>
-                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                    <button class="btn-primary" type="button" onclick="simularDesastresDr()">Simular os quatro desastres</button>
-                    <button class="btn-secondary" type="button" onclick="restaurarDr()">Restaurar laboratório</button>
-                </div>
-                <div id="dr-resultado" aria-live="polite" class="table-responsive" style="margin-top: 0.6rem; font-size: 0.8rem;"></div>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- SEÇÃO 4: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 5 de 7</small></span><h2>Checklist de Continuidade</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist de Continuidade</h2></div>
 
         <p class="lead-text">
             Use esta lista para revisar o plano de continuidade de uma empresa. O estado das caixas fica salvo no seu navegador.
@@ -2407,7 +1986,7 @@ Restauração nunca testada: some 50% de incerteza ao tempo e não confie no res
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 6 de 7</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2496,7 +2075,7 @@ Restauração nunca testada: some 50% de incerteza ao tempo e não confie no res
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 7 de 7</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
@@ -2542,527 +2121,7 @@ Restauração nunca testada: some 50% de incerteza ao tempo e não confie no res
 
 </article>
 
-<!-- DADOS DO SIMULADOR (lidos pelo motor abaixo e validados pelos testes) -->
-<script type="application/json" id="dr-dados">
-{
- "sistemas": [
-  {
-   "id": "loja",
-   "nome": "Loja virtual e checkout",
-   "impacto_h": 40000,
-   "mtpd_h": 8,
-   "perda_tolerada_h": 1,
-   "tamanho_gb": 200
-  },
-  {
-   "id": "erp",
-   "nome": "ERP financeiro",
-   "impacto_h": 8000,
-   "mtpd_h": 48,
-   "perda_tolerada_h": 4,
-   "tamanho_gb": 800
-  },
-  {
-   "id": "wms",
-   "nome": "WMS do centro de distribuição",
-   "impacto_h": 15000,
-   "mtpd_h": 24,
-   "perda_tolerada_h": 1,
-   "tamanho_gb": 300
-  },
-  {
-   "id": "folha",
-   "nome": "Folha de pagamento",
-   "impacto_h": 1000,
-   "mtpd_h": 120,
-   "perda_tolerada_h": 24,
-   "tamanho_gb": 100
-  }
- ],
- "sites": {
-  "nenhum": {
-   "nome": "Sem site de DR",
-   "ativacao_h": 0
-  },
-  "frio": {
-   "nome": "Site frio",
-   "ativacao_h": 72
-  },
-  "nuvem": {
-   "nome": "DR em nuvem",
-   "ativacao_h": 4
-  },
-  "morno": {
-   "nome": "Site morno",
-   "ativacao_h": 12
-  },
-  "quente": {
-   "nome": "Site quente",
-   "ativacao_h": 1
-  }
- },
- "perda_replicacao": {
-  "assincrona": 0.25,
-  "sincrona": 0
- },
- "nova_infra_h": 168,
- "exclusao_descoberta_dias": 10,
- "tipos_copia": {
-  "local_disco": {
-   "nome": "Disco no mesmo datacenter",
-   "local": "mesmo_datacenter",
-   "midia": "disco",
-   "imutavel": false,
-   "offline": false,
-   "taxa_gb_h": 500
-  },
-  "outro_site_disco": {
-   "nome": "Disco em outro site",
-   "local": "outro_site",
-   "midia": "disco",
-   "imutavel": false,
-   "offline": false,
-   "taxa_gb_h": 200
-  },
-  "nuvem_comum": {
-   "nome": "Armazenamento de objetos na nuvem",
-   "local": "nuvem",
-   "midia": "objeto",
-   "imutavel": false,
-   "offline": false,
-   "taxa_gb_h": 100
-  },
-  "nuvem_imutavel": {
-   "nome": "Nuvem com bloqueio de objeto (imutável)",
-   "local": "nuvem",
-   "midia": "objeto",
-   "imutavel": true,
-   "offline": false,
-   "taxa_gb_h": 100
-  },
-  "fita_offline": {
-   "nome": "Fita guardada fora do site (offline)",
-   "local": "outro_site",
-   "midia": "fita",
-   "imutavel": false,
-   "offline": true,
-   "taxa_gb_h": 150
-  }
- },
- "custos": {
-  "frequencia": {
-   "1": 1200,
-   "4": 600,
-   "12": 300,
-   "24": 200,
-   "168": 80
-  },
-  "replicacao": {
-   "nenhuma": 0,
-   "assincrona": 2500,
-   "sincrona": 7000
-  },
-  "site": {
-   "nenhum": 0,
-   "frio": 1000,
-   "nuvem": 2000,
-   "morno": 3500,
-   "quente": 9000
-  },
-  "copias": {
-   "local_disco": 300,
-   "outro_site_disco": 700,
-   "nuvem_comum": 400,
-   "nuvem_imutavel": 600,
-   "fita_offline": 350
-  },
-  "retencao": {
-   "7": 0,
-   "30": 150,
-   "90": 400
-  },
-  "teste": 250
- },
- "alvos_referencia": {
-  "loja": {
-   "rto": 4,
-   "rpo": 1
-  },
-  "erp": {
-   "rto": 24,
-   "rpo": 4
-  },
-  "wms": {
-   "rto": 8,
-   "rpo": 1
-  },
-  "folha": {
-   "rto": 72,
-   "rpo": 24
-  }
- },
- "estrategia_referencia": {
-  "loja": {
-   "frequencia_h": 1,
-   "replicacao": "assincrona",
-   "site": "nuvem",
-   "copias": [
-    "local_disco",
-    "fita_offline"
-   ],
-   "retencao_dias": 30,
-   "teste": true
-  },
-  "erp": {
-   "frequencia_h": 4,
-   "replicacao": "nenhuma",
-   "site": "nuvem",
-   "copias": [
-    "local_disco",
-    "fita_offline"
-   ],
-   "retencao_dias": 30,
-   "teste": true
-  },
-  "wms": {
-   "frequencia_h": 1,
-   "replicacao": "nenhuma",
-   "site": "nuvem",
-   "copias": [
-    "local_disco",
-    "fita_offline"
-   ],
-   "retencao_dias": 30,
-   "teste": true
-  },
-  "folha": {
-   "frequencia_h": 24,
-   "replicacao": "nenhuma",
-   "site": "nuvem",
-   "copias": [
-    "local_disco",
-    "fita_offline"
-   ],
-   "retencao_dias": 30,
-   "teste": true
-  }
- },
- "custo_referencia": 17900,
- "orcamento_mensal": 21500,
- "estrategia_inicial": {
-  "loja": {
-   "frequencia_h": 24,
-   "replicacao": "nenhuma",
-   "site": "nenhum",
-   "copias": [
-    "local_disco"
-   ],
-   "retencao_dias": 7,
-   "teste": false
-  },
-  "erp": {
-   "frequencia_h": 24,
-   "replicacao": "nenhuma",
-   "site": "nenhum",
-   "copias": [
-    "local_disco"
-   ],
-   "retencao_dias": 7,
-   "teste": false
-  },
-  "wms": {
-   "frequencia_h": 24,
-   "replicacao": "nenhuma",
-   "site": "nenhum",
-   "copias": [
-    "local_disco"
-   ],
-   "retencao_dias": 7,
-   "teste": false
-  },
-  "folha": {
-   "frequencia_h": 24,
-   "replicacao": "nenhuma",
-   "site": "nenhum",
-   "copias": [
-    "local_disco"
-   ],
-   "retencao_dias": 7,
-   "teste": false
-  }
- },
- "contexto": "Valores fictícios e simplificados: tempos de ativação, velocidades de restauração e custos servem para comparar estratégias, não como referência de mercado.",
- "opcoes_rto": [
-  1,
-  2,
-  4,
-  8,
-  12,
-  24,
-  48,
-  72,
-  120,
-  168
- ],
- "opcoes_rpo": [
-  0,
-  0.25,
-  1,
-  4,
-  12,
-  24,
-  48
- ],
- "alvos_iniciais": {
-  "loja": {
-   "rto": 168,
-   "rpo": 48
-  },
-  "erp": {
-   "rto": 168,
-   "rpo": 48
-  },
-  "wms": {
-   "rto": 168,
-   "rpo": 48
-  },
-  "folha": {
-   "rto": 168,
-   "rpo": 48
-  }
- },
- "missoes": [
-  {
-   "id": "bia",
-   "texto": "Defina RTO e RPO de cada sistema dentro do que a BIA permite."
-  },
-  {
-   "id": "regra",
-   "texto": "Faça os quatro sistemas cumprirem a regra 3-2-1-1-0."
-  },
-  {
-   "id": "aprovado",
-   "texto": "Passe nos quatro desastres em todos os sistemas."
-  },
-  {
-   "id": "orcamento",
-   "texto": "Passe em tudo dentro do orçamento mensal aprovado."
-  }
- ]
-}
-</script>
-
-<script>
-(function() {
-    var DR = JSON.parse(document.getElementById("dr-dados").textContent);
-    var CENARIOS = ["storage", "incendio", "ransomware", "exclusao"];
-    var alvos = {}, estrategias = {}, feitas = {};
-
-    function el(tag, texto, estilo) {
-        var e = document.createElement(tag);
-        if (texto !== undefined && texto !== null) e.textContent = texto;
-        if (estilo) e.setAttribute("style", estilo);
-        return e;
-    }
-    function copia(o) { return JSON.parse(JSON.stringify(o)); }
-    function reais(v) { return "R$ " + v.toLocaleString("pt-BR"); }
-    function horas(h) { return h === null ? "—" : (Math.round(h * 100) / 100).toLocaleString("pt-BR") + " h"; }
-
-    // ===================================================== motor (espelhado nos testes)
-    function custo(e) {
-        var c = DR.custos;
-        return c.frequencia[String(e.frequencia_h)] + c.replicacao[e.replicacao] + c.site[e.site] + e.copias.reduce(function(s, x) { return s + c.copias[x]; }, 0) + c.retencao[String(e.retencao_dias)] + (e.teste ? c.teste : 0);
-    }
-    function regra(e) {
-        var cs = e.copias.map(function(x) { return DR.tipos_copia[x]; }), midias = { disco: true };
-        cs.forEach(function(c) { midias[c.midia] = true; });
-        return { tres_copias: 1 + cs.length >= 3, duas_midias: Object.keys(midias).length >= 2, uma_fora: cs.some(function(c) { return c.local !== "mesmo_datacenter"; }),
-            uma_imutavel_offline: cs.some(function(c) { return c.imutavel || c.offline; }), zero_erros: !!e.teste };
-    }
-    function recuperar(s, e, cen) {
-        var opcoes = [], site = DR.sites[e.site];
-        if (e.replicacao !== "nenhuma" && e.site !== "nenhum" && (cen === "storage" || cen === "incendio")) opcoes.push({ metodo: "failover", parada: site.ativacao_h, perda: DR.perda_replicacao[e.replicacao], copia: null });
-        var sobrev = [];
-        if (!(cen === "exclusao" && e.retencao_dias < DR.exclusao_descoberta_dias)) {
-            e.copias.forEach(function(x) {
-                var t = DR.tipos_copia[x];
-                if (cen === "incendio" && t.local === "mesmo_datacenter") return;
-                if (cen === "ransomware" && !(t.imutavel || t.offline)) return;
-                sobrev.push(x);
-            });
-        }
-        if (sobrev.length) {
-            var infra = cen === "incendio" ? (e.site !== "nenhum" ? site.ativacao_h : DR.nova_infra_h) : 0;
-            var melhor = sobrev.slice().sort(function(a, b) { var ta = s.tamanho_gb / DR.tipos_copia[a].taxa_gb_h, tb = s.tamanho_gb / DR.tipos_copia[b].taxa_gb_h; return ta - tb || (a < b ? -1 : a > b ? 1 : 0); })[0];
-            var tempo = infra + s.tamanho_gb / DR.tipos_copia[melhor].taxa_gb_h;
-            if (!e.teste) tempo *= 1.5;
-            opcoes.push({ metodo: "restauracao", parada: Math.round(tempo * 100) / 100, perda: e.frequencia_h, copia: melhor });
-        }
-        if (!opcoes.length) return { metodo: "irrecuperavel", parada: null, perda: null, copia: null };
-        return opcoes.sort(function(a, b) { return a.parada - b.parada || a.perda - b.perda || (a.metodo < b.metodo ? -1 : a.metodo > b.metodo ? 1 : 0); })[0];
-    }
-    window.avaliarContinuidade = function(alv, est) {
-        var res = {};
-        DR.sistemas.forEach(function(s) {
-            var a = alv[s.id], e = est[s.id], linhas = {};
-            CENARIOS.forEach(function(c) {
-                var r = recuperar(s, e, c);
-                r.ok = r.metodo !== "irrecuperavel" && r.parada <= a.rto && r.perda <= a.rpo;
-                linhas[c] = r;
-            });
-            res[s.id] = { cenarios: linhas, custo: custo(e), regra: regra(e), bia_ok: a.rto <= s.mtpd_h && a.rpo <= s.perda_tolerada_h };
-        });
-        return res;
-    };
-
-    // ===================================================== missões
-    function concluir(id) { if (!feitas[id]) { feitas[id] = true; renderizarMissoes(); } }
-    function renderizarMissoes() {
-        var ul = document.getElementById("dr-missoes");
-        ul.replaceChildren();
-        DR.missoes.forEach(function(m) {
-            var li = el("li", (feitas[m.id] ? "✓ " : "○ ") + m.texto, "color: " + (feitas[m.id] ? "var(--tip-color)" : "var(--ink)") + ";");
-            li.setAttribute("data-missao", m.id);
-            li.setAttribute("data-feita", feitas[m.id] ? "sim" : "nao");
-            ul.appendChild(li);
-        });
-    }
-
-    // ===================================================== interface
-    function selecao(opcoes, valor, quando) {
-        var s = el("select"); s.className = "form-control";
-        opcoes.forEach(function(o) { var op = el("option", o[1]); op.value = String(o[0]); s.appendChild(op); });
-        s.value = String(valor);
-        s.addEventListener("change", function() { quando(s.value); });
-        return s;
-    }
-    function rotulo(txt, filho) { var l = el("label", null, "display: flex; flex-direction: column; gap: 0.15rem; min-width: 0;"); l.appendChild(el("span", txt, "color: var(--muted);")); l.appendChild(filho); return l; }
-    function renderizarBia() {
-        var box = document.getElementById("dr-bia");
-        box.replaceChildren();
-        var todasOk = true;
-        DR.sistemas.forEach(function(s) {
-            var a = alvos[s.id], ok = a.rto <= s.mtpd_h && a.rpo <= s.perda_tolerada_h;
-            if (!ok) todasOk = false;
-            var c = el("div", null, "border: 1px solid " + (ok ? "var(--rule)" : "var(--danger-color)") + "; border-radius: var(--radius-sm); padding: 0.45rem 0.55rem; min-width: 0;");
-            c.setAttribute("data-bia", s.id);
-            c.setAttribute("data-ok", ok ? "sim" : "nao");
-            c.appendChild(el("strong", s.nome, "display: block;"));
-            c.appendChild(el("span", "Impacto: " + reais(s.impacto_h) + " por hora parada · MTPD " + s.mtpd_h + " h · o negócio tolera perder até " + horas(s.perda_tolerada_h) + " de dados", "display: block; font-size: 0.74rem; color: var(--muted);"));
-            var g = el("div", null, "display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem; margin-top: 0.3rem;");
-            g.appendChild(rotulo("RTO", selecao(DR.opcoes_rto.map(function(h) { return [h, h + " h"]; }), a.rto, function(v) { alvos[s.id].rto = Number(v); atualizar(); })));
-            g.appendChild(rotulo("RPO", selecao(DR.opcoes_rpo.map(function(h) { return [h, horas(h)]; }), a.rpo, function(v) { alvos[s.id].rpo = Number(v); atualizar(); })));
-            c.appendChild(g);
-            if (!ok) c.appendChild(el("span", a.rto > s.mtpd_h ? "RTO acima do MTPD: a empresa não aguenta esperar tanto." : "RPO acima do que o negócio tolera perder.", "display: block; font-size: 0.74rem; color: var(--danger-color); margin-top: 0.2rem;"));
-            box.appendChild(c);
-        });
-        if (todasOk) concluir("bia");
-    }
-    function renderizarEstrategias() {
-        var box = document.getElementById("dr-estrategias");
-        box.replaceChildren();
-        DR.sistemas.forEach(function(s) {
-            var e = estrategias[s.id], r = regra(e);
-            var c = el("div", null, "border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 0.45rem 0.55rem; min-width: 0;");
-            c.setAttribute("data-estrategia", s.id);
-            c.appendChild(el("strong", s.nome + " (" + s.tamanho_gb + " GB)", "display: block;"));
-            var g = el("div", null, "display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem; margin-top: 0.3rem;");
-            var mudar = function(campo, conv) { return function(v) { estrategias[s.id][campo] = conv ? conv(v) : v; if (campo === "site" && v === "nenhum") estrategias[s.id].replicacao = "nenhuma"; atualizar(); }; };
-            g.appendChild(rotulo("Backup a cada", selecao(Object.keys(DR.custos.frequencia).map(Number).sort(function(a, b) { return a - b; }).map(function(h) { return [h, h + " h"]; }), e.frequencia_h, mudar("frequencia_h", Number))));
-            g.appendChild(rotulo("Retenção", selecao(Object.keys(DR.custos.retencao).map(function(k) { return [Number(k), k + " dias"]; }), e.retencao_dias, mudar("retencao_dias", Number))));
-            g.appendChild(rotulo("Site de DR", selecao(Object.keys(DR.sites).map(function(k) { return [k, DR.sites[k].nome + (k !== "nenhum" ? " (" + DR.sites[k].ativacao_h + " h)" : "")]; }), e.site, mudar("site"))));
-            var rep = selecao([["nenhuma", "Sem replicação"], ["assincrona", "Assíncrona (15 min)"], ["sincrona", "Síncrona"]], e.replicacao, mudar("replicacao"));
-            rep.disabled = e.site === "nenhum";
-            g.appendChild(rotulo("Replicação", rep));
-            c.appendChild(g);
-            var cp = el("div", null, "display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.1rem; margin-top: 0.35rem;");
-            cp.appendChild(el("span", "Cópias de backup:", "color: var(--muted);"));
-            Object.keys(DR.tipos_copia).forEach(function(k) {
-                var l = el("label", null, "display: flex; gap: 0.3rem; align-items: center;");
-                var cb = el("input"); cb.type = "checkbox"; cb.checked = e.copias.indexOf(k) !== -1; cb.setAttribute("data-copia", s.id + ":" + k);
-                cb.addEventListener("change", function() { var l2 = estrategias[s.id].copias.filter(function(x) { return x !== k; }); if (cb.checked) l2.push(k); estrategias[s.id].copias = Object.keys(DR.tipos_copia).filter(function(x) { return l2.indexOf(x) !== -1; }); atualizar(); });
-                l.appendChild(cb); l.appendChild(el("span", DR.tipos_copia[k].nome + " · " + DR.tipos_copia[k].taxa_gb_h + " GB/h"));
-                cp.appendChild(l);
-            });
-            var lt = el("label", null, "display: flex; gap: 0.3rem; align-items: center; margin-top: 0.15rem;");
-            var ct = el("input"); ct.type = "checkbox"; ct.checked = !!e.teste; ct.setAttribute("data-teste", s.id);
-            ct.addEventListener("change", function() { estrategias[s.id].teste = ct.checked; atualizar(); });
-            lt.appendChild(ct); lt.appendChild(el("span", "Restauração testada trimestralmente, sem erros"));
-            cp.appendChild(lt);
-            c.appendChild(cp);
-            var nomes = { tres_copias: "3 cópias", duas_midias: "2 mídias", uma_fora: "1 fora", uma_imutavel_offline: "1 imutável/offline", zero_erros: "0 erros" };
-            var rr = el("div", null, "display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.35rem;");
-            Object.keys(nomes).forEach(function(k) { rr.appendChild(el("span", (r[k] ? "✓ " : "✕ ") + nomes[k], "font-size: 0.72rem; padding: 0 0.35rem; border-radius: var(--radius-sm); border: 1px solid " + (r[k] ? "var(--tip-color)" : "var(--danger-color)") + ";")); });
-            c.appendChild(rr);
-            c.appendChild(el("div", "Custo: " + reais(custo(e)) + "/mês", "margin-top: 0.3rem; font-weight: 600;"));
-            box.appendChild(c);
-        });
-        var total = DR.sistemas.reduce(function(t, s) { return t + custo(estrategias[s.id]); }, 0);
-        var o = document.getElementById("dr-orcamento");
-        o.textContent = "Custo total: " + reais(total) + "/mês · orçamento aprovado: " + reais(DR.orcamento_mensal) + "/mês" + (total > DR.orcamento_mensal ? " — acima do orçamento" : "");
-        o.style.color = total > DR.orcamento_mensal ? "var(--danger-color)" : "var(--tip-color)";
-        o.setAttribute("data-total", String(total));
-        if (DR.sistemas.every(function(s) { var r = regra(estrategias[s.id]); return Object.keys(r).every(function(k) { return r[k]; }); })) concluir("regra");
-    }
-    function atualizar() { renderizarBia(); renderizarEstrategias(); document.getElementById("dr-resultado").replaceChildren(el("p", "Configuração alterada: simule de novo.", "margin: 0; color: var(--muted);")); }
-    var NOMES_CEN = { storage: "Falha do storage", incendio: "Incêndio no datacenter", ransomware: "Ransomware", exclusao: "Exclusão descoberta após " + DR.exclusao_descoberta_dias + " dias" };
-    window.simularDesastresDr = function() {
-        var res = window.avaliarContinuidade(alvos, estrategias), box = document.getElementById("dr-resultado");
-        box.replaceChildren();
-        var t = el("table"); t.className = "data-table";
-        var h = el("tr"); h.appendChild(el("th", "Sistema (RTO / RPO)"));
-        CENARIOS.forEach(function(c) { h.appendChild(el("th", NOMES_CEN[c])); });
-        var th = el("thead"); th.appendChild(h); t.appendChild(th);
-        var tb = el("tbody"), tudo = true;
-        DR.sistemas.forEach(function(s) {
-            var tr = el("tr"); tr.appendChild(el("td", s.nome + " (" + alvos[s.id].rto + " h / " + horas(alvos[s.id].rpo) + ")", "font-weight: 600;"));
-            CENARIOS.forEach(function(c) {
-                var r = res[s.id].cenarios[c];
-                if (!r.ok) tudo = false;
-                var td = el("td", null, "background: " + (r.ok ? "rgba(22, 163, 74, 0.12)" : "rgba(220, 38, 38, 0.14)") + ";");
-                td.setAttribute("data-resultado", s.id + ":" + c);
-                td.setAttribute("data-ok", r.ok ? "sim" : "nao");
-                if (r.metodo === "irrecuperavel") td.appendChild(el("strong", "Irrecuperável", "color: var(--danger-color);"));
-                else {
-                    td.appendChild(el("div", (r.metodo === "failover" ? "Failover para o DR" : "Restaurar de: " + DR.tipos_copia[r.copia].nome)));
-                    td.appendChild(el("div", "Parada " + horas(r.parada) + " · perda " + horas(r.perda), "font-weight: 600; color: " + (r.ok ? "var(--tip-color)" : "var(--danger-color)") + ";"));
-                    if (r.metodo === "restauracao" && !estrategias[s.id].teste) td.appendChild(el("div", "nunca testado: +50%", "font-size: 0.7rem; color: rgb(202, 138, 4);"));
-                }
-                tr.appendChild(td);
-            });
-            tb.appendChild(tr);
-        });
-        t.appendChild(tb); box.appendChild(t);
-        var bia = DR.sistemas.every(function(s) { return res[s.id].bia_ok; });
-        var total = DR.sistemas.reduce(function(x, s) { return x + res[s.id].custo; }, 0);
-        box.setAttribute("data-aprovado", tudo && bia ? "sim" : "nao");
-        if (tudo && bia) concluir("aprovado");
-        if (tudo && bia && total <= DR.orcamento_mensal) concluir("orcamento");
-        return res;
-    };
-
-    window.restaurarDr = function() {
-        feitas = {};
-        alvos = {}; DR.sistemas.forEach(function(s) { alvos[s.id] = copia(DR.alvos_iniciais[s.id]); });
-        estrategias = copia(DR.estrategia_inicial);
-        renderizarMissoes(); renderizarBia(); renderizarEstrategias();
-        feitas = {}; renderizarMissoes();
-        document.getElementById("dr-resultado").replaceChildren(el("p", "Defina os objetivos e a estratégia e clique em Simular.", "margin: 0; color: var(--muted);"));
-    };
-    window.estadoDr = function() { return { alvos: alvos, estrategias: estrategias }; };
-
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("dr-contexto").textContent = DR.contexto;
-        restaurarDr();
-        if (typeof initChecklist === "function") {
-            initChecklist("continuidade");
-        }
-        if (typeof initQuiz === "function") {
-            initQuiz();
-        }
-    });
-})();
-</script>
+<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
 </main>
 </div>
 
@@ -3197,7 +2256,6 @@ Restauração nunca testada: some 50% de incerteza ao tempo e não confie no res
 
   const TIPOS = {
     teoria: { icone: '📘', rotulo: 'Teoria' },
-    laboratorio: { icone: '🧪', rotulo: 'Laboratório' },
     checklist: { icone: '☑️', rotulo: 'Checklist' },
     questoes: { icone: '❓', rotulo: 'Questões de concurso' },
     referencias: { icone: '📚', rotulo: 'Referências' },
@@ -3786,17 +2844,6 @@ Restauração nunca testada: some 50% de incerteza ao tempo e não confie no res
     });
   }
 
-  // Um simulador pode informar o progresso do laboratório ao sumário (opcional).
-  function labProgress(feitos, total) {
-    const secao = secaoDoTipo('laboratorio');
-    const f = Number(feitos);
-    const t = Number(total);
-    if (!Number.isFinite(f) || !Number.isFinite(t) || t <= 0) {
-      definirContador(secao, '');
-      return;
-    }
-    definirContador(secao, `${Math.max(0, Math.min(f, t))}/${t}`);
-  }
 
   // --------------------------------------------------------------------------
   // 6b. Glossário: tooltip dos termos (<dfn class="glossario">)
@@ -4010,7 +3057,6 @@ Restauração nunca testada: some 50% de incerteza ao tempo e não confie no res
   window.CS = {
     init,
     initGlossario,
-    labProgress,
     safeStorageGet,
     safeStorageSet,
     initTheme,
