@@ -1,7 +1,7 @@
 # Design Spec: Identidade Federada (SAML/SCIM) e Rotas CISO / AppSec
 
 **Data:** 2026-11-06  
-**Status:** Aguardando revisão do usuário  
+**Status:** Aprovada pelo usuário (2026-11-06)  
 **Repositório:** `estudos_cyberseguranca` (Mapa da Cibersegurança)  
 **Referência Metodológica:** Superpowers Spec-Driven Development (SDD)  
 **Origem:** Gaps P0 da análise profunda do Mapa; ciclo seguinte à remoção dos laboratórios (`2026-11-06-remocao-laboratorios`).
