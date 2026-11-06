@@ -90,7 +90,7 @@ Este ciclo fecha esse subprojeto de conteúdo P0: densificar federação clássi
 **Arquivo:** `_geradores/index_dados.py`  
 Inserir após `grc` e antes de `pericia`.
 
-**`ciso`** — nome sugerido: “CISO / Liderança de Segurança”; ícone a definir no plano (coerente com as demais rotas).  
+**`ciso`** — nome: “CISO / Liderança de Segurança”; ícone: `👔`.  
 Módulos (ordem pedagógica):
 
 1. Fundamentos-Ciber  
@@ -108,7 +108,7 @@ Módulos (ordem pedagógica):
 13. Lideranca-e-Programa-de-Seguranca  
 14. Estruturacao-da-Area-de-Seguranca  
 
-**`appsec`** — nome sugerido: “AppSec / Segurança de Aplicações”.  
+**`appsec`** — nome: “AppSec / Segurança de Aplicações”; ícone: `🧩`.  
 Módulos:
 
 1. Fundamentos-Ciber  
