@@ -1736,6 +1736,7 @@ dfn.glossario:focus-visible {
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: O Mesmo Usuário em Dois Mundos</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#ataques" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">MFA, Ataques à Identidade em Nuvem e PIM</span></span><span class="toc-contador"></span></a></li>
+    <li><a class="toc-item" href="#federacao-saml-entra" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Federação SAML no Entra ID e no AD FS</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Identidade Híbrida</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -1751,14 +1752,14 @@ dfn.glossario:focus-visible {
   <h1>Entra ID, Identidade Híbrida e Acesso Condicional</h1>
   <p class="mhead-sub">Sincronização híbrida, acesso condicional, MFA resistente a phishing e PIM</p>
   <div class="chips"><span class="chip">⏱ 45 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Protect</span><span class="chip">🎯 ATT&amp;CK T1110.003 Password Spraying / T1528 Steal Application Access Token / T1566 Phishing</span><span class="chip">👤 Blue Team &amp; Defesa · AppSec &amp; DevSecOps · Analista de Segurança da Informação</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>3 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>9 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>7 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 41: Identidade-Hibrida-e-Nuvem Body Fragment -->
 <article class="study-container" data-slug="identidade-hibrida">
 
     <!-- SEÇÃO 1: IDENTIDADE HÍBRIDA -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 5</small></span><h2>Introdução: O Mesmo Usuário em Dois Mundos</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 6</small></span><h2>Introdução: O Mesmo Usuário em Dois Mundos</h2></div>
 
         <p class="lead-text">
             Na Ipê Store, a Ana entra no computador com a conta do Active Directory (Estudos 38 e 39) e, no mesmo dia, abre o correio e os documentos na nuvem com a mesma senha. Isso é identidade híbrida: o AD local continua sendo a fonte das contas, e o Microsoft Entra ID (antigo Azure AD) autentica o acesso aos serviços em nuvem. A vantagem é uma identidade só; o risco é que um erro de um lado vira acesso do outro.
@@ -1817,7 +1818,7 @@ dfn.glossario:focus-visible {
 
     <!-- SEÇÃO 2: MFA, ATAQUES E PIM -->
     <section class="study-section" id="ataques" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 5</small></span><h2>MFA, Ataques à Identidade em Nuvem e PIM</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 6</small></span><h2>MFA, Ataques à Identidade em Nuvem e PIM</h2></div>
 
         <h3>Nem todo MFA é igual</h3>
         <div class="table-responsive">
@@ -1871,11 +1872,39 @@ Get-MgOauth2PermissionGrant -All | Select-Object ClientId, ConsentType, Scope
         </div>
     </section>
 
-    <!-- SEÇÃO 3: SIMULADOR -->
-    
-    <!-- SEÇÃO 4: CHECKLIST -->
+    <!-- SEÇÃO: PONTE SAML / ENTRA -->
+    <section class="study-section" id="federacao-saml-entra" data-tipo="teoria">
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 6</small></span><h2>Federação SAML no Entra ID e no AD FS</h2></div>
+
+        <p>
+            Quando a autenticação híbrida usa <strong>federação</strong>, o Microsoft Entra ID (ou aplicações SaaS) confia em
+            tokens/asserções emitidos por um IdP local — tipicamente o <strong>AD FS</strong> — ou o próprio Entra atua como
+            IdP <strong>SAML</strong> para aplicativos empresariais. Em ambos os casos, a chave de assinatura do IdP é Tier 0:
+            quem a controla forja identidade para qualquer usuário federado.
+        </p>
+
+        <p>
+            No Entra, o <em>claim mapping</em> decide quais atributos do usuário (UPN, grupos, department) saem na asserção SAML
+            para cada aplicativo. Erros de mapeamento geram acesso negado ou, pior, papéis errados no SP. Trate mudanças de
+            claims como mudança de autorização.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🔗</span>
+                <strong>Protocolo detalhado no estudo Autenticação e IAM</strong>
+            </div>
+            <p>
+                Asserções, ACS, Audience, metadados e a comparação SAML × OIDC estão no estudo
+                <strong>Autenticacao-e-IAM</strong> (seções SAML/SSO e SCIM). Este módulo cobre o papel do Entra/AD FS no desenho híbrido;
+                aquele cobre o protocolo.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 3 de 5</small></span><h2>Checklist de Identidade Híbrida</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 4 de 6</small></span><h2>Checklist de Identidade Híbrida</h2></div>
 
         <p class="lead-text">
             Use esta lista para revisar o tenant de uma empresa. O estado das caixas fica salvo no seu navegador.
@@ -1910,12 +1939,20 @@ Get-MgOauth2PermissionGrant -All | Select-Object ClientId, ConsentType, Scope
                 <input type="checkbox" id="chk-ca-7">
                 <label for="chk-ca-7"><strong>Privilégios e aplicativos:</strong> papéis administrativos via PIM e consentimento de aplicativos restrito a administradores.</label>
             </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ca-8">
+                <label for="chk-ca-8"><strong>Federação SAML:</strong> chave de assinatura do AD FS/Entra como IdP protegida (Tier 0) e claim mapping revisado por aplicativo.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ca-9">
+                <label for="chk-ca-9"><strong>Apps federados:</strong> cada SP SAML com entityID/ACS corretos; certificado de assinatura com plano de rotação.</label>
+            </li>
         </ul>
     </section>
 
     <!-- SEÇÃO 5: QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 4 de 5</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 5 de 6</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -1988,11 +2025,23 @@ Get-MgOauth2PermissionGrant -All | Select-Object ClientId, ConsentType, Scope
                 </div>
             </details>
         </div>
+
+        <div class="quiz-item" data-q="q7">
+            <div class="quiz-question">
+                <strong>Questão 7 (Federação SAML):</strong> Por que a chave de assinatura do AD FS (ou do Entra como IdP SAML) é tratada como Tier 0?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque quem controla essa chave forja asserções SAML para qualquer usuário federado. O protocolo (ACS, Audience, etc.) está detalhado no estudo Autenticacao-e-IAM; aqui o foco é o risco no desenho híbrido.</p>
+                </div>
+            </details>
+        </div>
     </section>
 
     <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 5 de 5</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 6 de 6</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">

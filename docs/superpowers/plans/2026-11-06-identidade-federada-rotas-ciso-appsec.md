@@ -54,7 +54,7 @@
 **Interfaces:**
 - Produces: seções `id="saml-sso"` e `id="scim-provisionamento"` com `data-tipo="teoria"`; checklist ≥3 itens novos sobre SAML/SCIM; ≥3 questões novas; referências SAML/SCIM; `validar_corpo` ok; título metadados inclui SAML (ex.: `"Senhas, MFA, OAuth 2.0, SAML, JWT e RBAC"`).
 
-- [ ] **Step 1: Teste (RED).** Criar `test_autenticacao_iam_conteudo.py` que:
+- [x] **Step 1: Teste (RED).** Criar `test_autenticacao_iam_conteudo.py` que:
   - carrega o corpo; `validar_corpo` sem erros;
   - `ids = [s.id for s in extrair_secoes(html)]` contém `saml-sso` e `scim-provisionamento`;
   - índice: `ids.index("federacao-oauth-oidc") < ids.index("saml-sso") < ids.index("scim-provisionamento") < ids.index("anatomia-jwt")`;
@@ -63,13 +63,13 @@
   - questões: pelo menos 3 `quiz-item` cujo texto casefold menciona `saml` ou `scim`.
   Rodar: `python3 -m unittest testes.test_autenticacao_iam_conteudo` → FAIL.
 
-- [ ] **Step 2: Implementar** corpo + metadados + CURRICULO §3.04 + README conforme Interfaces e spec §3.1 (densidade B: bindings, NameID, metadados, SAML×OIDC, pitfalls, Mermaid SP-initiated; SCIM/JML). Sem `<script>` de lab.
+- [x] **Step 2: Implementar** corpo + metadados + CURRICULO §3.04 + README conforme Interfaces e spec §3.1 (densidade B: bindings, NameID, metadados, SAML×OIDC, pitfalls, Mermaid SP-initiated; SCIM/JML). Sem `<script>` de lab.
 
-- [ ] **Step 3: Rodar** `python3 -m unittest testes.test_autenticacao_iam_conteudo testes.test_contrato testes.test_marca` → PASS.
+- [x] **Step 3: Rodar** `python3 -m unittest testes.test_autenticacao_iam_conteudo testes.test_contrato testes.test_marca` → PASS.
 
-- [ ] **Step 4: Compilar** `./_geradores/gerar.sh Autenticacao-e-IAM` → OK.
+- [x] **Step 4: Compilar** `./_geradores/gerar.sh Autenticacao-e-IAM` → OK.
 
-- [ ] **Step 5: Commit** (se pedido) `feat(iam): adiciona SAML/SSO e SCIM ao estudo Autenticacao-e-IAM`.
+- [x] **Step 5: Commit** (se pedido) `feat(iam): adiciona SAML/SSO e SCIM ao estudo Autenticacao-e-IAM`.
 
 ---
 
@@ -83,15 +83,15 @@
 - Consumes: existência do estudo 04 como destino da remissão (slug/título “Autenticação e IAM” / `Autenticacao-e-IAM`).
 - Produces: seção `id="federacao-saml-entra"` `data-tipo="teoria"`; texto com SAML + (Entra ou AD FS); remissão ao 04; +1–2 checklist; +1 questão; **não** contém tutorial de bindings SAML (ausência de subtítulo/heading “Binding” / “NameID” como tópico próprio — pode citar de passagem).
 
-- [ ] **Step 1: Teste (RED).** Arquivo novo: `validar_corpo` ok; `federacao-saml-entra` em ids; `"SAML" in html`; remissão: `"Autenticacao-e-IAM" in html` **ou** frase casefold com `autenticação e iam` / `estudo`+`iam`; checklist ≥1 item com `saml` ou `federa`; ≥1 `quiz-item` com `saml` ou `federa`. Rodar → FAIL.
+- [x] **Step 1: Teste (RED).** Arquivo novo: `validar_corpo` ok; `federacao-saml-entra` em ids; `"SAML" in html`; remissão: `"Autenticacao-e-IAM" in html` **ou** frase casefold com `autenticação e iam` / `estudo`+`iam`; checklist ≥1 item com `saml` ou `federa`; ≥1 `quiz-item` com `saml` ou `federa`. Rodar → FAIL.
 
-- [ ] **Step 2: Implementar** seção curta + checklist/questão conforme Interfaces e spec §3.2.
+- [x] **Step 2: Implementar** seção curta + checklist/questão conforme Interfaces e spec §3.2.
 
-- [ ] **Step 3: Rodar** `python3 -m unittest testes.test_identidade_hibrida_conteudo` → PASS.
+- [x] **Step 3: Rodar** `python3 -m unittest testes.test_identidade_hibrida_conteudo` → PASS.
 
-- [ ] **Step 4: Compilar** `./_geradores/gerar.sh Identidade-Hibrida-e-Nuvem` → OK.
+- [x] **Step 4: Compilar** `./_geradores/gerar.sh Identidade-Hibrida-e-Nuvem` → OK.
 
-- [ ] **Step 5: Commit** (se pedido) `feat(identidade): ponte SAML/Entra remetendo ao IAM`.
+- [x] **Step 5: Commit** (se pedido) `feat(identidade): ponte SAML/Entra remetendo ao IAM`.
 
 ---
 
@@ -112,19 +112,19 @@
   - appsec: `` `01 -> 61 -> 03 -> 04 -> 35 -> 12 -> 13 -> 21 -> 41 -> 22 -> 50 -> 51 -> 52 -> 53` ``  
   (inserir como rotas 5 e 6; renumerar Perícia→7 e Analista SI→8).
 
-- [ ] **Step 1: Teste (RED).** Em `test_rotas_sugeridas.py`: atualizar `IDS_ESPERADOS` para as 8 ids; renomear teste de “seis” para “oito” rotas. Acrescentar:
+- [x] **Step 1: Teste (RED).** Em `test_rotas_sugeridas.py`: atualizar `IDS_ESPERADOS` para as 8 ids; renomear teste de “seis” para “oito” rotas. Acrescentar:
   - `test_rota_ciso_modulos` — `ROTAS_PERFIL` entry `ciso` tem os 14 slugs da spec na ordem;
   - `test_rota_appsec_modulos` — idem para `appsec`;
   - `test_descricao_appsec_nao_promete_ssdlc` — `"SSDLC" not in` descrição e `"SAMM" not in` descrição (casefold ok).
   Rodar `python3 -m unittest testes.test_rotas_sugeridas` → FAIL (ids/CURRICULO).
 
-- [ ] **Step 2: Implementar** `ROTAS_PERFIL` + CURRICULO §5 (+ intro de perfis se necessário) conforme Interfaces.
+- [x] **Step 2: Implementar** `ROTAS_PERFIL` + CURRICULO §5 (+ intro de perfis se necessário) conforme Interfaces.
 
-- [ ] **Step 3: Rodar** `python3 -m unittest testes.test_rotas_sugeridas testes.test_curriculo testes.test_portal` → PASS.
+- [x] **Step 3: Rodar** `python3 -m unittest testes.test_rotas_sugeridas testes.test_curriculo testes.test_portal` → PASS.
 
-- [ ] **Step 4: Compilar portal** `./_geradores/gerar.sh portal` → OK; grep no `index.html`: `data-rota="ciso"` e `data-rota="appsec"`.
+- [x] **Step 4: Compilar portal** `./_geradores/gerar.sh portal` → OK; grep no `index.html`: `data-rota="ciso"` e `data-rota="appsec"`.
 
-- [ ] **Step 5: Commit** (se pedido) `feat(portal): adiciona rotas CISO e AppSec`.
+- [x] **Step 5: Commit** (se pedido) `feat(portal): adiciona rotas CISO e AppSec`.
 
 ---
 
@@ -133,18 +133,18 @@
 **Files:**
 - Regenerados: treinamentos 04/41 (se ainda stale), `index.html`
 
-- [ ] **Step 1: Compilar** `./_geradores/gerar.sh Autenticacao-e-IAM` e `./_geradores/gerar.sh Identidade-Hibrida-e-Nuvem` (ou `todos` se preferir uma passada).
+- [x] **Step 1: Compilar** `./_geradores/gerar.sh Autenticacao-e-IAM` e `./_geradores/gerar.sh Identidade-Hibrida-e-Nuvem` (ou `todos` se preferir uma passada).
 
-- [ ] **Step 2: Grep residual**
+- [x] **Step 2: Grep residual**
   - Em `_geradores/autenticacao_e_iam_body.html`: `SAML` e `SCIM` presentes; `id="saml-sso"` e `id="scim-provisionamento"`.
   - Em `_geradores/identidade_hibrida_e_nuvem_body.html`: `id="federacao-saml-entra"` e `SAML`.
   - Em `index.html`: `ciso` e `appsec` nas rotas.
   - Zero `data-tipo="laboratorio"` / `.lab-box` reintroduzidos nestes corpos.
 
-- [ ] **Step 3: Suíte amostral**  
+- [x] **Step 3: Suíte amostral**  
   `python3 -m unittest testes.test_autenticacao_iam_conteudo testes.test_identidade_hibrida_conteudo testes.test_rotas_sugeridas testes.test_curriculo testes.test_corpos_sem_laboratorio testes.test_marca` → PASS.
 
-- [ ] **Step 4: Commit** (se pedido) `build: regenera IAM, Identidade Híbrida e portal com rotas CISO/AppSec`.
+- [x] **Step 4: Commit** (se pedido) `build: regenera IAM, Identidade Híbrida e portal com rotas CISO/AppSec`.
 
 ---
 

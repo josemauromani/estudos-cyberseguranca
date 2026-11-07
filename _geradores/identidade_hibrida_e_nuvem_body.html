@@ -130,9 +130,37 @@ Get-MgOauth2PermissionGrant -All | Select-Object ClientId, ConsentType, Scope
         </div>
     </section>
 
-    <!-- SEÇÃO 3: SIMULADOR -->
-    
-    <!-- SEÇÃO 4: CHECKLIST -->
+    <!-- SEÇÃO: PONTE SAML / ENTRA -->
+    <section class="study-section" id="federacao-saml-entra" data-tipo="teoria">
+        <h2>Federação SAML no Entra ID e no AD FS</h2>
+
+        <p>
+            Quando a autenticação híbrida usa <strong>federação</strong>, o Microsoft Entra ID (ou aplicações SaaS) confia em
+            tokens/asserções emitidos por um IdP local — tipicamente o <strong>AD FS</strong> — ou o próprio Entra atua como
+            IdP <strong>SAML</strong> para aplicativos empresariais. Em ambos os casos, a chave de assinatura do IdP é Tier 0:
+            quem a controla forja identidade para qualquer usuário federado.
+        </p>
+
+        <p>
+            No Entra, o <em>claim mapping</em> decide quais atributos do usuário (UPN, grupos, department) saem na asserção SAML
+            para cada aplicativo. Erros de mapeamento geram acesso negado ou, pior, papéis errados no SP. Trate mudanças de
+            claims como mudança de autorização.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🔗</span>
+                <strong>Protocolo detalhado no estudo Autenticação e IAM</strong>
+            </div>
+            <p>
+                Asserções, ACS, Audience, metadados e a comparação SAML × OIDC estão no estudo
+                <strong>Autenticacao-e-IAM</strong> (seções SAML/SSO e SCIM). Este módulo cobre o papel do Entra/AD FS no desenho híbrido;
+                aquele cobre o protocolo.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO: CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
         <h2>Checklist de Identidade Híbrida</h2>
 
@@ -168,6 +196,14 @@ Get-MgOauth2PermissionGrant -All | Select-Object ClientId, ConsentType, Scope
             <li class="checklist-item">
                 <input type="checkbox" id="chk-ca-7">
                 <label for="chk-ca-7"><strong>Privilégios e aplicativos:</strong> papéis administrativos via PIM e consentimento de aplicativos restrito a administradores.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ca-8">
+                <label for="chk-ca-8"><strong>Federação SAML:</strong> chave de assinatura do AD FS/Entra como IdP protegida (Tier 0) e claim mapping revisado por aplicativo.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ca-9">
+                <label for="chk-ca-9"><strong>Apps federados:</strong> cada SP SAML com entityID/ACS corretos; certificado de assinatura com plano de rotação.</label>
             </li>
         </ul>
     </section>
@@ -244,6 +280,18 @@ Get-MgOauth2PermissionGrant -All | Select-Object ClientId, ConsentType, Scope
                 <summary class="quiz-toggle">Ver resposta explicada</summary>
                 <div class="quiz-answer">
                     <p><strong>Resposta:</strong> Para ver nos registros quem ela bloquearia ou obrigaria a mais prova, antes de aplicar. Assim se descobre, por exemplo, um administrador sem FIDO2 registrado antes de trancá-lo do lado de fora.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 7 (Federação SAML):</strong> Por que a chave de assinatura do AD FS (ou do Entra como IdP SAML) é tratada como Tier 0?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Porque quem controla essa chave forja asserções SAML para qualquer usuário federado. O protocolo (ACS, Audience, etc.) está detalhado no estudo Autenticacao-e-IAM; aqui o foco é o risco no desenho híbrido.</p>
                 </div>
             </details>
         </div>

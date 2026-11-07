@@ -10,7 +10,7 @@ O projeto segue quatro diretrizes fundamentais:
 3. **Duplo Mapeamento Normativo:** Integração orgânica entre a pedagogia por trilhas temáticas e os frameworks internacionais:
    - **NIST Cybersecurity Framework (CSF) 2.0:** Govern, Identify, Protect, Detect, Respond, Recover.
    - **MITRE ATT&CK Matrix:** Táticas e técnicas reais de adversários cibernéticos.
-4. **Alinhamento a Perfis de Carreira:** Blue Team / Defesa, Red Team / Pentest, Engenharia de Nuvem & DevSecOps, Resposta a Incidentes / SOC, Governança, Risco e Conformidade (GRC) e Analista de Segurança da Informação (perfil generalista de vaga corporativa).
+4. **Alinhamento a Perfis de Carreira:** Blue Team / Defesa, Red Team / Pentest, Engenharia de Nuvem & DevSecOps, GRC, CISO / Liderança, AppSec, Perícia & Resposta a Incidentes e Analista de Segurança da Informação (perfil generalista de vaga corporativa).
 
 ---
 
@@ -144,12 +144,12 @@ flowchart LR
 - **Conceitos-Chave:** AES-GCM, RSA-2048/4096, Curvas Elípticas (ECDSA, Ed25519), Salting, Hash Colisões, CA Raiz, CRL e OCSP Stapling.
 
 #### 04. Autenticacao-e-IAM
-- **Título:** Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC
+- **Título:** Senhas, MFA, OAuth 2.0, SAML, JWT e RBAC
 - **Função NIST CSF 2.0:** *Protect (PR)*
-- **Tempo Estimado:** 45 minutos | **Carreiras:** AppSec, Blue Team, Cloud/DevSecOps
-- **Objetivos de Aprendizagem:** Projetar controles de identidade e controle de acesso; implementar autenticação multifator (TOTP/FIDO2); decodificar e validar tokens JSON Web Token (JWT); comparar RBAC (Role-Based) com ABAC (Attribute-Based).
+- **Tempo Estimado:** 55 minutos | **Carreiras:** AppSec, Blue Team, Cloud/DevSecOps
+- **Objetivos de Aprendizagem:** Projetar controles de identidade e controle de acesso; implementar autenticação multifator (TOTP/FIDO2); operar SSO SAML 2.0 (SP/IdP, asserção, ACS, Audience) e provisionamento SCIM/JML; decodificar e validar tokens JWT; comparar RBAC com ABAC; contrastar SAML e OIDC.
 - **Pré-requisitos:** Criptografia-Pratica.
-- **Conceitos-Chave:** Hashing de senhas (Argon2, bcrypt), TOTP RFC 6238, FIDO2/WebAuthn, JWT Header/Payload/Signature, None Algorithm Attack, Principle of Least Privilege.
+- **Conceitos-Chave:** Hashing de senhas (Argon2, bcrypt), TOTP RFC 6238, FIDO2/WebAuthn, SAML 2.0 (Binding, NameID, metadados), SCIM 2.0, JWT Header/Payload/Signature, None Algorithm Attack, Principle of Least Privilege.
 
 #### 05. Segmentacao-e-Firewall
 - **Título:** DMZ, VLANs, Regras de Firewall e Filtragem
@@ -732,12 +732,16 @@ Para orientar estudantes e profissionais com focos específicos, a matriz curric
    `01 -> 61 -> 02 -> 34 -> 04 -> 11 -> 12 -> 13 -> 38 -> 39 -> 50 -> 51 -> 14 -> 62 -> 15`
 3. **Rota DevSecOps & Cloud Security:**  
    `01 -> 61 -> 03 -> 04 -> 35 -> 06 -> 12 -> 13 -> 21 -> 41 -> 22 -> 50 -> 51 -> 52 -> 53 -> 24`
-4. **Rota GRC, Auditoria & Privacidade:**  
+4. **Rota GRC, Auditoria & Privacidade:**
    `01 -> 08 -> 40 -> 09 -> 25 -> 26 -> 58 -> 57 -> 27 -> 56 -> 54 -> 55 -> 28 -> 43 -> 44 -> 59 -> 60`
-5. **Rota Perícia & Resposta a Incidentes:**  
+5. **Rota CISO / Liderança de Segurança:**
+   `01 -> 08 -> 04 -> 40 -> 09 -> 25 -> 26 -> 58 -> 57 -> 28 -> 43 -> 44 -> 59 -> 60`
+6. **Rota AppSec / Segurança de Aplicações:**
+   `01 -> 61 -> 03 -> 04 -> 35 -> 12 -> 13 -> 21 -> 41 -> 22 -> 50 -> 51 -> 52 -> 53`
+7. **Rota Perícia & Resposta a Incidentes:**
    `01 -> 61 -> 02 -> 06 -> 36 -> 10 -> 48 -> 16 -> 47 -> 18 -> 53 -> 42 -> 45 -> 19 -> 56 -> 20`
-6. **Rota 6: Analista de Segurança da Informação (vaga):**  
-   `01 -> 61 -> 34 -> 36 -> 05 -> 06 -> 07 -> 10 -> 29 -> 30 -> 38 -> 40 -> 25 -> 26 -> 31 -> 54 -> 57 -> 18 -> 49 -> 42 -> 43 -> 32 -> 37 -> 33 -> 59`  
+8. **Rota Analista de Segurança da Informação (vaga):**
+   `01 -> 61 -> 34 -> 36 -> 05 -> 06 -> 07 -> 10 -> 29 -> 30 -> 38 -> 40 -> 25 -> 26 -> 31 -> 54 -> 57 -> 18 -> 49 -> 42 -> 43 -> 32 -> 37 -> 33 -> 59`
    Cada competência da vaga também aparece, com os módulos principais e de apoio, na seção "Rota por Vaga" do portal (`index.html`).
 
 No portal, a aba **Rotas Sugeridas** mostra cada rota como sequência numerada, com o progresso salvo no navegador e o próximo módulo a estudar. As sequências vêm de `ROTAS_PERFIL` em `_geradores/index_dados.py`, que é a fonte única; um teste (`test_rotas_sugeridas.py`) garante que esta seção continue igual aos dados.

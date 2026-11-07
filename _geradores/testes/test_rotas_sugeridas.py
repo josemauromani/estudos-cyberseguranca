@@ -15,7 +15,41 @@ from index_dados import ESTUDOS_DADOS, ROTAS_PERFIL  # noqa: E402
 
 from build_index import gerar_index_html, render_painel_rotas  # noqa: E402
 
-IDS_ESPERADOS = ["blue_soc", "red_team", "devsecops_cloud", "grc", "pericia", "analista_si"]
+IDS_ESPERADOS = ["blue_soc", "red_team", "devsecops_cloud", "grc", "ciso", "appsec", "pericia", "analista_si"]
+
+CISO_MODULOS = [
+    "Fundamentos-Ciber",
+    "Arquitetura-Zero-Trust",
+    "Autenticacao-e-IAM",
+    "PAM-e-Acessos-Privilegiados",
+    "Gestao-de-Vulnerabilidades",
+    "Gestao-de-Riscos-TI",
+    "ISO-27001-e-27002",
+    "Auditoria-de-TI",
+    "Gestao-de-Riscos-de-Terceiros",
+    "Continuidade-e-Disaster-Recovery",
+    "Gestao-de-Crise-e-Comunicacao",
+    "Exercicios-Tabletop",
+    "Lideranca-e-Programa-de-Seguranca",
+    "Estruturacao-da-Area-de-Seguranca",
+]
+
+APPSEC_MODULOS = [
+    "Fundamentos-Ciber",
+    "Fundamentos-de-Computacao-e-SO",
+    "Criptografia-Pratica",
+    "Autenticacao-e-IAM",
+    "Python-para-Seguranca",
+    "OWASP-Top-10-Web",
+    "Seguranca-em-APIs",
+    "Seguranca-em-Nuvem",
+    "Identidade-Hibrida-e-Nuvem",
+    "DevSecOps-e-CI-CD",
+    "Seguranca-de-Containers",
+    "Seguranca-em-Kubernetes",
+    "Infraestrutura-como-Codigo-Segura",
+    "Deteccao-e-Resposta-em-Nuvem",
+]
 
 
 def numero(slug):
@@ -30,14 +64,14 @@ def visao(html, nome):
 
 
 def sequencias_do_curriculo():
-    """As 6 sequências do §5 do CURRICULO.md, na ordem em que aparecem, como listas de números."""
+    """As sequências do §5 do CURRICULO.md, na ordem em que aparecem, como listas de números."""
     txt = (GERADORES_DIR / "CURRICULO.md").read_text(encoding="utf-8")
     secao = txt.split("## 5. Rotas de Aprendizagem por Perfil Profissional", 1)[1]
     return [[int(n) for n in seq.split(" -> ")] for seq in re.findall(r"`(\d\d(?: -> \d\d)+)`", secao)]
 
 
 class TestDadosDasRotas(unittest.TestCase):
-    def test_seis_rotas_com_ids_e_campos(self):
+    def test_oito_rotas_com_ids_e_campos(self):
         self.assertEqual([r["id"] for r in ROTAS_PERFIL], IDS_ESPERADOS)
         for r in ROTAS_PERFIL:
             with self.subTest(rota=r["id"]):
@@ -47,6 +81,24 @@ class TestDadosDasRotas(unittest.TestCase):
                 self.assertEqual(len(r["modulos"]), len(set(r["modulos"])), "módulo repetido na rota")
                 for slug in r["modulos"]:
                     self.assertIn(slug, ESTUDOS_DADOS)
+
+    def test_rota_ciso_modulos(self):
+        rotas = {r["id"]: r for r in ROTAS_PERFIL}
+        self.assertEqual(rotas["ciso"]["modulos"], CISO_MODULOS)
+        self.assertEqual(rotas["ciso"]["nome"], "CISO / Liderança de Segurança")
+        self.assertEqual(rotas["ciso"]["icone"], "👔")
+
+    def test_rota_appsec_modulos(self):
+        rotas = {r["id"]: r for r in ROTAS_PERFIL}
+        self.assertEqual(rotas["appsec"]["modulos"], APPSEC_MODULOS)
+        self.assertEqual(rotas["appsec"]["nome"], "AppSec / Segurança de Aplicações")
+        self.assertEqual(rotas["appsec"]["icone"], "🧩")
+
+    def test_descricao_appsec_nao_promete_ssdlc(self):
+        rotas = {r["id"]: r for r in ROTAS_PERFIL}
+        desc = rotas["appsec"]["descricao"].casefold()
+        self.assertNotIn("ssdlc", desc)
+        self.assertNotIn("samm", desc)
 
     def test_rotas_do_modulo_61(self):
         slug = "Fundamentos-de-Computacao-e-SO"

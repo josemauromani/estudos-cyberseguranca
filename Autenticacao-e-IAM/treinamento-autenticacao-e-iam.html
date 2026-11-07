@@ -1731,12 +1731,14 @@ dfn.glossario:focus-visible {
 <div class="shell">
 <aside class="toc" id="toc" aria-label="Sumário do módulo">
   <div class="toc-rotulo">Estudo 04 de 62</div>
-  <div class="toc-modulo">Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</div>
+  <div class="toc-modulo">Senhas, MFA, OAuth 2.0, SAML, JWT e RBAC</div>
   <div class="toc-progresso">0%</div>
   <ol class="toc-lista">
     <li><a class="toc-item" href="#pilares-iam" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Fundamentos de IAM, Governança e o Ciclo IAAA</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#senhas-e-mfa" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Armazenamento Seguro de Senhas &amp; Autenticação Multifator (MFA)</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#federacao-oauth-oidc" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Federação de Identidades, OAuth 2.0 e OpenID Connect (OIDC)</span></span><span class="toc-contador"></span></a></li>
+    <li><a class="toc-item" href="#saml-sso" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">SAML 2.0, SSO Corporativo e Asserções</span></span><span class="toc-contador"></span></a></li>
+    <li><a class="toc-item" href="#scim-provisionamento" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">SCIM 2.0 e Provisionamento Joiner–Mover–Leaver</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#anatomia-jwt" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Anatomia, Ciclo de Vida e Vetores de Ataque em Tokens JWT</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#modelos-controle-acesso" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Modelos de Controle de Acesso: DAC, MAC, RBAC e ABAC</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist-iam" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de Aplicação Prática: Auditoria e Implementação de IAM</span></span><span class="toc-contador"></span></a></li>
@@ -1751,10 +1753,10 @@ dfn.glossario:focus-visible {
 <main class="content">
 <header class="mhead" style="--track-color:#2563EB">
   <div class="mhead-kicker">Trilha 1 · Fundamentos &amp; Redes · Estudo 04</div>
-  <h1>Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC</h1>
-  <p class="mhead-sub">Controle de acesso robusto, fatores múltiplos, autorização moderna e federação de identidades</p>
-  <div class="chips"><span class="chip">⏱ 45 min</span><span class="chip">📈 Iniciante</span><span class="chip">🛡 NIST Protect</span><span class="chip">🎯 ATT&amp;CK TA0006 Credential Access / TA0004 Privilege Escalation / T1556 Modify Authentication Process / T1078 Valid Accounts</span><span class="chip">👤 AppSec &amp; DevSecOps · Blue Team &amp; Defesa · GRC &amp; Auditoria</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#pilares-iam" data-tipo="teoria"><span class="toc-tipo">Teoria</span>5 seções</a><a href="#checklist-iam" data-tipo="checklist"><span class="toc-tipo">Checklist</span>6 itens</a><a href="#questoes-fixacao" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>3 questões</a><a href="#fatos-essenciais" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <h1>Senhas, MFA, OAuth 2.0, SAML, JWT e RBAC</h1>
+  <p class="mhead-sub">Controle de acesso, MFA, OIDC, SSO SAML, SCIM/JML e autorização RBAC/ABAC</p>
+  <div class="chips"><span class="chip">⏱ 55 min</span><span class="chip">📈 Iniciante</span><span class="chip">🛡 NIST Protect</span><span class="chip">🎯 ATT&amp;CK TA0006 Credential Access / TA0004 Privilege Escalation / T1556 Modify Authentication Process / T1078 Valid Accounts</span><span class="chip">👤 AppSec &amp; DevSecOps · Blue Team &amp; Defesa · GRC &amp; Auditoria</span></div>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#pilares-iam" data-tipo="teoria"><span class="toc-tipo">Teoria</span>7 seções</a><a href="#checklist-iam" data-tipo="checklist"><span class="toc-tipo">Checklist</span>10 itens</a><a href="#questoes-fixacao" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos-essenciais" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- ==========================================================================
      Estudo 04: Autenticação e Gestão de Identidades (IAM)
@@ -1764,7 +1766,7 @@ dfn.glossario:focus-visible {
 <article class="study-container" data-slug="autenticacao-e-iam">
 <!-- SEÇÃO 1: PILARES DE IAM E O CICLO IAAA -->
 <section class="study-section" id="pilares-iam" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 8</small></span><h2>Fundamentos de IAM, Governança e o Ciclo IAAA</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 10</small></span><h2>Fundamentos de IAM, Governança e o Ciclo IAAA</h2></div>
 
   <p class="lead-text">
     A identidade é o novo perímetro da segurança cibernética. Em um cenário corporativo híbrido e descentralizado,
@@ -1838,7 +1840,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 2: ARMAZENAMENTO SEGURO DE SENHAS E MFA -->
 <section class="study-section" id="senhas-e-mfa" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 8</small></span><h2>Armazenamento Seguro de Senhas &amp; Autenticação Multifator (MFA)</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 10</small></span><h2>Armazenamento Seguro de Senhas &amp; Autenticação Multifator (MFA)</h2></div>
 
   <p>
     Senhas continuam sendo o mecanismo de autenticação primária mais difundido, porém o mais suscetível a erros de implementação.
@@ -1940,7 +1942,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 3: FEDERAÇÃO, OAUTH 2.0 E OPENID CONNECT -->
 <section class="study-section" id="federacao-oauth-oidc" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 8</small></span><h2>Federação de Identidades, OAuth 2.0 e OpenID Connect (OIDC)</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 10</small></span><h2>Federação de Identidades, OAuth 2.0 e OpenID Connect (OIDC)</h2></div>
 
   <p>
     Em ecossistemas modernos com dezenas de aplicações e microsserviços, exigir que cada software armazene suas próprias senhas
@@ -2002,9 +2004,133 @@ dfn.glossario:focus-visible {
   </div>
 </section>
 
+<!-- SEÇÃO: SAML / SSO -->
+<section class="study-section" id="saml-sso" data-tipo="teoria">
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 10</small></span><h2>SAML 2.0, SSO Corporativo e Asserções</h2></div>
+
+  <p>
+    Enquanto OAuth 2.0/OIDC dominam aplicações modernas e APIs, o <strong>SAML 2.0</strong> (Security Assertion Markup Language)
+    permanece o padrão dominante de <strong>Single Sign-On (SSO)</strong> em portais empresariais, SaaS legados e integrações B2B.
+    O protocolo troca mensagens XML assinadas entre um <strong>Service Provider (SP)</strong> — a aplicação que o usuário quer usar —
+    e um <strong>Identity Provider (IdP)</strong> — o sistema que autentica e emite a prova de identidade (Okta, Entra ID, AD FS, Keycloak).
+  </p>
+
+  <h3>Asserção SAML</h3>
+  <p>
+    A asserção é o artefato central. Em uma autenticação típica ela carrega, entre outros:
+  </p>
+  <ul>
+    <li><strong>Subject:</strong> quem foi autenticado (ligado ao formato de <em>NameID</em> — e-mail, persistent ID, transient, etc.).</li>
+    <li><strong>Conditions:</strong> janela de validade (<code>NotBefore</code> / <code>NotOnOrAfter</code>), <em>Audience</em> (o SP esperado) e restrições de endereço.</li>
+    <li><strong>AuthnStatement:</strong> quando e como o IdP autenticou o usuário (senha, MFA, etc.).</li>
+    <li><strong>AttributeStatement:</strong> atributos/claims (grupos, departamento, UPN) consumidos pelo SP para autorização local.</li>
+  </ul>
+
+  <h3>Bindings na prática</h3>
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>HTTP Redirect</h4>
+      <p>Mensagem SAML compactada (DEFLATE) e enviada na query string. Adequada a AuthnRequest curtas; limitada pelo tamanho da URL.</p>
+    </div>
+    <div class="info-card">
+      <h4>HTTP POST</h4>
+      <p>Formulário HTML com a asserção (ou resposta) em Base64 no corpo. É o binding mais comum para a <em>Response</em> do IdP ao SP.</p>
+    </div>
+    <div class="info-card">
+      <h4>Artifact</h4>
+      <p>O navegador leva só um identificador curto; SP e IdP trocam a asserção completa por canal back-channel (SOAP). Menos exposição no browser.</p>
+    </div>
+  </div>
+
+  <h3>Metadados XML e confiança</h3>
+  <p>
+    SP e IdP trocam <strong>metadados</strong> (EntityDescriptor): entityID, endpoints (ACS — Assertion Consumer Service —, SingleLogout),
+    certificados de assinatura/criptografia e preferências de NameID. A confiança começa aí: o SP valida a assinatura XML da Response
+    com a chave pública do IdP registrada nos metadados. Certificados expirados ou trocados sem rotação coordenada quebram o SSO em massa.
+  </p>
+
+  <h3>SAML × OIDC — quando usar cada um</h3>
+  <ul>
+    <li><strong>SAML:</strong> SSO browser-based para apps empresariais e SaaS que já falam SAML; forte em atributos XML e federação B2B clássica.</li>
+    <li><strong>OIDC:</strong> apps modernas, mobile, SPAs e APIs; tokens JWT, Discovery e fluxos OAuth (Authorization Code + PKCE).</li>
+    <li>Muitos IdPs emitem <strong>ambos</strong>: escolha pelo protocolo que o SP nativamente suporta, não por moda.</li>
+  </ul>
+
+  <div class="callout warning">
+    <h4>Pitfalls operacionais</h4>
+    <ul>
+      <li><strong>Clock skew:</strong> relógios SP/IdP desalinhados fazem Conditions falharem; tolere segundos e sincronize NTP.</li>
+      <li><strong>ACS errado:</strong> Assertion Consumer Service URL distinta da registrada → rejeição ou, pior, configuração frouxa.</li>
+      <li><strong>Audience / Recipient:</strong> a asserção deve destinar-se ao entityID do seu SP; aceite amplo habilita replay entre apps.</li>
+      <li><strong>Asserção sem assinatura válida:</strong> nunca confiar em Response unsigned ou com assinatura só no envelope se a política exige signed Assertion.</li>
+      <li><strong>Certificado expirado:</strong> planeje rotação (dois certificados válidos na janela de troca).</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <div class="diagram-header">
+      <span class="diagram-title">SSO SAML SP-initiated</span>
+      <span class="diagram-badge">Mermaid</span>
+    </div>
+    <pre class="mermaid" data-title="SSO SAML SP-initiated">
+sequenceDiagram
+    actor U as Usuário
+    participant SP as Service Provider
+    participant IdP as Identity Provider
+    U->>SP: acessa aplicação
+    SP->>U: redireciona AuthnRequest (Redirect/POST)
+    U->>IdP: autentica (senha/MFA)
+    IdP-->>U: SAML Response (asserção assinada)
+    U->>SP: POST no ACS
+    SP->>SP: valida assinatura, Audience, Conditions, NameID
+    SP-->>U: sessão local estabelecida
+  </pre>
+  </div>
+</section>
+
+<!-- SEÇÃO: SCIM / PROVISIONAMENTO -->
+<section class="study-section" id="scim-provisionamento" data-tipo="teoria">
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 5 de 10</small></span><h2>SCIM 2.0 e Provisionamento Joiner–Mover–Leaver</h2></div>
+
+  <p>
+    Autenticar via SAML/OIDC resolve <em>quem entra</em>. <strong>SCIM 2.0</strong> (System for Cross-domain Identity Management,
+    RFC 7643/7644) resolve <em>quem existe</em> na aplicação: criar, atualizar e desativar contas de forma padronizada via API REST/JSON
+    entre o IdP (ou HRIS) e o SP.
+  </p>
+
+  <div class="cards-grid">
+    <div class="info-card">
+      <h4>Joiner</h4>
+      <p>Admissão no RH dispara criação do usuário no IdP e, via SCIM, provisionamento no SaaS (licença, grupos, atributos).</p>
+    </div>
+    <div class="info-card">
+      <h4>Mover</h4>
+      <p>Mudança de cargo/área atualiza atributos e memberships; evita <em>privilege creep</em> se o mapeamento remover papéis antigos.</p>
+    </div>
+    <div class="info-card">
+      <h4>Leaver</h4>
+      <p>Desligamento deve <strong>desprovisionar</strong> (desativar/apagar no SP), não apenas impedir o próximo login no IdP —
+        sessões e tokens locais podem sobreviver se a conta no SaaS continuar ativa.</p>
+    </div>
+  </div>
+
+  <p>
+    Na prática: mapeie atributos (UPN, e-mail, department, groups) com cuidado; teste o offboarding com conta de laboratório;
+    separe “SSO desligado” de “conta removida”. SCIM complementa SAML/OIDC — um sem o outro deixa buraco no ciclo de vida.
+  </p>
+
+  <div class="callout tip">
+    <h4>Relação IdP × HRIS</h4>
+    <p>
+      O sistema de RH é frequentemente a fonte da verdade de admissão/desligamento; o IdP orquestra autenticação e empurra SCIM aos SaaS.
+      Gaps entre RH e IdP (estagiário que nunca entrou no IdP, demissão processada só no e-mail) geram contas órfãs exploráveis.
+    </p>
+  </div>
+</section>
+
 <!-- SEÇÃO 4: ANATOMIA E ATAQUES A TOKENS JWT -->
 <section class="study-section" id="anatomia-jwt" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 8</small></span><h2>Anatomia, Ciclo de Vida e Vetores de Ataque em Tokens JWT</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 6 de 10</small></span><h2>Anatomia, Ciclo de Vida e Vetores de Ataque em Tokens JWT</h2></div>
 
   <p>
     O <strong>JSON Web Token (JWT - RFC 7519)</strong> é o padrão aberto dominante para transmissão compacta e autossuficiente
@@ -2093,7 +2219,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 5: MODELOS DE CONTROLE DE ACESSO (RBAC vs ABAC) -->
 <section class="study-section" id="modelos-controle-acesso" data-tipo="teoria">
-  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 5 de 8</small></span><h2>Modelos de Controle de Acesso: DAC, MAC, RBAC e ABAC</h2></div>
+  <div class="shead"><span class="stype">📘 Teoria <small>· Seção 7 de 10</small></span><h2>Modelos de Controle de Acesso: DAC, MAC, RBAC e ABAC</h2></div>
 
   <p>
     Após a identidade do usuário ser comprovada pela autenticação, o subsistema de autorização deve decidir
@@ -2153,7 +2279,7 @@ dfn.glossario:focus-visible {
 
 <!-- SEÇÃO 7: CHECKLIST PRÁTICO -->
 <section class="study-section" id="checklist-iam" data-tipo="checklist">
-  <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 6 de 8</small></span><h2>Checklist de Aplicação Prática: Auditoria e Implementação de IAM</h2></div>
+  <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 8 de 10</small></span><h2>Checklist de Aplicação Prática: Auditoria e Implementação de IAM</h2></div>
 
   <p>
     Utilize este checklist técnico durante revisões de arquitetura, auditorias de conformidade (ISO 27001 / LGPD / SOC 2)
@@ -2214,12 +2340,48 @@ dfn.glossario:focus-visible {
         com auditorias semestrais para erradicação de acúmulo indevido de privilégios (<em>Privilege Creep</em>).
       </label>
     </li>
+
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_6">
+      <label for="list_0_6">
+        <strong>Validação rigorosa da asserção SAML:</strong>
+        O SP rejeita Responses sem assinatura válida, confere <em>Audience</em>/Recipient e Conditions (NotBefore/NotOnOrAfter)
+        com tolerância de clock skew documentada, e não aceita asserções destinadas a outro entityID.
+      </label>
+    </li>
+
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_7">
+      <label for="list_0_7">
+        <strong>ACS e metadados alinhados:</strong>
+        A URL do Assertion Consumer Service (ACS) no SP coincide com a registrada nos metadados do IdP; certificados de assinatura
+        SAML têm janela de rotação (dois certificados válidos durante a troca).
+      </label>
+    </li>
+
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_8">
+      <label for="list_0_8">
+        <strong>SCIM no offboarding:</strong>
+        O desligamento desprovisiona a conta no SaaS via SCIM (ou API equivalente), não apenas impede o próximo SSO —
+        contas locais órfãs são tratadas como incidente de identidade.
+      </label>
+    </li>
+
+    <li class="checklist-item">
+      <input type="checkbox" onchange="toggleCheckItem(this)" id="list_0_9">
+      <label for="list_0_9">
+        <strong>Escolha SAML × OIDC por capacidade do SP:</strong>
+        Novas integrações preferem OIDC quando o aplicativo é moderno/API-first; SAML quando o SaaS só oferece SSO SAML —
+        a decisão fica registrada na arquitetura de identidade, não no hábito do time.
+      </label>
+    </li>
   </ul>
 </section>
 
 <!-- SEÇÃO 8: QUESTÕES DE FIXAÇÃO E CONCURSOS -->
 <section class="study-section" id="questoes-fixacao" data-tipo="questoes">
-  <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 7 de 8</small></span><h2>Questões de Fixação e Concursos Públicos</h2></div>
+  <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 9 de 10</small></span><h2>Questões de Fixação e Concursos Públicos</h2></div>
 
   <p>
     Avalie seu entendimento técnico resolvendo questões baseadas em bancas de concursos públicos de alto nível (Cespe/Cebraspe, FGV)
@@ -2309,12 +2471,81 @@ dfn.glossario:focus-visible {
         </div>
       </details>
     </div>
+
+    <!-- Questão 4 -->
+    <div class="quiz-item" data-q="q4">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 4 &bull; SAML</span>
+        <p>
+          Em um fluxo SAML SP-initiated, o Service Provider recebe no ACS uma Response cujo <em>Audience</em> aponta para o entityID
+          de outro aplicativo da mesma empresa. O certificado de assinatura do IdP é válido. Qual é a ação correta do SP?
+        </p>
+      </div>
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
+          <p>
+            <strong>Gabarito: Rejeitar a asserção — Audience/Recipient deve corresponder ao SP que consome o ACS.</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> A assinatura prova origem no IdP, mas Conditions e Audience amarram a asserção ao destinatário.
+            Aceitar Audience de outro SP habilita replay entre aplicações. Clock skew e ACS corretos não substituem essa checagem.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Questão 5 -->
+    <div class="quiz-item" data-q="q5">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 5 &bull; SAML × OIDC</span>
+        <p>
+          Um time precisa integrar um aplicativo mobile nativo e uma API REST ao IdP corporativo. Qual protocolo é o mais adequado
+          como primeira escolha, e por quê, em contraste com SAML 2.0?
+        </p>
+      </div>
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
+          <p>
+            <strong>Gabarito: OpenID Connect (sobre OAuth 2.0), tipicamente Authorization Code + PKCE — SAML é orientado a SSO browser/XML.</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> OIDC emite ID Token/Access Token JWT e encaixa mobile e APIs. SAML 2.0 brilha em SSO web empresarial e SaaS
+            que só falam SAML; forçar SAML em cliente nativo costuma exigir bridges frágeis.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Questão 6 -->
+    <div class="quiz-item" data-q="q6">
+      <div class="quiz-question">
+        <span class="quiz-badge">Questão 6 &bull; SCIM</span>
+        <p>
+          Um colaborador é desligado: o IdP bloqueia o login SSO no mesmo dia, mas a conta no SaaS de CRM permanece ativa com API tokens
+          pessoais. Qual controle faltou no ciclo de vida da identidade?
+        </p>
+      </div>
+      <details class="quiz-details">
+        <summary class="quiz-toggle">Ver resposta comentada</summary>
+        <div class="quiz-answer">
+          <p>
+            <strong>Gabarito: Desprovisionamento via SCIM (ou equivalente) no SaaS — desligar SSO não remove a conta local nem tokens já emitidos.</strong>
+          </p>
+          <p>
+            <em>Justificativa:</em> SAML/OIDC controlam autenticação federada; SCIM (RFC 7643/7644) sincroniza criação/atualização/desativação.
+            Offboarding completo exige JML até o SP, não só o IdP.
+          </p>
+        </div>
+      </details>
+    </div>
   </div>
 </section>
 
 <!-- SEÇÃO 9: FATOS ESSENCIAIS E PRÓXIMOS PASSOS -->
 <section class="study-section" id="fatos-essenciais" data-tipo="referencias">
-  <div class="shead"><span class="stype">📚 Referências <small>· Seção 8 de 8</small></span><h2>Fatos Essenciais e Próximos Passos</h2></div>
+  <div class="shead"><span class="stype">📚 Referências <small>· Seção 10 de 10</small></span><h2>Fatos Essenciais e Próximos Passos</h2></div>
 
   <div class="facts-grid">
     <div class="facts-card">
@@ -2334,6 +2565,14 @@ dfn.glossario:focus-visible {
       <p>OAuth 2.0 fornece Access Tokens para autorização de APIs. Para autenticação federada de usuários, adota-se a camada OpenID Connect (OIDC).</p>
     </div>
     <div class="facts-card">
+      <h4>SAML Assina Asserções XML</h4>
+      <p>Valide assinatura, Audience, Conditions e ACS. Certificado expirado ou Audience errado quebram (ou enfraquecem) o SSO corporativo.</p>
+    </div>
+    <div class="facts-card">
+      <h4>SCIM Fecha o JML</h4>
+      <p>SSO sem desprovisionamento deixa contas órfãs. SCIM 2.0 (RFC 7643/7644) padroniza create/update/deactivate entre IdP e SaaS.</p>
+    </div>
+    <div class="facts-card">
       <h4>JWT É Assinado, Não Cifrado</h4>
       <p>Tokens JWS garantem integridade, mas o payload é Base64URL aberto. Nunca insira credenciais sensíveis no payload de um token comum.</p>
     </div>
@@ -2342,6 +2581,14 @@ dfn.glossario:focus-visible {
       <p>No <strong>Estudo 05 (Segmentacao-e-Firewall)</strong>, você dominará o isolamento de redes, zonas desmilitarizadas (DMZ), tabelas de estado e filtragem de pacotes.</p>
     </div>
   </div>
+
+  <h3>Referências</h3>
+  <ul>
+    <li>OASIS — Assertions and Protocols for the OASIS Security Assertion Markup Language (SAML) V2.0.</li>
+    <li>OpenID Foundation — OpenID Connect Core (contraste com SAML em SSO moderno).</li>
+    <li>IETF RFC 7643 / RFC 7644 — System for Cross-domain Identity Management (SCIM).</li>
+    <li>Documentação conceitual de federação SAML/OIDC em Microsoft Entra ID e Okta (fluxos SP/IdP e provisionamento).</li>
+  </ul>
 <div class="study-done">
   <span>Terminou este módulo? Marque como concluído para registrar o seu progresso.</span>
   <button class="btn-concluir" type="button">✓ Concluir módulo</button>
@@ -2349,8 +2596,6 @@ dfn.glossario:focus-visible {
 <div class="study-pager"><a href="../Criptografia-Pratica/treinamento-criptografia-pratica.html"><small>← Anterior · Estudo 03</small><b>Criptografia Simétrica, Assimétrica, Hashes e PKI</b></a><a href="../Segmentacao-e-Firewall/treinamento-segmentacao-e-firewall.html"><small>Próximo · Estudo 05 →</small><b>DMZ, VLANs, Regras de Firewall e Filtragem</b></a></div>
 </section>
 </article>
-
-<!-- SCRIPT EMBUTIDO: SIMULADOR DE SEGURANÇA JWT & MATRIZ RBAC -->
 </main>
 </div>
 
