@@ -1,7 +1,7 @@
 # Design Spec: Segurança em Mobile e MDM (módulo 63)
 
 **Data:** 2026-11-09  
-**Status:** Aguardando revisão do usuário  
+**Status:** Aprovada pelo usuário (2026-11-09)  
 **Repositório:** `estudos_cyberseguranca` (Mapa da Cibersegurança)  
 **Referência Metodológica:** Superpowers Spec-Driven Development (SDD)  
 **Origem:** Gaps P0 da análise profunda (Mobile + MDM/UEM); ciclo seguinte a DevSecOps SSDLC/SLSA/secrets (`2026-11-09-devsecops-ssdlc-supply-chain`).
