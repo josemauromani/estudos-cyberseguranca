@@ -94,11 +94,18 @@ class TestDadosDasRotas(unittest.TestCase):
         self.assertEqual(rotas["appsec"]["nome"], "AppSec / Segurança de Aplicações")
         self.assertEqual(rotas["appsec"]["icone"], "🧩")
 
-    def test_descricao_appsec_nao_promete_ssdlc(self):
+    def test_descricao_appsec_reflete_ssdlc_sem_prometer_samm_completo(self):
         rotas = {r["id"]: r for r in ROTAS_PERFIL}
         desc = rotas["appsec"]["descricao"].casefold()
-        self.assertNotIn("ssdlc", desc)
-        self.assertNotIn("samm", desc)
+        self.assertTrue(
+            "ssdlc" in desc or "ciclo de desenvolvimento seguro" in desc,
+            "descrição appsec deve citar SSDLC ou ciclo de desenvolvimento seguro",
+        )
+        self.assertNotIn("samm completo", desc)
+        self.assertTrue(
+            "sbom" in desc or "slsa" in desc or "secret" in desc,
+            "descrição appsec deve citar SBOM/SLSA ou secrets",
+        )
 
     def test_rotas_do_modulo_61(self):
         slug = "Fundamentos-de-Computacao-e-SO"

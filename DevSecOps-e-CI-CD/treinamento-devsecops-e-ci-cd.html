@@ -1731,11 +1731,13 @@ dfn.glossario:focus-visible {
 <div class="shell">
 <aside class="toc" id="toc" aria-label="Sumário do módulo">
   <div class="toc-rotulo">Estudo 22 de 62</div>
-  <div class="toc-modulo">Shift-Left, SAST, DAST, SCA e Containers</div>
+  <div class="toc-modulo">SSDLC, SAST/DAST/SCA, SLSA e Secrets no Pipeline</div>
   <div class="toc-progresso">0%</div>
   <ol class="toc-lista">
     <li><a class="toc-item" href="#introducao" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Introdução: Pegar a Falha Antes da Produção</span></span><span class="toc-contador"></span></a></li>
-    <li><a class="toc-item" href="#cadeia" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Dependências, Containers e Quality Gates</span></span><span class="toc-contador"></span></a></li>
+    <li><a class="toc-item" href="#ssdlc-samm" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">SSDLC, Security Champions e Maturidade (OWASP SAMM)</span></span><span class="toc-contador"></span></a></li>
+    <li><a class="toc-item" href="#cadeia" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Dependências, SLSA/VEX, Containers e Quality Gates</span></span><span class="toc-contador"></span></a></li>
+    <li><a class="toc-item" href="#secrets-no-pipeline" data-tipo="teoria"><span class="toc-icone">📘</span><span><span class="toc-tipo">Teoria</span><span class="toc-titulo">Secrets no Pipeline: Scan, Revogação e Cofre</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#checklist" data-tipo="checklist"><span class="toc-icone">☑️</span><span><span class="toc-tipo">Checklist</span><span class="toc-titulo">Checklist de DevSecOps</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#quiz" data-tipo="questoes"><span class="toc-icone">❓</span><span><span class="toc-tipo">Questões de concurso</span><span class="toc-titulo">Questões de Fixação e Entrevista</span></span><span class="toc-contador"></span></a></li>
     <li><a class="toc-item" href="#fatos" data-tipo="referencias"><span class="toc-icone">📚</span><span><span class="toc-tipo">Referências</span><span class="toc-titulo">Fatos Essenciais, Referências e Próximos Passos</span></span><span class="toc-contador"></span></a></li>
@@ -1748,20 +1750,24 @@ dfn.glossario:focus-visible {
 <main class="content">
 <header class="mhead" style="--track-color:#0891B2">
   <div class="mhead-kicker">Trilha 5 · Especialidades &amp; Fronteiras · Estudo 22</div>
-  <h1>Shift-Left, SAST, DAST, SCA e Containers</h1>
-  <p class="mhead-sub">Automação de segurança no ciclo de entrega contínua, governança de dependências e proteção de containers</p>
-  <div class="chips"><span class="chip">⏱ 45 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Protect</span><span class="chip">🎯 ATT&amp;CK TA0001 Initial Access / TA0008 Lateral Movement</span><span class="chip">👤 AppSec &amp; DevSecOps</span></div>
-  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>2 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>7 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>6 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
+  <h1>SSDLC, SAST/DAST/SCA, SLSA e Secrets no Pipeline</h1>
+  <p class="mhead-sub">Ciclo seguro (SSDLC/SAMM), cadeia de software (SBOM, SLSA, VEX), containers assinados e higiene de secrets no CI/CD</p>
+  <div class="chips"><span class="chip">⏱ 60 min</span><span class="chip">📈 Intermediário</span><span class="chip">🛡 NIST Protect</span><span class="chip">🎯 ATT&amp;CK TA0001 Initial Access / TA0008 Lateral Movement</span><span class="chip">👤 AppSec &amp; DevSecOps</span></div>
+  <nav class="roadmap" aria-label="Mapa do módulo"><a href="#introducao" data-tipo="teoria"><span class="toc-tipo">Teoria</span>4 seções</a><a href="#checklist" data-tipo="checklist"><span class="toc-tipo">Checklist</span>11 itens</a><a href="#quiz" data-tipo="questoes"><span class="toc-tipo">Questões de concurso</span>10 questões</a><a href="#fatos" data-tipo="referencias"><span class="toc-tipo">Referências</span></a></nav>
 </header>
 <!-- Estudo 22: DevSecOps-e-CI-CD Body Fragment -->
 <article class="study-container" data-slug="devsecops">
 
     <!-- SEÇÃO 1: SHIFT-LEFT -->
     <section class="study-section" id="introducao" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 5</small></span><h2>Introdução: Pegar a Falha Antes da Produção</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 1 de 7</small></span><h2>Introdução: Pegar a Falha Antes da Produção</h2></div>
 
         <p class="lead-text">
-            Nos Estudos 12 e 13, você explorou uma SQL injection e um mass assignment na loja da Ipê Store depois que já estavam no ar. Corrigir em produção custa caro: incidente, comunicação, correção às pressas. <strong>Shift-Left</strong> é mover a segurança para o começo do ciclo, de modo que a mesma falha seja apontada no merge request, minutos depois de escrita, por uma ferramenta que roda sozinha a cada mudança. O nome do processo é <strong>SSDLC</strong> (ciclo de desenvolvimento seguro): requisitos, revisão de código, testes automatizados e verificação antes do deploy.
+            Nos Estudos 12 e 13, você explorou uma SQL injection e um mass assignment na loja da Ipê Store depois que já estavam no ar. Corrigir em produção custa caro: incidente, comunicação, correção às pressas. <strong>Shift-Left</strong> é mover a segurança para o começo do ciclo, de modo que a mesma falha seja apontada no merge request, minutos depois de escrita, por uma ferramenta que roda sozinha a cada mudança.
+        </p>
+
+        <p>
+            Este estudo amarra três camadas: o <strong>SSDLC</strong> e a maturidade (próxima seção), a <strong>cadeia de software</strong> (SBOM, SLSA, VEX, containers e gates) e a higiene de <strong>secrets no pipeline</strong>. A esteira abaixo é o mapa; o detalhe de cada camada vem em seguida.
         </p>
 
         <div class="diagram-box">
@@ -1819,9 +1825,71 @@ jobs:
         </div>
     </section>
 
-    <!-- SEÇÃO 2: DEPENDÊNCIAS, CONTAINERS E GATES -->
+    <!-- SEÇÃO: SSDLC / SAMM / CHAMPIONS -->
+    <section class="study-section" id="ssdlc-samm" data-tipo="teoria">
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 7</small></span><h2>SSDLC, Security Champions e Maturidade (OWASP SAMM)</h2></div>
+
+        <p>
+            Ferramentas na esteira sem processo viram ruído. O <strong>SSDLC</strong> (Secure Software Development Life Cycle)
+            é o ciclo em que segurança entra em cada fase — não só no scan do merge request.
+        </p>
+
+        <h3>Fases do SSDLC (visão prática)</h3>
+        <ol>
+            <li><strong>Requisitos:</strong> dados sensíveis, ameaças de abuso e critérios de aceite de segurança (ex.: “sem segredo no repositório”).</li>
+            <li><strong>Design:</strong> threat modeling leve (pelo menos superfícies de ataque e trust boundaries; STRIDE no Estudo 01).</li>
+            <li><strong>Implementação:</strong> padrões seguros, revisão de código, SAST/segredos no MR.</li>
+            <li><strong>Verificação:</strong> SCA/SBOM, testes, DAST em staging, gates com baseline.</li>
+            <li><strong>Release:</strong> artefato assinado, provenance, só imagem verificada no deploy.</li>
+            <li><strong>Operação / feedback:</strong> monitoramento, correção e lições que voltam aos requisitos.</li>
+        </ol>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">SSDLC ligado à esteira</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="SSDLC ligado à esteira">
+flowchart LR
+    R["Requisitos"] --> D["Design"]
+    D --> I["Implementação"]
+    I --> V["Verificação<br><small>SAST SCA DAST</small>"]
+    V --> Rel["Release<br><small>assinatura SLSA</small>"]
+    Rel --> O["Ops / feedback"]
+    O --> R
+            </pre>
+        </div>
+
+        <h3>Security Champion</h3>
+        <p>
+            O <strong>Security Champion</strong> é alguém do time de produto (não necessariamente AppSec full-time) que conhece os gates,
+            escala riscos e traduz achados em correção. Não substitui o time de AppSec: amplifica cobertura. Sem Champion, o pipeline
+            vira “caixa preta” que o time evita.
+        </p>
+
+        <h3>OWASP SAMM como régua (não checklist íntegro)</h3>
+        <p>
+            O <strong>OWASP SAMM</strong> (Software Assurance Maturity Model) organiza práticas em famílias (governança, design,
+            implementação, verificação, operações) com níveis de maturidade. Use-o para <em>diagnosticar</em> onde o programa é fraco
+            (ex.: verificação forte, governança fraca) — não como prova de “SAMM completo” nem como certificação. Este módulo entrega
+            o vocabulário e a ligação com a esteira; um assessment SAMM formal é projeto à parte.
+        </p>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">📐</span>
+                <strong>Régua, não diploma</strong>
+            </div>
+            <p>
+                Dizer “estamos no nível 2 de Verification no SAMM” ajuda o roadmap. Dizer “somos SAMM completo” no portal ou no currículo
+                seria promessa falsa — e a rota AppSec deste mapa evita essa frase de propósito.
+            </p>
+        </div>
+    </section>
+
+    <!-- SEÇÃO: CADEIA / SLSA / VEX -->
     <section class="study-section" id="cadeia" data-tipo="teoria">
-        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 2 de 5</small></span><h2>Dependências, Containers e Quality Gates</h2></div>
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 3 de 7</small></span><h2>Dependências, SLSA/VEX, Containers e Quality Gates</h2></div>
 
         <h3>SBOM: saber o que está dentro</h3>
         <p>
@@ -1843,6 +1911,38 @@ jobs:
         </div>
         <p>
             Para priorizar, a gravidade (CVSS) não basta. O <strong>EPSS</strong> (da FIRST) estima a probabilidade de uma vulnerabilidade ser explorada nos próximos 30 dias, e o catálogo <strong>KEV</strong> (Known Exploited Vulnerabilities, da CISA) lista as que já estão sendo exploradas. Uma falha alta que está no KEV vem antes de uma crítica que ninguém explora.
+        </p>
+
+        <h3>SLSA: níveis de integridade da build</h3>
+        <p>
+            <strong>SLSA</strong> (Supply-chain Levels for Software Artifacts) descreve quão difícil é adulterar o que você entrega.
+            Na prática, trate os níveis como degraus — não como marketing:
+        </p>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Nível</th><th>O que exige (visão operacional)</th><th>Exemplo na esteira</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>0</strong></td><td>Nada garantido</td><td>Build no laptop, artefato sem provenance</td></tr>
+                    <tr><td><strong>1</strong></td><td>Processo documentado + provenance básica</td><td>CI gera atestado de “quem buildou o quê”</td></tr>
+                    <tr><td><strong>2</strong></td><td>Build hospedada, assinatura da provenance</td><td>GitHub Actions + Cosign/Sigstore no artefato</td></tr>
+                    <tr><td><strong>3</strong></td><td>Plataforma isolada, histórico auditável</td><td>Builders não modificáveis pelo autor do código</td></tr>
+                    <tr><td><strong>4</strong></td><td>Reprodutibilidade e controles máximos</td><td>Raro fora de fornecedores de alto rigor</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Assinatura de imagem (Cosign) e <strong>provenance</strong> (muitas vezes via <strong>in-toto</strong> / attestations)
+            respondem: “este binário veio deste commit neste pipeline?”. Sem isso, o SBOM diz o que há dentro, mas não prova a origem.
+        </p>
+
+        <h3>VEX: quando o CVE não te afeta</h3>
+        <p>
+            Um scanner pode marcar uma CVE na dependência enquanto o código <em>não exerce</em> o caminho vulnerável.
+            <strong>VEX</strong> (Vulnerability Exploitability eXchange) é o documento/máquina que declara o status
+            (ex.: <em>not_affected</em>, <em>fixed</em>, <em>under_investigation</em>) com justificativa.
+            Sem VEX, o gate ou o time trata todo achado SCA como incidente — ou ignora tudo.
         </p>
 
         <h3>Containers</h3>
@@ -1869,7 +1969,7 @@ cosign sign --key cosign.key registry.ipestore.example/loja:1.4.2
 cosign verify --key cosign.pub registry.ipestore.example/loja:1.4.2</code></pre>
         </div>
         <p>
-            Imagens <strong>distroless</strong> trazem só a aplicação e o runtime, sem shell nem gerenciador de pacotes: menos vulnerabilidades e menos ferramentas para um invasor. O projeto <strong>Sigstore</strong>, com o <strong>Cosign</strong>, assina imagens com chave própria ou sem chave (<em>keyless</em>, com identidade OIDC e registro público de transparência). O <code>cosign verify</code> antes do deploy garante que só roda o que saiu do pipeline (Estudo 25 trata a mesma ideia como controle de integridade).
+            Imagens <strong>distroless</strong> trazem só a aplicação e o runtime, sem shell nem gerenciador de pacotes: menos vulnerabilidades e menos ferramentas para um invasor. O projeto <strong>Sigstore</strong>, com o <strong>Cosign</strong>, assina imagens com chave própria ou sem chave (<em>keyless</em>, com identidade OIDC e registro público de transparência). O <code>cosign verify</code> antes do deploy garante que só roda o que saiu do pipeline (Estudo 25 trata a mesma ideia como controle de integridade). Detalhe de runtime de containers/Kubernetes: Estudos 50 e 51.
         </p>
 
         <h3>Quality gates: quando quebrar o build</h3>
@@ -1877,7 +1977,18 @@ cosign verify --key cosign.pub registry.ipestore.example/loja:1.4.2</code></pre>
             <li>Um <strong>quality gate</strong> define o limiar: por exemplo, quebrar com achado alto ou crítico. Limiar baixo demais trava o time em falsos positivos e o pipeline vira algo que todos pulam.</li>
             <li>Em código antigo, comece com uma <strong>baseline</strong>: os achados que já existiam são registrados, e o gate bloqueia só o que for <strong>novo</strong> no merge request. O legado vira um plano de correção à parte.</li>
             <li>Exceções existem, mas com justificativa, aprovador e validade: é um aceite de risco formal (Estudo 25). Exceção para achado crítico, ou sem data de fim, não é exceção, é abandono.</li>
+            <li>Combine gate de SCA com VEX: “CVE presente no SBOM, mas <em>not_affected</em> documentado” pode passar; “crítico no KEV sem mitigação” não.</li>
         </ul>
+    </section>
+
+    <!-- SEÇÃO: SECRETS -->
+    <section class="study-section" id="secrets-no-pipeline" data-tipo="teoria">
+        <div class="shead"><span class="stype">📘 Teoria <small>· Seção 4 de 7</small></span><h2>Secrets no Pipeline: Scan, Revogação e Cofre</h2></div>
+
+        <p>
+            Segredo no Git é incidente de identidade, não “dívida técnica”. O scan no merge request é necessário; o scan no
+            <strong>histórico</strong> (<code>fetch-depth: 0</code> + Gitleaks) é o que pega o commit antigo que ninguém reviu.
+        </p>
 
         <div class="callout danger">
             <div class="callout-title">
@@ -1885,16 +1996,35 @@ cosign verify --key cosign.pub registry.ipestore.example/loja:1.4.2</code></pre>
                 <strong>Segredo vazado se revoga, não se apaga</strong>
             </div>
             <p>
-                Apagar a chave do código num novo commit não a tira do <strong>histórico</strong> do Git, nem dos clones e forks que já existem. O único remédio é <strong>revogar</strong> a chave no provedor, gerar outra guardada num cofre e só depois limpar o código. Por isso o scan de segredos olha o histórico inteiro.
+                Apagar a chave do código num novo commit não a tira do <strong>histórico</strong> do Git, nem dos clones e forks que já existem.
+                O único remédio é <strong>revogar</strong> a chave no provedor, gerar outra guardada num cofre e só depois limpar o código.
             </p>
         </div>
+
+        <h3>Onde o segredo deveria viver</h3>
+        <ul>
+            <li><strong>Cofre / secret store</strong> (ou secrets do provedor de CI) injetados em runtime — não em arquivos versionados.</li>
+            <li><strong>OIDC federado no CI:</strong> o job assume uma identidade de curta duração no provedor de nuvem, em vez de access keys estáticas no repositório.</li>
+            <li>Rotação e menor privilégio: token de deploy não precisa de permissão de admin da conta.</li>
+        </ul>
+
+        <h3>Anti-padrões</h3>
+        <ul>
+            <li><code>ENV</code> / <code>ARG</code> com senha no Dockerfile (fica em camadas e no histórico do registry).</li>
+            <li>Imprimir secrets em logs do pipeline “para debug”.</li>
+            <li>PATs e cloud keys de longa duração colados em variáveis do repositório sem rotação.</li>
+            <li>Acreditar que “só o time privado vê o repo” — forks, backups e ex-colaboradores existem.</li>
+        </ul>
+
+        <p>
+            O Estudo 03 (criptografia) e os módulos de nuvem/IAM cobrem chaves e identidade em profundidade; aqui o foco é
+            <strong>não deixar o pipeline ser o vazador</strong>.
+        </p>
     </section>
 
-    <!-- SEÇÃO 3: SIMULADOR -->
-    
-    <!-- SEÇÃO 4: CHECKLIST -->
+    <!-- CHECKLIST -->
     <section class="study-section" id="checklist" data-tipo="checklist">
-        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 3 de 5</small></span><h2>Checklist de DevSecOps</h2></div>
+        <div class="shead"><span class="stype">☑️ Checklist <small>· Seção 5 de 7</small></span><h2>Checklist de DevSecOps</h2></div>
 
         <p class="lead-text">
             Use esta lista para avaliar a esteira de um time. O estado das caixas fica salvo no seu navegador.
@@ -1929,12 +2059,28 @@ cosign verify --key cosign.pub registry.ipestore.example/loja:1.4.2</code></pre>
                 <input type="checkbox" id="chk-ds-7">
                 <label for="chk-ds-7"><strong>Exceções:</strong> com justificativa, aprovador e validade; nenhuma para achado crítico.</label>
             </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-8">
+                <label for="chk-ds-8"><strong>SSDLC / Champion:</strong> fases do ciclo de desenvolvimento seguro combinadas e pelo menos um Security Champion por time de produto.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-9">
+                <label for="chk-ds-9"><strong>SLSA / provenance:</strong> builds geram atestado assinado; deploy exige verificação (Cosign/in-toto) alinhada ao nível SLSA alvo.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-10">
+                <label for="chk-ds-10"><strong>VEX:</strong> achados SCA “não exploráveis” têm status VEX documentado; críticos no KEV não passam só com desculpa.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-ds-11">
+                <label for="chk-ds-11"><strong>Cofre no CI:</strong> secrets de runtime via cofre ou OIDC de curta duração — nunca ENV/ARG no Dockerfile nem PAT eterno no repo.</label>
+            </li>
         </ul>
     </section>
 
-    <!-- SEÇÃO 5: QUIZ -->
+    <!-- QUIZ -->
     <section class="study-section" id="quiz" data-tipo="questoes">
-        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 4 de 5</small></span><h2>Questões de Fixação e Entrevista</h2></div>
+        <div class="shead"><span class="stype">❓ Questões de concurso <small>· Seção 6 de 7</small></span><h2>Questões de Fixação e Entrevista</h2></div>
 
         <div class="quiz-item" data-q="q1">
             <div class="quiz-question">
@@ -2007,16 +2153,64 @@ cosign verify --key cosign.pub registry.ipestore.example/loja:1.4.2</code></pre>
                 </div>
             </details>
         </div>
+
+        <div class="quiz-item" data-q="q7">
+            <div class="quiz-question">
+                <strong>Questão 7 (SSDLC):</strong> O time só tem Semgrep no MR e chama isso de “SSDLC completo”. O que falta no ciclo?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> SSDLC cobre requisitos, design, verificação, release e feedback operacional — não só SAST. Faltam, no mínimo, ameaças no design, SCA/SBOM, gates de release e retorno de incidentes aos requisitos. Um Security Champion ajuda a sustentar o processo.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item" data-q="q8">
+            <div class="quiz-question">
+                <strong>Questão 8 (SLSA):</strong> Qual a diferença prática entre ter SBOM e atingir um nível SLSA ≥ 2?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> O SBOM lista componentes. SLSA ≥ 2 exige build hospedada com provenance assinada — prova de origem do artefato (ex.: Cosign/in-toto), não só o inventário.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item" data-q="q9">
+            <div class="quiz-question">
+                <strong>Questão 9 (VEX):</strong> O SCA marca CVE numa lib transitiva; o time alega que o código nunca chama a API vulnerável. O que falta para o gate confiar nisso?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Um status VEX (ex.: not_affected) com justificativa revisável. Afirmação oral não substitui o documento que o processo de risk acceptance / gate consome.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item" data-q="q10">
+            <div class="quiz-question">
+                <strong>Questão 10 (SAMM / Champion):</strong> Para que serve o OWASP SAMM neste módulo, e o que um Security Champion não substitui?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> SAMM é régua de maturidade (governança, design, implementação, verificação, ops), não diploma de “SAMM completo”. O Champion amplifica o time de produto; não substitui AppSec especializado nem um assessment formal.</p>
+                </div>
+            </details>
+        </div>
     </section>
 
-    <!-- SEÇÃO 6: FATOS E REFERÊNCIAS -->
+    <!-- FATOS E REFERÊNCIAS -->
     <section class="study-section" id="fatos" data-tipo="referencias">
-        <div class="shead"><span class="stype">📚 Referências <small>· Seção 5 de 5</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
+        <div class="shead"><span class="stype">📚 Referências <small>· Seção 7 de 7</small></span><h2>Fatos Essenciais, Referências e Próximos Passos</h2></div>
 
         <div class="facts-grid">
             <div class="facts-card">
-                <h4>1. Shift-Left</h4>
-                <p>A falha apontada no merge request custa minutos; em produção, um incidente.</p>
+                <h4>1. Shift-Left + SSDLC</h4>
+                <p>A falha no MR custa minutos; SSDLC cobre o ciclo inteiro, não só o scanner.</p>
             </div>
             <div class="facts-card">
                 <h4>2. Ferramentas</h4>
@@ -2024,18 +2218,28 @@ cosign verify --key cosign.pub registry.ipestore.example/loja:1.4.2</code></pre>
             </div>
             <div class="facts-card">
                 <h4>3. Cadeia de software</h4>
-                <p>SBOM, imagem enxuta sem root e assinatura verificada antes do deploy.</p>
+                <p>SBOM + SLSA/provenance + VEX; imagem enxuta e assinatura verificada.</p>
             </div>
             <div class="facts-card">
-                <h4>4. Gates</h4>
+                <h4>4. Secrets</h4>
+                <p>Revogar, cofre/OIDC, nunca ENV/ARG nem PAT eterno no repo.</p>
+            </div>
+            <div class="facts-card">
+                <h4>5. Gates</h4>
                 <p>Limiar por severidade, baseline para o legado e exceções com prazo.</p>
+            </div>
+            <div class="facts-card">
+                <h4>6. Champion / SAMM</h4>
+                <p>Champion no time; SAMM como régua de maturidade, não como diploma.</p>
             </div>
         </div>
 
         <h3>Referências</h3>
         <ul>
             <li>NIST SP 800-218 — Secure Software Development Framework (SSDF).</li>
-            <li>OWASP DevSecOps Guideline, OWASP CycloneDX e especificação SPDX (ISO/IEC 5962:2021).</li>
+            <li>OWASP SAMM — Software Assurance Maturity Model; OWASP DevSecOps Guideline.</li>
+            <li>SLSA — Supply-chain Levels for Software Artifacts; in-toto / attestations.</li>
+            <li>OWASP CycloneDX e SPDX (ISO/IEC 5962); VEX (CISA/community profiles).</li>
             <li>FIRST — EPSS; CISA — Known Exploited Vulnerabilities Catalog.</li>
             <li>Documentação do Sigstore/Cosign, do Trivy, do Semgrep, do Gitleaks, do pip-audit e do OWASP ZAP.</li>
             <li>Kubernetes — Pod Security Standards e securityContext.</li>
@@ -2044,10 +2248,10 @@ cosign verify --key cosign.pub registry.ipestore.example/loja:1.4.2</code></pre>
         <div class="callout tip" style="margin-top: 1.5rem;">
             <div class="callout-title">
                 <span class="callout-icon">🎯</span>
-                <strong>Próximos Estudos: 21 — Segurança em Nuvem e 14 — Pentest e Metodologias</strong>
+                <strong>Próximos Estudos: 50/51 — Containers/Kubernetes e 21 — Segurança em Nuvem</strong>
             </div>
             <p>
-                O Estudo 21 leva estes cuidados para a infraestrutura como código e a nuvem. O Estudo 14 mostra o teste manual que complementa as ferramentas automáticas.
+                Os Estudos 50 e 51 aprofundam imagem, runtime e cluster. O Estudo 21 leva estes cuidados para a infraestrutura como código e a nuvem.
             </p>
         </div>
     <div class="study-done">
@@ -2058,8 +2262,6 @@ cosign verify --key cosign.pub registry.ipestore.example/loja:1.4.2</code></pre>
 </section>
 
 </article>
-
-<!-- DADOS Da checklist (lidos pelo motor abaixo e validados pelos testes) -->
 </main>
 </div>
 

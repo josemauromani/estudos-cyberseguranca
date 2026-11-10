@@ -338,12 +338,12 @@ flowchart LR
 - **Conceitos-Chave:** Shared Responsibility Model, AWS IAM Policies (Effect, Principal, Action, Resource, Condition), Políticas de Bucket S3 (Block Public Access), Metadados de Instância (IMDSv2 vs SSRF), CIS Cloud Benchmarks.
 
 #### 22. DevSecOps-e-CI-CD
-- **Título:** Shift-Left, SAST, DAST, SCA e Containers
+- **Título:** SSDLC, SAST/DAST/SCA, SLSA e Secrets no Pipeline
 - **Função NIST CSF 2.0:** *Protect (PR)*
-- **Tempo Estimado:** 45 minutos | **Carreiras:** DevSecOps, Engenharia de Software, AppSec
-- **Objetivos de Aprendizagem:** Integrar segurança ao ciclo de vida de desenvolvimento (SSDLC / Shift-Left); posicionar ferramentas SAST (Static Analysis), DAST (Dynamic Analysis) e SCA (Software Composition Analysis) em pipelines CI/CD; aplicar boas práticas de segurança em Docker e Kubernetes (imagens enxutas, containers sem privilégios de root, assinatura com Sigstore/Cosign).
+- **Tempo Estimado:** 60 minutos | **Carreiras:** DevSecOps, Engenharia de Software, AppSec
+- **Objetivos de Aprendizagem:** Integrar segurança ao ciclo de vida de desenvolvimento (SSDLC / Shift-Left) com Security Champions e OWASP SAMM como régua de maturidade; posicionar SAST, DAST e SCA em pipelines CI/CD; governar a cadeia de software com SBOM, SLSA/provenance e VEX; aplicar higiene de secrets (scan, revogação, cofre/OIDC); endurecer imagens (digest, non-root, Cosign) e quality gates com baseline.
 - **Pré-requisitos:** OWASP-Top-10-Web, Seguranca-em-APIs.
-- **Conceitos-Chave:** Shift-Left Security, SAST vs DAST vs IAST, Vulnerabilidades em dependências (SCA, SBOM - CycloneDX/SPDX), Dockerfile seguro (`USER nonroot`, imagens distroless), Quality Gates de build.
+- **Conceitos-Chave:** SSDLC, Security Champion, OWASP SAMM (régua), Shift-Left, SAST vs DAST vs IAST, SCA/SBOM (CycloneDX/SPDX), SLSA, VEX, secrets no pipeline, Dockerfile seguro (`USER nonroot`, distroless), Quality Gates.
 
 #### 23. Seguranca-em-IoT-e-OT
 - **Título:** Redes Industriais (SCADA/Modbus) e IoT
