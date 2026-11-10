@@ -1,7 +1,7 @@
 # Design Spec: DevSecOps — SSDLC, Supply Chain e Secrets
 
 **Data:** 2026-11-09  
-**Status:** Aguardando revisão do usuário  
+**Status:** Aprovada pelo usuário (2026-11-09)  
 **Repositório:** `estudos_cyberseguranca` (Mapa da Cibersegurança)  
 **Referência Metodológica:** Superpowers Spec-Driven Development (SDD)  
 **Origem:** Gaps P0 da análise profunda (SSDLC/SAMM, SBOM/SLSA, secrets); ciclo seguinte a identidade federada / rotas CISO–AppSec.
