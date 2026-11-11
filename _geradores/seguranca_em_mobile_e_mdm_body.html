@@ -1,0 +1,465 @@
+<!-- Estudo 63: Seguranca-em-Mobile-e-MDM Body Fragment -->
+<article class="study-container" data-slug="seguranca-em-mobile-e-mdm">
+
+    <section class="study-section" id="introducao" data-tipo="teoria">
+        <h2>Introdução: O Telefone Como Aplicação e Como Frota</h2>
+
+        <p class="lead-text">
+            O mesmo aparelho que abre o app de pagamentos da Ipê Pay também é o notebook de bolso do colaborador:
+            e-mail corporativo, MFA, documentos e Wi-Fi de hotel. Segurança mobile não é só “OWASP no APK” nem só
+            “instalar um MDM”: é o cruzamento de <strong>AppSec no cliente</strong> com
+            <strong>gestão de frota</strong> (MDM/UEM) e identidade (Estudos 04 e 41).
+        </p>
+
+        <p>
+            Este módulo segue a ordem: régua MASVS/MASTG e riscos → detalhes Android/iOS → um
+            <em>lab mental</em> de revisão → MDM/UEM/BYOD → matriz de controles por perfil.
+            Remissões: web/API (12/13), Zero Trust (08), EDR (10), Pix/antifraude (55).
+        </p>
+
+        <div class="diagram-box">
+            <div class="diagram-header">
+                <span class="diagram-title">Duas superfícies no mesmo bolso</span>
+                <span class="diagram-badge">Mermaid</span>
+            </div>
+            <pre class="mermaid" data-title="Duas superfícies no mesmo bolso">
+flowchart LR
+    App["App mobile<br><small>MASVS / Keystore</small>"]
+    Dev["Dispositivo<br><small>MDM / posture</small>"]
+    Id["Identidade<br><small>IAM / CA</small>"]
+    App --> Id
+    Dev --> Id
+    Id --> Rec["Recurso corporativo<br><small>e-mail, VPN, API</small>"]
+            </pre>
+        </div>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">📱</span>
+                <strong>Por que Pix e BYOD importam juntos</strong>
+            </div>
+            <p>
+                Fraude em pagamentos costuma explorar o canal mobile (malware, engenharia social, sessão sequestrada).
+                BYOD sem postura mínima entrega o mesmo canal com menos controle. Trate app e frota como um só risco.
+            </p>
+        </div>
+    </section>
+
+    <section class="study-section" id="masvs-riscos" data-tipo="teoria">
+        <h2>MASVS, MASTG e Riscos Mobile na Prática</h2>
+
+        <p>
+            O <strong>OWASP MASVS</strong> (Mobile Application Security Verification Standard) é a régua de
+            requisitos de segurança para apps. O <strong>MASTG</strong> (Mobile Application Security Testing Guide)
+            orienta <em>como</em> verificar esses requisitos. Use MASVS para desenho e aceite; MASTG para teste —
+            não como diploma de “MASVS completo L2 em tudo”.
+        </p>
+
+        <h3>Níveis e famílias (visão operacional)</h3>
+        <ul>
+            <li><strong>L1:</strong> baseline para a maioria dos apps (armazenamento, rede, privacidade básica).</li>
+            <li><strong>L2:</strong> apps que lidam com dados sensíveis ou risco financeiro (Pix, banking, saúde).</li>
+            <li><strong>R (Resilience):</strong> endurecimento contra engenharia reversa e adulteração — complementar, não substituto de L1/L2.</li>
+        </ul>
+
+        <h3>OWASP Mobile Top 10 (leitura prática)</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Tema</th><th>O que costuma quebrar</th><th>Controle típico</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Uso inadequado da plataforma</td><td>Permissões excessivas, intents abertos</td><td>Least privilege; export=false</td></tr>
+                    <tr><td>Armazenamento inseguro</td><td>Token em SharedPreferences/plist em claro</td><td>Keystore / Keychain; sem log de segredo</td></tr>
+                    <tr><td>Comunicação insegura</td><td>HTTP, certificate pinning ausente ou quebrado</td><td>TLS obrigatório; ATS / Network Security Config</td></tr>
+                    <tr><td>AuthN/AuthZ fraca</td><td>Sessão eterna; só no cliente</td><td>Tokens curtos; decisão no servidor (API 13)</td></tr>
+                    <tr><td>Code quality / supply chain</td><td>SDK de analytics com dados demais</td><td>Inventário de libs; SBOM mental do app</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout warning">
+            <div class="callout-title">
+                <span class="callout-icon">⚠️</span>
+                <strong>Régua, não marketing</strong>
+            </div>
+            <p>
+                “Somos MASVS L2” só vale se houver evidência mapeada requisito → teste (MASTG). Checklist de loja
+                da Apple/Google não substitui verificação de armazenamento e deeplinks.
+            </p>
+        </div>
+    </section>
+
+    <section class="study-section" id="android-ios" data-tipo="teoria">
+        <h2>Android e iOS: Armazenamento, IPC, Rede e Chaves</h2>
+
+        <h3>Armazenamento sensível</h3>
+        <ul>
+            <li><strong>Android:</strong> evitar SharedPreferences/arquivos internos para tokens; preferir
+                <strong>EncryptedSharedPreferences</strong> / Jetpack Security e, para chaves,
+                <strong>Android Keystore</strong> (hardware-backed quando disponível).</li>
+            <li><strong>iOS:</strong> dados sensíveis no <strong>Keychain</strong> com
+                <code>kSecAttrAccessibleWhenUnlockedThisDeviceOnly</code> (ou política mais restrita);
+                não guardar segredos em UserDefaults.</li>
+            <li>Logs, crash reporters e analytics: redigir PII e tokens — o “debug” vira vazamento.</li>
+        </ul>
+
+        <h3>IPC, deeplinks e permissões</h3>
+        <ul>
+            <li><strong>Android intents / exported components:</strong> componentes exportados sem validação
+                viram entrada de outro app. Default moderno: não exportar; validar caller e dados.</li>
+            <li><strong>Deeplinks / App Links / Universal Links:</strong> tratar parâmetros como entrada não
+                confiável (igual query string web). Autorização sempre no backend.</li>
+            <li>Permissões: peça no momento do uso; explique o porquê; recusa deve degradar com segurança.</li>
+        </ul>
+
+        <h3>Rede</h3>
+        <ul>
+            <li><strong>Android Network Security Config:</strong> bloquear cleartext; pins com cuidado (rotação e backup pins).</li>
+            <li><strong>iOS ATS (App Transport Security):</strong> exceções ATS são dívida — documente e limite por domínio.</li>
+            <li>Certificate pinning mal feito trava o app no dia da troca de certificado; planeje operação.</li>
+        </ul>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="terminal-title">Sinais de revisão rápida (mental)</span>
+                <button class="terminal-copy-btn" onclick="copyCode(this, 'code-mob-review')">Copiar</button>
+            </div>
+            <pre><code id="code-mob-review"># Android — componentes exportados demais?
+# Procure android:exported="true" sem permissão/validação
+
+# iOS — Keychain vs UserDefaults
+# Token de sessão NÃO deve aparecer em UserDefaults / plists de preferência
+
+# Rede
+# cleartextTrafficPermitted / NSExceptionAllowsInsecureHTTPLoads = dívida explícita</code></pre>
+        </div>
+    </section>
+
+    <section class="study-section" id="lab-mental-mobile" data-tipo="teoria">
+        <h2>Lab Mental: Percurso de Revisão de um App</h2>
+
+        <p>
+            Sem emulador neste módulo: percorra o checklist abaixo como se fosse a revisão de um merge request
+            ou um teste guiado pelo MASTG. Anote evidência (tela, trecho, config) para cada passo.
+        </p>
+
+        <ol>
+            <li><strong>Mapa de superfícies:</strong> telas de login, deeplinks, WebViews, SDKs de terceiros.</li>
+            <li><strong>Auth:</strong> onde o token vive? Tempo de vida? Refresh? Logout limpa Keystore/Keychain?</li>
+            <li><strong>Armazenamento:</strong> grep mental por SharedPreferences / UserDefaults / arquivos em claro.</li>
+            <li><strong>IPC:</strong> componentes exportados; intenções recebidas; validação de origem.</li>
+            <li><strong>Rede:</strong> só HTTPS? ATS/NSC? Pinning com plano de rotação?</li>
+            <li><strong>Backend:</strong> o app só “esconde” a regra ou a API reforça (BOLA, rate limit — Estudo 13)?</li>
+            <li><strong>Build:</strong> minificação/ofuscação ajuda resiliência, mas não substitui L1/L2.</li>
+            <li><strong>Frota:</strong> o app exige dispositivo gerenciado / posture (próxima seção) para dados sensíveis?</li>
+        </ol>
+
+        <div class="callout tip">
+            <div class="callout-title">
+                <span class="callout-icon">🧪</span>
+                <strong>Isto não é laboratório JS</strong>
+            </div>
+            <p>
+                É um roteiro de teoria para entrevista e revisão de código. Quando labs voltarem ao Mapa,
+                este percurso pode virar exercício instrumentado — o contrato atual permanece só conteúdo.
+            </p>
+        </div>
+    </section>
+
+    <section class="study-section" id="mdm-uem-byod" data-tipo="teoria">
+        <h2>MDM, UEM e Modelos COPE / BYOD / CYOD</h2>
+
+        <p>
+            <strong>MDM</strong> (Mobile Device Management) aplica políticas no dispositivo: enrollment, senha/biometria,
+            criptografia de disco, restrição de loja, remote wipe. <strong>UEM</strong> (Unified Endpoint Management)
+            estende a ideia a notebooks e outros endpoints — o conceito de posture é o mesmo do Zero Trust (Estudo 08)
+            e do Conditional Access (Estudo 41).
+        </p>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Modelo</th><th>Quem é dono</th><th>Controle típico</th><th>Risco residual</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>COPE</strong></td><td>Empresa</td><td>MDM forte, perfil de trabalho</td><td>Privacidade do colaborador / shadow IT</td></tr>
+                    <tr><td><strong>CYOD</strong></td><td>Empresa (escolha limitada)</td><td>Lista aprovada + MDM</td><td>Custo; ainda há uso pessoal</td></tr>
+                    <tr><td><strong>BYOD</strong></td><td>Colaborador</td><td>Work profile / container; MAM</td><td>Wipe parcial; apps pessoais; jailbreak/root</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Ciclo operacional</h3>
+        <ol>
+            <li><strong>Enrollment:</strong> dispositivo entra no domínio de gestão (usuário + identidade corporativa).</li>
+            <li><strong>Compliance:</strong> senha, patch, não-root/jailbreak, disco cifrado — posture para Conditional Access.</li>
+            <li><strong>Conteúdo:</strong> e-mail/VPN/apps só se compliant; senão bloqueio ou acesso degradado.</li>
+            <li><strong>Saída:</strong> offboarding → retire contas e faça <strong>wipe</strong> (completo ou seletivo no perfil de trabalho).</li>
+        </ol>
+
+        <div class="callout danger">
+            <div class="callout-title">
+                <span class="callout-icon">🔑</span>
+                <strong>Wipe e BYOD</strong>
+            </div>
+            <p>
+                Em BYOD, wipe total do aparelho pessoal sem política clara vira crise jurídica e de RH.
+                Prefira container/perfil de trabalho com wipe seletivo e aceite documentado no enrollment.
+            </p>
+        </div>
+
+        <p>
+            EDR no mobile é mais limitado que no desktop (Estudo 10): combine MDM (prevenção/posture) com
+            telemetria de identidade e do app. Não trate “tem MDM” como “tem EDR completo”.
+        </p>
+    </section>
+
+    <section class="study-section" id="matriz-controles" data-tipo="teoria">
+        <h2>Matriz: Perfil × Risco × Controle</h2>
+
+        <p>
+            Use a matriz para decidir o que o <em>app</em> deve garantir e o que a <em>frota</em> deve exigir.
+            Células vazias na sua organização = gap explícito.
+        </p>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Risco</th>
+                        <th>App (MASVS)</th>
+                        <th>COPE / CYOD</th>
+                        <th>BYOD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Token roubado do storage</td>
+                        <td>Keystore/Keychain; TTL curto</td>
+                        <td>Disco cifrado + PIN forte via MDM</td>
+                        <td>Só no work profile; sem backup pessoal do token</td>
+                    </tr>
+                    <tr>
+                        <td>Dispositivo lost/stolen</td>
+                        <td>Lockout local; biometria</td>
+                        <td>Remote wipe completo</td>
+                        <td>Wipe seletivo + revogar sessão IdP</td>
+                    </tr>
+                    <tr>
+                        <td>Malware / root</td>
+                        <td>Detectar root (sinal, não única defesa)</td>
+                        <td>Compliance bloqueia acesso</td>
+                        <td>Bloquear recurso sensível se não compliant</td>
+                    </tr>
+                    <tr>
+                        <td>Deeplink malicioso</td>
+                        <td>Validar params; authZ no servidor</td>
+                        <td>Loja restrita reduz apps atacantes</td>
+                        <td>Aceitar risco residual; educar usuário</td>
+                    </tr>
+                    <tr>
+                        <td>Acesso a API Pix / dados</td>
+                        <td>L2; sem segredo no cliente</td>
+                        <td>CA exige dispositivo gerenciado</td>
+                        <td>Step-up MFA + escopo mínimo do app</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="study-section" id="checklist" data-tipo="checklist">
+        <h2>Checklist de Mobile e MDM</h2>
+
+        <p class="lead-text">Use na revisão de app ou na política de frota. O estado das caixas fica no navegador.</p>
+
+        <ul class="checklist" data-checklist-slug="seguranca-em-mobile-e-mdm">
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-mob-1">
+                <label for="chk-mob-1"><strong>MASVS:</strong> requisitos L1/L2 mapeados ao app; evidência de teste (orientação MASTG).</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-mob-2">
+                <label for="chk-mob-2"><strong>Armazenamento:</strong> tokens no Keystore/Keychain — nunca UserDefaults/SharedPreferences em claro.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-mob-3">
+                <label for="chk-mob-3"><strong>Android/iOS rede:</strong> cleartext bloqueado (NSC/ATS); exceções documentadas.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-mob-4">
+                <label for="chk-mob-4"><strong>IPC/deeplinks:</strong> componentes não exportados à toa; parâmetros tratados como entrada hostil.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-mob-5">
+                <label for="chk-mob-5"><strong>MDM/UEM:</strong> enrollment, compliance e remote wipe definidos por modelo (COPE/BYOD).</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-mob-6">
+                <label for="chk-mob-6"><strong>BYOD:</strong> wipe seletivo + aceite; Conditional Access exige posture mínima.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-mob-7">
+                <label for="chk-mob-7"><strong>Matriz:</strong> perfil × risco × controle preenchida para dados financeiros/PII do app.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="chk-mob-8">
+                <label for="chk-mob-8"><strong>Backend:</strong> authZ e rate limit na API — o app não é a única linha de defesa.</label>
+            </li>
+        </ul>
+    </section>
+
+    <section class="study-section" id="quiz" data-tipo="questoes">
+        <h2>Questões de Fixação e Entrevista</h2>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 1 (MASVS):</strong> Qual a diferença prática entre MASVS e MASTG?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> MASVS lista <em>o que</em> o app deve atender (requisitos). MASTG orienta <em>como</em> testar. Um sem o outro vira marketing ou teste sem critério.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 2 (Armazenamento):</strong> Por que UserDefaults / SharedPreferences são péssimos para token de sessão?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Costumam ficar em claro (ou facilmente legíveis) no filesystem do app. Token vai para Keystore (Android) ou Keychain (iOS), com acessibilidade restrita e TTL curto no servidor.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 3 (Deeplink):</strong> Um deeplink abre o app já numa tela de transferência Pix. O que validar?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Tratar parâmetros como não confiáveis; exigir sessão autenticada; confirmação e authZ no backend. Deeplink não autoriza pagamento sozinho.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 4 (MDM vs UEM):</strong> Em uma frase, o que o UEM acrescenta ao MDM clássico?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Unifica a gestão de posture além do smartphone (ex.: notebooks e outros endpoints), alinhada a Zero Trust / Conditional Access.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 5 (BYOD):</strong> O RH pede wipe completo do celular pessoal de um ex-colaborador. O que responder?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Preferir wipe seletivo do perfil/container corporativo e revogação de contas/sessões. Wipe total de BYOD exige base contratual clara; caso contrário, risco jurídico e de confiança.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 6 (Matriz):</strong> Para COPE com app de dados financeiros, qual combinação mínima da matriz?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> App em linha L2 (Keystore/Keychain, TLS, authZ no servidor) + MDM com compliance e remote wipe + Conditional Access exigindo dispositivo gerenciado.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 7 (Android):</strong> Por que <code>android:exported="true"</code> sem necessidade é perigoso?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Outros apps podem invocar o componente (IPC) e enviar dados maliciosos. Só exporte com permissão/validação explícitas.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="quiz-item">
+            <div class="quiz-question">
+                <strong>Questão 8 (iOS):</strong> O que uma exceção ATS ampla sinaliza na revisão?
+            </div>
+            <details class="quiz-details">
+                <summary class="quiz-toggle">Ver resposta explicada</summary>
+                <div class="quiz-answer">
+                    <p><strong>Resposta:</strong> Dívida de comunicação insegura (HTTP ou TLS fraco). Deve ser justificada por domínio, limitada e com plano de remoção — não “ligar ATS off” no projeto todo.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <section class="study-section" id="fatos" data-tipo="referencias">
+        <h2>Fatos Essenciais, Referências e Próximos Passos</h2>
+
+        <div class="facts-grid">
+            <div class="facts-card">
+                <h4>1. Duas superfícies</h4>
+                <p>App (MASVS) e frota (MDM) compartilham o mesmo bolso e a mesma identidade.</p>
+            </div>
+            <div class="facts-card">
+                <h4>2. MASVS / MASTG</h4>
+                <p>Régua e método de teste — não selo de marketing.</p>
+            </div>
+            <div class="facts-card">
+                <h4>3. Storage e IPC</h4>
+                <p>Keystore/Keychain; deeplinks e exports como entrada hostil.</p>
+            </div>
+            <div class="facts-card">
+                <h4>4. BYOD</h4>
+                <p>Container + wipe seletivo + posture no Conditional Access.</p>
+            </div>
+            <div class="facts-card">
+                <h4>5. Matriz</h4>
+                <p>Perfil × risco × controle fecha o desenho AppSec + frota.</p>
+            </div>
+            <div class="facts-card">
+                <h4>6. Backend</h4>
+                <p>API continua soberana (Estudos 12/13); mobile só reforça.</p>
+            </div>
+        </div>
+
+        <h3>Referências</h3>
+        <ul>
+            <li>OWASP MASVS — Mobile Application Security Verification Standard.</li>
+            <li>OWASP MASTG — Mobile Application Security Testing Guide.</li>
+            <li>OWASP Mobile Top 10.</li>
+            <li>Android Keystore / Network Security Config; Apple Keychain / App Transport Security.</li>
+            <li>NIST SP 800-124 (guidelines for managing mobile devices) — visão de MDM em alto nível.</li>
+            <li>Remissões internas: Estudos 04, 08, 10, 12, 13, 41, 55.</li>
+        </ul>
+
+        <div class="callout tip" style="margin-top: 1.5rem;">
+            <div class="callout-title">
+                <span class="callout-icon">🎯</span>
+                <strong>Próximos Estudos</strong>
+            </div>
+            <p>
+                Aprofunde API (13) e identidade híbrida (41) para Conditional Access com posture.
+                EDR (10) e Zero Trust (08) completam a visão de endpoint além do telefone.
+            </p>
+        </div>
+    </section>
+
+</article>

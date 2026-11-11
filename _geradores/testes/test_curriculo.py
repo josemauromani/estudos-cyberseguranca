@@ -26,7 +26,7 @@ class TestCurriculo(unittest.TestCase):
 
     def test_tamanho_da_grade(self):
         """Único ponto com os totais fixos: crescer a grade é decisão explícita."""
-        self.assertEqual(len(self._linhas_catalogo()), 62)
+        self.assertEqual(len(self._linhas_catalogo()), 63)
         self.assertEqual(len(TRILHAS), 14)
 
     def test_estudos_txt_formato_valido(self):
@@ -118,7 +118,8 @@ class TestCurriculo(unittest.TestCase):
         self.assertIn("Trilha 14: Liderança & Estratégia", readme)
         self.assertIn("#### 59. Lideranca-e-Programa-de-Seguranca", curriculo)
         self.assertIn("#### 60. Estruturacao-da-Area-de-Seguranca", curriculo)
-        self.assertIn("62 módulos", readme)
+        self.assertIn("63 módulos", readme)
+        self.assertIn("#### 63. Seguranca-em-Mobile-e-MDM", curriculo)
         corpos = list((self.root / "_geradores").glob("*_body.html"))
         self.assertTrue(corpos)
         for nome, texto in [("README.md", readme), ("CURRICULO.md", curriculo),

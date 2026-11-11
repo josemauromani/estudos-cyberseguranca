@@ -1,6 +1,6 @@
 # Mapa da Cibersegurança
 
-> Plataforma autoinstrucional, prática e enciclopédica sobre segurança da informação, defesa cibernética e governança corporativa, estruturada em **62 módulos temáticos** organizados em **14 trilhas estruturantes**.
+> Plataforma autoinstrucional, prática e enciclopédica sobre segurança da informação, defesa cibernética e governança corporativa, estruturada em **63 módulos temáticos** organizados em **14 trilhas estruturantes**.
 
 ---
 
@@ -35,7 +35,7 @@ xdg-open index.html          # No Linux
 ```
 
 O portal `index.html` tem um **menu lateral** com sete visões:
-- **Catálogo:** tela inicial, com os 62 módulos, o bloco **Continuar estudando** (último módulo aberto) e o **status** de cada módulo (não iniciado, em andamento, concluído). Permite **Agrupar por** Trilha, Nível, Perfil ou NIST, marcar **Só não concluídos** e buscar por título, termo técnico ou conceito (atalho `/`).
+- **Catálogo:** tela inicial, com os 63 módulos, o bloco **Continuar estudando** (último módulo aberto) e o **status** de cada módulo (não iniciado, em andamento, concluído). Permite **Agrupar por** Trilha, Nível, Perfil ou NIST, marcar **Só não concluídos** e buscar por título, termo técnico ou conceito (atalho `/`).
 - **Rotas sugeridas:** a rota de cada perfil profissional (Blue Team, Red Team, AppSec, GRC, Cloud/DevSecOps, Analista de Segurança da Informação) como sequência numerada, com progresso e o próximo módulo.
 - **Por certificação:** os módulos que cobrem cada uma das 18 certificações (CEH, CISM, CISSP, CCSP, GSEC, Security+, ISFS, PDPF/PDPP, ITIL 4 Foundation, CSFPC, CISA, ISO/IEC 27001 Lead Auditor, eJPT, eCPPT, OSCP, CRISC, CDPSE e CGEIT).
 - **Pela necessidade:** atalhos para os módulos com base em problemas práticos do dia a dia corporativo.
@@ -185,6 +185,7 @@ flowchart TD
 | **60** | `Estruturacao-da-Area-de-Seguranca` | Estruturação da Área de Segurança: Maturidade, Time e Sourcing | Trilha 14: Liderança & Estratégia | Govern |
 | **61** | `Fundamentos-de-Computacao-e-SO` | Fundamentos de Computação e SO para Segurança | Trilha 1: Fundamentos & Redes | Identify / Protect |
 | **62** | `Exploracao-e-Escalada-de-Privilegio` | Exploração e Escalada de Privilégio: Detecção e Defesa | Trilha 3: Segurança Ofensiva | Detect / Protect |
+| **63** | `Seguranca-em-Mobile-e-MDM` | MASVS, Android/iOS, MDM e BYOD | Trilha 5: Especialidades | Protect |
 
 ---
 
@@ -243,7 +244,7 @@ flowchart LR
 
 ### Estrutura do Pipeline
 
-- `_geradores/estudos.txt`: Catálogo canônico dos 62 módulos com metadados estruturais (slug, título, pasta, arquivo HTML, número da trilha, cor do tema e função NIST CSF 2.0).
+- `_geradores/estudos.txt`: Catálogo canônico dos 63 módulos com metadados estruturais (slug, título, pasta, arquivo HTML, número da trilha, cor do tema e função NIST CSF 2.0).
 - `_geradores/CURRICULO.md`: Matriz pedagógica detalhada com competências, pré-requisitos e competências e pré-requisitos de cada módulo.
 - `_geradores/GUIA-DO-AUTOR.md`: Manual editorial e técnico para criação de novos módulos ou expansão de conteúdo.
 - `_geradores/base.css` e `_geradores/base.js`: Design System responsivo com suporte a temas claro e escuro, além de controladores de quizzes, checklists e utilitários de simulação.
@@ -286,7 +287,7 @@ python3 -m unittest discover -s _geradores/testes
 
 O currículo é estruturado de forma a atender diferentes objetivos e momentos de carreira:
 
-> No portal, a visão **Rotas sugeridas** mostra a rota de cada perfil como sequência numerada, com progresso e o próximo módulo a estudar; **Por certificação** reúne os módulos que cobrem cada prova; **Meu progresso** separa os concluídos dos que faltam; e o **Catálogo** agrupa os 62 módulos por nível (iniciante 12, intermediário 34, avançado 16), trilha, perfil ou função NIST.
+> No portal, a visão **Rotas sugeridas** mostra a rota de cada perfil como sequência numerada, com progresso e o próximo módulo a estudar; **Por certificação** reúne os módulos que cobrem cada prova; **Meu progresso** separa os concluídos dos que faltam; e o **Catálogo** agrupa os 63 módulos por nível (iniciante 12, intermediário 35, avançado 16), trilha, perfil ou função NIST.
 
 - **Blue Team & Defesa Ativa:** Módulos de redes, bastionamento Linux/Windows, firewalls, Zero Trust, EDR e detecção de ameaças; Linux e PowerShell para investigação (Trilha 8), Active Directory e detecção de ataques ao AD (Trilha 9) e ransomware (Trilha 10); engenharia de detecção, threat hunting, monitoramento de rede e SOAR (Trilha 11).
 - **Red Team & Testes de Invasão:** Técnicas de reconhecimento OSINT, OWASP Top 10 Web, segurança de APIs e metodologias de pentest; a cadeia de exploração e escalada vista pela detecção; Linux e caminhos de ataque no Active Directory (Trilhas 8 e 9); escalação de privilégio em Kubernetes (Trilha 12).

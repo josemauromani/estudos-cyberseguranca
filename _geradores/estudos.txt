@@ -1,4 +1,4 @@
-# Catálogo Canônico do Mapa da Cibersegurança (62 Módulos)
+# Catálogo Canônico do Mapa da Cibersegurança (63 Módulos)
 # Formato: slug|titulo_curto|pasta|arquivo_html|trilha_num|cor_tema|nist_fn
 #
 # Trilhas:
@@ -20,7 +20,7 @@
 Fundamentos-Ciber|Tríade CIA, Ameaças e Modelagem STRIDE|Fundamentos-Ciber|treinamento-fundamentos-ciber.html|1|#2563EB|Identify
 Redes-e-Protocolos|TCP/IP, DNS, Roteamento e Inspeção de Tráfego|Redes-e-Protocolos|treinamento-redes-e-protocolos.html|1|#2563EB|Protect / Detect
 Criptografia-Pratica|Criptografia Simétrica, Assimétrica, Hashes e PKI|Criptografia-Pratica|treinamento-criptografia-pratica.html|1|#2563EB|Protect
-Autenticacao-e-IAM|Senhas, MFA, OAuth 2.0, Tokens JWT e RBAC|Autenticacao-e-IAM|treinamento-autenticacao-e-iam.html|1|#2563EB|Protect
+Autenticacao-e-IAM|Senhas, MFA, OAuth 2.0, SAML, JWT e RBAC|Autenticacao-e-IAM|treinamento-autenticacao-e-iam.html|1|#2563EB|Protect
 Segmentacao-e-Firewall|DMZ, VLANs, Regras de Firewall e Filtragem|Segmentacao-e-Firewall|treinamento-segmentacao-e-firewall.html|1|#2563EB|Protect
 Hardening-Sistemas|Bastionamento Linux e Windows (CIS Benchmarks)|Hardening-Sistemas|treinamento-hardening-sistemas.html|2|#059669|Protect
 Seguranca-de-Redes-Defesa|IDS/IPS, WAF, VPNs e Proxies Reversos|Seguranca-de-Redes-Defesa|treinamento-seguranca-de-redes-defesa.html|2|#059669|Protect / Detect
@@ -38,7 +38,7 @@ Resposta-a-Incidentes|Ciclo NIST SP 800-61 Rev. 2 e Rev. 3 (Contenção e Erradi
 Forense-Digital|Cadeia de Custódia, Coleta de RAM e Artefatos|Forense-Digital|treinamento-forense-digital.html|4|#7C3AED|Respond
 Analise-Basica-de-Malware|Análise Estática vs Dinâmica e Sandboxes|Analise-Basica-de-Malware|treinamento-analise-basica-de-malware.html|4|#7C3AED|Detect / Respond
 Seguranca-em-Nuvem|Responsabilidade Compartilhada e CSPM|Seguranca-em-Nuvem|treinamento-seguranca-em-nuvem.html|5|#0891B2|Protect
-DevSecOps-e-CI-CD|Shift-Left, SAST, DAST, SCA e Containers|DevSecOps-e-CI-CD|treinamento-devsecops-e-ci-cd.html|5|#0891B2|Protect
+DevSecOps-e-CI-CD|SSDLC, SAST/DAST/SCA, SLSA e Secrets no Pipeline|DevSecOps-e-CI-CD|treinamento-devsecops-e-ci-cd.html|5|#0891B2|Protect
 Seguranca-em-IoT-e-OT|Redes Industriais (SCADA/Modbus) e IoT|Seguranca-em-IoT-e-OT|treinamento-seguranca-em-iot-e-ot.html|5|#0891B2|Protect
 IA-e-Ciberseguranca|Ameaças a LLMs (OWASP LLM), Deepfakes e Defesa|IA-e-Ciberseguranca|treinamento-ia-e-ciberseguranca.html|5|#0891B2|Protect / Detect
 Gestao-de-Riscos-TI|ISO 31000 e Avaliação Qualitativa vs Quantitativa (ALE/SLE)|Gestao-de-Riscos-TI|treinamento-gestao-de-riscos-ti.html|6|#D97706|Govern / Identify
@@ -79,3 +79,4 @@ Lideranca-e-Programa-de-Seguranca|Liderança e Programa de Segurança: o Papel d
 Estruturacao-da-Area-de-Seguranca|Estruturação da Área de Segurança: Maturidade, Time e Sourcing|Estruturacao-da-Area-de-Seguranca|treinamento-estruturacao-da-area-de-seguranca.html|14|#A16207|Govern
 Fundamentos-de-Computacao-e-SO|Fundamentos de Computação e SO para Segurança|Fundamentos-de-Computacao-e-SO|treinamento-fundamentos-de-computacao-e-so.html|1|#2563EB|Identify / Protect
 Exploracao-e-Escalada-de-Privilegio|Exploração e Escalada de Privilégio: Detecção e Defesa|Exploracao-e-Escalada-de-Privilegio|treinamento-exploracao-e-escalada-de-privilegio.html|3|#DC2626|Detect / Protect
+Seguranca-em-Mobile-e-MDM|MASVS, Android/iOS, MDM e BYOD|Seguranca-em-Mobile-e-MDM|treinamento-seguranca-em-mobile-e-mdm.html|5|#0891B2|Protect

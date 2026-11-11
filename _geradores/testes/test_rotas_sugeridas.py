@@ -42,6 +42,7 @@ APPSEC_MODULOS = [
     "Python-para-Seguranca",
     "OWASP-Top-10-Web",
     "Seguranca-em-APIs",
+    "Seguranca-em-Mobile-e-MDM",
     "Seguranca-em-Nuvem",
     "Identidade-Hibrida-e-Nuvem",
     "DevSecOps-e-CI-CD",
@@ -106,6 +107,22 @@ class TestDadosDasRotas(unittest.TestCase):
             "sbom" in desc or "slsa" in desc or "secret" in desc,
             "descrição appsec deve citar SBOM/SLSA ou secrets",
         )
+        self.assertTrue(
+            "mobile" in desc or "masvs" in desc or "mdm" in desc,
+            "descrição appsec deve citar mobile/MASVS/MDM",
+        )
+        self.assertNotIn("pentest mobile completo", desc)
+
+    def test_rota_analista_inclui_mobile_apos_edr(self):
+        rotas = {r["id"]: r for r in ROTAS_PERFIL}
+        m = rotas["analista_si"]["modulos"]
+        self.assertIn("Seguranca-em-Mobile-e-MDM", m)
+        self.assertEqual(
+            m.index("Seguranca-em-Mobile-e-MDM"),
+            m.index("Seguranca-em-Endpoints-EDR") + 1,
+        )
+        desc = rotas["analista_si"]["descricao"].casefold()
+        self.assertTrue("mdm" in desc or "byod" in desc or "mobile" in desc)
 
     def test_rotas_do_modulo_61(self):
         slug = "Fundamentos-de-Computacao-e-SO"

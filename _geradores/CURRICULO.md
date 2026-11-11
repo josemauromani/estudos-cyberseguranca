@@ -2,7 +2,7 @@
 
 ## 1. Visão Geral e Filosofia Pedagógica
 
-O currículo do **Mapa da Cibersegurança** foi concebido como uma formação autoinstrucional, prática e modular, dividida em **62 módulos temáticos** organizados em **14 trilhas estruturantes**. 
+O currículo do **Mapa da Cibersegurança** foi concebido como uma formação autoinstrucional, prática e modular, dividida em **63 módulos temáticos** organizados em **14 trilhas estruturantes**. 
 
 O projeto segue quatro diretrizes fundamentais:
 1. **Teoria Pragmática e Direta ao Ponto:** Eliminação de floreios acadêmicos desnecessários; foco no que engenheiros, analistas e auditores de segurança executam na rotina corporativa e no que bancas de concursos e certificações (CompTIA Security+, CySA+, PenTest+, CEH, CISSP) cobram.
@@ -102,7 +102,7 @@ flowchart LR
 | **Trilha 2** | Segurança Defensiva | `#059669` (Verde) | Bastionamento, defesas de rede, Zero Trust, vulnerabilidades e EDR | 06 ao 10, 29, 30 |
 | **Trilha 3** | Segurança Ofensiva | `#DC2626` (Vermelho) | Reconhecimento, falhas web, APIs, testes de intrusão, phishing e a cadeia de exploração vista pela detecção | 11 ao 15 e 62 |
 | **Trilha 4** | Operações, SOC & Resposta | `#7C3AED` (Roxo) | Monitoramento, SIEM, CTI, contenção de incidentes e forense | 16 ao 20 |
-| **Trilha 5** | Especialidades & Fronteiras | `#0891B2` (Ciano) | Nuvem pública, DevSecOps/CI-CD, IoT/TO (Purdue) e Inteligência Artificial | 21 ao 24 |
+| **Trilha 5** | Especialidades & Fronteiras | `#0891B2` (Ciano) | Nuvem pública, DevSecOps/CI-CD, IoT/TO (Purdue), Inteligência Artificial e Mobile/MDM | 21 ao 24 e 63 |
 | **Trilha 6** | Governança, Riscos & Conformidade | `#D97706` (Âmbar) | Gestão de risco (ALE/SLE), ISO 27001/27002, LGPD e continuidade de negócios | 25 ao 28, 31, 58 |
 | **Trilha 7** | Carreira & Formação | `#DB2777` (Rosa) | Inglês técnico, formação acadêmica, certificações e preparação para vagas | 32 e 33 |
 | **Trilha 8** | Ferramentas & Automação do Analista | `#475569` (Ardósia) | Base prática do analista: Linux e PowerShell para investigação, automação com Python e regex, laboratório doméstico e portfólio | 34 ao 37 |
@@ -115,7 +115,7 @@ flowchart LR
 
 ---
 
-## 3. Detalhamento dos 62 Módulos de Aprendizagem
+## 3. Detalhamento dos 63 Módulos de Aprendizagem
 
 ### Trilha 1: Fundamentos & Redes (`#2563EB`)
 
@@ -360,6 +360,14 @@ flowchart LR
 - **Objetivos de Aprendizagem:** Identificar os 10 riscos críticos em aplicações de Inteligência Artificial Generativa segundo o OWASP Top 10 for LLM Applications; entender ataques de Prompt Injection (direto e indireto) e Data Poisoning; analisar o impacto de Deepfakes de áudio e vídeo na engenharia social; utilizar IA defensiva para triagem de alertas e análise preditiva.
 - **Pré-requisitos:** Fundamentos-Ciber, OWASP-Top-10-Web.
 - **Conceitos-Chave:** OWASP LLM01: Prompt Injection, LLM02: Sensitive Information Disclosure, LLM06: Excessive Agency, Guardrails de entrada e saída, Detecção de Deepfake, IA em operações defensivas.
+
+#### 63. Seguranca-em-Mobile-e-MDM
+- **Título:** MASVS, Android/iOS, MDM e BYOD
+- **Função NIST CSF 2.0:** *Protect (PR)*
+- **Tempo Estimado:** 80 minutos | **Carreiras:** AppSec, DevSecOps, Blue Team, Analista de SI
+- **Objetivos de Aprendizagem:** Usar OWASP MASVS/MASTG como régua e método de teste; mitigar riscos Android/iOS (armazenamento, IPC/deeplinks, rede, Keystore/Keychain); conduzir um percurso guiado de revisão (lab mental); operar modelos COPE/BYOD/CYOD com MDM/UEM; aplicar matriz perfil × risco × controle.
+- **Pré-requisitos:** OWASP-Top-10-Web, Seguranca-em-APIs, Autenticacao-e-IAM.
+- **Conceitos-Chave:** MASVS, MASTG, OWASP Mobile Top 10, Android Keystore, iOS Keychain, ATS, Network Security Config, deeplinks, MDM, UEM, COPE, BYOD, CYOD, remote wipe, Conditional Access / posture.
 
 ---
 
@@ -713,7 +721,7 @@ flowchart LR
 |---|---|---|
 | **GOVERN (GV)** | 10 módulos | 25, 26, 27, 31, 54, 56, 57, 58, 59, 60 |
 | **IDENTIFY (ID)** | 7 módulos | 01, 09, 11, 14, 17, 25, 61 |
-| **PROTECT (PR)** | 34 módulos | 02, 03, 04, 05, 06, 07, 08, 09, 10, 12, 13, 15, 21, 22, 23, 24, 27, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 50, 51, 52, 55, 61, 62 |
+| **PROTECT (PR)** | 35 módulos | 02, 03, 04, 05, 06, 07, 08, 09, 10, 12, 13, 15, 21, 22, 23, 24, 27, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 50, 51, 52, 55, 61, 62, 63 |
 | **DETECT (DE)** | 19 módulos | 02, 07, 10, 16, 17, 20, 24, 29, 30, 34, 35, 36, 39, 46, 47, 48, 53, 55, 62 |
 | **RESPOND (RS)** | 8 módulos | 18, 19, 20, 42, 43, 44, 49, 53 |
 | **RECOVER (RC)** | 4 módulos | 28, 42, 44, 45 |
@@ -737,11 +745,11 @@ Para orientar estudantes e profissionais com focos específicos, a matriz curric
 5. **Rota CISO / Liderança de Segurança:**
    `01 -> 08 -> 04 -> 40 -> 09 -> 25 -> 26 -> 58 -> 57 -> 28 -> 43 -> 44 -> 59 -> 60`
 6. **Rota AppSec / Segurança de Aplicações:**
-   `01 -> 61 -> 03 -> 04 -> 35 -> 12 -> 13 -> 21 -> 41 -> 22 -> 50 -> 51 -> 52 -> 53`
+   `01 -> 61 -> 03 -> 04 -> 35 -> 12 -> 13 -> 63 -> 21 -> 41 -> 22 -> 50 -> 51 -> 52 -> 53`
 7. **Rota Perícia & Resposta a Incidentes:**
    `01 -> 61 -> 02 -> 06 -> 36 -> 10 -> 48 -> 16 -> 47 -> 18 -> 53 -> 42 -> 45 -> 19 -> 56 -> 20`
 8. **Rota Analista de Segurança da Informação (vaga):**
-   `01 -> 61 -> 34 -> 36 -> 05 -> 06 -> 07 -> 10 -> 29 -> 30 -> 38 -> 40 -> 25 -> 26 -> 31 -> 54 -> 57 -> 18 -> 49 -> 42 -> 43 -> 32 -> 37 -> 33 -> 59`
+   `01 -> 61 -> 34 -> 36 -> 05 -> 06 -> 07 -> 10 -> 63 -> 29 -> 30 -> 38 -> 40 -> 25 -> 26 -> 31 -> 54 -> 57 -> 18 -> 49 -> 42 -> 43 -> 32 -> 37 -> 33 -> 59`
    Cada competência da vaga também aparece, com os módulos principais e de apoio, na seção "Rota por Vaga" do portal (`index.html`).
 
 No portal, a aba **Rotas Sugeridas** mostra cada rota como sequência numerada, com o progresso salvo no navegador e o próximo módulo a estudar. As sequências vêm de `ROTAS_PERFIL` em `_geradores/index_dados.py`, que é a fonte única; um teste (`test_rotas_sugeridas.py`) garante que esta seção continue igual aos dados.

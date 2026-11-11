@@ -14,8 +14,8 @@ CORPOS = sorted(GERADORES.glob("*_body.html"))
 
 
 class TestCorposSemLaboratorio(unittest.TestCase):
-    def test_existem_62_corpos(self):
-        self.assertEqual(len(CORPOS), 62)
+    def test_existem_63_corpos(self):
+        self.assertEqual(len(CORPOS), 63)
 
 if __name__ == "__main__":
     unittest.main()
